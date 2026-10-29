@@ -6,7 +6,6 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QDateEdit>
 #include "DateWidget.h"
 
 //#include <iostream>

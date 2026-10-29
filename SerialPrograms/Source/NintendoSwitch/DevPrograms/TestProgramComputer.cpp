@@ -16,10 +16,6 @@
 #include <condition_variable>
 #include <iostream>
 #include <QImage>
-#include <QDateTime>
-#include <QGuiApplication>
-#include <QScreen>
-#include <QPixmap>
 #include "3rdParty-Core/nlohmann/json.hpp"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CpuId/CpuId.h"
@@ -63,16 +59,13 @@
 #include "Integrations/DiscordWebhook.h"
 #include "Integrations/PybindSwitchController.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "Pokemon/Inference/Pokemon_IvJudgeReader.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon/Pokemon_StatsCalculation.h"
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinySparkleSet.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
-#include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 #include "VideoGames/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
-#include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "VideoGames/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 //#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
@@ -81,7 +74,6 @@
 #include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h"
 #include "VideoGames/PokemonLA/Inference/PokemonLA_MountDetector.h"
-#include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "VideoGames/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.h"
 #include "VideoGames/PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "VideoGames/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"

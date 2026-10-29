@@ -5,7 +5,6 @@
  */
 
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonPokopia_SettingsScreenDetector.h"

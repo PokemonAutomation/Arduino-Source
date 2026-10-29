@@ -6,7 +6,6 @@
 
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV_Panels.h"
 
 #include "PokemonSV_Settings.h"

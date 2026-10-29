@@ -5,8 +5,6 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "PokemonLZA_DayNightChangeDetector.h"
 

@@ -4,7 +4,6 @@
  *
  */
 
-#include "ClientSocket.h"
 
 namespace PokemonAutomation{
 

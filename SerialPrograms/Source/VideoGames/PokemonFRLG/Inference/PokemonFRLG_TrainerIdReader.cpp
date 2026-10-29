@@ -4,7 +4,6 @@
  *
  */
 
-#include <opencv2/imgproc.hpp>
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "CommonFramework/GlobalSettingsPanel.h"

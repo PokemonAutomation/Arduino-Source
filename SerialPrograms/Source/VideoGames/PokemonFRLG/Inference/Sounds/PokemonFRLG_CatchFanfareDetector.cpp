@@ -6,7 +6,6 @@
 
 #include "CommonTools/Audio/AudioTemplateCache.h"
 #include "CommonTools/Audio/SpectrogramMatcher.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_CatchFanfareDetector.h"
 

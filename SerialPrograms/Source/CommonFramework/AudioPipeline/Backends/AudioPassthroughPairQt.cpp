@@ -13,7 +13,6 @@
 #include "Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.h"
 #include "Kernels/AudioPipeline/Kernels_WorkingAudio2WorkingAudio.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "CommonFramework/AudioPipeline/Tools/ChannelMixer.h"
 #include "CommonFramework/AudioPipeline/AudioSource.h"

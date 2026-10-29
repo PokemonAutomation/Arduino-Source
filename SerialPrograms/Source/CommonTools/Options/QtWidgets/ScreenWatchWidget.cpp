@@ -11,7 +11,6 @@
 #include <QDialog>
 #include <QScreen>
 #include <QMouseEvent>
-#include <QApplication>
 #include <QGuiApplication>
 #include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"

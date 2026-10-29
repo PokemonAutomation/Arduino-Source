@@ -14,7 +14,6 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
-#include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonSwSh/PokemonSwSh_Settings.h"
 #include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "VideoGames/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"

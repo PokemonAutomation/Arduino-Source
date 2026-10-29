@@ -10,7 +10,6 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "Pokemon/Pokemon_Strings.h"
 //#include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 //#include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"

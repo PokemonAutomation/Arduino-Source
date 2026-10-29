@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"

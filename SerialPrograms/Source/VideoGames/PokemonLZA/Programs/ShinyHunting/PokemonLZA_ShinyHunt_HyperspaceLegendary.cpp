@@ -15,7 +15,6 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"

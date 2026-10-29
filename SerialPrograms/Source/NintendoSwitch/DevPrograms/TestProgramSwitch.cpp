@@ -7,10 +7,6 @@
 #include <iostream>
 
 //#include <immintrin.h>
-#include <QApplication>
-#include <QClipboard>
-#include <QPixmap>
-#include <QVideoFrame>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Concurrency/BusyPeriodicRunner.h"
@@ -43,7 +39,6 @@
 #include "NintendoSwitch/Inference/NintendoSwitch_CloseGameDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IvJudgeReader.h"
-#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxGenderDetector.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
@@ -51,7 +46,6 @@
 #include "VideoGames/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h"
 #include "VideoGames/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
-#include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h"
@@ -60,7 +54,6 @@
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_MainMenuDetector.h"
 #include "VideoGames/PokemonLA/Inference/PokemonLA_MountDetector.h"
-#include "VideoGames/PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 //#include "CommonFramework/Environment/SystemSleep.h"
 #include "VideoGames/PokemonLA/Inference/Map/PokemonLA_MapZoomLevelReader.h"
 #include "VideoGames/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
@@ -72,12 +65,8 @@
 #include "VideoGames/PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.h"
 #include "VideoGames/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_GameEntry.h"
-#include "VideoGames/PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
-#include "VideoGames/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
 #include "VideoGames/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
-#include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
-#include "VideoGames/PokemonSV/Programs/Trading/PokemonSV_TradeRoutines.h"
 #include "VideoGames/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
 #include "VideoGames/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"
 #include "VideoGames/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h"

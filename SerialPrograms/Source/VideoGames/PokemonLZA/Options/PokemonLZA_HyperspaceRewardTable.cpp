@@ -4,7 +4,6 @@
  *
  */
 
-#include "VideoGames/PokemonLZA/Resources/PokemonLZA_HyperspaceRewardNames.h"
 #include "PokemonLZA_HyperspaceRewardTable.h"
 
 namespace PokemonAutomation{

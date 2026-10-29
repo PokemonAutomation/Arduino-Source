@@ -6,7 +6,6 @@
 
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"

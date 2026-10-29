@@ -7,7 +7,6 @@
 #include <iostream>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-#include <QLabel>
 #include <QPushButton>
 #include <QFileDialog>
 #include <QMessageBox>

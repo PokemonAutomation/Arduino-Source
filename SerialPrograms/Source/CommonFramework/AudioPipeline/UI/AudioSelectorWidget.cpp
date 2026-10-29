@@ -4,7 +4,6 @@
  *
  */
 
-#include <QAudio>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QComboBox>

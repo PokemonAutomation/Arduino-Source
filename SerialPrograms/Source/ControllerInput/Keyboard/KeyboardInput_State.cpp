@@ -4,7 +4,6 @@
  *
  */
 
-#include "KeyboardInput_State.h"
 
 namespace PokemonAutomation{
 

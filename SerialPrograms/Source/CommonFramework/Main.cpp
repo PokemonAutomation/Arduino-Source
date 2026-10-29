@@ -2,7 +2,6 @@
 #include <iostream>
 //#include <QTextStream>
 #include <QApplication>
-#include <QMessageBox>
 #include "Common/Cpp/Logging/LastLogTracker.h"
 #include "Common/Cpp/Logging/FileLogger.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
@@ -39,7 +38,6 @@
 #include "Startup/SetupSettings.h"
 #include "Startup/NewVersionCheck.h"
 #include "Windows/MainWindow.h"
-#include "Globals.h"
 #include "GlobalSettingsPanel.h"
 #include "GlobalServices.h"
 #include "PersistentSettings.h"

@@ -4,7 +4,6 @@
  *
  */
 
-#include <QLayout>
 #include <QMainWindow>
 #include <QResizeEvent>
 #include "CommonFramework/GlobalAutoPaths.h"
