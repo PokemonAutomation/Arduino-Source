@@ -6,8 +6,10 @@
 
 #include <iostream>
 #include <QMessageBox>
+#include <QApplication>
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
 #if QT_CONFIG(permissions)
+#include <QPermissions>
 #endif
 #endif
 #include "Common/Compiler.h"
