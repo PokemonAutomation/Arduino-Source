@@ -87,7 +87,7 @@ enum class TorterraMove{
     ROCK_CLIMB,
 };
 
-//  Returns the JSON slug for a TorterraMove (e.g. "earthquake").
+//  Returns the JSON slug for a configured helper move.
 const char* torterra_move_slug(TorterraMove move);
 
 enum class Trainer {

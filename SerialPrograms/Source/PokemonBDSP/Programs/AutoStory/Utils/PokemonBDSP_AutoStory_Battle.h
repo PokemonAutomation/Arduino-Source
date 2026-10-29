@@ -66,7 +66,7 @@ void handle_unexpected_battle(
 //  Outside-help battle handler
 // ---------------------------------------------------------------------------
 
-//  Handle a scripted trainer battle where a human helper (Torterra lv100) joins.
+//  Handle a scripted trainer battle where the configured human helper joins.
 //  Each turn it:
 //    1. OCRs current PP for all 4 configured moves.
 //    2. Calculates damage against all on-field opponents.

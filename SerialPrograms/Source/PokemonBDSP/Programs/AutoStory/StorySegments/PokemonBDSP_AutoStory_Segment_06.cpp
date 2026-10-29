@@ -171,12 +171,12 @@ static bool handle_battle(
     if (
         trainerid == "route_218_sailor_skyler"
     ) {
-        // Select Razor leaf
+        // Move the battle-move cursor up.
         pbf_press_dpad(context, DPAD_UP, 280ms, 200ms);
     } else if (
         trainerid == "canalave_clint"
     ) {
-        // Select Crunch
+        // Keep the current battle-move selection.
     }
     context.wait_for_all_requests();
 
