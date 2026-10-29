@@ -39,6 +39,7 @@ bool AudioSourceDescriptor_File::operator==(const AudioSourceDescriptor& x) cons
     std::string other_path = static_cast<const AudioSourceDescriptor_File&>(x).m_path;
 
     ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+//    cout << m_path << " == " << other_path << endl;
     return m_path == other_path;
 }
 std::string AudioSourceDescriptor_File::display_name() const{

@@ -41,7 +41,6 @@ void VideoSourceOption::set_descriptor(std::shared_ptr<VideoSourceDescriptor> de
     m_descriptor_cache[descriptor->type] = descriptor;
     m_descriptor = std::move(descriptor);
 }
-
 std::shared_ptr<VideoSourceDescriptor> VideoSourceOption::get_descriptor_from_cache(VideoSourceType type){
     auto iter = m_descriptor_cache.find(type);
     if (iter != m_descriptor_cache.end()){
