@@ -87,8 +87,10 @@ OverworldMatchResult match_eterna_center_departure(const ImageRGB32& frame);
 OverworldMatchResult match_eterna_gym_statues(const ImageRGB32& frame);
 // Two unique, agreeing landmarks close to the doorway; this confidence only
 // authorizes a watched entry attempt, never proves the interior location.
-double overworld_entry_confidence(const OverworldMatchResult& result, double tolerance_x = 1.0 / 50,
-                                  double tolerance_y = 1.0 / 27, double minimum_margin = .15);
+double overworld_entry_confidence(const OverworldMatchResult& result,
+    double tolerance_x = 1.0 / 50,
+    double tolerance_y = 1.0 / 27,
+    double minimum_margin = .15);
 OverworldMatchResult match_eterna_underground_house(const ImageRGB32& frame);
 OverworldMatchResult match_eterna_underground_man(const ImageRGB32& frame);
 OverworldMatchResult match_route201_potion_exit(const ImageRGB32& frame);

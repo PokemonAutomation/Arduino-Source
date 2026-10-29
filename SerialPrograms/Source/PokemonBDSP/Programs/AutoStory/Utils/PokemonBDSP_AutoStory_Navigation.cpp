@@ -43,8 +43,10 @@ void walk_until_battle(VideoStream& stream, ProControllerContext& context, uint1
     (void)timeout_sec;
 }
 
-void recalibrate_after_battle(const ProgramInfo& /*info*/, VideoStream& /*stream*/, ProControllerContext& context,
-                              std::function<void(ProControllerContext&)>&& recovery_action){
+void recalibrate_after_battle(const ProgramInfo& /*info*/,
+    VideoStream& /*stream*/,
+    ProControllerContext& context,
+    std::function<void(ProControllerContext&)>&& recovery_action){
     // TODO: implement — wait for overworld, then run recovery_action
     recovery_action(context);
 }
