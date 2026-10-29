@@ -19,21 +19,25 @@
 #define PokemonAutomation_PokemonBDSP_AutoStory_OverworldDetector_H
 
 #include "Common/Cpp/Color.h"
+
+#include "CommonFramework/Tools/VideoStream.h"
+
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
-#include "CommonFramework/Tools/VideoStream.h"
+
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
-#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 
-namespace PokemonAutomation{
-namespace NintendoSwitch{
-namespace PokemonBDSP{
+namespace PokemonAutomation {
+namespace NintendoSwitch {
+namespace PokemonBDSP {
 
 
 //  Static (single-frame) version — use when you already have a frame.
-class OverworldDetector : public StaticScreenDetector{
+class OverworldDetector : public StaticScreenDetector {
 public:
     OverworldDetector(Color color = COLOR_CYAN);
 
@@ -45,14 +49,14 @@ public:
 
 private:
     Color m_color;
-    ShortDialogDetector  m_dialog;
-    BattleMenuDetector   m_battle_menu;
-    MenuDetector         m_menu;
+    ShortDialogDetector m_dialog;
+    BattleMenuDetector m_battle_menu;
+    MenuDetector m_menu;
 };
 
 
 //  Watcher (callback) version — use with run_until<> or wait_until().
-class OverworldWatcher : public OverworldDetector, public VisualInferenceCallback{
+class OverworldWatcher : public OverworldDetector, public VisualInferenceCallback {
 public:
     OverworldWatcher(Color color = COLOR_CYAN);
 
@@ -63,7 +67,7 @@ public:
 
 //  Detects the big red button on the right edge of the Poketch overlay.
 //  Present only while the Poketch is shown at its normal size.
-class PoketchButtonDetector : public StaticScreenDetector{
+class PoketchButtonDetector : public StaticScreenDetector {
 public:
     PoketchButtonDetector(Color color = COLOR_RED);
 
@@ -75,7 +79,7 @@ private:
     ImageFloatBox m_button;
 };
 
-class PoketchButtonWatcher : public PoketchButtonDetector, public VisualInferenceCallback{
+class PoketchButtonWatcher : public PoketchButtonDetector, public VisualInferenceCallback {
 public:
     PoketchButtonWatcher(Color color = COLOR_RED);
 
