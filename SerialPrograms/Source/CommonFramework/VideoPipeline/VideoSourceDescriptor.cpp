@@ -8,10 +8,11 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "VideoSources/VideoSource_Null.h"
 
-#include "VideoSources/VideoSource_StillImage.h"
-#include "VideoSources/VideoSource_Camera.h"
+#include "Sources/VideoSource_Null.h"
+#include "Sources/VideoSource_StillImage.h"
+#include "Sources/VideoSource_Camera.h"
+
 #include "VideoSourceDescriptor.h"
 
 //#include <iostream>
