@@ -33,7 +33,7 @@ struct BDSPMoveData{
     uint8_t      accuracy;  // 0 = never-miss (e.g. Swift); otherwise 1-100
 };
 
-//  Returns move data for the given slug (e.g. "earthquake").
+//  Returns move data for the given slug.
 //  Throws InternalProgramError if the slug is not found.
 const BDSPMoveData& bdsp_move(const std::string& slug);
 

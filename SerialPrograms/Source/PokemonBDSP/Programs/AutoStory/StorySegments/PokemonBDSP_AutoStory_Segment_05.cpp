@@ -231,7 +231,7 @@ static bool handle_battle(
         trainerid == "route_213_beauty_cindy" or
         trainerid == "route_210_veteran_brian"
     ) {
-        // Select Razor leaf
+        // Move the battle-move cursor up.
         pbf_press_dpad(context, DPAD_UP, 280ms, 200ms);
 
     } else if (
@@ -240,7 +240,7 @@ static bool handle_battle(
         trainerid == "route_210_breeder_amber" or
         trainerid == "route_210_blackbelt_adam"
     ){
-        // Select Bulldoze
+        // Move the battle-move cursor down.
         pbf_press_dpad(context, DPAD_DOWN, 280ms, 200ms);
         
     } else if (
@@ -248,7 +248,7 @@ static bool handle_battle(
         trainerid == "route_210_birdkeeper_brianna" or
         trainerid == "celestic_town_galactic_grunt"
     ){
-        // Select Crunch
+        // Keep the current battle-move selection.
     }
     context.wait_for_all_requests();
 

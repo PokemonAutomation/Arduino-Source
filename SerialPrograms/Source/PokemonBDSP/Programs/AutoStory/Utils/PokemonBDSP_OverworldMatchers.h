@@ -53,9 +53,19 @@ OverworldMatchResult match_eterna_center_entrance(const ImageRGB32& frame);
 OverworldMatchResult match_hearthome_center_entrance(const ImageRGB32& frame);
 OverworldMatchResult match_hearthome_center_interior(const ImageRGB32& frame);
 OverworldMatchResult match_hearthome_contest_fantina(const ImageRGB32& frame);
+OverworldMatchResult match_veilstone_city_passage(const ImageRGB32& frame);
+OverworldMatchResult match_veilstone_dawn_stairs(const ImageRGB32& frame);
 OverworldMatchResult match_hearthome_gym_entrance(const ImageRGB32& frame);
 OverworldMatchResult match_route208_stair_top(const ImageRGB32& frame);
 OverworldMatchResult match_route208_lower_stair_lane(const ImageRGB32& frame);
+// User-marked sign frame and rock pair at the Route 209 renewal point.
+OverworldMatchResult match_route209_repel_point(const ImageRGB32& frame);
+// Lane 4 east corner; coarse bridge references only guide approach acquisition.
+OverworldMatchResult match_route215_jogger_corner(const ImageRGB32& frame);
+OverworldMatchResult match_route215_bridge_renewal(const ImageRGB32& frame);
+OverworldMatchResult match_route215_ace_renewal(const ImageRGB32& frame);
+OverworldMatchResult match_route215_derek_stairs_renewal(const ImageRGB32& frame);
+OverworldMatchResult match_route215_derek_stair_top_renewal(const ImageRGB32& frame);
 OverworldMatchResult match_route208_hannah_departure(const ImageRGB32& frame);
 OverworldMatchResult match_eterna_gym_entrance(const ImageRGB32& frame);
 OverworldMatchResult match_galactic_hq_cut(const ImageRGB32& frame);

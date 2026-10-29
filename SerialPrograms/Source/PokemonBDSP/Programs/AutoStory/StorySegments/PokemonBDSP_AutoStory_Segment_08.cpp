@@ -171,14 +171,14 @@ static bool handle_battle(
         trainerid == "galactic_hq_grunt_4" or
         trainerid == "galactic_hq_grunt_5"
     ) {
-        // Select Bulldoze
+        // Move the battle-move cursor down.
         pbf_press_dpad(context, DPAD_DOWN, 280ms, 200ms);
     } else if (
         trainerid == "galactic_hq_grunt_1" or
         trainerid == "galactic_hq_double_grunts_1" or
         trainerid == "route_222_sailor_luther"
     ) {
-        // Select Razor leaf
+        // Move the battle-move cursor up.
         pbf_press_dpad(context, DPAD_UP, 280ms, 200ms);
     } else if (
         trainerid == "veilstone_warehouse_warehouse_grunt_1" or
@@ -189,7 +189,7 @@ static bool handle_battle(
         trainerid == "galactic_hq_commander_saturn" or
         trainerid == "route_207_hiker_justin"
     ) {
-        // Select Crunch
+        // Keep the current battle-move selection.
     }
     context.wait_for_all_requests();
 

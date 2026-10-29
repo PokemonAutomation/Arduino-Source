@@ -1149,9 +1149,9 @@ namespace PokemonAutomation{
                     }, "Aroma Lady Teighler timed ledge approach")) {
                     recover_teighler_trigger(stream, context);
                 }
-                stream.log("[Segment 02 battle] Aroma Lady Teighler: Flamethrower (move 2).");
+                stream.log("[Segment 02 battle] Aroma Lady Teighler: move slot 2.");
                 wait_for_trainer_battle_menu(stream,context);
-                fight_trainer_using_move_slot(stream,context,2,"Aroma Lady Teighler (Flamethrower)");
+                fight_trainer_using_move_slot(stream,context,2,"Aroma Lady Teighler");
                 clear_post_battle_dialogue(stream,context);
 
                 // Omit the Awakening. The grass north of Teighler can trigger
@@ -1698,7 +1698,7 @@ namespace PokemonAutomation{
                 move(0,1,20ms);
                 stream.log("[Route 205] Forest entrance sign confirmed; checkpoint complete.",COLOR_GREEN);
             }
-            // Cheryl controls her own Pokemon. Select Flamethrower visually,
+            // Cheryl controls her own Pokemon. Select move slot 2 visually,
             // then A advances target selection and battle text, as in the recording.
             void eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context) {
                 (void)env;
@@ -2098,7 +2098,7 @@ namespace PokemonAutomation{
 
                 pbf_press_button(context,BUTTON_A,150ms,300ms);
                 wait_for_trainer_battle_menu(stream,context);
-                fight_trainer_using_moves(stream,context,2,"Lass Caroline (Flamethrower)",false);
+                fight_trainer_using_moves(stream,context,2,"Lass Caroline",false);
 
                 pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue.
 
@@ -2112,7 +2112,7 @@ namespace PokemonAutomation{
 
                 pbf_press_button(context,BUTTON_A,150ms,300ms);
                 wait_for_trainer_battle_menu(stream,context);
-                fight_trainer_using_moves(stream,context,2,"Aroma Lady Jenna (Flamethrower)",false);
+                fight_trainer_using_moves(stream,context,2,"Aroma Lady Jenna",false);
 
                 pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue.
 
@@ -2126,7 +2126,7 @@ namespace PokemonAutomation{
 
                 pbf_press_button(context,BUTTON_A,150ms,300ms);
                 wait_for_trainer_battle_menu(stream,context);
-                fight_trainer_using_moves(stream,context,2,"Aroma Lady Angela (Flamethrower)",false);
+                fight_trainer_using_moves(stream,context,2,"Aroma Lady Angela",false);
 
                 pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue
 
@@ -2140,7 +2140,7 @@ namespace PokemonAutomation{
 
                 pbf_press_button(context,BUTTON_A,150ms,300ms);
                 wait_for_trainer_battle_menu(stream,context);
-                fight_trainer_using_moves(stream,context,2,"Beauty Lindsay (Flamethrower)",false);
+                fight_trainer_using_moves(stream,context,2,"Beauty Lindsay",false);
 
                 pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue
 
@@ -2154,7 +2154,7 @@ namespace PokemonAutomation{
 
                 pbf_press_button(context,BUTTON_A,150ms,300ms);
                 wait_for_trainer_battle_menu(stream,context);
-                fight_trainer_using_moves(stream,context,2,"Gardenia (Flamethrower)",true);
+                fight_trainer_using_moves(stream,context,2,"Gardenia",true);
 
                 // The shared battle handler already advances reward dialogue
                 // while confirming the overworld. Do not require the badge

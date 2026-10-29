@@ -81,7 +81,7 @@ namespace PokemonAutomation {
                 ProControllerContext& context
             );
 
-            // One wild encounter using Scratch, followed by verified Potion healing.
+            // One wild encounter using move slot 1, followed by verified Potion healing.
             void battle_1_pokemon(VideoStream& stream, ProControllerContext& context);
 
             // Burst wiggle variant of catch_1_pokemon for testing.

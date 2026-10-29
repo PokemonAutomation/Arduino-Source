@@ -246,19 +246,19 @@ static bool handle_battle(
         trainerid == "verity_lakefront_grunt_1" or
         trainerid == "verity_lakefront_grunt_3"
     ) {
-        // Select Bulldoze
+        // Move the battle-move cursor down.
         pbf_press_dpad(context, DPAD_DOWN, 280ms, 200ms);
     } else if (
         trainerid == "route_217_ace_dalton"
     ) {
-        // Select Razor leaf
+        // Move the battle-move cursor up.
         pbf_press_dpad(context, DPAD_UP, 280ms, 200ms);
     } else if (
         trainerid == "verity_lakefront_grunt_2" or
         trainerid == "verity_lakefront_grunt_4" or
         trainerid == "verity_lakefront_commander_mars"
     ) {
-        // Select Crunch
+        // Keep the current battle-move selection.
     }
     context.wait_for_all_requests();
 
