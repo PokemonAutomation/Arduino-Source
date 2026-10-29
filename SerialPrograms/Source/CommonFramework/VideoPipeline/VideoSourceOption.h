@@ -25,18 +25,20 @@ public:
     std::shared_ptr<VideoSourceDescriptor> descriptor() const{
         return m_descriptor;
     }
-    void set_descriptor(std::shared_ptr<VideoSourceDescriptor> descriptor);
 
     //  Use a cache to help create a VideoSoruceDescriptor.
     //  The cache remembers the last used descriptor for each interface type. That way when
     //  the user switches back-and-forth between two interfaces, it will reload the previous
     //  one and return faster.
     //  If not found in cache, it will create a new one according to the type.
+    void set_descriptor(std::shared_ptr<VideoSourceDescriptor> descriptor);
     std::shared_ptr<VideoSourceDescriptor> get_descriptor_from_cache(VideoSourceType type);
+
 
 public:
     void load_json(const JsonValue& json);
     JsonValue to_json() const;
+
 
 public:
     Resolution m_resolution;

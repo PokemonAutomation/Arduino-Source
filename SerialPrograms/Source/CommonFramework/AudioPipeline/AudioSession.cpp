@@ -67,22 +67,14 @@ AudioSession::~AudioSession(){
 
 void AudioSession::save(AudioOption& option) const{
     std::lock_guard<Mutex> lg(m_lock);
-    option.m_input_source   = m_option.m_input_source;
-    option.m_input_choice   = m_option.m_input_choice;
-    option.m_output_device  = m_option.m_output_device;
-    option.m_volume         = m_option.m_volume;
-    option.m_display_type   = m_option.m_display_type;
+    option = m_option;
 }
 void AudioSession::load(const AudioOption& option){
     {
         std::lock_guard<Mutex> lg(m_lock);
         signal_pre_input_change();
 
-        m_option.m_input_source     = option.m_input_source;
-        m_option.m_input_choice     = option.m_input_choice;
-        m_option.m_output_device    = option.m_output_device;
-        m_option.m_volume           = option.m_volume;
-        m_option.m_display_type     = option.m_display_type;
+        m_option = option;
 
         if (sanitize_choice()){
             m_devices->set_audio_source(
@@ -133,6 +125,7 @@ void AudioSession::set_audio_input(const std::shared_ptr<AudioSourceDescriptor>&
 
 //    cout << "set_audio_input(): " << (int)source->type << endl;
 
+    m_option.set_input(source);
     m_option.m_input_source = source;
     m_option.m_input_choice = AudioInputChoice();
 

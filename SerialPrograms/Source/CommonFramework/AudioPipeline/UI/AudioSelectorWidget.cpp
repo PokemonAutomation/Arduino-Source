@@ -17,7 +17,7 @@
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 
 #include "CommonFramework/AudioPipeline/Sources/AudioSource_Null.h"
-#include "CommonFramework/AudioPipeline/Sources/AudioSource_File.h"
+//#include "CommonFramework/AudioPipeline/Sources/AudioSource_File.h"
 #include "CommonFramework/AudioPipeline/Sources/AudioSource_Device.h"
 
 #include "AudioDisplayWidget.h"
@@ -254,12 +254,8 @@ void AudioSelectorWidget::refresh_input_device(const std::shared_ptr<const Audio
     {
         AudioOption option;
         m_session.save(option);
-        sources.emplace_back(std::make_unique<AudioSourceDescriptor_Null>());
-        if (current_descriptor->type == AudioSourceType::File){
-            sources.emplace_back(current_descriptor);
-        }else{
-            sources.emplace_back(std::make_unique<AudioSourceDescriptor_File>());
-        }
+        sources.emplace_back(option.get_input_from_cache(AudioSourceType::None));
+        sources.emplace_back(option.get_input_from_cache(AudioSourceType::File));
     }
 
     //  Now add all the devices.
