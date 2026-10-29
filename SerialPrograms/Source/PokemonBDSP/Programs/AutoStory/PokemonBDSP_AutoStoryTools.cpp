@@ -1,81 +1,101 @@
-#include "PokemonBDSP/Inference/PokemonBDSP_TransitionWatchers.h"
-#include "CommonFramework/GlobalAutoPaths.h"
-#include "Common/Cpp/Filesystem/Filesystem.h"
+
+
+
 /*  BDSP AutoStory Tools
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
+
+#include <cctype>
 #include <cmath>
-#include "CommonFramework/ImageTools/ImageDiff.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
+#include <cstdlib>
+#include <unordered_set>
+
+#include "Common/Cpp/Filesystem/Filesystem.h"
+
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/VisualDetectors/ImageMatchDetector.h"
-#include "CommonTools/Images/SolidColorTest.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_ShopDetectors.h"
-#include "CommonTools/OCR/OCR_Routines.h"
-#include <cctype>
-#include "CommonTools/Images/ImageFilter.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
-#include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_ShopDetectors.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_TransitionWatchers.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
+#include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
+
 #include "Detect/PokemonBDSP_AutoStory_OverworldDetector.h"
+
 #include "PokemonBDSP_AutoStoryTools.h"
 
-#include <cstdlib>
-#include <unordered_set>
-
-namespace PokemonAutomation{
-namespace NintendoSwitch{
-namespace PokemonBDSP{
+namespace PokemonAutomation {
+namespace NintendoSwitch {
+namespace PokemonBDSP {
 
 
 const char* torterra_move_slug(TorterraMove move){
     switch (move){
-    case TorterraMove::EARTHQUAKE:  return "earthquake";
-    case TorterraMove::WOOD_HAMMER: return "wood-hammer";
-    case TorterraMove::RAZOR_LEAF:  return "razor-leaf";
-    case TorterraMove::CRUNCH:      return "crunch";
-    case TorterraMove::GIGA_DRAIN:  return "giga-drain";
-    case TorterraMove::IRON_TAIL:   return "iron-tail";
-    case TorterraMove::ROCK_TOMB:   return "rock-tomb";
-    case TorterraMove::FACADE:      return "facade";
-    case TorterraMove::STONE_EDGE:  return "stone-edge";
-    case TorterraMove::ROCK_SLIDE:  return "rock-slide";
-    case TorterraMove::BULLDOZE:    return "bulldoze";
-    case TorterraMove::STRENGTH:    return "strength";
-    case TorterraMove::ROCK_SMASH:  return "rock-smash";
-    case TorterraMove::ROCK_CLIMB:  return "rock-climb";
+    case TorterraMove::EARTHQUAKE:
+        return "earthquake";
+    case TorterraMove::WOOD_HAMMER:
+        return "wood-hammer";
+    case TorterraMove::RAZOR_LEAF:
+        return "razor-leaf";
+    case TorterraMove::CRUNCH:
+        return "crunch";
+    case TorterraMove::GIGA_DRAIN:
+        return "giga-drain";
+    case TorterraMove::IRON_TAIL:
+        return "iron-tail";
+    case TorterraMove::ROCK_TOMB:
+        return "rock-tomb";
+    case TorterraMove::FACADE:
+        return "facade";
+    case TorterraMove::STONE_EDGE:
+        return "stone-edge";
+    case TorterraMove::ROCK_SLIDE:
+        return "rock-slide";
+    case TorterraMove::BULLDOZE:
+        return "bulldoze";
+    case TorterraMove::STRENGTH:
+        return "strength";
+    case TorterraMove::ROCK_SMASH:
+        return "rock-smash";
+    case TorterraMove::ROCK_CLIMB:
+        return "rock-climb";
     }
     return "unknown";
 }
 
 const char* trainer_slug(Trainer t){
     switch (t){
-    case Trainer::Veilstone_GalacticGrunts_2v2: return "Veilstone_GalacticGrunts_2v2";
+    case Trainer::Veilstone_GalacticGrunts_2v2:
+        return "Veilstone_GalacticGrunts_2v2";
     }
     return "unknown";
 }
 
-bool fake_save_game(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context
-){
+bool fake_save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     pbf_mash_button(context, BUTTON_L, 1000ms);
 
     context.wait_for_all_requests();
@@ -87,21 +107,16 @@ bool fake_save_game(
     return true;
 }
 
-bool save_game(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context
-) {
+bool save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     static constexpr size_t MAX_RETRIES = 3;
 
-    for (size_t attempt = 0; attempt < MAX_RETRIES; attempt++) {
+    for (size_t attempt = 0; attempt < MAX_RETRIES; attempt++){
         try {
-            env.console.log(
-                "Checkpoint save attempt: " + std::to_string(attempt + 1)
-            );
+            env.console.log("Checkpoint save attempt: " + std::to_string(attempt + 1));
 
             // Only mash B on retries - no need to on first attempt
             // if already cleanly in the overworld.
-            if (attempt > 0) {
+            if (attempt > 0){
                 pbf_mash_button(context, BUTTON_B, 1000ms);
             }
 
@@ -118,41 +133,26 @@ bool save_game(
 
             // Verify overworld. Generous timeout: save animation + fade can be slow.
             OverworldWatcher overworld;
-            int ret = wait_until(
-                env.console,
-                context,
-                std::chrono::seconds(15),
-                { overworld }
-            );
-            if (ret < 0) {
-                throw OperationFailedExceptionWithScreenshot(
-                    ErrorReportMode::SEND_ERROR_REPORT,
-                    "Failed to detect overworld after save.",
-                    env.console
-                );
+            int ret = wait_until(env.console, context, std::chrono::seconds(15), {overworld});
+            if (ret < 0){
+                throw OperationFailedExceptionWithScreenshot(ErrorReportMode::SEND_ERROR_REPORT,
+                                                             "Failed to detect overworld after save.", env.console);
             }
 
             env.console.log("Checkpoint save verified.");
             return true;
 
-        }
-        catch (OperationFailedException& e) {
-            env.console.log(
-                "Checkpoint save failed: " + e.message(),
-                COLOR_RED
-            );
+        } catch (OperationFailedException& e){
+            env.console.log("Checkpoint save failed: " + e.message(), COLOR_RED);
             context.wait_for(1000ms);
         }
     }
 
     // Blind fallback: reuse the non-feedback save_game(context) from GameNavigation
     // rather than duplicating the button sequence manually.
-    env.console.log(
-        "All save retries failed. Using blind fallback.",
-        COLOR_ORANGE
-    );
+    env.console.log("All save retries failed. Using blind fallback.", COLOR_ORANGE);
     pbf_mash_button(context, BUTTON_B, 1000ms);
-    save_game(context);  // PokemonBDSP_GameNavigation.h - non-feedback overload
+    save_game(context); // PokemonBDSP_GameNavigation.h - non-feedback overload
     pbf_mash_button(context, BUTTON_B, 2000ms);
     context.wait_for_all_requests();
 
@@ -160,13 +160,9 @@ bool save_game(
 }
 
 
-void checkpoint_save(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats,
-    CheckpointSaveMode save_mode
-){
+void checkpoint_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+                     EventNotificationOption& notif_status_update, AutoStoryStats& stats,
+                     CheckpointSaveMode save_mode){
     const bool fake = save_mode == CheckpointSaveMode::FAKE;
     env.console.log(fake ? "[Checkpoint save] DIAGNOSTIC FAKE mode: save is not verified."
                          : "[Checkpoint save] REAL mode.");
@@ -175,20 +171,14 @@ void checkpoint_save(
     stats.m_checkpoint++;
     env.update_stats();
 
-    send_program_status_notification(
-        env,
-        notif_status_update,
-        fake ? "Diagnostic fake checkpoint save (not verified)." : success
-            ? "Saved at checkpoint (verified)."
-            : "Saved at checkpoint (blind fallback)."
-    );
+    send_program_status_notification(env, notif_status_update,
+                                     fake      ? "Diagnostic fake checkpoint save (not verified)."
+                                     : success ? "Saved at checkpoint (verified)."
+                                               : "Saved at checkpoint (blind fallback).");
 }
 
 
-void reload_backup_save(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context
-){
+void reload_backup_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // TODO: implement backup save reload.
     // This is called when a checkpoint with save=false fails.
     // Load the game's automatic backup save rather than resetting from HOME.
@@ -197,20 +187,14 @@ void reload_backup_save(
 }
 
 
-void checkpoint_reattempt_loop(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats,
-    std::function<void(size_t attempt_number)>&& action,
-    bool save,
-    CheckpointSaveMode save_mode,
-    CheckpointRetryScope retry_scope
-){
+void checkpoint_reattempt_loop(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+                               EventNotificationOption& notif_status_update, AutoStoryStats& stats,
+                               std::function<void(size_t attempt_number)>&& action, bool save,
+                               CheckpointSaveMode save_mode, CheckpointRetryScope retry_scope){
     static constexpr size_t MAX_ATTEMPTS = 20;
 
     for (size_t i = 0;; i++){
-        try{
+        try {
             if (i == 0 && retry_scope != CheckpointRetryScope::SELECTED_RANGE){
                 if (save || stats.m_first_run){
                     checkpoint_save(env, context, notif_status_update, stats, save_mode);
@@ -221,9 +205,12 @@ void checkpoint_reattempt_loop(
             action(i);
             return; // success
 
-        }catch (OperationFailedException& e){
-            if (retry_scope == CheckpointRetryScope::DEFER_TO_SELECTED_RANGE) throw;
-            env.console.log("checkpoint_reattempt_loop: attempt " + std::to_string(i) + " failed: " + e.message(), COLOR_RED);
+        } catch (OperationFailedException& e){
+            if (retry_scope == CheckpointRetryScope::DEFER_TO_SELECTED_RANGE){
+                throw;
+            }
+            env.console.log("checkpoint_reattempt_loop: attempt " + std::to_string(i) + " failed: " + e.message(),
+                            COLOR_RED);
             stats.m_reset++;
             env.update_stats();
 
@@ -236,19 +223,16 @@ void checkpoint_reattempt_loop(
                 bool ok = reset_game_from_home(env, env.console, context, true, 1000ms);
                 if (!ok){
                     throw OperationFailedExceptionWithScreenshot(
-                        ErrorReportMode::SEND_ERROR_REPORT,
-                        "Failed to reset game from HOME during checkpoint retry.",
-                        env.console
-                    );
+                        ErrorReportMode::SEND_ERROR_REPORT, "Failed to reset game from HOME during checkpoint retry.",
+                        env.console);
                 }
-            } else {
+            }else{
                 env.console.log("Reloading from backup save before retry...", COLOR_ORANGE);
                 reload_backup_save(env, context);
             }
         }
     }
 }
-
 
 
 void repeat(std::initializer_list<std::function<void()>> actions, size_t times){
@@ -260,79 +244,59 @@ void repeat(std::initializer_list<std::function<void()>> actions, size_t times){
 }
 
 
-void wait_for_dialogue(
-    VideoStream& stream,
-    ProControllerContext& context,
-    const std::string& label,
-    Milliseconds timeout
-){
-    auto log_detected = [&]{
+void wait_for_dialogue(VideoStream& stream, ProControllerContext& context, const std::string& label,
+                       Milliseconds timeout){
+    auto log_detected = [&] {
         if (!label.empty()){
             stream.log(label + " dialogue detected.");
         }
     };
 
     ShortDialogWatcher watcher_cyan(COLOR_CYAN);
-    int ret = run_until<ProControllerContext>(
-        stream, context,
-        [timeout](ProControllerContext& context){
-            context.wait_for(timeout);
-        },
-        {{watcher_cyan}}
-    );
-    if (ret == 0){ log_detected(); return; }
+    int ret = run_until<ProControllerContext>(stream, context,
+                                              [timeout](ProControllerContext& context){
+                                                  context.wait_for(timeout);
+                                              },
+                                              {{watcher_cyan}});
+    if (ret == 0){
+        log_detected();
+        return;
+    }
 
     ShortDialogWatcher watcher_red(COLOR_RED);
-    ret = run_until<ProControllerContext>(
-        stream, context,
-        [timeout](ProControllerContext& context){
-            context.wait_for(timeout);
-        },
-        {{watcher_red}}
-    );
-    if (ret == 0){ log_detected(); return; }
+    ret = run_until<ProControllerContext>(stream, context,
+                                          [timeout](ProControllerContext& context){
+                                              context.wait_for(timeout);
+                                          },
+                                          {{watcher_red}});
+    if (ret == 0){
+        log_detected();
+        return;
+    }
 
     OperationFailedExceptionWithScreenshot::fire(
         ErrorReportMode::SEND_ERROR_REPORT,
-        (label.empty() ? "wait_for_dialogue" : label) + ": dialogue not detected within timeout.",
-        stream
-    );
+        (label.empty() ? "wait_for_dialogue" : label) + ": dialogue not detected within timeout.", stream);
 }
 
 
-void mash_until_dialogue_ends(
-    VideoStream& stream,
-    ProControllerContext& context,
-    Button button,
-    Milliseconds timeout
-){
+void mash_until_dialogue_ends(VideoStream& stream, ProControllerContext& context, Button button, Milliseconds timeout){
     OverworldWatcher overworld;
-    int ret = run_until<ProControllerContext>(
-        stream, context,
-        [button, timeout](ProControllerContext& context){
-            pbf_mash_button(context, button, timeout);
-        },
-        {{overworld}}
-    );
+    int ret = run_until<ProControllerContext>(stream, context,
+                                              [button, timeout](ProControllerContext& context){
+                                                  pbf_mash_button(context, button, timeout);
+                                              },
+                                              {{overworld}});
     if (ret < 0){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT,
-            "mash_until_dialogue_ends: overworld not reached within timeout.",
-            stream
-        );
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                                                     "mash_until_dialogue_ends: overworld not reached within timeout.",
+                                                     stream);
     }
 }
 
 
-void repeat_dpad(
-    ProControllerContext& context,
-    DpadState& state,
-    DpadPosition dir,
-    Milliseconds press,
-    Milliseconds hold,
-    size_t times,
-    bool include_last_dir
-){
+void repeat_dpad(ProControllerContext& context, DpadState& state, DpadPosition dir, Milliseconds press,
+                 Milliseconds hold, size_t times, bool include_last_dir){
     if (include_last_dir && state.last_dir != DPAD_NONE && state.last_dir != dir){
         times += 1;
     }
@@ -344,38 +308,64 @@ void repeat_dpad(
 
 static const char* shop_item_name(ShopItem item){
     switch (item){
-    case ShopItem::FullRestore:  return "Full restore";
-    case ShopItem::MaxPotion:    return "Max potion";
-    case ShopItem::HyperPotion:  return "Hyper potion";
-    case ShopItem::SuperPotion:  return "Super potion";
-    case ShopItem::Potion:       return "Potion";
-    case ShopItem::Antidote:     return "Antidote";
-    case ShopItem::ParalyzHeal:  return "Paralyz heal";
-    case ShopItem::Awakening:    return "Awakening";
-    case ShopItem::Repel:        return "Repel";
-    case ShopItem::SuperRepel:   return "Super repel";
-    case ShopItem::MaxRepel:     return "Max repel";
-    case ShopItem::EscapeRope:   return "Escape rope";
-    default:                     return "Unknown";
+    case ShopItem::FullRestore:
+        return "Full restore";
+    case ShopItem::MaxPotion:
+        return "Max potion";
+    case ShopItem::HyperPotion:
+        return "Hyper potion";
+    case ShopItem::SuperPotion:
+        return "Super potion";
+    case ShopItem::Potion:
+        return "Potion";
+    case ShopItem::Antidote:
+        return "Antidote";
+    case ShopItem::ParalyzHeal:
+        return "Paralyz heal";
+    case ShopItem::Awakening:
+        return "Awakening";
+    case ShopItem::Repel:
+        return "Repel";
+    case ShopItem::SuperRepel:
+        return "Super repel";
+    case ShopItem::MaxRepel:
+        return "Max repel";
+    case ShopItem::EscapeRope:
+        return "Escape rope";
+    default:
+        return "Unknown";
     }
 }
 
 // Returns the OCR slug used as the dictionary key in ShopItemNameOCR.json.
 static const char* shop_item_slug(ShopItem item){
     switch (item){
-    case ShopItem::FullRestore:  return "full-restore";
-    case ShopItem::MaxPotion:    return "max-potion";
-    case ShopItem::HyperPotion:  return "hyper-potion";
-    case ShopItem::SuperPotion:  return "super-potion";
-    case ShopItem::Potion:       return "potion";
-    case ShopItem::Antidote:     return "antidote";
-    case ShopItem::ParalyzHeal:  return "paralyze-heal";
-    case ShopItem::Awakening:    return "awakening";
-    case ShopItem::Repel:        return "repel";
-    case ShopItem::SuperRepel:   return "super-repel";
-    case ShopItem::MaxRepel:     return "max-repel";
-    case ShopItem::EscapeRope:   return "escape-rope";
-    default:                     return "unknown";
+    case ShopItem::FullRestore:
+        return "full-restore";
+    case ShopItem::MaxPotion:
+        return "max-potion";
+    case ShopItem::HyperPotion:
+        return "hyper-potion";
+    case ShopItem::SuperPotion:
+        return "super-potion";
+    case ShopItem::Potion:
+        return "potion";
+    case ShopItem::Antidote:
+        return "antidote";
+    case ShopItem::ParalyzHeal:
+        return "paralyze-heal";
+    case ShopItem::Awakening:
+        return "awakening";
+    case ShopItem::Repel:
+        return "repel";
+    case ShopItem::SuperRepel:
+        return "super-repel";
+    case ShopItem::MaxRepel:
+        return "max-repel";
+    case ShopItem::EscapeRope:
+        return "escape-rope";
+    default:
+        return "unknown";
     }
 }
 
@@ -383,10 +373,12 @@ static const char* shop_item_slug(ShopItem item){
 static std::string make_buy_label(const std::vector<ItemToBuy>& items){
     std::string label;
     for (size_t i = 0; i < items.size(); i++){
-        if (i > 0) label += ", ";
+        if (i > 0){
+            label += ", ";
+        }
         if (items[i].quantity == BUY_MAX){
             label += "max ";
-        } else {
+        }else{
             label += std::to_string(items[i].quantity) + " ";
         }
         label += shop_item_name(items[i].item);
@@ -394,12 +386,8 @@ static std::string make_buy_label(const std::vector<ItemToBuy>& items){
     return label;
 }
 
-bool buy_items(
-    VideoStream& stream,
-    ProControllerContext& context,
-    const std::vector<ItemToBuy>& items,
-    Language language
-){
+bool buy_items(VideoStream& stream, ProControllerContext& context, const std::vector<ItemToBuy>& items,
+               Language language){
     if (items.empty()){
         return true;
     }
@@ -424,157 +412,152 @@ bool buy_items(
     // The hover detector scans this region to dynamically locate the red outline.
     static const ImageFloatBox ITEM_SCAN_AREA{0.417000, 0.100000, 0.540000, 0.625000};
 
-    static constexpr size_t MAX_OUTER       = 50;
-    static constexpr size_t MAX_ITEM_SEARCH = 50;  // max iterations per item before giving up
+    static constexpr size_t MAX_OUTER = 50;
+    static constexpr size_t MAX_ITEM_SEARCH = 50; // max iterations per item before giving up
 
     // ── Outer state machine ──────────────────────────────────────────────────
     for (size_t outer = 0; outer < MAX_OUTER; outer++){
-        SelectionArrowFinder  arrow_vendor(stream.overlay(), VENDOR_ARROW_BOX, COLOR_GREEN);
+        SelectionArrowFinder arrow_vendor(stream.overlay(), VENDOR_ARROW_BOX, COLOR_GREEN);
         ShopBuyingWindowWatcher buying_window;
-        ShortDialogWatcher    dialog(COLOR_RED);
+        ShortDialogWatcher dialog(COLOR_RED);
 
         // case 0: no detectors fired — press A in a for-loop (5 presses) while watching.
         stream.log("Starting to loop over items");
-        int state = run_until<ProControllerContext>(
-            stream, context,
-            [](ProControllerContext& ctx){
-                for (int i = 0; i < 5; i++){
-                    pbf_press_button(ctx, BUTTON_A, 80ms, 1000ms);
-                }
-            },
-            {{arrow_vendor}, {buying_window}, {dialog}}
-        );
+        int state = run_until<ProControllerContext>(stream, context,
+                                                    [](ProControllerContext& ctx){
+                                                        for (int i = 0; i < 5; i++){
+                                                            pbf_press_button(ctx, BUTTON_A, 80ms, 1000ms);
+                                                        }
+                                                    },
+                                                    {{arrow_vendor}, {buying_window}, {dialog}});
 
         context.wait_for_all_requests();
         pbf_wait(context, 500ms);
 
         switch (state){
 
-        case 0:  // case 1: SelectionArrow at vendor menu → press A to choose "Buy"
+        case 0: // case 1: SelectionArrow at vendor menu → press A to choose "Buy"
             stream.log("Found the selection arrow, pressing A to enter the buying window...", COLOR_GREEN);
             pbf_press_button(context, BUTTON_A, 80ms, 500ms);
             break;
 
-        case 1:  // case 2: buying window open → buy each requested item
-        stream.log("Found the buying window, searching for the right item...", COLOR_GREEN);
-        {
-            bool buying_failed = false;
+        case 1: // case 2: buying window open → buy each requested item
+            stream.log("Found the buying window, searching for the right item...", COLOR_GREEN);
+            {
+                bool buying_failed = false;
 
-            for (const ItemToBuy& item : items){
-                stream.log("Buying " + std::to_string(item.quantity) + "x " + shop_item_slug(item.item));
-                if (buying_failed) break;
-
-                // Detector fires only when the red outline is found AND both
-                // name and price OCR match the expected item slug.
-                ShopItemHoverDetector     hover(stream.logger(), ITEM_SCAN_AREA,
-                                               shop_item_slug(item.item), language, COLOR_CYAN);
-                ShopQuantityWindowWatcher qty_window;
-                SelectionArrowFinder      confirm_arrow(stream.overlay(), CONFIRM_ARROW_BOX, COLOR_GREEN);
-
-                bool item_bought     = false;
-                bool hover_confirmed = false;
-                for (size_t inner = 0; inner < MAX_ITEM_SEARCH && !item_bought; inner++){
-                    context.wait_for_all_requests();
-
-                    int sub = run_until<ProControllerContext>(
-                        stream, context,
-                        [](ProControllerContext& ctx){
-                            ctx.wait_for(1000ms);
-                        },
-                        {{confirm_arrow}, {qty_window}, {hover}}
-                    );
-
-                    context.wait_for_all_requests();
-
-                    stream.log("buy_items: sub=" + std::to_string(sub), COLOR_WHITE);
-
-                    switch (sub){
-
-                    case 0:  // YES/NO confirmation arrow → confirm purchase
-                        stream.log("Found the confirmation to buy arrow, pressing A to buy", COLOR_GREEN);
-                    {
-                        context.wait_for_all_requests();
-                        ShopBuyingWindowWatcher back_in_shop;
-                        run_until<ProControllerContext>(
-                            stream, context,
-                            [](ProControllerContext& ctx){
-                                for (int i = 0; i < 10; i++){
-                                    pbf_press_button(ctx, BUTTON_A, 80ms, 800ms);
-                                }
-                            },
-                            {{back_in_shop}}
-                        );
-                        item_bought = true;
+                for (const ItemToBuy& item : items){
+                    stream.log("Buying " + std::to_string(item.quantity) + "x " + shop_item_slug(item.item));
+                    if (buying_failed){
                         break;
                     }
 
-                    case 1:  // quantity window
-                        if (!hover_confirmed){
-                            // Quantity window appeared before we confirmed the right item —
-                            // an earlier A press accidentally opened the wrong item's selector.
-                            // Press B to go back to the list and continue searching.
-                            stream.log("Unexpected quantity window (wrong item), pressing B...", COLOR_YELLOW);
-                            pbf_press_button(context, BUTTON_B, 80ms, 800ms);
+                    // Detector fires only when the red outline is found AND both
+                    // name and price OCR match the expected item slug.
+                    ShopItemHoverDetector hover(stream.logger(), ITEM_SCAN_AREA, shop_item_slug(item.item), language,
+                                                COLOR_CYAN);
+                    ShopQuantityWindowWatcher qty_window;
+                    SelectionArrowFinder confirm_arrow(stream.overlay(), CONFIRM_ARROW_BOX, COLOR_GREEN);
+
+                    bool item_bought = false;
+                    bool hover_confirmed = false;
+                    for (size_t inner = 0; inner < MAX_ITEM_SEARCH && !item_bought; inner++){
+                        context.wait_for_all_requests();
+
+                        int sub = run_until<ProControllerContext>(stream, context,
+                                                                  [](ProControllerContext& ctx){
+                                                                      ctx.wait_for(1000ms);
+                                                                  },
+                                                                  {{confirm_arrow}, {qty_window}, {hover}});
+
+                        context.wait_for_all_requests();
+
+                        stream.log("buy_items: sub=" + std::to_string(sub), COLOR_WHITE);
+
+                        switch (sub){
+
+                        case 0: // YES/NO confirmation arrow → confirm purchase
+                            stream.log("Found the confirmation to buy arrow, pressing A to buy", COLOR_GREEN);
+                            {
+                                context.wait_for_all_requests();
+                                ShopBuyingWindowWatcher back_in_shop;
+                                run_until<ProControllerContext>(stream, context,
+                                                                [](ProControllerContext& ctx){
+                                                                    for (int i = 0; i < 10; i++){
+                                                                        pbf_press_button(ctx, BUTTON_A, 80ms, 800ms);
+                                                                    }
+                                                                },
+                                                                {{back_in_shop}});
+                                item_bought = true;
+                                break;
+                            }
+
+                        case 1: // quantity window
+                            if (!hover_confirmed){
+                                // Quantity window appeared before we confirmed the right item —
+                                // an earlier A press accidentally opened the wrong item's selector.
+                                // Press B to go back to the list and continue searching.
+                                stream.log("Unexpected quantity window (wrong item), pressing B...", COLOR_YELLOW);
+                                pbf_press_button(context, BUTTON_B, 80ms, 800ms);
+                                break;
+                            }
+                            stream.log("Found the quantity window", COLOR_GREEN);
+                            if (item.quantity == BUY_MAX){
+                                stream.log("Buying max quantity");
+                                pbf_press_dpad(context, DPAD_DOWN, 80ms, 300ms);
+                            }else{
+                                stream.log("Buying " + std::to_string(item.quantity) + " of the item");
+                                for (int q = 1; q < item.quantity; q++){
+                                    pbf_press_dpad(context, DPAD_UP, 80ms, 300ms);
+                                }
+                            }
+                            pbf_press_button(context, BUTTON_A, 80ms, 300ms);
+                            pbf_wait(context, 1000ms);
+                            break;
+
+                        case 2: // correct item highlighted → press A to open quantity selector
+                            stream.log("Found the right item, pressing A to buy a certain quantity...", COLOR_GREEN);
+                            hover_confirmed = true;
+                            pbf_press_button(context, BUTTON_A, 80ms, 300ms);
+                            pbf_wait(context, 1000ms);
+                            break;
+
+                        default: // outline not found or wrong item → advance to next row
+                            stream.log("Not on the right item, moving...", COLOR_GREEN);
+                            pbf_press_dpad(context, DPAD_DOWN, 80ms, 300ms);
+                            pbf_wait(context, 300ms);
                             break;
                         }
-                        stream.log("Found the quantity window", COLOR_GREEN);
-                        if (item.quantity == BUY_MAX){
-                            stream.log("Buying max quantity");
-                            pbf_press_dpad(context, DPAD_DOWN, 80ms, 300ms);
-                        } else {
-                            stream.log("Buying " + std::to_string(item.quantity) + " of the item");
-                            for (int q = 1; q < item.quantity; q++){
-                                pbf_press_dpad(context, DPAD_UP, 80ms, 300ms);
-                            }
-                        }
-                        pbf_press_button(context, BUTTON_A, 80ms, 300ms);
-                        pbf_wait(context, 1000ms);
-                        break;
+                    }
 
-                    case 2:  // correct item highlighted → press A to open quantity selector
-                        stream.log("Found the right item, pressing A to buy a certain quantity...", COLOR_GREEN);
-                        hover_confirmed = true;
-                        pbf_press_button(context, BUTTON_A, 80ms, 300ms);
-                        pbf_wait(context, 1000ms);
-                        break;
-
-                    default:  // outline not found or wrong item → advance to next row
-                        stream.log("Not on the right item, moving...", COLOR_GREEN);
-                        pbf_press_dpad(context, DPAD_DOWN, 80ms, 300ms);
-                        pbf_wait(context, 300ms);
-                        break;
+                    if (!item_bought){
+                        stream.log(label + ": buy_items: could not locate " + shop_item_name(item.item) +
+                                       " in shop list.",
+                                   COLOR_RED);
+                        buying_failed = true;
                     }
                 }
 
-                if (!item_bought){
-                    stream.log(label + ": buy_items: could not locate " +
-                               shop_item_name(item.item) + " in shop list.", COLOR_RED);
-                    buying_failed = true;
+                if (!buying_failed){
+                    stream.log("All items bought, exiting shop...", COLOR_GREEN);
+                    pbf_mash_button(context, BUTTON_B, 5000ms);
+                    return true;
                 }
+                break;
             }
 
-            if (!buying_failed){
-                stream.log("All items bought, exiting shop...", COLOR_GREEN);
-                pbf_mash_button(context, BUTTON_B, 5000ms);
-                return true;
-            }
-            break;
-        }
-
-        case 2:  // case 3: unexpected ShortDialog → press B until back in buying window
+        case 2: // case 3: unexpected ShortDialog → press B until back in buying window
         {
             ShopBuyingWindowWatcher back_in_shop;
-            run_until<ProControllerContext>(
-                stream, context,
-                [](ProControllerContext& ctx){
-                    pbf_mash_button(ctx, BUTTON_B, 5000ms);
-                },
-                {{back_in_shop}}
-            );
+            run_until<ProControllerContext>(stream, context,
+                                            [](ProControllerContext& ctx){
+                                                pbf_mash_button(ctx, BUTTON_B, 5000ms);
+                                            },
+                                            {{back_in_shop}});
             break;
         }
 
-        default:  // outer default: unrecognised state → press B to recover
+        default: // outer default: unrecognised state → press B to recover
             pbf_press_button(context, BUTTON_B, 80ms, 3000ms);
             break;
         }
@@ -585,11 +568,7 @@ bool buy_items(
 }
 
 
-bool heal_pokemon(
-    VideoStream& stream,
-    ProControllerContext& context,
-    const std::string& label
-){
+bool heal_pokemon(VideoStream& stream, ProControllerContext& context, const std::string& label){
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
 
@@ -606,13 +585,11 @@ bool heal_pokemon(
 
     // Exiting the Pokemon Center
     BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-    int ret = run_until<ProControllerContext>(
-        stream, context,
-        [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {0, -1}, 15000ms, 100ms);
-        },
-        {{black_screen}}
-    );
+    int ret = run_until<ProControllerContext>(stream, context,
+                                              [](ProControllerContext& context){
+                                                  pbf_move_left_joystick(context, {0, -1}, 15000ms, 100ms);
+                                              },
+                                              {{black_screen}});
     if (ret < 0){
         stream.log("heal_pokemon(" + label + "): black screen not detected", COLOR_RED);
         return false;
@@ -621,35 +598,49 @@ bool heal_pokemon(
     return true;
 }
 
-std::string fly_point_name(FlyPoint place) {
-    switch (place) {
-        case FlyPoint::CanalavCity:        return "canalave_city";
-        case FlyPoint::CelesticTown:      return "celestic_town";
-        case FlyPoint::EternaCity:         return "eterna_city";
-        case FlyPoint::FloaromaTown:       return "floaroma_town";
-        case FlyPoint::HearthomeCity:      return "hearthome_city";
-        case FlyPoint::JubilifeCity:       return "jubilife_city";
-        case FlyPoint::OreburghCity:       return "oreburgh_city";
-        case FlyPoint::PastoriaCity:       return "pastoria_city";
-        case FlyPoint::PokemonLeagueLower: return "pokemon_league_lower";
-        case FlyPoint::PokemonLeagueUpper: return "pokemon_league_upper";
-        case FlyPoint::Route221:           return "route_221";
-        case FlyPoint::SandgemTown:        return "sandgem_town";
-        case FlyPoint::SolaceonTown:       return "solaceon_town";
-        case FlyPoint::SnowpointCity:      return "snowpoint_city";
-        case FlyPoint::SunyshoreCity:      return "sunyshore_city";
-        case FlyPoint::TwinleafTown:       return "twinleaf_town";
-        case FlyPoint::VeilstoneCity:      return "veilstone_city";
-        case FlyPoint::CurrentCity:        return "current_city";
+std::string fly_point_name(FlyPoint place){
+    switch (place){
+    case FlyPoint::CanalavCity:
+        return "canalave_city";
+    case FlyPoint::CelesticTown:
+        return "celestic_town";
+    case FlyPoint::EternaCity:
+        return "eterna_city";
+    case FlyPoint::FloaromaTown:
+        return "floaroma_town";
+    case FlyPoint::HearthomeCity:
+        return "hearthome_city";
+    case FlyPoint::JubilifeCity:
+        return "jubilife_city";
+    case FlyPoint::OreburghCity:
+        return "oreburgh_city";
+    case FlyPoint::PastoriaCity:
+        return "pastoria_city";
+    case FlyPoint::PokemonLeagueLower:
+        return "pokemon_league_lower";
+    case FlyPoint::PokemonLeagueUpper:
+        return "pokemon_league_upper";
+    case FlyPoint::Route221:
+        return "route_221";
+    case FlyPoint::SandgemTown:
+        return "sandgem_town";
+    case FlyPoint::SolaceonTown:
+        return "solaceon_town";
+    case FlyPoint::SnowpointCity:
+        return "snowpoint_city";
+    case FlyPoint::SunyshoreCity:
+        return "sunyshore_city";
+    case FlyPoint::TwinleafTown:
+        return "twinleaf_town";
+    case FlyPoint::VeilstoneCity:
+        return "veilstone_city";
+    case FlyPoint::CurrentCity:
+        return "current_city";
     }
     return "unknown";
 }
 
-bool fly_to(
-    VideoStream& stream,
-    ProControllerContext& context,
-    FlyPoint place
-){
+bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place){
     // Each city branch below should update this to the city icon's position on the fly map.
     // Detection: when the cursor brackets overlap the icon, its normally uniform
     // color becomes non-uniform (stddev rises). Box stays as a rough fallback
@@ -661,13 +652,14 @@ bool fly_to(
     pbf_wait(context, 1000ms);
     open_menu(stream, context, MenuCursorPosition::MAP, 8);
 
-    if (place == FlyPoint::CurrentCity) {
+    if (place == FlyPoint::CurrentCity){
         ImageFloatBox button_a_box{0.540000, 0.960000, 0.070000, 0.035000};
         struct FlyAButtonDetector : VisualInferenceCallback {
             ImageFloatBox m_box;
-            FlyAButtonDetector(const ImageFloatBox& box)
-                : VisualInferenceCallback("FlyAButtonDetector"), m_box(box) {}
-            void make_overlays(VideoOverlaySet&) const override {}
+            FlyAButtonDetector(const ImageFloatBox& box) : VisualInferenceCallback("FlyAButtonDetector"), m_box(box){
+            }
+            void make_overlays(VideoOverlaySet&) const override {
+            }
             bool process_frame(const ImageViewRGB32& frame, WallClock) override {
                 ImageStats s = image_stats(extract_box_reference(frame, m_box));
                 return s.stddev.sum() > 30.0;
@@ -675,17 +667,17 @@ bool fly_to(
         };
         FlyAButtonDetector watcher(button_a_box);
         int ret = wait_until(stream, context, 3000ms, {{watcher}});
-        if (ret < 0) {
+        if (ret < 0){
             stream.log("CurrentCity: A button not found.", COLOR_RED);
             return false;
         }
         BlackScreenOverWatcher flying_black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int fly_ret = run_until<ProControllerContext>(
-            stream, context,
-            [](ProControllerContext& context){ pbf_mash_button(context, BUTTON_A, 200000ms); },
-            {{flying_black_screen}}
-        );
-        if (fly_ret < 0) {
+        int fly_ret = run_until<ProControllerContext>(stream, context,
+                                                      [](ProControllerContext& context){
+                                                          pbf_mash_button(context, BUTTON_A, 200000ms);
+                                                      },
+                                                      {{flying_black_screen}});
+        if (fly_ret < 0){
             stream.log("CurrentCity: black screen not detected!", COLOR_RED);
             return false;
         }
@@ -693,31 +685,31 @@ bool fly_to(
         return true;
     }
 
-    switch (place) {
-        case FlyPoint::CelesticTown:
-            pbf_move_left_joystick(context, {-1, +1}, 4000ms, 500ms);
-            break;
-        case FlyPoint::HearthomeCity:
-        case FlyPoint::OreburghCity:
-            pbf_move_left_joystick(context, {-1, -1}, 4000ms, 500ms);
-            break;
-        case FlyPoint::PastoriaCity:
-        case FlyPoint::PokemonLeagueLower:
-        case FlyPoint::PokemonLeagueUpper:
-        case FlyPoint::SolaceonTown:
-        case FlyPoint::SunyshoreCity:
-        case FlyPoint::VeilstoneCity:
-            pbf_move_left_joystick(context, {+1, -1}, 4000ms, 500ms);
-            break;
-        case FlyPoint::SnowpointCity:
-            pbf_move_left_joystick(context, {-1, +1}, 4000ms, 500ms);
-            break;
-        case FlyPoint::TwinleafTown:
-            pbf_move_left_joystick(context, {-1, -1}, 4000ms, 500ms);
-            break;
-        default:
-            pbf_move_left_joystick(context, {-1, -1}, 4000ms, 500ms);
-            break;
+    switch (place){
+    case FlyPoint::CelesticTown:
+        pbf_move_left_joystick(context, {-1, +1}, 4000ms, 500ms);
+        break;
+    case FlyPoint::HearthomeCity:
+    case FlyPoint::OreburghCity:
+        pbf_move_left_joystick(context, {-1, -1}, 4000ms, 500ms);
+        break;
+    case FlyPoint::PastoriaCity:
+    case FlyPoint::PokemonLeagueLower:
+    case FlyPoint::PokemonLeagueUpper:
+    case FlyPoint::SolaceonTown:
+    case FlyPoint::SunyshoreCity:
+    case FlyPoint::VeilstoneCity:
+        pbf_move_left_joystick(context, {+1, -1}, 4000ms, 500ms);
+        break;
+    case FlyPoint::SnowpointCity:
+        pbf_move_left_joystick(context, {-1, +1}, 4000ms, 500ms);
+        break;
+    case FlyPoint::TwinleafTown:
+        pbf_move_left_joystick(context, {-1, -1}, 4000ms, 500ms);
+        break;
+    default:
+        pbf_move_left_joystick(context, {-1, -1}, 4000ms, 500ms);
+        break;
     }
     context.wait_for_all_requests();
 
@@ -725,9 +717,10 @@ bool fly_to(
 
     struct FlyAButtonDetector : VisualInferenceCallback {
         ImageFloatBox m_box;
-        FlyAButtonDetector(const ImageFloatBox& box)
-            : VisualInferenceCallback("FlyAButtonDetector"), m_box(box) {}
-        void make_overlays(VideoOverlaySet&) const override {}
+        FlyAButtonDetector(const ImageFloatBox& box) : VisualInferenceCallback("FlyAButtonDetector"), m_box(box){
+        }
+        void make_overlays(VideoOverlaySet&) const override {
+        }
         bool process_frame(const ImageViewRGB32& frame, WallClock) override {
             ImageStats s = image_stats(extract_box_reference(frame, m_box));
             // Blue stripe is uniform when no button shown; A button disrupts it
@@ -736,76 +729,77 @@ bool fly_to(
     };
     FlyAButtonDetector watcher_1(button_a_box);
 
-    switch (place) {
-        case FlyPoint::CanalavCity:
-            break;
-        case FlyPoint::CelesticTown:
-            city_icon_box = {0.660000, 0.470000, 0.012000, 0.020000};
-            repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 15, false);
-            repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 13, false);
-            break;
-        case FlyPoint::EternaCity:
-            break;
-        case FlyPoint::FloaromaTown:
-            break;
-        case FlyPoint::HearthomeCity:
-            city_icon_box = {0.660000, 0.637000, 0.029000, 0.052000};
-            repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 16, false);
-            repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 7, false);
-            break;
-        case FlyPoint::JubilifeCity:
-            city_icon_box = {0.453000, 0.702000, 0.016000, 0.054000};
-            repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 4, false);
-            repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 5, false);
-            break;
-        case FlyPoint::OreburghCity:
-            city_icon_box = {0.566000, 0.702000, 0.012000, 0.054000};
-            repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 10, false);
-            repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 5, false);
-            break;
-        case FlyPoint::PastoriaCity:
-            break;
-        case FlyPoint::PokemonLeagueLower:
-            break;
-        case FlyPoint::PokemonLeagueUpper:
-            break;
-        case FlyPoint::Route221:
-            break;
-        case FlyPoint::SandgemTown:
-            break;
-        case FlyPoint::SolaceonTown:
-            city_icon_box = {0.735000, 0.603000, 0.030000, 0.022000};
-            repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 12, false);
-            repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 9, false);
-            break;
-        case FlyPoint::SnowpointCity:
-            city_icon_box = {0.602000, 0.070000, 0.013000, 0.054000};
-            repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 12, false);
-            repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 1, false);
-            break;
-        case FlyPoint::SunyshoreCity:
-            break;
-        case FlyPoint::TwinleafTown:
-            city_icon_box = {0.415000, 0.870000, 0.013000, 0.022000};
-            repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 2, false);
-            repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 1, false);
-            break;
-        case FlyPoint::VeilstoneCity:
-            city_icon_box = {0.829000, 0.537000, 0.017000, 0.054000};
-            repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 8, false);
-            repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 10, false);
-            break;
-        case FlyPoint::CurrentCity:
-            break;
+    switch (place){
+    case FlyPoint::CanalavCity:
+        break;
+    case FlyPoint::CelesticTown:
+        city_icon_box = {0.660000, 0.470000, 0.012000, 0.020000};
+        repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 15, false);
+        repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 13, false);
+        break;
+    case FlyPoint::EternaCity:
+        break;
+    case FlyPoint::FloaromaTown:
+        break;
+    case FlyPoint::HearthomeCity:
+        city_icon_box = {0.660000, 0.637000, 0.029000, 0.052000};
+        repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 16, false);
+        repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 7, false);
+        break;
+    case FlyPoint::JubilifeCity:
+        city_icon_box = {0.453000, 0.702000, 0.016000, 0.054000};
+        repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 4, false);
+        repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 5, false);
+        break;
+    case FlyPoint::OreburghCity:
+        city_icon_box = {0.566000, 0.702000, 0.012000, 0.054000};
+        repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 10, false);
+        repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 5, false);
+        break;
+    case FlyPoint::PastoriaCity:
+        break;
+    case FlyPoint::PokemonLeagueLower:
+        break;
+    case FlyPoint::PokemonLeagueUpper:
+        break;
+    case FlyPoint::Route221:
+        break;
+    case FlyPoint::SandgemTown:
+        break;
+    case FlyPoint::SolaceonTown:
+        city_icon_box = {0.735000, 0.603000, 0.030000, 0.022000};
+        repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 12, false);
+        repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 9, false);
+        break;
+    case FlyPoint::SnowpointCity:
+        city_icon_box = {0.602000, 0.070000, 0.013000, 0.054000};
+        repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 12, false);
+        repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 1, false);
+        break;
+    case FlyPoint::SunyshoreCity:
+        break;
+    case FlyPoint::TwinleafTown:
+        city_icon_box = {0.415000, 0.870000, 0.013000, 0.022000};
+        repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 2, false);
+        repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 1, false);
+        break;
+    case FlyPoint::VeilstoneCity:
+        city_icon_box = {0.829000, 0.537000, 0.017000, 0.054000};
+        repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 8, false);
+        repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 10, false);
+        break;
+    case FlyPoint::CurrentCity:
+        break;
     }
 
     context.wait_for_all_requests();
 
     struct CityIconDetector : VisualInferenceCallback {
         ImageFloatBox m_box;
-        CityIconDetector(const ImageFloatBox& box)
-            : VisualInferenceCallback("CityIconDetector"), m_box(box) {}
-        void make_overlays(VideoOverlaySet&) const override {}
+        CityIconDetector(const ImageFloatBox& box) : VisualInferenceCallback("CityIconDetector"), m_box(box){
+        }
+        void make_overlays(VideoOverlaySet&) const override {
+        }
         bool process_frame(const ImageViewRGB32& frame, WallClock) override {
             ImageStats s = image_stats(extract_box_reference(frame, m_box));
             // City icon is normally a uniform color; cursor brackets disrupt it
@@ -817,27 +811,25 @@ bool fly_to(
     const std::string name = fly_point_name(place);
     int ret_1 = wait_until(stream, context, 3000ms, {{watcher_1}});
     int ret_2 = wait_until(stream, context, 4000ms, {{watcher_2}});
-    if (ret_1 < 0) {
+    if (ret_1 < 0){
         stream.log("A button not found, retrying...", COLOR_RED);
     };
-    if (ret_2 < 0) {
+    if (ret_2 < 0){
         stream.log(name + " not found, retrying...", COLOR_RED);
     };
     if (ret_1 == 0 and ret_2 == 0){
         stream.log("Found " + name + ", flying towards it.", COLOR_GREEN);
         WhiteScreenOverWatcher flying_white_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
         BlackScreenOverWatcher flying_black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(
-            stream, context,
-            [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_A, 200000ms);
-            },
-            {{flying_white_screen}, {flying_black_screen}}
-        );
+        int ret = run_until<ProControllerContext>(stream, context,
+                                                  [](ProControllerContext& context){
+                                                      pbf_mash_button(context, BUTTON_A, 200000ms);
+                                                  },
+                                                  {{flying_white_screen}, {flying_black_screen}});
         if (ret < 0){
             stream.log("Flying to " + name + ": white / black screen not detected!", COLOR_RED);
             return false;
-        } else if (ret >= 0) {
+        }else if (ret >= 0){
             stream.log("Flying to " + name + ": white / black screen detected!", COLOR_GREEN);
             return true;
         }
@@ -865,13 +857,15 @@ bool fly_to(
 // ---------------------------------------------------------------------------
 
 // Slot 1's colored HP bar in the Bag. Read fill position rather than OCR.
-static double potion_hp_fraction(const ImageViewRGB32& frame) {
-    if (bag_pocket_position(frame) == 0) return -1;
+static double potion_hp_fraction(const ImageViewRGB32& frame){
+    if (bag_pocket_position(frame) == 0){
+        return -1;
+    }
     const ImageViewRGB32 bar = extract_box_reference(frame, ImageFloatBox{0.137, 0.160, 0.202, 0.016});
     size_t filled = 0;
-    for (size_t x = 0; x < bar.width(); x++) {
+    for (size_t x = 0; x < bar.width(); x++){
         size_t color = 0;
-        for (size_t y = 0; y < bar.height(); y++) {
+        for (size_t y = 0; y < bar.height(); y++){
             uint32_t p = bar.pixel(x, y);
             int r = (p >> 16) & 255, g = (p >> 8) & 255, b = p & 255;
             const bool green = g > r + 30 && g > b + 20;
@@ -884,42 +878,50 @@ static double potion_hp_fraction(const ImageViewRGB32& frame) {
     return bar.width() ? (double)filled / bar.width() : -1;
 }
 
-static double confirmed_potion_hp(VideoStream& stream, ProControllerContext& context) {
+static double confirmed_potion_hp(VideoStream& stream, ProControllerContext& context){
     double previous = -1;
     size_t stable = 0;
-    for (size_t check = 0; check < 20; check++) {
+    for (size_t check = 0; check < 20; check++){
         context.wait_for_all_requests();
         auto frame = stream.video().snapshot();
         double hp = frame ? potion_hp_fraction(frame) : -1;
-        if (hp >= 0 && previous >= 0 && std::abs(hp - previous) <= 0.015) {
-            if (++stable >= 3) return hp;
-        } else stable = 0;
+        if (hp >= 0 && previous >= 0 && std::abs(hp - previous) <= 0.015){
+            if (++stable >= 3){
+                return hp;
+            }
+        }else{
+            stable = 0;
+        }
         previous = hp;
         pbf_wait(context, 150ms);
     }
     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-        "Potion: Slot 1 HP bar could not be confirmed.", stream);
+                                                 "Potion: Slot 1 HP bar could not be confirmed.", stream);
 }
 
-void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context) {
+void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context){
     OverlayBoxScope hp_overlay(stream.overlay(), COLOR_GREEN, {0.137, 0.160, 0.202, 0.016}, "");
     BagItemTemplate potion;
     potion.reference_path = "PokemonBDSP/Autostory/Bag_Potion.png";
     potion.label = "Potion";
     potion.reference_row = 1;
     bool healed = false;
-    for (size_t dose = 0; dose < 3; dose++) {
+    for (size_t dose = 0; dose < 3; dose++){
         stream.log("[Potion] Finding Bag/Medicine/Potion; dose " + std::to_string(dose + 1) + "/3.");
-        if (!find_bag_item(stream, context, potion, 1, 5, 64, std::chrono::seconds(45))) {
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Potion: Could not verify Potion in the Medicine pocket.", stream);
+        if (!find_bag_item(stream, context, potion, 1, 5, 64, std::chrono::seconds(45))){
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT, "Potion: Could not verify Potion in the Medicine pocket.", stream);
         }
         const double before = confirmed_potion_hp(stream, context);
         stream.log("[Potion] Slot 1 HP bar before use=" + std::to_string(before * 100) + "%.");
-        if (before >= 0.98) { healed = true; break; }
-        if (before <= 0.005) {
+        if (before >= 0.98){
+            healed = true;
+            break;
+        }
+        if (before <= 0.005){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Potion: Slot 1 appears fainted; a Potion cannot revive it.", stream);
+                                                         "Potion: Slot 1 appears fainted; a Potion cannot revive it.",
+                                                         stream);
         }
         pbf_press_button(context, BUTTON_A, 80ms, 500ms);
         pbf_press_button(context, BUTTON_A, 80ms, 500ms);
@@ -927,9 +929,9 @@ void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context
         pbf_mash_button(context, BUTTON_B, 2000ms);
         context.wait_for_all_requests();
         OverworldWatcher overworld;
-        if (wait_until(stream, context, std::chrono::seconds(10), {{overworld}}) != 0) {
+        if (wait_until(stream, context, std::chrono::seconds(10), {{overworld}}) != 0){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Potion: Did not return to the overworld after use.", stream);
+                                                         "Potion: Did not return to the overworld after use.", stream);
         }
         // Reopen Bag to verify the result, including when the last Potion was used.
         open_menu(stream, context, MenuCursorPosition::BAG, 5);
@@ -937,53 +939,66 @@ void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context
         context.wait_for_all_requests();
         const double after = confirmed_potion_hp(stream, context);
         stream.log("[Potion] Slot 1 HP bar after use=" + std::to_string(after * 100) + "%.");
-        if (after <= before + 0.005) {
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+        if (after <= before + 0.005){
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
                 "Potion: Slot 1 HP did not increase; refusing to continue movement.", stream);
         }
-        if (after >= 0.98) { healed = true; break; }
+        if (after >= 0.98){
+            healed = true;
+            break;
+        }
         pbf_mash_button(context, BUTTON_B, 2000ms);
         context.wait_for_all_requests();
     }
-    if (!healed) OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-        "Potion: Full HP not confirmed after three uses.", stream);
+    if (!healed){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                                                     "Potion: Full HP not confirmed after three uses.", stream);
+    }
     pbf_mash_button(context, BUTTON_B, 2000ms);
     context.wait_for_all_requests();
     OverworldWatcher overworld;
-    if (wait_until(stream, context, std::chrono::seconds(10), {{overworld}}) != 0)
+    if (wait_until(stream, context, std::chrono::seconds(10), {{overworld}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "Potion: Final overworld return not confirmed.", stream);
+                                                     "Potion: Final overworld return not confirmed.", stream);
+    }
     stream.log("[Potion] Slot 1 HP bar full and overworld confirmed.");
 }
 
 
-namespace{
+namespace {
 
-struct IconGrid { int row, col; };
+struct IconGrid {
+    int row, col;
+};
 
 IconGrid icon_to_grid(MenuCursorPosition pos, int num_icons){
     switch (pos){
-    case MenuCursorPosition::POKEDEX:      return {0, 0};
-    case MenuCursorPosition::POKEMON:      return {0, 1};
-    case MenuCursorPosition::BAG:          return {0, 2};
-    case MenuCursorPosition::CARD:         return {0, 3};
-    case MenuCursorPosition::OPTIONS:      return {1, num_icons <= 5 ? 0 : 2};
-    case MenuCursorPosition::MAP:          return {1, 0};
-    case MenuCursorPosition::CAPSULES:     return {1, 1};
-    case MenuCursorPosition::MYSTERYGIFT:  return {1, 3};
-    default:                               return {-1, -1};
+    case MenuCursorPosition::POKEDEX:
+        return {0, 0};
+    case MenuCursorPosition::POKEMON:
+        return {0, 1};
+    case MenuCursorPosition::BAG:
+        return {0, 2};
+    case MenuCursorPosition::CARD:
+        return {0, 3};
+    case MenuCursorPosition::OPTIONS:
+        return {1, num_icons <= 5 ? 0 : 2};
+    case MenuCursorPosition::MAP:
+        return {1, 0};
+    case MenuCursorPosition::CAPSULES:
+        return {1, 1};
+    case MenuCursorPosition::MYSTERYGIFT:
+        return {1, 3};
+    default:
+        return {-1, -1};
     }
 }
 
 } // anonymous namespace
 
 
-void open_menu(
-    VideoStream& stream,
-    ProControllerContext& context,
-    MenuCursorPosition target,
-    int num_icons
-){
+void open_menu(VideoStream& stream, ProControllerContext& context, MenuCursorPosition target, int num_icons){
     using namespace std::chrono_literals;
 
     // Previous single opening attempt:
@@ -996,8 +1011,7 @@ void open_menu(
     MenuCursorDetector detector;
     {
         static const char* ICON_NAMES[MENU_CURSOR_NUM_ICONS] = {
-            "POKEDEX", "POKEMON", "BAG", "CARD",
-            "OPTIONS", "MAP", "CAPSULES", "MYSTERYGIFT",
+            "POKEDEX", "POKEMON", "BAG", "CARD", "OPTIONS", "MAP", "CAPSULES", "MYSTERYGIFT",
         };
         // Previous optional template directory: PokemonBDSP/AutoStory.
         std::string ref_dir = RESOURCE_PATH() + "PokemonBDSP/Autostory";
@@ -1011,10 +1025,7 @@ void open_menu(
             // Previously constructed the image before checking its availability.
             ImageRGB32 img(path);
             if (img){
-                detector.set_icon_reference(
-                    static_cast<MenuCursorPosition>(i),
-                    std::move(img)
-                );
+                detector.set_icon_reference(static_cast<MenuCursorPosition>(i), std::move(img));
             }
         }
     }
@@ -1063,31 +1074,26 @@ void open_menu(
                 }
             }
             if (cur != MenuCursorPosition::UNKNOWN){
-                stream.log("[Open menu] Menu and cursor detected on attempt " + std::to_string(attempt) + ".", COLOR_GREEN);
+                stream.log("[Open menu] Menu and cursor detected on attempt " + std::to_string(attempt) + ".",
+                           COLOR_GREEN);
                 break;
             }
-            stream.log("[Open menu] Menu cursor not detected on attempt " + std::to_string(attempt) + ".", COLOR_ORANGE);
-        }
-        catch (OperationFailedException& error){
+            stream.log("[Open menu] Menu cursor not detected on attempt " + std::to_string(attempt) + ".",
+                       COLOR_ORANGE);
+        } catch (OperationFailedException& error){
             stream.log("[Open menu] Attempt " + std::to_string(attempt) + " failed: " + error.message(), COLOR_ORANGE);
         }
     }
     if (cur == MenuCursorPosition::UNKNOWN){
         OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT,
-            "Menu or cursor detection failed after 3 opening attempts.",
-            stream
-        );
+            ErrorReportMode::SEND_ERROR_REPORT, "Menu or cursor detection failed after 3 opening attempts.", stream);
     }
 
-    IconGrid cur_g = icon_to_grid(cur,    num_icons);
+    IconGrid cur_g = icon_to_grid(cur, num_icons);
     IconGrid tgt_g = icon_to_grid(target, num_icons);
     if (tgt_g.row == -1){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT,
-            "Unknown target menu icon.",
-            stream
-        );
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "Unknown target menu icon.",
+                                                     stream);
     }
 
     if (cur_g.row != tgt_g.row){
@@ -1130,12 +1136,12 @@ void open_menu(
 //     ImageMatchDetector bag(reference, ImageFloatBox(0.055, 0.012, 0.044, 0.045), 35.0, true);
 //     const ImageFloatBox selected_header(0.428, 0.754, 0.382, 0.046);
 //     const auto deadline = std::chrono::steady_clock::now() + search_timeout;
-// 
+//
 //     stream.log("[Bag search] Looking for " + item.label + ".");
 //     open_menu(stream, context, MenuCursorPosition::BAG, num_icons);
 //     pbf_wait(context, 1000ms);
 //     context.wait_for_all_requests();
-// 
+//
 //     for (size_t pocket = 0; pocket < 8; pocket++){
 //         ImageRGB32 initial_header;
 //         ImageRGB32 previous_header;
@@ -1143,7 +1149,7 @@ void open_menu(
 //         size_t matching_frames = 0;
 //         size_t scrolls = 0;
 //         bool scanning_up = false;
-// 
+//
 //         while (std::chrono::steady_clock::now() < deadline){
 //             context.wait_for_all_requests();
 //             const VideoSnapshot frame = stream.video().snapshot();
@@ -1169,7 +1175,7 @@ void open_menu(
 //                 continue;
 //             }
 //             matching_frames = 0;
-// 
+//
 //             const ImageRGB32 header = extract_box_reference(frame, selected_header).scale_to(382, 46);
 //             if (!initial_header){
 //                 initial_header = header.copy();
@@ -1216,7 +1222,7 @@ void open_menu(
 //     stream.log("[Bag search] Item not found in any pocket.", COLOR_ORANGE);
 //     return false;
 // }
-// 
+//
 
 // One narrow strip on the left side of the red selection border. Divide its
 // height into the seven row bands; the item's art and NEW badge are outside it.
@@ -1224,9 +1230,7 @@ int bag_cursor_position(const ImageViewRGB32& frame){
     if (!frame){
         return 0;
     }
-    const ImageViewRGB32 strip = extract_box_reference(
-        frame, ImageFloatBox(0.431, 0.229, 0.005, 0.470)
-    );
+    const ImageViewRGB32 strip = extract_box_reference(frame, ImageFloatBox(0.431, 0.229, 0.005, 0.470));
     double best = 0.0;
     double second = 0.0;
     int position = 0;
@@ -1267,14 +1271,8 @@ static ImageFloatBox bag_list_name_box(size_t row){
     return ImageFloatBox(0.492, 0.213 + (row - 1) * 0.075, 0.335, 0.050);
 }
 
-static double bag_row_patch_score(
-    const ImageRGB32& reference,
-    const ImageViewRGB32& frame,
-    const ImageFloatBox& box
-){
-    const ImageRGB32 live = extract_box_reference(frame, box).scale_to(
-        reference.width(), reference.height()
-    );
+static double bag_row_patch_score(const ImageRGB32& reference, const ImageViewRGB32& frame, const ImageFloatBox& box){
+    const ImageRGB32 live = extract_box_reference(frame, box).scale_to(reference.width(), reference.height());
     return ImageMatch::pixel_RMSD(reference, live);
 }
 
@@ -1295,31 +1293,43 @@ static double bag_row_patch_score(
 // }
 
 size_t bag_clear_tab_count(const ImageViewRGB32& frame){
-    if (!frame || bag_pocket_position(frame)==0) return 0;
-    static const std::vector<std::shared_ptr<const ImageRGB32>> references=[] {
+    if (!frame || bag_pocket_position(frame) == 0){
+        return 0;
+    }
+    static const std::vector<std::shared_ptr<const ImageRGB32>> references = [] {
         std::vector<std::shared_ptr<const ImageRGB32>> refs;
-        for (const char* name : {"Normal","NormalMedium","NormalSmall","Alternate","AlternateMedium","AlternateSmall","Selected","SelectedMedium","SelectedSmall","SelectedBlue","SelectedBlueMedium","SelectedBlueSmall"})
-            refs.emplace_back(std::make_shared<const ImageRGB32>(
-                RESOURCE_PATH()+"PokemonBDSP/Autostory/BagTabs/"+name+".png"));
+        for (const char* name :
+             {"Normal", "NormalMedium", "NormalSmall", "Alternate", "AlternateMedium", "AlternateSmall", "Selected",
+              "SelectedMedium", "SelectedSmall", "SelectedBlue", "SelectedBlueMedium", "SelectedBlueSmall"}){
+            refs.emplace_back(
+                std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/Autostory/BagTabs/" + name + ".png"));
+        }
         return refs;
     }();
-    size_t clear=0;
-    for (size_t tab=0;tab<8;tab++) {
-        const double x=.570+tab*.0421;
+    size_t clear = 0;
+    for (size_t tab = 0; tab < 8; tab++){
+        const double x = .570 + tab * .0421;
         // A selected tab has a thin red outline. The NEW marker fills the
         // interior of this upper-left patch, which the outline leaves white.
-        auto badge=extract_box_reference(frame,ImageFloatBox(x+.007,.074,.006,.014));
-        size_t red=0;
-        for (size_t y=0;y<badge.height();y++) for (size_t bx=0;bx<badge.width();bx++) {
-            const uint32_t pixel=badge.pixel(bx,y);
-            int rr=(pixel>>16)&255,gg=(pixel>>8)&255,bb=pixel&255;
-            red+=rr>150 && rr>gg+60 && rr>bb+60;
+        auto badge = extract_box_reference(frame, ImageFloatBox(x + .007, .074, .006, .014));
+        size_t red = 0;
+        for (size_t y = 0; y < badge.height(); y++){
+            for (size_t bx = 0; bx < badge.width(); bx++){
+                const uint32_t pixel = badge.pixel(bx, y);
+                int rr = (pixel >> 16) & 255, gg = (pixel >> 8) & 255, bb = pixel & 255;
+                red += rr > 150 && rr > gg + 60 && rr > bb + 60;
+            }
         }
-        if (badge.width()*badge.height() && (double)red/(badge.width()*badge.height())>.45) continue;
-        const ImageFloatBox box{x,.06,.038,.072};
-        for (const auto& reference : references) {
-            ImageMatchDetector detector(reference,box,50.0);
-            if (detector.detect(frame)) {clear++;break;}
+        if (badge.width() * badge.height() && (double)red / (badge.width() * badge.height()) > .45){
+            continue;
+        }
+        const ImageFloatBox box{x, .06, .038, .072};
+        for (const auto& reference : references){
+            ImageMatchDetector detector(reference, box, 50.0);
+            if (detector.detect(frame)){
+                clear++;
+                break;
+            }
         }
     }
     return clear;
@@ -1327,47 +1337,56 @@ size_t bag_clear_tab_count(const ImageViewRGB32& frame){
 
 bool clear_new_item_flags(VideoStream& stream, ProControllerContext& context, int num_icons){
     stream.log("[Bag NEW flags] Opening bag to verify all eight tabs.");
-    open_menu(stream,context,MenuCursorPosition::BAG,num_icons);
-    pbf_wait(context,1000ms);
-    auto all_clear=[&]() {
+    open_menu(stream, context, MenuCursorPosition::BAG, num_icons);
+    pbf_wait(context, 1000ms);
+    auto all_clear = [&](){
         context.wait_for_all_requests();
-        size_t confirmed=0;
-        for (size_t check=0;check<3;check++) {
-            const auto frame=stream.video().snapshot();
-            const size_t count=frame?bag_clear_tab_count(*frame.frame):0;
-            stream.log("[Bag NEW flags] Clear tabs: "+std::to_string(count)+"/8.");
-            if (count!=8) return false;
+        size_t confirmed = 0;
+        for (size_t check = 0; check < 3; check++){
+            const auto frame = stream.video().snapshot();
+            const size_t count = frame ? bag_clear_tab_count(*frame.frame) : 0;
+            stream.log("[Bag NEW flags] Clear tabs: " + std::to_string(count) + "/8.");
+            if (count != 8){
+                return false;
+            }
             confirmed++;
-            pbf_wait(context,150ms);
+            pbf_wait(context, 150ms);
             context.wait_for_all_requests();
         }
-        return confirmed==3;
+        return confirmed == 3;
     };
-    bool cleared=all_clear();
-    for (size_t pocket=0;pocket<32 && !cleared;pocket++) {
-        if (pocket) pbf_press_dpad(context,DPAD_RIGHT,80ms,300ms);
+    bool cleared = all_clear();
+    for (size_t pocket = 0; pocket < 32 && !cleared; pocket++){
+        if (pocket){
+            pbf_press_dpad(context, DPAD_RIGHT, 80ms, 300ms);
+        }
         // Let the initial selection and each subsequent item clear its NEW
         // flag. Short taps avoid skipping rows through held-button repeat.
-        pbf_wait(context,1000ms);
-        for (size_t tap=0;tap<12;tap++) pbf_press_dpad(context,DPAD_DOWN,80ms,1000ms);
-        cleared=all_clear();
+        pbf_wait(context, 1000ms);
+        for (size_t tap = 0; tap < 12; tap++){
+            pbf_press_dpad(context, DPAD_DOWN, 80ms, 1000ms);
+        }
+        cleared = all_clear();
     }
-    pbf_press_dpad(context,DPAD_UP,3000ms,250ms);
-    pbf_mash_button(context,BUTTON_B,2000ms);
+    pbf_press_dpad(context, DPAD_UP, 3000ms, 250ms);
+    pbf_mash_button(context, BUTTON_B, 2000ms);
     context.wait_for_all_requests();
-    stream.log(cleared?"[Bag NEW flags] All eight tabs clear; bag closed.":
-        "[Bag NEW flags] Full pocket pass did not clear all eight tabs; bag closed.",cleared?COLOR_GREEN:COLOR_ORANGE);
+    stream.log(cleared ? "[Bag NEW flags] All eight tabs clear; bag closed."
+                       : "[Bag NEW flags] Full pocket pass did not clear all eight tabs; bag closed.",
+               cleared ? COLOR_GREEN : COLOR_ORANGE);
     return cleared;
 }
 
 int bag_pocket_position(const ImageViewRGB32& frame){
-    if (!frame) return 0;
+    if (!frame){
+        return 0;
+    }
     int selected = 0;
     for (int pocket = 1; pocket <= 8; pocket++){
         // The lower left edge of each tab is below the red NEW badge.
         // This strip includes both the normal outline and enlarged selection.
-        const auto edge = extract_box_reference(frame,
-            ImageFloatBox(0.570 + (pocket - 1) * 0.0421, 0.098, 0.0045, 0.021));
+        const auto edge =
+            extract_box_reference(frame, ImageFloatBox(0.570 + (pocket - 1) * 0.0421, 0.098, 0.0045, 0.021));
         size_t colored = 0;
         for (size_t y = 0; y < edge.height(); y++){
             for (size_t x = 0; x < edge.width(); x++){
@@ -1376,13 +1395,14 @@ int bag_pocket_position(const ImageViewRGB32& frame){
                 const int g = (pixel >> 8) & 255;
                 const int b = pixel & 255;
                 // Red when focused, blue when the item list has focus.
-                colored += (r > 160 && r > g + 60 && r > b + 60) ||
-                    (b > 160 && b > r + 40 && b > g + 20);
+                colored += (r > 160 && r > g + 60 && r > b + 60) || (b > 160 && b > r + 40 && b > g + 20);
             }
         }
         const double pixels = (double)edge.width() * edge.height();
         if (pixels > 0 && colored / pixels >= 0.18){
-            if (selected != 0) return 0;
+            if (selected != 0){
+                return 0;
+            }
             selected = pocket;
         }
     }
@@ -1390,21 +1410,19 @@ int bag_pocket_position(const ImageViewRGB32& frame){
 }
 
 bool bag_list_is_empty(const ImageViewRGB32& frame){
-    if (!frame || bag_pocket_position(frame) == 0 || bag_cursor_position(frame) != 0) return false;
+    if (!frame || bag_pocket_position(frame) == 0 || bag_cursor_position(frame) != 0){
+        return false;
+    }
     // Empty pockets have no item icons. The central Empty label is outside
     // this column; counting dark pixels in the name area included that label.
     const auto icons = extract_box_reference(frame, ImageFloatBox(0.449, 0.213, 0.032, 0.500));
     const auto stats = image_stats(icons);
-    return stats.average.r > 220 && stats.average.g > 220 && stats.average.b > 220 &&
-        stats.stddev.sum() < 20;
+    return stats.average.r > 220 && stats.average.g > 220 && stats.average.b > 220 && stats.stddev.sum() < 20;
 }
 
 
-std::array<BagItemRowMatch, 7> match_bag_item_rows(
-    const ImageViewRGB32& frame,
-    const ImageViewRGB32& reference,
-    const BagItemTemplate& item
-){
+std::array<BagItemRowMatch, 7> match_bag_item_rows(const ImageViewRGB32& frame, const ImageViewRGB32& reference,
+                                                   const BagItemTemplate& item){
     std::array<BagItemRowMatch, 7> result;
     if (!frame || !reference || item.reference_row < 1 || item.reference_row > 7){
         return result;
@@ -1414,8 +1432,7 @@ std::array<BagItemRowMatch, 7> match_bag_item_rows(
     for (size_t row = 1; row <= 7; row++){
         auto& match = result[row - 1];
         match.icon_rmsd = bag_row_patch_score(icon, frame, bag_list_icon_box(row));
-        match.name_rmsd = item.check_name
-            ? bag_row_patch_score(name, frame, bag_list_name_box(row)) : 0.0;
+        match.name_rmsd = item.check_name ? bag_row_patch_score(name, frame, bag_list_name_box(row)) : 0.0;
         match.matched = match.icon_rmsd <= item.max_icon_rmsd && match.name_rmsd <= item.max_name_rmsd;
     }
     return result;
@@ -1429,10 +1446,8 @@ BagMovePlan plan_bag_item_move(int cursor_row, int item_row){
         if (item_row == cursor_row){
             return {BagMoveAction::CONFIRM, 0};
         }
-        return {
-            item_row > cursor_row ? BagMoveAction::DOWN : BagMoveAction::UP,
-            static_cast<size_t>(std::abs(item_row - cursor_row))
-        };
+        return {item_row > cursor_row ? BagMoveAction::DOWN : BagMoveAction::UP,
+                static_cast<size_t>(std::abs(item_row - cursor_row))};
     }
     if (cursor_row == 7){
         return {BagMoveAction::REWIND, 1};
@@ -1450,7 +1465,9 @@ static int bag_confirm_pocket(VideoStream& stream, ProControllerContext& context
         const int pocket = frame ? bag_pocket_position(frame) : 0;
         matches = pocket != 0 && pocket == previous ? matches + 1 : pocket != 0 ? 1 : 0;
         previous = pocket;
-        if (matches >= 3) return pocket;
+        if (matches >= 3){
+            return pocket;
+        }
         pbf_wait(context, 100ms);
     }
     return 0;
@@ -1477,62 +1494,61 @@ static int bag_confirm_pocket(VideoStream& stream, ProControllerContext& context
 // }
 
 BagPocketMovePlan plan_bag_pocket_move(int current, int target){
-    if (current < 1 || current > 8 || target < 1 || target > 8) return {};
+    if (current < 1 || current > 8 || target < 1 || target > 8){
+        return {};
+    }
     const int right = (target - current + 8) % 8;
     const int left = (current - target + 8) % 8;
-    if (right == 0) return {BagPocketAction::CONFIRM, 0};
+    if (right == 0){
+        return {BagPocketAction::CONFIRM, 0};
+    }
     return right <= left ? BagPocketMovePlan{BagPocketAction::RIGHT, static_cast<size_t>(right)}
-        : BagPocketMovePlan{BagPocketAction::LEFT, static_cast<size_t>(left)};
+                         : BagPocketMovePlan{BagPocketAction::LEFT, static_cast<size_t>(left)};
 }
 
 static bool bag_navigate_to_pocket(VideoStream& stream, ProControllerContext& context, int target){
     int current = bag_confirm_pocket(stream, context);
     for (size_t attempt = 0; attempt < 3; attempt++){
         const auto plan = plan_bag_pocket_move(current, target);
-        if (plan.action == BagPocketAction::CONFIRM) return true;
+        if (plan.action == BagPocketAction::CONFIRM){
+            return true;
+        }
         if (plan.action == BagPocketAction::UNKNOWN){
             stream.log("[Bag search] Selected pocket not detected.", COLOR_ORANGE);
             return false;
         }
-        stream.log("[Bag search] Pocket " + std::to_string(current) + " to " +
-            std::to_string(target) + ": " +
-            (plan.action == BagPocketAction::RIGHT ? "right " : "left ") +
-            std::to_string(plan.presses) + " presses, attempt " + std::to_string(attempt + 1) + "/3.");
+        stream.log("[Bag search] Pocket " + std::to_string(current) + " to " + std::to_string(target) + ": " +
+                   (plan.action == BagPocketAction::RIGHT ? "right " : "left ") + std::to_string(plan.presses) +
+                   " presses, attempt " + std::to_string(attempt + 1) + "/3.");
         for (size_t press = 0; press < plan.presses; press++){
-            pbf_press_dpad(context, plan.action == BagPocketAction::RIGHT ? DPAD_RIGHT : DPAD_LEFT,
-                80ms, 150ms);
+            pbf_press_dpad(context, plan.action == BagPocketAction::RIGHT ? DPAD_RIGHT : DPAD_LEFT, 80ms, 150ms);
         }
         pbf_wait(context, 350ms);
         current = bag_confirm_pocket(stream, context);
-        stream.log("[Bag search] Final pocket=" + std::to_string(current) +
-            ", expected=" + std::to_string(target) + ".");
-        if (current == target) return true;
+        stream.log("[Bag search] Final pocket=" + std::to_string(current) + ", expected=" + std::to_string(target) +
+                   ".");
+        if (current == target){
+            return true;
+        }
     }
     stream.log("[Bag search] Target pocket not reached after 3 movement batches.", COLOR_ORANGE);
     return false;
 }
 
 
-bool find_bag_item(
-    VideoStream& stream,
-    ProControllerContext& context,
-    const BagItemTemplate& item,
-    int target_pocket,
-    int num_icons,
-    size_t max_scrolls_per_pocket,
-    std::chrono::milliseconds search_timeout
-){
+bool find_bag_item(VideoStream& stream, ProControllerContext& context, const BagItemTemplate& item, int target_pocket,
+                   int num_icons, size_t max_scrolls_per_pocket, std::chrono::milliseconds search_timeout){
     if (target_pocket < 1 || target_pocket > 8 || item.reference_row < 1 || item.reference_row > 7){
         stream.log("[Bag search] Invalid template reference row.", COLOR_ORANGE);
         return false;
     }
     auto reference = std::make_shared<const ImageRGB32>(RESOURCE_PATH() + item.reference_path);
-//     const ImageRGB32 reference_icon = extract_box_reference(
-//         *reference, bag_list_icon_box(item.reference_row)
-//     ).copy();
-//     const ImageRGB32 reference_name = extract_box_reference(
-//         *reference, bag_list_name_box(item.reference_row)
-//     ).copy();
+    //     const ImageRGB32 reference_icon = extract_box_reference(
+    //         *reference, bag_list_icon_box(item.reference_row)
+    //     ).copy();
+    //     const ImageRGB32 reference_name = extract_box_reference(
+    //         *reference, bag_list_name_box(item.reference_row)
+    //     ).copy();
     ImageMatchDetector bag(reference, ImageFloatBox(0.055, 0.012, 0.044, 0.045), 35.0, true);
     const auto deadline = std::chrono::steady_clock::now() + search_timeout;
 
@@ -1540,7 +1556,9 @@ bool find_bag_item(
     pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
 
-    if (!bag_navigate_to_pocket(stream, context, target_pocket)) return false;
+    if (!bag_navigate_to_pocket(stream, context, target_pocket)){
+        return false;
+    }
     // Previously searched all eight pockets. Only inspect the requested pocket now.
     // for (size_t pocket = 0; pocket < 8; pocket++){
     {
@@ -1553,8 +1571,7 @@ bool find_bag_item(
         bool empty = false;
         auto move = [&](DpadPosition direction, size_t count, bool check_rows = false){
             for (size_t press = 0; press < count; press++){
-                if (commands >= max_scrolls_per_pocket ||
-                    std::chrono::steady_clock::now() >= deadline){
+                if (commands >= max_scrolls_per_pocket || std::chrono::steady_clock::now() >= deadline){
                     stream.log("[Bag search] Limit reached; search incomplete.", COLOR_ORANGE);
                     return false;
                 }
@@ -1584,10 +1601,8 @@ bool find_bag_item(
             size_t missing_cursor = 0;
             size_t unchanged_pages = 0;
             ImageRGB32 previous_page;
-            stream.log(
-                "[Bag search] Looking for " + item.label + ": pocket " +
-                std::to_string(selected_pocket) + ", pass " + std::to_string(pass + 1) + "/3."
-            );
+            stream.log("[Bag search] Looking for " + item.label + ": pocket " + std::to_string(selected_pocket) +
+                       ", pass " + std::to_string(pass + 1) + "/3.");
             while (std::chrono::steady_clock::now() < deadline){
                 const VideoSnapshot frame = stream.video().snapshot();
                 if (!frame || !bag.detect(frame)){
@@ -1628,11 +1643,9 @@ bool find_bag_item(
                         }
                     }
                 }
-                stream.log(
-                    "[Bag search] " + item.label + (target == 0 ? " is not detected" : " is detected") +
-                    " on screen; item row=" + std::to_string(target) +
-                    ", cursor row=" + std::to_string(cursor) + "."
-                );
+                stream.log("[Bag search] " + item.label + (target == 0 ? " is not detected" : " is detected") +
+                           " on screen; item row=" + std::to_string(target) + ", cursor row=" + std::to_string(cursor) +
+                           ".");
                 if (ambiguous){
                     stream.log("[Bag search] Multiple rows match; selection is uncertain.", COLOR_ORANGE);
                     return false;
@@ -1659,8 +1672,8 @@ bool find_bag_item(
                     // row is sufficient; do not depend on the detail panel.
                     if (target == cursor){
                         if (++matching_frames >= 3){
-                            stream.log("[Bag search] Item and cursor confirmed in row " +
-                                std::to_string(cursor) + ".", COLOR_GREEN);
+                            stream.log("[Bag search] Item and cursor confirmed in row " + std::to_string(cursor) + ".",
+                                       COLOR_GREEN);
                             return true;
                         }
                         pbf_wait(context, 150ms);
@@ -1670,16 +1683,15 @@ bool find_bag_item(
                     matching_frames = 0;
                     const size_t count = plan_bag_item_move(cursor, target).presses;
                     stream.log("[Bag search] Moving " + std::string(target > cursor ? "down " : "up ") +
-                        std::to_string(count) + " time(s), then checking again.");
+                               std::to_string(count) + " time(s), then checking again.");
                     if (!move(target > cursor ? DPAD_DOWN : DPAD_UP, count)){
                         return false;
                     }
                     continue;
                 }
                 matching_frames = 0;
-                const ImageRGB32 page = extract_box_reference(
-                    frame, ImageFloatBox(0.449, 0.212, 0.378, 0.500)
-                ).scale_to(378, 500);
+                const ImageRGB32 page =
+                    extract_box_reference(frame, ImageFloatBox(0.449, 0.212, 0.378, 0.500)).scale_to(378, 500);
                 if (previous_page && ImageMatch::pixel_RMSD(previous_page, page) <= 3.0){
                     unchanged_pages++;
                 }else{
@@ -1716,35 +1728,26 @@ bool find_bag_item(
                 return false;
             }
         }
-//         if (pocket < 7){
-//             // pbf_press_dpad(context, DPAD_RIGHT, 80ms, 500ms);
-//             // context.wait_for_all_requests();
-//             if (!bag_advance_pocket(stream, context, selected_pocket)) return false;
-//         }
-
+        //         if (pocket < 7){
+        //             // pbf_press_dpad(context, DPAD_RIGHT, 80ms, 500ms);
+        //             // context.wait_for_all_requests();
+        //             if (!bag_advance_pocket(stream, context, selected_pocket)) return false;
+        //         }
     }
     stream.log("[Bag search] Item not found after three passes per nonempty pocket.", COLOR_ORANGE);
     return false;
 }
 
-bool use_escape_rope(
-    VideoStream& stream,
-    ProControllerContext& context,
-    int num_icons
-){
-    const BagItemTemplate rope{
-        // "PokemonBDSP/AutoStory/Bag_EscapeRope.png", "escape-rope"
-        "PokemonBDSP/Autostory/Bag_EscapeRope.png", "escape-rope"
-    };
+bool use_escape_rope(VideoStream& stream, ProControllerContext& context, int num_icons){
+    const BagItemTemplate rope{// "PokemonBDSP/AutoStory/Bag_EscapeRope.png", "escape-rope"
+                               "PokemonBDSP/Autostory/Bag_EscapeRope.png", "escape-rope"};
     if (!find_bag_item(stream, context, rope, 5, num_icons)){
         return false;
     }
 
     pbf_press_button(context, BUTTON_A, 80ms, 350ms);
     context.wait_for_all_requests();
-    SelectionArrowFinder use_menu(
-        stream.overlay(), ImageFloatBox(0.660, 0.100, 0.310, 0.430), COLOR_GREEN
-    );
+    SelectionArrowFinder use_menu(stream.overlay(), ImageFloatBox(0.660, 0.100, 0.310, 0.430), COLOR_GREEN);
     if (wait_until(stream, context, 3s, {{use_menu}}) != 0){
         stream.log("[Escape Rope] Item action menu not detected.", COLOR_ORANGE);
         return false;
@@ -1755,36 +1758,27 @@ bool use_escape_rope(
     BlackScreenWatcher transition;
     // Escape Rope fades white in the supplied clips; support black transitions too.
     WhiteScreenWatcher white_transition;
-    const int result = run_until<ProControllerContext>(
-        stream, context,
-        [](ProControllerContext& ctx){
-            for (size_t press = 0; press < 10; press++){
-                pbf_press_button(ctx, BUTTON_A, 80ms, 500ms);
-            }
-            ctx.wait_for_all_requests();
-            pbf_wait(ctx, 10s);
-            ctx.wait_for_all_requests();
-        },
-        {transition, white_transition}
-    );
+    const int result = run_until<ProControllerContext>(stream, context,
+                                                       [](ProControllerContext& ctx){
+                                                           for (size_t press = 0; press < 10; press++){
+                                                               pbf_press_button(ctx, BUTTON_A, 80ms, 500ms);
+                                                           }
+                                                           ctx.wait_for_all_requests();
+                                                           pbf_wait(ctx, 10s);
+                                                           ctx.wait_for_all_requests();
+                                                       },
+                                                       {transition, white_transition});
     if (result < 0){
         stream.log("[Escape Rope] No exit transition detected.", COLOR_ORANGE);
         return false;
     }
-    BlackScreenWatcher finished(
-        COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 100, 10,
-        BlackScreenWatcher::FinderType::GONE, 500ms
-    );
-    WhiteScreenWatcher white_finished(
-        COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 500, 10,
-        WhiteScreenWatcher::FinderType::GONE, 500ms
-    );
-    stream.log(std::string("[Escape Rope] ") +
-        (result == 1 ? "White" : "Black") + " exit transition detected.");
+    BlackScreenWatcher finished(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
+    WhiteScreenWatcher white_finished(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 500, 10, WhiteScreenWatcher::FinderType::GONE,
+                                      500ms);
+    stream.log(std::string("[Escape Rope] ") + (result == 1 ? "White" : "Black") + " exit transition detected.");
     // if (wait_until(stream, context, 15s, {{finished}}) != 0){ return false; }
-    const int finish_result = result == 1
-        ? wait_until(stream, context, 15s, {{white_finished}})
-        : wait_until(stream, context, 15s, {{finished}});
+    const int finish_result = result == 1 ? wait_until(stream, context, 15s, {{white_finished}})
+                                          : wait_until(stream, context, 15s, {{finished}});
     if (finish_result != 0){
         stream.log("[Escape Rope] Exit transition did not finish.", COLOR_ORANGE);
         return false;
@@ -1801,39 +1795,29 @@ bool use_escape_rope(
 }
 
 
-bool activate_repel(
-    VideoStream& stream,
-    ProControllerContext& context,
-    int num_icons,
-    int repel_type
-){
-    static const char* const slugs[]={"repel","super-repel","max-repel"};
-    if (repel_type<0 || repel_type>2) {
-        stream.log("activate_repel: type must be 0 (Repel), 1 (Super Repel), or 2 (Max Repel).",COLOR_RED);
+bool activate_repel(VideoStream& stream, ProControllerContext& context, int num_icons, int repel_type){
+    static const char* const slugs[] = {"repel", "super-repel", "max-repel"};
+    if (repel_type < 0 || repel_type > 2){
+        stream.log("activate_repel: type must be 0 (Repel), 1 (Super Repel), or 2 (Max Repel).", COLOR_RED);
         return false;
     }
-    const std::string slug=slugs[repel_type];
-    stream.log("Activating "+slug);
+    const std::string slug = slugs[repel_type];
+    stream.log("Activating " + slug);
     open_menu(stream, context, MenuCursorPosition::BAG, num_icons);
     context.wait_for_all_requests();
     pbf_wait(context, 1000ms);
 
-    auto repel_tab_ref = std::make_shared<const ImageRGB32>(
-        RESOURCE_PATH() + "PokemonBDSP/Autostory/Bag_RepelTab.png"
-    );
+    auto repel_tab_ref = std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/Autostory/Bag_RepelTab.png");
     // A smaller reference covers capture-resize sampling differences without
     // loosening the match threshold or changing shared image processing.
-    auto repel_tab_small_ref = std::make_shared<const ImageRGB32>(
-        RESOURCE_PATH() + "PokemonBDSP/Autostory/Bag_RepelTabSmall.png"
-    );
+    auto repel_tab_small_ref =
+        std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/Autostory/Bag_RepelTabSmall.png");
     // Obtaining Honey adds a NEW badge to the same selected Other Items tab.
     // Keep the original references and threshold for the earlier route stages.
-    auto repel_tab_honey_ref = std::make_shared<const ImageRGB32>(
-        RESOURCE_PATH() + "PokemonBDSP/Autostory/Bag_RepelTabHoney.png"
-    );
-    auto repel_tab_honey_small_ref = std::make_shared<const ImageRGB32>(
-        RESOURCE_PATH() + "PokemonBDSP/Autostory/Bag_RepelTabHoneySmall.png"
-    );
+    auto repel_tab_honey_ref =
+        std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/Autostory/Bag_RepelTabHoney.png");
+    auto repel_tab_honey_small_ref =
+        std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/Autostory/Bag_RepelTabHoneySmall.png");
     const ImageFloatBox repel_tab_box{0.735000, 0.055000, 0.045000, 0.080000};
     const double repel_tab_rmsd = 50.0;
 
@@ -1847,17 +1831,18 @@ bool activate_repel(
         ImageMatchWatcher small_watcher(repel_tab_small_ref, repel_tab_box, repel_tab_rmsd);
         ImageMatchWatcher honey_watcher(repel_tab_honey_ref, repel_tab_box, repel_tab_rmsd);
         ImageMatchWatcher honey_small_watcher(repel_tab_honey_small_ref, repel_tab_box, repel_tab_rmsd);
-        int ret = wait_until(stream, context, 400ms, {{watcher}, {small_watcher}, {honey_watcher}, {honey_small_watcher}});
+        int ret =
+            wait_until(stream, context, 400ms, {{watcher}, {small_watcher}, {honey_watcher}, {honey_small_watcher}});
         if (ret >= 0){
-            stream.log("[AutoStory] activate_repel: repel tab found after "
-                       + std::to_string(press) + " press(es).", COLOR_GREEN);
+            stream.log("[AutoStory] activate_repel: repel tab found after " + std::to_string(press) + " press(es).",
+                       COLOR_GREEN);
             found = true;
             break;
         }
 
         if (press < 8){
-            stream.log("[AutoStory] activate_repel: tab not found, pressing right ("
-                       + std::to_string(press + 1) + "/8).");
+            stream.log("[AutoStory] activate_repel: tab not found, pressing right (" + std::to_string(press + 1) +
+                       "/8).");
             pbf_press_dpad(context, DPAD_RIGHT, 80ms, 300ms);
         }
     }
@@ -1869,44 +1854,55 @@ bool activate_repel(
 
     // Reuse the Bag cursor/name geometry and existing Tesseract backend. A later
     // save may contain all three Repels and unrelated Other Items in any order.
-    bool item_found=false;
-    size_t confirmed=0;
-    size_t unknown_cursor=0;
-    for (size_t scan=0;scan<256;scan++) {
+    bool item_found = false;
+    size_t confirmed = 0;
+    size_t unknown_cursor = 0;
+    for (size_t scan = 0; scan < 256; scan++){
         context.wait_for_all_requests();
-        const auto frame=stream.video().snapshot();
-        if (!frame || bag_list_is_empty(*frame.frame)) break;
-        const int cursor=bag_cursor_position(*frame.frame);
-        if (!cursor) {
-            if (++unknown_cursor>=3) break;
-            pbf_wait(context,200ms);
+        const auto frame = stream.video().snapshot();
+        if (!frame || bag_list_is_empty(*frame.frame)){
+            break;
+        }
+        const int cursor = bag_cursor_position(*frame.frame);
+        if (!cursor){
+            if (++unknown_cursor >= 3){
+                break;
+            }
+            pbf_wait(context, 200ms);
             continue;
         }
-        unknown_cursor=0;
+        unknown_cursor = 0;
         // Use the existing Tesseract entry point directly so item selection
         // does not depend on the optional Paddle/ONNX runtime configuration.
-        const std::string text=OCR::tesseract_ocr_read(Language::English,
-            extract_box_reference(*frame.frame,bag_list_name_box(cursor)));
+        const std::string text =
+            OCR::tesseract_ocr_read(Language::English, extract_box_reference(*frame.frame, bag_list_name_box(cursor)));
         std::string normalized;
-        for (unsigned char ch:text) if (std::isalpha(ch)) normalized.push_back((char)std::tolower(ch));
-        static const char* const names[]={"repel","superrepel","maxrepel"};
-        if (normalized==names[repel_type]) {
-            if (++confirmed>=2) {item_found=true;break;}
-            pbf_wait(context,150ms);
-        } else {
-            confirmed=0;
+        for (unsigned char ch : text){
+            if (std::isalpha(ch)){
+                normalized.push_back((char)std::tolower(ch));
+            }
+        }
+        static const char* const names[] = {"repel", "superrepel", "maxrepel"};
+        if (normalized == names[repel_type]){
+            if (++confirmed >= 2){
+                item_found = true;
+                break;
+            }
+            pbf_wait(context, 150ms);
+        }else{
+            confirmed = 0;
             // Search both directions so a non-wrapping list opened halfway
             // down still reaches items above the initial cursor position.
-            pbf_press_dpad(context,scan<128 ? DPAD_DOWN : DPAD_UP,80ms,300ms);
+            pbf_press_dpad(context, scan < 128 ? DPAD_DOWN : DPAD_UP, 80ms, 300ms);
         }
     }
-    if (!item_found) {
-        stream.log("activate_repel: requested item not confirmed: "+slug,COLOR_RED);
-        pbf_mash_button(context,BUTTON_B,2000ms);
+    if (!item_found){
+        stream.log("activate_repel: requested item not confirmed: " + slug, COLOR_RED);
+        pbf_mash_button(context, BUTTON_B, 2000ms);
         context.wait_for_all_requests();
         return false;
     }
-    stream.log("[AutoStory] activate_repel: selected item confirmed: "+slug,COLOR_GREEN);
+    stream.log("[AutoStory] activate_repel: selected item confirmed: " + slug, COLOR_GREEN);
 
     context.wait_for_all_requests();
     pbf_wait(context, 400ms);
@@ -1929,29 +1925,22 @@ bool activate_repel(
 }
 
 
-void use_HM(
-    VideoStream& stream,
-    ProControllerContext& context,
-    const std::string& label
+void use_HM(VideoStream& stream, ProControllerContext& context, const std::string& label
 
 ){
     stream.log("Using " + label);
     const ImageFloatBox box{0.670000, 0.600000, 0.100000, 0.150000};
     SelectionArrowFinder arrow(stream.overlay(), box, COLOR_GREEN);
 
-    int ret = run_until<ProControllerContext>(
-        stream, context,
-        [](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_A, 30000ms);
-        },
-        {{arrow}}
-    );
+    int ret = run_until<ProControllerContext>(stream, context,
+                                              [](ProControllerContext& context){
+                                                  pbf_mash_button(context, BUTTON_A, 30000ms);
+                                              },
+                                              {{arrow}});
     if (ret != 0){
         OperationFailedExceptionWithScreenshot::fire(
             ErrorReportMode::SEND_ERROR_REPORT,
-            "Using " + label + ": HM confirmation arrow not found; stopping before further movement.",
-            stream
-        );
+            "Using " + label + ": HM confirmation arrow not found; stopping before further movement.", stream);
     }
 
     stream.log("Using " + label + ": selection arrow found, confirming.", COLOR_GREEN);
@@ -1962,7 +1951,7 @@ void use_HM(
 
 bool get_on_bicycle(VideoStream& stream, ProControllerContext& context, GearLevel /*gear*/){
     static const ImageFloatBox FRONT_BOX{0.440000, 0.470000, 0.035000, 0.054000};
-    static const ImageFloatBox BACK_BOX {0.520000, 0.470000, 0.022000, 0.054000};
+    static const ImageFloatBox BACK_BOX{0.520000, 0.470000, 0.022000, 0.054000};
     // Spark color range: white (R=232,G=255,B=255) down to light green (R=163,G=217,B=181)
     static const uint32_t SPARK_MIN = 0xFF000000u | (163u << 16) | (217u << 8) | 181u;
     static const uint32_t SPARK_MAX = 0xFFFFFFFFu;
@@ -1983,33 +1972,37 @@ bool get_on_bicycle(VideoStream& stream, ProControllerContext& context, GearLeve
         while (std::chrono::steady_clock::now() < deadline){
             context.wait_for(50ms);
             VideoSnapshot screen = stream.video().snapshot();
-            if (!screen) continue;
+            if (!screen){
+                continue;
+            }
 
             size_t front_pixels = 0, back_pixels = 0;
-            filter_rgb32_range(front_pixels, extract_box_reference(screen, FRONT_BOX), SPARK_MIN, SPARK_MAX, Color(0), false);
-            filter_rgb32_range(back_pixels,  extract_box_reference(screen, BACK_BOX),  SPARK_MIN, SPARK_MAX, Color(0), false);
+            filter_rgb32_range(front_pixels, extract_box_reference(screen, FRONT_BOX), SPARK_MIN, SPARK_MAX, Color(0),
+                               false);
+            filter_rgb32_range(back_pixels, extract_box_reference(screen, BACK_BOX), SPARK_MIN, SPARK_MAX, Color(0),
+                               false);
 
-            if (front_pixels > max_front) max_front = front_pixels;
-            if (back_pixels  > max_back)  max_back  = back_pixels;
+            if (front_pixels > max_front){
+                max_front = front_pixels;
+            }
+            if (back_pixels > max_back){
+                max_back = back_pixels;
+            }
 
             if (front_pixels >= SPARK_THRESHOLD || back_pixels >= SPARK_THRESHOLD){
-                stream.log(
-                    "[AutoStory] get_on_bicycle: sparks detected "
-                    "(front=" + std::to_string(front_pixels) +
-                    " back="  + std::to_string(back_pixels)  +
-                    " threshold=" + std::to_string(SPARK_THRESHOLD) + ").",
-                    COLOR_GREEN
-                );
+                stream.log("[AutoStory] get_on_bicycle: sparks detected "
+                           "(front=" +
+                               std::to_string(front_pixels) + " back=" + std::to_string(back_pixels) +
+                               " threshold=" + std::to_string(SPARK_THRESHOLD) + ").",
+                           COLOR_GREEN);
                 return true;
             }
         }
-        stream.log(
-            "[AutoStory] get_on_bicycle: no sparks detected "
-            "(peak front=" + std::to_string(max_front) +
-            " back="       + std::to_string(max_back)  +
-            " threshold="  + std::to_string(SPARK_THRESHOLD) + ").",
-            COLOR_ORANGE
-        );
+        stream.log("[AutoStory] get_on_bicycle: no sparks detected "
+                   "(peak front=" +
+                       std::to_string(max_front) + " back=" + std::to_string(max_back) +
+                       " threshold=" + std::to_string(SPARK_THRESHOLD) + ").",
+                   COLOR_ORANGE);
         return false;
     };
 

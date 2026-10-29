@@ -17,14 +17,17 @@
 #include <functional>
 #include <string>
 #include <vector>
+
 #include "CommonFramework/Tools/VideoStream.h"
+
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
+
 #include "PokemonBDSP/Programs/AutoStory/PokemonBDSP_AutoStoryTools.h"
 
-namespace PokemonAutomation{
-    struct ProgramInfo;
-namespace NintendoSwitch{
-namespace PokemonBDSP{
+namespace PokemonAutomation {
+struct ProgramInfo;
+namespace NintendoSwitch {
+namespace PokemonBDSP {
 
 
 // ---------------------------------------------------------------------------
@@ -35,11 +38,7 @@ namespace PokemonBDSP{
 //  This does not attempt to catch — it simply presses A to select the first move
 //  repeatedly until the battle ends.
 //  After the black-screen transition and experience gain, returns to the caller.
-void run_battle_press_A(
-    const ProgramInfo& info,
-    VideoStream& stream,
-    ProControllerContext& context
-);
+void run_battle_press_A(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
 
 
 // ---------------------------------------------------------------------------
@@ -53,13 +52,10 @@ void run_battle_press_A(
 //  The whole sequence retries up to `max_attempts` times.
 //  Throws OperationFailedException if max_attempts is exceeded.
 void handle_unexpected_battle(
-    const ProgramInfo& info,
-    VideoStream& stream,
-    ProControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     std::function<void(const ProgramInfo&, VideoStream&, ProControllerContext&)>&& action,
     std::function<void(const ProgramInfo&, VideoStream&, ProControllerContext&)>&& recovery_action,
-    size_t max_attempts = 5
-);
+    size_t max_attempts = 5);
 
 
 // ---------------------------------------------------------------------------
@@ -75,15 +71,8 @@ void handle_unexpected_battle(
 //    4. Mashes A to cover target selection and partner's move.
 //    5. After XP gain, updates on-field opponents via OCR.
 //  Returns when the battle ends and the player is back in the overworld.
-void handle_battle_with_outside_help(
-    const ProgramInfo& info,
-    VideoStream& stream,
-    ProControllerContext& context,
-    const std::string& trainer_id,
-    const AutoStoryOptions& options
-);
-
-
+void handle_battle_with_outside_help(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
+                                     const std::string& trainer_id, const AutoStoryOptions& options);
 
 
 // ---------------------------------------------------------------------------
@@ -104,14 +93,9 @@ void handle_battle_with_outside_help(
 //    5. Selects the pre-planned optimal move and executes it.
 //    6. After XP gain, OCRs the new opponent and loops.
 //  Returns when the battle ends and the player is back in the overworld.
-void handle_expert_battle(
-    const ProgramInfo& info,
-    VideoStream& stream,
-    ProControllerContext& context,
-    const std::vector<Trainer>& all_trainers,
-    Trainer current_trainer,
-    const AutoStoryOptions& options
-);
+void handle_expert_battle(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
+                          const std::vector<Trainer>& all_trainers, Trainer current_trainer,
+                          const AutoStoryOptions& options);
 
 
 }

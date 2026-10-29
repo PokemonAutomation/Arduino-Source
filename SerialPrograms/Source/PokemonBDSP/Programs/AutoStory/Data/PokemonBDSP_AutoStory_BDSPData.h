@@ -11,11 +11,12 @@
 
 #include <string>
 #include <vector>
+
 #include "Pokemon/Pokemon_Types.h"
 
-namespace PokemonAutomation{
-namespace NintendoSwitch{
-namespace PokemonBDSP{
+namespace PokemonAutomation {
+namespace NintendoSwitch {
+namespace PokemonBDSP {
 
 using namespace Pokemon;
 
@@ -24,13 +25,13 @@ using namespace Pokemon;
 //  Move data
 // ---------------------------------------------------------------------------
 
-struct BDSPMoveData{
+struct BDSPMoveData {
     MoveCategory category;
-    PokemonType  type;
-    uint8_t      base_power;
-    uint8_t      pp;
-    bool         spread;
-    uint8_t      accuracy;  // 0 = never-miss (e.g. Swift); otherwise 1-100
+    PokemonType type;
+    uint8_t base_power;
+    uint8_t pp;
+    bool spread;
+    uint8_t accuracy; // 0 = never-miss (e.g. Swift); otherwise 1-100
 };
 
 //  Returns move data for the given slug.
@@ -42,14 +43,14 @@ const BDSPMoveData& bdsp_move(const std::string& slug);
 //  Pokemon base stats
 // ---------------------------------------------------------------------------
 
-struct BDSPPokemonData{
-    PokemonType type[2];   // type[1] == NONE for mono-type pokemon
-    uint8_t     hp;
-    uint8_t     attack;
-    uint8_t     defense;
-    uint8_t     spatk;
-    uint8_t     spdef;
-    uint8_t     speed;
+struct BDSPPokemonData {
+    PokemonType type[2]; // type[1] == NONE for mono-type pokemon
+    uint8_t hp;
+    uint8_t attack;
+    uint8_t defense;
+    uint8_t spatk;
+    uint8_t spdef;
+    uint8_t speed;
 };
 
 //  Returns base stats for the given species slug (e.g. "beautifly").
@@ -61,34 +62,34 @@ const BDSPPokemonData& bdsp_pokemon(const std::string& slug);
 //  Trainer database
 // ---------------------------------------------------------------------------
 
-enum class BDSPBattleType{
+enum class BDSPBattleType {
     SINGLES,
     DOUBLES,
 };
 
-struct BDSPStatSet{
-    uint8_t hp      = 0;
-    uint8_t attack  = 0;
+struct BDSPStatSet {
+    uint8_t hp = 0;
+    uint8_t attack = 0;
     uint8_t defense = 0;
-    uint8_t spatk   = 0;
-    uint8_t spdef   = 0;
-    uint8_t speed   = 0;
+    uint8_t spatk = 0;
+    uint8_t spdef = 0;
+    uint8_t speed = 0;
 };
 
-struct BDSPTrainerPokemon{
+struct BDSPTrainerPokemon {
     std::string species;
-    uint8_t     level;
+    uint8_t level;
     BDSPStatSet ivs;
     BDSPStatSet evs;
-    bool        has_intimidate = false;
+    bool has_intimidate = false;
 };
 
-struct BDSPTrainer{
+struct BDSPTrainer {
     std::vector<BDSPTrainerPokemon> pokemon;
 };
 
-struct BDSPTrainerData{
-    BDSPBattleType         battle_type;
+struct BDSPTrainerData {
+    BDSPBattleType battle_type;
     std::vector<BDSPTrainer> trainers;
 };
 
