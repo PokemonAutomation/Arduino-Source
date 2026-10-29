@@ -72,6 +72,23 @@
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
         "PACKAGE_BUILD": "ON"
       }
+    },
+    {
+      "name": "macos-ccache",
+      "inherits": "RelWithDebInfo",
+      "displayName": "macOS RelWithDebInfo with shared ccache",
+      "description": "Apple Clang builds with a 5 GB local compiler cache shared across worktrees.",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      },
+      "cacheVariables": {
+        "CMAKE_C_COMPILER_LAUNCHER": "ccache;cache_dir=$penv{HOME}/Library/Caches/pokemonautomation-ccache;base_dir=${sourceParentDir};max_size=5G",
+        "CMAKE_CXX_COMPILER_LAUNCHER": "ccache;cache_dir=$penv{HOME}/Library/Caches/pokemonautomation-ccache;base_dir=${sourceParentDir};max_size=5G",
+        "CMAKE_C_FLAGS": "-fdebug-prefix-map=${sourceParentDir}=. -fdebug-compilation-dir=.",
+        "CMAKE_CXX_FLAGS": "-fdebug-prefix-map=${sourceParentDir}=. -fdebug-compilation-dir=."
+      }
     }
   ],
   "buildPresets": [
@@ -99,6 +116,10 @@
     {
       "name": "Publish",
       "configurePreset": "Publish"
+    },
+    {
+      "name": "macos-ccache",
+      "configurePreset": "macos-ccache"
     }
   ]
 }
