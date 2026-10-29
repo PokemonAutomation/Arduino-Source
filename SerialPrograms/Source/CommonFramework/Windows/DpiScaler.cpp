@@ -4,8 +4,6 @@
  *
  */
 
-#include <QApplication>
-#include <QScreen>
 #include "DpiScaler.h"
 
 //#include <iostream>

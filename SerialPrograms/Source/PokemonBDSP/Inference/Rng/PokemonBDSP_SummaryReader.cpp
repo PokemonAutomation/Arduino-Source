@@ -6,11 +6,7 @@
 
 #include <string>
 #include "Common/Cpp/Logging/AbstractLogger.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
-#include "CommonTools/OCR/OCR_Routines.h"
-#include "Pokemon/Inference/Pokemon_NatureReader.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxNatureDetector.h"
 #include "PokemonBDSP_SummaryReader.h"
 

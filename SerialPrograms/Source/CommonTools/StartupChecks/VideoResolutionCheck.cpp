@@ -5,9 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "VideoResolutionCheck.h"
 
 namespace PokemonAutomation{
 

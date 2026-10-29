@@ -10,7 +10,6 @@
 #include <fstream>
 #include <mutex>
 #include <iostream>
-#include <onnxruntime_cxx_api.h>
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include <QMessageBox>

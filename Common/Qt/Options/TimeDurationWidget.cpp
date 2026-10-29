@@ -6,7 +6,6 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QLineEdit>
 #include "TimeDurationWidget.h"
 
 //#include <iostream>

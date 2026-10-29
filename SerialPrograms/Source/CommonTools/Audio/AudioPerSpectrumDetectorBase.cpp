@@ -8,7 +8,6 @@
 #include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "SpectrogramMatcher.h"
 #include "AudioPerSpectrumDetectorBase.h"
 

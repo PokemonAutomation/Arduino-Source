@@ -5,8 +5,6 @@
  */
 
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonBDSP_ExperienceGainDetector.h"
 

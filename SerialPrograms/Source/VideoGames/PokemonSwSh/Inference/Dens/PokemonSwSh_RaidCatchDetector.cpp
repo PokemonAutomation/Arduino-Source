@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/ColorClustering.h"
 #include "PokemonSwSh_RaidCatchDetector.h"

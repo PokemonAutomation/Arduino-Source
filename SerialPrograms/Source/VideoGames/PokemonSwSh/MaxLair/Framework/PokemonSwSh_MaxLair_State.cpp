@@ -4,7 +4,6 @@
  *
  */
 #include "Common/Cpp/PrettyPrint.h"
-#include "Pokemon/Pokemon_Types.h"
 #include "PokemonSwSh_MaxLair_State.h"
 
 namespace PokemonAutomation{

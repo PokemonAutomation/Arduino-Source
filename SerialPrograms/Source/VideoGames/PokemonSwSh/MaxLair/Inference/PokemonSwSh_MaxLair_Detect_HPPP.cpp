@@ -6,7 +6,6 @@
 
 #include "Common/Cpp/Strings/Unicode.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/OCR/OCR_StringNormalization.h"

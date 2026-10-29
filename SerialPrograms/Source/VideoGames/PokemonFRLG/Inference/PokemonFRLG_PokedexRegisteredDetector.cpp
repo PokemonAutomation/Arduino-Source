@@ -4,7 +4,6 @@
  *
  */
 
-#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/WaterfillUtilities.h"

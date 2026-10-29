@@ -14,7 +14,6 @@
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
-#include "PokemonSV_AreaZero.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

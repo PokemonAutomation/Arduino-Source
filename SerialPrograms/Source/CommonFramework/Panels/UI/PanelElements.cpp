@@ -7,11 +7,9 @@
 #include <QMessageBox>
 #include <QVBoxLayout>
 #include <QScrollArea>
-#include <QLabel>
 #include <QPushButton>
 #include "Common/Cpp/ColoredText.h"
 #include "Common/Qt/Options/ConfigWidget.h"
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/Panels/PanelSession.h"
 #include "CommonFramework/ProgramSession.h"
 #include "GameConsole/ConsoleProgram.h"

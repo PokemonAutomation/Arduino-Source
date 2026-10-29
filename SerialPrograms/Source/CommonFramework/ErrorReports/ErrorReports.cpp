@@ -5,7 +5,6 @@
  */
 
 #include <iostream>
-#include <QMessageBox>
 #include "Common/Cpp/Filesystem/FileIO.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/PrettyPrint.h"
@@ -19,11 +18,8 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
-#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "ProgramDumper.h"
 #include "ErrorReports.h"
 

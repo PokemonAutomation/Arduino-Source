@@ -7,7 +7,6 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "PokemonBDSP_RunFromBattle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

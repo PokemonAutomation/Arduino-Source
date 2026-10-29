@@ -6,7 +6,6 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "Kernels_ImagePixelSumSqr.h"
 #include "Kernels_ImagePixelSumSqr_TestInfra.h"
 
 namespace PokemonAutomation{

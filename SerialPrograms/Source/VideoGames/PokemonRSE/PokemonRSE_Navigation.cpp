@@ -11,7 +11,6 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
@@ -21,7 +20,6 @@
 #include "VideoGames/PokemonRSE/Inference/Menus/PokemonRSE_LoadMenuDetector.h"
 #include "VideoGames/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.h"
 #include "VideoGames/PokemonRSE/PokemonRSE_Settings.h"
-#include "PokemonRSE_Navigation.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

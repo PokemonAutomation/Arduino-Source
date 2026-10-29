@@ -8,7 +8,6 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "Kernels_ImagePixelSumSqrDev.h"
 #include "Kernels_ImagePixelSumSqrDev_TestInfra.h"
 
 namespace PokemonAutomation{

@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "PokemonBDSP_Tests.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

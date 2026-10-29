@@ -5,7 +5,6 @@
  */
 
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch_Commands_Superscalar.h"
 
 namespace PokemonAutomation{

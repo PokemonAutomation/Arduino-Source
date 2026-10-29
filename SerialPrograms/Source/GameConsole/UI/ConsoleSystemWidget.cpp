@@ -4,8 +4,6 @@
  *
  */
 
-#include <QKeyEvent>
-#include <QVBoxLayout>
 #include "CommandRowWidget.h"
 #include "ConsoleSystemWidget.h"
 

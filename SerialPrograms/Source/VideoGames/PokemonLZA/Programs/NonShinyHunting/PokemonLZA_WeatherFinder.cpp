@@ -13,9 +13,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "VideoGames/PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
-#include "VideoGames/PokemonLZA/Programs/PokemonLZA_MenuNavigation.h"
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_WeatherDetector.h"
 #include "PokemonLZA_WeatherFinder.h"
 

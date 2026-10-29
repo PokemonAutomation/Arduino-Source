@@ -4,13 +4,11 @@
  *
  */
 
-#include <QtGlobal>
 //#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
-#include "CameraImplementations.h"
 
 //#include <iostream>
 //using std::cout;

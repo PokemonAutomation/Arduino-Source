@@ -8,7 +8,6 @@
 #include <thread>
 #include <iostream>
 #include "Common/Cpp/CpuId/CpuId.h"
-#include "SpinPause.h"
 #include "SpinLock.h"
 
 #if 0

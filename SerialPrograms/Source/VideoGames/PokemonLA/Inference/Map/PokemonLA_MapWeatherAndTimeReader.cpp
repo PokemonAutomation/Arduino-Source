@@ -9,14 +9,11 @@
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "CommonTools/ImageMatch/SilhouetteDictionaryMatcher.h"
 #include "Tests/TestUtils.h"
 #include "VideoGames/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h"
-#include "PokemonLA_MapWeatherAndTimeReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

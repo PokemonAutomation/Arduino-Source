@@ -7,7 +7,6 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Tools/ErrorDumper.h"

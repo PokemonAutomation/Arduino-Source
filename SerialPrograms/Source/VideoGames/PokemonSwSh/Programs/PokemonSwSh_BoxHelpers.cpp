@@ -4,14 +4,11 @@
  *
  */
 
-#include "CommonFramework/Tools/VideoStream.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
-#include "PokemonSwSh_BoxHelpers.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

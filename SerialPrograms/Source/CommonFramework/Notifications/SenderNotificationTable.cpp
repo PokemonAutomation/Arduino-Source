@@ -4,7 +4,6 @@
  *
  */
 
-#include "SenderNotificationTable.h"
 
 namespace PokemonAutomation{
 

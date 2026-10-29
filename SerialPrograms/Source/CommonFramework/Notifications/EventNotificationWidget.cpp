@@ -4,7 +4,6 @@
  *
  */
 
-#include <QFont>
 #include <QPushButton>
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"

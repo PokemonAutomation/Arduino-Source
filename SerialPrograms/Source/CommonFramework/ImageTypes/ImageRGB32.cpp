@@ -7,7 +7,6 @@
 #include <utility>
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "CompileTimeBackends.h"
-#include "ImageViewRGB32.h"
 #include "ImageRGB32.h"
 
 #ifdef PA_IMAGE_BACKEND_Qt

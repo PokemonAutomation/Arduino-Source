@@ -4,12 +4,8 @@
  *
  */
 
-#include <QVBoxLayout>
-#include <QLabel>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/NoWheelComboBox.h"
-#include "PokemonBDSP_EncounterFilterEnums.h"
-#include "PokemonBDSP_EncounterFilterWidget.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

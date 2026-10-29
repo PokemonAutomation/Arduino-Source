@@ -5,7 +5,6 @@
  */
 
 #include <QString>
-#include "StringToolsQt.h"
 
 namespace PokemonAutomation{
 

@@ -7,11 +7,9 @@
 #include <cmath>
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Images/DistanceToLine.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
-#include "PokemonSwSh_MaxLair_Detect_PathSide.h"
 
 //#include <iostream>
 //using std::cout;

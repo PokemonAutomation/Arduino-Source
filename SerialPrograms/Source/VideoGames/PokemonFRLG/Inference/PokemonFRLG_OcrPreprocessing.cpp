@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <opencv2/imgproc.hpp>
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 
 #include "PokemonFRLG_OcrPreprocessing.h"

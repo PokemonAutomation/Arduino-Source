@@ -12,7 +12,6 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Tests/GuardPageImage.h"
-#include "Kernels_ImageScaleBrightness_Tests.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

@@ -6,8 +6,6 @@
 
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "Tests/TestUtils.h"
 #include "PokemonHome_ShinyDetector.h"
 
 namespace PokemonAutomation{

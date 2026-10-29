@@ -12,7 +12,6 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/Images/ImageFilter.h"
 //#include "Tests/TestUtils.h"
-#include "PokemonLA_MapZoomLevelReader.h"
 
 //#include <iostream>
 //using std::cout;

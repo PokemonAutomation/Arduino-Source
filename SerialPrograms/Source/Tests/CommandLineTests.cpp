@@ -9,7 +9,6 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "ComputerPrograms/ComputerPrograms_UnitTestRunner.h"
 
-#include "CommandLineTests.h"
 
 using std::cout;
 using std::endl;

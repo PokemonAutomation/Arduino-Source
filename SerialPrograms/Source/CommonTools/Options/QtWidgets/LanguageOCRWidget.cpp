@@ -5,10 +5,8 @@
  */
 
 #include <QStandardItemModel>
-#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QComboBox>
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/Globals.h"
 #include "LanguageOCRWidget.h"

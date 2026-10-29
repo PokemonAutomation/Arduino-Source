@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonTools/OCR/OCR_Routines.h"
 #include "Pokemon_BerryNameReader.h"
 
 namespace PokemonAutomation{

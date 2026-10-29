@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Concurrency/AsyncTask.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"

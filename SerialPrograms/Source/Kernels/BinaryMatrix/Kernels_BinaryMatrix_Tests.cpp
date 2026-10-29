@@ -21,7 +21,6 @@
 #include "Kernels_BinaryMatrixTile_64x8_arm64_NEON.h"
 #endif
 #include "Tests/GuardPageImage.h"
-#include "Kernels_BinaryMatrix_Tests.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

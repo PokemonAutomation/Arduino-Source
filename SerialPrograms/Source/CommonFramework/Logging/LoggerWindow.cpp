@@ -4,7 +4,6 @@
  *
  */
 
-#include <QCoreApplication>
 #include <QTimer>
 #include <QMenuBar>
 #include "Common/Cpp/Logging/LastLogTracker.h"

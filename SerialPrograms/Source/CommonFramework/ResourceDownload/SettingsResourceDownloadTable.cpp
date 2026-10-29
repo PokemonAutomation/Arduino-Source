@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "ResourceDownload.h"
 #include "SettingsResourceDownloadRow.h"
 #include "SettingsResourceDownloadTable.h"
 

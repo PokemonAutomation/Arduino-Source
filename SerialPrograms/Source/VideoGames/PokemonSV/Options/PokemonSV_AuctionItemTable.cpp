@@ -4,7 +4,6 @@
  *
  */
 
-#include "VideoGames/PokemonSV/Resources/PokemonSV_AuctionItemNames.h"
 #include "PokemonSV_AuctionItemTable.h"
 
 namespace PokemonAutomation{

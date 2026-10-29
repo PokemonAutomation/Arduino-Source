@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/CpuId/CpuId.h"
-#include "Kernels_AudioChannelInterleave.h"
 
 #include "Kernels_AudioChannelInterleave_Default.h"
 

@@ -10,7 +10,6 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokeballNames.h"
 #include "PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h"
-#include "PokemonBDSP_EncounterFilterEnums.h"
 #include "PokemonBDSP_EncounterFilterOverride.h"
 
 namespace PokemonAutomation{

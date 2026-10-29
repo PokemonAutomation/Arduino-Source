@@ -7,12 +7,7 @@
 #include <string>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Tests/TestUtils.h"
-#include "VideoGames/PokemonHome/Inference/PokemonHome_ButtonDetector.h"
 #include "PokemonHome_BoxViewDetector.h"
 
 namespace PokemonAutomation{

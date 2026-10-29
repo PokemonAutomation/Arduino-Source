@@ -7,7 +7,6 @@
 #include <QStandardItemModel>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QComboBox>
 #include "EnumDropdownWidget.h"
 
 namespace PokemonAutomation{

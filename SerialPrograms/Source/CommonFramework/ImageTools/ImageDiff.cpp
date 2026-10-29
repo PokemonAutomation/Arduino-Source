@@ -10,7 +10,6 @@
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqr.h"
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.h"
 #include "Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "ImageDiff.h"
 

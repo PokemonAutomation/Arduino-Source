@@ -6,11 +6,8 @@
 
 #include <iostream>
 #include <QUrl>
-#include <QAudioBuffer>
 #include <QAudioDecoder>
-#include <QAudioFormat>
 #include <QTimer>
-#include <QEventLoop>
 #include "3rdParty/QtWavFile/WavFile.h"
 #include "Common/Qt/StringToolsQt.h"
 #include "Common/Qt/GlobalThreadPoolsQt.h"

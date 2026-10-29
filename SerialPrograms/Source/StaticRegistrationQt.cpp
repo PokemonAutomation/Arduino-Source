@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonTools/Options/QtWidgets/ScreenWatchWidget.h"
 #include "Common/Qt/Options/BatchWidget.h"
 
 //  Basic Options
@@ -51,7 +50,6 @@
 
 //  Controllers
 //#include "Controllers/NullControllerWidget.h"
-#include "Controllers/ControllerSelectorWidget.h"
 #include "Controllers/PABotBase2/SerialPABotBase2_SelectorWidget.h"
 #include "GameConsole/UI/ConsoleSystemWidget.h"
 
@@ -68,7 +66,6 @@
 //#include "NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.h"
 
 //  Pokemon LA
-#include "StaticRegistration.h"
 
 namespace PokemonAutomation{
 

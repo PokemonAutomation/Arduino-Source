@@ -7,13 +7,10 @@
 #include <map>
 #include <string>
 #include <thread>
-#include <QObject>
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "GlobalThreadPoolsQt.h"
-#include "QtThreadPool.h"
-#include "QtThreadPool_Tests.h"
 
 namespace PokemonAutomation{
 

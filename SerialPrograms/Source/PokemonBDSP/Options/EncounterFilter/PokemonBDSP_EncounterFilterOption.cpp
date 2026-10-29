@@ -4,7 +4,6 @@
  *
  */
 
-#include "PokemonBDSP_EncounterFilterEnums.h"
 #include "PokemonBDSP_EncounterFilterOption.h"
 
 namespace PokemonAutomation{

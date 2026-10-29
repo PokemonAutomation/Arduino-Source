@@ -10,7 +10,6 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "VideoGames/PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "VideoGames/PokemonLA/PokemonLA_TravelLocations.h"
 #include "PokemonLA_GeneratePokemonImageTrainingData.h"

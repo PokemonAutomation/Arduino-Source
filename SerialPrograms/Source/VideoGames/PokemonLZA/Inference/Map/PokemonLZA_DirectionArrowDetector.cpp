@@ -8,10 +8,8 @@
 #include <sstream>
 #include <opencv2/opencv.hpp>
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 //#include "Tests/TestUtils.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonLZA_DirectionArrowDetector.h"
 
 // #define DEBUG_DIRECTION_ARROW

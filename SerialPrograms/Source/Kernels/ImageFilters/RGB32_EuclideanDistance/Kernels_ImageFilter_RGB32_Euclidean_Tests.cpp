@@ -24,9 +24,7 @@
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
-#include "Kernels_ImageFilter_RGB32_Euclidean_Tests.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

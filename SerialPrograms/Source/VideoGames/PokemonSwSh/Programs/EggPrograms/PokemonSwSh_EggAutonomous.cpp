@@ -7,11 +7,7 @@
 #include <cmath>
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
@@ -27,9 +23,7 @@
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
-#include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_BoxHelpers.h"
 #include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
-#include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h"
 #include "PokemonSwSh_EggHelpers.h"
 #include "PokemonSwSh_EggAutonomous.h"
 

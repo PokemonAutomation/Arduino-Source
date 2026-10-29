@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "ResolutionOption.h"
 

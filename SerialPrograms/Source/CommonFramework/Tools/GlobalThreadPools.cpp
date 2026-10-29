@@ -7,7 +7,6 @@
 #include "Common/Cpp/Concurrency/Backends/ThreadPool_Default.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
-#include "GlobalThreadPools.h"
 
 namespace PokemonAutomation{
 namespace GlobalThreadPools{

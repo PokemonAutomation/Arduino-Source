@@ -8,7 +8,6 @@
 #include <sstream>
 #include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "Pokemon/Pokemon_CollectedPokemonInfo.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_SummaryReader.h"
 #include "VideoGames/PokemonHome/Programs/PokemonHome_BoxNavigation.h"

@@ -5,7 +5,6 @@
  */
 
 #ifdef QT_CORE_LIB
-#include <QSerialPortInfo>
 #include <QMessageBox>
 #include "Controllers/SerialPort/SerialPortPollerQt.h"
 #endif

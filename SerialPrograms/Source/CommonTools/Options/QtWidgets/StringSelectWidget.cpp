@@ -4,7 +4,6 @@
  *
  */
 
-#include <QStandardItemModel>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QCompleter>

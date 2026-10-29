@@ -6,7 +6,6 @@
 
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Framework/NintendoSwitch_MultiSwitchProgramSession.h"
-#include "NintendoSwitch_MultiSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -6,17 +6,14 @@
 
 #include <iostream>
 #include <QMessageBox>
-#include <QApplication>
 #if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
 #if QT_CONFIG(permissions)
-#include <QPermissions>
 #endif
 #endif
 #include "Common/Compiler.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "SetupSettings.h"
 
 using std::cout;
 using std::endl;

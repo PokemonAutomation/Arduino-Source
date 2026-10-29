@@ -12,7 +12,6 @@
 
 #include "VideoSources/VideoSource_StillImage.h"
 #include "VideoSources/VideoSource_Camera.h"
-#include "VideoSourceDescriptor.h"
 
 //#include <iostream>
 //using std::cout;

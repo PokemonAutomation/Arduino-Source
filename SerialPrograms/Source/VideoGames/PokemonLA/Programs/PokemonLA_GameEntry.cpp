@@ -12,7 +12,6 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "VideoGames/PokemonLA/PokemonLA_Settings.h"
-#include "PokemonLA_GameEntry.h"
 
 //#include <iostream>
 //using std::cout;

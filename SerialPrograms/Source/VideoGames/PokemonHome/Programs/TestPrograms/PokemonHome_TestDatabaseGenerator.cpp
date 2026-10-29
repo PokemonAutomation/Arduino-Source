@@ -14,13 +14,8 @@
 #include <string>
 #include <vector>
 #include "Common/Cpp/Filesystem/Filesystem.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
-#include "Pokemon/Pokemon_OriginMarks.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "Pokemon/Pokemon_Types.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_BallReader.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_AlphaDetector.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_BoxGenderDetector.h"

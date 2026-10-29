@@ -7,11 +7,7 @@
 
 //#include <iostream>
 //#include <filesystem>
-#include <opencv2/imgproc.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <QMessageBox>
 //#include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 //#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"

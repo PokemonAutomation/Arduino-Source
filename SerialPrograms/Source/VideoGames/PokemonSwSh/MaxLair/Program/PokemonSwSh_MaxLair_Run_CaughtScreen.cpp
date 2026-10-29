@@ -6,7 +6,6 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -14,7 +13,6 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonSwSh/PokemonSwSh_Settings.h"
-#include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.h"
@@ -23,7 +21,6 @@
 #include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Entrance.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Notifications.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_CatchScreenTracker.h"
-#include "PokemonSwSh_MaxLair_Run_CaughtScreen.h"
 
 //#include <iostream>
 //using std::cout;

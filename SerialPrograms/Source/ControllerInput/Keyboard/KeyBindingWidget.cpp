@@ -4,9 +4,7 @@
  *
  */
 
-#include <QKeyEvent>
 #include "CommonFramework/Logging/Logger.h"
-#include "ControllerInput/Keyboard/GlobalQtKeyMap.h"
 #include "ControllerInput/Keyboard/KeyboardInput_KeyMappings.h"
 #include "KeyBindingWidget.h"
 

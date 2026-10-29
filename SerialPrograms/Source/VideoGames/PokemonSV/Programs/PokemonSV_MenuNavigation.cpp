@@ -3,7 +3,6 @@
  */
 
 #include "Common/Cpp/RecursiveThrottler.h"
-#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -14,16 +13,11 @@
 //#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.h"
 //#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_NeutralDateSkip.h"
 #include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h"
-#include "VideoGames/PokemonSV/PokemonSV_Settings.h"
-#include "VideoGames/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "VideoGames/PokemonSV/Inference/Map/PokemonSV_MapDetector.h"
 #include "VideoGames/PokemonSV/Inference/PokemonSV_BagDetector.h"
-#include "VideoGames/PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
-#include "VideoGames/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "VideoGames/PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
-#include "PokemonSV_ConnectToInternet.h"
 #include "PokemonSV_MenuNavigation.h"
 
 namespace PokemonAutomation{

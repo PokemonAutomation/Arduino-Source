@@ -5,13 +5,10 @@
  */
 
 #include "Common/Cpp/ScopeExit.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
-#include "CommonFramework/Panels/PanelSession.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Framework/MultiConsoleProgramSession.h"
-#include "MultiConsoleProgram.h"
 
 namespace PokemonAutomation{
 namespace GameConsole{

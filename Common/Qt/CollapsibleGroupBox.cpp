@@ -8,7 +8,6 @@
 #include <QAbstractButton>
 #include <QKeyEvent>
 #include <QPainter>
-#include <QStyle>
 #include <QStyleOption>
 #include "CollapsibleGroupBox.h"
 

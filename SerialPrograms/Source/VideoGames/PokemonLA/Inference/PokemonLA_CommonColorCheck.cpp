@@ -5,7 +5,6 @@
  */
 
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "PokemonLA_CommonColorCheck.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

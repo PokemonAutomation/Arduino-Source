@@ -4,7 +4,6 @@
  *
  */
 
-#include <QEventLoop>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Logging/Logger.h"

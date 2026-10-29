@@ -8,7 +8,6 @@
 #include "Common/Cpp/Logging/TaggedLogger.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Logger.h"
 
 namespace PokemonAutomation{
 

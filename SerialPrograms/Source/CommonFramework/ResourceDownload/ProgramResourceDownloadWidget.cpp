@@ -4,9 +4,6 @@
  *
  */
 
-#include <QMessageBox>
-#include <QEventLoop>
-#include "CommonFramework/ProgramSession.h"
 #include "ProgramResourceDownloadWidget.h"
 
 //#include <iostream>

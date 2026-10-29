@@ -5,7 +5,6 @@
  */
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "PokemonBDSP_BoxRelease.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

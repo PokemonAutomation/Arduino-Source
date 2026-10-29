@@ -4,7 +4,6 @@
  *
  */
 
-#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include "BatchWidget.h"
 

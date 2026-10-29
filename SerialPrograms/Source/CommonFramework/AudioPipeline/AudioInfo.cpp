@@ -14,7 +14,6 @@
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Kernels/AudioPipeline/Kernels_AudioPipeline.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "AudioInfo.h"
 
 //#include <iostream>

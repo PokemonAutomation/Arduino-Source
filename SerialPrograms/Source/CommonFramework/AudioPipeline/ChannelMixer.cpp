@@ -8,7 +8,6 @@
 #include <QAudioFormat>
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "ChannelMixer.h"
 
 namespace PokemonAutomation{
 

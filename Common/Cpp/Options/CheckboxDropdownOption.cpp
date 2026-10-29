@@ -4,7 +4,6 @@
  *
  */
 
-#include "CheckboxDropdownOption.h"
 
 namespace PokemonAutomation{
 

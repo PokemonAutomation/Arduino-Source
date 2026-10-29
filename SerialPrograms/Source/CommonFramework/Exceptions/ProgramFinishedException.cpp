@@ -4,8 +4,6 @@
  *
  */
 
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "ProgramFinishedException.h"
 
 namespace PokemonAutomation{

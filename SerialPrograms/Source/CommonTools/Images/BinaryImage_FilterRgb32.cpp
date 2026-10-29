@@ -6,7 +6,6 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"

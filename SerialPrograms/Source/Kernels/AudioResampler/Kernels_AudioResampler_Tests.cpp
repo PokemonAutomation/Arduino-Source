@@ -17,7 +17,6 @@
 #include "Common/Cpp/Containers/GuardPageBuffer.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/KaiserWindow/Kernels_KaiserWindow.h"
-#include "Kernels_AudioResampler_BlockKernels.h"
 #include "Kernels_AudioResampler_Tests.h"
 #include "Kernels_AudioResampler.h"
 

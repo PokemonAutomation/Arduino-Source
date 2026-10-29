@@ -12,18 +12,15 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Options/Environment/SleepSuppressOption.h"
 #include "CommonFramework/ProgramSession.h"
 #include "CommonFramework/ProgramStats/StatsDatabase.h"
-#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/ResourceDownload/ProgramMissingResourceTracker.h"
 #include "CommonFramework/ResourceDownload/GlobalResourceDownloadManager.h"
-#include "CommonFramework/ResourceDownload/ResourceDownloadHelpers.h"
 #include "Integrations/ProgramTracker.h"
 
 namespace PokemonAutomation{

@@ -7,7 +7,6 @@
 #include "Common/Cpp/Concurrency/Watchdog.h"
 #include "Common/Cpp/Concurrency/PeriodicRunner.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
-#include "GlobalServices.h"
 
 namespace PokemonAutomation{
 

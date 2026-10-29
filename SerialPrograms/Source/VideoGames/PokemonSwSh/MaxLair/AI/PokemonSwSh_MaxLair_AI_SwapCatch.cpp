@@ -5,7 +5,6 @@
  */
 
 #include <cstddef>
-#include "PokemonSwSh_MaxLair_AI.h"
 #include "PokemonSwSh_MaxLair_AI_Tools.h"
 
 //#include <iostream>

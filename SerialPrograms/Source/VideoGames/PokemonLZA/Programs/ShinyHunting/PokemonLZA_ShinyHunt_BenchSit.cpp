@@ -16,7 +16,6 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
-#include "VideoGames/PokemonLZA/Inference/PokemonLZA_DayNightStateDetector.h"
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA_ShinyHunt_BenchSit.h"

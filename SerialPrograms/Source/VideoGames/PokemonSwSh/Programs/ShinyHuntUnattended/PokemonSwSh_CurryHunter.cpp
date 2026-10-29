@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonFramework/Globals.h"
 #include "CommonTools/Async/InferenceSession.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"

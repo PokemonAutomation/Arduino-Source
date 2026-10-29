@@ -4,19 +4,12 @@
  *
  */
 
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 
-#include "VideoGames/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
-#include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.h"
-#include "VideoGames/PokemonSV/Programs/PokemonSV_GameEntry.h"
-#include "VideoGames/PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
-#include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
-#include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_25.h"
 
 //#include <iostream>

@@ -6,7 +6,6 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
-#include "PokemonLZA_AvailablePokemon.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

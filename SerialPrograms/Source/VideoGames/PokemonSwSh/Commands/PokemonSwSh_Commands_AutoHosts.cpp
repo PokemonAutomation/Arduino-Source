@@ -10,7 +10,6 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "VideoGames/PokemonSwSh/PokemonSwSh_Settings.h"
 #include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
-#include "PokemonSwSh_Commands_AutoHosts.h"
 //#include "PokemonSwSh_Messages_AutoHosts.h"
 
 //#include <iostream>

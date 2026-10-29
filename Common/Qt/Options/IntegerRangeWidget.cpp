@@ -6,8 +6,6 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QLineEdit>
-#include "ConfigWidget.h"
 #include "IntegerRangeWidget.h"
 
 namespace PokemonAutomation{

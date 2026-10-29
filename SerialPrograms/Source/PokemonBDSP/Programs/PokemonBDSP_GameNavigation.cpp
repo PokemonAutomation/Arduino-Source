@@ -10,7 +10,6 @@
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxDetector.h"
-#include "PokemonBDSP_GameNavigation.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

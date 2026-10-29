@@ -5,7 +5,6 @@
  */
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
-#include "PokemonSwSh_Commands_EggRoutines.h"
 //#include "PokemonSwSh_Messages_EggRoutines.h"
 
 namespace PokemonAutomation{

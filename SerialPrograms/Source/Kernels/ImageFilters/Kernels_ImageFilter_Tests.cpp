@@ -14,7 +14,6 @@
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Tests/GuardPageImage.h"
 #include "RGB32_Range/Kernels_ImageFilter_RGB32_Range.h"
-#include "Kernels_ImageFilter_Tests.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

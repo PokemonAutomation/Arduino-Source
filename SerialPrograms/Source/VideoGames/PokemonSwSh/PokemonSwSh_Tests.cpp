@@ -6,14 +6,12 @@
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
-#include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_MainMenuDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
-#include "PokemonSwSh_Tests.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

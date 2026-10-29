@@ -6,7 +6,6 @@
 
 #include "CommonTools/Audio/AudioTemplateCache.h"
 #include "CommonTools/Audio/SpectrogramMatcher.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "VideoGames/PokemonRSE/PokemonRSE_Settings.h"
 #include "PokemonRSE_ShinySoundDetector.h"
 

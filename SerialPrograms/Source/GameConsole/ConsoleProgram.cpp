@@ -4,11 +4,8 @@
  *
  */
 
-#include "CommonFramework/Panels/PanelSession.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
-#include "Framework/ConsoleSystemSession.h"
 #include "Framework/ConsoleProgramSession.h"
-#include "ConsoleProgram.h"
 
 namespace PokemonAutomation{
 namespace GameConsole{

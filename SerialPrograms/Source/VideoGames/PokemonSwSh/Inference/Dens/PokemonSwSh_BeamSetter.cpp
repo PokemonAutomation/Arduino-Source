@@ -8,7 +8,6 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/Tools/StatAccumulator.h"

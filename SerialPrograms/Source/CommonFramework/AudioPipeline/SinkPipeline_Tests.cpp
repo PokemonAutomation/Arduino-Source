@@ -28,9 +28,7 @@
 #include <thread>
 #include <vector>
 #include <QAudioDecoder>
-#include <QAudioFormat>
 #include <QCoreApplication>
-#include <QEventLoop>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/TestRunners/UnitTest.h"
@@ -42,10 +40,8 @@
 #include "Kernels/AudioResampler/Kernels_AudioResampler.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/AudioPipeline/ChannelMixer.h"
-#include "CommonFramework/AudioPipeline/AudioInfo.h"
 #include "CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.h"
 #include "CommonFramework/AudioPipeline/AudioSources/AudioSource_File.h"
-#include "SinkPipeline_Tests.h"
 
 namespace PokemonAutomation{
 

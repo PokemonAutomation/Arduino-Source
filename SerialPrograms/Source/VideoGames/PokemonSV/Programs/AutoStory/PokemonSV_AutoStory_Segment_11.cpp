@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -13,15 +12,11 @@
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h"
 #include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h"
 #include "VideoGames/PokemonSV/PokemonSV_Settings.h"
-#include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_OliveDetector.h"
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_GameEntry.h"
-#include "VideoGames/PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
-#include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
 #include "PokemonSV_OliveActionFailedException.h"
-#include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_11.h"
 
 //#include <iostream>

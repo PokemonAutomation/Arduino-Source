@@ -11,7 +11,6 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSV_CodeEntry.h"
 #include "PokemonSV_FastCodeEntry.h"
 
 //#include <iostream>

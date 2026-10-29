@@ -15,7 +15,6 @@
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.h"
-#include "PokemonSV_CodeEntry.h"
 #include "PokemonSV_VideoFastCodeEntry.h"
 
 namespace PokemonAutomation{

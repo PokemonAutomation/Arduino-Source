@@ -15,7 +15,6 @@
 #include "NintendoSwitch/Options/TurboMacroTable.h"
 
 #include "ControllerTypeStrings.h"
-#include "ControllerStateTable.h"
 
 //#include <iostream>
 //using std::cout;

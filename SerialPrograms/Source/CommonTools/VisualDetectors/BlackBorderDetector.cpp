@@ -5,7 +5,6 @@
  */
 
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "BlackBorderDetector.h"

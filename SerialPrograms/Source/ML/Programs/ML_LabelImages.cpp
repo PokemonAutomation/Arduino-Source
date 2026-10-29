@@ -22,7 +22,6 @@
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/VideoPipeline/VideoSources/VideoSource_StillImage.h"
 #include "ML/DataLabeling/ML_AnnotationIO.h"
-#include "ML/DataLabeling/ML_SegmentAnythingModel.h"
 #include "ControllerInput/Keyboard/KeyboardInput_State.h"
 #include "GameConsole/Framework/ConsoleSystemSession.h"
 #include "Pokemon/Pokemon_Strings.h"

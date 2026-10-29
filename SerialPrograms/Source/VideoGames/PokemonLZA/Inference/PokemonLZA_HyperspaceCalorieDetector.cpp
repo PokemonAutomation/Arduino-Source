@@ -5,8 +5,6 @@
  */
 
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"

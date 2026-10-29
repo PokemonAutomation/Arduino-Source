@@ -6,7 +6,6 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QLineEdit>
 #include "StringWidget.h"
 
 // #include <iostream>

@@ -5,7 +5,6 @@
  */
 
 #include "Framework/MultiConsolePanelSession.h"
-#include "MultiConsolePanel.h"
 
 namespace PokemonAutomation{
 namespace GameConsole{

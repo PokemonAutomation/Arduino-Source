@@ -16,7 +16,6 @@
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/AudioResampler/Kernels_AudioResampler.h"
 #include "CommonFramework/AudioPipeline/ChannelMixer.h"
-#include "Kernels_AudioPipeline.h"
 #include "Kernels_RawAudio2WorkingAudio.h"
 #include "Kernels_WorkingAudio2RawAudio.h"
 #include "Kernels_AudioPipeline_RoundTrip_TestInfra.h"

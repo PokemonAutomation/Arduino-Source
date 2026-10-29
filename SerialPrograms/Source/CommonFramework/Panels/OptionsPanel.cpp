@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Json/JsonValue.h"
-#include "OptionsPanel.h"
 #include "OptionsPanelSession.h"
 
 namespace PokemonAutomation{

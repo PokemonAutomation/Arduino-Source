@@ -14,7 +14,6 @@
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/AudioPipeline/AudioInfo.h"
-#include "AudioInfo_Tests.h"
 
 namespace PokemonAutomation{
 

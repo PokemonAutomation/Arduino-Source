@@ -6,18 +6,13 @@
 
 #include <iostream>
 #include <opencv2/imgproc.hpp>
-#include <opencv2/imgcodecs.hpp>
-#include <QMessageBox>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "ML_YOLOv5Detector.h"
 
 //#include <iostream>

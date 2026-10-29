@@ -9,7 +9,6 @@
 #include <QAudio>
 #include <QAudioFormat>
 #include "Kernels/AudioStreamConverter/Kernels_AudioStreamConverter.h"
-#include "AudioFormatUtils.h"
 
 
 

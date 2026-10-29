@@ -5,13 +5,11 @@
  */
 
 #include "CommonFramework/Notifications/ProgramInfo.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "Pokemon/Inference/Pokemon_ReadHpBar.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h"
-#include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_HPPP.h"
 #include "PokemonSwSh_MaxLair_Detect_PathSide.h"
 #include "PokemonSwSh_MaxLair_Detect_PathMap.h"
 #include "PokemonSwSh_MaxLair_Detect_PathSelect.h"

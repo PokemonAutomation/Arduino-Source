@@ -9,7 +9,6 @@
 #include "Inference/PokemonHome_BallReader.h"
 #include "Inference/PokemonHome_BoxGenderDetector.h"
 #include "Inference/PokemonHome_BoxViewDetector.h"
-#include "Inference/PokemonHome_ButtonDetector.h"
 #include "Inference/PokemonHome_GigantamaxDetector.h"
 #include "Inference/PokemonHome_OriginMarkReader.h"
 #include "Inference/PokemonHome_SelectionArrowDetector.h"
@@ -17,7 +16,6 @@
 #include "Inference/PokemonHome_SummaryReader.h"
 #include "Inference/PokemonHome_SummaryScreenDetector.h"
 #include "Inference/PokemonHome_TeraTypeReader.h"
-#include "PokemonHome_Tests.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -10,7 +10,6 @@
 #include "Inference/PokemonLA_StatusInfoScreenDetector.h"
 #include "Inference/PokemonLA_WildPokemonFocusDetector.h"
 #include "Inference/PokemonLA_BerryTreeDetector.h"
-#include "Inference/Objects/PokemonLA_DialogYellowArrowDetector.h"
 #include "Inference/Objects/PokemonLA_FlagTracker.h"
 #include "Inference/Objects/PokemonLA_MMOQuestionMarkDetector.h"
 #include "Inference/Objects/PokemonLA_BattleSpriteArrowDetector.h"
@@ -23,10 +22,8 @@
 #include "Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
 #include "Inference/Battles/PokemonLA_BattleSpriteWatcher.h"
-#include "Inference/Battles/PokemonLA_BattleStartDetector.h"
 #include "Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "Programs/PokemonLA_GameSave.h"
-#include "PokemonLA_Tests.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

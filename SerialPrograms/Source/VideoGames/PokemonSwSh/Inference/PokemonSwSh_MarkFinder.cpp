@@ -8,9 +8,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
-#include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "CommonTools/ImageMatch/SubObjectTemplateMatcher.h"
-#include "PokemonSwSh_MarkFinder.h"
 
 //#include <iostream>
 //using std::cout;

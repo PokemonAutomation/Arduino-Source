@@ -6,11 +6,9 @@
 
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
-#include "Pokemon/Pokemon_Types.h"
 #include "PokemonHome_GigantamaxDetector.h"
 #include "PokemonHome_TeraTypeReader.h"
 

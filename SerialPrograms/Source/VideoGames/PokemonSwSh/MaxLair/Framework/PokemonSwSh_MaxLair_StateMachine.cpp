@@ -5,10 +5,8 @@
  */
 
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
-#include "CommonTools/Async/InterruptableCommands.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/FrozenImageDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -29,7 +27,6 @@
 #include "VideoGames/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSwap.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_CaughtScreen.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Entrance.h"
-#include "PokemonSwSh_MaxLair_StateMachine.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

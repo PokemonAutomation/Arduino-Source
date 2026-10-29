@@ -6,8 +6,6 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
-#include "CommonTools/InferenceCallbacks/AudioInferenceCallback.h"
 #include "CommonTools/InferencePivots/VisualInferencePivot.h"
 #include "CommonTools/InferencePivots/AudioInferencePivot.h"
 #include "InferenceSession.h"

@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonFramework/Tools/ErrorDumper.h"
 #include "PokemonSV_ClothingTopDetector.h"
 
 //#include <iostream>

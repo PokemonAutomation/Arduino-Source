@@ -5,8 +5,6 @@
  */
 
 #include <iostream>
-#include <QFont>
-#include <QPushButton>
 #include <QMessageBox>
 #include <QHBoxLayout>
 #include "SettingsResourceDownloadWidget.h"

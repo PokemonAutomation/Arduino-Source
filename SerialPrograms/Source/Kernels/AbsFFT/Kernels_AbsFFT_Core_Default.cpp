@@ -4,7 +4,6 @@
  *
  */
 
-#include "Kernels_AbsFFT_Arch_Default.h"
 #include "Kernels_AbsFFT_TwiddleTable.tpp"
 #include "Kernels_AbsFFT_FullTransform.tpp"
 

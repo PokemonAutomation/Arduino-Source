@@ -6,7 +6,6 @@
 
 #include "Common/Cpp/Json/JsonValue.h"
 #include "SysbotBase_Descriptor.h"
-#include "SysbotBase_Connection.h"
 #include "SysbotBase3_ProController.h"
 
 //#include <iostream>

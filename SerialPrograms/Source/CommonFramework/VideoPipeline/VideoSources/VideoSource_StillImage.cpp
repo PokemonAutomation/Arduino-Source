@@ -4,7 +4,6 @@
  *
  */
 
-#include <QWidget>
 #include <QPainter>
 #include <QFileDialog>
 #include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"

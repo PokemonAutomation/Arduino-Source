@@ -6,12 +6,8 @@
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/ImageGradient.h"
-#include "CommonTools/OCR/OCR_Routines.h"
 #include "Tests/TestUtils.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "VideoGames/PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"

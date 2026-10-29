@@ -10,7 +10,6 @@
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Containers/Pimpl.tpp"
-#include "Concurrency/SpinLock.h"
 #include "Exceptions.h"
 #include "ListenerSet.h"
 #include "CancellableScope.h"

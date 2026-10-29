@@ -8,14 +8,12 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <onnxruntime_cxx_api.h>
 #include "3rdParty/ONNX/OnnxToolsPA.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/FileHash.h"
 #include "ML_OrtEnv.h"
-#include "ML_ONNXRuntimeHelpers.h"
 
 namespace PokemonAutomation{
 namespace ML{

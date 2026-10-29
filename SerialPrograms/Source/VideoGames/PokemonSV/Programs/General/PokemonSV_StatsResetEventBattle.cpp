@@ -5,10 +5,8 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonTools/Options/LanguageOCROption.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -17,11 +15,8 @@
 #include "VideoGames/PokemonSV/PokemonSV_Settings.h"
 #include "VideoGames/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
 #include "VideoGames/PokemonSV/Inference/PokemonSV_StatHexagonReader.h"
-#include "VideoGames/PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "VideoGames/PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "VideoGames/PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
-#include "VideoGames/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h"
-#include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_StatsResetChecker.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "VideoGames/PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"

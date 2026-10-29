@@ -16,7 +16,6 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "Integrations/DiscordSettingsOption.h"
 #include "Integrations/DiscordWebhook.h"
-#include "Integrations/DppIntegration/DppClient.h"
 #include "ProgramNotifications.h"
 
 //#include <iostream>

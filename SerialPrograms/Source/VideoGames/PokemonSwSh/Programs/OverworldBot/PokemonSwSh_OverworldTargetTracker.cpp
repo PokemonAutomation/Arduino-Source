@@ -5,8 +5,6 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
 #include "PokemonSwSh_OverworldTargetTracker.h"
 

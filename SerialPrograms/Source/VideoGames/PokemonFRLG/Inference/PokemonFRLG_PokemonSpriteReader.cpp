@@ -4,9 +4,6 @@
  *
  */
 
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "VideoGames/PokemonFRLG/Resources/PokemonFRLG_PokemonSprites.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"

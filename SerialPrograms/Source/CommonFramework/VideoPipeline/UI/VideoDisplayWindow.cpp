@@ -4,12 +4,9 @@
  *
  */
 
-#include <QLayout>
-#include <QMainWindow>
 #include <QResizeEvent>
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Windows/WindowTracker.h"
-#include "VideoDisplayWidget.h"
 #include "VideoDisplayWindow.h"
 
 //#include <iostream>

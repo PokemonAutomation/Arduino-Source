@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonFramework/Logging/Logger.h"
 #include "VideoGames/PokemonSV/Resources/PokemonSV_TournamentPrizeNames.h"
 #include "PokemonSV_TournamentPrizeSelectOption.h"
 

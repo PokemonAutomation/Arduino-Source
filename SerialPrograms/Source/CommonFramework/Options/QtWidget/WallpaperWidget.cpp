@@ -8,7 +8,6 @@
 #include <utility>
 #include <QApplication>
 #include <QImageReader>
-#include <QPaintEvent>
 #include <QPainter>
 #include <QStyleOption>
 #include "CommonFramework/GlobalAutoPaths.h"

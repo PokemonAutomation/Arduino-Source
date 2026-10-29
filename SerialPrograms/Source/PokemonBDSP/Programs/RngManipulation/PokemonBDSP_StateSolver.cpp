@@ -8,7 +8,6 @@
 #include <cmath>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
-#include "Pokemon/Pokemon_Gf2Matrix.h"
 #include "PokemonBDSP_StateSolver.h"
 
 namespace PokemonAutomation{

@@ -14,8 +14,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/AlignedVector.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
-#include "CommonFramework/AudioPipeline/AudioFeed.h"
-#include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "CommonTools/Audio/AudioTemplateCache.h"
 #include "CommonTools/Audio/SpectrogramMatcher.h"
 #include "CommonTools/Async/InferenceSession.h"

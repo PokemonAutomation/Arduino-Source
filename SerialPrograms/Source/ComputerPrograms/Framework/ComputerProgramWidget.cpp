@@ -7,7 +7,6 @@
 #include <QMessageBox>
 #include "Common/Cpp/ScopeExit.h"
 #include "CommonFramework/Panels/PanelTools.h"
-#include "CommonFramework/Panels/UI/PanelElements.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/ResourceDownload/ProgramResourceDownloadWidget.h"
 #include "ComputerProgramWidget.h"

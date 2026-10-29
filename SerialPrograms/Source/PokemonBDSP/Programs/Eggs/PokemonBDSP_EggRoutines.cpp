@@ -8,7 +8,6 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
-#include "PokemonBDSP_EggRoutines.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

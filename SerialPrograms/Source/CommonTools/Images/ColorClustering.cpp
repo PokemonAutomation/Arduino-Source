@@ -5,7 +5,6 @@
  */
 
 #include <cmath>
-#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "ColorClustering.h"
 
 //#include <iostream>

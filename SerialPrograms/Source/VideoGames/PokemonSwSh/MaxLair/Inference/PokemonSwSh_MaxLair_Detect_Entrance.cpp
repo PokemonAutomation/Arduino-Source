@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonSwSh_MaxLair_Detect_Entrance.h"

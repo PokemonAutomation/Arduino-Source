@@ -5,7 +5,6 @@
  */
 
 #include <QHBoxLayout>
-#include <QFrame>
 #include <QLabel>
 #include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "LabelCellWidget.h"

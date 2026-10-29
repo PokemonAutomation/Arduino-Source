@@ -21,7 +21,6 @@
 #include "Common/Cpp/Strings/StringTools.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "ML_AnnotationIO.h"
 #include "ML_SegmentAnythingModelConstants.h"
 #include "ML_ObjectAnnotation.h"
 

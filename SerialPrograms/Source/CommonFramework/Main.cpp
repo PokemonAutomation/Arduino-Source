@@ -2,7 +2,6 @@
 #include <iostream>
 //#include <QTextStream>
 #include <QApplication>
-#include <QMessageBox>
 #include "Common/Cpp/Logging/LastLogTracker.h"
 #include "Common/Cpp/Logging/FileLogger.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
@@ -25,8 +24,6 @@
 #include "ControllerInput/ControllerInput.h"
 #include "Controllers/SerialPort/SerialPortPollerQt.h"
 #include "Integrations/DiscordSettingsOption.h"
-#include "Integrations/DiscordSocial/DiscordSocial.h"
-#include "Integrations/DppIntegration/DppClient.h"
 #include "Integrations/DiscordWebhook.h"
 #include "VideoPipeline/Backends/MediaServicesQt6.h"
 #include "ErrorReports/ProgramDumper.h"
@@ -34,12 +31,10 @@
 #include "Environment/HardwareValidation.h"
 //#include "Tools/StatsDatabase.h"
 //#include "Windows/DpiScaler.h"
-#include "Logging/Logger.h"
 #include "Logging/OutputRedirector.h"
 #include "Startup/SetupSettings.h"
 #include "Startup/NewVersionCheck.h"
 #include "Windows/MainWindow.h"
-#include "Globals.h"
 #include "GlobalSettingsPanel.h"
 #include "GlobalServices.h"
 #include "PersistentSettings.h"

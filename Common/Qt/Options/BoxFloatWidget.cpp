@@ -4,7 +4,6 @@
  *
  */
 
-#include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QLabel>
 #include "Common/Cpp/Strings/StringTools.h"

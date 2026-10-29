@@ -8,11 +8,9 @@
 #include <utility>
 //#include <QStatusBar>
 #include <QMenuBar>
-#include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QGroupBox>
 #include <QCheckBox>
-#include <QLabel>
 #include <QPushButton>
 #include <QMessageBox>
 #include "Common/Cpp/ScopeExit.h"
@@ -24,7 +22,6 @@
 #include "Common/Cpp/ColoredText.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "Common/Qt/UiStateQtWidget.h"
-#include "PanelLists.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"

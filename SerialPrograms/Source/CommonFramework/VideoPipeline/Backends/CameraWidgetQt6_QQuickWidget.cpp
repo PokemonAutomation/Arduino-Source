@@ -4,10 +4,6 @@
  *
  */
 
-#include <QByteArray>
-#include <QUrl>
-#include <QCamera>
-#include <QPainter>
 #include <QVideoSink>
 #include <QQuickItem>
 #include "Common/Qt/Redispatch.h"

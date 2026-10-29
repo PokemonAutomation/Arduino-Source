@@ -6,13 +6,11 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QComboBox>
 #include <QPushButton>
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
 #include "CommonFramework/Panels/ConsoleSettingsStretch.h"
-#include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CommonFramework/VideoPipeline/VideoSources/VideoSource_Null.h"
 
 #include "CommonFramework/VideoPipeline/VideoSources/VideoSource_Camera.h"

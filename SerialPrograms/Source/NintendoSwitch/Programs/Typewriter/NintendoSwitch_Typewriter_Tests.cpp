@@ -11,7 +11,6 @@
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "NintendoSwitch_Typewriter_Tests.h"
 #include "NintendoSwitch_TypewriterTextMapping.h"
 
 namespace PokemonAutomation{

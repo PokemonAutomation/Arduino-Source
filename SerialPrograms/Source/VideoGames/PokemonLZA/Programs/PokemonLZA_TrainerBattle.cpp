@@ -5,7 +5,6 @@
  */
 
 // #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/Async/InterruptableCommands.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"

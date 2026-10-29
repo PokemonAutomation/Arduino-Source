@@ -8,7 +8,6 @@
 #include <cmath>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"

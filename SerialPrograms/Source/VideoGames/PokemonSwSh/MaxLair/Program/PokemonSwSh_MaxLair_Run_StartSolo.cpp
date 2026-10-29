@@ -13,7 +13,6 @@
 #include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Notifications.h"
 #include "PokemonSwSh_MaxLair_Run_EnterLobby.h"
-#include "PokemonSwSh_MaxLair_Run_StartSolo.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -4,7 +4,6 @@
  *
  */
 
-#include <QVideoFrameFormat>
 #include "VideoFrameQt.h"
 
 namespace PokemonAutomation{

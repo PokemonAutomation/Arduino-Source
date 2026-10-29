@@ -6,7 +6,6 @@
 
 
 #include <iostream>
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "GlobalResourceDownloadManager.h"
 
 #include "ResourceDownload.h"

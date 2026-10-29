@@ -10,16 +10,12 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/Globals.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceSession.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/Inference/Rng/PokemonBDSP_BlinkExtraction.h"
-#include "PokemonBDSP/Inference/Rng/PokemonBDSP_EyeBlinkDetector.h"
 #include "PokemonBDSP_IntroSeedFinder.h"
-#include "PokemonBDSP_StateSolver.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
