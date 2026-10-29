@@ -20,7 +20,7 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
-#include "CommonFramework/VideoPipeline/VideoSources/VideoSource_StillImage.h"
+#include "CommonFramework/VideoPipeline/Sources/VideoSource_StillImage.h"
 #include "ML/DataLabeling/ML_AnnotationIO.h"
 #include "ControllerInput/Keyboard/KeyboardInput_State.h"
 #include "GameConsole/Framework/ConsoleSystemSession.h"

@@ -870,11 +870,15 @@ bool check_baby_info(
 ){
     context.wait_for_all_requests();
 
+    //  Only require the judge screen when a filter checks IVs. Players must unlock the
+    //  judge in the game, and those who don't filter on IVs may not have it. Shininess,
+    //  gender and nature can all be read from the plain stats screen.
     Language language = LANGUAGE;
-    if (language == Language::None){
-        change_view_to_stats_or_judge(stream, context);
-    }else{
+    const bool read_ivs = language != Language::None && FILTERS.require_iv_judge();
+    if (read_ivs){
         change_view_to_judge(stream, context, language);
+    }else{
+        change_view_to_stats_or_judge(stream, context);
     }
 
     VideoOverlaySet overlay_set(stream.overlay());
@@ -882,8 +886,9 @@ bool check_baby_info(
     BoxShinyWatcher shiny_detector;
     // BoxShinyDetector shiny_detector;
     shiny_detector.make_overlays(overlay_set);
-    
-    IvJudgeReaderScope iv_reader_scope(stream.overlay(), LANGUAGE);
+
+    //  With `Language::None`, the reader skips OCR and reports every IV as unknown.
+    IvJudgeReaderScope iv_reader_scope(stream.overlay(), read_ivs ? language : Language::None);
     BoxGenderDetector gender_detector;
     gender_detector.make_overlays(overlay_set);
     BoxNatureDetector nature_detector(stream.overlay(), LANGUAGE);
@@ -900,7 +905,11 @@ bool check_baby_info(
     StatsHuntGenderFilter gender = gender_detector.detect(screen);
     NatureReader::Results nature = nature_detector.read(stream.logger(), screen);
 
-    stream.log(IVs.to_string(), COLOR_GREEN);
+    if (read_ivs){
+        stream.log(IVs.to_string(), COLOR_GREEN);
+    }else{
+        stream.log("IVs: not read (no filter checks IVs, or no game language set).", COLOR_GREEN);
+    }
     stream.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
     stream.log("Nature: " + nature.to_string(), COLOR_GREEN);
 

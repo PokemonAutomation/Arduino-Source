@@ -118,6 +118,11 @@ public:
         const IvJudgeReader::Results& IVs
     ) const;
 
+    //  Return true if any filter row sets an IV column to something other than "Anything".
+    //  Programs use this to decide whether they need to read IVs from the in-game judge
+    //  screen, which players must unlock first.
+    bool require_iv_judge() const;
+
 public:
     const StatsHuntMiscFeatureFlags feature_flags;
 };

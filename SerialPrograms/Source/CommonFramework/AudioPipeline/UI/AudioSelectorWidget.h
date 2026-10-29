@@ -26,7 +26,6 @@ public:
     ~AudioSelectorWidget();
 
 private:
-    void build_input_list(const std::shared_ptr<const AudioSourceDescriptor>& source);
     void build_output_list(const AudioDeviceInfo& device);
 
     void refresh_all();
@@ -60,7 +59,7 @@ private:
     QPushButton* m_record_button = nullptr;
     bool m_record_is_on = false;
 
-    std::vector<AudioDeviceInfo> m_input_audios;
+    std::vector<std::shared_ptr<AudioSourceDescriptor>> m_input_sources;
     std::vector<AudioInputChoice> m_input_choices;
 
     std::vector<AudioDeviceInfo> m_output_audios;

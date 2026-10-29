@@ -191,9 +191,7 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(STATS_FILE);
     PA_ADD_OPTION(TEMP_FOLDER);
     PA_ADD_OPTION(THEME);
-    if (IS_BETA_VERSION){
-        PA_ADD_OPTION(WALLPAPER);
-    }
+    PA_ADD_OPTION(WALLPAPER);
     PA_ADD_OPTION(OCR_LIBRARY);
 
     // gated behind Dev mode. see GlobalSettings::load_json

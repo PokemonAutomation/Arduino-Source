@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/AudioPipeline/AudioSourceDescriptor.h"
-#include "CommonFramework/AudioPipeline/IO/AudioSource.h"
+#include "CommonFramework/AudioPipeline/AudioSource.h"
 #include "CommonFramework/AudioPipeline/IO/AudioInputFile.h"
 
 namespace PokemonAutomation{
@@ -34,9 +34,7 @@ public:
 
     virtual bool should_reload() const override{ return true; }
     virtual bool operator==(const AudioSourceDescriptor& x) const override;
-    virtual std::string display_name() const override{
-        return "Play Audio File";
-    }
+    virtual std::string display_name() const override;
 
     virtual std::vector<AudioInputChoice> supported_formats() const override;
     virtual bool sanitize_desired_format(Logger& logger, AudioInputChoice& format) const override;

@@ -254,6 +254,21 @@ StatsHuntAction StatsHuntIvJudgeFilterTable::get_action(
     }
     return action;
 }
+bool StatsHuntIvJudgeFilterTable::require_iv_judge() const{
+    std::vector<std::unique_ptr<StatsHuntIvJudgeFilterRow>> list = copy_snapshot();
+    for (const std::unique_ptr<StatsHuntIvJudgeFilterRow>& filter : list){
+        const IvJudgeFilter ivs[] = {
+            filter->iv_hp, filter->iv_atk, filter->iv_def,
+            filter->iv_spatk, filter->iv_spdef, filter->iv_speed,
+        };
+        for (IvJudgeFilter iv : ivs){
+            if (iv != IvJudgeFilter::Anything){
+                return true;
+            }
+        }
+    }
+    return false;
+}
 
 
 

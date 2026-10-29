@@ -8,10 +8,12 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "VideoSources/VideoSource_Null.h"
 
-#include "VideoSources/VideoSource_StillImage.h"
-#include "VideoSources/VideoSource_Camera.h"
+#include "Sources/VideoSource_Null.h"
+#include "Sources/VideoSource_StillImage.h"
+#include "Sources/VideoSource_Camera.h"
+
+#include "VideoSourceOption.h"
 
 //#include <iostream>
 //using std::cout;
@@ -39,7 +41,6 @@ void VideoSourceOption::set_descriptor(std::shared_ptr<VideoSourceDescriptor> de
     m_descriptor_cache[descriptor->type] = descriptor;
     m_descriptor = std::move(descriptor);
 }
-
 std::shared_ptr<VideoSourceDescriptor> VideoSourceOption::get_descriptor_from_cache(VideoSourceType type){
     auto iter = m_descriptor_cache.find(type);
     if (iter != m_descriptor_cache.end()){

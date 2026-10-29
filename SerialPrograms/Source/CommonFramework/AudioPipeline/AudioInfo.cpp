@@ -335,18 +335,15 @@ AudioInputChoiceList input_choices(std::vector<AudioFormat> supported, const Aud
         return x.channelConfig() < y.channelConfig();
     });
 
+    //  4. The misreporting capture-card case: 1ch x 96000, which is
+    //  physically two 48 kHz channels interleaved.
+    //  Offer the reinterpretations in addition to the native choice.
     for (const AudioFormat& format : deduped){
         ret.choices.emplace_back(format);
-    }
-
-    //  4. The misreporting capture-card case: the only supported format is
-    //  1ch x 96000, which is physically two 48 kHz channels interleaved.
-    //  Offer the reinterpretations in addition to the native choice.
-    if (ret.choices.size() == 1){
-        const QAudioFormat& only = ret.choices[0].format().native_format();
+        const QAudioFormat& only = format.native_format();
         if (only.channelCount() == 1 && only.sampleRate() == 96000){
-            ret.choices.emplace_back(reinterpreted_96k_choice(ret.choices[0].format(), false));
-            ret.choices.emplace_back(reinterpreted_96k_choice(ret.choices[0].format(), true));
+            ret.choices.emplace_back(reinterpreted_96k_choice(format, false));
+            ret.choices.emplace_back(reinterpreted_96k_choice(format, true));
         }
     }
 

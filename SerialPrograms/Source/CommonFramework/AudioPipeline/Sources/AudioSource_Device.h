@@ -8,7 +8,7 @@
 #define PokemonAutomation_AudioPipeline_AudioSource_Device_H
 
 #include "CommonFramework/AudioPipeline/AudioSourceDescriptor.h"
-#include "CommonFramework/AudioPipeline/IO/AudioSource.h"
+#include "CommonFramework/AudioPipeline/AudioSource.h"
 #include "CommonFramework/AudioPipeline/IO/AudioInputDevice.h"
 
 namespace PokemonAutomation{
