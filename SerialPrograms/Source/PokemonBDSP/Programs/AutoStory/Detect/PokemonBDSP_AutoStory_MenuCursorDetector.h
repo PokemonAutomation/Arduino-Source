@@ -40,28 +40,31 @@
 #include <array>
 #include <optional>
 #include <string>
+
 #include "Common/Cpp/Color.h"
+
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/VideoStream.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 
-namespace PokemonAutomation{
-namespace NintendoSwitch{
-namespace PokemonBDSP{
+namespace PokemonAutomation {
+namespace NintendoSwitch {
+namespace PokemonBDSP {
 
 
-enum class MenuCursorPosition{
-    UNKNOWN     = -1,
-    POKEDEX     = 0,
-    POKEMON     = 1,
-    BAG         = 2,
-    CARD        = 3,
-    OPTIONS     = 4,
-    MAP         = 5,
-    CAPSULES    = 6,
+enum class MenuCursorPosition {
+    UNKNOWN = -1,
+    POKEDEX = 0,
+    POKEMON = 1,
+    BAG = 2,
+    CARD = 3,
+    OPTIONS = 4,
+    MAP = 5,
+    CAPSULES = 6,
     MYSTERYGIFT = 7,
 };
 
@@ -70,20 +73,20 @@ static constexpr int MENU_CURSOR_NUM_ICONS = 8;
 std::string menu_cursor_to_string(MenuCursorPosition pos);
 
 
-class MenuCursorDetector{
+class MenuCursorDetector {
 public:
     // ── Approach 1: dark pixel detection ─────────────────────────────────────
-    static constexpr int    BOXES_PER_ICON        = 3;
-    static constexpr int    REQUIRED_VOTES        = 1;    // out of BOXES_PER_ICON
-    static constexpr uint8_t BLACK_CHANNEL_MAX    = 50;   // R,G,B <= this → dark pixel
-    static constexpr size_t  MIN_DARK_PIXEL_COUNT = 1;    // dark pixels per box to fire
+    static constexpr int BOXES_PER_ICON = 3;
+    static constexpr int REQUIRED_VOTES = 1;          // out of BOXES_PER_ICON
+    static constexpr uint8_t BLACK_CHANNEL_MAX = 50;  // R,G,B <= this → dark pixel
+    static constexpr size_t MIN_DARK_PIXEL_COUNT = 1; // dark pixels per box to fire
 
     // ── Approach 2: template match ───────────────────────────────────────────
     // Reference PNGs are the UN-hovered state of each icon. When hovered, the
     // icon gains dark pixels and diverges from the reference, so RMSD increases.
     // detect_image_match() selects the icon with the HIGHEST RMSD >= threshold.
     // Tune upward to reduce false positives; downward if the correct icon is missed.
-    static constexpr double MATCH_RMSD_THRESHOLD  = 53.0;
+    static constexpr double MATCH_RMSD_THRESHOLD = 53.0;
 
     MenuCursorDetector(Color color = COLOR_RED);
 

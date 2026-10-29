@@ -62,6 +62,7 @@ OverworldLightingTest_Descriptor::OverworldLightingTest_Descriptor()
     : SingleSwitchProgramDescriptor("PokemonBDSP:OverworldLightingTest","Pokemon BDSP","Overworld Matcher Lighting Test","",
         "Place the player at the selected matcher's reference location. Tests 24 hourly lighting settings without moving the player. "
         "Changes console date/time; saves screenshots and CSV results under Screenshots/OverworldLightingTest.",
+        PanelQualityStanding::DEVELOPER,
         ProgramControllerClass::StandardController_NoRestrictions,FeedbackType::REQUIRED,AllowCommandsWhenRunning::DISABLE_COMMANDS)
 {}
 OverworldLightingTest::~OverworldLightingTest(){

@@ -6,27 +6,27 @@
 
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/Images/SolidColorTest.h"
+
 #include "PokemonBDSP_AutoStory_OverworldDetector.h"
 
 using namespace std::chrono_literals;
 
-namespace PokemonAutomation{
-namespace NintendoSwitch{
-namespace PokemonBDSP{
+namespace PokemonAutomation {
+namespace NintendoSwitch {
+namespace PokemonBDSP {
 
 
 // ---------------------------------------------------------------------------
 //  OverworldDetector
 // ---------------------------------------------------------------------------
 
-OverworldDetector::OverworldDetector(Color color)
-    : m_color(color)
-    , m_battle_menu(BattleType::STANDARD, color)
-{}
+OverworldDetector::OverworldDetector(Color color) : m_color(color), m_battle_menu(BattleType::STANDARD, color){
+}
 
-void OverworldDetector::make_overlays(VideoOverlaySet& items) const{
+void OverworldDetector::make_overlays(VideoOverlaySet& items) const {
     m_dialog.make_overlays(items);
     m_battle_menu.make_overlays(items);
     m_menu.make_overlays(items);
@@ -34,9 +34,15 @@ void OverworldDetector::make_overlays(VideoOverlaySet& items) const{
 
 bool OverworldDetector::detect(const ImageViewRGB32& screen){
     // We are in the overworld when none of the overlay screens are present.
-    if (m_dialog.detect(screen))     return false;
-    if (m_battle_menu.detect(screen)) return false;
-    if (m_menu.detect(screen))        return false;
+    if (m_dialog.detect(screen)){
+        return false;
+    }
+    if (m_battle_menu.detect(screen)){
+        return false;
+    }
+    if (m_menu.detect(screen)){
+        return false;
+    }
     return true;
 }
 
@@ -46,11 +52,10 @@ bool OverworldDetector::detect(const ImageViewRGB32& screen){
 // ---------------------------------------------------------------------------
 
 OverworldWatcher::OverworldWatcher(Color color)
-    : OverworldDetector(color)
-    , VisualInferenceCallback("OverworldWatcher")
-{}
+    : OverworldDetector(color), VisualInferenceCallback("OverworldWatcher"){
+}
 
-void OverworldWatcher::make_overlays(VideoOverlaySet& items) const{
+void OverworldWatcher::make_overlays(VideoOverlaySet& items) const {
     OverworldDetector::make_overlays(items);
 }
 
@@ -63,12 +68,10 @@ bool OverworldWatcher::process_frame(const ImageViewRGB32& frame, WallClock /*ti
 //  PoketchButtonDetector
 // ---------------------------------------------------------------------------
 
-PoketchButtonDetector::PoketchButtonDetector(Color color)
-    : m_color(color)
-    , m_button(0.968, 0.170, 0.022, 0.120)
-{}
+PoketchButtonDetector::PoketchButtonDetector(Color color) : m_color(color), m_button(0.968, 0.170, 0.022, 0.120){
+}
 
-void PoketchButtonDetector::make_overlays(VideoOverlaySet& items) const{
+void PoketchButtonDetector::make_overlays(VideoOverlaySet& items) const {
     items.add(m_color, m_button);
 }
 
@@ -79,11 +82,10 @@ bool PoketchButtonDetector::detect(const ImageViewRGB32& screen){
 }
 
 PoketchButtonWatcher::PoketchButtonWatcher(Color color)
-    : PoketchButtonDetector(color)
-    , VisualInferenceCallback("PoketchButtonWatcher")
-{}
+    : PoketchButtonDetector(color), VisualInferenceCallback("PoketchButtonWatcher"){
+}
 
-void PoketchButtonWatcher::make_overlays(VideoOverlaySet& items) const{
+void PoketchButtonWatcher::make_overlays(VideoOverlaySet& items) const {
     PoketchButtonDetector::make_overlays(items);
 }
 
@@ -103,7 +105,8 @@ bool ensure_poketch_visible(VideoStream& stream, ProControllerContext& context){
         if (look_for_poketch_button(stream, context)){
             return true;
         }
-        stream.log("[AutoStory] Poketch button not found. Attempt " + std::to_string(attempt + 1) + " of 3.", COLOR_ORANGE);
+        stream.log("[AutoStory] Poketch button not found. Attempt " + std::to_string(attempt + 1) + " of 3.",
+                   COLOR_ORANGE);
 
         if (attempt == 0){
             //  Most likely hidden: one tap shows it.
