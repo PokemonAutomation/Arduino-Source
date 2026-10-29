@@ -136,7 +136,8 @@ bool save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& contex
             int ret = wait_until(env.console, context, std::chrono::seconds(15), {overworld});
             if (ret < 0){
                 throw OperationFailedExceptionWithScreenshot(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "Failed to detect overworld after save.", env.console);
+                    "Failed to detect overworld after save.",
+                    env.console);
             }
 
             env.console.log("Checkpoint save verified.");
@@ -160,21 +161,24 @@ bool save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& contex
 }
 
 
-void checkpoint_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                     EventNotificationOption& notif_status_update, AutoStoryStats& stats,
-                     CheckpointSaveMode save_mode){
+void checkpoint_save(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats,
+    CheckpointSaveMode save_mode){
     const bool fake = save_mode == CheckpointSaveMode::FAKE;
-    env.console.log(fake ? "[Checkpoint save] DIAGNOSTIC FAKE mode: save is not verified."
-                         : "[Checkpoint save] REAL mode.");
+    env.console.log(
+        fake ? "[Checkpoint save] DIAGNOSTIC FAKE mode: save is not verified." : "[Checkpoint save] REAL mode.");
     bool success = fake ? fake_save_game(env, context) : save_game(env, context);
 
     stats.m_checkpoint++;
     env.update_stats();
 
-    send_program_status_notification(env, notif_status_update,
-                                     fake      ? "Diagnostic fake checkpoint save (not verified)."
-                                     : success ? "Saved at checkpoint (verified)."
-                                               : "Saved at checkpoint (blind fallback).");
+    send_program_status_notification(env,
+        notif_status_update,
+        fake          ? "Diagnostic fake checkpoint save (not verified)."
+        : success ? "Saved at checkpoint (verified)."
+        : "Saved at checkpoint (blind fallback).");
 }
 
 
@@ -187,10 +191,14 @@ void reload_backup_save(SingleSwitchProgramEnvironment& env, ProControllerContex
 }
 
 
-void checkpoint_reattempt_loop(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                               EventNotificationOption& notif_status_update, AutoStoryStats& stats,
-                               std::function<void(size_t attempt_number)>&& action, bool save,
-                               CheckpointSaveMode save_mode, CheckpointRetryScope retry_scope){
+void checkpoint_reattempt_loop(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats,
+    std::function<void(size_t attempt_number)>&& action,
+    bool save,
+    CheckpointSaveMode save_mode,
+    CheckpointRetryScope retry_scope){
     static constexpr size_t MAX_ATTEMPTS = 20;
 
     for (size_t i = 0;; i++){
@@ -210,7 +218,7 @@ void checkpoint_reattempt_loop(SingleSwitchProgramEnvironment& env, ProControlle
                 throw;
             }
             env.console.log("checkpoint_reattempt_loop: attempt " + std::to_string(i) + " failed: " + e.message(),
-                            COLOR_RED);
+                COLOR_RED);
             stats.m_reset++;
             env.update_stats();
 
@@ -222,8 +230,8 @@ void checkpoint_reattempt_loop(SingleSwitchProgramEnvironment& env, ProControlle
                 env.console.log("Resetting game from HOME before retry...", COLOR_ORANGE);
                 bool ok = reset_game_from_home(env, env.console, context, true, 1000ms);
                 if (!ok){
-                    throw OperationFailedExceptionWithScreenshot(
-                        ErrorReportMode::SEND_ERROR_REPORT, "Failed to reset game from HOME during checkpoint retry.",
+                    throw OperationFailedExceptionWithScreenshot(ErrorReportMode::SEND_ERROR_REPORT,
+                        "Failed to reset game from HOME during checkpoint retry.",
                         env.console);
                 }
             }else{
@@ -244,8 +252,10 @@ void repeat(std::initializer_list<std::function<void()>> actions, size_t times){
 }
 
 
-void wait_for_dialogue(VideoStream& stream, ProControllerContext& context, const std::string& label,
-                       Milliseconds timeout){
+void wait_for_dialogue(VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& label,
+    Milliseconds timeout){
     auto log_detected = [&] {
         if (!label.empty()){
             stream.log(label + " dialogue detected.");
@@ -253,50 +263,58 @@ void wait_for_dialogue(VideoStream& stream, ProControllerContext& context, const
     };
 
     ShortDialogWatcher watcher_cyan(COLOR_CYAN);
-    int ret = run_until<ProControllerContext>(stream, context,
-                                              [timeout](ProControllerContext& context){
-                                                  context.wait_for(timeout);
-                                              },
-                                              {{watcher_cyan}});
+    int ret = run_until<ProControllerContext>(stream,
+        context,
+        [timeout](ProControllerContext& context){
+            context.wait_for(timeout);
+        },
+        {{watcher_cyan}});
     if (ret == 0){
         log_detected();
         return;
     }
 
     ShortDialogWatcher watcher_red(COLOR_RED);
-    ret = run_until<ProControllerContext>(stream, context,
-                                          [timeout](ProControllerContext& context){
-                                              context.wait_for(timeout);
-                                          },
-                                          {{watcher_red}});
+    ret = run_until<ProControllerContext>(stream,
+        context,
+        [timeout](ProControllerContext& context){
+            context.wait_for(timeout);
+        },
+        {{watcher_red}});
     if (ret == 0){
         log_detected();
         return;
     }
 
-    OperationFailedExceptionWithScreenshot::fire(
-        ErrorReportMode::SEND_ERROR_REPORT,
-        (label.empty() ? "wait_for_dialogue" : label) + ": dialogue not detected within timeout.", stream);
+    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+        (label.empty() ? "wait_for_dialogue" : label) + ": dialogue not detected within timeout.",
+        stream);
 }
 
 
 void mash_until_dialogue_ends(VideoStream& stream, ProControllerContext& context, Button button, Milliseconds timeout){
     OverworldWatcher overworld;
-    int ret = run_until<ProControllerContext>(stream, context,
-                                              [button, timeout](ProControllerContext& context){
-                                                  pbf_mash_button(context, button, timeout);
-                                              },
-                                              {{overworld}});
+    int ret = run_until<ProControllerContext>(stream,
+        context,
+        [button, timeout](ProControllerContext& context){
+            pbf_mash_button(context, button, timeout);
+        },
+        {{overworld}});
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "mash_until_dialogue_ends: overworld not reached within timeout.",
-                                                     stream);
+            "mash_until_dialogue_ends: overworld not reached within timeout.",
+            stream);
     }
 }
 
 
-void repeat_dpad(ProControllerContext& context, DpadState& state, DpadPosition dir, Milliseconds press,
-                 Milliseconds hold, size_t times, bool include_last_dir){
+void repeat_dpad(ProControllerContext& context,
+    DpadState& state,
+    DpadPosition dir,
+    Milliseconds press,
+    Milliseconds hold,
+    size_t times,
+    bool include_last_dir){
     if (include_last_dir && state.last_dir != DPAD_NONE && state.last_dir != dir){
         times += 1;
     }
@@ -386,8 +404,10 @@ static std::string make_buy_label(const std::vector<ItemToBuy>& items){
     return label;
 }
 
-bool buy_items(VideoStream& stream, ProControllerContext& context, const std::vector<ItemToBuy>& items,
-               Language language){
+bool buy_items(VideoStream& stream,
+    ProControllerContext& context,
+    const std::vector<ItemToBuy>& items,
+    Language language){
     if (items.empty()){
         return true;
     }
@@ -423,13 +443,14 @@ bool buy_items(VideoStream& stream, ProControllerContext& context, const std::ve
 
         // case 0: no detectors fired — press A in a for-loop (5 presses) while watching.
         stream.log("Starting to loop over items");
-        int state = run_until<ProControllerContext>(stream, context,
-                                                    [](ProControllerContext& ctx){
-                                                        for (int i = 0; i < 5; i++){
-                                                            pbf_press_button(ctx, BUTTON_A, 80ms, 1000ms);
-                                                        }
-                                                    },
-                                                    {{arrow_vendor}, {buying_window}, {dialog}});
+        int state = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& ctx){
+                for (int i = 0; i < 5; i++){
+                    pbf_press_button(ctx, BUTTON_A, 80ms, 1000ms);
+                }
+            },
+            {{arrow_vendor}, {buying_window}, {dialog}});
 
         context.wait_for_all_requests();
         pbf_wait(context, 500ms);
@@ -454,8 +475,11 @@ bool buy_items(VideoStream& stream, ProControllerContext& context, const std::ve
 
                     // Detector fires only when the red outline is found AND both
                     // name and price OCR match the expected item slug.
-                    ShopItemHoverDetector hover(stream.logger(), ITEM_SCAN_AREA, shop_item_slug(item.item), language,
-                                                COLOR_CYAN);
+                    ShopItemHoverDetector hover(stream.logger(),
+                        ITEM_SCAN_AREA,
+                        shop_item_slug(item.item),
+                        language,
+                        COLOR_CYAN);
                     ShopQuantityWindowWatcher qty_window;
                     SelectionArrowFinder confirm_arrow(stream.overlay(), CONFIRM_ARROW_BOX, COLOR_GREEN);
 
@@ -464,11 +488,12 @@ bool buy_items(VideoStream& stream, ProControllerContext& context, const std::ve
                     for (size_t inner = 0; inner < MAX_ITEM_SEARCH && !item_bought; inner++){
                         context.wait_for_all_requests();
 
-                        int sub = run_until<ProControllerContext>(stream, context,
-                                                                  [](ProControllerContext& ctx){
-                                                                      ctx.wait_for(1000ms);
-                                                                  },
-                                                                  {{confirm_arrow}, {qty_window}, {hover}});
+                        int sub = run_until<ProControllerContext>(stream,
+                            context,
+                            [](ProControllerContext& ctx){
+                                ctx.wait_for(1000ms);
+                            },
+                            {{confirm_arrow}, {qty_window}, {hover}});
 
                         context.wait_for_all_requests();
 
@@ -481,13 +506,14 @@ bool buy_items(VideoStream& stream, ProControllerContext& context, const std::ve
                             {
                                 context.wait_for_all_requests();
                                 ShopBuyingWindowWatcher back_in_shop;
-                                run_until<ProControllerContext>(stream, context,
-                                                                [](ProControllerContext& ctx){
-                                                                    for (int i = 0; i < 10; i++){
-                                                                        pbf_press_button(ctx, BUTTON_A, 80ms, 800ms);
-                                                                    }
-                                                                },
-                                                                {{back_in_shop}});
+                                run_until<ProControllerContext>(stream,
+                                    context,
+                                    [](ProControllerContext& ctx){
+                                        for (int i = 0; i < 10; i++){
+                                            pbf_press_button(ctx, BUTTON_A, 80ms, 800ms);
+                                        }
+                                    },
+                                    {{back_in_shop}});
                                 item_bought = true;
                                 break;
                             }
@@ -532,8 +558,8 @@ bool buy_items(VideoStream& stream, ProControllerContext& context, const std::ve
 
                     if (!item_bought){
                         stream.log(label + ": buy_items: could not locate " + shop_item_name(item.item) +
-                                       " in shop list.",
-                                   COLOR_RED);
+                            " in shop list.",
+                            COLOR_RED);
                         buying_failed = true;
                     }
                 }
@@ -549,11 +575,12 @@ bool buy_items(VideoStream& stream, ProControllerContext& context, const std::ve
         case 2: // case 3: unexpected ShortDialog → press B until back in buying window
         {
             ShopBuyingWindowWatcher back_in_shop;
-            run_until<ProControllerContext>(stream, context,
-                                            [](ProControllerContext& ctx){
-                                                pbf_mash_button(ctx, BUTTON_B, 5000ms);
-                                            },
-                                            {{back_in_shop}});
+            run_until<ProControllerContext>(stream,
+                context,
+                [](ProControllerContext& ctx){
+                    pbf_mash_button(ctx, BUTTON_B, 5000ms);
+                },
+                {{back_in_shop}});
             break;
         }
 
@@ -585,11 +612,12 @@ bool heal_pokemon(VideoStream& stream, ProControllerContext& context, const std:
 
     // Exiting the Pokemon Center
     BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-    int ret = run_until<ProControllerContext>(stream, context,
-                                              [](ProControllerContext& context){
-                                                  pbf_move_left_joystick(context, {0, -1}, 15000ms, 100ms);
-                                              },
-                                              {{black_screen}});
+    int ret = run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& context){
+            pbf_move_left_joystick(context, {0, -1}, 15000ms, 100ms);
+        },
+        {{black_screen}});
     if (ret < 0){
         stream.log("heal_pokemon(" + label + "): black screen not detected", COLOR_RED);
         return false;
@@ -656,7 +684,9 @@ bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place){
         ImageFloatBox button_a_box{0.540000, 0.960000, 0.070000, 0.035000};
         struct FlyAButtonDetector : VisualInferenceCallback {
             ImageFloatBox m_box;
-            FlyAButtonDetector(const ImageFloatBox& box) : VisualInferenceCallback("FlyAButtonDetector"), m_box(box){
+            FlyAButtonDetector(const ImageFloatBox& box)
+                : VisualInferenceCallback("FlyAButtonDetector")
+                , m_box(box){
             }
             void make_overlays(VideoOverlaySet&) const override {
             }
@@ -672,11 +702,12 @@ bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place){
             return false;
         }
         BlackScreenOverWatcher flying_black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int fly_ret = run_until<ProControllerContext>(stream, context,
-                                                      [](ProControllerContext& context){
-                                                          pbf_mash_button(context, BUTTON_A, 200000ms);
-                                                      },
-                                                      {{flying_black_screen}});
+        int fly_ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_A, 200000ms);
+            },
+            {{flying_black_screen}});
         if (fly_ret < 0){
             stream.log("CurrentCity: black screen not detected!", COLOR_RED);
             return false;
@@ -717,7 +748,9 @@ bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place){
 
     struct FlyAButtonDetector : VisualInferenceCallback {
         ImageFloatBox m_box;
-        FlyAButtonDetector(const ImageFloatBox& box) : VisualInferenceCallback("FlyAButtonDetector"), m_box(box){
+        FlyAButtonDetector(const ImageFloatBox& box)
+            : VisualInferenceCallback("FlyAButtonDetector")
+            , m_box(box){
         }
         void make_overlays(VideoOverlaySet&) const override {
         }
@@ -796,7 +829,9 @@ bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place){
 
     struct CityIconDetector : VisualInferenceCallback {
         ImageFloatBox m_box;
-        CityIconDetector(const ImageFloatBox& box) : VisualInferenceCallback("CityIconDetector"), m_box(box){
+        CityIconDetector(const ImageFloatBox& box)
+            : VisualInferenceCallback("CityIconDetector")
+            , m_box(box){
         }
         void make_overlays(VideoOverlaySet&) const override {
         }
@@ -821,11 +856,12 @@ bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place){
         stream.log("Found " + name + ", flying towards it.", COLOR_GREEN);
         WhiteScreenOverWatcher flying_white_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
         BlackScreenOverWatcher flying_black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_mash_button(context, BUTTON_A, 200000ms);
-                                                  },
-                                                  {{flying_white_screen}, {flying_black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_A, 200000ms);
+            },
+            {{flying_white_screen}, {flying_black_screen}});
         if (ret < 0){
             stream.log("Flying to " + name + ": white / black screen not detected!", COLOR_RED);
             return false;
@@ -896,7 +932,8 @@ static double confirmed_potion_hp(VideoStream& stream, ProControllerContext& con
         pbf_wait(context, 150ms);
     }
     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                 "Potion: Slot 1 HP bar could not be confirmed.", stream);
+        "Potion: Slot 1 HP bar could not be confirmed.",
+        stream);
 }
 
 void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context){
@@ -909,8 +946,9 @@ void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context
     for (size_t dose = 0; dose < 3; dose++){
         stream.log("[Potion] Finding Bag/Medicine/Potion; dose " + std::to_string(dose + 1) + "/3.");
         if (!find_bag_item(stream, context, potion, 1, 5, 64, std::chrono::seconds(45))){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::SEND_ERROR_REPORT, "Potion: Could not verify Potion in the Medicine pocket.", stream);
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Potion: Could not verify Potion in the Medicine pocket.",
+                stream);
         }
         const double before = confirmed_potion_hp(stream, context);
         stream.log("[Potion] Slot 1 HP bar before use=" + std::to_string(before * 100) + "%.");
@@ -920,8 +958,8 @@ void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context
         }
         if (before <= 0.005){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                         "Potion: Slot 1 appears fainted; a Potion cannot revive it.",
-                                                         stream);
+                "Potion: Slot 1 appears fainted; a Potion cannot revive it.",
+                stream);
         }
         pbf_press_button(context, BUTTON_A, 80ms, 500ms);
         pbf_press_button(context, BUTTON_A, 80ms, 500ms);
@@ -931,7 +969,8 @@ void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context
         OverworldWatcher overworld;
         if (wait_until(stream, context, std::chrono::seconds(10), {{overworld}}) != 0){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                         "Potion: Did not return to the overworld after use.", stream);
+                "Potion: Did not return to the overworld after use.",
+                stream);
         }
         // Reopen Bag to verify the result, including when the last Potion was used.
         open_menu(stream, context, MenuCursorPosition::BAG, 5);
@@ -940,9 +979,9 @@ void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context
         const double after = confirmed_potion_hp(stream, context);
         stream.log("[Potion] Slot 1 HP bar after use=" + std::to_string(after * 100) + "%.");
         if (after <= before + 0.005){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::SEND_ERROR_REPORT,
-                "Potion: Slot 1 HP did not increase; refusing to continue movement.", stream);
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Potion: Slot 1 HP did not increase; refusing to continue movement.",
+                stream);
         }
         if (after >= 0.98){
             healed = true;
@@ -953,14 +992,16 @@ void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context
     }
     if (!healed){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Potion: Full HP not confirmed after three uses.", stream);
+            "Potion: Full HP not confirmed after three uses.",
+            stream);
     }
     pbf_mash_button(context, BUTTON_B, 2000ms);
     context.wait_for_all_requests();
     OverworldWatcher overworld;
     if (wait_until(stream, context, std::chrono::seconds(10), {{overworld}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Potion: Final overworld return not confirmed.", stream);
+            "Potion: Final overworld return not confirmed.",
+            stream);
     }
     stream.log("[Potion] Slot 1 HP bar full and overworld confirmed.");
 }
@@ -1011,7 +1052,14 @@ void open_menu(VideoStream& stream, ProControllerContext& context, MenuCursorPos
     MenuCursorDetector detector;
     {
         static const char* ICON_NAMES[MENU_CURSOR_NUM_ICONS] = {
-            "POKEDEX", "POKEMON", "BAG", "CARD", "OPTIONS", "MAP", "CAPSULES", "MYSTERYGIFT",
+            "POKEDEX",
+            "POKEMON",
+            "BAG",
+            "CARD",
+            "OPTIONS",
+            "MAP",
+            "CAPSULES",
+            "MYSTERYGIFT",
         };
         // Previous optional template directory: PokemonBDSP/AutoStory.
         std::string ref_dir = RESOURCE_PATH() + "PokemonBDSP/Autostory";
@@ -1075,25 +1123,27 @@ void open_menu(VideoStream& stream, ProControllerContext& context, MenuCursorPos
             }
             if (cur != MenuCursorPosition::UNKNOWN){
                 stream.log("[Open menu] Menu and cursor detected on attempt " + std::to_string(attempt) + ".",
-                           COLOR_GREEN);
+                    COLOR_GREEN);
                 break;
             }
             stream.log("[Open menu] Menu cursor not detected on attempt " + std::to_string(attempt) + ".",
-                       COLOR_ORANGE);
+                COLOR_ORANGE);
         } catch (OperationFailedException& error){
             stream.log("[Open menu] Attempt " + std::to_string(attempt) + " failed: " + error.message(), COLOR_ORANGE);
         }
     }
     if (cur == MenuCursorPosition::UNKNOWN){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT, "Menu or cursor detection failed after 3 opening attempts.", stream);
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Menu or cursor detection failed after 3 opening attempts.",
+            stream);
     }
 
     IconGrid cur_g = icon_to_grid(cur, num_icons);
     IconGrid tgt_g = icon_to_grid(target, num_icons);
     if (tgt_g.row == -1){
-        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "Unknown target menu icon.",
-                                                     stream);
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Unknown target menu icon.",
+            stream);
     }
 
     if (cur_g.row != tgt_g.row){
@@ -1298,9 +1348,18 @@ size_t bag_clear_tab_count(const ImageViewRGB32& frame){
     }
     static const std::vector<std::shared_ptr<const ImageRGB32>> references = [] {
         std::vector<std::shared_ptr<const ImageRGB32>> refs;
-        for (const char* name :
-             {"Normal", "NormalMedium", "NormalSmall", "Alternate", "AlternateMedium", "AlternateSmall", "Selected",
-              "SelectedMedium", "SelectedSmall", "SelectedBlue", "SelectedBlueMedium", "SelectedBlueSmall"}){
+        for (const char* name : {"Normal",
+            "NormalMedium",
+            "NormalSmall",
+            "Alternate",
+            "AlternateMedium",
+            "AlternateSmall",
+            "Selected",
+            "SelectedMedium",
+            "SelectedSmall",
+            "SelectedBlue",
+            "SelectedBlueMedium",
+            "SelectedBlueSmall"}){
             refs.emplace_back(
                 std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/Autostory/BagTabs/" + name + ".png"));
         }
@@ -1372,8 +1431,8 @@ bool clear_new_item_flags(VideoStream& stream, ProControllerContext& context, in
     pbf_mash_button(context, BUTTON_B, 2000ms);
     context.wait_for_all_requests();
     stream.log(cleared ? "[Bag NEW flags] All eight tabs clear; bag closed."
-                       : "[Bag NEW flags] Full pocket pass did not clear all eight tabs; bag closed.",
-               cleared ? COLOR_GREEN : COLOR_ORANGE);
+        : "[Bag NEW flags] Full pocket pass did not clear all eight tabs; bag closed.",
+        cleared ? COLOR_GREEN : COLOR_ORANGE);
     return cleared;
 }
 
@@ -1421,8 +1480,8 @@ bool bag_list_is_empty(const ImageViewRGB32& frame){
 }
 
 
-std::array<BagItemRowMatch, 7> match_bag_item_rows(const ImageViewRGB32& frame, const ImageViewRGB32& reference,
-                                                   const BagItemTemplate& item){
+std::array<BagItemRowMatch, 7>
+match_bag_item_rows(const ImageViewRGB32& frame, const ImageViewRGB32& reference, const BagItemTemplate& item){
     std::array<BagItemRowMatch, 7> result;
     if (!frame || !reference || item.reference_row < 1 || item.reference_row > 7){
         return result;
@@ -1447,7 +1506,7 @@ BagMovePlan plan_bag_item_move(int cursor_row, int item_row){
             return {BagMoveAction::CONFIRM, 0};
         }
         return {item_row > cursor_row ? BagMoveAction::DOWN : BagMoveAction::UP,
-                static_cast<size_t>(std::abs(item_row - cursor_row))};
+            static_cast<size_t>(std::abs(item_row - cursor_row))};
     }
     if (cursor_row == 7){
         return {BagMoveAction::REWIND, 1};
@@ -1503,7 +1562,7 @@ BagPocketMovePlan plan_bag_pocket_move(int current, int target){
         return {BagPocketAction::CONFIRM, 0};
     }
     return right <= left ? BagPocketMovePlan{BagPocketAction::RIGHT, static_cast<size_t>(right)}
-                         : BagPocketMovePlan{BagPocketAction::LEFT, static_cast<size_t>(left)};
+        : BagPocketMovePlan{BagPocketAction::LEFT, static_cast<size_t>(left)};
 }
 
 static bool bag_navigate_to_pocket(VideoStream& stream, ProControllerContext& context, int target){
@@ -1518,15 +1577,15 @@ static bool bag_navigate_to_pocket(VideoStream& stream, ProControllerContext& co
             return false;
         }
         stream.log("[Bag search] Pocket " + std::to_string(current) + " to " + std::to_string(target) + ": " +
-                   (plan.action == BagPocketAction::RIGHT ? "right " : "left ") + std::to_string(plan.presses) +
-                   " presses, attempt " + std::to_string(attempt + 1) + "/3.");
+            (plan.action == BagPocketAction::RIGHT ? "right " : "left ") + std::to_string(plan.presses) +
+            " presses, attempt " + std::to_string(attempt + 1) + "/3.");
         for (size_t press = 0; press < plan.presses; press++){
             pbf_press_dpad(context, plan.action == BagPocketAction::RIGHT ? DPAD_RIGHT : DPAD_LEFT, 80ms, 150ms);
         }
         pbf_wait(context, 350ms);
         current = bag_confirm_pocket(stream, context);
-        stream.log("[Bag search] Final pocket=" + std::to_string(current) + ", expected=" + std::to_string(target) +
-                   ".");
+        stream.log(
+            "[Bag search] Final pocket=" + std::to_string(current) + ", expected=" + std::to_string(target) + ".");
         if (current == target){
             return true;
         }
@@ -1536,8 +1595,13 @@ static bool bag_navigate_to_pocket(VideoStream& stream, ProControllerContext& co
 }
 
 
-bool find_bag_item(VideoStream& stream, ProControllerContext& context, const BagItemTemplate& item, int target_pocket,
-                   int num_icons, size_t max_scrolls_per_pocket, std::chrono::milliseconds search_timeout){
+bool find_bag_item(VideoStream& stream,
+    ProControllerContext& context,
+    const BagItemTemplate& item,
+    int target_pocket,
+    int num_icons,
+    size_t max_scrolls_per_pocket,
+    std::chrono::milliseconds search_timeout){
     if (target_pocket < 1 || target_pocket > 8 || item.reference_row < 1 || item.reference_row > 7){
         stream.log("[Bag search] Invalid template reference row.", COLOR_ORANGE);
         return false;
@@ -1602,7 +1666,7 @@ bool find_bag_item(VideoStream& stream, ProControllerContext& context, const Bag
             size_t unchanged_pages = 0;
             ImageRGB32 previous_page;
             stream.log("[Bag search] Looking for " + item.label + ": pocket " + std::to_string(selected_pocket) +
-                       ", pass " + std::to_string(pass + 1) + "/3.");
+                ", pass " + std::to_string(pass + 1) + "/3.");
             while (std::chrono::steady_clock::now() < deadline){
                 const VideoSnapshot frame = stream.video().snapshot();
                 if (!frame || !bag.detect(frame)){
@@ -1644,8 +1708,7 @@ bool find_bag_item(VideoStream& stream, ProControllerContext& context, const Bag
                     }
                 }
                 stream.log("[Bag search] " + item.label + (target == 0 ? " is not detected" : " is detected") +
-                           " on screen; item row=" + std::to_string(target) + ", cursor row=" + std::to_string(cursor) +
-                           ".");
+                    " on screen; item row=" + std::to_string(target) + ", cursor row=" + std::to_string(cursor) + ".");
                 if (ambiguous){
                     stream.log("[Bag search] Multiple rows match; selection is uncertain.", COLOR_ORANGE);
                     return false;
@@ -1673,7 +1736,7 @@ bool find_bag_item(VideoStream& stream, ProControllerContext& context, const Bag
                     if (target == cursor){
                         if (++matching_frames >= 3){
                             stream.log("[Bag search] Item and cursor confirmed in row " + std::to_string(cursor) + ".",
-                                       COLOR_GREEN);
+                                COLOR_GREEN);
                             return true;
                         }
                         pbf_wait(context, 150ms);
@@ -1683,7 +1746,7 @@ bool find_bag_item(VideoStream& stream, ProControllerContext& context, const Bag
                     matching_frames = 0;
                     const size_t count = plan_bag_item_move(cursor, target).presses;
                     stream.log("[Bag search] Moving " + std::string(target > cursor ? "down " : "up ") +
-                               std::to_string(count) + " time(s), then checking again.");
+                        std::to_string(count) + " time(s), then checking again.");
                     if (!move(target > cursor ? DPAD_DOWN : DPAD_UP, count)){
                         return false;
                     }
@@ -1740,7 +1803,8 @@ bool find_bag_item(VideoStream& stream, ProControllerContext& context, const Bag
 
 bool use_escape_rope(VideoStream& stream, ProControllerContext& context, int num_icons){
     const BagItemTemplate rope{// "PokemonBDSP/AutoStory/Bag_EscapeRope.png", "escape-rope"
-                               "PokemonBDSP/Autostory/Bag_EscapeRope.png", "escape-rope"};
+        "PokemonBDSP/Autostory/Bag_EscapeRope.png",
+        "escape-rope"};
     if (!find_bag_item(stream, context, rope, 5, num_icons)){
         return false;
     }
@@ -1758,27 +1822,32 @@ bool use_escape_rope(VideoStream& stream, ProControllerContext& context, int num
     BlackScreenWatcher transition;
     // Escape Rope fades white in the supplied clips; support black transitions too.
     WhiteScreenWatcher white_transition;
-    const int result = run_until<ProControllerContext>(stream, context,
-                                                       [](ProControllerContext& ctx){
-                                                           for (size_t press = 0; press < 10; press++){
-                                                               pbf_press_button(ctx, BUTTON_A, 80ms, 500ms);
-                                                           }
-                                                           ctx.wait_for_all_requests();
-                                                           pbf_wait(ctx, 10s);
-                                                           ctx.wait_for_all_requests();
-                                                       },
-                                                       {transition, white_transition});
+    const int result = run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+            for (size_t press = 0; press < 10; press++){
+                pbf_press_button(ctx, BUTTON_A, 80ms, 500ms);
+            }
+            ctx.wait_for_all_requests();
+            pbf_wait(ctx, 10s);
+            ctx.wait_for_all_requests();
+        },
+        {transition, white_transition});
     if (result < 0){
         stream.log("[Escape Rope] No exit transition detected.", COLOR_ORANGE);
         return false;
     }
     BlackScreenWatcher finished(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
-    WhiteScreenWatcher white_finished(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 500, 10, WhiteScreenWatcher::FinderType::GONE,
-                                      500ms);
+    WhiteScreenWatcher white_finished(COLOR_RED,
+        {0.1, 0.1, 0.8, 0.8},
+        500,
+        10,
+        WhiteScreenWatcher::FinderType::GONE,
+        500ms);
     stream.log(std::string("[Escape Rope] ") + (result == 1 ? "White" : "Black") + " exit transition detected.");
     // if (wait_until(stream, context, 15s, {{finished}}) != 0){ return false; }
     const int finish_result = result == 1 ? wait_until(stream, context, 15s, {{white_finished}})
-                                          : wait_until(stream, context, 15s, {{finished}});
+        : wait_until(stream, context, 15s, {{finished}});
     if (finish_result != 0){
         stream.log("[Escape Rope] Exit transition did not finish.", COLOR_ORANGE);
         return false;
@@ -1835,14 +1904,14 @@ bool activate_repel(VideoStream& stream, ProControllerContext& context, int num_
             wait_until(stream, context, 400ms, {{watcher}, {small_watcher}, {honey_watcher}, {honey_small_watcher}});
         if (ret >= 0){
             stream.log("[AutoStory] activate_repel: repel tab found after " + std::to_string(press) + " press(es).",
-                       COLOR_GREEN);
+                COLOR_GREEN);
             found = true;
             break;
         }
 
         if (press < 8){
-            stream.log("[AutoStory] activate_repel: tab not found, pressing right (" + std::to_string(press + 1) +
-                       "/8).");
+            stream.log(
+                "[AutoStory] activate_repel: tab not found, pressing right (" + std::to_string(press + 1) + "/8).");
             pbf_press_dpad(context, DPAD_RIGHT, 80ms, 300ms);
         }
     }
@@ -1932,15 +2001,16 @@ void use_HM(VideoStream& stream, ProControllerContext& context, const std::strin
     const ImageFloatBox box{0.670000, 0.600000, 0.100000, 0.150000};
     SelectionArrowFinder arrow(stream.overlay(), box, COLOR_GREEN);
 
-    int ret = run_until<ProControllerContext>(stream, context,
-                                              [](ProControllerContext& context){
-                                                  pbf_mash_button(context, BUTTON_A, 30000ms);
-                                              },
-                                              {{arrow}});
+    int ret = run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_A, 30000ms);
+        },
+        {{arrow}});
     if (ret != 0){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT,
-            "Using " + label + ": HM confirmation arrow not found; stopping before further movement.", stream);
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Using " + label + ": HM confirmation arrow not found; stopping before further movement.",
+            stream);
     }
 
     stream.log("Using " + label + ": selection arrow found, confirming.", COLOR_GREEN);
@@ -1977,10 +2047,18 @@ bool get_on_bicycle(VideoStream& stream, ProControllerContext& context, GearLeve
             }
 
             size_t front_pixels = 0, back_pixels = 0;
-            filter_rgb32_range(front_pixels, extract_box_reference(screen, FRONT_BOX), SPARK_MIN, SPARK_MAX, Color(0),
-                               false);
-            filter_rgb32_range(back_pixels, extract_box_reference(screen, BACK_BOX), SPARK_MIN, SPARK_MAX, Color(0),
-                               false);
+            filter_rgb32_range(front_pixels,
+                extract_box_reference(screen, FRONT_BOX),
+                SPARK_MIN,
+                SPARK_MAX,
+                Color(0),
+                false);
+            filter_rgb32_range(back_pixels,
+                extract_box_reference(screen, BACK_BOX),
+                SPARK_MIN,
+                SPARK_MAX,
+                Color(0),
+                false);
 
             if (front_pixels > max_front){
                 max_front = front_pixels;
@@ -1991,18 +2069,18 @@ bool get_on_bicycle(VideoStream& stream, ProControllerContext& context, GearLeve
 
             if (front_pixels >= SPARK_THRESHOLD || back_pixels >= SPARK_THRESHOLD){
                 stream.log("[AutoStory] get_on_bicycle: sparks detected "
-                           "(front=" +
-                               std::to_string(front_pixels) + " back=" + std::to_string(back_pixels) +
-                               " threshold=" + std::to_string(SPARK_THRESHOLD) + ").",
-                           COLOR_GREEN);
+                    "(front=" +
+                    std::to_string(front_pixels) + " back=" + std::to_string(back_pixels) +
+                    " threshold=" + std::to_string(SPARK_THRESHOLD) + ").",
+                    COLOR_GREEN);
                 return true;
             }
         }
         stream.log("[AutoStory] get_on_bicycle: no sparks detected "
-                   "(peak front=" +
-                       std::to_string(max_front) + " back=" + std::to_string(max_back) +
-                       " threshold=" + std::to_string(SPARK_THRESHOLD) + ").",
-                   COLOR_ORANGE);
+            "(peak front=" +
+            std::to_string(max_front) + " back=" + std::to_string(max_back) +
+            " threshold=" + std::to_string(SPARK_THRESHOLD) + ").",
+            COLOR_ORANGE);
         return false;
     };
 

@@ -46,7 +46,8 @@ static void segment03_finish_transition(VideoStream& stream, ProControllerContex
     BlackScreenWatcher visible(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
     if (wait_until(stream, context, 30s, {{visible}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     label + ": Transition did not finish.", stream);
+            label + ": Transition did not finish.",
+            stream);
     }
     pbf_wait(context, 500ms);
     context.wait_for_all_requests();
@@ -54,11 +55,14 @@ static void segment03_finish_transition(VideoStream& stream, ProControllerContex
 
 // Stationary destination confirmation: do not steer during an NPC reward
 // scene or declare arrival from a fade that has only just started.
-static void segment03_confirm_location(VideoStream& stream, ProControllerContext& context,
-                                       OverworldMatchResult (*matcher)(const ImageRGB32&), const std::string& label,
-                                       size_t observations = 20, bool advance_dialogue = false,
-                                       bool require_target = false,
-                                       OverworldMatchResult (*instruction_card)(const ImageRGB32&) = nullptr){
+static void segment03_confirm_location(VideoStream& stream,
+    ProControllerContext& context,
+    OverworldMatchResult (*matcher)(const ImageRGB32&),
+    const std::string& label,
+    size_t observations = 20,
+    bool advance_dialogue = false,
+    bool require_target = false,
+    OverworldMatchResult (*instruction_card)(const ImageRGB32&) = nullptr){
     context.wait_for_all_requests();
     size_t confirmations = 0;
     for (size_t observation = 0; observation < observations; observation++){
@@ -90,45 +94,55 @@ static void segment03_confirm_location(VideoStream& stream, ProControllerContext
         context.wait_for_all_requests();
     }
     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                 label + ": Expected scene not confirmed.", stream);
+        label + ": Expected scene not confirmed.",
+        stream);
 }
 
 // Watch the approach itself, cancelling queued movement as soon as the
 // trainer speaks or a battle starts. The existing battle engine owns combat.
-static void segment03_expected_encounter(VideoStream& stream, ProControllerContext& context, const std::string& label,
-                                         const std::function<void(ProControllerContext&)>& approach,
-                                         Milliseconds encounter_wait = 45000ms, bool require_encounter = true){
+static void segment03_expected_encounter(VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& label,
+    const std::function<void(ProControllerContext&)>& approach,
+    Milliseconds encounter_wait = 45000ms,
+    bool require_encounter = true){
     context.wait_for_all_requests();
     ShortDialogWatcher dialogue;
     StartBattleDetector starting(stream.overlay());
     BattleMenuWatcher menu(BattleType::TRAINER);
-    const int encountered = run_until<ProControllerContext>(stream, context,
-                                                            [&](ProControllerContext& ctx){
-                                                                approach(ctx);
-                                                                pbf_wait(ctx, encounter_wait);
-                                                            },
-                                                            {{dialogue}, {starting}, {menu}});
+    const int encountered = run_until<ProControllerContext>(stream,
+        context,
+        [&](ProControllerContext& ctx){
+            approach(ctx);
+            pbf_wait(ctx, encounter_wait);
+        },
+        {{dialogue}, {starting}, {menu}});
     if (encountered < 0){
         if (!require_encounter){
             stream.log("[" + label + "] No encounter within " + std::to_string(encounter_wait.count()) +
-                           "ms after approach; trainer dodged, continuing.",
-                       COLOR_GREEN);
+                "ms after approach; trainer dodged, continuing.",
+                COLOR_GREEN);
             return;
         }
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     label + ": Expected trainer encounter did not start.", stream);
+            label + ": Expected trainer encounter did not start.",
+            stream);
     }
     stream.log("[" + label + "] Encounter detected; route movement cancelled.");
     fight_trainer_using_moves(stream, context, 2, label, false);
 }
 
-static void segment03_wait_image(VideoStream& stream, ProControllerContext& context, const std::string& resource,
-                                 const ImageFloatBox& box, const std::string& label){
+static void segment03_wait_image(VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& resource,
+    const ImageFloatBox& box,
+    const std::string& label){
     auto reference = std::make_shared<ImageRGB32>(RESOURCE_PATH() + resource);
     ImageMatchWatcher ready(reference, box, 25.0, false, 250ms);
     if (wait_until(stream, context, 5s, {{ready}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     label + ": Visual confirmation missing.", stream);
+            label + ": Visual confirmation missing.",
+            stream);
     }
 }
 
@@ -136,7 +150,8 @@ static void segment03_register_bike(VideoStream& stream, ProControllerContext& c
     // Receiving Bike adds new flags after the earlier pre-shop Bag pass.
     if (!clear_new_item_flags(stream, context)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Eterna Bike: Could not clear reward flags.", stream);
+            "Eterna Bike: Could not clear reward flags.",
+            stream);
     }
     BagItemTemplate bike;
     bike.reference_path = "PokemonBDSP/Autostory/EternaBikeShop/BikeBag.png";
@@ -144,7 +159,8 @@ static void segment03_register_bike(VideoStream& stream, ProControllerContext& c
     bike.reference_row = 4;
     if (!find_bag_item(stream, context, bike, 8)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Eterna Bike: Bike selection not confirmed.", stream);
+            "Eterna Bike: Bike selection not confirmed.",
+            stream);
     }
     // Locate the Key Items tab and Bike first, then use the fixed Register
     // sequence without depending on popup, wheel, or confirmation images.
@@ -171,18 +187,19 @@ static void segment03_align_lower_stair_lane(VideoStream& stream, ProControllerC
         const auto frame = stream.video().snapshot();
         if (!frame){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                         "Route 208 lower stair lane: No video frame.", stream);
+                "Route 208 lower stair lane: No video frame.",
+                stream);
         }
         const auto match = match_route208_lower_stair_lane(*frame.frame);
         stream.log("[Route 208 lower stair lane] located=" + std::to_string(match.located) +
-                   ", target=" + std::to_string(match.at_target) + ", offset=(" + std::to_string(match.dx) + "," +
-                   std::to_string(match.dy) + ")");
+            ", target=" + std::to_string(match.at_target) + ", offset=(" + std::to_string(match.dx) + "," +
+            std::to_string(match.dy) + ")");
         if (!match.located){
             confirmations = 0;
             if (++missing > 6){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT,
-                    "Route 208 lower stair lane: Cliff/tree anchors missing; no blind search.", stream);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Route 208 lower stair lane: Cliff/tree anchors missing; no blind search.",
+                    stream);
             }
             pbf_wait(context, 500ms);
             continue;
@@ -200,28 +217,35 @@ static void segment03_align_lower_stair_lane(VideoStream& stream, ProControllerC
         const double error = vertical ? match.dy * 9.0 / 16 : match.dx;
         const auto duration = std::abs(error) > 1.0 / 24 ? 80ms : std::abs(error) > 1.0 / 64 ? 40ms : 16ms;
         pbf_move_left_joystick(context,
-                               {vertical ? 0.0 : (error > 0 ? 1.0 : -1.0), vertical ? (error < 0 ? 1.0 : -1.0) : 0.0},
-                               duration, 0ms);
+            {vertical ? 0.0 : (error > 0 ? 1.0 : -1.0), vertical ? (error < 0 ? 1.0 : -1.0) : 0.0},
+            duration,
+            0ms);
         pbf_wait(context, 500ms);
     }
-    OperationFailedExceptionWithScreenshot::fire(
-        ErrorReportMode::SEND_ERROR_REPORT, "Route 208 lower stair lane: Could not confirm the safe descent endpoint.",
+    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+        "Route 208 lower stair lane: Could not confirm the safe descent endpoint.",
         stream);
 }
 
-static bool segment03_cycling_move(VideoStream& stream, ProControllerContext& context, double x, double y,
-                                   Milliseconds duration, Milliseconds rest, const std::string& label,
-                                   bool require_transition = false){
+static bool segment03_cycling_move(VideoStream& stream,
+    ProControllerContext& context,
+    double x,
+    double y,
+    Milliseconds duration,
+    Milliseconds rest,
+    const std::string& label,
+    bool require_transition = false){
     context.wait_for_all_requests();
     BlackScreenWatcher black;
     WhiteScreenWatcher white;
     BattleMenuWatcher battle(BattleType::TRAINER);
-    const int result = run_until<ProControllerContext>(stream, context,
-                                                       [&](ProControllerContext& ctx){
-                                                           pbf_move_left_joystick(ctx, {x, y}, duration, 0ms);
-                                                           pbf_wait(ctx, rest);
-                                                       },
-                                                       {{black}, {white}, {battle}});
+    const int result = run_until<ProControllerContext>(stream,
+        context,
+        [&](ProControllerContext& ctx){
+            pbf_move_left_joystick(ctx, {x, y}, duration, 0ms);
+            pbf_wait(ctx, rest);
+        },
+        {{black}, {white}, {battle}});
     if (result == 2){
         fight_trainer_using_moves(stream, context, 2, label + " encounter", false);
         return false;
@@ -229,19 +253,29 @@ static bool segment03_cycling_move(VideoStream& stream, ProControllerContext& co
     if (result < 0){
         if (require_transition){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                         label + ": Transition did not start.", stream);
+                label + ": Transition did not start.",
+                stream);
         }
         return false;
     }
-    BlackScreenWatcher black_gone(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 100, 10, BlackScreenWatcher::FinderType::GONE,
-                                  500ms);
-    WhiteScreenWatcher white_gone(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 500, 10, WhiteScreenWatcher::FinderType::GONE,
-                                  500ms);
+    BlackScreenWatcher black_gone(COLOR_RED,
+        {0.1, 0.1, 0.8, 0.8},
+        100,
+        10,
+        BlackScreenWatcher::FinderType::GONE,
+        500ms);
+    WhiteScreenWatcher white_gone(COLOR_RED,
+        {0.1, 0.1, 0.8, 0.8},
+        500,
+        10,
+        WhiteScreenWatcher::FinderType::GONE,
+        500ms);
     const int finished = result == 1 ? wait_until(stream, context, 30s, {{white_gone}})
-                                     : wait_until(stream, context, 30s, {{black_gone}});
+        : wait_until(stream, context, 30s, {{black_gone}});
     if (finished != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     label + ": Transition did not finish.", stream);
+            label + ": Transition did not finish.",
+            stream);
     }
     // A cleared fade can precede restored movement control.
     pbf_wait(context, 2000ms);
@@ -261,7 +295,7 @@ static bool segment03_align_cycle_start(VideoStream& stream, ProControllerContex
         const auto frame = stream.video().snapshot();
         const auto match = frame ? match_cycling_road_bridge_approach(*frame.frame) : OverworldMatchResult{};
         const bool stable = match.located && have_pose && std::abs(match.dx - previous_dx) <= 1.0 / 192 &&
-                            std::abs(match.dy - previous_dy) <= 1.0 / 108;
+            std::abs(match.dy - previous_dy) <= 1.0 / 108;
         // Reliable rail/deck geometry and a settled pose renew the budget.
         // Keep correcting while the visual alignment remains strong.
         if (stable){
@@ -269,15 +303,14 @@ static bool segment03_align_cycle_start(VideoStream& stream, ProControllerContex
         }else{
             ++observations_without_strong_alignment;
         }
-        std::string diagnostic =
-            "[Cycling Road bridge] observation=" + std::to_string(observation + 1) +
+        std::string diagnostic = "[Cycling Road bridge] observation=" + std::to_string(observation + 1) +
             " located=" + std::to_string(match.located) + " target=" + std::to_string(match.at_target) +
             " stable=" + std::to_string(stable) +
             " observations_without_strong_alignment=" + std::to_string(observations_without_strong_alignment) +
             " offset=" + std::to_string(match.dx) + "," + std::to_string(match.dy);
         for (const auto& anchor : match.landmarks){
             diagnostic += " [" + anchor.name + " coverage=" + std::to_string(anchor.score) +
-                          " accepted=" + std::to_string(anchor.accepted) + "]";
+                " accepted=" + std::to_string(anchor.accepted) + "]";
         }
         stream.log(diagnostic);
         double x = 0, y = 0;
@@ -287,16 +320,16 @@ static bool segment03_align_cycle_start(VideoStream& stream, ProControllerContex
             have_pose = false;
             if (++missing >= 6){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "Cycling Road: Bridge deck and right rail not acquired.",
-                                                             stream);
+                    "Cycling Road: Bridge deck and right rail not acquired.",
+                    stream);
             }
             rest = 500ms;
         }else{
             missing = 0;
             if (std::abs(match.dx) > .32 || std::abs(match.dy) > .60){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "Cycling Road: Bridge alignment offset exceeds bounds.",
-                                                             stream);
+                    "Cycling Road: Bridge alignment offset exceeds bounds.",
+                    stream);
             }
             if (!stable){
                 // The camera keeps easing after the bicycle stops. Require
@@ -332,28 +365,30 @@ static bool segment03_align_cycle_start(VideoStream& stream, ProControllerContex
         ShortDialogWatcher dialogue;
         StartBattleDetector starting(stream.overlay());
         BattleMenuWatcher menu(BattleType::TRAINER);
-        const int interrupted = run_until<ProControllerContext>(stream, context,
-                                                                [&](ProControllerContext& ctx){
-                                                                    if (hold > 0ms){
-                                                                        pbf_move_left_joystick(ctx, {x, y}, hold, rest);
-                                                                    }else{
-                                                                        pbf_wait(ctx, rest);
-                                                                    }
-                                                                    ctx.wait_for_all_requests();
-                                                                },
-                                                                {{black}, {white}, {dialogue}, {starting}, {menu}});
+        const int interrupted = run_until<ProControllerContext>(stream,
+            context,
+            [&](ProControllerContext& ctx){
+                if (hold > 0ms){
+                    pbf_move_left_joystick(ctx, {x, y}, hold, rest);
+                }else{
+                    pbf_wait(ctx, rest);
+                }
+                ctx.wait_for_all_requests();
+            },
+            {{black}, {white}, {dialogue}, {starting}, {menu}});
         if (interrupted >= 2){
             stream.log("[Cycling Road] Encounter during bridge approach; alignment movement cancelled.");
             return true;
         }
         if (interrupted >= 0){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                         "Cycling Road: Unexpected transition during bridge alignment.",
-                                                         stream);
+                "Cycling Road: Unexpected transition during bridge alignment.",
+                stream);
         }
     }
     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                 "Cycling Road: Bridge lane alignment did not converge.", stream);
+        "Cycling Road: Bridge lane alignment did not converge.",
+        stream);
 }
 
 
@@ -364,17 +399,18 @@ static void segment03_cycle_road_battles(VideoStream& stream, ProControllerConte
         ShortDialogWatcher dialogue;
         StartBattleDetector starting(stream.overlay());
         BattleMenuWatcher menu(BattleType::TRAINER);
-        return run_until<ProControllerContext>(stream, context,
-                                               [&](ProControllerContext& ctx){
-                                                   if (initial){
-                                                       pbf_move_left_joystick(ctx, {0, -1}, 3300ms, 0ms);
-                                                   }
-                                                   // From the first encounter onward the controller stays
-                                                   // neutral. The bicycle rolls naturally into the next trainer.
-                                                   pbf_wait(ctx, completed >= 3 ? 7000ms : 45000ms);
-                                                   ctx.wait_for_all_requests();
-                                               },
-                                               {{dialogue}, {starting}, {menu}});
+        return run_until<ProControllerContext>(stream,
+            context,
+            [&](ProControllerContext& ctx){
+                if (initial){
+                    pbf_move_left_joystick(ctx, {0, -1}, 3300ms, 0ms);
+                }
+                // From the first encounter onward the controller stays
+                // neutral. The bicycle rolls naturally into the next trainer.
+                pbf_wait(ctx, completed >= 3 ? 7000ms : 45000ms);
+                ctx.wait_for_all_requests();
+            },
+            {{dialogue}, {starting}, {menu}});
     };
     while (completed < 4){
         const int result = encounter_pending ? 0 : watch(completed == 0);
@@ -384,9 +420,9 @@ static void segment03_cycle_road_battles(VideoStream& stream, ProControllerConte
                 stream.log("[Cycling Road] Three battles complete; 7s without another encounter. Continuing south.");
                 return;
             }
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::SEND_ERROR_REPORT,
-                "Cycling Road: Expected at least three battles before the south gate.", stream);
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Cycling Road: Expected at least three battles before the south gate.",
+                stream);
         }
         fight_trainer_using_moves(stream, context, 2, "Cycling Road encounter " + std::to_string(completed + 1), false);
         ++completed;
@@ -395,44 +431,56 @@ static void segment03_cycle_road_battles(VideoStream& stream, ProControllerConte
     stream.log("[Cycling Road] Four battles complete; skipping the quiet wait.");
 }
 
-static void segment03_doorway(VideoStream& stream, ProControllerContext& context, bool north,
-                              std::chrono::milliseconds duration, const std::string& label, double horizontal = 0){
+static void segment03_doorway(VideoStream& stream,
+    ProControllerContext& context,
+    bool north,
+    std::chrono::milliseconds duration,
+    const std::string& label,
+    double horizontal = 0){
     context.wait_for_all_requests();
     // Horizontal HQ stairs must cancel at fade-out, before loading can
     // swallow or carry movement onto the next floor. Vertical door callers
     // retain their existing transition behavior.
     if (horizontal != 0){
         BlackScreenWatcher entering;
-        if (run_until<ProControllerContext>(stream, context,
-                                            [&](ProControllerContext& ctx){
-                                                pbf_move_left_joystick(ctx, {horizontal, 0}, duration, 0ms);
-                                                pbf_wait(ctx, 3000ms);
-                                            },
-                                            {{entering}}) != 0){
+        if (run_until<ProControllerContext>(stream,
+            context,
+            [&](ProControllerContext& ctx){
+                    pbf_move_left_joystick(ctx, {horizontal, 0}, duration, 0ms);
+                    pbf_wait(ctx, 3000ms);
+                },
+            {{entering}}) != 0){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                         label + ": Stair transition did not start.", stream);
+                label + ": Stair transition did not start.",
+                stream);
         }
-        BlackScreenWatcher visible(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 100, 10, BlackScreenWatcher::FinderType::GONE,
-                                   500ms);
+        BlackScreenWatcher visible(COLOR_RED,
+            {0.1, 0.1, 0.8, 0.8},
+            100,
+            10,
+            BlackScreenWatcher::FinderType::GONE,
+            500ms);
         if (wait_until(stream, context, 30s, {{visible}}) != 0){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                         label + ": Stair transition did not finish.", stream);
+                label + ": Stair transition did not finish.",
+                stream);
         }
         pbf_wait(context, 500ms);
         context.wait_for_all_requests();
         return;
     }
     BlackScreenOverWatcher transition(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-    int result =
-        run_until<ProControllerContext>(stream, context,
-                                        [&](ProControllerContext& ctx){
-                                            pbf_move_left_joystick(ctx, {0, north ? 1.0 : -1.0}, duration, 0ms);
-                                            pbf_wait(ctx, 3000ms);
-                                        },
-                                        {{transition}});
+    int result = run_until<ProControllerContext>(stream,
+        context,
+        [&](ProControllerContext& ctx){
+            pbf_move_left_joystick(ctx, {0, north ? 1.0 : -1.0}, duration, 0ms);
+            pbf_wait(ctx, 3000ms);
+        },
+        {{transition}});
     if (result != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     label + ": Doorway transition not confirmed.", stream);
+            label + ": Doorway transition not confirmed.",
+            stream);
     }
     segment03_finish_transition(stream, context, label);
 }
@@ -453,7 +501,8 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context){
     pbf_wait(context, 2621ms);
     if (!heal_pokemon(stream, context, "Eterna before Galactic HQ")){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Eterna Center exit was not confirmed.", stream);
+            "Eterna Center exit was not confirmed.",
+            stream);
     }
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1895ms, 0ms);
     pbf_wait(context, 130ms);
@@ -474,14 +523,14 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context){
         const auto position = frame ? match_galactic_hq_cut(*frame.frame) : OverworldMatchResult{};
         for (const auto& anchor : position.landmarks){
             stream.log("[Galactic HQ Cut] " + anchor.name + " score=" + std::to_string(anchor.score) +
-                       ", margin=" + std::to_string(anchor.margin) + ", offset=(" + std::to_string(anchor.dx) + "," +
-                       std::to_string(anchor.dy) + ")");
+                ", margin=" + std::to_string(anchor.margin) + ", offset=(" + std::to_string(anchor.dx) + "," +
+                std::to_string(anchor.dy) + ")");
         }
         if (!position.located){
             hq_cut_confirmations = 0;
             if (++hq_cut_missing > 6){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "Galactic HQ: Front bush sign/Center alignment not confirmed.",
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Galactic HQ: Front bush sign/Center alignment not confirmed.",
                     stream);
             }
             // Let a passing shadow clear; never search by moving blindly.
@@ -491,8 +540,9 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context){
         }
         hq_cut_missing = 0;
         if (std::abs(position.dx) > .20){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::SEND_ERROR_REPORT, "Galactic HQ: Front bush alignment offset exceeds bounds.", stream);
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Galactic HQ: Front bush alignment offset exceeds bounds.",
+                stream);
         }
         if (position.at_target){
             if (++hq_cut_confirmations >= 3){
@@ -500,44 +550,48 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context){
             }
         }else{
             hq_cut_confirmations = 0;
-            pbf_move_left_joystick(context, {position.dx > 0 ? 1.0 : -1.0, 0},
-                                   std::abs(position.dx) > 1.0 / 24 ? 80ms : 40ms, 0ms);
+            pbf_move_left_joystick(context,
+                {position.dx > 0 ? 1.0 : -1.0, 0},
+                std::abs(position.dx) > 1.0 / 24 ? 80ms : 40ms,
+                0ms);
         }
         pbf_wait(context, 250ms);
         context.wait_for_all_requests();
     }
     if (hq_cut_confirmations < 3){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Galactic HQ: Front bush column did not converge.", stream);
+            "Galactic HQ: Front bush column did not converge.",
+            stream);
     }
     // Some attempts reach the bush before the interaction accepts input.
     // Confirm its dialogue while stationary, then finish the Cut animation.
     ShortDialogWatcher hq_cut_dialogue;
-    if (run_until<ProControllerContext>(stream, context,
-                                        [](ProControllerContext& ctx){
-                                            for (size_t press = 0; press < 30; press++){
-                                                pbf_move_left_joystick(ctx, {0, 1}, 80ms, 100ms);
-                                                pbf_press_button(ctx, BUTTON_A, 150ms, 500ms);
-                                            }
-                                        },
-                                        {{hq_cut_dialogue}}) != 0){
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+                for (size_t press = 0; press < 30; press++){
+                    pbf_move_left_joystick(ctx, {0, 1}, 80ms, 100ms);
+                    pbf_press_button(ctx, BUTTON_A, 150ms, 500ms);
+                }
+            },
+        {{hq_cut_dialogue}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Galactic HQ: Front bush interaction did not produce dialogue.",
-                                                     stream);
+            "Galactic HQ: Front bush interaction did not produce dialogue.",
+            stream);
     }
     clear_post_battle_dialogue(stream, context, BUTTON_A, 6000ms);
     context.wait_for_all_requests();
     // Cut succeeds, but the Center exit can leave us one tile west of
     // the HQ doorway. Do not replay the interior route against its wall.
     BlackScreenWatcher hq_entering;
-    const int hq_entry = run_until<ProControllerContext>(
-        stream, context,
+    const int hq_entry = run_until<ProControllerContext>(stream,
+        context,
         [&](ProControllerContext& ctx){
             pbf_move_left_joystick(ctx, {0, 1}, 1507ms, 193ms);
             ctx.wait_for_all_requests();
             for (size_t correction = 0; correction < 4; correction++){
                 stream.log("[Galactic HQ entry] No transition; correcting east toward doorway, attempt " +
-                           std::to_string(correction + 1) + "/4.");
+                    std::to_string(correction + 1) + "/4.");
                 pbf_move_left_joystick(ctx, {1, 0}, 80ms, 100ms);
                 pbf_move_left_joystick(ctx, {0, 1}, 350ms, 250ms);
                 ctx.wait_for_all_requests();
@@ -546,16 +600,21 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context){
         },
         {{hq_entering}});
     if (hq_entry != 0){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT,
-            "Galactic HQ: Doorway transition not detected after bounded east correction.", stream);
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Galactic HQ: Doorway transition not detected after bounded east correction.",
+            stream);
     }
     stream.log("[Galactic HQ entry] Doorway transition detected; waiting for interior.");
-    BlackScreenWatcher hq_visible(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 100, 10, BlackScreenWatcher::FinderType::GONE,
-                                  500ms);
+    BlackScreenWatcher hq_visible(COLOR_RED,
+        {0.1, 0.1, 0.8, 0.8},
+        100,
+        10,
+        BlackScreenWatcher::FinderType::GONE,
+        500ms);
     if (wait_until(stream, context, 30s, {{hq_visible}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Galactic HQ: Entry transition did not finish.", stream);
+            "Galactic HQ: Entry transition did not finish.",
+            stream);
     }
     pbf_wait(context, 500ms);
     context.wait_for_all_requests();
@@ -571,11 +630,12 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context){
     // stopped and reuse the battle handler only if its command menu appears.
     // A party that fought both together needs no second battle handler.
     BattleMenuWatcher hq_next_grunt(BattleType::TRAINER);
-    const int hq_next_battle = run_until<ProControllerContext>(stream, context,
-                                                               [](ProControllerContext& ctx){
-                                                                   pbf_mash_button(ctx, BUTTON_B, 30000ms);
-                                                               },
-                                                               {{hq_next_grunt}});
+    const int hq_next_battle = run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+            pbf_mash_button(ctx, BUTTON_B, 30000ms);
+        },
+        {{hq_next_grunt}});
     if (hq_next_battle == 0){
         stream.log("[Galactic HQ] Second entrance grunt detected before stair movement.");
         fight("Galactic HQ second entrance grunt", false);
@@ -626,17 +686,18 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context){
     // Advance the introduction before entering the battle handler's
     // B-based waiting loop. A single press may only open the first text.
     BattleMenuWatcher jupiter_menu(BattleType::TRAINER);
-    if (run_until<ProControllerContext>(stream, context,
-                                        [](ProControllerContext& ctx){
-                                            for (size_t press = 0; press < 30; press++){
-                                                pbf_press_button(ctx, BUTTON_A, 150ms, 500ms);
-                                            }
-                                            pbf_wait(ctx, 15000ms);
-                                        },
-                                        {{jupiter_menu}}) != 0){
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+                for (size_t press = 0; press < 30; press++){
+                    pbf_press_button(ctx, BUTTON_A, 150ms, 500ms);
+                }
+                pbf_wait(ctx, 15000ms);
+            },
+        {{jupiter_menu}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Galactic HQ: Jupiter interaction did not reach the battle menu.",
-                                                     stream);
+            "Galactic HQ: Jupiter interaction did not reach the battle menu.",
+            stream);
     }
     fight("Commander Jupiter", true);
     // Jupiter's departure and the rescued family have chained dialogue.
@@ -668,15 +729,17 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context){
     pbf_wait(context, 1092ms);
     context.wait_for_all_requests();
     BlackScreenOverWatcher hq_leaving(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-    if (run_until<ProControllerContext>(stream, context,
-                                        [](ProControllerContext& ctx){
-                                            pbf_move_left_joystick(ctx, {0, -1}, 2350ms, 0ms);
-                                            pbf_move_left_joystick(ctx, {-1, -1}, 2744ms, 0ms);
-                                            pbf_wait(ctx, 3000ms);
-                                        },
-                                        {{hq_leaving}}) != 0){
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+                pbf_move_left_joystick(ctx, {0, -1}, 2350ms, 0ms);
+                pbf_move_left_joystick(ctx, {-1, -1}, 2744ms, 0ms);
+                pbf_wait(ctx, 3000ms);
+            },
+        {{hq_leaving}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Galactic HQ: Exit transition not confirmed.", stream);
+            "Galactic HQ: Exit transition not confirmed.",
+            stream);
     }
     segment03_finish_transition(stream, context, "Galactic HQ exit");
     segment03_confirm_location(stream, context, match_galactic_hq_exterior, "Galactic HQ exterior");
@@ -697,7 +760,8 @@ static void eterna_mart_escape_ropes(VideoStream& stream, ProControllerContext& 
     pbf_move_left_joystick(context, {0, 1}, 885ms, 300ms);
     if (!buy_items(stream, context, {{ShopItem::EscapeRope, 3}})){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Eterna Mart: Could not buy 3 Escape Ropes.", stream);
+            "Eterna Mart: Could not buy 3 Escape Ropes.",
+            stream);
     }
     segment03_doorway(stream, context, false, 5000ms, "Eterna Mart exit");
 
@@ -707,8 +771,12 @@ static void eterna_mart_escape_ropes(VideoStream& stream, ProControllerContext& 
     pbf_move_left_joystick(context, {-1, 0}, 587ms, 100ms);
     segment03_doorway(stream, context, true, 5000ms, "Eterna Center return after Mart");
     segment03_doorway(stream, context, false, 5000ms, "Eterna Center exit after Mart");
-    align_to_overworld_landmarks(stream, context, match_eterna_center_departure, "Eterna Center departure after Mart",
-                                 false, true);
+    align_to_overworld_landmarks(stream,
+        context,
+        match_eterna_center_departure,
+        "Eterna Center departure after Mart",
+        false,
+        true);
 }
 
 static void segment03_enter_cycle_shop(VideoStream& stream, ProControllerContext& context){
@@ -722,8 +790,8 @@ static void segment03_enter_cycle_shop(VideoStream& stream, ProControllerContext
     // Watch the entire approach AND the locator. A fade cancels all queued
     // input, even if the doorway is crossed before alignment has finished.
     BlackScreenWatcher entering;
-    const int result = run_until<ProControllerContext>(
-        stream, context,
+    const int result = run_until<ProControllerContext>(stream,
+        context,
         [&](ProControllerContext& ctx){
             pbf_move_left_joystick(ctx, {0, -1}, 1514ms, 0ms);
             pbf_wait(ctx, 177ms);
@@ -731,8 +799,15 @@ static void segment03_enter_cycle_shop(VideoStream& stream, ProControllerContext
             pbf_wait(ctx, 522ms);
             pbf_move_left_joystick(ctx, {1, 0}, 144ms, 0ms);
             pbf_wait(ctx, 439ms);
-            align_to_overworld_landmarks(stream, ctx, match_eterna_cycle_shop_entrance, "Eterna bicycle shop entrance",
-                                         false, true, false, match_eterna_cycle_shop_interior, &entered);
+            align_to_overworld_landmarks(stream,
+                ctx,
+                match_eterna_cycle_shop_entrance,
+                "Eterna bicycle shop entrance",
+                false,
+                true,
+                false,
+                match_eterna_cycle_shop_interior,
+                &entered);
             if (!entered){
                 pbf_move_left_joystick(ctx, {0, 1}, 4000ms, 0ms);
                 pbf_wait(ctx, 3000ms);
@@ -741,7 +816,8 @@ static void segment03_enter_cycle_shop(VideoStream& stream, ProControllerContext
         {{entering}});
     if (result != 0 && !entered){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Eterna bicycle shop: Entry transition not detected.", stream);
+            "Eterna bicycle shop: Entry transition not detected.",
+            stream);
     }
     segment03_finish_transition(stream, context, "Eterna bicycle shop entrance");
     segment03_confirm_location(stream, context, match_eterna_cycle_shop_interior, "Eterna bicycle shop interior");
@@ -760,16 +836,25 @@ void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context){
     pbf_wait(context, 27ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 745ms, 0ms);
     pbf_wait(context, 868ms);
-    align_to_overworld_landmarks(stream, context, match_eterna_center_entrance, "Eterna Center after Jupiter", false,
-                                 true);
+    align_to_overworld_landmarks(stream,
+        context,
+        match_eterna_center_entrance,
+        "Eterna Center after Jupiter",
+        false,
+        true);
     segment03_doorway(stream, context, true, 4000ms, "Eterna Center entrance after Jupiter");
     if (!heal_pokemon(stream, context, "Eterna after Jupiter")){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Eterna Center exit not confirmed.", stream);
+            "Eterna Center exit not confirmed.",
+            stream);
     }
     segment03_finish_transition(stream, context, "Eterna Center heal exit");
-    align_to_overworld_landmarks(stream, context, match_eterna_center_departure, "Eterna Center departure to Mart",
-                                 false, true);
+    align_to_overworld_landmarks(stream,
+        context,
+        match_eterna_center_departure,
+        "Eterna Center departure to Mart",
+        false,
+        true);
     eterna_mart_escape_ropes(stream, context);
     segment03_enter_cycle_shop(stream, context);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 505ms, 0ms);
@@ -783,22 +868,29 @@ void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context){
     // Cancel Up immediately on dialogue; all subsequent inputs are A only.
     context.wait_for_all_requests();
     ShortDialogWatcher keeper_dialogue;
-    if (run_until<ProControllerContext>(stream, context,
-                                        [](ProControllerContext& ctx){
-                                            for (size_t press = 0; press < 20; press++){
-                                                pbf_move_left_joystick(ctx, {0, 1}, 80ms, 100ms);
-                                                pbf_press_button(ctx, BUTTON_A, 150ms, 500ms);
-                                            }
-                                        },
-                                        {{keeper_dialogue}}) != 0){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT, "Eterna bicycle shop: Keeper interaction did not produce dialogue.",
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+                for (size_t press = 0; press < 20; press++){
+                    pbf_move_left_joystick(ctx, {0, 1}, 80ms, 100ms);
+                    pbf_press_button(ctx, BUTTON_A, 150ms, 500ms);
+                }
+            },
+        {{keeper_dialogue}}) != 0){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Eterna bicycle shop: Keeper interaction did not produce dialogue.",
             stream);
     }
     // The reward scene returns us outside already mounted. Wait for that
     // positive destination instead of replaying a fixed dialogue burst.
-    segment03_confirm_location(stream, context, match_eterna_cycle_shop_reward, "Eterna bicycle reward complete", 180,
-                               true, true, match_eterna_bike_riding_card);
+    segment03_confirm_location(stream,
+        context,
+        match_eterna_cycle_shop_reward,
+        "Eterna bicycle reward complete",
+        180,
+        true,
+        true,
+        match_eterna_bike_riding_card);
     segment03_register_bike(stream, context);
     segment03_cycling_move(stream, context, -1, 0, 733ms, 316ms, "Cycling Road approach");
     segment03_cycling_move(stream, context, 0, -1, 3280ms, 3000ms, "Cycling Road north gate entrance", true);
@@ -809,8 +901,8 @@ void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     OverworldWatcher north_gate_overworld;
     if (wait_until(stream, context, 10s, {{north_gate_overworld}}) != 0){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT, "Cycling Road: Overworld not visible after north gate exit settle.",
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Cycling Road: Overworld not visible after north gate exit settle.",
             stream);
     }
     BlackScreenWatcher north_gate_black;
@@ -818,16 +910,16 @@ void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context){
     ShortDialogWatcher north_gate_dialogue;
     StartBattleDetector north_gate_starting(stream.overlay());
     BattleMenuWatcher north_gate_menu(BattleType::TRAINER);
-    const int clearance = run_until<ProControllerContext>(
-        stream, context,
+    const int clearance = run_until<ProControllerContext>(stream,
+        context,
         [](ProControllerContext& ctx){
             pbf_move_left_joystick(ctx, {0, -1}, 750ms, 250ms);
             ctx.wait_for_all_requests();
         },
         {{north_gate_black}, {north_gate_white}, {north_gate_dialogue}, {north_gate_starting}, {north_gate_menu}});
     if (clearance == 0 || clearance == 1){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT, "Cycling Road: Unexpected transition while clearing north gate steps.",
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Cycling Road: Unexpected transition while clearing north gate steps.",
             stream);
     }
     const bool cycling_encounter = clearance >= 2 || segment03_align_cycle_start(stream, context);
@@ -847,13 +939,16 @@ void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context){
     if (!south_gate_entered){
         segment03_cycling_move(stream, context, 0, -1, 1977ms, 1544ms, "Cycling Road south gate entrance", true);
     }
-    segment03_confirm_location(stream, context, match_cycling_road_south_gate_interior,
-                               "Cycling Road south gate interior");
+    segment03_confirm_location(stream,
+        context,
+        match_cycling_road_south_gate_interior,
+        "Cycling Road south gate interior");
     segment03_cycling_move(stream, context, 0, -1, 1977ms, 1544ms, "Cycling Road south gate exit", true);
     OverworldWatcher south_gate_overworld;
     if (wait_until(stream, context, 10s, {{south_gate_overworld}}) != 0){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT, "Cycling Road: Overworld not visible after south gate exit.", stream);
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Cycling Road: Overworld not visible after south gate exit.",
+            stream);
     }
     // Stay southbound until the scripted Dawn/Lucas dialogue actually
     // appears. Cancel movement at the dialogue instead of spending inputs
@@ -872,8 +967,8 @@ void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context){
         BattleMenuWatcher dawn_menu(BattleType::TRAINER);
         const Milliseconds south = attempt == 0 ? 1546ms : 3000ms;
         stream.log("[Route 207 Dawn] South approach attempt=" + std::to_string(attempt + 1));
-        const int result = run_until<ProControllerContext>(
-            stream, context,
+        const int result = run_until<ProControllerContext>(stream,
+            context,
             [south](ProControllerContext& ctx){
                 pbf_move_left_joystick(ctx, {0, -1}, south, 500ms);
                 ctx.wait_for_all_requests();
@@ -882,14 +977,14 @@ void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context){
         if (result == 0){
             dawn_dialogue_seen = true;
         }else if (result >= 0){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::SEND_ERROR_REPORT, "Route 207 Dawn: Unexpected transition or battle before dialogue.",
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Route 207 Dawn: Unexpected transition or battle before dialogue.",
                 stream);
         }
     }
     if (!dawn_dialogue_seen){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT, "Route 207 Dawn: Dialogue not encountered after southward retries.",
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Route 207 Dawn: Dialogue not encountered after southward retries.",
             stream);
     }
     stream.log("[Route 207 Dawn] Dialogue detected; south movement cancelled.", COLOR_GREEN);
@@ -910,7 +1005,8 @@ void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context){
     }
     if (!dawn_dialogue_cleared){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Route 207 Dawn: Dialogue did not remain cleared.", stream);
+            "Route 207 Dawn: Dialogue did not remain cleared.",
+            stream);
     }
     pbf_wait(context, 6000ms);
     stream.log("[Route 207 Dawn] Dialogue cleared; continuing to Camper Anthony.", COLOR_GREEN);
@@ -926,13 +1022,16 @@ void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context){
     // Justin can be dodged. After the recorded approach, wait three seconds
     // for an encounter; otherwise keep the remaining Coronet route.
     segment03_expected_encounter(
-        stream, context, "Route 207 Hiker Justin",
+        stream,
+        context,
+        "Route 207 Hiker Justin",
         [](ProControllerContext& ctx){
             pbf_move_left_joystick(ctx, {1, 0}, 994ms, 508ms);
             pbf_move_left_joystick(ctx, {0, 1}, 534ms, 457ms);
             pbf_move_left_joystick(ctx, {1, 0}, 2076ms, 149ms);
         },
-        3000ms, false);
+        3000ms,
+        false);
     // Keep the recorded route after Justin; replace its final blind doorway
     // excerpt with the same watched down/right search used at Oreburgh Gate.
     bool coronet_entered = segment03_cycling_move(stream, context, 1, 0, 942ms, 443ms, "Mount Coronet approach");
@@ -955,7 +1054,8 @@ void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context){
     OverworldWatcher coronet_overworld;
     if (wait_until(stream, context, 10s, {{coronet_overworld}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Mount Coronet: Interior not ready after west entrance.", stream);
+            "Mount Coronet: Interior not ready after west entrance.",
+            stream);
     }
     context.wait_for_all_requests();
 }
@@ -1046,8 +1146,8 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
         ShortDialogWatcher dialogue;
         StartBattleDetector starting(stream.overlay());
         BattleMenuWatcher menu(BattleType::TRAINER);
-        const int engaged = run_until<ProControllerContext>(
-            stream, context,
+        const int engaged = run_until<ProControllerContext>(stream,
+            context,
             [&](ProControllerContext& ctx){
                 pbf_move_left_joystick(ctx, {1, 0}, 4828ms, 104ms);
                 ctx.wait_for_all_requests();
@@ -1080,8 +1180,8 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
             StartBattleDetector dialogue_starting(stream.overlay());
             BattleMenuWatcher dialogue_menu(BattleType::TRAINER);
             bool dialogue_cleared = false;
-            const int battle_started = run_until<ProControllerContext>(
-                stream, context,
+            const int battle_started = run_until<ProControllerContext>(stream,
+                context,
                 [&](ProControllerContext& ctx){
                     mash_until_dialogue_ends(stream, ctx, BUTTON_A, 20s);
                     ctx.wait_for_all_requests();
@@ -1095,9 +1195,9 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
                 {{dialogue_starting}, {dialogue_menu}});
             if (battle_started < 0){
                 if (!dialogue_cleared || ++approach_dialogues > 2){
-                    OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReportMode::SEND_ERROR_REPORT,
-                        "Route 208 bridge: Approach dialogue did not clear within bounded recovery.", stream);
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "Route 208 bridge: Approach dialogue did not clear within bounded recovery.",
+                        stream);
                 }
                 stream.log("[Route 208 bridge] Nonbattle dialogue cleared; resuming watched crossing.");
                 continue;
@@ -1105,19 +1205,21 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
         }
         fight_trainer_using_moves(stream, context, 2, "Route 208 Hiker", false);
         if (++bridge_battles > 2){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::SEND_ERROR_REPORT, "Route 208 bridge: Unexpected additional Hiker battle.", stream);
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Route 208 bridge: Unexpected additional Hiker battle.",
+                stream);
         }
         pbf_wait(context, 500ms);
         context.wait_for_all_requests();
     }
     if (!bridge_approach_clear){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Route 208 bridge: Watched east approach did not clear.", stream);
+            "Route 208 bridge: Watched east approach did not clear.",
+            stream);
     }
     stream.log("[Route 208 bridge] Full east approach clear after " + std::to_string(bridge_battles) +
-                   " battle(s); continuing toward the stairs.",
-               COLOR_GREEN);
+        " battle(s); continuing toward the stairs.",
+        COLOR_GREEN);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 421ms, 0ms);
     pbf_wait(context, 178ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 1436ms, 0ms);
@@ -1127,11 +1229,23 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
     // Fixed eastward travel can stop beyond the stair column. Center above
     // the stairs using the native left-rock pose before moving south.
     bool rock_acquisition_timed_out = false;
-    align_to_overworld_landmarks(stream, context, match_route208_stair_top, "Route 208 stair-top rocks", false, true,
-                                 false, nullptr, nullptr, 0, 0, 0, &rock_acquisition_timed_out);
+    align_to_overworld_landmarks(stream,
+        context,
+        match_route208_stair_top,
+        "Route 208 stair-top rocks",
+        false,
+        true,
+        false,
+        nullptr,
+        nullptr,
+        0,
+        0,
+        0,
+        &rock_acquisition_timed_out);
     if (!activate_repel(stream, context, 5)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Route 208 stair top: Repel activation failed.", stream);
+            "Route 208 stair top: Repel activation failed.",
+            stream);
     }
     context.wait_for_all_requests();
     if (rock_acquisition_timed_out){
@@ -1142,26 +1256,26 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
         BlackScreenWatcher fallback_black;
         WhiteScreenWatcher fallback_white;
         BattleMenuWatcher fallback_battle(BattleType::TRAINER);
-        const int fallback_interrupted =
-            run_until<ProControllerContext>(stream, context,
-                                            [&](ProControllerContext& ctx){
-                                                // East: clamp against the cliff edge.
-                                                pbf_move_left_joystick(ctx, {1, 0}, 2000ms, 0ms);
-                                                ctx.wait_for_all_requests();
-                                                // Southwest: drag toward the stair column.
-                                                pbf_move_left_joystick(ctx, {-1, -1}, 1500ms, 0ms);
-                                                ctx.wait_for_all_requests();
-                                                // South: user-requested 1650ms trial; recovery may start farther down the stairs.
-                                                pbf_move_left_joystick(ctx, {0, -1}, 1650ms, 0ms);
-                                                pbf_wait(ctx, 643ms);
-                                                ctx.wait_for_all_requests();
-                                                segment03_align_lower_stair_lane(stream, ctx);
-                                            },
-                                            {{fallback_black}, {fallback_white}, {fallback_battle}});
+        const int fallback_interrupted = run_until<ProControllerContext>(stream,
+            context,
+            [&](ProControllerContext& ctx){
+                // East: clamp against the cliff edge.
+                pbf_move_left_joystick(ctx, {1, 0}, 2000ms, 0ms);
+                ctx.wait_for_all_requests();
+                // Southwest: drag toward the stair column.
+                pbf_move_left_joystick(ctx, {-1, -1}, 1500ms, 0ms);
+                ctx.wait_for_all_requests();
+                // South: user-requested 1650ms trial; recovery may start farther down the stairs.
+                pbf_move_left_joystick(ctx, {0, -1}, 1650ms, 0ms);
+                pbf_wait(ctx, 643ms);
+                ctx.wait_for_all_requests();
+                segment03_align_lower_stair_lane(stream, ctx);
+            },
+            {{fallback_black}, {fallback_white}, {fallback_battle}});
         if (fallback_interrupted >= 0){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::SEND_ERROR_REPORT,
-                "Route 208 stair fallback: Unexpected transition or battle before west gate approach.", stream);
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Route 208 stair fallback: Unexpected transition or battle before west gate approach.",
+                stream);
         }
     }else{
         // Pass just above the honey tree, between the southern trainer
@@ -1185,20 +1299,24 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
     }
     if (!hearthome_gate_entered){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Hearthome west gate: Interior transition not confirmed.", stream);
+            "Hearthome west gate: Interior transition not confirmed.",
+            stream);
     }
     if (!segment03_cycling_move(stream, context, 1, 0, 1800ms, 1588ms, "Hearthome west gate exit", true)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Hearthome west gate: Exterior transition not confirmed.", stream);
+            "Hearthome west gate: Exterior transition not confirmed.",
+            stream);
     }
     OverworldWatcher hearthome_outside;
     if (wait_until(stream, context, 10s, {{hearthome_outside}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Hearthome west gate: Overworld not ready after exit.", stream);
+            "Hearthome west gate: Overworld not ready after exit.",
+            stream);
     }
     if (segment03_cycling_move(stream, context, 1, 0, 2200ms, 6189ms, "Hearthome Buneary approach")){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT, "Hearthome Buneary approach: Unexpected extra transition.", stream);
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Hearthome Buneary approach: Unexpected extra transition.",
+            stream);
     }
     // Begin the scene deadline after the approach requests finish, not
     // while the recorded movement and neutral waits remain queued.
@@ -1206,7 +1324,8 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
     ShortDialogWatcher buneary_dialogue;
     if (wait_until(stream, context, 15s, {{buneary_dialogue}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Hearthome Buneary: Dialogue did not start.", stream);
+            "Hearthome Buneary: Dialogue did not start.",
+            stream);
     }
     bool buneary_cleared = false;
     for (size_t pass = 0; pass < 6 && !buneary_cleared; pass++){
@@ -1226,7 +1345,8 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
     }
     if (!buneary_cleared){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Hearthome Buneary: Scene did not clear.", stream);
+            "Hearthome Buneary: Scene did not clear.",
+            stream);
     }
     stream.log("[Hearthome Buneary] Scene cleared; expiring Repel without renewal before Center travel.", COLOR_GREEN);
     pbf_move_left_joystick(context, {1, 0}, 500ms, 0ms);
@@ -1237,8 +1357,8 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
     // remaining outdoor inputs; the room must then be confirmed visually.
     bool center_entered = false;
     BlackScreenWatcher center_transition;
-    const int center_entry = run_until<ProControllerContext>(
-        stream, context,
+    const int center_entry = run_until<ProControllerContext>(stream,
+        context,
         [&](ProControllerContext& ctx){
             pbf_move_left_joystick(ctx, {1.000000, -0.000000}, 3350ms, 0ms);
             pbf_wait(ctx, 437ms);
@@ -1261,9 +1381,15 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
             pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 500ms, 0ms);
             pbf_move_left_joystick(ctx, {0.000000, 1.000000}, 250ms, 0ms);
             pbf_wait(ctx, 59ms);
-            align_to_overworld_landmarks(stream, ctx, match_hearthome_center_entrance,
-                                         "Hearthome Center exterior alignment", false, true, false,
-                                         match_hearthome_center_interior, &center_entered);
+            align_to_overworld_landmarks(stream,
+                ctx,
+                match_hearthome_center_entrance,
+                "Hearthome Center exterior alignment",
+                false,
+                true,
+                false,
+                match_hearthome_center_interior,
+                &center_entered);
             if (!center_entered){
                 pbf_move_left_joystick(ctx, {0, 1}, 4000ms, 0ms);
                 pbf_wait(ctx, 3000ms);
@@ -1272,7 +1398,8 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
         {{center_transition}});
     if (center_entry != 0 && !center_entered){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Hearthome Center: Entry transition not detected.", stream);
+            "Hearthome Center: Entry transition not detected.",
+            stream);
     }
     segment03_finish_transition(stream, context, "Hearthome Center entrance");
     pbf_wait(context, 1500ms);
@@ -1280,7 +1407,8 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
     segment03_confirm_location(stream, context, match_hearthome_center_interior, "Hearthome Center interior");
     if (!heal_pokemon(stream, context, "Hearthome")){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Hearthome Center exit not confirmed.", stream);
+            "Hearthome Center exit not confirmed.",
+            stream);
     }
     // Let the exit scene and camera settle before spending the Hall travel
     // budget. The old east hold began while the exit was still fading in.
@@ -1290,32 +1418,37 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
     OverworldWatcher center_exit_ready;
     if (wait_until(stream, context, 10s, {{center_exit_ready}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Hearthome Center: Exterior not ready after healing.", stream);
+            "Hearthome Center: Exterior not ready after healing.",
+            stream);
     }
     pbf_move_left_joystick(context, {1, 0}, 2092ms, 185ms);
     // Bring the Hall into view without the old 1004ms north overshoot.
     pbf_move_left_joystick(context, {0, 1}, 600ms, 500ms);
     context.wait_for_all_requests();
-    align_to_overworld_landmarks(stream, context, match_hearthome_contest_fantina, "Hearthome Contest Hall Fantina",
-                                 false, true);
+    align_to_overworld_landmarks(stream,
+        context,
+        match_hearthome_contest_fantina,
+        "Hearthome Contest Hall Fantina",
+        false,
+        true);
     // Repeat the existing short Up/A interaction within the 15s window.
     // Dialogue cancels the remaining inputs before any text cleanup.
     ShortDialogWatcher fantina_dialogue;
     BlackScreenWatcher fantina_black;
     WhiteScreenWatcher fantina_white;
-    const int fantina_started =
-        run_until<ProControllerContext>(stream, context,
-                                        [](ProControllerContext& ctx){
-                                            constexpr auto pulse = 16ms + 100ms + 194ms + 277ms;
-                                            Milliseconds elapsed = 0ms;
-                                            for (; elapsed + pulse <= 15s; elapsed += pulse){
-                                                pbf_move_left_joystick(ctx, {0, 1}, 16ms, 100ms);
-                                                pbf_press_button(ctx, BUTTON_A, 194ms, 277ms);
-                                                ctx.wait_for_all_requests();
-                                            }
-                                            pbf_wait(ctx, 15s - elapsed);
-                                        },
-                                        {{fantina_dialogue}, {fantina_black}, {fantina_white}});
+    const int fantina_started = run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+            constexpr auto pulse = 16ms + 100ms + 194ms + 277ms;
+            Milliseconds elapsed = 0ms;
+            for (; elapsed + pulse <= 15s; elapsed += pulse){
+                pbf_move_left_joystick(ctx, {0, 1}, 16ms, 100ms);
+                pbf_press_button(ctx, BUTTON_A, 194ms, 277ms);
+                ctx.wait_for_all_requests();
+            }
+            pbf_wait(ctx, 15s - elapsed);
+        },
+        {{fantina_dialogue}, {fantina_black}, {fantina_white}});
     if (fantina_started > 0){
         // Fantina's opening camera cut fades to black before the text box.
         // The watcher has cancelled Up/A; wait without further movement.
@@ -1323,13 +1456,14 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
         segment03_finish_transition(stream, context, "Hearthome Fantina opening");
         ShortDialogWatcher opening_dialogue;
         if (wait_until(stream, context, 15s, {{opening_dialogue}}) != 0){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::SEND_ERROR_REPORT, "Hearthome Fantina: Opening fade was not followed by dialogue.",
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Hearthome Fantina: Opening fade was not followed by dialogue.",
                 stream);
         }
     }else if (fantina_started != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Hearthome Contest Hall: Fantina dialogue did not start.", stream);
+            "Hearthome Contest Hall: Fantina dialogue did not start.",
+            stream);
     }
     clear_post_battle_dialogue(stream, context, BUTTON_B);
     pbf_wait(context, 2000ms);
@@ -1340,8 +1474,9 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     ShortDialogWatcher contest_dialogue;
     if (wait_until(stream, context, 15s, {{contest_dialogue}}) != 0){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT, "Hearthome Contest Hall: Interior dialogue did not start.", stream);
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Hearthome Contest Hall: Interior dialogue did not start.",
+            stream);
     }
     // Use Buneary's resumed-text and scene-clear checks, with B to clear.
     bool contest_cleared = false;
@@ -1361,18 +1496,21 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
     }
     if (!contest_cleared){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Hearthome Contest Hall: Interior scene did not clear.", stream);
+            "Hearthome Contest Hall: Interior scene did not clear.",
+            stream);
     }
     // Own the exit before handing off the checkpoint. The transition watcher
     // cancels southward movement at the fade, leaving the fixed outdoor spawn.
     if (!segment03_cycling_move(stream, context, 0, -1, 903ms, 1455ms, "Hearthome Contest Hall exit", true)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Hearthome Contest Hall: Exit transition not confirmed.", stream);
+            "Hearthome Contest Hall: Exit transition not confirmed.",
+            stream);
     }
     OverworldWatcher hall_outside;
     if (wait_until(stream, context, 10s, {{hall_outside}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Hearthome Contest Hall: Overworld not ready after exit.", stream);
+            "Hearthome Contest Hall: Overworld not ready after exit.",
+            stream);
     }
     // The approach landmark view is not the post-exit doorway view.
     // The watched south exit plus restored overworld completes this boundary.
@@ -1384,8 +1522,8 @@ void heartholme_to_lost_tower(VideoStream& stream, ProControllerContext& context
     OverworldWatcher hall_start;
     if (wait_until(stream, context, 10s, {{hall_start}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Hearthome Contest Hall checkpoint start: Overworld not ready.",
-                                                     stream);
+            "Hearthome Contest Hall checkpoint start: Overworld not ready.",
+            stream);
     }
     // butters' recorded Contest Hall-to-rival route.
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1294ms, 0ms);
@@ -1403,39 +1541,53 @@ void heartholme_to_lost_tower(VideoStream& stream, ProControllerContext& context
     context.wait_for_all_requests();
     // Cancel at each gate fade, then allow a defined settling wait.
     BlackScreenWatcher east_gate_entry;
-    if (run_until<ProControllerContext>(stream, context,
-                                        [](ProControllerContext& ctx){
-                                            pbf_move_left_joystick(ctx, {1, 0}, 3446ms, 0ms);
-                                            pbf_wait(ctx, 983ms);
-                                        },
-                                        {{east_gate_entry}}) != 0){
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+                pbf_move_left_joystick(ctx, {1, 0}, 3446ms, 0ms);
+                pbf_wait(ctx, 983ms);
+            },
+        {{east_gate_entry}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Hearthome east gate: Entrance transition did not start.", stream);
+            "Hearthome east gate: Entrance transition did not start.",
+            stream);
     }
-    BlackScreenWatcher east_gate_entry_finished(COLOR_RED, {.1, .1, .8, .8}, 100, 10,
-                                                BlackScreenWatcher::FinderType::GONE, 500ms);
+    BlackScreenWatcher east_gate_entry_finished(COLOR_RED,
+        {.1, .1, .8, .8},
+        100,
+        10,
+        BlackScreenWatcher::FinderType::GONE,
+        500ms);
     if (wait_until(stream, context, 30s, {{east_gate_entry_finished}}) != 0){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT, "Hearthome east gate: Entrance transition did not finish.", stream);
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Hearthome east gate: Entrance transition did not finish.",
+            stream);
     }
     pbf_wait(context, 983ms);
     context.wait_for_all_requests();
 
     BlackScreenWatcher east_gate_exit;
-    if (run_until<ProControllerContext>(stream, context,
-                                        [](ProControllerContext& ctx){
-                                            pbf_move_left_joystick(ctx, {1, 0}, 2095ms, 0ms);
-                                            pbf_wait(ctx, 1660ms);
-                                        },
-                                        {{east_gate_exit}}) != 0){
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+                pbf_move_left_joystick(ctx, {1, 0}, 2095ms, 0ms);
+                pbf_wait(ctx, 1660ms);
+            },
+        {{east_gate_exit}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Hearthome east gate: Exit transition did not start.", stream);
+            "Hearthome east gate: Exit transition did not start.",
+            stream);
     }
-    BlackScreenWatcher east_gate_exit_finished(COLOR_RED, {.1, .1, .8, .8}, 100, 10,
-                                               BlackScreenWatcher::FinderType::GONE, 500ms);
+    BlackScreenWatcher east_gate_exit_finished(COLOR_RED,
+        {.1, .1, .8, .8},
+        100,
+        10,
+        BlackScreenWatcher::FinderType::GONE,
+        500ms);
     if (wait_until(stream, context, 30s, {{east_gate_exit_finished}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Hearthome east gate: Exit transition did not finish.", stream);
+            "Hearthome east gate: Exit transition did not finish.",
+            stream);
     }
     pbf_wait(context, 1660ms);
     context.wait_for_all_requests();
@@ -1445,7 +1597,8 @@ void heartholme_to_lost_tower(VideoStream& stream, ProControllerContext& context
     // Use the existing Bag helper instead of replaying recorded menu inputs.
     if (!activate_repel(stream, context, 8, 0)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Route 209: Repel activation failed.", stream);
+            "Route 209: Repel activation failed.",
+            stream);
     }
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 1412ms, 0ms);
     pbf_wait(context, 77ms);
@@ -1465,11 +1618,19 @@ void heartholme_to_lost_tower(VideoStream& stream, ProControllerContext& context
     pbf_wait(context, 1001ms);
     context.wait_for_all_requests();
     // butters' marked road pose: sign frame and rock pair.
-    align_to_overworld_landmarks(stream, context, match_route209_repel_point, "Route 209 Repel point before expiry",
-                                 false, true);
+    align_to_overworld_landmarks(stream,
+        context,
+        match_route209_repel_point,
+        "Route 209 Repel point before expiry",
+        false,
+        true);
     force_repel_expiry(stream, context, RepelRenewalChoice::YES, false, true);
-    align_to_overworld_landmarks(stream, context, match_route209_repel_point, "Route 209 Repel point after renewal",
-                                 false, true);
+    align_to_overworld_landmarks(stream,
+        context,
+        match_route209_repel_point,
+        "Route 209 Repel point after renewal",
+        false,
+        true);
 
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 1345ms, 0ms);
     pbf_wait(context, 309ms);
@@ -1490,47 +1651,63 @@ void heartholme_to_lost_tower(VideoStream& stream, ProControllerContext& context
     // Normalize the checkpoint boundary with a complete enter/exit cycle.
     // Cancel movement at each fade so it cannot continue onto the next map.
     BlackScreenWatcher tower_entry;
-    if (run_until<ProControllerContext>(stream, context,
-                                        [](ProControllerContext& ctx){
-                                            pbf_move_left_joystick(ctx, {0, 1}, 1311ms, 0ms);
-                                            pbf_wait(ctx, 3000ms);
-                                        },
-                                        {{tower_entry}}) != 0){
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+                pbf_move_left_joystick(ctx, {0, 1}, 1311ms, 0ms);
+                pbf_wait(ctx, 3000ms);
+            },
+        {{tower_entry}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Lost Tower handoff: Entry transition did not start.", stream);
+            "Lost Tower handoff: Entry transition did not start.",
+            stream);
     }
-    BlackScreenWatcher tower_entry_finished(COLOR_RED, {.1, .1, .8, .8}, 100, 10, BlackScreenWatcher::FinderType::GONE,
-                                            500ms);
+    BlackScreenWatcher tower_entry_finished(COLOR_RED,
+        {.1, .1, .8, .8},
+        100,
+        10,
+        BlackScreenWatcher::FinderType::GONE,
+        500ms);
     if (wait_until(stream, context, 30s, {{tower_entry_finished}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Lost Tower handoff: Entry transition did not finish.", stream);
+            "Lost Tower handoff: Entry transition did not finish.",
+            stream);
     }
     OverworldWatcher tower_inside;
     if (wait_until(stream, context, 10s, {{tower_inside}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Lost Tower handoff: Indoor overworld not ready.", stream);
+            "Lost Tower handoff: Indoor overworld not ready.",
+            stream);
     }
 
     BlackScreenWatcher tower_exit;
-    if (run_until<ProControllerContext>(stream, context,
-                                        [](ProControllerContext& ctx){
-                                            pbf_move_left_joystick(ctx, {0, -1}, 1311ms, 0ms);
-                                            pbf_wait(ctx, 3000ms);
-                                        },
-                                        {{tower_exit}}) != 0){
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+                pbf_move_left_joystick(ctx, {0, -1}, 1311ms, 0ms);
+                pbf_wait(ctx, 3000ms);
+            },
+        {{tower_exit}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Lost Tower handoff: Exit transition did not start.", stream);
+            "Lost Tower handoff: Exit transition did not start.",
+            stream);
     }
-    BlackScreenWatcher tower_exit_finished(COLOR_RED, {.1, .1, .8, .8}, 100, 10, BlackScreenWatcher::FinderType::GONE,
-                                           500ms);
+    BlackScreenWatcher tower_exit_finished(COLOR_RED,
+        {.1, .1, .8, .8},
+        100,
+        10,
+        BlackScreenWatcher::FinderType::GONE,
+        500ms);
     if (wait_until(stream, context, 30s, {{tower_exit_finished}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Lost Tower handoff: Exit transition did not finish.", stream);
+            "Lost Tower handoff: Exit transition did not finish.",
+            stream);
     }
     OverworldWatcher tower_outside;
     if (wait_until(stream, context, 10s, {{tower_outside}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Lost Tower handoff: Outdoor overworld not ready.", stream);
+            "Lost Tower handoff: Outdoor overworld not ready.",
+            stream);
     }
     context.wait_for_all_requests();
     stream.log("[Lost Tower handoff] Outside doorway, facing south; checkpoint complete.", COLOR_GREEN);
@@ -1540,29 +1717,37 @@ void lost_tower(VideoStream& stream, ProControllerContext& context){
     // Turn north, then enter using the same single-step timing as Segment 02.
     context.wait_for_all_requests();
     BlackScreenWatcher entering_tower;
-    if (run_until<ProControllerContext>(stream, context,
-                                        [](ProControllerContext& ctx){
-                                            for (int i = 0; i < 2; i++){
-                                                pbf_press_dpad(ctx, DPAD_UP, 80ms, 300ms);
-                                            }
-                                            pbf_wait(ctx, 2389ms);
-                                        },
-                                        {{entering_tower}}) != 0){
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+                for (int i = 0; i < 2; i++){
+                    pbf_press_dpad(ctx, DPAD_UP, 80ms, 300ms);
+                }
+                pbf_wait(ctx, 2389ms);
+            },
+        {{entering_tower}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Lost Tower entry: Transition did not start.", stream);
+            "Lost Tower entry: Transition did not start.",
+            stream);
     }
-    BlackScreenWatcher tower_entry_finished(COLOR_RED, {.1, .1, .8, .8}, 100, 10, BlackScreenWatcher::FinderType::GONE,
-                                            500ms);
+    BlackScreenWatcher tower_entry_finished(COLOR_RED,
+        {.1, .1, .8, .8},
+        100,
+        10,
+        BlackScreenWatcher::FinderType::GONE,
+        500ms);
     if (wait_until(stream, context, 30s, {{tower_entry_finished}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Lost Tower entry: Transition did not finish.", stream);
+            "Lost Tower entry: Transition did not finish.",
+            stream);
     }
     pbf_wait(context, 500ms);
     context.wait_for_all_requests();
     OverworldWatcher tower_entry_ready;
     if (wait_until(stream, context, 10s, {{tower_entry_ready}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Lost Tower entry: Overworld not ready.", stream);
+            "Lost Tower entry: Overworld not ready.",
+            stream);
     }
 
     // butters' route, using the same counted D-pad steps as the Eterna Gym.
@@ -1573,28 +1758,36 @@ void lost_tower(VideoStream& stream, ProControllerContext& context){
         int count;
     };
     const Move to_floor2[] = {
-        {DPAD_UP, 4}, {DPAD_LEFT, 4}, {DPAD_UP, 6}, {DPAD_LEFT, 2}, {DPAD_UP, 3}, {DPAD_RIGHT, 2},
+        {DPAD_UP, 4},
+        {DPAD_LEFT, 4},
+        {DPAD_UP, 6},
+        {DPAD_LEFT, 2},
+        {DPAD_UP, 3},
+        {DPAD_RIGHT, 2},
     };
     BlackScreenWatcher stairs_to_floor2;
-    if (run_until<ProControllerContext>(stream, context,
-                                        [&](ProControllerContext& ctx){
-                                            for (const auto& move : to_floor2){
-                                                for (int i = 0; i < move.count; i++){
-                                                    pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
-                                                }
-                                            }
-                                            // Keep watching if the last step starts a delayed stair fade.
-                                            pbf_wait(ctx, 3000ms);
-                                        },
-                                        {{stairs_to_floor2}}) != 0){
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [&](ProControllerContext& ctx){
+                for (const auto& move : to_floor2){
+                    for (int i = 0; i < move.count; i++){
+                        pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
+                    }
+                }
+                // Keep watching if the last step starts a delayed stair fade.
+                pbf_wait(ctx, 3000ms);
+            },
+        {{stairs_to_floor2}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Lost Tower floor 2: Stair transition did not start.", stream);
+            "Lost Tower floor 2: Stair transition did not start.",
+            stream);
     }
     segment03_finish_transition(stream, context, "Lost Tower floor 2");
     OverworldWatcher floor2_ready;
     if (wait_until(stream, context, 10s, {{floor2_ready}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Lost Tower floor 2: Overworld not ready after stairs.", stream);
+            "Lost Tower floor 2: Overworld not ready after stairs.",
+            stream);
     }
 
     const Move to_floor3[] = {
@@ -1609,25 +1802,28 @@ void lost_tower(VideoStream& stream, ProControllerContext& context){
         {DPAD_RIGHT, 4},
     };
     BlackScreenWatcher stairs_to_floor3;
-    if (run_until<ProControllerContext>(stream, context,
-                                        [&](ProControllerContext& ctx){
-                                            for (const auto& move : to_floor3){
-                                                for (int i = 0; i < move.count; i++){
-                                                    pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
-                                                }
-                                            }
-                                            // Keep watching if the last step starts a delayed stair fade.
-                                            pbf_wait(ctx, 3000ms);
-                                        },
-                                        {{stairs_to_floor3}}) != 0){
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [&](ProControllerContext& ctx){
+                for (const auto& move : to_floor3){
+                    for (int i = 0; i < move.count; i++){
+                        pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
+                    }
+                }
+                // Keep watching if the last step starts a delayed stair fade.
+                pbf_wait(ctx, 3000ms);
+            },
+        {{stairs_to_floor3}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Lost Tower floor 3: Stair transition did not start.", stream);
+            "Lost Tower floor 3: Stair transition did not start.",
+            stream);
     }
     segment03_finish_transition(stream, context, "Lost Tower floor 3");
     OverworldWatcher floor3_ready;
     if (wait_until(stream, context, 10s, {{floor3_ready}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Lost Tower floor 3: Overworld not ready after stairs.", stream);
+            "Lost Tower floor 3: Overworld not ready after stairs.",
+            stream);
     }
 
     const Move to_repel[] = {
@@ -1642,12 +1838,12 @@ void lost_tower(VideoStream& stream, ProControllerContext& context){
             const auto frame = stream.video().snapshot();
             if (!frame){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "Lost Tower Repel: No frame before the next down step.",
-                                                             stream);
+                    "Lost Tower Repel: No frame before the next down step.",
+                    stream);
             }
             if (pending_repel_dialogue.detect(*frame.frame)){
                 stream.log("[Lost Tower Repel] Pending renewal before down press " + std::to_string(i + 1) +
-                           "; clearing before movement.");
+                    "; clearing before movement.");
                 clear_post_battle_dialogue(stream, context, BUTTON_A);
                 repel_renewed = true;
             }
@@ -1656,16 +1852,17 @@ void lost_tower(VideoStream& stream, ProControllerContext& context){
             // fresh dialogue watcher's 250ms confirmation can cancel the rest.
             // The triggering step counts; all subsequent steps remain unqueued.
             ShortDialogWatcher step_repel_dialogue(COLOR_YELLOW);
-            const int expiry = run_until<ProControllerContext>(stream, context,
-                                                               [&](ProControllerContext& ctx){
-                                                                   pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
-                                                                   ctx.wait_for_all_requests();
-                                                                   pbf_wait(ctx, 500ms);
-                                                               },
-                                                               {{step_repel_dialogue}});
+            const int expiry = run_until<ProControllerContext>(stream,
+                context,
+                [&](ProControllerContext& ctx){
+                    pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
+                    ctx.wait_for_all_requests();
+                    pbf_wait(ctx, 500ms);
+                },
+                {{step_repel_dialogue}});
             if (expiry == 0){
                 stream.log("[Lost Tower Repel] Renewal after down press " + std::to_string(i + 1) + "/" +
-                           std::to_string(move.count) + "; clearing before the remaining steps.");
+                    std::to_string(move.count) + "; clearing before the remaining steps.");
                 clear_post_battle_dialogue(stream, context, BUTTON_A);
                 repel_renewed = true;
             }
@@ -1711,8 +1908,9 @@ void lost_tower(VideoStream& stream, ProControllerContext& context){
         context.wait_for_all_requests();
         const auto frame = stream.video().snapshot();
         if (!frame){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::SEND_ERROR_REPORT, "Lost Tower biker: No frame before the next up press.", stream);
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower biker: No frame before the next up press.",
+                stream);
         }
         if (pending_biker_dialogue.detect(*frame.frame)){
             biker_challenged = true;
@@ -1722,14 +1920,15 @@ void lost_tower(VideoStream& stream, ProControllerContext& context){
         // A fresh 250ms dialogue watch cannot cancel the 80ms hold itself.
         // Count that press, then preserve any subsequent unqueued presses.
         ShortDialogWatcher approaching_biker(COLOR_YELLOW);
-        const int challenge = run_until<ProControllerContext>(stream, context,
-                                                              [](ProControllerContext& ctx){
-                                                                  pbf_press_dpad(ctx, DPAD_UP, 80ms, 300ms);
-                                                                  ctx.wait_for_all_requests();
-                                                                  // Observe the walk-up before another up press can be queued.
-                                                                  pbf_wait(ctx, 5000ms);
-                                                              },
-                                                              {{approaching_biker}});
+        const int challenge = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& ctx){
+                pbf_press_dpad(ctx, DPAD_UP, 80ms, 300ms);
+                ctx.wait_for_all_requests();
+                // Observe the walk-up before another up press can be queued.
+                pbf_wait(ctx, 5000ms);
+            },
+            {{approaching_biker}});
         biker_up_completed++;
         if (challenge == 0){
             biker_challenged = true;
@@ -1739,7 +1938,7 @@ void lost_tower(VideoStream& stream, ProControllerContext& context){
     }
     if (biker_challenged){
         stream.log("[Lost Tower biker] Dialogue detected after " + std::to_string(biker_up_completed) +
-                   " up presses; handling the trainer battle.");
+            " up presses; handling the trainer battle.");
         fight_trainer_using_moves(stream, context, std::vector<size_t>{2}, "Lost Tower biker", false);
         clear_post_battle_dialogue(stream, context, BUTTON_B);
 
@@ -1759,54 +1958,71 @@ void lost_tower(VideoStream& stream, ProControllerContext& context){
     }
 
     const Move to_floor4[] = {
-        {DPAD_UP, 1}, {DPAD_LEFT, 2},  {DPAD_UP, 4}, {DPAD_LEFT, 6},
-        {DPAD_UP, 4}, {DPAD_RIGHT, 3}, {DPAD_UP, 4}, {DPAD_RIGHT, 3},
+        {DPAD_UP, 1},
+        {DPAD_LEFT, 2},
+        {DPAD_UP, 4},
+        {DPAD_LEFT, 6},
+        {DPAD_UP, 4},
+        {DPAD_RIGHT, 3},
+        {DPAD_UP, 4},
+        {DPAD_RIGHT, 3},
     };
     BlackScreenWatcher stairs_to_floor4;
-    if (run_until<ProControllerContext>(stream, context,
-                                        [&](ProControllerContext& ctx){
-                                            for (const auto& move : to_floor4){
-                                                for (int i = 0; i < move.count; i++){
-                                                    pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
-                                                }
-                                            }
-                                            // Keep watching if the last step starts a delayed stair fade.
-                                            pbf_wait(ctx, 3000ms);
-                                        },
-                                        {{stairs_to_floor4}}) != 0){
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [&](ProControllerContext& ctx){
+                for (const auto& move : to_floor4){
+                    for (int i = 0; i < move.count; i++){
+                        pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
+                    }
+                }
+                // Keep watching if the last step starts a delayed stair fade.
+                pbf_wait(ctx, 3000ms);
+            },
+        {{stairs_to_floor4}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Lost Tower floor 4: Stair transition did not start.", stream);
+            "Lost Tower floor 4: Stair transition did not start.",
+            stream);
     }
     segment03_finish_transition(stream, context, "Lost Tower floor 4");
     OverworldWatcher floor4_ready;
     if (wait_until(stream, context, 10s, {{floor4_ready}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Lost Tower floor 4: Overworld not ready after stairs.", stream);
+            "Lost Tower floor 4: Overworld not ready after stairs.",
+            stream);
     }
 
     const Move to_floor5[] = {
-        {DPAD_DOWN, 6}, {DPAD_LEFT, 8}, {DPAD_UP, 3}, {DPAD_LEFT, 2}, {DPAD_UP, 4}, {DPAD_RIGHT, 3},
+        {DPAD_DOWN, 6},
+        {DPAD_LEFT, 8},
+        {DPAD_UP, 3},
+        {DPAD_LEFT, 2},
+        {DPAD_UP, 4},
+        {DPAD_RIGHT, 3},
     };
     BlackScreenWatcher stairs_to_floor5;
-    if (run_until<ProControllerContext>(stream, context,
-                                        [&](ProControllerContext& ctx){
-                                            for (const auto& move : to_floor5){
-                                                for (int i = 0; i < move.count; i++){
-                                                    pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
-                                                }
-                                            }
-                                            // Keep watching if the last step starts a delayed stair fade.
-                                            pbf_wait(ctx, 3000ms);
-                                        },
-                                        {{stairs_to_floor5}}) != 0){
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [&](ProControllerContext& ctx){
+                for (const auto& move : to_floor5){
+                    for (int i = 0; i < move.count; i++){
+                        pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
+                    }
+                }
+                // Keep watching if the last step starts a delayed stair fade.
+                pbf_wait(ctx, 3000ms);
+            },
+        {{stairs_to_floor5}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Lost Tower floor 5: Stair transition did not start.", stream);
+            "Lost Tower floor 5: Stair transition did not start.",
+            stream);
     }
     segment03_finish_transition(stream, context, "Lost Tower floor 5");
     OverworldWatcher floor5_ready;
     if (wait_until(stream, context, 10s, {{floor5_ready}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Lost Tower floor 5: Overworld not ready after stairs.", stream);
+            "Lost Tower floor 5: Overworld not ready after stairs.",
+            stream);
     }
 
     const Move to_rewards[] = {
@@ -1829,7 +2045,8 @@ void lost_tower(VideoStream& stream, ProControllerContext& context){
     stream.log("[Lost Tower reward] Dialogue absent for four seconds; opening the Bag.");
     if (!use_escape_rope(stream, context, 8)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Lost Tower: Escape Rope exit was not confirmed.", stream);
+            "Lost Tower: Escape Rope exit was not confirmed.",
+            stream);
     }
     // The exterior is visible before the Rope arrival camera finishes settling.
     // Keep the following south/left movement out of that arrival animation.
@@ -1837,8 +2054,9 @@ void lost_tower(VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     OverworldWatcher rope_exit_ready;
     if (wait_until(stream, context, 10s, {{rope_exit_ready}}) != 0){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT, "Lost Tower: Overworld not ready after Escape Rope settling.", stream);
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Lost Tower: Overworld not ready after Escape Rope settling.",
+            stream);
     }
     context.wait_for_all_requests();
     stream.log("[Lost Tower] Reward dialogue cleared; Escape Rope exit settled.", COLOR_GREEN);
@@ -1922,14 +2140,16 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
     ShortDialogWatcher calvin_dialogue;
     StartBattleDetector calvin_start(stream.overlay());
     BattleMenuWatcher calvin_menu(BattleType::TRAINER);
-    if (run_until<ProControllerContext>(stream, context,
-                                        [](ProControllerContext& ctx){
-                                            pbf_move_left_joystick(ctx, {1.000000, 0.000000}, 794ms, 0ms);
-                                            pbf_wait(ctx, 15000ms);
-                                        },
-                                        {{calvin_dialogue}, {calvin_start}, {calvin_menu}}) < 0){
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+                pbf_move_left_joystick(ctx, {1.000000, 0.000000}, 794ms, 0ms);
+                pbf_wait(ctx, 15000ms);
+            },
+        {{calvin_dialogue}, {calvin_start}, {calvin_menu}}) < 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Route 215 Calvin: Trainer encounter did not start.", stream);
+            "Route 215 Calvin: Trainer encounter did not start.",
+            stream);
     }
     fight_trainer_using_moves(stream, context, std::vector<size_t>{2}, "Route 215 Ruin Maniac Calvin", false);
     // Renew in the clear area after Calvin, before the next walking strip.
@@ -1946,7 +2166,7 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
     constexpr double lane_pitch = 70.0 / 1080;
     constexpr double lane_tolerance = 1.0 / 54;
     size_t missing_pose = 0, stale_frames = 0, stalled = 0, lane_changes = 0, lane_presses = 0, arrival_frames = 0,
-           jogger_battles = 0;
+        jogger_battles = 0;
     int changing_to = 0;
     bool east_pending = false, last_coarse = false, corner_ready = false;
     double last_x = 0;
@@ -1958,18 +2178,20 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
         context.wait_for_all_requests();
         if (std::chrono::steady_clock::now() - bypass_started > 90s){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                         "Route 215 jogger: Lane search timed out.", stream);
+                "Route 215 jogger: Lane search timed out.",
+                stream);
         }
         const auto frame = stream.video().snapshot();
         if (!frame){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                         "Route 215 jogger: No video frame.", stream);
+                "Route 215 jogger: No video frame.",
+                stream);
         }
         if (frame.timestamp <= fresh_after || frame.timestamp <= last_frame_time){
             if (++stale_frames >= 8){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "Route 215 jogger: Video is not advancing after movement.",
-                                                             stream);
+                    "Route 215 jogger: Video is not advancing after movement.",
+                    stream);
             }
             pbf_wait(context, 500ms);
             continue;
@@ -1978,8 +2200,9 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
         stale_frames = 0;
         if (jogger_dialogue.detect(*frame.frame) || jogger_battle.detect(*frame.frame)){
             if (++jogger_battles > 1){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "Route 215 jogger: Repeated unexpected encounter.", stream);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Route 215 jogger: Repeated unexpected encounter.",
+                    stream);
             }
             // The recorded failure is the jogger's trainer introduction.
             // Complete it with the shared move-list handler, then measure
@@ -2000,26 +2223,28 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
         }
         if (jogger_transition.detect(*frame.frame)){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                         "Route 215 jogger: Unexpected transition.", stream);
+                "Route 215 jogger: Unexpected transition.",
+                stream);
         }
         const auto pose = match_route215_jogger_corner(*frame.frame);
         for (const auto& anchor : pose.landmarks){
             stream.log("[Route 215 jogger] " + anchor.name + " score=" + std::to_string(anchor.score) +
-                       ", margin=" + std::to_string(anchor.margin) + ", accepted=" + std::to_string(anchor.accepted) +
-                       ", offset=(" + std::to_string(anchor.dx) + "," + std::to_string(anchor.dy) + ")");
+                ", margin=" + std::to_string(anchor.margin) + ", accepted=" + std::to_string(anchor.accepted) +
+                ", offset=(" + std::to_string(anchor.dx) + "," + std::to_string(anchor.dy) + ")");
         }
-        const int lane = pose.located && std::abs(pose.dy) <= lane_tolerance                ? 4
-                         : pose.located && std::abs(pose.dy - lane_pitch) <= lane_tolerance ? 3
-                                                                                            : 0;
+        const int lane = pose.located && std::abs(pose.dy) <= lane_tolerance   ? 4
+            : pose.located && std::abs(pose.dy - lane_pitch) <= lane_tolerance ? 3
+            : 0;
         stream.log("[Route 215 jogger] lane=" + std::to_string(lane) + ", coarse=" + std::to_string(pose.coarse) +
-                   ", offset=(" + std::to_string(pose.dx) + "," + std::to_string(pose.dy) + ")");
+            ", offset=(" + std::to_string(pose.dx) + "," + std::to_string(pose.dy) + ")");
         if (!lane){
             // Wait out rain/clouds or a settling step; never search vertically
             // from a missing or ambiguous pose, including after a blocked step.
             arrival_frames = 0;
             if (++missing_pose >= 8){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "Route 215 jogger: Cannot verify lane 3 or 4.", stream);
+                    "Route 215 jogger: Cannot verify lane 3 or 4.",
+                    stream);
             }
             pbf_wait(context, 500ms);
             continue;
@@ -2051,8 +2276,9 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
         arrival_frames = 0;
         if (!changing_to && ((near_corner && lane == 3) || stalled >= 2)){
             if (++lane_changes > 6){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "Route 215 jogger: Both safe lanes remain blocked.", stream);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Route 215 jogger: Both safe lanes remain blocked.",
+                    stream);
             }
             changing_to = lane == 4 ? 3 : 4;
             lane_presses = 0;
@@ -2072,7 +2298,8 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
             }
             if (bypass_movement + 80ms > movement_limit){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "Route 215 jogger: Movement budget exhausted.", stream);
+                    "Route 215 jogger: Movement budget exhausted.",
+                    stream);
             }
             pbf_press_dpad(context, changing_to == 3 ? DPAD_UP : DPAD_DOWN, 80ms, 300ms);
             context.wait_for_all_requests();
@@ -2083,12 +2310,14 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
         }
         if (!pose.coarse && pose.dx < -1.0 / 32){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                         "Route 215 jogger: Passed the expected east corner.", stream);
+                "Route 215 jogger: Passed the expected east corner.",
+                stream);
         }
         const auto duration = !pose.coarse && std::abs(pose.dx) <= 1.0 / 24 ? 40ms : 160ms;
         if (bypass_movement + duration > movement_limit){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                         "Route 215 jogger: Movement budget exhausted.", stream);
+                "Route 215 jogger: Movement budget exhausted.",
+                stream);
         }
         last_x = pose.dx;
         last_coarse = pose.coarse;
@@ -2102,7 +2331,8 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
     }
     if (!corner_ready){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Route 215 jogger: East corner not confirmed.", stream);
+            "Route 215 jogger: East corner not confirmed.",
+            stream);
     }
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1682ms, 0ms);
     pbf_wait(context, 501ms);
@@ -2126,17 +2356,19 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
     ShortDialogWatcher derek_dialogue;
     StartBattleDetector derek_start(stream.overlay());
     BattleMenuWatcher derek_menu(BattleType::TRAINER);
-    if (run_until<ProControllerContext>(stream, context,
-                                        [](ProControllerContext& ctx){
-                                            // The uninterrupted 1000ms approach ends one step into grass.
-                                            // Stop one recorded step earlier on Derek's sightline while
-                                            // the existing watchers wait for him to turn toward the player.
-                                            pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 850ms, 0ms);
-                                            pbf_wait(ctx, 15000ms);
-                                        },
-                                        {{derek_dialogue}, {derek_start}, {derek_menu}}) < 0){
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+                // The uninterrupted 1000ms approach ends one step into grass.
+                // Stop one recorded step earlier on Derek's sightline while
+                // the existing watchers wait for him to turn toward the player.
+                pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 850ms, 0ms);
+                pbf_wait(ctx, 15000ms);
+            },
+        {{derek_dialogue}, {derek_start}, {derek_menu}}) < 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Route 215 Derek: Trainer encounter did not start.", stream);
+            "Route 215 Derek: Trainer encounter did not start.",
+            stream);
     }
     fight_trainer_using_moves(stream, context, std::vector<size_t>{2}, "Route 215 Black Belt Derek", false);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1929ms, 0ms);
@@ -2145,8 +2377,12 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
     pbf_wait(context, 88ms);
     // Renew on the clear landing below the stairs, then restore its column.
     force_repel_expiry(stream, context, RepelRenewalChoice::YES, false, true);
-    align_to_overworld_landmarks(stream, context, match_route215_derek_stairs_renewal,
-                                 "Route 215 below Derek stairs after renewal", false, true);
+    align_to_overworld_landmarks(stream,
+        context,
+        match_route215_derek_stairs_renewal,
+        "Route 215 below Derek stairs after renewal",
+        false,
+        true);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 501ms, 0ms);
     pbf_wait(context, 390ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 954ms, 0ms);
@@ -2155,8 +2391,12 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
     pbf_wait(context, 453ms);
     // Stay west/east on the clear road row; south would enter tall grass.
     force_repel_expiry(stream, context, RepelRenewalChoice::YES, false, true);
-    align_to_overworld_landmarks(stream, context, match_route215_derek_stair_top_renewal,
-                                 "Route 215 above Derek stairs after renewal", false, true);
+    align_to_overworld_landmarks(stream,
+        context,
+        match_route215_derek_stair_top_renewal,
+        "Route 215 above Derek stairs after renewal",
+        false,
+        true);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1855ms, 0ms);
     pbf_wait(context, 171ms);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1385ms, 0ms);
@@ -2175,26 +2415,32 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
     pbf_wait(context, 1767ms);
     // Resume from the road/fence pose shown at renewal in the recording.
     // A fixed leftover west input compounds the variable expiry offset.
-    align_to_overworld_landmarks(stream, context, match_route215_ace_renewal,
-                                 "Route 215 before Ace Trainers after renewal", false, true);
+    align_to_overworld_landmarks(stream,
+        context,
+        match_route215_ace_renewal,
+        "Route 215 before Ace Trainers after renewal",
+        false,
+        true);
     context.wait_for_all_requests();
     ShortDialogWatcher dennis_dialogue;
     StartBattleDetector dennis_start(stream.overlay());
     BattleMenuWatcher dennis_menu(BattleType::TRAINER);
-    if (run_until<ProControllerContext>(stream, context,
-                                        [](ProControllerContext& ctx){
-                                            pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 1323ms, 0ms);
-                                            pbf_wait(ctx, 106ms);
-                                            pbf_move_left_joystick(ctx, {1.000000, 0.000000}, 834ms, 0ms);
-                                            pbf_wait(ctx, 206ms);
-                                            pbf_move_left_joystick(ctx, {0.000000, 1.000000}, 221ms, 0ms);
-                                            pbf_wait(ctx, 516ms);
-                                            pbf_move_left_joystick(ctx, {1.000000, 0.000000}, 667ms, 0ms);
-                                            pbf_wait(ctx, 15000ms);
-                                        },
-                                        {{dennis_dialogue}, {dennis_start}, {dennis_menu}}) < 0){
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+                pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 1323ms, 0ms);
+                pbf_wait(ctx, 106ms);
+                pbf_move_left_joystick(ctx, {1.000000, 0.000000}, 834ms, 0ms);
+                pbf_wait(ctx, 206ms);
+                pbf_move_left_joystick(ctx, {0.000000, 1.000000}, 221ms, 0ms);
+                pbf_wait(ctx, 516ms);
+                pbf_move_left_joystick(ctx, {1.000000, 0.000000}, 667ms, 0ms);
+                pbf_wait(ctx, 15000ms);
+            },
+        {{dennis_dialogue}, {dennis_start}, {dennis_menu}}) < 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Route 215 Dennis: Trainer encounter did not start.", stream);
+            "Route 215 Dennis: Trainer encounter did not start.",
+            stream);
     }
     // Dennis and Maya are separate consecutive battles.
     fight_trainer_using_moves(stream, context, std::vector<size_t>{2}, "Route 215 Ace Trainer Dennis", false);
@@ -2213,8 +2459,13 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
     // Veilstone needs no Repel. Clear the remaining expiry without renewal
     // on the paved north/south strip before normalizing the city approach.
     force_repel_expiry(stream, context, RepelRenewalChoice::NO, true);
-    align_to_overworld_landmarks(stream, context, match_veilstone_city_passage, "Veilstone passage after expiry", false,
-                                 true, true);
+    align_to_overworld_landmarks(stream,
+        context,
+        match_veilstone_city_passage,
+        "Veilstone passage after expiry",
+        false,
+        true,
+        true);
     // Replay the successful street approach, then correct onto the western
     // stair lane before climbing. Do not use the NPC pair as a wall stop.
     pbf_move_left_joystick(context, {0.0, -1.0}, 1342ms, 0ms);
@@ -2226,21 +2477,26 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
     // north leg; correct its lane before continuing the remaining ascent.
     pbf_move_left_joystick(context, {0.0, 1.0}, 200ms, 0ms);
     context.wait_for_all_requests();
-    align_to_overworld_landmarks(stream, context, match_veilstone_dawn_stairs, "Veilstone western stair approach",
-                                 false, true);
+    align_to_overworld_landmarks(stream,
+        context,
+        match_veilstone_dawn_stairs,
+        "Veilstone western stair approach",
+        false,
+        true);
     stream.log("[Veilstone approach] Following the western stairs toward Dawn.");
     ShortDialogWatcher dawn_dialogue;
-    if (run_until<ProControllerContext>(stream, context,
-                                        [](ProControllerContext& ctx){
-                                            pbf_move_left_joystick(ctx, {0.0, 1.0}, 3023ms, 0ms);
-                                            pbf_press_button(ctx, BUTTON_A, 80ms, 100ms);
-                                            // Dawn's turn, walk and camera cut precede the first box.
-                                            // Keep watching through the cutscene; cancel as soon as it opens.
-                                            pbf_wait(ctx, 15000ms);
-                                        },
-                                        {{dawn_dialogue}}) != 0){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT, "Veilstone Dawn: Dialogue did not start from the west stair approach.",
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+                pbf_move_left_joystick(ctx, {0.0, 1.0}, 3023ms, 0ms);
+                pbf_press_button(ctx, BUTTON_A, 80ms, 100ms);
+                // Dawn's turn, walk and camera cut precede the first box.
+                // Keep watching through the cutscene; cancel as soon as it opens.
+                pbf_wait(ctx, 15000ms);
+            },
+        {{dawn_dialogue}}) != 0){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Veilstone Dawn: Dialogue did not start from the west stair approach.",
             stream);
     }
     clear_post_battle_dialogue(stream, context, BUTTON_B, 4000ms);
@@ -2248,18 +2504,20 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
     // The new recording already enters the Gym. Cancel at its first fade.
     context.wait_for_all_requests();
     BlackScreenWatcher gym_entry;
-    if (run_until<ProControllerContext>(stream, context,
-                                        [](ProControllerContext& ctx){
-                                            pbf_move_left_joystick(ctx, {0.000000, 1.000000}, 1954ms, 0ms);
-                                            pbf_wait(ctx, 223ms);
-                                            pbf_move_left_joystick(ctx, {1.000000, -0.000000}, 110ms, 0ms);
-                                            pbf_wait(ctx, 190ms);
-                                            pbf_move_left_joystick(ctx, {0.000000, 1.000000}, 910ms, 0ms);
-                                            pbf_wait(ctx, 3000ms);
-                                        },
-                                        {{gym_entry}}) != 0){
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+                pbf_move_left_joystick(ctx, {0.000000, 1.000000}, 1954ms, 0ms);
+                pbf_wait(ctx, 223ms);
+                pbf_move_left_joystick(ctx, {1.000000, -0.000000}, 110ms, 0ms);
+                pbf_wait(ctx, 190ms);
+                pbf_move_left_joystick(ctx, {0.000000, 1.000000}, 910ms, 0ms);
+                pbf_wait(ctx, 3000ms);
+            },
+        {{gym_entry}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Veilstone Gym: Entrance transition did not start.", stream);
+            "Veilstone Gym: Entrance transition did not start.",
+            stream);
     }
     segment03_finish_transition(stream, context, "Veilstone Gym entrance");
     // The first visit pans across the Gym before returning to the entrance.
@@ -2267,8 +2525,9 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
     context.wait_for_all_requests();
     OverworldWatcher gym_ready;
     if (wait_until(stream, context, 10s, {{gym_ready}}) != 0){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT, "Veilstone Gym: Overworld not ready after the entrance scene.", stream);
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Veilstone Gym: Overworld not ready after the entrance scene.",
+            stream);
     }
     context.wait_for_all_requests();
 }
@@ -2284,39 +2543,109 @@ static void gym_Puzzle_03(VideoStream& stream, ProControllerContext& context){
     };
 
     const Move sequence1[] = {
-        {DPAD_RIGHT, 8, 0ms}, {DPAD_UP, 6, 0ms},       {DPAD_LEFT, 2, 0ms}, {DPAD_UP, 2, 0ms},
-        {DPAD_RIGHT, 1, 0ms}, {DPAD_RIGHT, 1, 1000ms}, {DPAD_UP, 2, 0ms},
+        {DPAD_RIGHT, 8, 0ms},
+        {DPAD_UP, 6, 0ms},
+        {DPAD_LEFT, 2, 0ms},
+        {DPAD_UP, 2, 0ms},
+        {DPAD_RIGHT, 1, 0ms},
+        {DPAD_RIGHT, 1, 1000ms},
+        {DPAD_UP, 2, 0ms},
     };
 
     const Move sequence2[] = {
-        {DPAD_UP, 5, 0ms},    {DPAD_RIGHT, 1, 0ms},    {DPAD_RIGHT, 1, 1000ms}, {DPAD_DOWN, 8, 0ms},
-        {DPAD_RIGHT, 2, 0ms}, {DPAD_DOWN, 3, 0ms},     {DPAD_LEFT, 5, 0ms},     {DPAD_UP, 7, 0ms},
-        {DPAD_RIGHT, 1, 0ms}, {DPAD_RIGHT, 1, 1000ms}, {DPAD_RIGHT, 1, 0ms},    {DPAD_UP, 3, 0ms},
-        {DPAD_LEFT, 2, 0ms},  {DPAD_UP, 2, 0ms},       {DPAD_RIGHT, 1, 0ms},    {DPAD_RIGHT, 1, 2000ms},
-        {DPAD_RIGHT, 1, 0ms}, {DPAD_DOWN, 10, 0ms},    {DPAD_RIGHT, 6, 0ms},    {DPAD_UP, 7, 0ms},
-        {DPAD_LEFT, 1, 0ms},  {DPAD_LEFT, 1, 1000ms},  {DPAD_UP, 6, 0ms},       {DPAD_RIGHT, 2, 0ms},
-        {DPAD_UP, 2, 0ms},    {DPAD_LEFT, 1, 0ms},     {DPAD_LEFT, 1, 1000ms},  {DPAD_LEFT, 1, 0ms},
-        {DPAD_DOWN, 13, 0ms}, {DPAD_LEFT, 3, 0ms},     {DPAD_UP, 4, 0ms},       {DPAD_LEFT, 2, 0ms},
-        {DPAD_UP, 8, 0ms},    {DPAD_RIGHT, 2, 0ms},    {DPAD_UP, 4, 0ms},       {DPAD_LEFT, 4, 0ms},
-        {DPAD_DOWN, 2, 0ms},  {DPAD_LEFT, 1, 0ms},     {DPAD_LEFT, 1, 1000ms},  {DPAD_UP, 2, 0ms},
-        {DPAD_RIGHT, 4, 0ms}, {DPAD_DOWN, 6, 0ms},     {DPAD_LEFT, 2, 0ms},     {DPAD_DOWN, 7, 0ms},
-        {DPAD_RIGHT, 2, 0ms}, {DPAD_DOWN, 3, 0ms},     {DPAD_LEFT, 5, 0ms},     {DPAD_UP, 7, 0ms},
-        {DPAD_LEFT, 4, 0ms},  {DPAD_LEFT, 1, 2000ms},  {DPAD_LEFT, 2, 0ms},     {DPAD_UP, 5, 0ms},
-        {DPAD_LEFT, 1, 0ms},  {DPAD_LEFT, 1, 2000ms},  {DPAD_DOWN, 5, 0ms},     {DPAD_RIGHT, 4, 0ms},
+        {DPAD_UP, 5, 0ms},
+        {DPAD_RIGHT, 1, 0ms},
+        {DPAD_RIGHT, 1, 1000ms},
+        {DPAD_DOWN, 8, 0ms},
+        {DPAD_RIGHT, 2, 0ms},
+        {DPAD_DOWN, 3, 0ms},
+        {DPAD_LEFT, 5, 0ms},
+        {DPAD_UP, 7, 0ms},
+        {DPAD_RIGHT, 1, 0ms},
+        {DPAD_RIGHT, 1, 1000ms},
+        {DPAD_RIGHT, 1, 0ms},
+        {DPAD_UP, 3, 0ms},
+        {DPAD_LEFT, 2, 0ms},
+        {DPAD_UP, 2, 0ms},
+        {DPAD_RIGHT, 1, 0ms},
+        {DPAD_RIGHT, 1, 2000ms},
+        {DPAD_RIGHT, 1, 0ms},
+        {DPAD_DOWN, 10, 0ms},
+        {DPAD_RIGHT, 6, 0ms},
+        {DPAD_UP, 7, 0ms},
+        {DPAD_LEFT, 1, 0ms},
+        {DPAD_LEFT, 1, 1000ms},
+        {DPAD_UP, 6, 0ms},
+        {DPAD_RIGHT, 2, 0ms},
+        {DPAD_UP, 2, 0ms},
+        {DPAD_LEFT, 1, 0ms},
+        {DPAD_LEFT, 1, 1000ms},
+        {DPAD_LEFT, 1, 0ms},
+        {DPAD_DOWN, 13, 0ms},
+        {DPAD_LEFT, 3, 0ms},
+        {DPAD_UP, 4, 0ms},
+        {DPAD_LEFT, 2, 0ms},
+        {DPAD_UP, 8, 0ms},
+        {DPAD_RIGHT, 2, 0ms},
+        {DPAD_UP, 4, 0ms},
+        {DPAD_LEFT, 4, 0ms},
+        {DPAD_DOWN, 2, 0ms},
+        {DPAD_LEFT, 1, 0ms},
+        {DPAD_LEFT, 1, 1000ms},
+        {DPAD_UP, 2, 0ms},
+        {DPAD_RIGHT, 4, 0ms},
+        {DPAD_DOWN, 6, 0ms},
+        {DPAD_LEFT, 2, 0ms},
+        {DPAD_DOWN, 7, 0ms},
+        {DPAD_RIGHT, 2, 0ms},
+        {DPAD_DOWN, 3, 0ms},
+        {DPAD_LEFT, 5, 0ms},
+        {DPAD_UP, 7, 0ms},
+        {DPAD_LEFT, 4, 0ms},
+        {DPAD_LEFT, 1, 2000ms},
+        {DPAD_LEFT, 2, 0ms},
+        {DPAD_UP, 5, 0ms},
+        {DPAD_LEFT, 1, 0ms},
+        {DPAD_LEFT, 1, 2000ms},
+        {DPAD_DOWN, 5, 0ms},
+        {DPAD_RIGHT, 4, 0ms},
         {DPAD_DOWN, 3, 0ms},
     };
 
     const Move sequence3[] = {
-        {DPAD_RIGHT, 2, 0ms},    {DPAD_DOWN, 3, 0ms},     {DPAD_LEFT, 1, 0ms},  {DPAD_LEFT, 1, 3000ms},
-        {DPAD_DOWN, 3, 0ms},     {DPAD_LEFT, 4, 0ms},     {DPAD_UP, 5, 0ms},    {DPAD_LEFT, 1, 0ms},
-        {DPAD_LEFT, 1, 2000ms},  {DPAD_DOWN, 5, 0ms},     {DPAD_LEFT, 8, 0ms},  {DPAD_UP, 3, 0ms},
-        {DPAD_RIGHT, 1, 0ms},    {DPAD_RIGHT, 1, 3000ms}, {DPAD_UP, 11, 0ms},   {DPAD_RIGHT, 1, 0ms},
-        {DPAD_RIGHT, 1, 1000ms}, {DPAD_DOWN, 13, 0ms},    {DPAD_RIGHT, 4, 0ms}, {DPAD_UP, 3, 0ms},
+        {DPAD_RIGHT, 2, 0ms},
+        {DPAD_DOWN, 3, 0ms},
+        {DPAD_LEFT, 1, 0ms},
+        {DPAD_LEFT, 1, 3000ms},
+        {DPAD_DOWN, 3, 0ms},
+        {DPAD_LEFT, 4, 0ms},
+        {DPAD_UP, 5, 0ms},
+        {DPAD_LEFT, 1, 0ms},
+        {DPAD_LEFT, 1, 2000ms},
+        {DPAD_DOWN, 5, 0ms},
+        {DPAD_LEFT, 8, 0ms},
+        {DPAD_UP, 3, 0ms},
+        {DPAD_RIGHT, 1, 0ms},
+        {DPAD_RIGHT, 1, 3000ms},
+        {DPAD_UP, 11, 0ms},
+        {DPAD_RIGHT, 1, 0ms},
+        {DPAD_RIGHT, 1, 1000ms},
+        {DPAD_DOWN, 13, 0ms},
+        {DPAD_RIGHT, 4, 0ms},
+        {DPAD_UP, 3, 0ms},
     };
 
     const Move sequence4[] = {
-        {DPAD_RIGHT, 2, 0ms},    {DPAD_UP, 9, 0ms},    {DPAD_LEFT, 2, 0ms}, {DPAD_UP, 4, 0ms},    {DPAD_RIGHT, 4, 0ms},
-        {DPAD_RIGHT, 1, 1000ms}, {DPAD_RIGHT, 1, 0ms}, {DPAD_DOWN, 8, 0ms}, {DPAD_RIGHT, 4, 0ms}, {DPAD_UP, 3, 0ms},
+        {DPAD_RIGHT, 2, 0ms},
+        {DPAD_UP, 9, 0ms},
+        {DPAD_LEFT, 2, 0ms},
+        {DPAD_UP, 4, 0ms},
+        {DPAD_RIGHT, 4, 0ms},
+        {DPAD_RIGHT, 1, 1000ms},
+        {DPAD_RIGHT, 1, 0ms},
+        {DPAD_DOWN, 8, 0ms},
+        {DPAD_RIGHT, 4, 0ms},
+        {DPAD_UP, 3, 0ms},
     };
 
     const Move sequence5[] = {
@@ -2421,8 +2750,10 @@ std::string AutoStory_Segment_03::end_text() const {
     return "End: Inside Veilstone Gym in front of Maylene, facing north, after acquiring the third badge and clearing her reward dialogue.";
 }
 
-void AutoStory_Segment_03::run_segment(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                       AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Segment_03::run_segment(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     stats.m_segment++;
     env.update_stats();
     context.wait_for_all_requests();
@@ -2450,16 +2781,23 @@ std::string AutoStory_Checkpoint_0301::end_text() const {
     return "Outside Eterna Galactic HQ after defeating Jupiter and completing the rescue dialogue, facing south against the uncut front bush.";
 }
 
-void AutoStory_Checkpoint_0301::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0301::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     Checkpoint_0301(env, context, options, stats);
 }
 
 
-void Checkpoint_0301(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void Checkpoint_0301(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             // Recorded route with feedback battle handling.
             eterna_gym_to_jupiter(env.console, context);
@@ -2477,16 +2815,23 @@ std::string AutoStory_Checkpoint_0302::end_text() const {
     return "Inside Mount Coronet at the west entrance after defeating Hiker Justin, facing east.";
 }
 
-void AutoStory_Checkpoint_0302::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0302::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     Checkpoint_0302(env, context, options, stats);
 }
 
 
-void Checkpoint_0302(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void Checkpoint_0302(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             // Set daylight once for this outdoor locator strip, including the
             // Center, Mart return, bicycle shop, and north Route 206 gate.
@@ -2515,16 +2860,23 @@ std::string AutoStory_Checkpoint_0303::end_text() const {
     return "Inside Mount Coronet near the east exit, after the first Cyrus meeting.";
 }
 
-void AutoStory_Checkpoint_0303::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0303::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     Checkpoint_0303(env, context, options, stats);
 }
 
 
-void Checkpoint_0303(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void Checkpoint_0303(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             // Recorded route with feedback battle handling.
             coronet1(env.console, context);
@@ -2542,16 +2894,23 @@ std::string AutoStory_Checkpoint_0304::end_text() const {
     return "Just outside the Hearthome Contest Hall doorway, facing south with Repel inactive, after the Keira/Johanna introduction.";
 }
 
-void AutoStory_Checkpoint_0304::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0304::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     Checkpoint_0304(env, context, options, stats);
 }
 
 
-void Checkpoint_0304(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void Checkpoint_0304(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             // Recorded route with feedback battle handling.
             coronet_to_heartholme(env.console, context);
@@ -2569,16 +2928,23 @@ std::string AutoStory_Checkpoint_0305::end_text() const {
     return "Just outside the Lost Tower doorway on Route 209 after entering and exiting, facing south with Repel active.";
 }
 
-void AutoStory_Checkpoint_0305::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0305::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     Checkpoint_0305(env, context, options, stats);
 }
 
 
-void Checkpoint_0305(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void Checkpoint_0305(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             // Restore night lighting on every attempt, including after a reset.
             context.wait_for_all_requests();
@@ -2608,16 +2974,23 @@ std::string AutoStory_Checkpoint_0306::end_text() const {
     return "Inside Veilstone Gym at the entrance, facing north.";
 }
 
-void AutoStory_Checkpoint_0306::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0306::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     Checkpoint_0306(env, context, options, stats);
 }
 
 
-void Checkpoint_0306(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void Checkpoint_0306(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             // Restore night before the route on every attempt, including resets.
             context.wait_for_all_requests();
@@ -2646,16 +3019,23 @@ std::string AutoStory_Checkpoint_0307::end_text() const {
     return "Inside Veilstone Gym in front of Maylene, facing north, after acquiring the third badge and clearing her reward dialogue.";
 }
 
-void AutoStory_Checkpoint_0307::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0307::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     Checkpoint_0307(env, context, options, stats);
 }
 
 
-void Checkpoint_0307(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void Checkpoint_0307(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             //#. Veilstone Gym navigation and battle
             gym_Puzzle_03(env.console, context);

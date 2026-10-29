@@ -23,7 +23,9 @@ namespace PokemonBDSP {
 //  OverworldDetector
 // ---------------------------------------------------------------------------
 
-OverworldDetector::OverworldDetector(Color color) : m_color(color), m_battle_menu(BattleType::STANDARD, color){
+OverworldDetector::OverworldDetector(Color color)
+    : m_color(color)
+    , m_battle_menu(BattleType::STANDARD, color){
 }
 
 void OverworldDetector::make_overlays(VideoOverlaySet& items) const {
@@ -52,7 +54,8 @@ bool OverworldDetector::detect(const ImageViewRGB32& screen){
 // ---------------------------------------------------------------------------
 
 OverworldWatcher::OverworldWatcher(Color color)
-    : OverworldDetector(color), VisualInferenceCallback("OverworldWatcher"){
+    : OverworldDetector(color)
+    , VisualInferenceCallback("OverworldWatcher"){
 }
 
 void OverworldWatcher::make_overlays(VideoOverlaySet& items) const {
@@ -68,7 +71,9 @@ bool OverworldWatcher::process_frame(const ImageViewRGB32& frame, WallClock /*ti
 //  PoketchButtonDetector
 // ---------------------------------------------------------------------------
 
-PoketchButtonDetector::PoketchButtonDetector(Color color) : m_color(color), m_button(0.968, 0.170, 0.022, 0.120){
+PoketchButtonDetector::PoketchButtonDetector(Color color)
+    : m_color(color)
+    , m_button(0.968, 0.170, 0.022, 0.120){
 }
 
 void PoketchButtonDetector::make_overlays(VideoOverlaySet& items) const {
@@ -82,7 +87,8 @@ bool PoketchButtonDetector::detect(const ImageViewRGB32& screen){
 }
 
 PoketchButtonWatcher::PoketchButtonWatcher(Color color)
-    : PoketchButtonDetector(color), VisualInferenceCallback("PoketchButtonWatcher"){
+    : PoketchButtonDetector(color)
+    , VisualInferenceCallback("PoketchButtonWatcher"){
 }
 
 void PoketchButtonWatcher::make_overlays(VideoOverlaySet& items) const {
@@ -106,7 +112,7 @@ bool ensure_poketch_visible(VideoStream& stream, ProControllerContext& context){
             return true;
         }
         stream.log("[AutoStory] Poketch button not found. Attempt " + std::to_string(attempt + 1) + " of 3.",
-                   COLOR_ORANGE);
+            COLOR_ORANGE);
 
         if (attempt == 0){
             //  Most likely hidden: one tap shows it.

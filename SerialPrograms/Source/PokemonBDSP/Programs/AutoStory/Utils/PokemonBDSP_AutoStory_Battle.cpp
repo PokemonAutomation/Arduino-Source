@@ -54,18 +54,20 @@ using namespace std::chrono_literals;
 
 void run_battle_press_A(const ProgramInfo& /*info*/, VideoStream& stream, ProControllerContext& context){
     EndBattleWatcher end_battle;
-    run_until<ProControllerContext>(stream, context,
-                                    [](ProControllerContext& ctx){
-                                        pbf_mash_button(ctx, BUTTON_A, 120000ms);
-                                    },
-                                    {{end_battle}});
+    run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+            pbf_mash_button(ctx, BUTTON_A, 120000ms);
+        },
+        {{end_battle}});
 
     OverworldWatcher overworld;
-    run_until<ProControllerContext>(stream, context,
-                                    [](ProControllerContext& ctx){
-                                        pbf_mash_button(ctx, BUTTON_A, 120000ms);
-                                    },
-                                    {{overworld}});
+    run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+            pbf_mash_button(ctx, BUTTON_A, 120000ms);
+        },
+        {{overworld}});
 }
 
 
@@ -73,18 +75,20 @@ void run_battle_press_A(const ProgramInfo& /*info*/, VideoStream& stream, ProCon
 //  handle_unexpected_battle
 // ---------------------------------------------------------------------------
 
-void handle_unexpected_battle(
-    const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
+void handle_unexpected_battle(const ProgramInfo& info,
+    VideoStream& stream,
+    ProControllerContext& context,
     std::function<void(const ProgramInfo&, VideoStream&, ProControllerContext&)>&& action,
     std::function<void(const ProgramInfo&, VideoStream&, ProControllerContext&)>&& recovery_action,
     size_t max_attempts){
     for (size_t attempt = 0; attempt < max_attempts; attempt++){
         StartBattleDetector start_battle(stream.overlay());
-        int result = run_until<ProControllerContext>(stream, context,
-                                                     [&](ProControllerContext& ctx){
-                                                         action(info, stream, ctx);
-                                                     },
-                                                     {{start_battle}});
+        int result = run_until<ProControllerContext>(stream,
+            context,
+            [&](ProControllerContext& ctx){
+                action(info, stream, ctx);
+            },
+            {{start_battle}});
         if (result < 0){
             return;
         }
@@ -92,7 +96,8 @@ void handle_unexpected_battle(
         recovery_action(info, stream, context);
     }
     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                 "handle_unexpected_battle: exceeded max attempts", stream);
+        "handle_unexpected_battle: exceeded max attempts",
+        stream);
 }
 
 
@@ -157,8 +162,8 @@ struct MoveScore {
     bool ohko_all = false;
 };
 
-static MoveScore score_move(const BDSPMoveData& mdata, const std::vector<std::string>& on_field,
-                            const BDSPTrainerData& trainer_data){
+static MoveScore
+score_move(const BDSPMoveData& mdata, const std::vector<std::string>& on_field, const BDSPTrainerData& trainer_data){
     if (mdata.category == MoveCategory::STATUS){
         return {};
     }
@@ -193,11 +198,9 @@ static MoveScore score_move(const BDSPMoveData& mdata, const std::vector<std::st
 
         const BDSPPokemonData& pdata = bdsp_pokemon(slug);
         uint16_t hp = calc_stats_hp(pdata.hp, tp->level, tp->ivs.hp, tp->evs.hp);
-        uint16_t def =
-            (mdata.category == MoveCategory::PHYSICAL)
-                ? calc_stats_nonhp(pdata.defense, tp->level, tp->ivs.defense, tp->evs.defense,
-                                   NatureAdjustment::NEUTRAL)
-                : calc_stats_nonhp(pdata.spdef, tp->level, tp->ivs.spdef, tp->evs.spdef, NatureAdjustment::NEUTRAL);
+        uint16_t def = (mdata.category == MoveCategory::PHYSICAL)
+            ? calc_stats_nonhp(pdata.defense, tp->level, tp->ivs.defense, tp->evs.defense, NatureAdjustment::NEUTRAL)
+            : calc_stats_nonhp(pdata.spdef, tp->level, tp->ivs.spdef, tp->evs.spdef, NatureAdjustment::NEUTRAL);
 
         double mult = type_multiplier(mdata.type, pdata.type[0], pdata.type[1]);
         if (mdata.spread && trainer_data.battle_type == BDSPBattleType::DOUBLES){
@@ -228,8 +231,11 @@ static void navigate_to_slot(ProControllerContext& context, int slot){
 //  handle_battle_with_outside_help
 // ---------------------------------------------------------------------------
 
-void handle_battle_with_outside_help(const ProgramInfo& /*info*/, VideoStream& stream, ProControllerContext& context,
-                                     const std::string& trainer_id, const AutoStoryOptions& options){
+void handle_battle_with_outside_help(const ProgramInfo& /*info*/,
+    VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& trainer_id,
+    const AutoStoryOptions& options){
     Logger& logger = stream.logger();
     const BDSPTrainerData& trainer_data = bdsp_trainer(trainer_id);
     const OutsideHelpConfig& help = options.outside_help;
@@ -310,8 +316,8 @@ void handle_battle_with_outside_help(const ProgramInfo& /*info*/, VideoStream& s
                 }
 
                 bool prefer = (best_slot < 0) || (s.ohko_all && !best_ohko) ||
-                              (s.ohko_all && best_ohko && s.upper_sum < best_hi) ||
-                              (!s.ohko_all && !best_ohko && s.upper_sum > best_hi);
+                    (s.ohko_all && best_ohko && s.upper_sum < best_hi) ||
+                    (!s.ohko_all && !best_ohko && s.upper_sum > best_hi);
 
                 if (prefer){
                     best_slot = i;
@@ -329,8 +335,8 @@ void handle_battle_with_outside_help(const ProgramInfo& /*info*/, VideoStream& s
             }
 
             logger.log("Move slot " + std::to_string(best_slot) + " (" + move_slugs[best_slot] + ")" +
-                           (best_ohko ? " [OHKO]" : " [best effort]"),
-                       COLOR_WHITE);
+                (best_ohko ? " [OHKO]" : " [best effort]"),
+                COLOR_WHITE);
 
             navigate_to_slot(context, best_slot);
             pbf_mash_button(context, BUTTON_A, 500ms);
@@ -362,11 +368,12 @@ void handle_battle_with_outside_help(const ProgramInfo& /*info*/, VideoStream& s
                 // XP gain — mash through, then update on_field via OCR
                 BattleMenuWatcher menu3(BattleType::TRAINER);
                 EndBattleWatcher end2;
-                int after = run_until<ProControllerContext>(stream, context,
-                                                            [](ProControllerContext& ctx){
-                                                                pbf_mash_button(ctx, BUTTON_A, 120000ms);
-                                                            },
-                                                            {{menu3}, {end2}});
+                int after = run_until<ProControllerContext>(stream,
+                    context,
+                    [](ProControllerContext& ctx){
+                        pbf_mash_button(ctx, BUTTON_A, 120000ms);
+                    },
+                    {{menu3}, {end2}});
                 if (after == 1 || after < 0){
                     battle_active = false;
                 }else{
@@ -377,7 +384,7 @@ void handle_battle_with_outside_help(const ProgramInfo& /*info*/, VideoStream& s
                     for (size_t i = 0; i < names.size() && i < on_field.size(); i++){
                         if (!names[i].empty() && names[i] != on_field[i]){
                             logger.log("Slot " + std::to_string(i) + ": " + on_field[i] + " → " + names[i],
-                                       COLOR_WHITE);
+                                COLOR_WHITE);
                             on_field[i] = names[i];
                         }
                     }
@@ -389,11 +396,12 @@ void handle_battle_with_outside_help(const ProgramInfo& /*info*/, VideoStream& s
 
     // Mash through XP/dialog until overworld
     OverworldWatcher overworld;
-    run_until<ProControllerContext>(stream, context,
-                                    [](ProControllerContext& ctx){
-                                        pbf_mash_button(ctx, BUTTON_A, 120000ms);
-                                    },
-                                    {{overworld}});
+    run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+            pbf_mash_button(ctx, BUTTON_A, 120000ms);
+        },
+        {{overworld}});
 }
 
 
@@ -521,8 +529,11 @@ static void use_full_restore_in_battle(VideoStream& stream, ProControllerContext
 //  OCR the opponent name box and restrict matches to `candidates`.
 //  Returns the best matching slug in candidates, or the best unrestricted match
 //  if no candidate qualifies.
-static std::string ocr_opponent_restricted(Logger& logger, Language language, const ImageViewRGB32& frame,
-                                           const ImageFloatBox& box, const std::vector<std::string>& candidates){
+static std::string ocr_opponent_restricted(Logger& logger,
+    Language language,
+    const ImageViewRGB32& frame,
+    const ImageFloatBox& box,
+    const std::vector<std::string>& candidates){
     using namespace Pokemon;
     ImageViewRGB32 cropped = extract_box_reference(frame, box);
     OCR::StringMatchResult result =
@@ -574,8 +585,11 @@ static double intimidate_atk_mult(int count){
 
 //  Score move `slot` (0-3) against a single opponent pokemon.
 //  Returns {lower_damage, upper_damage, is_ohko}.
-static std::tuple<int, int, bool> score_move_expert(const BDSPMoveData& mdata, const BDSPTrainerPokemon& tp,
-                                                    int effective_atk, int effective_spatk, bool doubles){
+static std::tuple<int, int, bool> score_move_expert(const BDSPMoveData& mdata,
+    const BDSPTrainerPokemon& tp,
+    int effective_atk,
+    int effective_spatk,
+    bool doubles){
     if (mdata.category == MoveCategory::STATUS){
         return {0, 0, false};
     }
@@ -584,10 +598,9 @@ static std::tuple<int, int, bool> score_move_expert(const BDSPMoveData& mdata, c
     uint16_t hp = calc_stats_hp(pdata.hp, tp.level, tp.ivs.hp, tp.evs.hp);
 
     int atk_stat = (mdata.category == MoveCategory::PHYSICAL) ? effective_atk : effective_spatk;
-    uint16_t def =
-        (mdata.category == MoveCategory::PHYSICAL)
-            ? calc_stats_nonhp(pdata.defense, tp.level, tp.ivs.defense, tp.evs.defense, NatureAdjustment::NEUTRAL)
-            : calc_stats_nonhp(pdata.spdef, tp.level, tp.ivs.spdef, tp.evs.spdef, NatureAdjustment::NEUTRAL);
+    uint16_t def = (mdata.category == MoveCategory::PHYSICAL)
+        ? calc_stats_nonhp(pdata.defense, tp.level, tp.ivs.defense, tp.evs.defense, NatureAdjustment::NEUTRAL)
+        : calc_stats_nonhp(pdata.spdef, tp.level, tp.ivs.spdef, tp.evs.spdef, NatureAdjustment::NEUTRAL);
 
     double mult = type_multiplier(mdata.type, pdata.type[0], pdata.type[1]);
     if (mdata.spread && doubles){
@@ -600,9 +613,13 @@ static std::tuple<int, int, bool> score_move_expert(const BDSPMoveData& mdata, c
     return {lo, hi, ohko};
 }
 
-static BattlePlan build_expert_plan(Logger& logger, const std::array<std::string, 4>& move_slugs,
-                                    const std::array<int, 4>& current_pp, const std::vector<Trainer>& all_trainers,
-                                    Trainer current_trainer, int base_atk, int base_spatk){
+static BattlePlan build_expert_plan(Logger& logger,
+    const std::array<std::string, 4>& move_slugs,
+    const std::array<int, 4>& current_pp,
+    const std::vector<Trainer>& all_trainers,
+    Trainer current_trainer,
+    int base_atk,
+    int base_spatk){
     // Running PP budget across the full sequence
     std::array<int, 4> pp = current_pp;
 
@@ -652,13 +669,13 @@ static BattlePlan build_expert_plan(Logger& logger, const std::array<std::string
                     if (acc > 0 && acc < 100){
                         int adj = 100 - 2 * (100 - acc);
                         logger.log(move_slugs[i] + " vs " + tp.species + ": accuracy=" + std::to_string(acc) +
-                                       "% (adjusted=" + std::to_string(adj) + "%)",
-                                   COLOR_YELLOW);
+                            "% (adjusted=" + std::to_string(adj) + "%)",
+                            COLOR_YELLOW);
                     }
 
-                    bool prefer = (best_slot < 0) || (ohko && !best_ohko)   // new OHKO > non-OHKO
-                                  || (ohko && best_ohko && hi < best_hi)    // both OHKO: lower overkill
-                                  || (!ohko && !best_ohko && hi > best_hi); // no OHKO: higher damage
+                    bool prefer = (best_slot < 0) || (ohko && !best_ohko) // new OHKO > non-OHKO
+                        || (ohko && best_ohko && hi < best_hi)            // both OHKO: lower overkill
+                        || (!ohko && !best_ohko && hi > best_hi);         // no OHKO: higher damage
 
                     if (prefer){
                         best_slot = i;
@@ -673,9 +690,9 @@ static BattlePlan build_expert_plan(Logger& logger, const std::array<std::string
                 }else{
                     pp[best_slot]--;
                     logger.log(std::string(is_current ? "[plan] " : "[pre-plan] ") + tp.species + " → slot " +
-                                   std::to_string(best_slot) + " (" + move_slugs[best_slot] + ")" +
-                                   (best_ohko ? " [OHKO]" : " [best effort, hi=" + std::to_string(best_hi) + "]"),
-                               COLOR_WHITE);
+                        std::to_string(best_slot) + " (" + move_slugs[best_slot] + ")" +
+                        (best_ohko ? " [OHKO]" : " [best effort, hi=" + std::to_string(best_hi) + "]"),
+                        COLOR_WHITE);
                     if (is_current){
                         // Only override if this species hasn't been planned yet
                         // (in case the same species appears twice — first occurrence wins)
@@ -704,8 +721,12 @@ static BattlePlan build_expert_plan(Logger& logger, const std::array<std::string
 // ---------------------------------------------------------------------------
 
 //  Snapshot the current frame, OCR on-field names, and update `on_field`.
-static void update_on_field(Logger& logger, Language language, VideoStream& stream, BDSPBattleType battle_type,
-                            const std::vector<std::string>& candidates, std::vector<std::string>& on_field){
+static void update_on_field(Logger& logger,
+    Language language,
+    VideoStream& stream,
+    BDSPBattleType battle_type,
+    const std::vector<std::string>& candidates,
+    std::vector<std::string>& on_field){
     VideoSnapshot frame = stream.video().snapshot();
     if (battle_type == BDSPBattleType::SINGLES){
         static const ImageFloatBox BOX(0.505, 0.010, 0.420, 0.085);
@@ -728,9 +749,12 @@ static void update_on_field(Logger& logger, Language language, VideoStream& stre
 }
 
 
-void handle_expert_battle(const ProgramInfo& /*info*/, VideoStream& stream, ProControllerContext& context,
-                          const std::vector<Trainer>& all_trainers, Trainer current_trainer,
-                          const AutoStoryOptions& options){
+void handle_expert_battle(const ProgramInfo& /*info*/,
+    VideoStream& stream,
+    ProControllerContext& context,
+    const std::vector<Trainer>& all_trainers,
+    Trainer current_trainer,
+    const AutoStoryOptions& options){
     using namespace Pokemon;
 
     Logger& logger = stream.logger();
@@ -801,8 +825,8 @@ void handle_expert_battle(const ProgramInfo& /*info*/, VideoStream& stream, ProC
             bool has_status = detect_player_status(frame);
             if (hp < 0.33 || has_status){
                 logger.log("Full Restore needed (HP=" + std::to_string((int)(hp * 100)) +
-                               "%, status=" + (has_status ? "yes" : "no") + ")",
-                           COLOR_WHITE);
+                    "%, status=" + (has_status ? "yes" : "no") + ")",
+                    COLOR_WHITE);
                 use_full_restore_in_battle(stream, context, options.language);
             }
         }
@@ -824,8 +848,13 @@ void handle_expert_battle(const ProgramInfo& /*info*/, VideoStream& stream, ProC
 
         // 3. Build plan on first turn (after we have real PP values from OCR)
         if (!plan_built){
-            plan = build_expert_plan(logger, move_slugs, pp_remaining, all_trainers, current_trainer, base_atk,
-                                     base_spatk);
+            plan = build_expert_plan(logger,
+                move_slugs,
+                pp_remaining,
+                all_trainers,
+                current_trainer,
+                base_atk,
+                base_spatk);
             plan_built = true;
         }
 
@@ -847,8 +876,8 @@ void handle_expert_battle(const ProgramInfo& /*info*/, VideoStream& stream, ProC
                             intimidate_seen.insert(slug);
                             eff_atk = (int)(base_atk * intimidate_atk_mult(intimidate_count));
                             logger.log(slug + " has Intimidate — ATK stage -" + std::to_string(intimidate_count) +
-                                           " (effective ATK=" + std::to_string(eff_atk) + ")",
-                                       COLOR_YELLOW);
+                                " (effective ATK=" + std::to_string(eff_atk) + ")",
+                                COLOR_YELLOW);
                         }
                     }
                 }
@@ -896,7 +925,7 @@ void handle_expert_battle(const ProgramInfo& /*info*/, VideoStream& stream, ProC
                 }
 
                 bool prefer = (best_slot < 0) || (ohko && !best_ohko) || (ohko && best_ohko && hi < best_hi) ||
-                              (!ohko && !best_ohko && hi > best_hi);
+                    (!ohko && !best_ohko && hi > best_hi);
 
                 if (prefer){
                     best_slot = i;
@@ -922,8 +951,8 @@ void handle_expert_battle(const ProgramInfo& /*info*/, VideoStream& stream, ProC
             context.wait_for_all_requests();
         }else{
             logger.log("Move slot " + std::to_string(best_slot) + " (" + move_slugs[best_slot] + ") vs " +
-                           (on_field.empty() ? "?" : on_field[0]),
-                       COLOR_WHITE);
+                (on_field.empty() ? "?" : on_field[0]),
+                COLOR_WHITE);
             navigate_to_slot(context, best_slot);
             pbf_mash_button(context, BUTTON_A, 500ms);
             context.wait_for_all_requests();
@@ -954,11 +983,12 @@ void handle_expert_battle(const ProgramInfo& /*info*/, VideoStream& stream, ProC
                 // XP gain — mash until the NEXT battle menu appears (or battle ends)
                 BattleMenuWatcher menu3(BattleType::TRAINER);
                 EndBattleWatcher end2;
-                int after = run_until<ProControllerContext>(stream, context,
-                                                            [](ProControllerContext& ctx){
-                                                                pbf_mash_button(ctx, BUTTON_A, 120000ms);
-                                                            },
-                                                            {{menu3}, {end2}});
+                int after = run_until<ProControllerContext>(stream,
+                    context,
+                    [](ProControllerContext& ctx){
+                        pbf_mash_button(ctx, BUTTON_A, 120000ms);
+                    },
+                    {{menu3}, {end2}});
                 if (after != 0){
                     // Battle ended during XP screens
                     break;
@@ -977,11 +1007,12 @@ void handle_expert_battle(const ProgramInfo& /*info*/, VideoStream& stream, ProC
 
     // Mash through any remaining XP/dialog until we're back in the overworld
     OverworldWatcher overworld;
-    run_until<ProControllerContext>(stream, context,
-                                    [](ProControllerContext& ctx){
-                                        pbf_mash_button(ctx, BUTTON_A, 120000ms);
-                                    },
-                                    {{overworld}});
+    run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+            pbf_mash_button(ctx, BUTTON_A, 120000ms);
+        },
+        {{overworld}});
 }
 
 

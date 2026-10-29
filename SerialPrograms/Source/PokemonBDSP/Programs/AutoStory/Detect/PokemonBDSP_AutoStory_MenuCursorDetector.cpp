@@ -42,75 +42,72 @@ std::string menu_cursor_to_string(MenuCursorPosition pos){
 }
 
 
-MenuCursorDetector::MenuCursorDetector(Color color)
-    : m_color(color)
-      // -------------------------------------------------------------------------
-      //  Top row — left to right
-      // -------------------------------------------------------------------------
-      // TODO: replace each ImageFloatBox(0,0,0,0) with the real normalized
-      // (x, y, width, height) for a small region that gains dark pixels when
-      // that icon is hovered. Use the test program overlays to tune coordinates.
-      // -------------------------------------------------------------------------
-      ,
-      m_pokedex_box{
-          ImageFloatBox(0.180000, 0.115000, 0.135000, 0.195000),
-      },
-      m_pokemon_box{
-          ImageFloatBox(0.347500, 0.115000, 0.135000, 0.195000),
-      },
-      m_bag_box{
-          ImageFloatBox(0.515000, 0.115000, 0.135000, 0.195000),
-      },
-      m_card_box{
-          ImageFloatBox(0.682500, 0.115000, 0.135000, 0.195000),
-      } // -------------------------------------------------------------------------
-      //  Bottom row — left to right
-      //  5-icon layout: OPTIONS is the only bottom icon (far-left position).
-      //  8-icon layout: MAP, CAPSULES, OPTIONS, MYSTERYGIFT from left to right.
-      //  OPTIONS sits at a different x-position in each layout — use a separate
-      //  MenuCursorDetector instance if you need to detect OPTIONS in both.
-      // -------------------------------------------------------------------------
-      ,
-      m_options_box{
-          ImageFloatBox(0.515000, 0.364000, 0.135000, 0.195000),
-      },
-      m_map_box{
-          ImageFloatBox(0.180000, 0.364000, 0.135000, 0.195000),
-      },
-      m_capsules_box{
-          ImageFloatBox(0.347500, 0.364000, 0.135000, 0.195000),
-      },
-      m_mysterygift_box{
-          ImageFloatBox(0.682500, 0.364000, 0.135000, 0.195000),
-      } // -------------------------------------------------------------------------
-      //  Approach 2 search boxes — one per icon, same area as the dark-pixel box.
-      //  The template PNG is slid across this area at its native size.
-      // -------------------------------------------------------------------------
-      ,
-      m_icon_match_box{
-          ImageFloatBox(0.180000, 0.115000, 0.135000, 0.195000), // 0 POKEDEX
-          ImageFloatBox(0.347500, 0.115000, 0.135000, 0.195000), // 1 POKEMON
-          ImageFloatBox(0.515000, 0.115000, 0.135000, 0.195000), // 2 BAG
-          ImageFloatBox(0.682500, 0.115000, 0.135000, 0.195000), // 3 CARD
-          ImageFloatBox(0.515000, 0.364000, 0.135000, 0.195000), // 4 OPTIONS (8-icon layout)
-          ImageFloatBox(0.180000, 0.364000, 0.135000, 0.195000), // 5 MAP
-          ImageFloatBox(0.347500, 0.364000, 0.135000, 0.195000), // 6 CAPSULES
-          ImageFloatBox(0.682500, 0.364000, 0.135000, 0.195000), // 7 MYSTERYGIFT
-      } {
+MenuCursorDetector::MenuCursorDetector(Color color) :
+    m_color(color)
+    // -------------------------------------------------------------------------
+    //  Top row — left to right
+    // -------------------------------------------------------------------------
+    // TODO: replace each ImageFloatBox(0,0,0,0) with the real normalized
+    // (x, y, width, height) for a small region that gains dark pixels when
+    // that icon is hovered. Use the test program overlays to tune coordinates.
+    // -------------------------------------------------------------------------
+    , m_pokedex_box{
+        ImageFloatBox(0.180000, 0.115000, 0.135000, 0.195000),
+    },
+    m_pokemon_box{
+        ImageFloatBox(0.347500, 0.115000, 0.135000, 0.195000),
+    },
+    m_bag_box{
+        ImageFloatBox(0.515000, 0.115000, 0.135000, 0.195000),
+    },
+    m_card_box{
+        ImageFloatBox(0.682500, 0.115000, 0.135000, 0.195000),
+    } // -------------------------------------------------------------------------
+    //  Bottom row — left to right
+    //  5-icon layout: OPTIONS is the only bottom icon (far-left position).
+    //  8-icon layout: MAP, CAPSULES, OPTIONS, MYSTERYGIFT from left to right.
+    //  OPTIONS sits at a different x-position in each layout — use a separate
+    //  MenuCursorDetector instance if you need to detect OPTIONS in both.
+    // -------------------------------------------------------------------------
+    , m_options_box{
+        ImageFloatBox(0.515000, 0.364000, 0.135000, 0.195000),
+    },
+    m_map_box{
+        ImageFloatBox(0.180000, 0.364000, 0.135000, 0.195000),
+    },
+    m_capsules_box{
+        ImageFloatBox(0.347500, 0.364000, 0.135000, 0.195000),
+    },
+    m_mysterygift_box{
+        ImageFloatBox(0.682500, 0.364000, 0.135000, 0.195000),
+    } // -------------------------------------------------------------------------
+    //  Approach 2 search boxes — one per icon, same area as the dark-pixel box.
+    //  The template PNG is slid across this area at its native size.
+    // -------------------------------------------------------------------------
+    , m_icon_match_box{
+        ImageFloatBox(0.180000, 0.115000, 0.135000, 0.195000), // 0 POKEDEX
+        ImageFloatBox(0.347500, 0.115000, 0.135000, 0.195000), // 1 POKEMON
+        ImageFloatBox(0.515000, 0.115000, 0.135000, 0.195000), // 2 BAG
+        ImageFloatBox(0.682500, 0.115000, 0.135000, 0.195000), // 3 CARD
+        ImageFloatBox(0.515000, 0.364000, 0.135000, 0.195000), // 4 OPTIONS (8-icon layout)
+        ImageFloatBox(0.180000, 0.364000, 0.135000, 0.195000), // 5 MAP
+        ImageFloatBox(0.347500, 0.364000, 0.135000, 0.195000), // 6 CAPSULES
+        ImageFloatBox(0.682500, 0.364000, 0.135000, 0.195000), // 7 MYSTERYGIFT
+    } {
 }
 
 
 void MenuCursorDetector::make_overlays(VideoOverlaySet& items) const {
     for (const ImageFloatBox* icon_boxes : {
-             m_pokedex_box,
-             m_pokemon_box,
-             m_bag_box,
-             m_card_box,
-             m_options_box,
-             m_map_box,
-             m_capsules_box,
-             m_mysterygift_box,
-         }){
+        m_pokedex_box,
+        m_pokemon_box,
+        m_bag_box,
+        m_card_box,
+        m_options_box,
+        m_map_box,
+        m_capsules_box,
+        m_mysterygift_box,
+    }){
         for (int i = 0; i < BOXES_PER_ICON; i++){
             if (icon_boxes[i].width > 0.0 && icon_boxes[i].height > 0.0){
                 items.add(m_color, icon_boxes[i]);
@@ -139,8 +136,12 @@ int count_dark_boxes(const ImageViewRGB32& screen, const ImageFloatBox* boxes, i
             continue;
         }
         size_t dark_pixels = 0;
-        filter_rgb32_range(dark_pixels, extract_box_reference(screen, boxes[i]), 0xff000000u, maxs, Color(0xffffffff),
-                           false);
+        filter_rgb32_range(dark_pixels,
+            extract_box_reference(screen, boxes[i]),
+            0xff000000u,
+            maxs,
+            Color(0xffffffff),
+            false);
         if (dark_pixels >= MenuCursorDetector::MIN_DARK_PIXEL_COUNT){
             count++;
         }
@@ -199,10 +200,14 @@ MenuCursorPosition MenuCursorDetector::detect_dark_pixels(const ImageViewRGB32& 
         const ImageFloatBox* boxes;
     };
     const IconEntry icons[] = {
-        {MenuCursorPosition::POKEDEX, m_pokedex_box},   {MenuCursorPosition::POKEMON, m_pokemon_box},
-        {MenuCursorPosition::BAG, m_bag_box},           {MenuCursorPosition::CARD, m_card_box},
-        {MenuCursorPosition::OPTIONS, m_options_box},   {MenuCursorPosition::MAP, m_map_box},
-        {MenuCursorPosition::CAPSULES, m_capsules_box}, {MenuCursorPosition::MYSTERYGIFT, m_mysterygift_box},
+        {MenuCursorPosition::POKEDEX, m_pokedex_box},
+        {MenuCursorPosition::POKEMON, m_pokemon_box},
+        {MenuCursorPosition::BAG, m_bag_box},
+        {MenuCursorPosition::CARD, m_card_box},
+        {MenuCursorPosition::OPTIONS, m_options_box},
+        {MenuCursorPosition::MAP, m_map_box},
+        {MenuCursorPosition::CAPSULES, m_capsules_box},
+        {MenuCursorPosition::MYSTERYGIFT, m_mysterygift_box},
     };
 
     MenuCursorPosition best_pos = MenuCursorPosition::UNKNOWN;
