@@ -106,7 +106,7 @@ static bool handle_battle(
         trainerid == "victory_road_dragontamer_andre" or
         trainerid == "victory_road_veteran_edgar"
     ) {
-        // Select Bulldoze
+        // Move the battle-move cursor down.
         pbf_press_dpad(context, DPAD_DOWN, 280ms, 200ms);
     } else if (
         trainerid == "route_223_swimmer_miranda" or
@@ -117,14 +117,14 @@ static bool handle_battle(
         trainerid == "victory_road_ace_sydney" or
         trainerid == "victory_road_psychic_valencia"
     ) {
-        // Select Razor leaf
+        // Move the battle-move cursor up.
         pbf_press_dpad(context, DPAD_UP, 280ms, 200ms);
     } else if (
         trainerid == "victory_road_ace_omar" or
         trainerid == "victory_road_veteran_clayton" or
         trainerid == "victory_road_dragontamer_clinton"
     ) {
-        // Select Crunch
+        // Keep the current battle-move selection.
     }
     context.wait_for_all_requests();
 

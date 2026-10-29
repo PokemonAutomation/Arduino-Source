@@ -1,5 +1,6 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include <algorithm>
+#include <array>
 #include <cmath>
 #include <opencv2/imgproc.hpp>
 #include "CommonFramework/Globals.h"
@@ -536,6 +537,119 @@ OverworldMatchResult match_route208_lower_stair_lane(const ImageRGB32& frame){
     }
     return best;
 }
+OverworldMatchResult match_route209_repel_point(const ImageRGB32& frame){
+    // butters' marked sign frame and rock pair; the cloud-sensitive pillar is excluded.
+    // Only the sign's left frame/post is used; lettering is excluded.
+    OverworldMatchResult best;
+    double best_score=-1;
+    // Lighting samples are translated back to the original marked target.
+    // Appearance 1 remains acquisition-only; all others describe that target.
+    static const std::array<const char*,2> appearances[]={
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/EastSignFrame.png",
+            "PokemonBDSP/Autostory/Route209Repel/EastRockPair.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H04F1.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H04F1.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H18F4.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H18F4.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H12F1.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H12F1.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H02F3.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H02F3.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H11F4.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H11F4.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H12F4.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H12F4.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H12F5.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H12F5.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H02F5.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H02F5.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H10F2.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H10F2.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H10F3.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H10F3.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H10F4.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H10F4.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H10F5.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H10F5.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H11F1.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H11F1.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H11F2.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H11F2.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H11F3.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H11F3.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H02F4.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H02F4.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H03F5.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H03F5.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H10F1.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H10F1.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H11F5.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H11F5.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H13F5.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H13F5.png"},
+        {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H14F5.png",
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H14F5.png"},
+    };
+    for (double scale : {1.0,.95,1.05,.90,1.10}){
+        std::vector<OverworldLandmarkResult> lighting_landmarks(2);
+        for (size_t appearance=0;appearance<std::size(appearances);appearance++){
+            std::vector<LandmarkConfig> configs={
+                {"Sign frame","PokemonBDSP/Autostory/Route209Repel/SignFrame.png",
+                    {1242.0/1920,580.0/1080,28.0/1920,80.0/1080},{0,0,1,1},.93,.15},
+                {"Rock pair","PokemonBDSP/Autostory/Route209Repel/RockPair.png",
+                    {580.0/1920,690.0/1080,155.0/1920,165.0/1080},{0,0,1,1},.93,.15}
+            };
+            for (size_t i=0;i<configs.size();i++)configs[i].path=appearances[appearance][i];
+            for (auto& config : configs){
+                const double w=config.target.width,h=config.target.height;
+                config.target.width*=scale;config.target.height*=scale;
+                config.target.x+=(w-config.target.width)/2;
+                config.target.y+=(h-config.target.height)/2;
+            }
+            auto candidate=match_landmarks(frame,configs,2,1.0/128,POSITION_TOLERANCE_Y,true);
+            if (appearance!=1){
+                for(size_t i=0;i<candidate.landmarks.size();i++){
+                    const auto& landmark=candidate.landmarks[i];
+                    if(landmark.accepted && (!lighting_landmarks[i].accepted ||
+                        landmark.score>lighting_landmarks[i].score))lighting_landmarks[i]=landmark;
+                }
+            }
+            double score=1;
+            // Both remaining anchors must pass confidence and agree spatially.
+            for (const auto& landmark : candidate.landmarks)
+                score=std::min(score,landmark.score);
+            candidate.at_target=appearance!=1 && candidate.located && std::abs(candidate.dx)<=1.0/128 &&
+                std::abs(candidate.dy)<=POSITION_TOLERANCE_Y;
+            // East-side appearance is acquisition-only; the marked pose owns arrival.
+            if (appearance==1 && std::abs(candidate.dx)<=1.0/128 &&
+                std::abs(candidate.dy)<=POSITION_TOLERANCE_Y) candidate.located=false;
+            if (candidate.located)return candidate;
+            if ((candidate.at_target && !best.at_target) ||
+                (candidate.located && !best.located) ||
+                (candidate.at_target==best.at_target && candidate.located==best.located && score>best_score)){
+                best=std::move(candidate);best_score=score;
+            }
+        }
+        // Combine lighting references only when the sign and rock agree.
+        OverworldMatchResult combined;
+        combined.landmarks=std::move(lighting_landmarks);
+        const auto& sign=combined.landmarks[0];
+        const auto& rock=combined.landmarks[1];
+        combined.located=sign.accepted && rock.accepted &&
+            std::abs(sign.dx-rock.dx)<=AGREEMENT_X &&
+            std::abs(sign.dy-rock.dy)<=AGREEMENT_Y;
+        if(combined.located){
+            combined.dx=(sign.dx+rock.dx)/2;
+            combined.dy=(sign.dy+rock.dy)/2;
+            combined.at_target=std::abs(combined.dx)<=1.0/128 &&
+                std::abs(combined.dy)<=POSITION_TOLERANCE_Y;
+            return combined;
+        }
+    }
+    return best;
+}
 OverworldMatchResult match_route208_hannah_departure(const ImageRGB32& frame){
     OverworldMatchResult best;
     double best_score=-1;
@@ -582,7 +696,7 @@ OverworldMatchResult match_route208_hannah_departure(const ImageRGB32& frame){
 }
 OverworldMatchResult match_hearthome_center_entrance(const ImageRGB32& frame){
     // Real stationary hourly views cover daylight, night, dusk and cloud edges.
-    // The target is Kevin's street pose below the door; entry remains watched.
+    // The target is butters' street pose below the door; entry remains watched.
     struct Reference { const char* ball; const char* awning; double ball_width,ball_height; };
     const Reference references[]={
         {"PokemonBDSP/Autostory/HearthomeCenter/Lighting00Ball.png","PokemonBDSP/Autostory/HearthomeCenter/Lighting00Awning.png",144.0/1920,128.0/1080},
@@ -671,6 +785,48 @@ OverworldMatchResult match_hearthome_contest_fantina(const ImageRGB32& frame){
     return match_lighting_pair(frame,variants,"Contest Hall sign frame",
         "Contest Hall roof emblem",1.0/128);
 }
+// Fixed city landmarks preserve the recorded passage and western stair lane.
+OverworldMatchResult match_veilstone_city_passage(const ImageRGB32& frame){
+    auto fine=match_landmarks(frame,{
+        {"Passage house","PokemonBDSP/Autostory/VeilstoneDawn/PassageHouse.png",
+            {42.0/960,222.0/540,210.0/960,110.0/540},{0,0,.55,1},.93,.12},
+        {"Game Corner facade","PokemonBDSP/Autostory/VeilstoneDawn/PassageGameCorner.png",
+            {592.0/960,227.0/540,230.0/960,110.0/540},{.45,0,.55,1},.93,.12}
+    },2,1.0/128,1.0/108,true);
+    if (fine.located) return fine;
+    // The former reference column lies just inside the left cliff in the
+    // live corridor. Recenter eight pixels horizontally and two vertically in the
+    // matcher image; keep both arrival tolerances unchanged.
+    // A farther-east expiry may expose only the house's right window.
+    std::vector<LandmarkConfig> variants;
+    for (double scale : {.85,.90,.95,1.0,1.05,1.10}){
+        const double hw=95.0/960*scale,hh=80.0/540*scale;
+        const double gw=230.0/960*scale,gh=110.0/540*scale;
+        variants.push_back({"House window","PokemonBDSP/Autostory/VeilstoneDawn/PassageHouseWindow.png",
+            {(165.0+95.0/2-8)/960-hw/2,(250.0+80.0/2+2)/540-hh/2,hw,hh},{0,0,.55,1},.94,.15});
+        variants.push_back({"Game Corner facade","PokemonBDSP/Autostory/VeilstoneDawn/PassageGameCorner.png",
+            {(600.0+230.0/2-8)/960-gw/2,(225.0+110.0/2+2)/540-gh/2,gw,gh},{.25,0,.75,1},.93,.12});
+    }
+    // At the east-side roof obstruction, perspective changes the facade.
+    // Calibrate this acquisition-only view to the simultaneously visible house
+    // window. It guides west off that roof corner; fine arrival stays mandatory.
+    variants.push_back({"Game Corner facade","PokemonBDSP/Autostory/VeilstoneDawn/GameCornerEastApproach.png",
+        {644.0/960,228.0/540,240.0/960,100.0/540},{.25,0,.75,1},.93,.12});
+    auto approach=match_lighting_pair(frame,variants,"House window","Game Corner facade",1.0/128);
+    approach.coarse=true;approach.at_target=false;
+    return approach;
+}
+OverworldMatchResult match_veilstone_dawn_stairs(const ImageRGB32& frame){
+    // The residential terrace to the east has similar stairs. Require its
+    // distinct west corner together with the western staircase, not NPCs.
+    return match_landmarks(frame,{
+        {"Western stairs","PokemonBDSP/Autostory/VeilstoneDawn/GymStairs.png",
+            {445.0/960,40.0/540,165.0/960,55.0/540},{.10,0,.65,.70},.93,.12},
+        {"East terrace corner","PokemonBDSP/Autostory/VeilstoneDawn/EastTerraceCorner.png",
+            {620.0/960,155.0/540,200.0/960,110.0/540},{.35,0,.65,.85},.93,.12}
+    },2,1.0/128,1.0/108,true);
+}
+
 OverworldMatchResult match_hearthome_gym_entrance(const ImageRGB32& frame){
     // Wider fixed facade distinguishes the window bays at night. Real hourly
     // references cover the illuminated windows; cursor, NPCs and text stay out.
@@ -1681,6 +1837,398 @@ OverworldMatchResult match_ravaged_path_south_entrance(const ImageRGB32& frame){
     if (!boundary.landmarks.empty()) result.landmarks.push_back(boundary.landmarks[0]);
     return result;
 }
+OverworldMatchResult match_route215_bridge_renewal(const ImageRGB32& frame){
+    // Restore the successful west bridge approach after variable expiry movement.
+    if (!frame) return {};
+    cv::Mat gray,smoothed;
+    cv::resize(gray_image(frame),gray,cv::Size(960,540),0,0,cv::INTER_AREA);
+    cv::GaussianBlur(gray,smoothed,cv::Size(0,0),.8);
+    ImageRGB32 filtered(960,540);
+    cv::Mat pixels(540,960,CV_8UC4,filtered.data(),filtered.bytes_per_row());
+    cv::cvtColor(smoothed,pixels,cv::COLOR_GRAY2BGRA);
+    auto result=match_lighting_pair(filtered,{
+        {"Bridge west edge","PokemonBDSP/Autostory/Route215Renewal/BridgeEdge.png",
+            {538.0/960,302.0/540,50.0/960,100.0/540},{.15,.25,.85,.75},.90,.10},
+        {"Landing cliff corner","PokemonBDSP/Autostory/Route215Renewal/BridgeCliff.png",
+            {333.0/960,410.0/540,64.0/960,88.0/540},{.10,.25,.85,.75},.90,.10}
+        ,{"Bridge west edge","PokemonBDSP/Autostory/Route215Renewal/BridgeFarEdge.png",
+            {538.0/960,302.0/540,50.0/960,100.0/540},{.15,.25,.85,.75},.90,.10},
+        {"Landing cliff corner","PokemonBDSP/Autostory/Route215Renewal/BridgeFarCliff.png",
+            {333.0/960,410.0/540,64.0/960,88.0/540},{.10,.25,.85,.75},.90,.10}
+        ,{"Bridge west edge","PokemonBDSP/Autostory/Route215Renewal/BridgeNightEdge.png",
+            {538.0/960,302.0/540,50.0/960,100.0/540},{.15,.25,.85,.75},.90,.10},
+        {"Landing cliff corner","PokemonBDSP/Autostory/Route215Renewal/BridgeNightCliff.png",
+            {333.0/960,410.0/540,64.0/960,88.0/540},{.10,.25,.85,.75},.90,.10}
+        ,{"Bridge west edge","PokemonBDSP/Autostory/Route215Renewal/BridgeNightFarEdge.png",
+            {538.0/960,302.0/540,50.0/960,100.0/540},{.15,.25,.85,.75},.90,.10},
+        {"Landing cliff corner","PokemonBDSP/Autostory/Route215Renewal/BridgeNightFarCliff.png",
+            {333.0/960,410.0/540,64.0/960,88.0/540},{.10,.25,.85,.75},.90,.10}
+    },"Bridge west edge","Landing cliff corner",1.0/128);
+    result.at_target=result.located && std::abs(result.dx)<=1.0/128 && std::abs(result.dy)<=1.0/108;
+    return result;
+}
+OverworldMatchResult match_route215_ace_renewal(const ImageRGB32& frame){
+    // The road bend and fence corner exclude the patrolling trainers.
+    if (!frame) return {};
+    cv::Mat gray,smoothed;
+    cv::resize(gray_image(frame),gray,cv::Size(960,540),0,0,cv::INTER_AREA);
+    cv::GaussianBlur(gray,smoothed,cv::Size(0,0),.8);
+    ImageRGB32 filtered(960,540);
+    cv::Mat pixels(540,960,CV_8UC4,filtered.data(),filtered.bytes_per_row());
+    cv::cvtColor(smoothed,pixels,cv::COLOR_GRAY2BGRA);
+    auto result=match_landmarks(filtered,{
+        {"Road bend","PokemonBDSP/Autostory/Route215Renewal/AceRoad.png",
+            {352.0/960,180.0/540,60.0/960,80.0/540},{.10,.15,.85,.80},.92,.08},
+        {"Fence corner","PokemonBDSP/Autostory/Route215Renewal/AceFence.png",
+            {165.0/960,389.0/540,110.0/960,78.0/540},{.05,.25,.90,.75},.90,.10,LandmarkFeatures::LOCAL_CONTRAST}
+    },2,1.0/128,1.0/108,true);
+    if (result.located) return result;
+    // Expiry may finish east of the fence's visible range. Two separate road
+    // bends establish a horizontal recovery direction along this clear row.
+    // Perspective changes their spacing, so this pair cannot confirm arrival.
+    // Suppress thin rain streaks and puddle rings in the broader road shapes;
+    // retain the original input and confidence gates for the fine fence pair.
+    cv::medianBlur(gray,smoothed,5);
+    cv::GaussianBlur(smoothed,smoothed,cv::Size(0,0),.8);
+    cv::cvtColor(smoothed,pixels,cv::COLOR_GRAY2BGRA);
+    auto approach=match_lighting_pair(filtered,{
+        {"Upper road bend","PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadGoal.png",
+            {352.0/960,180.0/540,60.0/960,80.0/540},{0,.25,1,.30},.92,.08},
+        {"Upper road bend","PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadNear.png",
+            {352.0/960,180.0/540,60.0/960,80.0/540},{0,.25,1,.30},.92,.08},
+        {"Upper road bend","PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadFar.png",
+            {352.0/960,180.0/540,60.0/960,80.0/540},{0,.25,1,.30},.92,.08},
+        {"Upper road bend","PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadWestFar.png",
+            {352.0/960,180.0/540,60.0/960,80.0/540},{0,.25,1,.30},.92,.08},
+        {"Upper road bend","PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadWestNear.png",
+            {352.0/960,180.0/540,60.0/960,80.0/540},{0,.25,1,.30},.92,.08},
+        {"Upper road bend","PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadWest.png",
+            {352.0/960,180.0/540,60.0/960,80.0/540},{0,.25,1,.30},.92,.08},
+        {"Upper road bend","PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadWestNearRain.png",
+            {352.0/960,180.0/540,60.0/960,80.0/540},{0,.25,1,.30},.92,.08},
+        {"Upper road bend","PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadFarRain.png",
+            {352.0/960,180.0/540,60.0/960,80.0/540},{0,.25,1,.30},.92,.08},
+        {"Lower road bend","PokemonBDSP/Autostory/Route215Renewal/AceAcquireLowerRoadEast.png",
+            {500.0/960,420.0/540,80.0/960,70.0/540},{0,.70,1,.30},.93,.10},
+        {"Lower road bend","PokemonBDSP/Autostory/Route215Renewal/AceAcquireLowerRoad.png",
+            {500.0/960,420.0/540,80.0/960,70.0/540},{0,.70,1,.30},.93,.10}
+    },"Upper road bend","Lower road bend",1.0/128);
+    // At the eastern extreme, the original bends leave the screen. The two
+    // corners of the same grass bed remain visible above the clear road.
+    auto east=match_lighting_pair(filtered,{
+        {"Grass west corner","PokemonBDSP/Autostory/Route215Renewal/AceGrassWest.png",
+            {665.0/960,145.0/540,110.0/960,75.0/540},{0,.20,1,.40},.92,.10},
+        {"Grass east corner","PokemonBDSP/Autostory/Route215Renewal/AceGrassEast.png",
+            {890.0/960,175.0/540,65.0/960,62.0/540},{0,.20,1,.40},.92,.10},
+        {"Grass west corner","PokemonBDSP/Autostory/Route215Renewal/AceGrassFarWest.png",
+            {665.0/960,145.0/540,110.0/960,75.0/540},{0,.20,1,.40},.92,.10},
+        {"Grass east corner","PokemonBDSP/Autostory/Route215Renewal/AceGrassFarEast.png",
+            {890.0/960,175.0/540,65.0/960,62.0/540},{0,.20,1,.40},.92,.10},
+        {"Grass east corner","PokemonBDSP/Autostory/Route215Renewal/AceGrassFarEastShoulder.png",
+            {850.0/960,145.0/540,105.0/960,80.0/540},{0,.20,1,.40},.92,.10}
+    },"Grass west corner","Grass east corner",1.0/128);
+    const auto& west=east.landmarks[0];const auto& right=east.landmarks[1];
+    const double east_nearest=std::min(std::abs(west.dx),std::abs(right.dx));
+    east.located=west.accepted && right.accepted &&
+        std::abs(west.dy-right.dy)<=AGREEMENT_Y &&
+        west.dx< -1.0/12 && right.dx< -1.0/12 &&
+        east_nearest>2*std::abs(west.dx-right.dx) &&
+        east.dy>=-1.0/27 && east.dy<=1.0/9;
+    if (east.located) { east.coarse=true;east.at_target=false;return east; }
+    // From the eastern end, the fixed route sign remains unique while the
+    // road bends are off-screen. Its virtual goal lies beyond the right edge;
+    // this pair guides acquisition only and can never confirm arrival.
+    auto far_east=match_lighting_pair(filtered,{
+        {"Grass west corner","PokemonBDSP/Autostory/Route215Renewal/AceGrassFarWest.png",
+            {665.0/960,145.0/540,110.0/960,75.0/540},{0,.20,1,.40},.92,.10},
+        {"Route 215 sign","PokemonBDSP/Autostory/Route215Renewal/AceRoute215Sign.png",
+            {1128.0/960,359.0/540,90.0/960,45.0/540},{.50,.40,.50,.50},.94,.20},
+        {"Route 215 sign","PokemonBDSP/Autostory/Route215Renewal/AceRoute215SignRain.png",
+            {1128.0/960,359.0/540,90.0/960,45.0/540},{.50,.40,.50,.50},.94,.20}
+    },"Grass west corner","Route 215 sign",1.0/128);
+    const auto& corner=far_east.landmarks[0];const auto& sign=far_east.landmarks[1];
+    const double far_nearest=std::min(std::abs(corner.dx),std::abs(sign.dx));
+    far_east.located=corner.accepted && sign.accepted &&
+        std::abs(corner.dy-sign.dy)<=AGREEMENT_Y &&
+        corner.dx< -1.0/4 && sign.dx< -1.0/4 &&
+        far_nearest>2*std::abs(corner.dx-sign.dx) &&
+        far_east.dy>=-1.0/27 && far_east.dy<=1.0/9;
+    if (far_east.located) {far_east.coarse=true;far_east.at_target=false;return far_east;}
+    const auto& upper=approach.landmarks[0];const auto& lower=approach.landmarks[1];
+    // Keep the shared row when both bends already agree. In the recorded
+    // perspective-shifted rows the nearer bend moves 1.35 times as far;
+    // compare those acquisition errors in the farther bend's plane.
+    // Neither model changes the strict fine-arrival checks above.
+    const double lower_plane_dy=std::abs(upper.dy-lower.dy)<=AGREEMENT_Y ?
+        lower.dy : lower.dy/1.35;
+    approach.dy=(upper.dy+lower_plane_dy)/2;
+    const double nearest=std::min(std::abs(upper.dx),std::abs(lower.dx));
+    const bool horizontal_support=upper.dx*lower.dx>0 && nearest>1.0/64 &&
+        nearest>2*std::abs(upper.dx-lower.dx);
+    // Expiry can also finish one row south, already near the goal column.
+    // Both accepted bends must agree before correcting that row vertically.
+    const bool vertical_support=std::abs(upper.dx-lower.dx)<=AGREEMENT_X &&
+        std::max(std::abs(upper.dx),std::abs(lower.dx))<=1.0/12 &&
+        std::abs(upper.dy-lower_plane_dy)<=1.0/108 &&
+        upper.dy*lower_plane_dy>0 && std::abs(approach.dy)>1.0/54;
+    approach.located=upper.accepted && lower.accepted &&
+        std::abs(upper.dy-lower_plane_dy)<=AGREEMENT_Y &&
+        std::abs(approach.dy)<=1.0/9 && (horizontal_support || vertical_support);
+    approach.coarse=true;approach.at_target=false;
+    return approach;
+}
+OverworldMatchResult match_route215_derek_stairs_renewal(const ImageRGB32& frame){
+    if (!frame) return {};
+    cv::Mat gray,smoothed;
+    cv::resize(gray_image(frame),gray,cv::Size(960,540),0,0,cv::INTER_AREA);
+    cv::GaussianBlur(gray,smoothed,cv::Size(0,0),.8);
+    ImageRGB32 filtered(960,540);
+    cv::Mat pixels(540,960,CV_8UC4,filtered.data(),filtered.bytes_per_row());
+    cv::cvtColor(smoothed,pixels,cv::COLOR_GRAY2BGRA);
+    // Clear landing below the short stairs; neither tree nor player is an anchor.
+    auto result=match_lighting_pair(filtered,{
+        {"White stair railing","PokemonBDSP/Autostory/Route215Renewal/DerekStairsRailing.png",
+            {500.0/960,78.0/540,90.0/960,110.0/540},{.10,.05,.85,.85},.93,.12},
+        {"Lower stair corner","PokemonBDSP/Autostory/Route215Renewal/DerekStairsCorner.png",
+            {589.0/960,315.0/540,95.0/960,105.0/540},{.10,.20,.85,.80},.93,.12}
+        ,{"White stair railing","PokemonBDSP/Autostory/Route215Renewal/DerekStairsNightRailing.png",
+            {500.0/960,78.0/540,90.0/960,110.0/540},{.10,.05,.85,.85},.93,.12},
+        {"Lower stair corner","PokemonBDSP/Autostory/Route215Renewal/DerekStairsNightCorner.png",
+            {589.0/960,315.0/540,95.0/960,105.0/540},{.10,.20,.85,.80},.93,.12}
+    },"White stair railing","Lower stair corner",1.0/128);
+    result.at_target=result.located && std::abs(result.dx)<=1.0/128 && std::abs(result.dy)<=1.0/108;
+    if (result.located) return result;
+    // Far west of this landing, perspective shifts the two structures by
+    // different amounts. Use that view only to acquire the horizontal column;
+    // the original close pair above remains the sole arrival check.
+    auto approach=match_landmarks(filtered,{
+        {"White stair railing","PokemonBDSP/Autostory/Route215Renewal/DerekStairsWestRailing.png",
+            {500.0/960,78.0/540,90.0/960,110.0/540},{.10,.05,.85,.85},.93,.12},
+        {"Lower stair corner","PokemonBDSP/Autostory/Route215Renewal/DerekStairsWestCorner.png",
+            {589.0/960,315.0/540,95.0/960,105.0/540},{.10,.20,.85,.80},.93,.12}
+    },2,1.0/128,1.0/108,true);
+    const auto& rail=approach.landmarks[0];const auto& stair=approach.landmarks[1];
+    const double nearest=std::min(std::abs(rail.dx),std::abs(stair.dx));
+    approach.located=rail.accepted && stair.accepted &&
+        std::abs(rail.dy-stair.dy)<=AGREEMENT_Y &&
+        std::abs((rail.dy+stair.dy)/2)<=1.0/108 &&
+        rail.dx*stair.dx>0 && nearest>1.0/64 &&
+        nearest>2*std::abs(rail.dx-stair.dx);
+    approach.dx=(rail.dx+stair.dx)/2;approach.dy=(rail.dy+stair.dy)/2;
+    approach.coarse=true;approach.at_target=false;
+    return approach;
+}
+OverworldMatchResult match_route215_derek_stair_top_renewal(const ImageRGB32& frame){
+    if (!frame) return {};
+    cv::Mat gray,smoothed;
+    cv::resize(gray_image(frame),gray,cv::Size(960,540),0,0,cv::INTER_AREA);
+    cv::GaussianBlur(gray,smoothed,cv::Size(0,0),.8);
+    ImageRGB32 filtered(960,540);
+    cv::Mat pixels(540,960,CV_8UC4,filtered.data(),filtered.bytes_per_row());
+    cv::cvtColor(smoothed,pixels,cv::COLOR_GRAY2BGRA);
+    // The road row above the stairs is clear west/east, below the tall grass.
+    auto result=match_lighting_pair(filtered,{
+        {"Stair-top barrier","PokemonBDSP/Autostory/Route215Renewal/DerekStairTopBarrier.png",
+            {384.0/960,401.0/540,127.0/960,70.0/540},{.05,.15,.90,.85},.93,.12},
+        {"West fence corner","PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFence.png",
+            {274.0/960,275.0/540,69.0/960,125.0/540},{.05,.15,.90,.85},.90,.12,LandmarkFeatures::LOCAL_CONTRAST}
+        ,{"Stair-top barrier","PokemonBDSP/Autostory/Route215Renewal/DerekStairTopBarrierEast.png",
+            {384.0/960,401.0/540,127.0/960,70.0/540},{.05,.15,.90,.85},.93,.12},
+        {"West fence corner","PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFenceEast.png",
+            {274.0/960,275.0/540,69.0/960,125.0/540},{.05,.15,.90,.85},.90,.12,LandmarkFeatures::LOCAL_CONTRAST}
+        ,{"Stair-top barrier","PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNightBarrier.png",
+            {384.0/960,401.0/540,127.0/960,70.0/540},{.05,.15,.90,.85},.93,.12},
+        {"West fence corner","PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNightFence.png",
+            {274.0/960,275.0/540,69.0/960,125.0/540},{.05,.15,.90,.85},.90,.12,LandmarkFeatures::LOCAL_CONTRAST}
+        ,{"Stair-top barrier","PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNightEastBarrier.png",
+            {384.0/960,401.0/540,127.0/960,70.0/540},{.05,.15,.90,.85},.93,.12},
+        {"West fence corner","PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNightEastFence.png",
+            {274.0/960,275.0/540,69.0/960,125.0/540},{.05,.15,.90,.85},.90,.12,LandmarkFeatures::LOCAL_CONTRAST}
+        ,{"Stair-top barrier","PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNightWestBarrier.png",
+            {384.0/960,401.0/540,127.0/960,70.0/540},{.05,.15,.90,.85},.93,.12},
+        {"West fence corner","PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNightWestFence.png",
+            {274.0/960,275.0/540,69.0/960,125.0/540},{.05,.15,.90,.85},.90,.12,LandmarkFeatures::LOCAL_CONTRAST}
+        ,{"West fence corner","PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNorthFence.png",
+            {274.0/960,275.0/540,69.0/960,125.0/540},{.05,.15,.90,.85},.90,.12,LandmarkFeatures::LOCAL_CONTRAST}
+        ,{"Stair-top barrier","PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFarEastNorthBarrier.png",
+            {384.0/960,401.0/540,127.0/960,70.0/540},{.05,.15,.90,.85},.93,.12}
+        ,{"West fence corner","PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFarEastNorthFence.png",
+            {274.0/960,275.0/540,69.0/960,125.0/540},{.05,.15,.90,.85},.90,.12,LandmarkFeatures::LOCAL_CONTRAST}
+        ,{"Stair-top barrier","PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFarEastBarrier.png",
+            {384.0/960,401.0/540,127.0/960,70.0/540},{.05,.15,.90,.85},.93,.12}
+        ,{"West fence corner","PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFarEastFence.png",
+            {274.0/960,275.0/540,69.0/960,125.0/540},{.05,.15,.90,.85},.90,.12,LandmarkFeatures::LOCAL_CONTRAST}
+        // Raw-luminance alternatives preserve fence structure when local
+        // contrast normalization amplifies a passing rain streak.
+        ,{"West fence corner","PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFarEastNorthGrayFence.png",
+            {274.0/960,275.0/540,69.0/960,125.0/540},{.05,.15,.90,.85},.90,.12}
+        ,{"West fence corner","PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFarEastGrayFence.png",
+            {274.0/960,275.0/540,69.0/960,125.0/540},{.05,.15,.90,.85},.90,.12}
+    },"Stair-top barrier","West fence corner",1.0/128);
+    result.at_target=result.located && std::abs(result.dx)<=1.0/128 && std::abs(result.dy)<=1.0/108;
+    if (!result.located && result.landmarks.size()==2){
+        const auto& barrier=result.landmarks[0];const auto& fence=result.landmarks[1];
+        const double nearest=std::min(std::abs(barrier.dx),std::abs(fence.dx));
+        // Far-east perspective changes spacing: acquire the column first,
+        // then use the original strict two-anchor arrival check.
+        if (barrier.accepted && fence.accepted &&
+            std::abs(barrier.dy-fence.dy)<=AGREEMENT_Y && std::abs(result.dy)<=1.0/20 &&
+            barrier.dx*fence.dx>0 && nearest>1.0/64 &&
+            nearest>2*std::abs(barrier.dx-fence.dx)){
+            result.located=true;result.coarse=true;result.at_target=false;
+        }
+    }
+    return result;
+}
+OverworldMatchResult match_route215_jogger_corner(const ImageRGB32& frame){
+    if (!frame) return {};
+    // These references describe the game capture, without the recording canvas.
+    // Smooth only this locator before contrast normalization to suppress rain
+    // streaks and capture resampling noise; other detectors retain their inputs.
+    cv::Mat gray,smoothed;
+    cv::resize(gray_image(frame),gray,cv::Size(960,540),0,0,cv::INTER_AREA);
+    cv::GaussianBlur(gray,smoothed,cv::Size(0,0),.8);
+    ImageRGB32 filtered(960,540);
+    cv::Mat pixels(540,960,CV_8UC4,filtered.data(),filtered.bytes_per_row());
+    cv::cvtColor(smoothed,pixels,cv::COLOR_GRAY2BGRA);
+    // Fixed fence cap and road bend; neither the moving jogger nor the item
+    // supplies position evidence. Each view maps back to the same lane-4 corner.
+    // Search only the cap/bend height of lanes 4 and 3. This excludes similar
+    // lower fence sections; a missing cap never authorizes a vertical search.
+    // Low-frequency cap/cliff alternatives require higher correlation (.95/.97)
+    // as well as a unique peak and an independently agreeing structural anchor.
+    const std::vector<LandmarkConfig> appearances={
+        {"Fence top","PokemonBDSP/Autostory/Route215JoggerV2/FenceGoal.png",
+            {0.534375,0.312962962963,32.0/960,42.0/540},{0,.24,1,.26},.93,.08,LandmarkFeatures::LOCAL_CONTRAST},
+        {"Fence top","PokemonBDSP/Autostory/Route215JoggerV2/FenceRainWest.png",
+            {0.535416666667,0.311111111111,32.0/960,42.0/540},{0,.24,1,.26},.93,.08,LandmarkFeatures::LOCAL_CONTRAST},
+        {"Fence top","PokemonBDSP/Autostory/Route215JoggerV2/FenceCloudWest.png",
+            {0.535416666667,0.311111111111,32.0/960,42.0/540},{0,.24,1,.26},.93,.08,LandmarkFeatures::LOCAL_CONTRAST},
+        {"Fence top","PokemonBDSP/Autostory/Route215JoggerV2/FenceLane3.png",
+            {0.535416666667,0.312962962963,32.0/960,42.0/540},{0,.24,1,.26},.93,.08,LandmarkFeatures::LOCAL_CONTRAST},
+        {"Fence top","PokemonBDSP/Autostory/Route215JoggerV2/FenceMid.png",
+            {0.534375,0.312962962963,32.0/960,42.0/540},{0,.24,1,.26},.93,.08,LandmarkFeatures::LOCAL_CONTRAST},
+        {"Fence top","PokemonBDSP/Autostory/Route215JoggerV2/FenceNear.png",
+            {0.534375,0.312962962963,32.0/960,42.0/540},{0,.24,1,.26},.93,.08,LandmarkFeatures::LOCAL_CONTRAST},
+        {"Fence top","PokemonBDSP/Autostory/Route215JoggerV2/FenceApproachFar.png",
+            {0.534375,0.312962962963,32.0/960,42.0/540},{0,.24,1,.26},.93,.08,LandmarkFeatures::LOCAL_CONTRAST},
+        {"Fence top","PokemonBDSP/Autostory/Route215JoggerV2/FenceApproachMiddle.png",
+            {0.534375,0.312962962963,32.0/960,42.0/540},{0,.24,1,.26},.93,.08,LandmarkFeatures::LOCAL_CONTRAST},
+        {"Fence top","PokemonBDSP/Autostory/Route215JoggerV2/FenceApproachNear.png",
+            {0.534375,0.312962962963,32.0/960,42.0/540},{0,.24,1,.26},.93,.08,LandmarkFeatures::LOCAL_CONTRAST},
+        {"Fence top","PokemonBDSP/Autostory/Route215JoggerV2/FenceGrayLane3.png",
+            {0.535416666667,0.312962962963,32.0/960,24.0/540},{0,.24,1,.26},.95,.05},
+        {"Road bend","PokemonBDSP/Autostory/Route215JoggerV2/RoadUpperDayGoal.png",
+            {422.0/960,164.0/540,80.0/960,25.0/540},{0,.24,1,.26},.90,.15},
+        // In lane 3 the cap overlaps the lower part of the full road patch.
+        // Upper-bend alternatives keep position evidence clear of the player.
+        {"Road bend","PokemonBDSP/Autostory/Route215JoggerV2/RoadUpperGoal.png",
+            {0.439583333333,0.303703703704,80.0/960,25.0/540},{0,.24,1,.26},.90,.15},
+        {"Road bend","PokemonBDSP/Autostory/Route215JoggerV2/RoadUpperRainWest.png",
+            {0.439583333333,0.303703703704,80.0/960,25.0/540},{0,.24,1,.26},.90,.15},
+        {"Road bend","PokemonBDSP/Autostory/Route215JoggerV2/RoadUpperCloudWest.png",
+            {0.447916666667,0.307407407407,80.0/960,25.0/540},{0,.24,1,.26},.90,.15},
+        {"Road bend","PokemonBDSP/Autostory/Route215JoggerV2/RoadGoal.png",
+            {0.439583333333,0.303703703704,80.0/960,41.0/540},{0,.24,1,.26},.90,.15},
+        {"Road bend","PokemonBDSP/Autostory/Route215JoggerV2/RoadRainWest.png",
+            {0.439583333333,0.303703703704,80.0/960,41.0/540},{0,.24,1,.26},.90,.15},
+        {"Road bend","PokemonBDSP/Autostory/Route215JoggerV2/RoadCloudWest.png",
+            {0.447916666667,0.307407407407,80.0/960,41.0/540},{0,.24,1,.26},.90,.15},
+    };
+    std::vector<LandmarkConfig> variants;
+    for (const auto& appearance : appearances){
+        if (std::string(appearance.name)=="Road bend"){
+            variants.push_back(appearance);
+            continue;
+        }
+        // Horizontal perspective changes as the fence crosses the screen.
+        for (double scale : {.96,1.0,1.04}){
+            auto variant=appearance;
+            variant.target.width*=scale;
+            variant.target.x+=(appearance.target.width-variant.target.width)/2;
+            variants.push_back(variant);
+        }
+    }
+    // A road bend can disambiguate repeated fence sections. Choose complete
+    // agreeing pairs, rather than rejecting one anchor before considering the other.
+    const auto candidates=match_landmarks(filtered,variants,variants.size()+1,
+        1.0/128,POSITION_TOLERANCE_Y,true);
+    OverworldMatchResult best;
+    double best_score=-1;
+    bool supported=false,ambiguous=false;
+    double first_x=0,first_y=0;
+    for (const auto& fence : candidates.landmarks){
+        if (fence.name!="Fence top") continue;
+        for (const auto& road : candidates.landmarks){
+            if (road.name!="Road bend") continue;
+            const double score=std::min(fence.score,road.score);
+            const bool agrees=std::abs(fence.dx-road.dx)<=AGREEMENT_X &&
+                std::abs(fence.dy-road.dy)<=AGREEMENT_Y;
+            const bool valid=fence.accepted && road.accepted && agrees;
+            const double dx=(fence.dx+road.dx)/2,dy=(fence.dy+road.dy)/2;
+            if (valid){
+                if (supported && (std::abs(dx-first_x)>AGREEMENT_X ||
+                    std::abs(dy-first_y)>AGREEMENT_Y)) ambiguous=true;
+                if (!supported){first_x=dx;first_y=dy;}
+            }
+            if ((valid && !supported) || (valid==supported && score>best_score)){
+                best.landmarks={fence,road};best.dx=dx;best.dy=dy;best_score=score;
+            }
+            supported|=valid;
+        }
+    }
+    best.located=supported && !ambiguous;
+    best.at_target=best.located && std::abs(best.dx)<=1.0/128 &&
+        std::abs(best.dy)<=POSITION_TOLERANCE_Y;
+    if (best.located) return best;
+    // West of the visible fence, bridge/cliff pairs establish the walking row.
+    // Their x coordinates are acquisition-only and can never confirm arrival.
+    const std::vector<std::vector<LandmarkConfig>> approaches={
+        {
+            // The observed lane-4 to lane-3 step changes the bridge-foot view.
+            // Both corners must agree; this pair never confirms arrival.
+            {"Bridge west corner","PokemonBDSP/Autostory/Route215JoggerV2/BridgeWestNightLane3.png",
+                {106.0/960-.435625,297.0/540-70.0/1080,60.0/960,75.0/540},{0,.2,1,.6},.90,.12,LandmarkFeatures::LOCAL_CONTRAST},
+            {"Bridge east corner","PokemonBDSP/Autostory/Route215JoggerV2/BridgeEastNightLane3.png",
+                {260.0/960-.435625,295.0/540-70.0/1080,65.0/960,75.0/540},{0,.2,1,.6},.90,.12,LandmarkFeatures::LOCAL_CONTRAST}
+        },{
+            // When the east fence is off-screen, these two full bridge-foot
+            // corners establish lane 4. They never authorize arrival.
+            {"Bridge west corner","PokemonBDSP/Autostory/Route215JoggerV2/BridgeWestCurrent.png",
+                {106.0/960-.435,257.0/540,60.0/960,75.0/540},{0,.2,1,.6},.90,.12,LandmarkFeatures::LOCAL_CONTRAST},
+            {"Bridge east corner","PokemonBDSP/Autostory/Route215JoggerV2/BridgeEastCurrent.png",
+                {260.0/960-.435,255.0/540,65.0/960,75.0/540},{0,.2,1,.6},.90,.12,LandmarkFeatures::LOCAL_CONTRAST}
+        },{
+
+            {"Bridge west corner","PokemonBDSP/Autostory/Route215JoggerV2/BridgeWestBridgeFar.png",
+                {240.0/960-.61,246.0/540,64.0/960,60.0/540},{0,.2,1,.6},.90,.12,LandmarkFeatures::LOCAL_CONTRAST},
+            {"Bridge east corner","PokemonBDSP/Autostory/Route215JoggerV2/BridgeEastBridgeFar.png",
+                {388.0/960-.61,246.0/540,64.0/960,60.0/540},{0,.2,1,.6},.90,.12,LandmarkFeatures::LOCAL_CONTRAST}
+        },{
+            {"Bridge west corner","PokemonBDSP/Autostory/Route215JoggerV2/BridgeWestBridgeMid.png",
+                {108.0/960-.445,245.0/540,64.0/960,60.0/540},{0,.2,1,.6},.90,.12,LandmarkFeatures::LOCAL_CONTRAST},
+            {"South cliff corner","PokemonBDSP/Autostory/Route215JoggerV2/SouthCliffBridgeMid.png",
+                {77.0/960-.445,295.0/540,90.0/960,80.0/540},{0,.2,1,.6},.97,.05}
+        },{
+            {"Bridge west corner","PokemonBDSP/Autostory/Route215JoggerV2/BridgeWestBridgeNear.png",
+                {68.0/960-.405,245.0/540,64.0/960,60.0/540},{0,.2,1,.6},.90,.12,LandmarkFeatures::LOCAL_CONTRAST},
+            {"South cliff corner","PokemonBDSP/Autostory/Route215JoggerV2/SouthCliffBridgeNear.png",
+                {37.0/960-.405,295.0/540,90.0/960,80.0/540},{0,.2,1,.6},.97,.05}
+        }
+    };
+    for (const auto& approach : approaches){
+        auto candidate=match_landmarks(filtered,approach,2,1.0/128,1.0/54,true);
+        const double score=std::min(candidate.landmarks[0].score,candidate.landmarks[1].score);
+        if (best.located && candidate.located && std::abs(best.dy-candidate.dy)>AGREEMENT_Y){
+            best.located=false;best.at_target=false;best.coarse=true;return best;
+        }
+        candidate.coarse=true;candidate.at_target=false;
+        if ((candidate.located && !best.located) || (candidate.located==best.located && score>best_score)){
+            best=std::move(candidate);best_score=score;
+        }
+    }
+    return best;
+}
 const std::vector<OverworldMatcher>& overworld_matchers(){    static const std::vector<OverworldMatcher> matchers={
         {"route204-north-approach","Route 204 left of sign after Tyler",match_route204_north_approach},
         {"teighler-alcove-corner","Teighler alcove bottom-left corner",match_teighler_alcove_corner},
@@ -1703,8 +2251,16 @@ const std::vector<OverworldMatcher>& overworld_matchers(){    static const std::
         {"hearthome-center","Hearthome Pokemon Center doorway",match_hearthome_center_entrance},
         {"hearthome-center-interior","Hearthome Pokemon Center interior",match_hearthome_center_interior},
         {"hearthome-fantina","Hearthome Contest Hall sign + roof emblem (Fantina)",match_hearthome_contest_fantina},
+        {"veilstone-city-passage","Veilstone city passage before the west turn",match_veilstone_city_passage},
+        {"veilstone-dawn-stairs","Veilstone western stairs toward Dawn",match_veilstone_dawn_stairs},
         {"hearthome-gym","Hearthome Gym doorway (arch + facade)",match_hearthome_gym_entrance},
         {"route208-stair-top","Route 208 stair-top rocks",match_route208_stair_top},
+        {"route209-repel-point","Route 209 Repel renewal point",match_route209_repel_point},
+        {"route215-jogger-corner","Route 215 east corner beyond the jogger",match_route215_jogger_corner},
+        {"route215-bridge-renewal","Route 215 west bridge renewal",match_route215_bridge_renewal},
+        {"route215-ace-renewal","Route 215 renewal before Ace Trainers",match_route215_ace_renewal},
+        {"route215-derek-stairs-renewal","Route 215 renewal below Derek stairs",match_route215_derek_stairs_renewal},
+        {"route215-derek-stair-top-renewal","Route 215 renewal above Derek stairs",match_route215_derek_stair_top_renewal},
         {"route208-hannah-departure","Route 208 field after Hannah",match_route208_hannah_departure},
         {"eterna-gym","Eterna Gym doorway",match_eterna_gym_entrance},
         {"galactic-hq-jupiter","Galactic HQ Jupiter interaction",match_galactic_hq_jupiter},

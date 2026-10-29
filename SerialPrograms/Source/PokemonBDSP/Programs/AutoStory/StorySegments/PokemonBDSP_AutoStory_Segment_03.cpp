@@ -9,7 +9,9 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include <chrono>
+#include <cmath>
 #include <functional>
+#include <vector>
 #include "CommonFramework/Globals.h"
 #include "CommonTools/VisualDetectors/ImageMatchDetector.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
@@ -20,6 +22,7 @@
 #include "../Detect/PokemonBDSP_AutoStory_OverworldDetector.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "../Utils/PokemonBDSP_AutoStory_Segment_00_tools.h"
+#include "../Utils/PokemonBDSP_OverworldMatchers.h"
 #include "../Utils/PokemonBDSP_Autostory_Segment_01_tools.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
@@ -32,11 +35,6 @@ using namespace std::chrono_literals;
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
-            static void segment03_route_battle(VideoStream& stream, ProControllerContext& context,
-                const std::string& label, bool post_battle_dialogue_cleanup = false) {
-                fight_trainer_using_moves(stream,context,2,label,post_battle_dialogue_cleanup);
-            }
-
     static void segment03_finish_transition(VideoStream& stream, ProControllerContext& context,
         const std::string& label) {
         BlackScreenWatcher visible(COLOR_RED,{0.1,0.1,0.8,0.8},
@@ -104,7 +102,7 @@ namespace PokemonBDSP{
                 label+": Expected trainer encounter did not start.",stream);
         }
         stream.log("["+label+"] Encounter detected; route movement cancelled.");
-        segment03_route_battle(stream,context,label,false);
+        fight_trainer_using_moves(stream, context, 2, label, false);
     }
 
     static void segment03_wait_image(VideoStream& stream, ProControllerContext& context,
@@ -199,7 +197,7 @@ namespace PokemonBDSP{
                 pbf_wait(ctx,rest);
             },{{black},{white},{battle}});
         if (result==2) {
-            segment03_route_battle(stream,context,label+" encounter");
+            fight_trainer_using_moves(stream, context, 2, label+" encounter", false);
             return false;
         }
         if (result<0) {
@@ -342,8 +340,7 @@ namespace PokemonBDSP{
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "Cycling Road: Expected at least three battles before the south gate.",stream);
             }
-            segment03_route_battle(stream,context,
-                "Cycling Road encounter "+std::to_string(completed+1),false);
+            fight_trainer_using_moves(stream, context, 2, "Cycling Road encounter "+std::to_string(completed+1), false);
             ++completed;
             stream.log("[Cycling Road] Completed battles: "+std::to_string(completed)+"/4.");
         }
@@ -387,7 +384,7 @@ namespace PokemonBDSP{
 
     void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context) {
         auto fight=[&](const std::string& label, bool post_battle_dialogue_cleanup = false) {
-            segment03_route_battle(stream,context,label+" (Flamethrower)",post_battle_dialogue_cleanup);
+            fight_trainer_using_moves(stream, context, 2, label, post_battle_dialogue_cleanup);
         };
                 pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1060ms, 0ms);
                 pbf_wait(context, 225ms);
@@ -988,7 +985,7 @@ namespace PokemonBDSP{
                     continue;
                 }
             }
-            segment03_route_battle(stream,context,"Route 208 Hiker");
+            fight_trainer_using_moves(stream, context, 2, "Route 208 Hiker", false);
             if (++bridge_battles>2)
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "Route 208 bridge: Unexpected additional Hiker battle.",stream);
@@ -1241,559 +1238,829 @@ namespace PokemonBDSP{
         if (wait_until(stream,context,10s,{{hall_start}})!=0)
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 "Hearthome Contest Hall checkpoint start: Overworld not ready.",stream);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1830ms, 0ms);
-        pbf_wait(context, 144ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1880ms, 0ms);
-        pbf_wait(context, 81ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 609ms, 0ms);
-        pbf_wait(context, 73ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 2014ms, 0ms);
-        pbf_wait(context, 186ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1744ms, 0ms);
-        pbf_wait(context, 14ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 411ms, 0ms);
-        pbf_wait(context, 164ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1944ms, 0ms);
-        pbf_wait(context, 226ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1142ms, 0ms);
-        pbf_wait(context, 539ms);
-        segment03_route_battle(stream,context,"Barry in Hearthome");
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 877ms, 0ms);
-        pbf_wait(context, 55ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 2561ms, 0ms);
-        pbf_wait(context, 25ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 344ms, 0ms);
-        pbf_wait(context, 203ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 518ms, 0ms);
-        pbf_wait(context, 1655ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1906ms, 0ms);
-        pbf_wait(context, 1761ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 878ms, 0ms);
-        pbf_wait(context, 1967ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1366ms, 0ms);
-        pbf_wait(context, 167ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 450ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, 1.000000}, 250ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 244ms, 0ms);
-        pbf_wait(context, 77ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 143ms, 0ms);
-        pbf_wait(context, 71ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 232ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, 1.000000}, 261ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 206ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, 1.000000}, 142ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 278ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, 1.000000}, 225ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 3015ms, 0ms);
+        // butters' recorded Contest Hall-to-rival route.
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1294ms, 0ms);
+        pbf_wait(context, 132ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 3255ms, 0ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 2666ms, 0ms);
+        pbf_wait(context, 62ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2068ms, 0ms);
+        pbf_wait(context, 456ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1065ms, 0ms);
+        fight_trainer_using_moves(stream, context, std::vector<size_t>{2, 1}, "Barry in Hearthome", true);
+        // butters' recorded rival-to-Lost Tower route.
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1088ms, 0ms);
         pbf_wait(context, 95ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1122ms, 0ms);
-        pbf_wait(context, 9ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1523ms, 0ms);
-        pbf_wait(context, 14ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 626ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, 1.000000}, 28ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 300ms, 0ms);
-        pbf_wait(context, 110ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1079ms, 0ms);
-        pbf_wait(context, 189ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 322ms, 0ms);
-        pbf_wait(context, 344ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 90ms, 0ms);
-        pbf_wait(context, 777ms);
         context.wait_for_all_requests();
-    }
-    static void lost_tower(VideoStream& stream, ProControllerContext& context) {
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 745ms, 0ms);
-        pbf_wait(context, 100ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 994ms, 0ms);
-        pbf_wait(context, 94ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1179ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, 1.000000}, 193ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 884ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1382ms, 0ms);
-        pbf_wait(context, 524ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1750ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, 1.000000}, 145ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 116ms, 0ms);
-        pbf_wait(context, 373ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 321ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, 1.000000}, 212ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 202ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, 1.000000}, 132ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 212ms, 0ms);
-        pbf_wait(context, 1507ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 403ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, 1.000000}, 210ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 244ms, 0ms);
-        pbf_wait(context, 56ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 567ms, 0ms);
-        pbf_wait(context, 855ms);
-        pbf_press_button(context, BUTTON_X, 212ms, 0ms);
-        pbf_wait(context, 683ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 184ms, 0ms);
-        pbf_wait(context, 415ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 129ms, 0ms);
-        pbf_wait(context, 190ms);
-        pbf_press_button(context, BUTTON_A, 196ms, 0ms);
-        pbf_wait(context, 1326ms);
-        pbf_press_button(context, BUTTON_A, 144ms, 0ms);
-        pbf_wait(context, 591ms);
-        pbf_press_button(context, BUTTON_A, 142ms, 0ms);
-        pbf_wait(context, 1017ms);
-        pbf_press_button(context, BUTTON_A, 160ms, 0ms);
-        pbf_wait(context, 411ms);
-        pbf_press_button(context, BUTTON_B, 190ms, 0ms);
-        pbf_wait(context, 594ms);
-        pbf_press_button(context, BUTTON_B, 172ms, 0ms);
-        pbf_wait(context, 190ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 317ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, 1.000000}, 266ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 76ms, 0ms);
-        pbf_wait(context, 424ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 265ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, 1.000000}, 61ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 280ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, 1.000000}, 144ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 814ms, 0ms);
-        pbf_wait(context, 1386ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 944ms, 0ms);
-        pbf_wait(context, 390ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 347ms, 0ms);
-        pbf_wait(context, 236ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 450ms, 0ms);
-        pbf_wait(context, 400ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 581ms, 0ms);
-        pbf_wait(context, 8ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 964ms, 0ms);
-        pbf_wait(context, 129ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 215ms, 0ms);
-        pbf_wait(context, 390ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1092ms, 0ms);
-        pbf_wait(context, 129ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1353ms, 0ms);
-        pbf_wait(context, 276ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 193ms, 0ms);
-        pbf_wait(context, 535ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 711ms, 0ms);
-        pbf_wait(context, 123ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 746ms, 0ms);
-        pbf_wait(context, 1670ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1114ms, 0ms);
-        pbf_wait(context, 474ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 175ms, 0ms);
-        pbf_wait(context, 377ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 828ms, 0ms);
-        pbf_wait(context, 366ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 165ms, 0ms);
-        pbf_wait(context, 274ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1012ms, 0ms);
-        pbf_wait(context, 1860ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 900ms, 0ms);
-        pbf_wait(context, 1078ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1089ms, 0ms);
-        pbf_wait(context, 711ms);
-        segment03_route_battle(stream,context,"Lost Tower trainers");
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 245ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, 1.000000}, 167ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 228ms, 0ms);
-        pbf_wait(context, 455ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 817ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, 1.000000}, 47ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 853ms, 0ms);
-        pbf_wait(context, 13884ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1010ms, 0ms);
-        pbf_wait(context, 2229ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 261ms, 0ms);
-        pbf_wait(context, 887ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 60ms, 0ms);
-        pbf_wait(context, 420ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1567ms, 0ms);
-        pbf_wait(context, 173ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 578ms, 0ms);
-        pbf_wait(context, 53ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 308ms, 0ms);
-        pbf_wait(context, 54ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 451ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, 1.000000}, 126ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 33ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, 1.000000}, 85ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 883ms, 0ms);
-        pbf_wait(context, 1309ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 419ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, -1.000000}, 44ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 300ms, 0ms);
-        pbf_wait(context, 371ms);
-        pbf_press_button(context, BUTTON_A, 181ms, 0ms);
-        pbf_wait(context, 136ms);
-        pbf_press_button(context, BUTTON_A, 177ms, 0ms);
-        pbf_wait(context, 137ms);
-        pbf_press_button(context, BUTTON_A, 146ms, 0ms);
-        pbf_wait(context, 286ms);
-        pbf_press_button(context, BUTTON_A, 150ms, 0ms);
-        pbf_wait(context, 175ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 310ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, -1.000000}, 124ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 377ms, 0ms);
-        pbf_wait(context, 320ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 327ms, 0ms);
-        pbf_wait(context, 118ms);
-        pbf_press_button(context, BUTTON_A, 213ms, 0ms);
-        pbf_wait(context, 173ms);
-        pbf_press_button(context, BUTTON_A, 205ms, 0ms);
-        pbf_wait(context, 106ms);
-        pbf_press_button(context, BUTTON_A, 170ms, 0ms);
-        pbf_wait(context, 115ms);
-        pbf_press_button(context, BUTTON_A, 177ms, 0ms);
-        pbf_wait(context, 145ms);
-        pbf_press_button(context, BUTTON_A, 194ms, 0ms);
-        pbf_wait(context, 334ms);
-        pbf_press_button(context, BUTTON_A, 217ms, 0ms);
-        pbf_wait(context, 174ms);
-        pbf_press_button(context, BUTTON_A, 190ms, 0ms);
-        pbf_wait(context, 234ms);
-        pbf_press_button(context, BUTTON_A, 233ms, 0ms);
-        pbf_wait(context, 119ms);
-        pbf_press_button(context, BUTTON_A, 201ms, 0ms);
-        pbf_wait(context, 133ms);
-        pbf_press_button(context, BUTTON_A, 195ms, 0ms);
-        pbf_wait(context, 123ms);
-        pbf_press_button(context, BUTTON_A, 214ms, 0ms);
-        pbf_wait(context, 109ms);
-        pbf_press_button(context, BUTTON_B, 217ms, 0ms);
-        pbf_wait(context, 157ms);
-        pbf_press_button(context, BUTTON_B, 162ms, 0ms);
-        pbf_wait(context, 523ms);
-        pbf_press_button(context, BUTTON_B, 192ms, 0ms);
-        pbf_wait(context, 79ms);
-        pbf_press_button(context, BUTTON_B, 132ms, 0ms);
-        pbf_wait(context, 115ms);
-        pbf_press_button(context, BUTTON_B, 126ms, 0ms);
-        pbf_wait(context, 211ms);
-        pbf_press_button(context, BUTTON_B, 156ms, 0ms);
-        pbf_wait(context, 528ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 156ms, 0ms);
-        pbf_wait(context, 559ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 171ms, 0ms);
-        pbf_wait(context, 65ms);
-        pbf_press_button(context, BUTTON_A, 204ms, 0ms);
-        pbf_wait(context, 172ms);
-        pbf_press_button(context, BUTTON_A, 177ms, 0ms);
-        pbf_wait(context, 113ms);
-        pbf_press_button(context, BUTTON_A, 173ms, 0ms);
-        pbf_wait(context, 92ms);
-        pbf_press_button(context, BUTTON_A, 158ms, 0ms);
-        pbf_wait(context, 102ms);
-        pbf_press_button(context, BUTTON_A, 168ms, 0ms);
-        pbf_wait(context, 104ms);
-        pbf_press_button(context, BUTTON_A, 179ms, 0ms);
-        pbf_wait(context, 106ms);
-        pbf_press_button(context, BUTTON_A, 194ms, 0ms);
-        pbf_wait(context, 402ms);
-        pbf_press_button(context, BUTTON_A, 182ms, 0ms);
-        pbf_wait(context, 390ms);
-        pbf_press_button(context, BUTTON_A, 193ms, 0ms);
-        pbf_wait(context, 571ms);
-        pbf_press_button(context, BUTTON_A, 213ms, 0ms);
-        pbf_wait(context, 2265ms);
-        pbf_press_button(context, BUTTON_A, 218ms, 0ms);
-        pbf_wait(context, 934ms);
-        pbf_press_button(context, BUTTON_A, 232ms, 0ms);
-        pbf_wait(context, 171ms);
-        pbf_press_button(context, BUTTON_A, 180ms, 0ms);
-        pbf_wait(context, 488ms);
-        pbf_press_button(context, BUTTON_A, 229ms, 0ms);
-        pbf_wait(context, 154ms);
-        pbf_press_button(context, BUTTON_A, 193ms, 0ms);
-        pbf_wait(context, 287ms);
-        pbf_press_button(context, BUTTON_A, 199ms, 0ms);
-        pbf_wait(context, 855ms);
-        pbf_press_button(context, BUTTON_A, 249ms, 0ms);
-        pbf_wait(context, 594ms);
-        pbf_press_button(context, BUTTON_A, 218ms, 0ms);
-        pbf_wait(context, 172ms);
-        pbf_press_button(context, BUTTON_A, 172ms, 0ms);
-        pbf_wait(context, 363ms);
-        pbf_press_button(context, BUTTON_A, 207ms, 0ms);
-        pbf_wait(context, 1485ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 400ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, 1.000000}, 49ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 652ms, 0ms);
-        pbf_wait(context, 69ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 89ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, 1.000000}, 126ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 149ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, 1.000000}, 101ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 104ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, 1.000000}, 24ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 152ms, 0ms);
+        // Cancel at each gate fade, then allow a defined settling wait.
+        BlackScreenWatcher east_gate_entry;
+        if (run_until<ProControllerContext>(stream,context,
+            [](ProControllerContext& ctx) {
+                pbf_move_left_joystick(ctx,{1,0},3446ms,0ms);
+                pbf_wait(ctx,983ms);
+            },{{east_gate_entry}})!=0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Hearthome east gate: Entrance transition did not start.",stream);
+        BlackScreenWatcher east_gate_entry_finished(COLOR_RED,{.1,.1,.8,.8},
+            100,10,BlackScreenWatcher::FinderType::GONE,500ms);
+        if (wait_until(stream,context,30s,{{east_gate_entry_finished}})!=0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Hearthome east gate: Entrance transition did not finish.",stream);
+        pbf_wait(context,983ms);
         context.wait_for_all_requests();
-    }
-    void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& context) {
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 501ms, 0ms);
-        pbf_wait(context, 303ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 527ms, 0ms);
-        pbf_wait(context, 243ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 221ms, 0ms);
-        pbf_wait(context, 546ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1208ms, 0ms);
-        pbf_wait(context, 177ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 171ms, 0ms);
-        pbf_wait(context, 177ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 2245ms, 0ms);
-        pbf_wait(context, 487ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 523ms, 0ms);
-        pbf_wait(context, 196ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 854ms, 0ms);
-        pbf_wait(context, 378ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 205ms, 0ms);
-        pbf_wait(context, 273ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 792ms, 0ms);
-        pbf_wait(context, 2437ms);
-        if (!heal_pokemon(stream,context,"Solaceon")) OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT,"Solaceon Center exit not confirmed.",stream);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 181ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, -1.000000}, 192ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 448ms, 0ms);
-        pbf_wait(context, 13ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 811ms, 0ms);
-        pbf_wait(context, 49ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 549ms, 0ms);
-        pbf_wait(context, 391ms);
-        pbf_press_button(context, BUTTON_B, 175ms, 0ms);
-        pbf_wait(context, 222ms);
-        pbf_press_button(context, BUTTON_B, 141ms, 0ms);
-        pbf_wait(context, 781ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 180ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -1.000000}, 38ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1070ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -1.000000}, 17ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 186ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -1.000000}, 35ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 191ms, 0ms);
-        pbf_wait(context, 31ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 323ms, 0ms);
-        pbf_wait(context, 3187ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 795ms, 0ms);
-        pbf_wait(context, 72ms);
-        pbf_press_button(context, BUTTON_A, 178ms, 0ms);
-        pbf_wait(context, 540ms);
-        pbf_press_button(context, BUTTON_A, 159ms, 0ms);
-        pbf_wait(context, 655ms);
-        pbf_press_button(context, BUTTON_A, 168ms, 0ms);
-        pbf_wait(context, 1683ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 163ms, 0ms);
-        pbf_wait(context, 2372ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 160ms, 0ms);
-        pbf_wait(context, 454ms);
-        pbf_press_button(context, BUTTON_A, 165ms, 0ms);
-        pbf_wait(context, 1591ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 147ms, 0ms);
-        pbf_wait(context, 853ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 91ms, 0ms);
-        pbf_wait(context, 389ms);
-        pbf_press_button(context, BUTTON_A, 162ms, 0ms);
-        pbf_wait(context, 438ms);
-        pbf_press_button(context, BUTTON_A, 160ms, 0ms);
-        pbf_wait(context, 106ms);
-        pbf_press_button(context, BUTTON_A, 144ms, 0ms);
-        pbf_wait(context, 287ms);
-        pbf_press_button(context, BUTTON_A, 169ms, 0ms);
-        pbf_wait(context, 534ms);
-        pbf_press_button(context, BUTTON_A, 160ms, 0ms);
-        pbf_wait(context, 655ms);
-        pbf_press_button(context, BUTTON_B, 211ms, 0ms);
-        pbf_wait(context, 473ms);
-        pbf_press_button(context, BUTTON_B, 168ms, 0ms);
-        pbf_wait(context, 401ms);
-        pbf_press_button(context, BUTTON_B, 175ms, 0ms);
-        pbf_wait(context, 439ms);
-        pbf_press_button(context, BUTTON_B, 78ms, 0ms);
-        pbf_wait(context, 723ms);
-        pbf_press_button(context, BUTTON_B, 159ms, 0ms);
-        pbf_wait(context, 213ms);
-        pbf_press_button(context, BUTTON_B, 122ms, 0ms);
-        pbf_wait(context, 544ms);
-        pbf_press_button(context, BUTTON_B, 144ms, 0ms);
-        pbf_wait(context, 567ms);
-        pbf_press_button(context, BUTTON_B, 167ms, 0ms);
-        pbf_wait(context, 216ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1117ms, 0ms);
-        pbf_wait(context, 1924ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1610ms, 0ms);
-        pbf_wait(context, 189ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 5877ms, 0ms);
-        pbf_wait(context, 2351ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 383ms, 0ms);
-        pbf_wait(context, 321ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 745ms, 0ms);
-        pbf_wait(context, 3127ms);
-        pbf_press_button(context, BUTTON_A, 213ms, 0ms);
-        pbf_wait(context, 144ms);
-        pbf_press_button(context, BUTTON_A, 184ms, 0ms);
-        pbf_wait(context, 550ms);
-        pbf_press_button(context, BUTTON_A, 211ms, 0ms);
-        pbf_wait(context, 122ms);
-        pbf_press_button(context, BUTTON_A, 188ms, 0ms);
-        pbf_wait(context, 130ms);
-        pbf_press_button(context, BUTTON_A, 160ms, 0ms);
-        pbf_wait(context, 272ms);
-        pbf_press_button(context, BUTTON_A, 168ms, 0ms);
-        pbf_wait(context, 5334ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 159ms, 0ms);
-        pbf_wait(context, 204ms);
-        pbf_press_button(context, BUTTON_A, 170ms, 0ms);
-        pbf_wait(context, 698ms);
-        pbf_press_button(context, BUTTON_A, 195ms, 0ms);
-        pbf_wait(context, 230ms);
-        pbf_press_button(context, BUTTON_A, 169ms, 0ms);
-        pbf_wait(context, 773ms);
-        pbf_press_button(context, BUTTON_X, 212ms, 0ms);
-        pbf_wait(context, 1555ms);
-        pbf_press_button(context, BUTTON_X, 233ms, 0ms);
-        pbf_wait(context, 1255ms);
-        pbf_press_button(context, BUTTON_A, 173ms, 0ms);
-        pbf_wait(context, 1640ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 177ms, 0ms);
-        pbf_wait(context, 278ms);
-        pbf_press_button(context, BUTTON_A, 189ms, 0ms);
-        pbf_wait(context, 506ms);
-        pbf_press_button(context, BUTTON_A, 182ms, 0ms);
-        pbf_wait(context, 700ms);
-        pbf_press_button(context, BUTTON_A, 167ms, 0ms);
-        pbf_wait(context, 869ms);
-        pbf_press_button(context, BUTTON_B, 176ms, 0ms);
-        pbf_wait(context, 356ms);
-        pbf_press_button(context, BUTTON_B, 211ms, 0ms);
-        pbf_wait(context, 257ms);
-        pbf_press_button(context, BUTTON_B, 158ms, 0ms);
-        pbf_wait(context, 496ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1677ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, 1.000000}, 14ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 2254ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, 1.000000}, 11ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 2190ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, 1.000000}, 1ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 3839ms, 0ms);
-        pbf_wait(context, 98ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1963ms, 0ms);
-        pbf_wait(context, 13ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1099ms, 0ms);
-        pbf_wait(context, 235ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 2766ms, 0ms);
-        pbf_wait(context, 40ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1652ms, 0ms);
-        pbf_wait(context, 30ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 839ms, 0ms);
-        pbf_wait(context, 98ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 725ms, 0ms);
+
+        BlackScreenWatcher east_gate_exit;
+        if (run_until<ProControllerContext>(stream,context,
+            [](ProControllerContext& ctx) {
+                pbf_move_left_joystick(ctx,{1,0},2095ms,0ms);
+                pbf_wait(ctx,1660ms);
+            },{{east_gate_exit}})!=0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Hearthome east gate: Exit transition did not start.",stream);
+        BlackScreenWatcher east_gate_exit_finished(COLOR_RED,{.1,.1,.8,.8},
+            100,10,BlackScreenWatcher::FinderType::GONE,500ms);
+        if (wait_until(stream,context,30s,{{east_gate_exit_finished}})!=0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Hearthome east gate: Exit transition did not finish.",stream);
+        pbf_wait(context,1660ms);
+        context.wait_for_all_requests();
+        stream.log("[Hearthome east gate] Entry and exit transitions finished.",COLOR_GREEN);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1128ms, 0ms);
+        pbf_wait(context, 7266ms);
+        // Use the existing Bag helper instead of replaying recorded menu inputs.
+        if (!activate_repel(stream, context, 8, 0))
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Route 209: Repel activation failed.", stream);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1412ms, 0ms);
         pbf_wait(context, 77ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 824ms, 0ms);
-        pbf_wait(context, 356ms);
-        segment03_route_battle(stream,context,"Route 215 first trainer");
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 2350ms, 0ms);
-        pbf_wait(context, 56ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2095ms, 0ms);
-        pbf_wait(context, 69ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 747ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, 1.000000}, 10ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1434ms, 0ms);
-        pbf_wait(context, 41ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1993ms, 0ms);
-        pbf_wait(context, 55ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1542ms, 0ms);
-        pbf_wait(context, 192ms);
-        pbf_press_button(context, BUTTON_A, 174ms, 0ms);
-        pbf_wait(context, 841ms);
-        pbf_press_button(context, BUTTON_A, 184ms, 0ms);
-        pbf_wait(context, 549ms);
-        pbf_press_button(context, BUTTON_A, 177ms, 0ms);
-        pbf_wait(context, 261ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 541ms, 0ms);
-        pbf_wait(context, 6ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 562ms, 0ms);
-        pbf_wait(context, 42ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 520ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -1.000000}, 77ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 166ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -1.000000}, 37ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 647ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, 1.000000}, 15ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1062ms, 0ms);
-        pbf_wait(context, 197ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1426ms, 0ms);
-        pbf_wait(context, 5ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 676ms, 0ms);
-        pbf_wait(context, 9ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 2523ms, 0ms);
-        pbf_wait(context, 471ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 378ms, 0ms);
-        pbf_wait(context, 488ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 943ms, 0ms);
-        pbf_wait(context, 272ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 127ms, 0ms);
-        pbf_wait(context, 380ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 920ms, 0ms);
-        pbf_wait(context, 92ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1115ms, 0ms);
-        pbf_wait(context, 16ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 144ms, 0ms);
-        pbf_wait(context, 480ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 613ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -1.000000}, 10ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 320ms, 0ms);
-        pbf_wait(context, 56ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 778ms, 0ms);
-        pbf_wait(context, 476ms);
-        segment03_route_battle(stream,context,"Route 215 Ace Trainers");
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 4051ms, 0ms);
-        pbf_wait(context, 1256ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1047ms, 0ms);
-        pbf_wait(context, 503ms);
-        pbf_press_button(context, BUTTON_B, 189ms, 0ms);
-        pbf_wait(context, 222ms);
-        pbf_press_button(context, BUTTON_B, 183ms, 0ms);
-        pbf_wait(context, 637ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1824ms, 0ms);
-        pbf_wait(context, 1256ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 2226ms, 0ms);
-        pbf_wait(context, 891ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1678ms, 0ms);
-        pbf_wait(context, 70ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1496ms, 0ms);
-        pbf_wait(context, 54ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1179ms, 0ms);
-        pbf_wait(context, 21ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 2448ms, 0ms);
-        pbf_wait(context, 54ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1574ms, 0ms);
-        pbf_wait(context, 58ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 3675ms, 0ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1878ms, 0ms);
+        pbf_wait(context, 100ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1246ms, 0ms);
+        pbf_wait(context, 522ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 3110ms, 0ms);
+        pbf_wait(context, 322ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1245ms, 0ms);
+        pbf_wait(context, 89ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 3634ms, 0ms);
+        pbf_wait(context, 966ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 2378ms, 0ms);
+        pbf_wait(context, 310ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 612ms, 0ms);
+        pbf_wait(context, 1001ms);
+        context.wait_for_all_requests();
+        // butters' marked road pose: sign frame and rock pair.
+        align_to_overworld_landmarks(stream, context, match_route209_repel_point,
+            "Route 209 Repel point before expiry", false, true);
+        force_repel_expiry(stream, context, RepelRenewalChoice::YES, false, true);
+        align_to_overworld_landmarks(stream, context, match_route209_repel_point,
+            "Route 209 Repel point after renewal", false, true);
+
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1345ms, 0ms);
+        pbf_wait(context, 309ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 789ms, 0ms);
+        pbf_wait(context, 456ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1100ms, 0ms);
+        pbf_wait(context, 122ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1040ms, 0ms);
         pbf_wait(context, 93ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 666ms, 0ms);
-        pbf_wait(context, 69ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1757ms, 0ms);
-        pbf_wait(context, 57ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 3227ms, 0ms);
-        pbf_wait(context, 4788ms);
-        pbf_press_button(context, BUTTON_A, 182ms, 0ms);
-        pbf_wait(context, 388ms);
-        pbf_press_button(context, BUTTON_A, 211ms, 0ms);
-        pbf_wait(context, 176ms);
-        pbf_press_button(context, BUTTON_A, 172ms, 0ms);
-        pbf_wait(context, 509ms);
-        pbf_press_button(context, BUTTON_A, 198ms, 0ms);
-        pbf_wait(context, 255ms);
-        pbf_press_button(context, BUTTON_A, 170ms, 0ms);
-        pbf_wait(context, 408ms);
-        pbf_press_button(context, BUTTON_A, 212ms, 0ms);
-        pbf_wait(context, 189ms);
-        pbf_press_button(context, BUTTON_A, 166ms, 0ms);
-        pbf_wait(context, 458ms);
-        pbf_press_button(context, BUTTON_A, 168ms, 0ms);
-        pbf_wait(context, 3630ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 744ms, 0ms);
-        // The recording ends outside the gym door, facing north.
-        segment03_doorway(stream,context,true,1200ms,"Veilstone Gym entrance");
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1157ms, 0ms);
+        pbf_wait(context, 488ms);
+        // Repel was renewed at the marked road pose; no delayed prompt inputs.
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 835ms, 0ms);
+        pbf_wait(context, 549ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1451ms, 0ms);
+        pbf_wait(context, 901ms);
+        context.wait_for_all_requests();
+        // Normalize the checkpoint boundary with a complete enter/exit cycle.
+        // Cancel movement at each fade so it cannot continue onto the next map.
+        BlackScreenWatcher tower_entry;
+        if (run_until<ProControllerContext>(stream,context,
+            [](ProControllerContext& ctx) {
+                pbf_move_left_joystick(ctx,{0,1},1311ms,0ms);
+                pbf_wait(ctx,3000ms);
+            },{{tower_entry}})!=0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower handoff: Entry transition did not start.",stream);
+        BlackScreenWatcher tower_entry_finished(COLOR_RED,{.1,.1,.8,.8},
+            100,10,BlackScreenWatcher::FinderType::GONE,500ms);
+        if (wait_until(stream,context,30s,{{tower_entry_finished}})!=0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower handoff: Entry transition did not finish.",stream);
+        OverworldWatcher tower_inside;
+        if (wait_until(stream,context,10s,{{tower_inside}})!=0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower handoff: Indoor overworld not ready.",stream);
+
+        BlackScreenWatcher tower_exit;
+        if (run_until<ProControllerContext>(stream,context,
+            [](ProControllerContext& ctx) {
+                pbf_move_left_joystick(ctx,{0,-1},1311ms,0ms);
+                pbf_wait(ctx,3000ms);
+            },{{tower_exit}})!=0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower handoff: Exit transition did not start.",stream);
+        BlackScreenWatcher tower_exit_finished(COLOR_RED,{.1,.1,.8,.8},
+            100,10,BlackScreenWatcher::FinderType::GONE,500ms);
+        if (wait_until(stream,context,30s,{{tower_exit_finished}})!=0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower handoff: Exit transition did not finish.",stream);
+        OverworldWatcher tower_outside;
+        if (wait_until(stream,context,10s,{{tower_outside}})!=0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower handoff: Outdoor overworld not ready.",stream);
+        context.wait_for_all_requests();
+        stream.log("[Lost Tower handoff] Outside doorway, facing south; checkpoint complete.",COLOR_GREEN);
+    }
+    void lost_tower(VideoStream& stream, ProControllerContext& context) {
+        // Checkpoint 03.06 starts outside the doorway, facing south, with Repel active.
+        // Turn north, then enter using the same single-step timing as Segment 02.
+        context.wait_for_all_requests();
+        BlackScreenWatcher entering_tower;
+        if (run_until<ProControllerContext>(stream, context,
+            [](ProControllerContext& ctx) {
+                for (int i = 0; i < 2; i++) {
+                    pbf_press_dpad(ctx, DPAD_UP, 80ms, 300ms);
+                }
+                pbf_wait(ctx, 2389ms);
+            }, {{entering_tower}}) != 0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower entry: Transition did not start.", stream);
+        BlackScreenWatcher tower_entry_finished(COLOR_RED, {.1,.1,.8,.8},
+            100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
+        if (wait_until(stream, context, 30s, {{tower_entry_finished}}) != 0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower entry: Transition did not finish.", stream);
+        pbf_wait(context, 500ms);
+        context.wait_for_all_requests();
+        OverworldWatcher tower_entry_ready;
+        if (wait_until(stream, context, 10s, {{tower_entry_ready}}) != 0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower entry: Overworld not ready.", stream);
+
+        // butters' route, using the same counted D-pad steps as the Eterna Gym.
+        // Counts include one facing press whenever the commanded direction changes.
+        // Keep the same direction across a dialogue stop without another facing press.
+        struct Move {
+            DpadPosition dir;
+            int count;
+        };
+        const Move to_floor2[] = {
+            {DPAD_UP, 4},
+            {DPAD_LEFT, 4},
+            {DPAD_UP, 6},
+            {DPAD_LEFT, 2},
+            {DPAD_UP, 3},
+            {DPAD_RIGHT, 2},
+        };
+        BlackScreenWatcher stairs_to_floor2;
+        if (run_until<ProControllerContext>(stream, context,
+            [&](ProControllerContext& ctx) {
+                for (const auto& move : to_floor2) {
+                    for (int i = 0; i < move.count; i++) {
+                        pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
+                    }
+                }
+                // Keep watching if the last step starts a delayed stair fade.
+                pbf_wait(ctx, 3000ms);
+            }, {{stairs_to_floor2}}) != 0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower floor 2: Stair transition did not start.", stream);
+        segment03_finish_transition(stream, context, "Lost Tower floor 2");
+        OverworldWatcher floor2_ready;
+        if (wait_until(stream, context, 10s, {{floor2_ready}}) != 0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower floor 2: Overworld not ready after stairs.", stream);
+
+        const Move to_floor3[] = {
+            {DPAD_DOWN, 12},
+            {DPAD_LEFT, 6},
+            {DPAD_UP, 2},
+            // Includes the extra left step to clear the gravestone column.
+            {DPAD_LEFT, 8},
+            {DPAD_UP, 8},
+            {DPAD_RIGHT, 2},
+            {DPAD_UP, 4},
+            {DPAD_RIGHT, 4},
+        };
+        BlackScreenWatcher stairs_to_floor3;
+        if (run_until<ProControllerContext>(stream, context,
+            [&](ProControllerContext& ctx) {
+                for (const auto& move : to_floor3) {
+                    for (int i = 0; i < move.count; i++) {
+                        pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
+                    }
+                }
+                // Keep watching if the last step starts a delayed stair fade.
+                pbf_wait(ctx, 3000ms);
+            }, {{stairs_to_floor3}}) != 0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower floor 3: Stair transition did not start.", stream);
+        segment03_finish_transition(stream, context, "Lost Tower floor 3");
+        OverworldWatcher floor3_ready;
+        if (wait_until(stream, context, 10s, {{floor3_ready}}) != 0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower floor 3: Overworld not ready after stairs.", stream);
+
+        const Move to_repel[] = {
+            {DPAD_DOWN, 6},
+        };
+        bool repel_renewed = false;
+        ShortDialogDetector pending_repel_dialogue(COLOR_YELLOW);
+        for (const auto& move : to_repel) {
+            for (int i = 0; i < move.count; i++) {
+                // Never queue another step while an expiry prompt is already visible.
+                context.wait_for_all_requests();
+                const auto frame = stream.video().snapshot();
+                if (!frame)
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "Lost Tower Repel: No frame before the next down step.", stream);
+                if (pending_repel_dialogue.detect(*frame.frame)) {
+                    stream.log("[Lost Tower Repel] Pending renewal before down press " +
+                        std::to_string(i + 1) + "; clearing before movement.");
+                    clear_post_battle_dialogue(stream, context, BUTTON_A);
+                    repel_renewed = true;
+                }
+
+                // Watch only one press at a time. Its 80ms hold finishes before the
+                // fresh dialogue watcher's 250ms confirmation can cancel the rest.
+                // The triggering step counts; all subsequent steps remain unqueued.
+                ShortDialogWatcher step_repel_dialogue(COLOR_YELLOW);
+                const int expiry = run_until<ProControllerContext>(stream, context,
+                    [&](ProControllerContext& ctx) {
+                        pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
+                        ctx.wait_for_all_requests();
+                        pbf_wait(ctx, 500ms);
+                    }, {{step_repel_dialogue}});
+                if (expiry == 0) {
+                    stream.log("[Lost Tower Repel] Renewal after down press " +
+                        std::to_string(i + 1) + "/" + std::to_string(move.count) +
+                        "; clearing before the remaining steps.");
+                    clear_post_battle_dialogue(stream, context, BUTTON_A);
+                    repel_renewed = true;
+                }
+                context.wait_for_all_requests();
+            }
+        }
+        // Preserve the bounded final observation if expiry arrives after the last step.
+        if (!repel_renewed) {
+            ShortDialogWatcher late_repel_dialogue(COLOR_YELLOW);
+            if (wait_until(stream, context, 3s, {{late_repel_dialogue}}) == 0) {
+                stream.log("[Lost Tower Repel] Late renewal dialogue detected; accepting renewal.");
+                clear_post_battle_dialogue(stream, context, BUTTON_A);
+            } else {
+                stream.log("[Lost Tower Repel] No renewal dialogue at the recorded stop; continuing.");
+            }
+        }
+
+        const Move to_biker[] = {
+            {DPAD_DOWN, 1},
+            {DPAD_RIGHT, 2},
+            {DPAD_DOWN, 3},
+            {DPAD_LEFT, 2},
+            {DPAD_DOWN, 6},
+            // Clear the gravestone column before beginning the watched up step.
+            {DPAD_LEFT, 5},
+            {DPAD_UP, 2},
+        };
+        for (const auto& move : to_biker) {
+            for (int i = 0; i < move.count; i++) {
+                pbf_press_dpad(context, move.dir, 80ms, 300ms);
+            }
+        }
+        context.wait_for_all_requests();
+        // The final up movement is one facing press and one movement press.
+        // Stop at a trainer prompt before any later path segment is queued.
+        constexpr int BIKER_UP_PRESSES = 2;
+        int biker_up_completed = 0;
+        // A trainer's walk-up can lock movement before the dialogue box appears.
+        ShortDialogWatcher corner_biker_dialogue(COLOR_YELLOW);
+        bool biker_challenged = wait_until(stream, context, 5s, {{corner_biker_dialogue}}) == 0;
+        ShortDialogDetector pending_biker_dialogue(COLOR_YELLOW);
+        while (!biker_challenged && biker_up_completed < BIKER_UP_PRESSES) {
+            context.wait_for_all_requests();
+            const auto frame = stream.video().snapshot();
+            if (!frame)
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Lost Tower biker: No frame before the next up press.", stream);
+            if (pending_biker_dialogue.detect(*frame.frame)) {
+                biker_challenged = true;
+                break;
+            }
+
+            // A fresh 250ms dialogue watch cannot cancel the 80ms hold itself.
+            // Count that press, then preserve any subsequent unqueued presses.
+            ShortDialogWatcher approaching_biker(COLOR_YELLOW);
+            const int challenge = run_until<ProControllerContext>(stream, context,
+                [](ProControllerContext& ctx) {
+                    pbf_press_dpad(ctx, DPAD_UP, 80ms, 300ms);
+                    ctx.wait_for_all_requests();
+                    // Observe the walk-up before another up press can be queued.
+                    pbf_wait(ctx, 5000ms);
+                }, {{approaching_biker}});
+            biker_up_completed++;
+            if (challenge == 0) {
+                biker_challenged = true;
+                break;
+            }
+            context.wait_for_all_requests();
+        }
+        if (biker_challenged) {
+            stream.log("[Lost Tower biker] Dialogue detected after " +
+                std::to_string(biker_up_completed) + " up presses; handling the trainer battle.");
+            fight_trainer_using_moves(stream, context, std::vector<size_t>{2},
+                "Lost Tower biker", false);
+            clear_post_battle_dialogue(stream, context, BUTTON_B);
+
+            // The trainer conversation turns the player toward the biker.
+            // Restore north if its facing press was already used before the battle.
+            if (biker_up_completed > 0) {
+                pbf_press_dpad(context, DPAD_UP, 80ms, 300ms);
+                context.wait_for_all_requests();
+            }
+            for (; biker_up_completed < BIKER_UP_PRESSES; biker_up_completed++) {
+                pbf_press_dpad(context, DPAD_UP, 80ms, 300ms);
+            }
+            context.wait_for_all_requests();
+            stream.log("[Lost Tower biker] North-facing approach complete; resuming the recorded path.");
+        } else {
+            stream.log("[Lost Tower biker] No dialogue; continuing the recorded path.");
+        }
+
+        const Move to_floor4[] = {
+            {DPAD_UP, 1},
+            {DPAD_LEFT, 2},
+            {DPAD_UP, 4},
+            {DPAD_LEFT, 6},
+            {DPAD_UP, 4},
+            {DPAD_RIGHT, 3},
+            {DPAD_UP, 4},
+            {DPAD_RIGHT, 3},
+        };
+        BlackScreenWatcher stairs_to_floor4;
+        if (run_until<ProControllerContext>(stream, context,
+            [&](ProControllerContext& ctx) {
+                for (const auto& move : to_floor4) {
+                    for (int i = 0; i < move.count; i++) {
+                        pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
+                    }
+                }
+                // Keep watching if the last step starts a delayed stair fade.
+                pbf_wait(ctx, 3000ms);
+            }, {{stairs_to_floor4}}) != 0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower floor 4: Stair transition did not start.", stream);
+        segment03_finish_transition(stream, context, "Lost Tower floor 4");
+        OverworldWatcher floor4_ready;
+        if (wait_until(stream, context, 10s, {{floor4_ready}}) != 0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower floor 4: Overworld not ready after stairs.", stream);
+
+        const Move to_floor5[] = {
+            {DPAD_DOWN, 6},
+            {DPAD_LEFT, 8},
+            {DPAD_UP, 3},
+            {DPAD_LEFT, 2},
+            {DPAD_UP, 4},
+            {DPAD_RIGHT, 3},
+        };
+        BlackScreenWatcher stairs_to_floor5;
+        if (run_until<ProControllerContext>(stream, context,
+            [&](ProControllerContext& ctx) {
+                for (const auto& move : to_floor5) {
+                    for (int i = 0; i < move.count; i++) {
+                        pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
+                    }
+                }
+                // Keep watching if the last step starts a delayed stair fade.
+                pbf_wait(ctx, 3000ms);
+            }, {{stairs_to_floor5}}) != 0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower floor 5: Stair transition did not start.", stream);
+        segment03_finish_transition(stream, context, "Lost Tower floor 5");
+        OverworldWatcher floor5_ready;
+        if (wait_until(stream, context, 10s, {{floor5_ready}}) != 0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower floor 5: Overworld not ready after stairs.", stream);
+
+        const Move to_rewards[] = {
+            {DPAD_DOWN, 4},
+            {DPAD_LEFT, 5},
+            {DPAD_DOWN, 3},
+        };
+        for (const auto& move : to_rewards) {
+            for (int i = 0; i < move.count; i++) {
+                pbf_press_dpad(context, move.dir, 80ms, 300ms);
+            }
+        }
+        context.wait_for_all_requests();
+        // Use the Segment 01 conversation pattern: start once, then clear with B.
+        context.wait_for_all_requests();
+        pbf_press_button(context, BUTTON_A, 80ms, 100ms);
+        context.wait_for_all_requests();
+        wait_for_dialogue(stream, context, "Lost Tower reward: First box", 30s);
+        clear_post_battle_dialogue(stream, context, BUTTON_B, 4000ms);
+        stream.log("[Lost Tower reward] Dialogue absent for four seconds; opening the Bag.");
+        if (!use_escape_rope(stream, context, 8))
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower: Escape Rope exit was not confirmed.", stream);
+        // The exterior is visible before the Rope arrival camera finishes settling.
+        // Keep the following south/left movement out of that arrival animation.
+        pbf_wait(context, 5000ms);
+        context.wait_for_all_requests();
+        OverworldWatcher rope_exit_ready;
+        if (wait_until(stream, context, 10s, {{rope_exit_ready}}) != 0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Lost Tower: Overworld not ready after Escape Rope settling.", stream);
+        context.wait_for_all_requests();
+        stream.log("[Lost Tower] Reward dialogue cleared; Escape Rope exit settled.", COLOR_GREEN);
+    }
+
+    void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& context) {
+        // Recorded Tower-to-Gym path; shared helpers handle prompts and battles.
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 336ms, 0ms);
+        pbf_wait(context, 590ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 327ms, 0ms);
+        pbf_wait(context, 590ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 745ms, 0ms);
+        pbf_wait(context, 379ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 77ms, 0ms);
+        pbf_wait(context, 17ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1167ms, 0ms);
+        pbf_wait(context, 1882ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 512ms, 0ms);
+        pbf_wait(context, 171ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 500ms, 0ms);
+        pbf_wait(context, 1767ms);
+        pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 1701ms, 0ms);
+        pbf_press_button(context, BUTTON_PLUS, 181ms, 219ms);
+        // Stay north/south on the open road beside Lost Tower.
+        force_repel_expiry(stream, context, RepelRenewalChoice::YES, true, true);
+        pbf_wait(context, 1767ms);
+        pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 4384ms, 0ms);
+        pbf_wait(context, 1767ms);
+        pbf_press_button(context, BUTTON_PLUS, 181ms, 219ms);
+        pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 1701ms, 0ms);
+        pbf_wait(context, 133ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1379ms, 0ms);
+        pbf_wait(context, 365ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1701ms, 0ms);
+        pbf_wait(context, 133ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 3179ms, 0ms);
+        pbf_wait(context, 76ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 3172ms, 0ms);
+        pbf_wait(context, 28ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 4210ms, 0ms);
+        pbf_wait(context, 421ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 2327ms, 0ms);
+        pbf_wait(context, 71ms);
+        // Expiry can interrupt this eastward leg or the following north turn.
+        // Renew on the clear strip, then repeat the recorded eastward alignment
+        // against the trees before taking the uninterrupted north leg.
+        force_repel_expiry(stream, context, RepelRenewalChoice::YES, false, true);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 2327ms, 0ms);
+        pbf_wait(context, 71ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1028ms, 0ms);
+        pbf_wait(context, 120ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 2480ms, 0ms);
+        pbf_wait(context, 773ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 182ms, 0ms);
+        pbf_wait(context, 567ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 2514ms, 0ms);
+        pbf_wait(context, 86ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 180ms, 0ms);
+        pbf_wait(context, 308ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 137ms, 0ms);
+        pbf_wait(context, 510ms);
+        pbf_wait(context, 1767ms);
+        pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 500ms, 0ms);
+        pbf_wait(context, 510ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 383ms, 0ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 161ms, 0ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 756ms, 0ms);
+        pbf_wait(context, 335ms);
+        // The clear cliff platform permits west/east renewal. Restore its east
+        // edge afterward so a partial expiry pulse cannot offset the bridge approach.
+        force_repel_expiry(stream, context, RepelRenewalChoice::YES, false, true);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 756ms, 0ms);
+        pbf_wait(context, 335ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 2176ms, 0ms);
+        pbf_wait(context, 24ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 826ms, 0ms);
+        pbf_wait(context, 561ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 957ms, 0ms);
+        pbf_wait(context, 621ms);
+        context.wait_for_all_requests();
+        ShortDialogWatcher calvin_dialogue;
+        StartBattleDetector calvin_start(stream.overlay());
+        BattleMenuWatcher calvin_menu(BattleType::TRAINER);
+        if (run_until<ProControllerContext>(stream,context,
+            [](ProControllerContext& ctx){
+                pbf_move_left_joystick(ctx,{1.000000,0.000000},794ms,0ms);
+                pbf_wait(ctx,15000ms);
+            },{{calvin_dialogue},{calvin_start},{calvin_menu}})<0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Route 215 Calvin: Trainer encounter did not start.",stream);
+        fight_trainer_using_moves(stream, context, std::vector<size_t>{2},
+            "Route 215 Ruin Maniac Calvin", false);
+        // Renew in the clear area after Calvin, before the next walking strip.
+        force_repel_expiry(stream, context, RepelRenewalChoice::YES, false, true);
+        // Cover at most one unfinished 500ms westward expiry pulse.
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1582ms, 0ms);
+        pbf_wait(context, 406ms);
+        // The item occupies lane 2. Search only lanes 4 and 3 (numbered from the top).
+        // Every D-pad press is observed separately: facing changes must not become
+        // an unverified extra step north. Fixed scenery measures eastward progress.
+        ShortDialogDetector jogger_dialogue;
+        BattleMenuDetector jogger_battle(BattleType::TRAINER, COLOR_GREEN);
+        BlackScreenDetector jogger_transition;
+        constexpr double lane_pitch=70.0/1080;
+        constexpr double lane_tolerance=1.0/54;
+        size_t missing_pose=0, stale_frames=0, stalled=0, lane_changes=0, lane_presses=0, arrival_frames=0, jogger_battles=0;
+        int changing_to=0;
+        bool east_pending=false, last_coarse=false, corner_ready=false;
+        double last_x=0;
+        Milliseconds bypass_movement=0ms;
+        WallClock fresh_after=current_time(), last_frame_time=WallClock::min();
+        auto bypass_started=std::chrono::steady_clock::now();
+        for (size_t observation=0;observation<120;observation++){
+            context.throw_if_cancelled();
+            context.wait_for_all_requests();
+            if (std::chrono::steady_clock::now()-bypass_started>90s)
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Route 215 jogger: Lane search timed out.",stream);
+            const auto frame=stream.video().snapshot();
+            if (!frame)
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Route 215 jogger: No video frame.",stream);
+            if (frame.timestamp<=fresh_after || frame.timestamp<=last_frame_time){
+                if (++stale_frames>=8)
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "Route 215 jogger: Video is not advancing after movement.",stream);
+                pbf_wait(context,500ms);
+                continue;
+            }
+            last_frame_time=frame.timestamp;stale_frames=0;
+            if (jogger_dialogue.detect(*frame.frame) || jogger_battle.detect(*frame.frame)){
+                if (++jogger_battles>1)
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "Route 215 jogger: Repeated unexpected encounter.",stream);
+                // The recorded failure is the jogger's trainer introduction.
+                // Complete it with the shared move-list handler, then measure
+                // the current lane again; the trainer may have approached us.
+                fight_trainer_using_moves(stream,context,std::vector<size_t>{2},
+                    "Route 215 jogger",false);
+                context.wait_for_all_requests();fresh_after=current_time();
+                last_frame_time=WallClock::min();
+                missing_pose=0;stale_frames=0;stalled=0;arrival_frames=0;
+                changing_to=0;lane_presses=0;east_pending=false;
+                bypass_started=std::chrono::steady_clock::now();
+                continue;
+            }
+            if (jogger_transition.detect(*frame.frame))
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Route 215 jogger: Unexpected transition.",stream);
+            const auto pose=match_route215_jogger_corner(*frame.frame);
+            for (const auto& anchor : pose.landmarks)
+                stream.log("[Route 215 jogger] "+anchor.name+" score="+std::to_string(anchor.score)+
+                    ", margin="+std::to_string(anchor.margin)+", accepted="+std::to_string(anchor.accepted)+
+                    ", offset=("+std::to_string(anchor.dx)+","+std::to_string(anchor.dy)+")");
+            const int lane=pose.located && std::abs(pose.dy)<=lane_tolerance ? 4 :
+                pose.located && std::abs(pose.dy-lane_pitch)<=lane_tolerance ? 3 : 0;
+            stream.log("[Route 215 jogger] lane="+std::to_string(lane)+
+                ", coarse="+std::to_string(pose.coarse)+", offset=("+
+                std::to_string(pose.dx)+","+std::to_string(pose.dy)+")");
+            if (!lane){
+                // Wait out rain/clouds or a settling step; never search vertically
+                // from a missing or ambiguous pose, including after a blocked step.
+                arrival_frames=0;
+                if (++missing_pose>=8)
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "Route 215 jogger: Cannot verify lane 3 or 4.",stream);
+                pbf_wait(context,500ms);
+                continue;
+            }
+            missing_pose=0;
+            if (east_pending){
+                stalled=pose.coarse==last_coarse && last_x-pose.dx<1.0/256 ? stalled+1 : 0;
+                east_pending=false;
+            }
+            if (changing_to && lane==changing_to){
+                changing_to=0;lane_presses=0;stalled=0;
+            }
+            const bool near_corner=!pose.coarse && std::abs(pose.dx)<=1.0/128;
+            if (near_corner && lane==4 && !changing_to){
+                if (++arrival_frames<3){pbf_wait(context,250ms);continue;}
+                force_repel_expiry(stream,context,RepelRenewalChoice::YES,false,true);
+                // Expiry preserves lane 4. Cover its possible unfinished 500ms
+                // west pulse, then settle east against the fence before going south.
+                pbf_move_left_joystick(context,{1.0,0.0},1000ms,0ms);
+                context.wait_for_all_requests();
+                corner_ready=true;
+                break;
+            }
+            arrival_frames=0;
+            if (!changing_to && ((near_corner && lane==3) || stalled>=2)){
+                if (++lane_changes>6)
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "Route 215 jogger: Both safe lanes remain blocked.",stream);
+                changing_to=lane==4 ? 3 : 4;
+                lane_presses=0;stalled=0;
+                pbf_wait(context,750ms);
+                continue;
+            }
+            const auto movement_limit=8000ms;
+            if (changing_to){
+                if (lane_presses>=2){
+                    // A blocked lane change leaves us in the observed lane.
+                    // Wait for the jogger, then try east again without assuming a step.
+                    changing_to=0;lane_presses=0;
+                    pbf_wait(context,750ms);
+                    continue;
+                }
+                if (bypass_movement+80ms>movement_limit)
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "Route 215 jogger: Movement budget exhausted.",stream);
+                pbf_press_dpad(context,changing_to==3 ? DPAD_UP : DPAD_DOWN,80ms,300ms);
+                context.wait_for_all_requests();fresh_after=current_time();
+                bypass_movement+=80ms;++lane_presses;
+                continue;
+            }
+            if (!pose.coarse && pose.dx < -1.0/32)
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Route 215 jogger: Passed the expected east corner.",stream);
+            const auto duration=!pose.coarse && std::abs(pose.dx)<=1.0/24 ? 40ms : 160ms;
+            if (bypass_movement+duration>movement_limit)
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Route 215 jogger: Movement budget exhausted.",stream);
+            last_x=pose.dx;last_coarse=pose.coarse;
+            // Only a small westward correction is allowed at the verified corner.
+            pbf_move_left_joystick(context,{!pose.coarse && pose.dx<0 ? -1.0 : 1.0,0.0},duration,0ms);
+            pbf_wait(context,400ms);
+            context.wait_for_all_requests();fresh_after=current_time();
+            bypass_movement+=duration;east_pending=true;
+        }
+        if (!corner_ready)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Route 215 jogger: East corner not confirmed.",stream);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1682ms, 0ms);
+        pbf_wait(context, 501ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1843ms, 0ms);
+        pbf_wait(context, 55ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 2431ms, 0ms);
+        pbf_wait(context, 723ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2075ms, 0ms);
+        pbf_wait(context, 243ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 500ms, 0ms);
+        pbf_wait(context, 75ms);
+        // The corner-to-bridge leg stays below the regular Repel movement budget.
+        force_repel_expiry(stream,context,RepelRenewalChoice::YES,false,true);
+        pbf_wait(context, 1767ms);
+        // Expiry stays on the clear upper strip. The recorded east crossing
+        // takes 2392ms; 3000ms also covers an unfinished 500ms west expiry pulse.
+        // The eastern wall fixes the starting column for Derek's south approach.
+        pbf_move_left_joystick(context,{1.0,0.0},3000ms,0ms);
+        pbf_wait(context, 43ms);
+        context.wait_for_all_requests();
+        ShortDialogWatcher derek_dialogue;
+        StartBattleDetector derek_start(stream.overlay());
+        BattleMenuWatcher derek_menu(BattleType::TRAINER);
+        if (run_until<ProControllerContext>(stream,context,
+            [](ProControllerContext& ctx){
+                // The uninterrupted 1000ms approach ends one step into grass.
+                // Stop one recorded step earlier on Derek's sightline while
+                // the existing watchers wait for him to turn toward the player.
+                pbf_move_left_joystick(ctx,{0.000000,-1.000000},850ms,0ms);
+                pbf_wait(ctx,15000ms);
+            },{{derek_dialogue},{derek_start},{derek_menu}})<0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Route 215 Derek: Trainer encounter did not start.",stream);
+        fight_trainer_using_moves(stream, context, std::vector<size_t>{2},
+            "Route 215 Black Belt Derek", false);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1929ms, 0ms);
+        pbf_wait(context, 5ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 2195ms, 0ms);
+        pbf_wait(context, 88ms);
+        // Renew on the clear landing below the stairs, then restore its column.
+        force_repel_expiry(stream,context,RepelRenewalChoice::YES,false,true);
+        align_to_overworld_landmarks(stream,context,match_route215_derek_stairs_renewal,
+            "Route 215 below Derek stairs after renewal",false,true);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 501ms, 0ms);
+        pbf_wait(context, 390ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 954ms, 0ms);
+        pbf_wait(context, 310ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1148ms, 0ms);
+        pbf_wait(context, 453ms);
+        // Stay west/east on the clear road row; south would enter tall grass.
+        force_repel_expiry(stream,context,RepelRenewalChoice::YES,false,true);
+        align_to_overworld_landmarks(stream,context,match_route215_derek_stair_top_renewal,
+            "Route 215 above Derek stairs after renewal",false,true);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1855ms, 0ms);
+        pbf_wait(context, 171ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1385ms, 0ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 2478ms, 0ms);
+        pbf_wait(context, 355ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 580ms, 0ms);
+        pbf_wait(context, 392ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 978ms, 0ms);
+        pbf_wait(context, 201ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1159ms, 0ms);
+        pbf_wait(context, 122ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 535ms, 0ms);
+        pbf_wait(context, 234ms);
+        // West/east follows the clear strip south of the grass before the Ace Trainers.
+        force_repel_expiry(stream, context, RepelRenewalChoice::YES, false, true);
+        pbf_wait(context, 1767ms);
+        // Resume from the road/fence pose shown at renewal in the recording.
+        // A fixed leftover west input compounds the variable expiry offset.
+        align_to_overworld_landmarks(stream,context,match_route215_ace_renewal,
+            "Route 215 before Ace Trainers after renewal",false,true);
+        context.wait_for_all_requests();
+        ShortDialogWatcher dennis_dialogue;
+        StartBattleDetector dennis_start(stream.overlay());
+        BattleMenuWatcher dennis_menu(BattleType::TRAINER);
+        if (run_until<ProControllerContext>(stream,context,
+            [](ProControllerContext& ctx){
+                pbf_move_left_joystick(ctx,{0.000000,-1.000000},1323ms,0ms);
+                pbf_wait(ctx,106ms);
+                pbf_move_left_joystick(ctx,{1.000000,0.000000},834ms,0ms);
+                pbf_wait(ctx,206ms);
+                pbf_move_left_joystick(ctx,{0.000000,1.000000},221ms,0ms);
+                pbf_wait(ctx,516ms);
+                pbf_move_left_joystick(ctx,{1.000000,0.000000},667ms,0ms);
+                pbf_wait(ctx,15000ms);
+            },{{dennis_dialogue},{dennis_start},{dennis_menu}})<0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Route 215 Dennis: Trainer encounter did not start.",stream);
+        // Dennis and Maya are separate consecutive battles.
+        fight_trainer_using_moves(stream, context, std::vector<size_t>{2},
+            "Route 215 Ace Trainer Dennis", false);
+        fight_trainer_using_moves(stream, context, std::vector<size_t>{2},
+            "Route 215 Ace Trainer Maya", false);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 10884ms, 0ms);
+        pbf_wait(context, 48ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 2314ms, 0ms);
+        pbf_move_left_joystick(context, {1.000000, -1.000000}, 26ms, 0ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 2251ms, 0ms);
+        pbf_move_left_joystick(context, {1.000000, -1.000000}, 27ms, 0ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1382ms, 0ms);
+        pbf_wait(context, 29ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1035ms, 0ms);
+        pbf_move_left_joystick(context, {-1.000000, -1.000000}, 75ms, 0ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 2190ms, 0ms);
+        // Veilstone needs no Repel. Clear the remaining expiry without renewal
+        // on the paved north/south strip before normalizing the city approach.
+        force_repel_expiry(stream, context, RepelRenewalChoice::NO, true);
+        align_to_overworld_landmarks(stream,context,match_veilstone_city_passage,
+            "Veilstone passage after expiry",false,true,true);
+        // Replay the successful street approach, then correct onto the western
+        // stair lane before climbing. Do not use the NPC pair as a wall stop.
+        pbf_move_left_joystick(context,{0.0,-1.0},1342ms,0ms);
+        pbf_move_left_joystick(context,{-1.0,0.0},1404ms,0ms);
+        pbf_move_left_joystick(context,{0.0,-1.0},368ms,0ms);
+        pbf_move_left_joystick(context,{-1.0,-1.0},90ms,0ms);
+        pbf_move_left_joystick(context,{-1.0,0.0},1458ms,0ms);
+        // Expose the western stair base with the first 200ms of the recorded
+        // north leg; correct its lane before continuing the remaining ascent.
+        pbf_move_left_joystick(context,{0.0,1.0},200ms,0ms);
+        context.wait_for_all_requests();
+        align_to_overworld_landmarks(stream,context,match_veilstone_dawn_stairs,
+            "Veilstone western stair approach",false,true);
+        stream.log("[Veilstone approach] Following the western stairs toward Dawn.");
+        ShortDialogWatcher dawn_dialogue;
+        if (run_until<ProControllerContext>(stream,context,
+            [](ProControllerContext& ctx){
+                pbf_move_left_joystick(ctx,{0.0,1.0},3023ms,0ms);
+                pbf_press_button(ctx,BUTTON_A,80ms,100ms);
+                // Dawn's turn, walk and camera cut precede the first box.
+                // Keep watching through the cutscene; cancel as soon as it opens.
+                pbf_wait(ctx,15000ms);
+            },{{dawn_dialogue}})!=0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Veilstone Dawn: Dialogue did not start from the west stair approach.",stream);
+        clear_post_battle_dialogue(stream, context, BUTTON_B, 4000ms);
+
+        // The new recording already enters the Gym. Cancel at its first fade.
+        context.wait_for_all_requests();
+        BlackScreenWatcher gym_entry;
+        if (run_until<ProControllerContext>(stream, context,
+            [](ProControllerContext& ctx) {
+                pbf_move_left_joystick(ctx, {0.000000, 1.000000}, 1954ms, 0ms);
+                pbf_wait(ctx, 223ms);
+                pbf_move_left_joystick(ctx, {1.000000, -0.000000}, 110ms, 0ms);
+                pbf_wait(ctx, 190ms);
+                pbf_move_left_joystick(ctx, {0.000000, 1.000000}, 910ms, 0ms);
+                pbf_wait(ctx, 3000ms);
+            }, {{gym_entry}}) != 0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Veilstone Gym: Entrance transition did not start.", stream);
+        segment03_finish_transition(stream, context, "Veilstone Gym entrance");
+        // The first visit pans across the Gym before returning to the entrance.
+        pbf_wait(context, 5000ms);
+        context.wait_for_all_requests();
+        OverworldWatcher gym_ready;
+        if (wait_until(stream, context, 10s, {{gym_ready}}) != 0)
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Veilstone Gym: Overworld not ready after the entrance scene.", stream);
         context.wait_for_all_requests();
     }
 
@@ -1920,19 +2187,6 @@ static void gym_Puzzle_03(VideoStream& stream, ProControllerContext& context){
         {DPAD_UP, 8, 0ms},
     };
 
-    const Move sequence6[] = {
-        {DPAD_DOWN, 8, 0ms},
-        {DPAD_LEFT, 2, 0ms},
-        {DPAD_DOWN, 3, 0ms},
-        {DPAD_RIGHT, 2, 0ms},
-        {DPAD_DOWN, 5, 0ms},
-        {DPAD_RIGHT, 2, 0ms},
-        {DPAD_DOWN, 3, 0ms},
-        {DPAD_LEFT, 1, 0ms},
-        {DPAD_LEFT, 1, 3000ms},
-        {DPAD_DOWN, 6, 0ms},
-    };
-
     for (const auto& move : sequence1){
         for (int i = 0; i < move.count; i++){
             pbf_press_dpad(context, move.dir, 80ms, 300ms);
@@ -1945,7 +2199,7 @@ static void gym_Puzzle_03(VideoStream& stream, ProControllerContext& context){
     //Button presses to initiate Trainer battle 01 (Black Belt Rafael).
 
     pbf_press_button(context,BUTTON_A,150ms,300ms);
-    segment03_route_battle(stream,context,"Black Belt Rafael (Flamethrower)");
+    fight_trainer_using_moves(stream, context, 2, "Black Belt Rafael", false);
 
     pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue
 
@@ -1961,7 +2215,7 @@ static void gym_Puzzle_03(VideoStream& stream, ProControllerContext& context){
     //Button presses to initiate Trainer battle 02 (Black Belt Jeffrey).
 
     pbf_press_button(context,BUTTON_A,150ms,300ms);
-    segment03_route_battle(stream,context,"Black Belt Jeffrey (Flamethrower)");
+    fight_trainer_using_moves(stream, context, 2, "Black Belt Jeffrey", false);
 
     pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue
 
@@ -1977,7 +2231,7 @@ static void gym_Puzzle_03(VideoStream& stream, ProControllerContext& context){
     //Button presses to initiate Trainer battle 03 (Black Belt Darren).
 
     pbf_press_button(context,BUTTON_A,150ms,300ms);
-    segment03_route_battle(stream,context,"Black Belt Darren (Flamethrower)");
+    fight_trainer_using_moves(stream, context, 2, "Black Belt Darren", false);
 
     pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue
 
@@ -1993,7 +2247,7 @@ static void gym_Puzzle_03(VideoStream& stream, ProControllerContext& context){
     //Button presses to initiate Trainer battle 04 (Black Belt Colby).
 
     pbf_press_button(context,BUTTON_A,150ms,300ms);
-    segment03_route_battle(stream,context,"Black Belt Colby (Flamethrower)");
+    fight_trainer_using_moves(stream, context, 1, "Black Belt Colby", false);
 
     pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue
 
@@ -2009,26 +2263,19 @@ static void gym_Puzzle_03(VideoStream& stream, ProControllerContext& context){
     //Button presses to initiate the Gym battle.
 
     pbf_press_button(context,BUTTON_A,150ms,300ms);
-    segment03_route_battle(stream,context,"Maylene (Flamethrower)",true);
+    fight_trainer_using_moves(stream, context, 1, "Maylene", true);
 
-    pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue
+    // Clear badge and reward dialogue before handing off inside the Gym.
+    // Match Gardenia's quiet period so gaps between rewards do not end cleanup.
+    stream.log("[Veilstone Gym puzzle] Shared battle cleanup returned; clearing remaining Maylene rewards with B.");
+    clear_post_battle_dialogue(stream, context, BUTTON_B, 6000ms);
+    stream.log("[Veilstone Gym puzzle] Maylene post-battle dialogue cleared; remaining here for Segment 04.");
 
-    for (const auto& move : sequence6){
-        for (int i = 0; i < move.count; i++){
-            pbf_press_dpad(context, move.dir, 80ms, 300ms);
-            if (move.delay.count() > 0){
-                pbf_wait(context, move.delay);
-            }
-        }
-    }
-
-    //Exits Buiilding
-    pbf_wait(context, 1000ms);
 }
 
 std::string AutoStory_Segment_03::name()       const{ return "03: Second Badge to Third Badge"; }
 std::string AutoStory_Segment_03::start_text() const{ return "Start: Second Gym Badge acquired (Eterna City)."; }
-std::string AutoStory_Segment_03::end_text()   const{ return "End: Third Gym Badge acquired (Veilstone City)."; }
+std::string AutoStory_Segment_03::end_text()   const{ return "End: Inside Veilstone Gym in front of Maylene, facing north, after acquiring the third badge and clearing her reward dialogue."; }
 
 void AutoStory_Segment_03::run_segment(
     SingleSwitchProgramEnvironment& env,
@@ -2184,9 +2431,9 @@ void Checkpoint_0304(
         true
     );
 }
-std::string AutoStory_Checkpoint_0305::name()       const { return "03.05 - Hearthome and Lost Tower"; }
+std::string AutoStory_Checkpoint_0305::name()       const { return "03.05 - Hearthome to Lost Tower"; }
 std::string AutoStory_Checkpoint_0305::start_text() const { return "Just outside the Hearthome Contest Hall doorway, facing south with Repel inactive, after the Keira/Johanna introduction."; }
-std::string AutoStory_Checkpoint_0305::end_text()   const { return "At the Lost Tower departure position after the tower gifts and recorded return path."; }
+std::string AutoStory_Checkpoint_0305::end_text()   const { return "Just outside the Lost Tower doorway on Route 209 after entering and exiting, facing south with Repel active."; }
 
 void AutoStory_Checkpoint_0305::run_checkpoint(
     SingleSwitchProgramEnvironment& env,
@@ -2206,9 +2453,19 @@ void Checkpoint_0305(
 ) {
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/) {
+            // Restore night lighting on every attempt, including after a reset.
+            context.wait_for_all_requests();
+            env.console.log("[Route 209 locator setup] Setting 22:00; preserving the current date.");
+            DateTime locator_time;
+            locator_time.hour = 22;
+            locator_time.minute = 0;
+            locator_time.second = 0;
+            set_time_fast(env, context, locator_time, true);
+            pbf_wait(context, 5000ms);
+            context.wait_for_all_requests();
             // Recorded route with feedback battle handling.
             heartholme_to_lost_tower(env.console, context);
-            lost_tower(env.console, context);
+            // Stop here. Checkpoint 03.06 saves outside and owns the Tower visit.
 
         },
 
@@ -2217,7 +2474,7 @@ void Checkpoint_0305(
 }
 
 std::string AutoStory_Checkpoint_0306::name()       const { return "03.06 - Lost Tower to Veilstone"; }
-std::string AutoStory_Checkpoint_0306::start_text() const { return "At the Lost Tower departure position after the tower gifts and recorded return path."; }
+std::string AutoStory_Checkpoint_0306::start_text() const { return "Just outside the Lost Tower doorway on Route 209 after entering and exiting, facing south with Repel active."; }
 std::string AutoStory_Checkpoint_0306::end_text()   const { return "Inside Veilstone Gym at the entrance, facing north."; }
 
 void AutoStory_Checkpoint_0306::run_checkpoint(
@@ -2238,16 +2495,27 @@ void Checkpoint_0306(
 ) {
     checkpoint_reattempt_loop(env, context, options, stats,
         [&](size_t /*attempt*/) {
-            // Recorded route with feedback battle handling.
+            // Restore night before the route on every attempt, including resets.
+            context.wait_for_all_requests();
+            env.console.log("[Route 215 locator setup] Setting 22:00; preserving the current date.");
+            DateTime locator_time;
+            locator_time.hour = 22;
+            locator_time.minute = 0;
+            locator_time.second = 0;
+            set_time_fast(env, context, locator_time, true);
+            pbf_wait(context, 5000ms);
+            context.wait_for_all_requests();
+            // Save/retry begins outside the Tower, at the end of 03.05.
+            lost_tower(env.console, context);
             lost_tower_to_veilstone_gym(env.console, context);
         },
         true
     );
 }
 
-std::string AutoStory_Checkpoint_0307::name()       const { return "03.07 - Inside Gym 3"; }
-std::string AutoStory_Checkpoint_0307::start_text() const { return "Inside Veilstone Gym at the entrance, facing north."; }
-std::string AutoStory_Checkpoint_0307::end_text()   const { return "Third Gym Badge acquired (Veilstone City)."; }
+std::string AutoStory_Checkpoint_0307::name()       const { return "03.07 - Veilstone Gym (start inside at entrance)"; }
+std::string AutoStory_Checkpoint_0307::start_text() const { return "Start inside Veilstone Gym at the entrance, facing north."; }
+std::string AutoStory_Checkpoint_0307::end_text()   const { return "Inside Veilstone Gym in front of Maylene, facing north, after acquiring the third badge and clearing her reward dialogue."; }
 
 void AutoStory_Checkpoint_0307::run_checkpoint(
     SingleSwitchProgramEnvironment& env,

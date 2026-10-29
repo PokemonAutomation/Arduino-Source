@@ -28,7 +28,7 @@ namespace PokemonBDSP{
 
 
 std::string AutoStory_Segment_04::name()       const{ return "04: Third Badge to Fourth Badge"; }
-std::string AutoStory_Segment_04::start_text() const{ return "Start: Third Gym Badge acquired (Hearthome City)."; }
+std::string AutoStory_Segment_04::start_text() const{ return "Start: Inside Veilstone Gym in front of Maylene, facing north, after acquiring the third badge and clearing her reward dialogue."; }
 std::string AutoStory_Segment_04::end_text()   const{ return "End: Fourth Gym Badge acquired (Pastoria City)."; }
 
 
@@ -60,6 +60,7 @@ void AutoStory_Segment_04::run_segment(
     AutoStory_Checkpoint_0415().run_checkpoint(env, context, options, stats);
     AutoStory_Checkpoint_0416().run_checkpoint(env, context, options, stats);
     AutoStory_Checkpoint_0417().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0418().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
@@ -67,14 +68,14 @@ void AutoStory_Segment_04::run_segment(
 
 
 std::string AutoStory_Checkpoint_0401::name()       const{ return "04.01 - leave_gym"; }
-std::string AutoStory_Checkpoint_0401::start_text() const{ return "Inside Hearthome City gym after third badge."; }
-std::string AutoStory_Checkpoint_0401::end_text()   const{ return "Exited Hearthome City gym."; }
+std::string AutoStory_Checkpoint_0401::start_text() const{ return "Inside Veilstone Gym in front of Maylene, facing north, after acquiring the third badge and clearing her reward dialogue."; }
+std::string AutoStory_Checkpoint_0401::end_text()   const{ return "Outside Veilstone Gym, before clearing Dawn's post-Gym conversation."; }
 void AutoStory_Checkpoint_0401::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_0401(env, context, options, stats);
 }
 
 std::string AutoStory_Checkpoint_0402::name()       const{ return "04.02 - go_to_veilstone_pokemon_center"; }
-std::string AutoStory_Checkpoint_0402::start_text() const{ return "Outside Hearthome City gym."; }
+std::string AutoStory_Checkpoint_0402::start_text() const{ return "Outside Veilstone Gym, before clearing Dawn's post-Gym conversation."; }
 std::string AutoStory_Checkpoint_0402::end_text()   const{ return "Entered Veilstone City Pokemon Center."; }
 void AutoStory_Checkpoint_0402::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_0402(env, context, options, stats);
@@ -180,9 +181,26 @@ void AutoStory_Checkpoint_0416::run_checkpoint(SingleSwitchProgramEnvironment& e
 
 std::string AutoStory_Checkpoint_0417::name()       const{ return "04.17 - go_to_pastoria_gym"; }
 std::string AutoStory_Checkpoint_0417::start_text() const{ return "Outside Pastoria City Pokemon Center."; }
-std::string AutoStory_Checkpoint_0417::end_text()   const{ return "Fourth Gym Badge acquired (Pastoria City)."; }
+std::string AutoStory_Checkpoint_0417::end_text()   const{ return "Inside Pastoria Gym at the entrance, facing north."; }
 void AutoStory_Checkpoint_0417::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_0417(env, context, options, stats);
+}
+
+std::string AutoStory_Checkpoint_0418::name()       const{ return "04.18 - Pastoria Gym Puzzle"; }
+std::string AutoStory_Checkpoint_0418::start_text() const{ return "Inside Pastoria Gym at the entrance, facing north."; }
+std::string AutoStory_Checkpoint_0418::end_text()   const{ return "Not implemented: Pastoria Gym puzzle and Crasher Wake battle."; }
+void AutoStory_Checkpoint_0418::run_checkpoint(
+    SingleSwitchProgramEnvironment&,
+    ProControllerContext& context,
+    AutoStoryOptions,
+    AutoStoryStats&
+) const{
+    context.wait_for_all_requests();
+    // Stop before any movement until the puzzle and leader battle are implemented.
+    throw OperationFailedException(
+        ErrorReportMode::NO_ERROR_REPORT,
+        "04.18 - Pastoria Gym Puzzle is not implemented. Stopped inside the Gym."
+    );
 }
 
 static void move_back_after_unexpected_battle(
@@ -229,19 +247,19 @@ static bool handle_battle(
         trainerid == "route_213_tuber_jared" or
         trainerid == "route_213_beauty_cindy"
     ) {
-        // Select Razor Leaf
+        // Move the battle-move cursor up.
         pbf_press_dpad(context, DPAD_UP, 280ms, 200ms);
     } else if (
         trainerid == "route_214_collector_brady" or
         trainerid == "route_214_collector_douglas"
     ){
-        // Select Bulldoze
+        // Move the battle-move cursor down.
         pbf_press_dpad(context, DPAD_DOWN, 280ms, 200ms);
     } else if (
         trainerid == "route_214_psychic_abigail" or
         trainerid == "route_214_psychic_mitchell"
     ){
-        // Select Crunch
+        // Keep the current battle-move selection.
     }
     context.wait_for_all_requests();
 

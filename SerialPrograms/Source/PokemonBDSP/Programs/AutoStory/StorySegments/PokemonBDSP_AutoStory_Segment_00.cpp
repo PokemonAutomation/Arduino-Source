@@ -636,8 +636,8 @@ namespace PokemonAutomation {
             stream.log("[Tutorial] Checking starter HP after the first Potion pickup.");
             use_potion_first_pokemon(stream, context);
             context.wait_for_all_requests();
-            // Start with one training encounter toward level 6 / Ember. The helper
-            // waits through XP/automatic move learning and heals after the fight.
+            // Complete one training encounter before Tristan. The helper waits
+            // through XP/automatic move learning and heals after the fight.
             battle_1_pokemon(stream, context);
 
             // Stop on the verified Route 201 reference instead of overshooting

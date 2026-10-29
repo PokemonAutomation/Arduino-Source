@@ -230,7 +230,7 @@ void handle_battle_with_outside_help(
     bool battle_active = true;
     while (battle_active){
 
-        // Wait for Torterra's battle menu
+        // Wait for the lead Pokemon's battle menu
         {
             BattleMenuWatcher menu(BattleType::TRAINER);
             EndBattleWatcher  end;
