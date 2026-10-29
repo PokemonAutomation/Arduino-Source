@@ -1246,6 +1246,11 @@ namespace PokemonAutomation {
                 ShortDialogDetector dialogue(COLOR_YELLOW);
                 BattleMenuDetector battle(BattleType::TRAINER, COLOR_GREEN);
                 size_t confirmations = 0, missing = 0;
+                bool ace_bypass = false;
+                const bool route215_renewal=matcher==match_route215_bridge_renewal ||
+                    matcher==match_route215_ace_renewal || matcher==match_route215_derek_stairs_renewal ||
+                    matcher==match_route215_derek_stair_top_renewal;
+                Milliseconds correction_movement=0ms;
                 for (size_t attempt = 0; attempt < 80; attempt++) {
                     const auto frame = stream.video().snapshot();
                     if (!frame) OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
@@ -1291,6 +1296,18 @@ namespace PokemonAutomation {
                     stream.log("[" + label + "] located=" + std::to_string(result.located) +
                         ", coarse=" + std::to_string(result.coarse) + ", at_target=" + std::to_string(result.at_target) +
                         ", consensus offset=(" + std::to_string(result.dx) + "," + std::to_string(result.dy) + ")");
+                    // The blue-haired NPC patrols the narrow eastern row. Shift
+                    // one tile north on the clear road before crossing west;
+                    // return to the original row only after clearing his column.
+                    if (matcher==match_route215_ace_renewal && result.located){
+                        if (result.dx< -1.0/12) ace_bypass=true;
+                        else if (result.dx>=-1.0/32) ace_bypass=false;
+                    }
+                    const bool ace_row_recovery=ace_bypass &&
+                        std::abs(result.dy-70.0/1080)>1.0/108;
+                    const bool ace_central_row=matcher==match_route215_ace_renewal &&
+                        !ace_bypass && result.coarse && std::abs(result.dx)<=1.0/12 &&
+                        std::abs(result.dy)>1.0/54;
                     const double entry_confidence=moderate_entry_confidence>0 ? overworld_entry_confidence(result) : 0;
                     const bool moderate_arrival=moderate_entry_confidence>0 && entry_confidence>=moderate_entry_confidence;
                     if(moderate_entry_confidence>0) stream.log("["+label+"] Exterior entry confidence="+
@@ -1356,14 +1373,18 @@ namespace PokemonAutomation {
                         // Fine correction changes axis priority, never arrival gates.
                         const bool stair_fine_correction=matcher==match_route208_stair_top &&
                             !result.coarse && std::abs(result.dx)<=1.0/64;
-                        const bool horizontal = !contest_row_recovery && !gym_row_recovery && !jupiter_row_recovery && (jupiter_anchor_horizontal || coarse_horizontal || plaza_anchor_horizontal || eterna_anchor_horizontal || gym_anchor_horizontal || (!result.coarse &&
+                        const bool horizontal = !ace_row_recovery && !ace_central_row && (ace_bypass ||
+                            (!contest_row_recovery && !gym_row_recovery && !jupiter_row_recovery && (jupiter_anchor_horizontal || coarse_horizontal || plaza_anchor_horizontal || eterna_anchor_horizontal || gym_anchor_horizontal || (!result.coarse &&
                             ((horizontal_first && !stair_fine_correction && std::abs(result.dx)>1.0/128) ||
-                             std::abs(result.dx)>=std::abs(result.dy)*9.0/16)));
+                             std::abs(result.dx)>=std::abs(result.dy)*9.0/16)))));
                         if (stair_fine_correction && horizontal_first && !horizontal && std::abs(result.dx)>1.0/128)
                             stream.log("["+label+"] Near stair column; correcting the larger vertical error first.");
-                        if (coarse_horizontal) stream.log("[" + label +
+                        if (ace_row_recovery) stream.log("["+label+"] Clearing the NPC row before crossing west.");
+                        else if (ace_central_row) stream.log("["+label+"] Both road bends support restoring the arrival row.");
+                        else if (coarse_horizontal && horizontal) stream.log("[" + label +
                             "] Both landmarks agree on a large horizontal offset; correcting the street lane first.");
-                        const double error = horizontal ? result.dx : result.dy*9.0/16;
+                        const double error = horizontal ? result.dx :
+                            (result.dy-(ace_bypass ? 70.0/1080 : 0.0))*9.0/16;
                         auto duration = std::abs(error) > 1.0/24 ? 80ms : std::abs(error) > 1.0/64 ? 40ms : 16ms;
                         // A 16ms turn may not complete a step. Use a bounded
                         // full correction while reacquiring the second plaza anchor.
@@ -1381,17 +1402,33 @@ namespace PokemonAutomation {
                                         label+": Correction would approach the stair boundary.",stream);
                             }
                         }
+                        if (route215_renewal){
+                            if (correction_movement+duration>1500ms)
+                                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                                    label+": Renewal alignment movement budget exhausted.",stream);
+                            correction_movement+=duration;
+                        }
                         pbf_move_left_joystick(context,
                             {horizontal ? (result.dx > 0 ? 1.0 : -1.0) : 0.0,
-                             horizontal ? 0.0 : (result.dy < 0 ? 1.0 : -1.0)}, duration, 0ms);
+                             horizontal ? 0.0 : (error < 0 ? 1.0 : -1.0)}, duration, 0ms);
                         pbf_wait(context, 500ms);
                     } else {
                         confirmations = 0;
-                        if (matcher==match_hearthome_center_entrance || matcher==match_hearthome_contest_fantina){
+                        if (matcher==match_hearthome_center_entrance || matcher==match_hearthome_contest_fantina ||
+                            matcher==match_veilstone_city_passage || matcher==match_veilstone_dawn_stairs ||
+                            route215_renewal){
                             // Do not sweep into a different doorway or around the Hall's
-                            // side when a cloud, NPC or fade hides the required anchors.
+                            // side, or onto a Veilstone terrace, while required anchors are hidden.
                             if (++missing>20) OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                                 label+": Scene anchors missing; stationary reacquisition exhausted.",stream);
+                            // Recorded expiry endpoints can be north of the passage.
+                            // Acquire its buildings along the clear south-only strip;
+                            // cap total search motion, then remain stationary.
+                            if (matcher==match_veilstone_city_passage && search_down_first &&
+                                correction_movement<1800ms){
+                                pbf_move_left_joystick(context,{0.0,-1.0},100ms,0ms);
+                                correction_movement+=100ms;
+                            }
                             pbf_wait(context,500ms);
                             context.wait_for_all_requests();
                             continue;
@@ -1473,16 +1510,16 @@ namespace PokemonAutomation {
             }
 
             void fight_tristan(VideoStream& stream, ProControllerContext& context) {
-                // Chimchar learns Ember into slot 3 at level 6. Confirm the move
-                // cursor visually; missing slot 3 fails instead of using Scratch.
-                fight_using_move_slot(stream, context, BattleType::TRAINER, 3, "Tristan (Ember)");
+                // All starters use move slot 3. Confirm its cursor position
+                // visually without reading the move name; fail if slot 3 is absent.
+                fight_trainer_using_move_slot(stream, context, 3, "Tristan (move slot 3)");
             }
 
             void battle_1_pokemon(VideoStream& stream, ProControllerContext& context) {
                 stream.log("[Training] Finding one wild Pokemon using the catch encounter wiggle.", COLOR_BLUE);
                 encounter_one_wild_pokemon(stream, context);
-                // Use the same battle loop as Tristan, but Scratch is slot 1.
-                fight_using_move_slot(stream, context, BattleType::STANDARD, 1, "Training (Scratch)");
+                // Use the same battle loop as Tristan with move slot 1.
+                fight_using_move_slot(stream, context, BattleType::STANDARD, 1, "Training (move slot 1)");
                 stream.log("[Training] Fight and level-up cleanup complete; verifying Potion healing.");
                 use_potion_first_pokemon(stream, context);
                 context.wait_for_all_requests();
