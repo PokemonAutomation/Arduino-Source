@@ -137,3 +137,29 @@ migrate a file to the wrappers when you're already touching it and it's straight
   `Common/Cpp/CancellableScope.h` (`CancellableScope::throw_if_cancelled()` in loops).
 - File paths: use the macros from `CommonFramework/GlobalAutoPaths.h` (`RESOURCE_PATH()`,
   `USER_FILE_PATH()`, `DOWNLOADED_RESOURCE_PATH()`, ...) rather than hardcoding locations.
+
+### Control flow formatting
+
+- Put the opening brace on the same line as `if`, `else if`, `for`, `while`, or `switch`,
+  with **no space between the closing `)` and `{`**: `if (condition){`, not `if (condition) {`.
+  Write `}else if (condition){` and `}else{` without spaces around `else`'s braces.
+- Always use braces and multiline bodies for conditionals and loops, even for a single
+  statement. Do not write `if (condition) return;` or `if (condition){ return; }`.
+  Put the body on its own indented line and the closing brace on its own line (except when
+  followed by `else` / `else if`). The same rule applies to one-statement loop bodies.
+- Follow these rules in new or edited control flow even when nearby legacy code differs.
+  Avoid reformatting unrelated code.
+
+```cpp
+if (condition){
+    do_something();
+}else if (other_condition){
+    do_something_else();
+}else{
+    handle_default();
+}
+
+for (size_t i = 0; i < count; i++){
+    process(i);
+}
+```
