@@ -8,6 +8,7 @@
 #include "CommonFramework/GlobalServices.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "Backends/AudioPassthroughPairQtThread.h"
+#include "Sources/AudioSource_Null.h"
 #include "AudioPipelineOptions.h"
 #include "AudioSession.h"
 
@@ -123,20 +124,7 @@ AudioOption::AudioDisplayType AudioSession::display_type() const{
 
 
 void AudioSession::clear_audio_input(){
-    std::lock_guard<Mutex> lg(m_lock);
-    m_logger.log("Clearing audio input...");
-    signal_pre_input_change();
-    m_devices->clear_audio_source();
-    m_option.m_input_source.reset();
-    signal_post_input_change();
-
-    //  We need to do this at the end.
-    //  The previous line "signal_post_input_change()" is what will shut off the
-    //  audio stream. If we clear the history before that, a race condition can
-    //  add another spectrum to the history before the stream actually stops.
-    //  When this happens, we will be left with a non-empty history which will
-    //  be displayed as a non-moving freq-bars or spectrum instead of black.
-    m_spectrum_holder.clear();
+    set_audio_input(std::make_unique<AudioSourceDescriptor_Null>());
 }
 void AudioSession::set_audio_input(const std::shared_ptr<AudioSourceDescriptor>& source){
     std::lock_guard<Mutex> lg(m_lock);
@@ -155,6 +143,14 @@ void AudioSession::set_audio_input(const std::shared_ptr<AudioSourceDescriptor>&
     }
 
     signal_post_input_change();
+
+    //  We need to do this at the end.
+    //  The previous line "signal_post_input_change()" is what will shut off the
+    //  audio stream. If we clear the history before that, a race condition can
+    //  add another spectrum to the history before the stream actually stops.
+    //  When this happens, we will be left with a non-empty history which will
+    //  be displayed as a non-moving freq-bars or spectrum instead of black.
+    m_spectrum_holder.clear();
 }
 void AudioSession::set_input_choice(const AudioInputChoice& choice){
     std::lock_guard<Mutex> lg(m_lock);

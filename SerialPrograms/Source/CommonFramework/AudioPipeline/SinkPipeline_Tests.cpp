@@ -44,7 +44,7 @@
 #include "CommonFramework/AudioPipeline/ChannelMixer.h"
 #include "CommonFramework/AudioPipeline/AudioInfo.h"
 #include "CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.h"
-#include "CommonFramework/AudioPipeline/AudioSources/AudioSource_File.h"
+#include "CommonFramework/AudioPipeline/Sources/AudioSource_File.h"
 #include "SinkPipeline_Tests.h"
 
 namespace PokemonAutomation{

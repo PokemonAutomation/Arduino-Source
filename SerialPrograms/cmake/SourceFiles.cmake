@@ -505,12 +505,12 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/AudioPipeline/AudioSession.h
     Source/CommonFramework/AudioPipeline/AudioSourceDescriptor.cpp
     Source/CommonFramework/AudioPipeline/AudioSourceDescriptor.h
-    Source/CommonFramework/AudioPipeline/AudioSources/AudioSource_Device.cpp
-    Source/CommonFramework/AudioPipeline/AudioSources/AudioSource_Device.h
-    Source/CommonFramework/AudioPipeline/AudioSources/AudioSource_File.cpp
-    Source/CommonFramework/AudioPipeline/AudioSources/AudioSource_File.h
-    Source/CommonFramework/AudioPipeline/AudioSources/AudioSource_Null.cpp
-    Source/CommonFramework/AudioPipeline/AudioSources/AudioSource_Null.h
+    Source/CommonFramework/AudioPipeline/Sources/AudioSource_Device.cpp
+    Source/CommonFramework/AudioPipeline/Sources/AudioSource_Device.h
+    Source/CommonFramework/AudioPipeline/Sources/AudioSource_File.cpp
+    Source/CommonFramework/AudioPipeline/Sources/AudioSource_File.h
+    Source/CommonFramework/AudioPipeline/Sources/AudioSource_Null.cpp
+    Source/CommonFramework/AudioPipeline/Sources/AudioSource_Null.h
     Source/CommonFramework/AudioPipeline/AudioTemplate.cpp
     Source/CommonFramework/AudioPipeline/AudioTemplate.h
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.cpp
@@ -755,12 +755,12 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/VideoPipeline/VideoSource.h
     Source/CommonFramework/VideoPipeline/VideoSourceDescriptor.cpp
     Source/CommonFramework/VideoPipeline/VideoSourceDescriptor.h
-    Source/CommonFramework/VideoPipeline/VideoSources/VideoSource_Camera.cpp
-    Source/CommonFramework/VideoPipeline/VideoSources/VideoSource_Camera.h
-    Source/CommonFramework/VideoPipeline/VideoSources/VideoSource_Null.cpp
-    Source/CommonFramework/VideoPipeline/VideoSources/VideoSource_Null.h
-    Source/CommonFramework/VideoPipeline/VideoSources/VideoSource_StillImage.cpp
-    Source/CommonFramework/VideoPipeline/VideoSources/VideoSource_StillImage.h
+    Source/CommonFramework/VideoPipeline/Sources/VideoSource_Camera.cpp
+    Source/CommonFramework/VideoPipeline/Sources/VideoSource_Camera.h
+    Source/CommonFramework/VideoPipeline/Sources/VideoSource_Null.cpp
+    Source/CommonFramework/VideoPipeline/Sources/VideoSource_Null.h
+    Source/CommonFramework/VideoPipeline/Sources/VideoSource_StillImage.cpp
+    Source/CommonFramework/VideoPipeline/Sources/VideoSource_StillImage.h
     Source/CommonFramework/Windows/ButtonDiagram.cpp
     Source/CommonFramework/Windows/ButtonDiagram.h
     Source/CommonFramework/Windows/DpiScaler.cpp

@@ -41,6 +41,9 @@ bool AudioSourceDescriptor_File::operator==(const AudioSourceDescriptor& x) cons
     ReadSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
     return m_path == other_path;
 }
+std::string AudioSourceDescriptor_File::display_name() const{
+    return "Play Audio File";
+}
 
 std::vector<AudioInputChoice> AudioSourceDescriptor_File::supported_formats() const{
     return {};

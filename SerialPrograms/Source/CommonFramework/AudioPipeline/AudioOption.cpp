@@ -5,9 +5,9 @@
  */
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "AudioSources/AudioSource_Null.h"
-#include "AudioSources/AudioSource_File.h"
-#include "AudioSources/AudioSource_Device.h"
+#include "Sources/AudioSource_Null.h"
+#include "Sources/AudioSource_File.h"
+#include "Sources/AudioSource_Device.h"
 #include "AudioOption.h"
 
 //#include <iostream>
@@ -45,7 +45,9 @@ std::string AudioOption::audioDisplayTypeToString(AudioOption::AudioDisplayType 
     }
 }
 
-AudioOption::AudioOption() = default;
+AudioOption::AudioOption()
+    : m_input_source(new AudioSourceDescriptor_Null())
+{}
 
 void AudioOption::load_json(const JsonValue& json){
     const JsonObject* obj = json.to_object();

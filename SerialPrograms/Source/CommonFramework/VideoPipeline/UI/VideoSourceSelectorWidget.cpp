@@ -13,9 +13,10 @@
 #include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
 #include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
-#include "CommonFramework/VideoPipeline/VideoSources/VideoSource_Null.h"
 
-#include "CommonFramework/VideoPipeline/VideoSources/VideoSource_Camera.h"
+#include "CommonFramework/VideoPipeline/Sources/VideoSource_Null.h"
+#include "CommonFramework/VideoPipeline/Sources/VideoSource_Camera.h"
+
 #include "VideoSourceSelectorWidget.h"
 
 //#include <iostream>
