@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/AudioPipeline/AudioSourceDescriptor.h"
-#include "CommonFramework/AudioPipeline/IO/AudioSource.h"
+#include "CommonFramework/AudioPipeline/AudioSource.h"
 #include "CommonFramework/AudioPipeline/IO/AudioInputFile.h"
 
 namespace PokemonAutomation{

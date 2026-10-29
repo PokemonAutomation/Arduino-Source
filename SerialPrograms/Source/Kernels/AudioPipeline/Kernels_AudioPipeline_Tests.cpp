@@ -15,7 +15,7 @@
 #include "Common/Cpp/Containers/GuardPageBuffer.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/AudioResampler/Kernels_AudioResampler.h"
-#include "CommonFramework/AudioPipeline/ChannelMixer.h"
+#include "CommonFramework/AudioPipeline/Tools/ChannelMixer.h"
 #include "Kernels_AudioPipeline.h"
 #include "Kernels_RawAudio2WorkingAudio.h"
 #include "Kernels_WorkingAudio2RawAudio.h"

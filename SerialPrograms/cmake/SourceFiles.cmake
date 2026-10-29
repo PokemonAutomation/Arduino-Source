@@ -511,14 +511,13 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/AudioPipeline/Sources/AudioSource_File.h
     Source/CommonFramework/AudioPipeline/Sources/AudioSource_Null.cpp
     Source/CommonFramework/AudioPipeline/Sources/AudioSource_Null.h
+    Source/CommonFramework/AudioPipeline/AudioSource.h
     Source/CommonFramework/AudioPipeline/AudioTemplate.cpp
     Source/CommonFramework/AudioPipeline/AudioTemplate.h
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.cpp
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.h
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQtThread.cpp
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQtThread.h
-    Source/CommonFramework/AudioPipeline/ChannelMixer.cpp
-    Source/CommonFramework/AudioPipeline/ChannelMixer.h
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader.cpp
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader.h
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader_Tests.cpp
@@ -529,7 +528,6 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/AudioPipeline/IO/AudioInputFile.h
     Source/CommonFramework/AudioPipeline/IO/AudioOutputDevice.cpp
     Source/CommonFramework/AudioPipeline/IO/AudioOutputDevice.h
-    Source/CommonFramework/AudioPipeline/IO/AudioSource.h
     Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.cpp
     Source/CommonFramework/AudioPipeline/Spectrum/AudioSpectrumHolder.h
     Source/CommonFramework/AudioPipeline/SinkPipeline_Tests.cpp
@@ -541,6 +539,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/AudioPipeline/Spectrum/Spectrograph.h
     Source/CommonFramework/AudioPipeline/Tools/AudioFormatUtils.cpp
     Source/CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h
+    Source/CommonFramework/AudioPipeline/Tools/ChannelMixer.cpp
+    Source/CommonFramework/AudioPipeline/Tools/ChannelMixer.h
     Source/CommonFramework/AudioPipeline/UI/AudioDisplayWidget.cpp
     Source/CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h
     Source/CommonFramework/AudioPipeline/UI/AudioSelectorWidget.cpp
@@ -753,8 +753,9 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/VideoPipeline/VideoSession.h
     Source/CommonFramework/VideoPipeline/VideoSource.cpp
     Source/CommonFramework/VideoPipeline/VideoSource.h
-    Source/CommonFramework/VideoPipeline/VideoSourceDescriptor.cpp
     Source/CommonFramework/VideoPipeline/VideoSourceDescriptor.h
+    Source/CommonFramework/VideoPipeline/VideoSourceOption.cpp
+    Source/CommonFramework/VideoPipeline/VideoSourceOption.h
     Source/CommonFramework/VideoPipeline/Sources/VideoSource_Camera.cpp
     Source/CommonFramework/VideoPipeline/Sources/VideoSource_Camera.h
     Source/CommonFramework/VideoPipeline/Sources/VideoSource_Null.cpp
