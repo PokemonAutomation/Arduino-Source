@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include <QVBoxLayout>
 #include <QScrollArea>
+#include <QLabel>
 #include <QPushButton>
 #include "Common/Cpp/ColoredText.h"
 #include "Common/Qt/Options/ConfigWidget.h"

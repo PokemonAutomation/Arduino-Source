@@ -8,6 +8,7 @@
 
 #include <cstring>
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
+#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_ARM64_NEON.h"
 
 namespace PokemonAutomation{

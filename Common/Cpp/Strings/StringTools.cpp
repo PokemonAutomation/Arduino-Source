@@ -8,6 +8,7 @@
 #include <cctype>
 #include <stdexcept>
 #include <vector>
+#include "StringTools.h"
 
 namespace PokemonAutomation{
 namespace StringTools{

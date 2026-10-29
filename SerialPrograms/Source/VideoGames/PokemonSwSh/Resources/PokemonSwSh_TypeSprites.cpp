@@ -7,6 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh_TypeSprites.h"
 

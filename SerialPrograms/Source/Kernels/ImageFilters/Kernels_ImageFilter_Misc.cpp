@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Kernels_ImageFilter_Misc.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

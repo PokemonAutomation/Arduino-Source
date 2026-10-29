@@ -9,6 +9,7 @@
 #include "Common/Cpp/Rectangle.tpp"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/ImageTypes/ImageViewHSV32.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "ImageBoxes.h"
 

@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonBDSP_DialogDetector.h"
 

@@ -5,6 +5,7 @@
  */
 
 #include <QKeyEvent>
+#include <QHBoxLayout>
 #include <QCheckBox>
 #include <QMessageBox>
 #include "Common/Qt/NoWheelComboBox.h"

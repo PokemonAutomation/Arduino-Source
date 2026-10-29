@@ -6,6 +6,7 @@
 
 #include <sstream>
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Async/InterruptableCommands.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA_FlagNavigationAir.h"

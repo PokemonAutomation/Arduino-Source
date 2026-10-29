@@ -13,10 +13,12 @@
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "Pokemon/Pokemon_AdvRng.h"
 #include "VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_TrainerCardDetector.h"
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_TrainerIdReader.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "VideoGames/PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.h"
+#include "PokemonFRLG_RngCalibration.h"
 #include "PokemonFRLG_SidHelper.h"
 
 namespace PokemonAutomation{

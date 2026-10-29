@@ -5,6 +5,7 @@
  */
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "PokemonSwSh_ShinyHuntTools.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

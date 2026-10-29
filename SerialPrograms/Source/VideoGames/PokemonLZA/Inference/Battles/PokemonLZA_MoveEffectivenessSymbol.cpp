@@ -6,6 +6,7 @@
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 //#include "CommonFramework/Logging/Logger.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "PokemonLZA_MoveEffectivenessSymbol.h"
 

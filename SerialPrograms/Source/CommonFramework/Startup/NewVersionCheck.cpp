@@ -14,6 +14,7 @@
 #include "CommonFramework/Tools/FileDownloader.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "NewVersionCheck.h"
 
 //#include <iostream>
 //using std::cout;

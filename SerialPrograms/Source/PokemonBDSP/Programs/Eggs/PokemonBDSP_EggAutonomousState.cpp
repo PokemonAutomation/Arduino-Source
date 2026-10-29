@@ -6,6 +6,9 @@
 
 #include <cmath>
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Async/InferenceRoutines.h"

@@ -5,6 +5,7 @@
  */
 
 #include "ComputerPrograms/Framework/ComputerProgramSession.h"
+#include "ComputerProgram.h"
 
 namespace PokemonAutomation{
 

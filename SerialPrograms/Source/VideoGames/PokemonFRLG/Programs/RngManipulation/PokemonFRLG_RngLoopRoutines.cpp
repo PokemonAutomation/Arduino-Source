@@ -11,6 +11,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Random.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_RngNavigation.h"
 #include "PokemonFRLG_RngLoopRoutines.h"
 

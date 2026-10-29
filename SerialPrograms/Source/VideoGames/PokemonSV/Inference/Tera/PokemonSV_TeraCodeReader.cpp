@@ -8,6 +8,7 @@
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/Images/ImageManip.h"
@@ -15,6 +16,7 @@
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "CommonTools/OCR/OCR_Routines.h"
+#include "PokemonSV_TeraCodeReader.h"
 
 //#define PA_ENABLE_CODE_DEBUG
 

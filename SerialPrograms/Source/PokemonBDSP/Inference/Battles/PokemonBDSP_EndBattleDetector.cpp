@@ -3,6 +3,10 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
+#include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/SolidColorTest.h"
+#include "PokemonBDSP_EndBattleDetector.h"
 
 //#include <iostream>
 //using std::cout;

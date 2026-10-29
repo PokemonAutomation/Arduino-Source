@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Strings/StringTools.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -17,8 +18,10 @@
 #include "VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.h"
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleLevelUpReader.h"
+#include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_RngNavigation.h"
 #include "PokemonFRLG_HardReset.h"
+#include "PokemonFRLG_SeedsDatabase.h"
 #include "PokemonFRLG_StarterRng.h"
 
 namespace PokemonAutomation{

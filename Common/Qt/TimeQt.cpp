@@ -4,6 +4,7 @@
  *
  */
 
+#include <QDateTime>
 #include <QTimeZone>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"

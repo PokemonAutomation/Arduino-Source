@@ -5,10 +5,12 @@
  */
 
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
+#include "PokemonSwSh_Internet.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

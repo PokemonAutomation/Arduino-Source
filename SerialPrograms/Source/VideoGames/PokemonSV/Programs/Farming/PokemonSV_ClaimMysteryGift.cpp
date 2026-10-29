@@ -25,6 +25,7 @@
 //#include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "VideoGames/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.h"
+#include "VideoGames/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_ClaimMysteryGift.h"
 
 //#include <iostream>

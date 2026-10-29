@@ -4,7 +4,10 @@
  *
  */
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTools/FloatPixel.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "ImageTools.h"
 
 namespace PokemonAutomation{
 

@@ -12,6 +12,7 @@
 //#include "PokemonSV_BoxRoutines.h"
 #include "VideoGames/PokemonSV/Inference/PokemonSV_BagDetector.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
+#include "PokemonSV_BoxAttach.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

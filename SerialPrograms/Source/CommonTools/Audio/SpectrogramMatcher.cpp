@@ -8,6 +8,8 @@
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h"
 #include "Kernels/SpikeConvolution/Kernels_SpikeConvolution.h"
+#include "CommonFramework/AudioPipeline/AudioFeed.h"
+#include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "SpectrogramMatcher.h"
 
 //#include <iostream>

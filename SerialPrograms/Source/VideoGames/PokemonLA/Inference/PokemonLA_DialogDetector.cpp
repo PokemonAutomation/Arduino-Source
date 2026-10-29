@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonLA_CommonColorCheck.h"

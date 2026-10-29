@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "PokemonLZA_IvJudgeReader.h"
 
 namespace PokemonAutomation{

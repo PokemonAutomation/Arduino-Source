@@ -4,9 +4,12 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
+#include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_02.h"
 
 //#include <iostream>

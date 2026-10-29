@@ -4,6 +4,7 @@
  *
  */
 
+#include <QAudioFormat>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Logging/AbstractLogger.h"
@@ -11,6 +12,7 @@
 #include "Kernels/AudioPipeline/Kernels_RawAudio2WorkingAudio.h"
 #include "Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.h"
 #include "Kernels/AudioPipeline/Kernels_WorkingAudio2WorkingAudio.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "CommonFramework/AudioPipeline/Tools/ChannelMixer.h"
 #include "CommonFramework/AudioPipeline/AudioSource.h"

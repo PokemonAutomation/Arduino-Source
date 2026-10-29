@@ -6,6 +6,7 @@
 
 #include "3rdParty-Core/nlohmann/json.hpp"
 #include "Common/Cpp/Filesystem/FileIO.h"
+#include "JsonValue.h"
 #include "JsonArray.h"
 #include "JsonObject.h"
 #include "JsonTools.h"

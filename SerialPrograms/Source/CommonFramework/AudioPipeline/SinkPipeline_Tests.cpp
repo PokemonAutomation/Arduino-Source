@@ -28,7 +28,9 @@
 #include <thread>
 #include <vector>
 #include <QAudioDecoder>
+#include <QAudioFormat>
 #include <QCoreApplication>
+#include <QEventLoop>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/TestRunners/UnitTest.h"

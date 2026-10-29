@@ -5,6 +5,8 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "PokemonSV_PokemonMovesReader.h"
 
 //#include <iostream>

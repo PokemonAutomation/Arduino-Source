@@ -4,6 +4,7 @@
  *
  */
 #include "Common/Cpp/Containers/Pimpl.tpp"
+#include "VideoOverlay.h"
 
 namespace PokemonAutomation{
 

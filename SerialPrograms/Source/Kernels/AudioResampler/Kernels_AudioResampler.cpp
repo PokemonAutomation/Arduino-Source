@@ -13,6 +13,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Containers/AlignedVector.tpp"
 #include "Kernels/Kernels_Alignment.h"
+#include "Kernels_AudioResampler_BlockKernels.h"
 #include "Kernels_AudioResampler.h"
 
 namespace PokemonAutomation{

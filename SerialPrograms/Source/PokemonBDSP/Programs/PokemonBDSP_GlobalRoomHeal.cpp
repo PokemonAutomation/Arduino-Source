@@ -8,6 +8,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
+#include "PokemonBDSP_GlobalRoomHeal.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

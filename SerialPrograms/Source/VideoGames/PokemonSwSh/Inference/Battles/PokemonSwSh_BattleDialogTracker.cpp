@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "PokemonSwSh_BattleDialogTracker.h"
 
 //#include <iostream>

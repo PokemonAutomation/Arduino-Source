@@ -5,6 +5,7 @@
  */
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "PokemonLA_NotificationReader.h"

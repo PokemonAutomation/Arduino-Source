@@ -5,8 +5,15 @@
  */
 
 #include <memory>
+#include <QObject>
+#include <QByteArray>
+#include <QEventLoop>
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
 #include <QNetworkReply>
+#include <QObject>
 #include <QTimer>
+#include <QSslError>
 #include "Common/Cpp/Filesystem/FileIO.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Json/JsonValue.h"

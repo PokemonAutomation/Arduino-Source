@@ -15,7 +15,9 @@
 #include <filesystem>
 #include <fstream>
 #include <vector>
+#include <QAudioFormat>
 #include <QAudioDecoder>
+#include <QEventLoop>
 #include <QTimer>
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
@@ -23,6 +25,7 @@
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "CommonFramework/AudioPipeline/IO/AudioFileLoader.h"
 #include "CommonFramework/AudioPipeline/IO/AudioInputFile.h"
+#include "AudioFileLoader_Tests.h"
 
 namespace PokemonAutomation{
 

@@ -5,6 +5,7 @@
  */
 
 #include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_PartyDialogs.h"
 

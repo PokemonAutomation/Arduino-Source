@@ -4,6 +4,8 @@
  *
  */
 
+#include <QGuiApplication>
+#include <QPixmap>
 #include <QScreen>
 #include <QPainter>
 #include "Common/Cpp/Containers/Pimpl.tpp"

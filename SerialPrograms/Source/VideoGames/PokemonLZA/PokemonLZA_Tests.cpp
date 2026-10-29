@@ -9,6 +9,7 @@
 #include "Inference/Donuts/PokemonLZA_FlavorPowerScreenDetector.h"
 #include "Inference/PokemonLZA_AlertEyeDetector.h"
 #include "Inference/Boxes/PokemonLZA_BoxDetection.h"
+#include "Inference/PokemonLZA_ButtonDetector.h"
 #include "Inference/Map/PokemonLZA_DirectionArrowDetector.h"
 #include "Inference/PokemonLZA_DialogDetector.h"
 #include "Inference/PokemonLZA_WeatherDetector.h"

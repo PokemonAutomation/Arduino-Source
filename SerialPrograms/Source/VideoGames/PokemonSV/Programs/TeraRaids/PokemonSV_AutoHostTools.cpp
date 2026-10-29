@@ -10,9 +10,11 @@
 #include "Common/Qt/TimeQt.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/FileDownloader.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "VideoGames/PokemonSV/Options/PokemonSV_AutoHostOptions.h"
 #include "PokemonSV_AutoHostTools.h"
 
 namespace PokemonAutomation{

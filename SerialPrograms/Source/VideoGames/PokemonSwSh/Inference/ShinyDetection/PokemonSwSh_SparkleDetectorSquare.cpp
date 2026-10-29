@@ -11,6 +11,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonTools/Images/DistanceToLine.h"
+#include "PokemonSwSh_SparkleDetectorSquare.h"
 
 //#include <iostream>
 //using std::cout;

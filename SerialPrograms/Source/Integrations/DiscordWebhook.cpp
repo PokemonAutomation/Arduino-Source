@@ -5,9 +5,11 @@
  */
 
 #include <deque>
+#include <QString>
 #include <QFile>
 #include <QHttpMultiPart>
 #include <QEventLoop>
+#include <QNetworkAccessManager>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "Common/Cpp/Json/JsonArray.h"

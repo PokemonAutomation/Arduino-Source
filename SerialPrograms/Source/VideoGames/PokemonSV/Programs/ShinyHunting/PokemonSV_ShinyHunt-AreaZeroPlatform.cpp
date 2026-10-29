@@ -11,6 +11,7 @@
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -18,12 +19,14 @@
 #include "VideoGames/PokemonSV/PokemonSV_Settings.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "VideoGames/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_AreaZero.h"
 #include "VideoGames/PokemonSV/Programs/Battles/PokemonSV_Battles.h"
 #include "VideoGames/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
+#include "PokemonSV_LetsGoTools.h"
 #include "PokemonSV_ShinyHunt-AreaZeroPlatform.h"
 
 //#include <iostream>

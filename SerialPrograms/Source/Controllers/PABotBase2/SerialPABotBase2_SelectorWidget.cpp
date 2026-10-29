@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Filesystem/Filesystem.h"
+#include "SerialPABotBase2_Descriptor.h"
 #include "SerialPABotBase2_SelectorWidget.h"
 
 //#include <iostream>

@@ -4,6 +4,9 @@
  *
  */
 
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h"

@@ -7,8 +7,13 @@
 #include <format>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
+#include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/OCR/OCR_SmallDictionaryMatcher.h"
 #include "CommonTools/Images/SolidColorTest.h"

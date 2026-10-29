@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonTools/OCR/OCR_Routines.h"
 #include "Pokemon_NatureReader.h"
 
 namespace PokemonAutomation{

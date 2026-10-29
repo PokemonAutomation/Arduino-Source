@@ -4,6 +4,7 @@
  *
  */
 
+#include "SystemSleep.h"
 
 #if 0
 #elif _WIN32

@@ -5,6 +5,9 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "VideoGames/PokemonSV/Inference/PokemonSV_BlueberryQuestReader.h"
 #include "PokemonSV_BlueberryQuestDetector.h"

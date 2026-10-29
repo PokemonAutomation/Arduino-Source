@@ -18,6 +18,7 @@
 #include "ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h"
 #include "SpikeConvolution/Kernels_SpikeConvolution.h"
 #include "Waterfill/Kernels_Waterfill_Tests.h"
+#include "Kernels_Tests.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

@@ -11,6 +11,7 @@
 //#include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
 #include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
+#include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_BoxHelpers.h"
 #include "PokemonSwSh_EggHelpers.h"
 #include "PokemonSwSh_EggHatcher.h"
 

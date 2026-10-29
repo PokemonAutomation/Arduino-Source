@@ -14,6 +14,7 @@
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/OCR/OCR_StringNormalization.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch_DateManipTools.h"
 #include "NintendoSwitch_DateManip_US.h"
 
 namespace PokemonAutomation{

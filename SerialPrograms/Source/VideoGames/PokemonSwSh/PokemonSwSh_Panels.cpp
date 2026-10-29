@@ -8,6 +8,7 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "PokemonSwSh_Panels.h"
 
+#include "PokemonSwSh_Settings.h"
 
 #include "Programs/QoLMacros/PokemonSwSh_FastCodeEntry.h"
 #include "Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.h"

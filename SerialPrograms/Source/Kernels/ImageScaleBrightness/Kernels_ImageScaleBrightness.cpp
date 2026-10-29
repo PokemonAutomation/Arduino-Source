@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/CpuId/CpuId.h"
+#include "Kernels_ImageScaleBrightness.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

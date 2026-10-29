@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonSwSh_MaxLair_Detect_ProfessorSwap.h"
 

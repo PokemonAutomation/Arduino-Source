@@ -6,6 +6,7 @@
 
 #include "CommonTools/Async/InferenceSession.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "VideoGames/PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA_MountDetectionTest.h"
 
 namespace PokemonAutomation{

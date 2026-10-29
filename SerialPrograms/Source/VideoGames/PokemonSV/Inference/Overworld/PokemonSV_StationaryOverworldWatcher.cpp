@@ -6,6 +6,7 @@
 
 #include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
 #include "PokemonSV_StationaryOverworldWatcher.h"
 
 //#include <iostream>

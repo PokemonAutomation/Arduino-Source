@@ -5,7 +5,10 @@
  */
 
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonTools/Async/InterruptableCommands.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "VideoGames/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 #include "PokemonSwSh_MaxLair_Run_PathSelect.h"

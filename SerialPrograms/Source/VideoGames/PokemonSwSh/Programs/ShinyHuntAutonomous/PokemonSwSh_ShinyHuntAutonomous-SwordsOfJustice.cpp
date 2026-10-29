@@ -13,6 +13,8 @@
 #include "VideoGames/PokemonSwSh/PokemonSwSh_Settings.h"
 #include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "VideoGames/PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
+#include "VideoGames/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
+#include "VideoGames/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
 #include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.h"
 #include "PokemonSwSh_ShinyHuntAutonomous-SwordsOfJustice.h"

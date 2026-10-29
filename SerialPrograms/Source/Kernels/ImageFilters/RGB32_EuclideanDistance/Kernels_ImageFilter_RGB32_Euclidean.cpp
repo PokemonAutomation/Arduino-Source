@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CpuId/CpuId.h"
+#include "Kernels_ImageFilter_RGB32_Euclidean.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

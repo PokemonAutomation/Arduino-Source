@@ -13,6 +13,7 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "VideoGames/PokemonSwSh/PokemonSwSh_Settings.h"
 #include "VideoGames/PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh_GameEntry.h"
 
 //#include <iostream>
 //using std::cout;

@@ -4,6 +4,7 @@
  *
  */
 
+#include "NullControllerWidget.h"
 
 namespace PokemonAutomation{
 

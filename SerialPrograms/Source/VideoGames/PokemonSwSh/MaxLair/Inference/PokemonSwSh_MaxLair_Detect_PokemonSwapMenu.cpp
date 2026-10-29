@@ -4,7 +4,9 @@
  *
  */
 
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "Pokemon/Inference/Pokemon_ReadHpBar.h"

@@ -7,6 +7,7 @@
 #include <chrono>
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -15,6 +16,7 @@
 #include "VideoGames/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "VideoGames/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
 #include "VideoGames/PokemonLA/Programs/PokemonLA_BattleRoutines.h"
+#include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_DialogEllipseDetector.h"
 #include "VideoGames/PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA_IngoBattleGrinder.h"

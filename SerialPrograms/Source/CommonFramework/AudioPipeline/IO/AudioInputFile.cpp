@@ -5,8 +5,11 @@
  */
 
 #include <memory>
+#include <QString>
 #include <QUrl>
+#include <QAudioBuffer>
 #include <QAudioDecoder>
+#include <QEventLoop>
 #include <QTimer>
 #include "3rdParty/QtWavFile/WavFile.h"
 #include "Common/Cpp/Exceptions.h"

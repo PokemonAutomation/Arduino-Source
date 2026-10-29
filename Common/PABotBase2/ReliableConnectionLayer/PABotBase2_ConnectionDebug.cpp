@@ -8,6 +8,7 @@
 #include "Common/CRC32/pabb_CRC32.h"
 #include "PABotBase2_PacketSender.h"
 #include "PABotBase2_StreamCoalescer.h"
+#include "PABotBase2_ConnectionDebug.h"
 
 namespace PokemonAutomation{
 namespace PABotBase2{

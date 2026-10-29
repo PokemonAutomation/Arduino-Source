@@ -4,6 +4,7 @@
  *
  */
 
+#include <QCamera>
 #include <QVideoSink>
 #include "Common/Qt/Redispatch.h"
 #include "CommonFramework/Logging/Logger.h"

@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Logging/Logger.h"
 #include "Pokemon/Resources/Pokemon_PokeballNames.h"
 #include "VideoGames/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h"
 #include "PokemonSwSh_BallSelectOption.h"

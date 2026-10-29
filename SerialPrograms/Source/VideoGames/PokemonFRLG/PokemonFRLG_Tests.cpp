@@ -25,6 +25,7 @@
 #include "Inference/PokemonFRLG_WildEncounterReader.h"
 #include "PokemonFRLG_Navigation.h"
 
+#include "PokemonFRLG_Tests.h"
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{

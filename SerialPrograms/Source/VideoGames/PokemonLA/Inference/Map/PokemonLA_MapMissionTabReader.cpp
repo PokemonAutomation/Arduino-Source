@@ -7,8 +7,11 @@
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 //#include "Tests/TestUtils.h"
+#include "PokemonLA_MapMissionTabReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

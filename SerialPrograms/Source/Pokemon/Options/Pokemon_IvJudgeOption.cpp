@@ -4,6 +4,7 @@
  *
  */
 
+#include "Pokemon/Pokemon_IvJudge.h"
 #include "Pokemon_IvJudgeOption.h"
 
 namespace PokemonAutomation{

@@ -9,6 +9,7 @@
 #include <map>
 #include <vector>
 #include "Common/Cpp/Exceptions.h"
+#include "ExpressionEvaluator.h"
 
 //#include <iostream>
 //using std::cout;

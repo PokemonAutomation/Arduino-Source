@@ -4,7 +4,13 @@
  *
  */
 
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
 #include "VideoGames/PokemonRSE/PokemonRSE_Settings.h"
 #include "PokemonRSE_LoadMenuDetector.h"
 

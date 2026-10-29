@@ -11,6 +11,7 @@
 #include <QMouseEvent>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/Redispatch.h"
+#include "VideoDisplayWidget.h"
 #include "VideoDisplayWindow.h"
 
 //#include <iostream>

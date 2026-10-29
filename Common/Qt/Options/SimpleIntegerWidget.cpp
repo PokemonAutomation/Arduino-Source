@@ -6,6 +6,8 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
+#include "ConfigWidget.h"
 #include "SimpleIntegerWidget.h"
 
 //#include <iostream>

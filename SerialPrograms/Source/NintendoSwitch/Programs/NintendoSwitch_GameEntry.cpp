@@ -10,6 +10,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"

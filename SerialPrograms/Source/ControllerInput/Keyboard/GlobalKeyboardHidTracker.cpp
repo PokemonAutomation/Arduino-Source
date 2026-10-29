@@ -9,6 +9,7 @@
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "KeyboardInput_State.h"
 #include "KeyboardInput_KeyMappings.h"
 #include "GlobalKeyboardHidTracker.h"
 

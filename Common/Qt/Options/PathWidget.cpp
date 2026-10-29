@@ -6,6 +6,8 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
 #include <QFileDialog>
 #include "PathWidget.h"
 

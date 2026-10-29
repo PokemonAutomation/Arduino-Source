@@ -9,6 +9,7 @@
 #include <iostream>
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "Tests/TestUtils.h"
 #include "PokemonLA_FlagTracker.h"
 

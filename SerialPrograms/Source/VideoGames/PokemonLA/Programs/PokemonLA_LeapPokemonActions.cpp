@@ -7,10 +7,12 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "VideoGames/PokemonLA/Resources/PokemonLA_PokemonInfo.h"
 #include "VideoGames/PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
 #include "VideoGames/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "VideoGames/PokemonLA/PokemonLA_TravelLocations.h"
 #include "PokemonLA_MountChange.h"
+#include "PokemonLA_RegionNavigation.h"
 #include "PokemonLA_BattleRoutines.h"
 #include "PokemonLA_LeapPokemonActions.h"
 

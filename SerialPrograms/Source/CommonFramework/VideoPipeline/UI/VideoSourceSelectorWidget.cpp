@@ -6,6 +6,7 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QComboBox>
 #include <QPushButton>
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/GlobalSettingsPanel.h"

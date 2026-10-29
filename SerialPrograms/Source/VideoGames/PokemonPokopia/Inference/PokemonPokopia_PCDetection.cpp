@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include "Common/Cpp/Exceptions.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"

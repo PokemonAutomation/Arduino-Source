@@ -9,6 +9,7 @@
 #include <arm_neon.h>
 #include "Common/Compiler.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Kernels_AudioResampler_BlockKernels.h"
 #include "Kernels_AudioResampler_Tests.h"
 
 namespace PokemonAutomation{

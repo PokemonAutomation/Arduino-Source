@@ -3,6 +3,8 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
@@ -13,7 +15,11 @@
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "VideoGames/PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
 #include "VideoGames/PokemonSV/Programs/Battles/PokemonSV_Battles.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
+#include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_33.h"
 
 //#include <iostream>

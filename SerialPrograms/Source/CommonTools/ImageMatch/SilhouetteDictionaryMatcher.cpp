@@ -6,6 +6,8 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "ImageCropper.h"
 #include "SilhouetteDictionaryMatcher.h"

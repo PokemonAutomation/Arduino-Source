@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "FilterToAlpha.h"
 
 #ifdef PA_ARCH_x86
 #include <smmintrin.h>

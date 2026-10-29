@@ -7,9 +7,12 @@
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/ImageMatch/SubObjectTemplateMatcher.h"
+#include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "PokemonBDSP_BoxGenderDetector.h"
 
 //#include <iostream>

@@ -13,6 +13,7 @@
 #include "NintendoSwitch/Inference/NintendoSwitch_StartGameUserSelectDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "PokemonFRLG_BlindNavigation.h"
 #include "PokemonFRLG_HardReset.h"
 
 namespace PokemonAutomation{

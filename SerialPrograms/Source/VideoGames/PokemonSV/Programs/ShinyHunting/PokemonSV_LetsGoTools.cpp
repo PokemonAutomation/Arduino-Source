@@ -7,6 +7,7 @@
 #include <algorithm>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Exceptions/ProgramFinishedException.h"
 //#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 //#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
@@ -15,6 +16,7 @@
 //#include "Pokemon/Pokemon_Notification.h"
 //#include "VideoGames/PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
 #include "VideoGames/PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h"
+#include "VideoGames/PokemonSV/Programs/Battles/PokemonSV_Battles.h"
 //#include "VideoGames/PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
 #include "PokemonSV_LetsGoTools.h"
 

@@ -17,6 +17,7 @@
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/Dens/PokemonSwSh_RaidCatchDetector.h"
+#include "VideoGames/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
 #include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "VideoGames/PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.h"
 #include "PokemonSwSh_ShinyHuntAutonomous-Regigigas2.h"

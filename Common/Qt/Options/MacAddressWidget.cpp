@@ -4,6 +4,8 @@
  *
  */
 
+#include <QLineEdit>
+#include "ConfigWidget.h"
 #include "MacAddressWidget.h"
 
 //#include <iostream>

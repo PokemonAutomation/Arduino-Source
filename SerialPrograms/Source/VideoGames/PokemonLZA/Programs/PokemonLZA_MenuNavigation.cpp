@@ -19,6 +19,7 @@
 #include "VideoGames/PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h"
 #include "VideoGames/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
+#include "PokemonLZA_MenuNavigation.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

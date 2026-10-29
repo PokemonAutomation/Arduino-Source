@@ -10,6 +10,8 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "VideoGames/PokemonPokopia/Inference/PokemonPokopia_ButtonDetector.h"
+#include "VideoGames/PokemonPokopia/Inference/PokemonPokopia_SelectionArrowDetector.h"
 #include "VideoGames/PokemonPokopia/Programs/PokemonPokopia_PCNavigation.h"
 
 namespace PokemonAutomation{

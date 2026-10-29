@@ -5,6 +5,7 @@
  */
 
 #include <QPainter>
+#include <QResizeEvent>
 #include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "CommonFramework/GlobalServices.h"
 #include "VideoOverlayWidget.h"

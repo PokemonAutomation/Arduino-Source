@@ -8,11 +8,16 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "ML/Inference/ML_YOLOv5Detector.h"
 #include "ML/Models/ML_YOLOv5Model.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "VideoGames/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h"
+#include "ML_YOLONavigation.h"
 
 using namespace std::chrono_literals;
 

@@ -5,6 +5,8 @@
  */
 
 #include <QFile>
+#include <QTextStream>
+#include <QApplication>
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "ThemeSelectorOption.h"
 

@@ -4,6 +4,7 @@
  *
  */
 
+#include "SettingsResourceDownloadRow.h"
 #include "SettingsResourceDownloadOptions.h"
 
 

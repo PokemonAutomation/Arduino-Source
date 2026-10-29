@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonSwSh_BattleDialogDetector.h"

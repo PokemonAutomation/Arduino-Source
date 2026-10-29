@@ -4,6 +4,7 @@
  *
  */
 
+#include <QKeyEvent>
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "GlobalQtKeyMap.h"
 

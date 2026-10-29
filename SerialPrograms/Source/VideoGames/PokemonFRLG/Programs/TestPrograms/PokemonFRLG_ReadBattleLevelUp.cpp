@@ -8,8 +8,10 @@
 #include <string>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleLevelUpReader.h"
 #include "PokemonFRLG_ReadBattleLevelUp.h"
 

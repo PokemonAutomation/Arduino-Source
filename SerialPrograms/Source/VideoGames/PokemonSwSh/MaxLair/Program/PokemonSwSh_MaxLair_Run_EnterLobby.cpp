@@ -5,6 +5,9 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Images/ImageManip.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/SolidColorTest.h"

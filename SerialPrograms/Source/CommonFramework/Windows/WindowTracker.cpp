@@ -7,6 +7,7 @@
 #include <set>
 #include <QMainWindow>
 #include "Common/Cpp/Concurrency/Mutex.h"
+#include "WindowTracker.h"
 
 //#include <iostream>
 //using std::cout;

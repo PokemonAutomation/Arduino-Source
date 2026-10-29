@@ -11,6 +11,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.h"
 //#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"

@@ -6,11 +6,13 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QComboBox>
 #include <QPushButton>
 #include <QFileDialog>
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Panels/ConsoleSettingsStretch.h"
+#include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 
 #include "CommonFramework/AudioPipeline/Sources/AudioSource_Null.h"

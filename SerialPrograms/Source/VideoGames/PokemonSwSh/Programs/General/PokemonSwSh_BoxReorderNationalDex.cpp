@@ -7,7 +7,9 @@
 #include <algorithm>
 #include <sstream>
 #include <map>
+#include "CommonFramework/Language.h"
 //#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"

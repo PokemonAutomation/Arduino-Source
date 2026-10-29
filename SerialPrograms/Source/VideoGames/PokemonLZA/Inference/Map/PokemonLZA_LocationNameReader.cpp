@@ -6,6 +6,7 @@
 
 #include <array>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/OCR/OCR_Routines.h"
 #include "PokemonLZA_LocationNameReader.h"
 
 

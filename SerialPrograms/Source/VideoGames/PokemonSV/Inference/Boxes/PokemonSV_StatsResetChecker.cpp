@@ -10,6 +10,7 @@
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.h"
 #include "VideoGames/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
+#include "PokemonSV_StatsResetChecker.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

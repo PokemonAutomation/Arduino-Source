@@ -10,6 +10,8 @@
 #include "Common/Cpp/Containers/Pimpl.tpp"   //  Pimpl<QAudioFormat> (AudioFormat) instantiations
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/AudioPipeline/AudioInfo.h"
+#include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 #include "CommonFramework/Recording/StreamHistoryOption.h"
 
 #if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)

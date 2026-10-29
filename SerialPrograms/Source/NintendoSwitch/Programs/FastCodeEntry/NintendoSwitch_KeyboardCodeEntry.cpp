@@ -11,6 +11,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "NintendoSwitch_CodeEntryTools.h"
+#include "NintendoSwitch_KeyboardEntryMappings.h"
 #include "NintendoSwitch_KeyboardCodeEntry.h"
 
 //#include <iostream>

@@ -6,6 +6,7 @@
 
 //#include "Common/Cpp/CancellableScope.h"
 #include "NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_OemController.h"
+#include "PABotBase2_Connection.h"
 
 //#include <iostream>
 //using std::cout;

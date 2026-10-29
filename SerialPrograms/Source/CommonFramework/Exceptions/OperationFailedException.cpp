@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "OperationFailedException.h"
 

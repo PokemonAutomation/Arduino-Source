@@ -4,6 +4,7 @@
  *
  */
 
+#include <QCamera>
 #include <QPainter>
 #include <QVideoSink>
 #include "Common/Qt/Redispatch.h"

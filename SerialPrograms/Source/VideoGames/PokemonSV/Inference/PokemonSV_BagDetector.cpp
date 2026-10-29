@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonSV_PokemonSummaryReader.h"
 #include "PokemonSV_BagDetector.h"

@@ -16,6 +16,7 @@
 #include "Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "VideoGames/PokemonLA/PokemonLA_Locations.h"

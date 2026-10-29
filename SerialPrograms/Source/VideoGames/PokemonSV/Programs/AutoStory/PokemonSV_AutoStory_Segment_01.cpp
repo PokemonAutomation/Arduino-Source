@@ -10,6 +10,8 @@
 #include "VideoGames/PokemonSV/Inference/PokemonSV_TutorialDetector.h"
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
+#include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_01.h"
 
 //#include <iostream>

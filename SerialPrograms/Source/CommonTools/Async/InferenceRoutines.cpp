@@ -7,6 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "InferenceSession.h"
 #include "InferenceRoutines.h"

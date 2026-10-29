@@ -8,6 +8,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 //#include "ImageDiff.h"
 #include "ImageCropper.h"

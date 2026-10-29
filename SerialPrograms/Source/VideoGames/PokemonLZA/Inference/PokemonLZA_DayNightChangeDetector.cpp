@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonTools/Images/WaterfillUtilities.h"
 #include "PokemonLZA_DayNightChangeDetector.h"
 
 namespace PokemonAutomation{

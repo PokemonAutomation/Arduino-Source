@@ -5,13 +5,17 @@
  */
 
 #include "Common/Cpp/Strings/StringTools.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Language.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_RngNavigation.h"
 #include "PokemonFRLG_HardReset.h"
+#include "PokemonFRLG_RngCalibration.h"
 #include "PokemonFRLG_RngLoopRoutines.h"
 #include "PokemonFRLG_StaticRng.h"
 

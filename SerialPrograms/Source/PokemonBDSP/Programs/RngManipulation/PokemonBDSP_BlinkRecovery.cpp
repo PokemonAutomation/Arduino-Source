@@ -16,6 +16,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP_BlinkRecovery.h"
 #include "PokemonBDSP_StateReidentifier.h"
+#include "PokemonBDSP_StateSolver.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

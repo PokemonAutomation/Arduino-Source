@@ -6,7 +6,9 @@
 
 #include <string>
 #include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Tests/TestUtils.h"
+#include "VideoGames/PokemonHome/Inference/PokemonHome_ButtonDetector.h"
 #include "PokemonHome_SummaryScreenDetector.h"
 
 namespace PokemonAutomation{

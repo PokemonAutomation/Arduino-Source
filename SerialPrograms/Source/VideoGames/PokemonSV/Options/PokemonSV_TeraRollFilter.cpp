@@ -8,6 +8,7 @@
 #include <algorithm>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
 #include "VideoGames/PokemonSV/Programs/TeraRaids/PokemonSV_TeraRoutines.h"

@@ -11,6 +11,7 @@
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
 #include "VideoGames/PokemonSV/Programs/Boxes/PokemonSV_BoxAttach.h"
 #include "VideoGames/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"

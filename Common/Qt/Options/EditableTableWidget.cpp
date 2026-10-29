@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QVBoxLayout>
 #include <QHeaderView>
+#include <QLabel>
 #include <QPushButton>
 #include <QMessageBox>
 #include "Common/Cpp/Json/JsonValue.h"

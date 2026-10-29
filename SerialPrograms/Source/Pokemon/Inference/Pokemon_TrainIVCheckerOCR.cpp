@@ -5,6 +5,7 @@
  */
 
 #include <thread>
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/OCR/OCR_TrainingTools.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon_IvJudgeReader.h"

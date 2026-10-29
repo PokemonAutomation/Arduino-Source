@@ -11,6 +11,7 @@
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Framework/NintendoSwitch_SingleSwitchProgramSession.h"
+#include "NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

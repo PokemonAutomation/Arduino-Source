@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <opencv2/imgproc.hpp>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "PokemonBDSP_EyeBlinkDetector.h"

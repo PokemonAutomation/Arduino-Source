@@ -14,6 +14,7 @@
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/GlobalAutoPaths.h"
+#include "SetupSettings.h"
 
 using std::cout;
 using std::endl;

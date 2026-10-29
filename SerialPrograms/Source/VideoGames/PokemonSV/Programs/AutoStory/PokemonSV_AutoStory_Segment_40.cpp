@@ -11,6 +11,8 @@
 #include "VideoGames/PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
 #include "VideoGames/PokemonSV/Inference/PokemonSV_TutorialDetector.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
+#include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_40.h"
 
 //#include <iostream>

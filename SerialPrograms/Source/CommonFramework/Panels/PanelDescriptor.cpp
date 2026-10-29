@@ -4,6 +4,7 @@
  *
  */
 
+#include "PanelDescriptor.h"
 #include "PanelSession.h"
 
 namespace PokemonAutomation{

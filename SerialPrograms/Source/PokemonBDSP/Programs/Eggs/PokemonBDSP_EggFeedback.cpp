@@ -5,14 +5,17 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/FrozenImageDetector.h"
 #include "CommonTools/VisualDetectors/ImageMatchDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
 #include "PokemonBDSP_EggRoutines.h"
+#include "PokemonBDSP_EggFeedback.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

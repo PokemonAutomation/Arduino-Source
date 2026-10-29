@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "PABotBase2_MessageHandler.h"
 
 namespace PokemonAutomation{
 namespace PABotBase2{

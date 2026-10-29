@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Strings/Unicode.h"
 #include "Common/Qt/StringToolsQt.h"
+#include "Integrations/DppIntegration/DppClient.h"
 #include "DiscordIntegrationSettings.h"
 
 //#include <iostream>

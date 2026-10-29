@@ -5,6 +5,11 @@
  */
 
 #include "Common/Cpp/Json/JsonValue.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
+#include "CommonFramework/Exceptions/ProgramFinishedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "ComputerProgramSession.h"
 
 //#include <iostream>

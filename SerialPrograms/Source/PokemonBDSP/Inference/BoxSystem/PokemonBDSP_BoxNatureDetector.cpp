@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "PokemonBDSP_BoxNatureDetector.h"
 
 namespace PokemonAutomation{

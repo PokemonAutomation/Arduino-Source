@@ -13,6 +13,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "VideoGames/PokemonRSE/Inference/Dialogs/PokemonRSE_BattleDialogs.h"
 #include "VideoGames/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h"
 #include "VideoGames/PokemonRSE/PokemonRSE_Navigation.h"
 #include "PokemonRSE_ShinyHunt-Mew.h"

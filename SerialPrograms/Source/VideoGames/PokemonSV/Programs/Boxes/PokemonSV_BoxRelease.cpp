@@ -11,6 +11,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV_BoxRoutines.h"
+#include "PokemonSV_BoxRelease.h"
 
 //#include <iostream>
 //using std::cout;

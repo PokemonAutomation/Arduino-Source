@@ -4,6 +4,7 @@
  *
  */
 
+#include "PokemonSwSh_EncounterFilterEnums.h"
 #include "PokemonSwSh_EncounterFilterOption.h"
 
 namespace PokemonAutomation{

@@ -10,6 +10,7 @@
 #include "CommonFramework/Logging/Logger.h"
 //#include "CommonFramework/PersistentSettings.h"
 #ifdef QT_CORE_LIB
+#include "CommonFramework/Panels/PanelTools.h"
 #include "NintendoSwitch/NintendoSwitch_SettingsPanel.h"
 #endif
 #include "NintendoSwitch_ControllerSettings.h"

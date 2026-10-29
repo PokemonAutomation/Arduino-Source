@@ -6,7 +6,9 @@
 
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageDiff.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "PokemonBDSP_VSSeekerReaction.h"
 

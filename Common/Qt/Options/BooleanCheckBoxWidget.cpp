@@ -6,6 +6,7 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QCheckBox>
 #include "BooleanCheckBoxWidget.h"
 
 namespace PokemonAutomation{

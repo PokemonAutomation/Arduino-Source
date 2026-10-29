@@ -5,7 +5,9 @@
  */
 
 #include "CommonFramework/ProgramSession.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "ProgramEnvironment.h"
 
 
 namespace PokemonAutomation{

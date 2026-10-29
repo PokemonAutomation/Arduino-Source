@@ -7,6 +7,7 @@
 #include <thread>
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/OCR/OCR_TrainingTools.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"

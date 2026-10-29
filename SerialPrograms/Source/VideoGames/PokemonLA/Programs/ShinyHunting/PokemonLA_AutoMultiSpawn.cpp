@@ -23,6 +23,8 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "VideoGames/PokemonLA/Inference/Battles/PokemonLA_BattleSpriteWatcher.h"
+#include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
+#include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "VideoGames/PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 #include "VideoGames/PokemonLA/Inference/PokemonLA_WildPokemonFocusDetector.h"
 #include "VideoGames/PokemonLA/PokemonLA_TravelLocations.h"

@@ -4,6 +4,8 @@
  *
  */
 
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "VideoGames/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "PokemonSwSh_PokemonSpriteReader.h"

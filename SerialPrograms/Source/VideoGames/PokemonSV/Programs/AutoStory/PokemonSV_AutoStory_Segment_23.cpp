@@ -4,7 +4,9 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 
+#include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_23.h"
 
 //#include <iostream>

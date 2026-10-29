@@ -6,6 +6,7 @@
 
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/ImageMatchDetector.h"
@@ -16,6 +17,7 @@
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 #include "VideoGames/PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP_StarterReset.h"

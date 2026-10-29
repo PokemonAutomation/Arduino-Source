@@ -7,6 +7,7 @@
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "VideoGames/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h"
 #include "VideoGames/PokemonRSE/Inference/Menus/PokemonRSE_StartMenuDetector.h"
+#include "PokemonRSE_Tests.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

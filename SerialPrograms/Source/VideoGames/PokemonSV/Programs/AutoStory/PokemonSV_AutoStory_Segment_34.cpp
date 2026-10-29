@@ -7,7 +7,11 @@
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "VideoGames/PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
+#include "VideoGames/PokemonSV/Programs/PokemonSV_WorldNavigation.h"
+#include "PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_AutoStory_Segment_34.h"
 
 //#include <iostream>

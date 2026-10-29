@@ -5,6 +5,7 @@
  */
 
 #include <QVBoxLayout>
+#include <QFrame>
 #include <QLabel>
 #include "StaticTextWidget.h"
 

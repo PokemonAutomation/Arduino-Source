@@ -14,6 +14,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "VideoGames/PokemonLGPE/PokemonLGPE_Settings.h"
+#include "PokemonLGPE_GameEntry.h"
 
 //#include <iostream>
 //using std::cout;

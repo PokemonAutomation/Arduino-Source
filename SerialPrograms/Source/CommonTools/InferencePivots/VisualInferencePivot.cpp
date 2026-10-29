@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "VisualInferencePivot.h"
 
 //#include <iostream>

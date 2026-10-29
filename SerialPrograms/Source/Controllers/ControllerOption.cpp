@@ -8,6 +8,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "ControllerTypeStrings.h"
+#include "ControllerDescriptor.h"
 #include "ControllerOption.h"
 #include "NullController.h"
 
