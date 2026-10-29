@@ -357,7 +357,7 @@ std::string AutoStory_Checkpoint_0418::start_text() const {
     return "Inside Pastoria Gym at the entrance, facing north.";
 }
 std::string AutoStory_Checkpoint_0418::end_text() const {
-    return "Inside Pastoria Gym in front of Crasher Wake, facing north, after acquiring the fourth badge and clearing his reward dialogue.";
+    return "Outside Pastoria Gym at the doorway, facing south, after acquiring the fourth badge and clearing the reward dialogue.";
 }
 void AutoStory_Checkpoint_0418::run_checkpoint(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -376,98 +376,139 @@ void AutoStory_Checkpoint_0418::run_checkpoint(SingleSwitchProgramEnvironment& e
                 Milliseconds delay;
             };
 
-            // Recorded walking counts; repeat_dpad adds the facing press on each turn.
+            // Trial: use the supplied counts without an extra facing press.
             const std::vector<Move> sequences[] = {
                 {
                     // Trainer 1
                     {DPAD_UP, 16, 0ms},
-                    {DPAD_LEFT, 9, 0ms},
+                    {DPAD_LEFT, 11, 0ms},
                     {DPAD_DOWN, 8, 0ms},
-                    {DPAD_LEFT, 2, 0ms},
-                    {DPAD_RIGHT, 6, 0ms},
-                    {DPAD_UP, 6, 0ms},
-                    {DPAD_RIGHT, 8, 0ms},
-                    {DPAD_UP, 6, 0ms},
-                    {DPAD_LEFT, 4, 0ms},
-                    {DPAD_RIGHT, 1, 0ms},
-                    {DPAD_UP, 13, 0ms},
-                    {DPAD_RIGHT, 4, 0ms},
-                    {DPAD_DOWN, 1, 0ms},
-                    {DPAD_LEFT, 4, 0ms},
-                    {DPAD_DOWN, 4, 0ms},
+                    {DPAD_DOWN, 1, 2000ms},
                     {DPAD_RIGHT, 5, 0ms},
-                    {DPAD_DOWN, 9, 0ms},
-                    {DPAD_LEFT, 20, 0ms},
-                    {DPAD_DOWN, 5, 0ms},
+                    {DPAD_UP, 7, 0ms},
+                    {DPAD_RIGHT, 10, 0ms},
+                    {DPAD_UP, 7, 0ms},
+                    {DPAD_LEFT, 4, 0ms},
+                    {DPAD_UP, 14, 0ms},
                     {DPAD_RIGHT, 4, 0ms},
+                    {DPAD_RIGHT, 1, 2000ms},
+                    {DPAD_LEFT, 4, 0ms},
+                    {DPAD_DOWN, 6, 0ms},
+                    {DPAD_RIGHT, 3, 0ms},
+                    {DPAD_DOWN, 7, 0ms},
+                    {DPAD_LEFT, 12, 0ms},
+                    {DPAD_DOWN, 5, 0ms},
+                    {DPAD_RIGHT, 3, 0ms},
                 },
                 {
                     // Trainer 2
                     {DPAD_RIGHT, 2, 0ms},
-                    {DPAD_LEFT, 1, 0ms},
-                    {DPAD_LEFT, 3, 0ms},
+                    {DPAD_RIGHT, 1, 2000ms},
+                    {DPAD_LEFT, 4, 0ms},
                     {DPAD_DOWN, 11, 0ms},
                     {DPAD_RIGHT, 6, 0ms},
                 },
                 {
                     // Trainer 3
-                    {DPAD_RIGHT, 8, 0ms},
+                    {DPAD_RIGHT, 10, 0ms},
                     {DPAD_UP, 2, 0ms},
                 },
                 {
                     // Trainer 4
-                    {DPAD_UP, 7, 0ms},
-                    {DPAD_RIGHT, 1, 0ms},
-                    {DPAD_UP, 13, 0ms},
+                    {DPAD_UP, 21, 0ms},
                     {DPAD_LEFT, 1, 0ms},
-                    {DPAD_LEFT, 1, 0ms},
-                    {DPAD_DOWN, 1, 0ms},
-                    {DPAD_RIGHT, 2, 0ms},
+                    {DPAD_LEFT, 1, 2000ms},
+                    {DPAD_DOWN, 2, 0ms},
+                    {DPAD_RIGHT, 5, 0ms},
                     {DPAD_DOWN, 17, 0ms},
-                    {DPAD_RIGHT, 2, 0ms},
-                    {DPAD_UP, 7, 0ms},
-                    {DPAD_UP, 19, 0ms},
-                    {DPAD_LEFT, 8, 0ms},
-                    {DPAD_DOWN, 1, 0ms},
-                    {DPAD_LEFT, 10, 0ms},
-                    {DPAD_DOWN, 10, 0ms},
-                    {DPAD_LEFT, 2, 0ms},
+                    {DPAD_DOWN, 1, 2000ms},
+                    {DPAD_UP, 25, 0ms},
+                    {DPAD_LEFT, 18, 0ms},
+                    {DPAD_DOWN, 11, 0ms},
+                    {DPAD_LEFT, 4, 0ms},
                     {DPAD_UP, 10, 0ms},
                 },
                 {
-                    // Crasher Wake approach; the battle is added after the recording ends.
+                    // Crasher Wake approach
+                    {DPAD_UP, 2, 0ms},
+                    {DPAD_UP, 1, 4000ms},
+                    {DPAD_DOWN, 4, 0ms},
+                    {DPAD_RIGHT, 11, 0ms},
+                    {DPAD_UP, 5, 0ms},
+                },
+                {
+                    // Return from Crasher Wake
                     {DPAD_UP, 3, 0ms},
-                    {DPAD_LEFT, 2, 0ms},
-                    {DPAD_DOWN, 6, 0ms},
+                    {DPAD_LEFT, 3, 0ms},
+                    {DPAD_UP, 3, 0ms},
+                    {DPAD_LEFT, 11, 0ms},
+                    {DPAD_DOWN, 35, 0ms},
+                    {DPAD_RIGHT, 10, 0ms},
+                    {DPAD_DOWN, 5, 0ms},
                     {DPAD_RIGHT, 4, 0ms},
-                    {DPAD_UP, 1, 0ms},
-                    {DPAD_RIGHT, 8, 0ms},
-                    {DPAD_UP, 4, 0ms},
+                    {DPAD_DOWN, 2, 0ms},
                 },
             };
 
-            DpadState dpad;
-            dpad.last_dir = DPAD_UP;
-            for (size_t battle = 0; battle < 5; battle++){
-                const bool gym_leader = battle == 4;
-                const std::string label =
-                    gym_leader ? "Crasher Wake" : "Pastoria Gym trainer " + std::to_string(battle + 1);
-                stream.log("[Pastoria Gym puzzle] Approaching " + label + ".");
-                for (const auto& move : sequences[battle]){
-                    repeat_dpad(context, dpad, move.dir, 80ms, 300ms, move.count, true);
-                    if (move.delay > 0ms){
-                        pbf_wait(context, move.delay);
+            for (size_t stage = 0; stage < 6; stage++){
+                stream.log("[Pastoria Gym puzzle] Movement stage " + std::to_string(stage + 1) + ".");
+                if (stage == 5){
+                    // Observe the supplied return route and stop movement at the Gym exit fade.
+                    BlackScreenWatcher exit_black(COLOR_RED);
+                    if (run_until<ProControllerContext>(stream,
+                        context,
+                        [&](ProControllerContext& ctx){
+                            for (const auto& move : sequences[stage]){
+                                // repeat_dpad(ctx, dpad, move.dir, 80ms, 300ms, move.count, true);
+                                for (int press = 0; press < move.count; press++){
+                                    pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
+                                    if (move.delay > 0ms){
+                                        pbf_wait(ctx, move.delay);
+                                    }
+                                }
+                            }
+                            pbf_wait(ctx, 5000ms);
+                        },
+                        {{exit_black}}) != 0){
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                            "Pastoria Gym return: Exit transition did not start.",
+                            stream);
+                    }
+                    BlackScreenWatcher outside(COLOR_RED,
+                        {0.1, 0.1, 0.8, 0.8},
+                        100,
+                        10,
+                        BlackScreenWatcher::FinderType::GONE,
+                        500ms);
+                    if (wait_until(stream, context, 30s, {{outside}}) != 0){
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                            "Pastoria Gym return: Exit transition did not finish.",
+                            stream);
+                    }
+                    pbf_wait(context, 500ms);
+                    context.wait_for_all_requests();
+                    break;
+                }
+                for (const auto& move : sequences[stage]){
+                    // repeat_dpad(context, dpad, move.dir, 80ms, 300ms, move.count, true);
+                    for (int press = 0; press < move.count; press++){
+                        pbf_press_dpad(context, move.dir, 80ms, 300ms);
+                        if (move.delay > 0ms){
+                            pbf_wait(context, move.delay);
+                        }
                     }
                 }
                 context.wait_for_all_requests();
 
-                // Replace recorded battle/menu inputs with the existing slot-based handler.
+                const bool gym_leader = stage == 4;
+                const std::string label =
+                    gym_leader ? "Crasher Wake" : "Pastoria Gym trainer " + std::to_string(stage + 1);
                 pbf_press_button(context, BUTTON_A, 150ms, 300ms);
                 fight_trainer_using_moves(stream, context, 1, label, gym_leader);
                 clear_post_battle_dialogue(stream, context, BUTTON_B, gym_leader ? 6000ms : 3000ms);
             }
             stream.log(
-                "[Pastoria Gym puzzle] Crasher Wake defeated and reward dialogue cleared; remaining inside the Gym.",
+                "[Pastoria Gym puzzle] Reward dialogue cleared; outside the Gym doorway, ready for 05.01.",
                 COLOR_GREEN);
         },
         true);
