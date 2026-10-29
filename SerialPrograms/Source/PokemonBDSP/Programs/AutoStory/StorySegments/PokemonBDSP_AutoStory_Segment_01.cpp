@@ -73,8 +73,11 @@ static std::pair<double, double> joystick_for(MoveDirection direction){
 //  Watches for a short dialogue box over several attempts. Returns true as soon as one is seen.
 //  Returns false (without throwing) only if every attempt times out, so callers can skip
 //  an optional interaction. Multiple attempts guard against a single missed detection.
-static bool try_detect_dialogue(VideoStream& stream, ProControllerContext& context, const std::string& label,
-                                size_t attempts = 3, std::chrono::milliseconds window = 5000ms){
+static bool try_detect_dialogue(VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& label,
+    size_t attempts = 3,
+    std::chrono::milliseconds window = 5000ms){
     for (size_t attempt = 0; attempt < attempts; attempt++){
         ShortDialogWatcher watcher_cyan(COLOR_CYAN);
         ShortDialogWatcher watcher_red(COLOR_RED);
@@ -83,8 +86,8 @@ static bool try_detect_dialogue(VideoStream& stream, ProControllerContext& conte
             return true;
         }
         stream.log(label + " dialogue not detected (attempt " + std::to_string(attempt + 1) + "/" +
-                       std::to_string(attempts) + ").",
-                   COLOR_ORANGE);
+            std::to_string(attempts) + ").",
+            COLOR_ORANGE);
     }
     return false;
 }
@@ -112,9 +115,11 @@ struct DoorwayWalkOptions {
 //  travel_time + options.grace, if more than options.max_battles occur, or if a battle
 //  cannot be escaped.
 //  Returns the total active walking time used.
-static std::chrono::milliseconds walk_until_doorway(VideoStream& stream, ProControllerContext& context,
-                                                    MoveDirection direction, std::chrono::milliseconds travel_time,
-                                                    const DoorwayWalkOptions& options = DoorwayWalkOptions()){
+static std::chrono::milliseconds walk_until_doorway(VideoStream& stream,
+    ProControllerContext& context,
+    MoveDirection direction,
+    std::chrono::milliseconds travel_time,
+    const DoorwayWalkOptions& options = DoorwayWalkOptions()){
     enum class NavState {
         WALKING,
         BLACK_SCREEN,
@@ -133,8 +138,8 @@ static std::chrono::milliseconds walk_until_doorway(VideoStream& stream, ProCont
         switch (state){
         case NavState::WALKING: {
             if (walked >= max_travel){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "walk_until_doorway: Doorway not found within time budget.",
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "walk_until_doorway: Doorway not found within time budget.",
                     stream);
             }
             context.wait_for_all_requests();
@@ -169,12 +174,13 @@ static std::chrono::milliseconds walk_until_doorway(VideoStream& stream, ProCont
         }
         case NavState::IN_BATTLE: {
             if (++battles > options.max_battles){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "walk_until_doorway: Too many battles while walking.", stream);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "walk_until_doorway: Too many battles while walking.",
+                    stream);
             }
             stream.log("[AutoStory] Wild battle. Escaping. Walked " + std::to_string(walked.count()) + "ms of " +
-                           std::to_string(travel_time.count()) + "ms.",
-                       COLOR_ORANGE);
+                std::to_string(travel_time.count()) + "ms.",
+                COLOR_ORANGE);
             escape_wild_battle(stream, context, options.battle_type);
             state = NavState::WALKING;
             break;
@@ -184,7 +190,7 @@ static std::chrono::milliseconds walk_until_doorway(VideoStream& stream, ProCont
         }
     }
     stream.log("[AutoStory] Doorway transition detected after " + std::to_string(walked.count()) + "ms of walking.",
-               COLOR_GREEN);
+        COLOR_GREEN);
     return walked;
 }
 
@@ -194,8 +200,9 @@ static std::chrono::milliseconds walk_until_doorway(VideoStream& stream, ProCont
 //  Navigates the player from Jubilife City to the Oreburgh Gate, including the
 //  first Barry fight.
 // ---------------------------------------------------------------------------
-void jubilife_to_oreburgh_gate(SingleSwitchProgramEnvironment& env, VideoStream& stream,
-                               ProControllerContext& context){
+void jubilife_to_oreburgh_gate(SingleSwitchProgramEnvironment& env,
+    VideoStream& stream,
+    ProControllerContext& context){
     // Wait for game to fully accept input after save/overworld return
     pbf_wait(context, 2000ms);
     context.wait_for_all_requests();
@@ -289,12 +296,12 @@ void oreburgh_gate_to_mine(SingleSwitchProgramEnvironment& env, VideoStream& str
     bool black_screen_found = false;
     for (size_t attempt = 0; attempt < 3 && !black_screen_found; attempt++){
         BlackScreenWatcher black_screen;
-        int ret =
-            run_until<ProControllerContext>(stream, context,
-                                            [](ProControllerContext& context){
-                                                pbf_move_left_joystick(context, {0.000000, -1.000000}, 4740ms, 0ms);
-                                            },
-                                            {black_screen});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0.000000, -1.000000}, 4740ms, 0ms);
+            },
+            {black_screen});
         if (ret == 0){
             stream.log("Black screen detected.");
             black_screen_found = true;
@@ -303,8 +310,9 @@ void oreburgh_gate_to_mine(SingleSwitchProgramEnvironment& env, VideoStream& str
     context.wait_for_all_requests();
 
     if (!black_screen_found){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT, "oreburgh_gate_to_mine: No black screen after 3 attempts.", stream);
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "oreburgh_gate_to_mine: No black screen after 3 attempts.",
+            stream);
     }
 
     //  Let the mine entrance transition fully finish so the next step's black screen
@@ -338,8 +346,8 @@ static MineCenterOffset measure_mine_center_offset(const ImageViewRGB32& referen
 
     // Entrance beam and both posts. Avoid the player and shadow.
     const std::array<ImageFloatBox, 3> boxes = {ImageFloatBox(0.35, 0.285, 0.30, 0.07),
-                                                ImageFloatBox(0.355, 0.37, 0.035, 0.23),
-                                                ImageFloatBox(0.615, 0.37, 0.035, 0.23)};
+        ImageFloatBox(0.355, 0.37, 0.035, 0.23),
+        ImageFloatBox(0.615, 0.37, 0.035, 0.23)};
 
     const int search_radius = (int)std::lround(0.10 * live_scaled.width());
     std::vector<double> scores(2 * search_radius + 1);
@@ -396,7 +404,7 @@ static MineCenterOffset measure_mine_center_offset(const ImageViewRGB32& referen
     const size_t best_index = static_cast<size_t>(best_shift + search_radius);
 
     const bool valid = best_score <= 20.0 && worst_regions[best_index] <= 30.0 &&
-                       alternative_score - best_score >= 3.0 && std::abs(best_shift) < search_radius;
+        alternative_score - best_score >= 3.0 && std::abs(best_shift) < search_radius;
 
     return {valid, static_cast<double>(best_shift) / live_scaled.width(), best_score};
 }
@@ -420,7 +428,7 @@ static bool oreburgh_mine_alignment_test(VideoStream& stream, ProControllerConte
         const MineCenterOffset measurement = measure_mine_center_offset(reference, frame);
 
         stream.log("[Mine align] Offset=" + std::to_string(measurement.offset) +
-                   ", score=" + std::to_string(measurement.score) + (measurement.valid ? ", trusted" : ", unsure"));
+            ", score=" + std::to_string(measurement.score) + (measurement.valid ? ", trusted" : ", unsure"));
 
         if (!measurement.valid){
             stream.log("[Mine align] Entrance position unsure. Stopping.", COLOR_ORANGE);
@@ -459,18 +467,19 @@ static bool oreburgh_mine_alignment_test(VideoStream& stream, ProControllerConte
         BattleMenuWatcher menu(BattleType::STANDARD, COLOR_YELLOW);
         BattleDialogWatcher dialog(COLOR_YELLOW);
 
-        const int result = run_until<ProControllerContext>(stream, context,
-                                                           [x, duration](ProControllerContext& ctx){
-                                                               pbf_move_left_joystick(ctx, {x, 0.0}, duration, 0ms);
-                                                               pbf_wait(ctx, 500ms);
-                                                               ctx.wait_for_all_requests();
-                                                           },
-                                                           {black, menu, dialog});
+        const int result = run_until<ProControllerContext>(stream,
+            context,
+            [x, duration](ProControllerContext& ctx){
+                pbf_move_left_joystick(ctx, {x, 0.0}, duration, 0ms);
+                pbf_wait(ctx, 500ms);
+                ctx.wait_for_all_requests();
+            },
+            {black, menu, dialog});
 
         if (result >= 0){
             stream.log("[Mine align] Battle or transition detected. "
-                       "Stopping the alignment test.",
-                       COLOR_ORANGE);
+                "Stopping the alignment test.",
+                COLOR_ORANGE);
             return false;
         }
 
@@ -491,8 +500,12 @@ static bool mine_escape_and_settle(VideoStream& stream, ProControllerContext& co
     context.wait_for_all_requests();
 
     // Check the return waits instead of ignoring their results.
-    BlackScreenWatcher visible(COLOR_YELLOW, ImageFloatBox(0.1, 0.1, 0.8, 0.8), 100, 10,
-                               BlackScreenWatcher::FinderType::GONE, 500ms);
+    BlackScreenWatcher visible(COLOR_YELLOW,
+        ImageFloatBox(0.1, 0.1, 0.8, 0.8),
+        100,
+        10,
+        BlackScreenWatcher::FinderType::GONE,
+        500ms);
 
     if (wait_until(stream, context, 8s, {{visible}}) != 0){
         stream.log("[Mine encounter] Screen did not return. Stopping.", COLOR_ORANGE);
@@ -523,13 +536,14 @@ static bool mine_force_encounter_test(VideoStream& stream, ProControllerContext&
         BattleMenuWatcher menu(BattleType::STANDARD, COLOR_YELLOW);
         BattleDialogWatcher dialog(COLOR_YELLOW);
 
-        const int result = run_until<ProControllerContext>(stream, context,
-                                                           [y](ProControllerContext& ctx){
-                                                               pbf_move_left_joystick(ctx, {0.0, y}, 120ms, 0ms);
-                                                               pbf_wait(ctx, 400ms);
-                                                               ctx.wait_for_all_requests();
-                                                           },
-                                                           {black, menu, dialog});
+        const int result = run_until<ProControllerContext>(stream,
+            context,
+            [y](ProControllerContext& ctx){
+                pbf_move_left_joystick(ctx, {0.0, y}, 120ms, 0ms);
+                pbf_wait(ctx, 400ms);
+                ctx.wait_for_all_requests();
+            },
+            {black, menu, dialog});
 
         if (result >= 0){
             stream.log("[Mine encounter] Wiggle interrupted. Checking for battle.");
@@ -540,8 +554,8 @@ static bool mine_force_encounter_test(VideoStream& stream, ProControllerContext&
     }
 
     stream.log("[Mine encounter] No encounter within 60 seconds. "
-               "Test incomplete; stopping.",
-               COLOR_ORANGE);
+        "Test incomplete; stopping.",
+        COLOR_ORANGE);
     return false;
 }
 
@@ -555,11 +569,12 @@ static bool mine_run_with_encounters(VideoStream& stream, ProControllerContext& 
         BattleDialogWatcher dialog(COLOR_YELLOW);
         bool completed = false;
 
-        const int result = run_until<ProControllerContext>(stream, context,
-                                                           [&](ProControllerContext& ctx){
-                                                               completed = action(ctx);
-                                                           },
-                                                           {black, menu, dialog});
+        const int result = run_until<ProControllerContext>(stream,
+            context,
+            [&](ProControllerContext& ctx){
+                completed = action(ctx);
+            },
+            {black, menu, dialog});
 
         if (result < 0){
             return completed;
@@ -578,8 +593,11 @@ static bool mine_run_with_encounters(VideoStream& stream, ProControllerContext& 
     }
 }
 
-static bool mine_timed_walk(VideoStream& stream, ProControllerContext& context, double x, double y,
-                            std::chrono::milliseconds duration){
+static bool mine_timed_walk(VideoStream& stream,
+    ProControllerContext& context,
+    double x,
+    double y,
+    std::chrono::milliseconds duration){
     auto remaining = duration;
 
     return mine_run_with_encounters(stream, context, [&](ProControllerContext& ctx){
@@ -608,9 +626,11 @@ struct MinePictureScore {
 // Supports four, five, or six regions. Existing four-region callers keep
 // their original search ranges through the default arguments.
 template <size_t Regions>
-static MinePictureScore mine_score_picture(const ImageRGB32& reference, const ImageRGB32& live,
-                                           const std::array<ImageFloatBox, Regions>& boxes,
-                                           double horizontal_range = 1.0 / 60, double vertical_range = 2.0 / 135){
+static MinePictureScore mine_score_picture(const ImageRGB32& reference,
+    const ImageRGB32& live,
+    const std::array<ImageFloatBox, Regions>& boxes,
+    double horizontal_range = 1.0 / 60,
+    double vertical_range = 2.0 / 135){
     MinePictureScore best;
     const int radius_x = (int)std::lround(horizontal_range * live.width());
     const int radius_y = (int)std::lround(vertical_range * live.height());
@@ -640,9 +660,14 @@ static MinePictureScore mine_score_picture(const ImageRGB32& reference, const Im
 }
 
 
-static bool mine_check_picture(VideoStream& stream, ProControllerContext& context, const char* filename,
-                               const std::array<ImageFloatBox, 4>& boxes, const std::string& label,
-                               size_t max_attempts = 8, double max_average = 20.0, double max_patch = 30.0){
+static bool mine_check_picture(VideoStream& stream,
+    ProControllerContext& context,
+    const char* filename,
+    const std::array<ImageFloatBox, 4>& boxes,
+    const std::string& label,
+    size_t max_attempts = 8,
+    double max_average = 20.0,
+    double max_patch = 30.0){
     const ImageRGB32 reference(mine_navigation_resource_path() + filename);
     const ImageRGB32 reference_scaled = reference.scale_to(960, 540);
 
@@ -666,8 +691,8 @@ static bool mine_check_picture(VideoStream& stream, ProControllerContext& contex
             const ImageRGB32 live = frame->scale_to(960, 540);
             const MinePictureScore score = mine_score_picture(reference_scaled, live, boxes);
 
-            stream.log(label + ": average=" + std::to_string(score.average) +
-                       ", worst patch=" + std::to_string(score.worst));
+            stream.log(
+                label + ": average=" + std::to_string(score.average) + ", worst patch=" + std::to_string(score.worst));
 
             if (score.average <= max_average && score.worst <= max_patch){
                 if (++matching_frames >= 3){
@@ -702,11 +727,13 @@ struct MineWalkOptions {
 };
 
 template <size_t Regions, size_t Endpoints>
-static bool mine_walk_to_endpoints(VideoStream& stream, ProControllerContext& context,
-                                   const std::array<const char*, Endpoints>& files,
-                                   const std::array<std::array<ImageFloatBox, Regions>, Endpoints>& boxes,
-                                   const MineWalkOptions& options, const std::string& label,
-                                   bool force_encounter = false){
+static bool mine_walk_to_endpoints(VideoStream& stream,
+    ProControllerContext& context,
+    const std::array<const char*, Endpoints>& files,
+    const std::array<std::array<ImageFloatBox, Regions>, Endpoints>& boxes,
+    const MineWalkOptions& options,
+    const std::string& label,
+    bool force_encounter = false){
     std::array<std::unique_ptr<ImageRGB32>, Endpoints> references;
     for (size_t index = 0; index < Endpoints; index++){
         const ImageRGB32 image(mine_navigation_resource_path() + files[index]);
@@ -740,12 +767,15 @@ static bool mine_walk_to_endpoints(VideoStream& stream, ProControllerContext& co
                 double accepted_average = 1000.0;
 
                 for (size_t endpoint = 0; endpoint < Endpoints; endpoint++){
-                    const MinePictureScore score = mine_score_picture(*references[endpoint], live, boxes[endpoint],
-                                                                      options.horizontal_range, options.vertical_range);
+                    const MinePictureScore score = mine_score_picture(*references[endpoint],
+                        live,
+                        boxes[endpoint],
+                        options.horizontal_range,
+                        options.vertical_range);
                     stream.log(label + " Endpoint " + std::to_string(endpoint + 1) +
-                               ": average=" + std::to_string(score.average) +
-                               ", worst patch=" + std::to_string(score.worst) + ", screen-relative offset=(" +
-                               std::to_string(score.horizontal) + "," + std::to_string(score.vertical) + ")");
+                        ": average=" + std::to_string(score.average) + ", worst patch=" + std::to_string(score.worst) +
+                        ", screen-relative offset=(" + std::to_string(score.horizontal) + "," +
+                        std::to_string(score.vertical) + ")");
 
                     if (score.average <= options.max_average && score.worst <= options.max_patch &&
                         score.average < accepted_average){
@@ -803,13 +833,15 @@ static bool mine_walk_to_endpoints(VideoStream& stream, ProControllerContext& co
     }
 }
 
-static bool oreburgh_mine_walk_to_first_rock(VideoStream& stream, ProControllerContext& context,
-                                             bool force_encounter = false){
+static bool
+oreburgh_mine_walk_to_first_rock(VideoStream& stream, ProControllerContext& context, bool force_encounter = false){
     const std::array<const char*, 1> files = {"mine_path_01.png"};
-    const std::array<std::array<ImageFloatBox, 6>, 1> boxes = {
-        {{{ImageFloatBox(0.482, 0.585, 0.055, 0.055), ImageFloatBox(0.335, 0.670, 0.050, 0.055),
-           ImageFloatBox(0.412, 0.670, 0.050, 0.055), ImageFloatBox(0.570, 0.752, 0.045, 0.055),
-           ImageFloatBox(0.645, 0.752, 0.045, 0.055), ImageFloatBox(0.570, 0.290, 0.080, 0.120)}}}};
+    const std::array<std::array<ImageFloatBox, 6>, 1> boxes = {{{{ImageFloatBox(0.482, 0.585, 0.055, 0.055),
+                    ImageFloatBox(0.335, 0.670, 0.050, 0.055),
+                    ImageFloatBox(0.412, 0.670, 0.050, 0.055),
+                    ImageFloatBox(0.570, 0.752, 0.045, 0.055),
+                    ImageFloatBox(0.645, 0.752, 0.045, 0.055),
+                    ImageFloatBox(0.570, 0.290, 0.080, 0.120)}}}};
 
     MineWalkOptions options;
     options.x = 0.0;
@@ -822,13 +854,18 @@ static bool oreburgh_mine_walk_to_first_rock(VideoStream& stream, ProControllerC
 
 static bool oreburgh_mine_move_right(VideoStream& stream, ProControllerContext& context){
     const std::array<const char*, 2> files = {"mine_path_01_1.png", "mine_path_01_2.png"};
-    const std::array<std::array<ImageFloatBox, 6>, 2> boxes = {
-        {{{ImageFloatBox(0.400, 0.585, 0.055, 0.055), ImageFloatBox(0.245, 0.670, 0.050, 0.055),
-           ImageFloatBox(0.322, 0.670, 0.050, 0.055), ImageFloatBox(0.480, 0.752, 0.045, 0.055),
-           ImageFloatBox(0.555, 0.752, 0.045, 0.055), ImageFloatBox(0.485, 0.290, 0.080, 0.090)}},
-         {{ImageFloatBox(0.325, 0.585, 0.055, 0.055), ImageFloatBox(0.170, 0.670, 0.050, 0.055),
-           ImageFloatBox(0.244, 0.670, 0.050, 0.055), ImageFloatBox(0.395, 0.752, 0.045, 0.055),
-           ImageFloatBox(0.470, 0.752, 0.045, 0.055), ImageFloatBox(0.415, 0.290, 0.080, 0.090)}}}};
+    const std::array<std::array<ImageFloatBox, 6>, 2> boxes = {{{{ImageFloatBox(0.400, 0.585, 0.055, 0.055),
+                    ImageFloatBox(0.245, 0.670, 0.050, 0.055),
+                    ImageFloatBox(0.322, 0.670, 0.050, 0.055),
+                    ImageFloatBox(0.480, 0.752, 0.045, 0.055),
+                    ImageFloatBox(0.555, 0.752, 0.045, 0.055),
+                    ImageFloatBox(0.485, 0.290, 0.080, 0.090)}},
+            {{ImageFloatBox(0.325, 0.585, 0.055, 0.055),
+                    ImageFloatBox(0.170, 0.670, 0.050, 0.055),
+                    ImageFloatBox(0.244, 0.670, 0.050, 0.055),
+                    ImageFloatBox(0.395, 0.752, 0.045, 0.055),
+                    ImageFloatBox(0.470, 0.752, 0.045, 0.055),
+                    ImageFloatBox(0.415, 0.290, 0.080, 0.090)}}}};
 
     MineWalkOptions options;
     options.x = 1.0;
@@ -841,13 +878,18 @@ static bool oreburgh_mine_move_right(VideoStream& stream, ProControllerContext& 
 
 static bool oreburgh_mine_down_past_central_rock(VideoStream& stream, ProControllerContext& context){
     const std::array<const char*, 2> files = {"mine_path_02_1.png", "mine_path_02_2.png"};
-    const std::array<std::array<ImageFloatBox, 6>, 2> boxes = {
-        {{{ImageFloatBox(0.345, 0.420, 0.040, 0.045), ImageFloatBox(0.195, 0.500, 0.040, 0.045),
-           ImageFloatBox(0.270, 0.500, 0.040, 0.045), ImageFloatBox(0.410, 0.590, 0.040, 0.045),
-           ImageFloatBox(0.480, 0.590, 0.040, 0.045), ImageFloatBox(0.445, 0.180, 0.060, 0.090)}},
-         {{ImageFloatBox(0.420, 0.420, 0.040, 0.045), ImageFloatBox(0.270, 0.500, 0.040, 0.045),
-           ImageFloatBox(0.345, 0.500, 0.040, 0.045), ImageFloatBox(0.485, 0.590, 0.040, 0.045),
-           ImageFloatBox(0.555, 0.590, 0.040, 0.045), ImageFloatBox(0.520, 0.180, 0.060, 0.090)}}}};
+    const std::array<std::array<ImageFloatBox, 6>, 2> boxes = {{{{ImageFloatBox(0.345, 0.420, 0.040, 0.045),
+                    ImageFloatBox(0.195, 0.500, 0.040, 0.045),
+                    ImageFloatBox(0.270, 0.500, 0.040, 0.045),
+                    ImageFloatBox(0.410, 0.590, 0.040, 0.045),
+                    ImageFloatBox(0.480, 0.590, 0.040, 0.045),
+                    ImageFloatBox(0.445, 0.180, 0.060, 0.090)}},
+            {{ImageFloatBox(0.420, 0.420, 0.040, 0.045),
+                    ImageFloatBox(0.270, 0.500, 0.040, 0.045),
+                    ImageFloatBox(0.345, 0.500, 0.040, 0.045),
+                    ImageFloatBox(0.485, 0.590, 0.040, 0.045),
+                    ImageFloatBox(0.555, 0.590, 0.040, 0.045),
+                    ImageFloatBox(0.520, 0.180, 0.060, 0.090)}}}};
 
     MineWalkOptions options;
     options.x = 0.0;
@@ -863,10 +905,11 @@ static bool oreburgh_mine_down_past_central_rock(VideoStream& stream, ProControl
 
 static bool oreburgh_mine_move_left_to_gap(VideoStream& stream, ProControllerContext& context){
     const std::array<const char*, 1> files = {"mine_path_03.png"};
-    const std::array<std::array<ImageFloatBox, 5>, 1> boxes = {
-        {{{ImageFloatBox(0.340, 0.495, 0.040, 0.045), ImageFloatBox(0.410, 0.495, 0.040, 0.045),
-           ImageFloatBox(0.555, 0.580, 0.040, 0.045), ImageFloatBox(0.625, 0.580, 0.040, 0.045),
-           ImageFloatBox(0.580, 0.180, 0.060, 0.090)}}}};
+    const std::array<std::array<ImageFloatBox, 5>, 1> boxes = {{{{ImageFloatBox(0.340, 0.495, 0.040, 0.045),
+                    ImageFloatBox(0.410, 0.495, 0.040, 0.045),
+                    ImageFloatBox(0.555, 0.580, 0.040, 0.045),
+                    ImageFloatBox(0.625, 0.580, 0.040, 0.045),
+                    ImageFloatBox(0.580, 0.180, 0.060, 0.090)}}}};
 
     MineWalkOptions options;
     options.x = -1.0;
@@ -913,16 +956,17 @@ static bool mine_run_picture_step(VideoStream& stream, ProControllerContext& con
 
 static bool oreburgh_mine_confirm_05(VideoStream& stream, ProControllerContext& context){
     const MinePictureStep step = {"mine_path_05.png",
-                                  "[Mine endpoint 05]",
-                                  {ImageFloatBox(0.240, 0.240, 0.055, 0.080), ImageFloatBox(0.390, 0.220, 0.050, 0.090),
-                                   ImageFloatBox(0.360, 0.090, 0.030, 0.030),
-                                   ImageFloatBox(0.550, 0.140, 0.040, 0.040)},
-                                  0.0,
-                                  -1.0,
-                                  60ms,
-                                  10,
-                                  20.0,
-                                  30.0};
+        "[Mine endpoint 05]",
+        {ImageFloatBox(0.240, 0.240, 0.055, 0.080),
+            ImageFloatBox(0.390, 0.220, 0.050, 0.090),
+            ImageFloatBox(0.360, 0.090, 0.030, 0.030),
+            ImageFloatBox(0.550, 0.140, 0.040, 0.040)},
+        0.0,
+        -1.0,
+        60ms,
+        10,
+        20.0,
+        30.0};
     return mine_run_picture_step(stream, context, step);
 }
 
@@ -945,9 +989,10 @@ static bool oreburgh_mine_timed_to_07(VideoStream& stream, ProControllerContext&
     }
 
     // Path 6: crate, nearby small rock, large rock, upper-right small rock.
-    const std::array<ImageFloatBox, 4> path6_boxes = {
-        ImageFloatBox(0.350, 0.250, 0.085, 0.075), ImageFloatBox(0.405, 0.510, 0.035, 0.040),
-        ImageFloatBox(0.520, 0.300, 0.050, 0.080), ImageFloatBox(0.620, 0.350, 0.030, 0.040)};
+    const std::array<ImageFloatBox, 4> path6_boxes = {ImageFloatBox(0.350, 0.250, 0.085, 0.075),
+        ImageFloatBox(0.405, 0.510, 0.035, 0.040),
+        ImageFloatBox(0.520, 0.300, 0.050, 0.080),
+        ImageFloatBox(0.620, 0.350, 0.030, 0.040)};
 
     if (!mine_check_picture(stream, context, "mine_path_06.png", path6_boxes, "[Mine midpoint 06]")){
         return false;
@@ -960,9 +1005,10 @@ static bool oreburgh_mine_timed_to_07(VideoStream& stream, ProControllerContext&
     }
 
     // Path 7: crate and three visible rock surfaces.
-    const std::array<ImageFloatBox, 4> path7_boxes = {
-        ImageFloatBox(0.365, 0.025, 0.070, 0.055), ImageFloatBox(0.420, 0.270, 0.035, 0.040),
-        ImageFloatBox(0.560, 0.415, 0.025, 0.040), ImageFloatBox(0.530, 0.650, 0.060, 0.090)};
+    const std::array<ImageFloatBox, 4> path7_boxes = {ImageFloatBox(0.365, 0.025, 0.070, 0.055),
+        ImageFloatBox(0.420, 0.270, 0.035, 0.040),
+        ImageFloatBox(0.560, 0.415, 0.025, 0.040),
+        ImageFloatBox(0.530, 0.650, 0.060, 0.090)};
 
     return mine_check_picture(stream, context, "mine_path_07.png", path7_boxes, "[Mine endpoint 07]");
 }
@@ -970,16 +1016,17 @@ static bool oreburgh_mine_timed_to_07(VideoStream& stream, ProControllerContext&
 // Move left from path 7 to the position shown in path 8.
 static bool oreburgh_mine_left_to_08(VideoStream& stream, ProControllerContext& context){
     const MinePictureStep step = {"mine_path_08.png",
-                                  "[Mine endpoint 08]",
-                                  {ImageFloatBox(0.495, 0.035, 0.070, 0.055), ImageFloatBox(0.550, 0.270, 0.035, 0.040),
-                                   ImageFloatBox(0.695, 0.420, 0.030, 0.040),
-                                   ImageFloatBox(0.555, 0.585, 0.035, 0.040)},
-                                  -1.0,
-                                  0.0,
-                                  40ms,
-                                  20,
-                                  20.0,
-                                  30.0};
+        "[Mine endpoint 08]",
+        {ImageFloatBox(0.495, 0.035, 0.070, 0.055),
+            ImageFloatBox(0.550, 0.270, 0.035, 0.040),
+            ImageFloatBox(0.695, 0.420, 0.030, 0.040),
+            ImageFloatBox(0.555, 0.585, 0.035, 0.040)},
+        -1.0,
+        0.0,
+        40ms,
+        20,
+        20.0,
+        30.0};
     return mine_run_picture_step(stream, context, step);
 }
 
@@ -987,16 +1034,17 @@ static bool oreburgh_mine_left_to_08(VideoStream& stream, ProControllerContext& 
 
 static bool oreburgh_mine_down_to_09(VideoStream& stream, ProControllerContext& context){
     const MinePictureStep step = {"mine_path_09.png",
-                                  "[Mine endpoint 09]",
-                                  {ImageFloatBox(0.550, 0.115, 0.030, 0.040), ImageFloatBox(0.550, 0.390, 0.035, 0.040),
-                                   ImageFloatBox(0.620, 0.390, 0.025, 0.035),
-                                   ImageFloatBox(0.500, 0.720, 0.085, 0.080)},
-                                  0.0,
-                                  -1.0,
-                                  40ms,
-                                  25,
-                                  25.0,
-                                  35.0};
+        "[Mine endpoint 09]",
+        {ImageFloatBox(0.550, 0.115, 0.030, 0.040),
+            ImageFloatBox(0.550, 0.390, 0.035, 0.040),
+            ImageFloatBox(0.620, 0.390, 0.025, 0.035),
+            ImageFloatBox(0.500, 0.720, 0.085, 0.080)},
+        0.0,
+        -1.0,
+        40ms,
+        25,
+        25.0,
+        35.0};
     return mine_run_picture_step(stream, context, step);
 }
 
@@ -1066,28 +1114,30 @@ static bool oreburgh_mine_09_to_14(VideoStream& stream, ProControllerContext& co
         ImageFloatBox(0.550, 0.720, 0.030, 0.040)  // Lower small rock
     };
 
-    const MinePictureStep path10_boxes_step = {
-        "mine_path_10.png", "[Mine endpoint 10]", path10_boxes, 1.0, 0.0, 80ms, 30, 20.0, 30.0};
+    const MinePictureStep path10_boxes_step =
+        {"mine_path_10.png", "[Mine endpoint 10]", path10_boxes, 1.0, 0.0, 80ms, 30, 20.0, 30.0};
     if (!mine_run_picture_step(stream, context, path10_boxes_step)){
         return false;
     }
 
-    const std::array<ImageFloatBox, 4> path11_boxes = {
-        ImageFloatBox(0.405, 0.560, 0.070, 0.080), ImageFloatBox(0.475, 0.270, 0.030, 0.040),
-        ImageFloatBox(0.575, 0.290, 0.045, 0.080), ImageFloatBox(0.550, 0.575, 0.030, 0.040)};
+    const std::array<ImageFloatBox, 4> path11_boxes = {ImageFloatBox(0.405, 0.560, 0.070, 0.080),
+        ImageFloatBox(0.475, 0.270, 0.030, 0.040),
+        ImageFloatBox(0.575, 0.290, 0.045, 0.080),
+        ImageFloatBox(0.550, 0.575, 0.030, 0.040)};
 
-    const MinePictureStep path11_boxes_step = {
-        "mine_path_11.png", "[Mine endpoint 11]", path11_boxes, 0.0, -1.0, 80ms, 30, 20.0, 30.0};
+    const MinePictureStep path11_boxes_step =
+        {"mine_path_11.png", "[Mine endpoint 11]", path11_boxes, 0.0, -1.0, 80ms, 30, 20.0, 30.0};
     if (!mine_run_picture_step(stream, context, path11_boxes_step)){
         return false;
     }
 
-    const std::array<ImageFloatBox, 4> path12_boxes = {
-        ImageFloatBox(0.260, 0.560, 0.080, 0.080), ImageFloatBox(0.355, 0.270, 0.025, 0.035),
-        ImageFloatBox(0.435, 0.290, 0.040, 0.070), ImageFloatBox(0.415, 0.585, 0.025, 0.035)};
+    const std::array<ImageFloatBox, 4> path12_boxes = {ImageFloatBox(0.260, 0.560, 0.080, 0.080),
+        ImageFloatBox(0.355, 0.270, 0.025, 0.035),
+        ImageFloatBox(0.435, 0.290, 0.040, 0.070),
+        ImageFloatBox(0.415, 0.585, 0.025, 0.035)};
 
-    const MinePictureStep path12_boxes_step = {
-        "mine_path_12.png", "[Mine endpoint 12]", path12_boxes, 1.0, 0.0, 80ms, 30, 20.0, 30.0};
+    const MinePictureStep path12_boxes_step =
+        {"mine_path_12.png", "[Mine endpoint 12]", path12_boxes, 1.0, 0.0, 80ms, 30, 20.0, 30.0};
     if (!mine_run_picture_step(stream, context, path12_boxes_step)){
         return false;
     }
@@ -1099,8 +1149,8 @@ static bool oreburgh_mine_09_to_14(VideoStream& stream, ProControllerContext& co
         ImageFloatBox(0.405, 0.580, 0.030, 0.040)  // Bottom-left small rock
     };
 
-    const MinePictureStep path13_boxes_step = {
-        "mine_path_13.png", "[Mine endpoint 13]", path13_boxes, 0.0, -1.0, 80ms, 30, 20.0, 30.0};
+    const MinePictureStep path13_boxes_step =
+        {"mine_path_13.png", "[Mine endpoint 13]", path13_boxes, 0.0, -1.0, 80ms, 30, 20.0, 30.0};
     if (!mine_run_picture_step(stream, context, path13_boxes_step)){
         return false;
     }
@@ -1123,8 +1173,11 @@ static bool oreburgh_mine_09_to_14(VideoStream& stream, ProControllerContext& co
 
 // Compare a reference patch with a shifted live patch using the same
 // brightness adjustment as the native ImageMatchDetector.
-static double mine_offset_patch_score(const ImageRGB32& reference, const ImageRGB32& live, const ImageFloatBox& box,
-                                      double horizontal, double vertical){
+static double mine_offset_patch_score(const ImageRGB32& reference,
+    const ImageRGB32& live,
+    const ImageFloatBox& box,
+    double horizontal,
+    double vertical){
     const ImageViewRGB32 reference_crop = extract_box_reference(reference, box);
     ImageFloatBox shifted = box;
     shifted.x += horizontal;
@@ -1198,9 +1251,11 @@ static MineRoarkOffsetScore mine_score_roark_offsets(const ImageRGB32& reference
     const int helmet_radius_y = (int)std::lround(live.height() / 90.0);
     for (int extra_y = -helmet_radius_y; extra_y <= helmet_radius_y; extra_y++){
         for (int extra_x = -helmet_radius_x; extra_x <= helmet_radius_x; extra_x++){
-            const double score =
-                mine_offset_patch_score(reference, live, helmet_box, best.horizontal + (double)extra_x / live.width(),
-                                        best.vertical + (double)extra_y / live.height());
+            const double score = mine_offset_patch_score(reference,
+                live,
+                helmet_box,
+                best.horizontal + (double)extra_x / live.width(),
+                best.vertical + (double)extra_y / live.height());
             if (score < best.helmet){
                 best.helmet = score;
                 best.helmet_horizontal = (double)extra_x / live.width();
@@ -1235,10 +1290,10 @@ static bool oreburgh_mine_align_to_18(VideoStream& stream, ProControllerContext&
             const MineRoarkOffsetScore score = mine_score_roark_offsets(reference_scaled, live);
 
             stream.log("[Mine endpoint 18] Left rock=" + std::to_string(score.left) +
-                       ", Right rock=" + std::to_string(score.right) + ", Helmet=" + std::to_string(score.helmet) +
-                       ", shared screen-relative offset=(" + std::to_string(score.horizontal) + "," +
-                       std::to_string(score.vertical) + "), helmet screen-relative extra=(" +
-                       std::to_string(score.helmet_horizontal) + "," + std::to_string(score.helmet_vertical) + ")");
+                ", Right rock=" + std::to_string(score.right) + ", Helmet=" + std::to_string(score.helmet) +
+                ", shared screen-relative offset=(" + std::to_string(score.horizontal) + "," +
+                std::to_string(score.vertical) + "), helmet screen-relative extra=(" +
+                std::to_string(score.helmet_horizontal) + "," + std::to_string(score.helmet_vertical) + ")");
 
             if (score.left <= max_rmsd && score.right <= max_rmsd && score.helmet <= max_rmsd){
                 if (++matching_frames >= 3){
@@ -1278,8 +1333,8 @@ static bool oreburgh_mine_14_to_19(VideoStream& stream, ProControllerContext& co
         ImageFloatBox(0.325, 0.560, 0.035, 0.045)  // Lower rock
     };
 
-    const MinePictureStep path15_boxes_step = {
-        "mine_path_15_actual.png", "[Mine endpoint 15]", path15_boxes, 1.0, 0.0, 80ms, 30, 20.0, 30.0};
+    const MinePictureStep path15_boxes_step =
+        {"mine_path_15_actual.png", "[Mine endpoint 15]", path15_boxes, 1.0, 0.0, 80ms, 30, 20.0, 30.0};
     if (!mine_run_picture_step(stream, context, path15_boxes_step)){
         return false;
     }
@@ -1292,8 +1347,8 @@ static bool oreburgh_mine_14_to_19(VideoStream& stream, ProControllerContext& co
         ImageFloatBox(0.330, 0.495, 0.035, 0.045)  // Lower rock
     };
 
-    const MinePictureStep path16_boxes_step = {
-        "mine_path_16.png", "[Mine endpoint 16]", path16_boxes, 0.0, -1.0, 80ms, 30, 20.0, 30.0};
+    const MinePictureStep path16_boxes_step =
+        {"mine_path_16.png", "[Mine endpoint 16]", path16_boxes, 0.0, -1.0, 80ms, 30, 20.0, 30.0};
     if (!mine_run_picture_step(stream, context, path16_boxes_step)){
         return false;
     }
@@ -1320,18 +1375,18 @@ bool oreburgh_mine_route(VideoStream& stream, ProControllerContext& context, con
     };
 
     const std::array<Step, 10> steps = {{{"Align entrance", oreburgh_mine_alignment_test},
-                                         {"Walk to first rock",
-                                          [](VideoStream& video, ProControllerContext& controller){
-                                              return oreburgh_mine_walk_to_first_rock(video, controller, false);
-                                          }},
-                                         {"Move right of first rock", oreburgh_mine_move_right},
-                                         {"Move below first rock", oreburgh_mine_down_past_central_rock},
-                                         {"Move left into center gap", oreburgh_mine_move_left_to_gap},
-                                         {"Reach position 07", oreburgh_mine_timed_to_07},
-                                         {"Reach position 08", oreburgh_mine_left_to_08},
-                                         {"Reach position 09", oreburgh_mine_down_to_09},
-                                         {"Reach 14 and collect item", oreburgh_mine_09_to_14},
-                                         {"Reach 18 and turn north for 19", oreburgh_mine_14_to_19}}};
+            {"Walk to first rock",
+                [](VideoStream& video, ProControllerContext& controller){
+                    return oreburgh_mine_walk_to_first_rock(video, controller, false);
+                }},
+            {"Move right of first rock", oreburgh_mine_move_right},
+            {"Move below first rock", oreburgh_mine_down_past_central_rock},
+            {"Move left into center gap", oreburgh_mine_move_left_to_gap},
+            {"Reach position 07", oreburgh_mine_timed_to_07},
+            {"Reach position 08", oreburgh_mine_left_to_08},
+            {"Reach position 09", oreburgh_mine_down_to_09},
+            {"Reach 14 and collect item", oreburgh_mine_09_to_14},
+            {"Reach 18 and turn north for 19", oreburgh_mine_14_to_19}}};
 
     const size_t first = static_cast<size_t>(options.first);
     const size_t last = static_cast<size_t>(options.last);
@@ -1365,8 +1420,9 @@ bool oreburgh_mine_route(VideoStream& stream, ProControllerContext& context, con
             stream.log(std::string("[Mine route] Stage failed: ") + step.name, COLOR_ORANGE);
 
             if (options.reset_on_failure){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, std::string("Mine route failed during: ") + step.name, stream);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    std::string("Mine route failed during: ") + step.name,
+                    stream);
             }
 
             return false;
@@ -1422,8 +1478,9 @@ static bool mine_talk_to_roark(VideoStream& stream, ProControllerContext& contex
 }
 
 // Retain the developer test entry point; both callers share the same route.
-bool oreburgh_mine_first_leg_test(VideoStream& stream, ProControllerContext& context,
-                                  const MineRouteTestOptions& options){
+bool oreburgh_mine_first_leg_test(VideoStream& stream,
+    ProControllerContext& context,
+    const MineRouteTestOptions& options){
     return oreburgh_mine_route(stream, context, options);
 }
 
@@ -1470,14 +1527,16 @@ void oreburgh_mine_nav(VideoStream& stream, ProControllerContext& context){
     route.reset_on_failure = true;
 
     if (!oreburgh_mine_route(stream, context, route)){
-        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "Mine route did not complete.",
-                                                     stream);
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Mine route did not complete.",
+            stream);
     }
 
 
     if (!mine_talk_and_escape(stream, context)){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT, "Mine route: Roark conversation or Escape Rope exit failed.", stream);
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Mine route: Roark conversation or Escape Rope exit failed.",
+            stream);
     }
 }
 // ---------------------------------------------------------------------------
@@ -1557,7 +1616,13 @@ void gym_Puzzle_01(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
         int count;
     };
     const Move sequence[] = {
-        {DPAD_UP, 3}, {DPAD_LEFT, 4}, {DPAD_UP, 5}, {DPAD_RIGHT, 8}, {DPAD_UP, 11}, {DPAD_LEFT, 5}, {DPAD_UP, 4},
+        {DPAD_UP, 3},
+        {DPAD_LEFT, 4},
+        {DPAD_UP, 5},
+        {DPAD_RIGHT, 8},
+        {DPAD_UP, 11},
+        {DPAD_LEFT, 5},
+        {DPAD_UP, 4},
     };
 
     for (const auto& move : sequence){
@@ -1583,8 +1648,9 @@ void gym_Puzzle_01(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
     while (std::chrono::steady_clock::now() < dialogue_deadline){
         const VideoSnapshot frame = stream.video().snapshot();
         if (!frame){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::SEND_ERROR_REPORT, "Gym post battle: No video frame while clearing dialogue.", stream);
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Gym post battle: No video frame while clearing dialogue.",
+                stream);
         }
         const auto now = std::chrono::steady_clock::now();
         if (post_battle_dialogue.detect(frame)){
@@ -1597,8 +1663,9 @@ void gym_Puzzle_01(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
         context.wait_for_all_requests();
     }
     if (!dialogue_finished){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT, "Gym post battle: Dialogue did not finish within 180 seconds.", stream);
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Gym post battle: Dialogue did not finish within 180 seconds.",
+            stream);
     }
     stream.log("[Gym post battle] Dialogue absent for 4 seconds. Walking down.");
 
@@ -1621,8 +1688,10 @@ std::string AutoStory_Segment_01::end_text() const {
     return "End: First Gym Badge acquired (Oreburgh City).";
 }
 
-void AutoStory_Segment_01::run_segment(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                       AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Segment_01::run_segment(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     stats.m_segment++;
     env.update_stats();
     context.wait_for_all_requests();
@@ -1648,16 +1717,23 @@ std::string AutoStory_checkpoint_0101::end_text() const {
 // ========================
 // Checkpoint 0101 Wrapper
 // ========================
-void AutoStory_checkpoint_0101::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_checkpoint_0101::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0101(env, context, options, stats);
 }
 
 
-void checkpoint_0101(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0101(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             jubilife_to_oreburgh_gate(env, env.console, context);
             oreburgh_gate_nav(env, env.console, context);
@@ -1679,16 +1755,23 @@ std::string AutoStory_checkpoint_0102::end_text() const {
     return "Inside Oreburgh Gym, ready to navigate to Roark.";
 }
 
-void AutoStory_checkpoint_0102::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_checkpoint_0102::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0102(env, context, options, stats);
 }
 
 
-void checkpoint_0102(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0102(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             oreburgh_gate_to_mine(env, env.console, context);
             oreburgh_mine_nav(env.console, context);
@@ -1715,16 +1798,23 @@ std::string AutoStory_checkpoint_0103::end_text() const {
     return "Standing at Roark after defeating him and acquiring the first badge.";
 }
 
-void AutoStory_checkpoint_0103::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_checkpoint_0103::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0103(env, context, options, stats);
 }
 
 
-void checkpoint_0103(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0103(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             //#. Oreburgh Gym navigation and battle
             gym_Puzzle_01(env, env.console, context);

@@ -38,14 +38,18 @@ void walk_steps(ProControllerContext& context, uint16_t direction, uint16_t step
 
 //  Walk in `direction` until a short dialog box is detected, or `timeout_sec` elapses.
 //  Throws OperationFailedException on timeout.
-void walk_until_dialog(VideoStream& stream, ProControllerContext& context, uint16_t direction,
-                       uint16_t timeout_sec = 30);
+void walk_until_dialog(VideoStream& stream,
+    ProControllerContext& context,
+    uint16_t direction,
+    uint16_t timeout_sec = 30);
 
 //  Walk in `direction` until a battle starts (StartBattleDetector fires),
 //  or `timeout_sec` elapses.
 //  Throws OperationFailedException on timeout.
-void walk_until_battle(VideoStream& stream, ProControllerContext& context, uint16_t direction,
-                       uint16_t timeout_sec = 30);
+void walk_until_battle(VideoStream& stream,
+    ProControllerContext& context,
+    uint16_t direction,
+    uint16_t timeout_sec = 30);
 
 
 // ---------------------------------------------------------------------------
@@ -62,8 +66,10 @@ void walk_until_battle(VideoStream& stream, ProControllerContext& context, uint1
 //  on the calling segment and is passed as a lambda.
 //  `recovery_action` should move the player from wherever they ended up back
 //  to a defined starting tile for the current checkpoint.
-void recalibrate_after_battle(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
-                              std::function<void(ProControllerContext&)>&& recovery_action);
+void recalibrate_after_battle(const ProgramInfo& info,
+    VideoStream& stream,
+    ProControllerContext& context,
+    std::function<void(ProControllerContext&)>&& recovery_action);
 
 
 }

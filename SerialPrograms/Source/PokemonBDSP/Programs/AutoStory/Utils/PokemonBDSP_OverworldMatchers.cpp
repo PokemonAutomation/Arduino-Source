@@ -33,8 +33,11 @@ static constexpr double POSITION_TOLERANCE_Y = 1.0 / 54;
 static constexpr double AGREEMENT_X = 1.0 / 64;
 static constexpr double AGREEMENT_Y = 1.0 / 54;
 static cv::Mat gray_image(const ImageRGB32& image){
-    cv::Mat pixels((int)image.height(), (int)image.width(), CV_8UC4, const_cast<uint32_t*>(image.data()),
-                   image.bytes_per_row());
+    cv::Mat pixels((int)image.height(),
+        (int)image.width(),
+        CV_8UC4,
+        const_cast<uint32_t*>(image.data()),
+        image.bytes_per_row());
     cv::Mat gray;
     cv::cvtColor(pixels, gray, cv::COLOR_BGRA2GRAY);
     return gray;
@@ -53,8 +56,11 @@ static cv::Mat normalize_landmark_illumination(const cv::Mat& gray){
 // White Pokeball versus yellow fascia is a color-ratio boundary. A cast
 // shadow changes their brightness, so compare blue fraction rather than luma.
 static cv::Mat landmark_blue_fraction(const ImageRGB32& image){
-    cv::Mat pixels((int)image.height(), (int)image.width(), CV_8UC4, const_cast<uint32_t*>(image.data()),
-                   image.bytes_per_row());
+    cv::Mat pixels((int)image.height(),
+        (int)image.width(),
+        CV_8UC4,
+        const_cast<uint32_t*>(image.data()),
+        image.bytes_per_row());
     cv::Mat small, floating;
     cv::resize(pixels, small, cv::Size(960, 540), 0, 0, cv::INTER_AREA);
     small.convertTo(floating, CV_32F);
@@ -65,9 +71,12 @@ static cv::Mat landmark_blue_fraction(const ImageRGB32& image){
     ratio.convertTo(structure, CV_8U, 768.0);
     return structure;
 }
-static OverworldMatchResult match_landmarks(const ImageRGB32& frame, const std::vector<LandmarkConfig>& configs,
-                                            size_t required, double tolerance_x, double tolerance_y,
-                                            bool smooth_resize = false){
+static OverworldMatchResult match_landmarks(const ImageRGB32& frame,
+    const std::vector<LandmarkConfig>& configs,
+    size_t required,
+    double tolerance_x,
+    double tolerance_y,
+    bool smooth_resize = false){
     OverworldMatchResult result;
     if (!frame){
         return result;
@@ -97,8 +106,10 @@ static OverworldMatchResult match_landmarks(const ImageRGB32& frame, const std::
             ImageRGB32 small = reference.scale_to(template_width, template_height);
             templ = gray_image(small);
         }
-        cv::Rect search((int)(config.search.x * 960), (int)(config.search.y * 540), (int)(config.search.width * 960),
-                        (int)(config.search.height * 540));
+        cv::Rect search((int)(config.search.x * 960),
+            (int)(config.search.y * 540),
+            (int)(config.search.width * 960),
+            (int)(config.search.height * 540));
         search &= cv::Rect(0, 0, 960, 540);
         if (search.width < templ.cols || search.height < templ.rows){
             result.landmarks.push_back(landmark);
@@ -125,9 +136,11 @@ static OverworldMatchResult match_landmarks(const ImageRGB32& frame, const std::
         cv::Mat competitors = scores.clone();
         const int peak_radius_x = (int)std::lround(0.015625 * gray.cols);
         const int peak_radius_y = (int)std::lround((1.0 / 36) * gray.rows);
-        cv::Rect exclusion = cv::Rect(location.x - peak_radius_x, location.y - peak_radius_y, 2 * peak_radius_x + 1,
-                                      2 * peak_radius_y + 1) &
-                             cv::Rect(0, 0, scores.cols, scores.rows);
+        cv::Rect exclusion = cv::Rect(location.x - peak_radius_x,
+            location.y - peak_radius_y,
+            2 * peak_radius_x + 1,
+            2 * peak_radius_y + 1) &
+            cv::Rect(0, 0, scores.cols, scores.rows);
         competitors(exclusion).setTo(-1);
         double runner_up;
         cv::minMaxLoc(competitors, nullptr, &runner_up);
@@ -136,8 +149,10 @@ static OverworldMatchResult match_landmarks(const ImageRGB32& frame, const std::
         landmark.dx = (double)location.x / gray.cols - config.target.x;
         landmark.dy = (double)location.y / gray.rows - config.target.y;
         landmark.accepted = landmark.score >= config.threshold && landmark.margin >= config.margin;
-        landmark.found = {(double)location.x / 960, (double)location.y / 540, (double)templ.cols / 960,
-                          (double)templ.rows / 540};
+        landmark.found = {(double)location.x / 960,
+            (double)location.y / 540,
+            (double)templ.cols / 960,
+            (double)templ.rows / 540};
         result.landmarks.push_back(landmark);
     }
     if (required == 1 && result.landmarks.size() == 1){
@@ -172,7 +187,7 @@ static OverworldMatchResult match_landmarks(const ImageRGB32& frame, const std::
                 result.dy = dy;
                 ambiguous = false;
             }else if (support == best_support &&
-                       (std::abs(dx - result.dx) > AGREEMENT_X || std::abs(dy - result.dy) > AGREEMENT_Y)){
+                (std::abs(dx - result.dx) > AGREEMENT_X || std::abs(dy - result.dy) > AGREEMENT_Y)){
                 ambiguous = true;
             }
         }
@@ -184,50 +199,54 @@ static OverworldMatchResult match_landmarks(const ImageRGB32& frame, const std::
 OverworldMatchResult match_poketch_landmarks(const ImageRGB32& frame){
     // Same cropped reference emblems and local search windows as production.
     OverworldMatchResult fine = match_landmarks(frame,
-                                                {{"Mart",
-                                                  "PokemonBDSP/Autostory/PoketchInteraction/Mart.png",
-                                                  {0.768750000000, 0.044444444444, 0.079166666667, 0.088888888889},
-                                                  {598.0 / 960, 0, 356.0 / 960, 212.0 / 540},
-                                                  .90,
-                                                  0},
-                                                 {"Center",
-                                                  "PokemonBDSP/Autostory/PoketchInteraction/Center.png",
-                                                  {0.900000000000, 0.748148148148, 0.075000000000, 0.137037037037},
-                                                  {724.0 / 960, 264.0 / 540, 236.0 / 960, 276.0 / 540},
-                                                  .90,
-                                                  0},
-                                                 {"School",
-                                                  "PokemonBDSP/Autostory/PoketchInteraction/School.png",
-                                                  {0.006250000000, 0.755555555556, 0.097916666667, 0.133333333333},
-                                                  {0, 268.0 / 540, 240.0 / 960, 272.0 / 540},
-                                                  .90,
-                                                  0}},
-                                                2, 7.0 / 960, 7.0 / 540);
+        {{"Mart",
+                "PokemonBDSP/Autostory/PoketchInteraction/Mart.png",
+                {0.768750000000, 0.044444444444, 0.079166666667, 0.088888888889},
+                {598.0 / 960, 0, 356.0 / 960, 212.0 / 540},
+                .90,
+                0},
+            {"Center",
+                "PokemonBDSP/Autostory/PoketchInteraction/Center.png",
+                {0.900000000000, 0.748148148148, 0.075000000000, 0.137037037037},
+                {724.0 / 960, 264.0 / 540, 236.0 / 960, 276.0 / 540},
+                .90,
+                0},
+            {"School",
+                "PokemonBDSP/Autostory/PoketchInteraction/School.png",
+                {0.006250000000, 0.755555555556, 0.097916666667, 0.133333333333},
+                {0, 268.0 / 540, 240.0 / 960, 272.0 / 540},
+                .90,
+                0}},
+        2,
+        7.0 / 960,
+        7.0 / 540);
     if (fine.located){
         return fine;
     }
     // Coarse acquisition searches the whole frame. Agreement and a peak margin
     // guard against confusing the Mart/Center emblems with another building.
     OverworldMatchResult coarse = match_landmarks(frame,
-                                                  {{"Mart",
-                                                    "PokemonBDSP/Autostory/PoketchInteraction/Mart.png",
-                                                    {0.768750000000, 0.044444444444, 0.079166666667, 0.088888888889},
-                                                    {0, 0, 1, 1},
-                                                    .93,
-                                                    .12},
-                                                   {"Center",
-                                                    "PokemonBDSP/Autostory/PoketchInteraction/Center.png",
-                                                    {0.900000000000, 0.748148148148, 0.075000000000, 0.137037037037},
-                                                    {0, 0, 1, 1},
-                                                    .93,
-                                                    .12},
-                                                   {"School",
-                                                    "PokemonBDSP/Autostory/PoketchInteraction/School.png",
-                                                    {0.006250000000, 0.755555555556, 0.097916666667, 0.133333333333},
-                                                    {0, 0, 1, 1},
-                                                    .92,
-                                                    .40}},
-                                                  2, 7.0 / 960, 7.0 / 540);
+        {{"Mart",
+                "PokemonBDSP/Autostory/PoketchInteraction/Mart.png",
+                {0.768750000000, 0.044444444444, 0.079166666667, 0.088888888889},
+                {0, 0, 1, 1},
+                .93,
+                .12},
+            {"Center",
+                "PokemonBDSP/Autostory/PoketchInteraction/Center.png",
+                {0.900000000000, 0.748148148148, 0.075000000000, 0.137037037037},
+                {0, 0, 1, 1},
+                .93,
+                .12},
+            {"School",
+                "PokemonBDSP/Autostory/PoketchInteraction/School.png",
+                {0.006250000000, 0.755555555556, 0.097916666667, 0.133333333333},
+                {0, 0, 1, 1},
+                .92,
+                .40}},
+        2,
+        7.0 / 960,
+        7.0 / 540);
     if (!coarse.located){
         // Acquisition may expose just one building. School keeps its strong
         // spatial margin; Mart/Center require a higher score than pair matching.
@@ -264,23 +283,27 @@ OverworldMatchResult match_poketch_landmarks(const ImageRGB32& frame){
 OverworldMatchResult match_oreburgh_mart(const ImageRGB32& frame){
     const ImageFloatBox target{0.502083333333, 0.235185185185, 0.056250000000, 0.079629629630};
     auto original = match_landmarks(frame,
-                                    {{"Mart emblem",
-                                      "PokemonBDSP/Autostory/OreburghMart/MartEmblem.png",
-                                      target,
-                                      {0, 0, 1, 360.0 / 540},
-                                      .93,
-                                      .10}},
-                                    1, POSITION_TOLERANCE_X, POSITION_TOLERANCE_Y);
+        {{"Mart emblem",
+                "PokemonBDSP/Autostory/OreburghMart/MartEmblem.png",
+                target,
+                {0, 0, 1, 360.0 / 540},
+                .93,
+                .10}},
+        1,
+        POSITION_TOLERANCE_X,
+        POSITION_TOLERANCE_Y);
     // The recorded daytime roof appearance narrowly missed the old template.
     // Preserve both confidence gates and reject disagreement between variants.
     auto recorded = match_landmarks(frame,
-                                    {{"Mart emblem",
-                                      "PokemonBDSP/Autostory/OreburghMart/MartEmblemRecorded.png",
-                                      target,
-                                      {0, 0, 1, 360.0 / 540},
-                                      .93,
-                                      .10}},
-                                    1, POSITION_TOLERANCE_X, POSITION_TOLERANCE_Y);
+        {{"Mart emblem",
+                "PokemonBDSP/Autostory/OreburghMart/MartEmblemRecorded.png",
+                target,
+                {0, 0, 1, 360.0 / 540},
+                .93,
+                .10}},
+        1,
+        POSITION_TOLERANCE_X,
+        POSITION_TOLERANCE_Y);
     if (original.located && recorded.located &&
         (std::abs(original.dx - recorded.dx) > AGREEMENT_X || std::abs(original.dy - recorded.dy) > AGREEMENT_Y)){
         original.located = false;
@@ -298,21 +321,27 @@ OverworldMatchResult match_jubilife_center_entrance(const ImageRGB32& frame){
     // The emblem is about 5.73% of screen width left of the player at approach:
     // shift its target right to center the door, preserving the approach height.
     OverworldMatchResult clear = match_landmarks(frame,
-                                                 {{"Center entrance",
-                                                   "PokemonBDSP/Autostory/JubilifeCenter/CenterEmblem.png",
-                                                   {0.462500000000, 0.109259259259, 0.072916666667, 0.111111111111},
-                                                   {0, 0, 1, 1},
-                                                   .90,
-                                                   .20}},
-                                                 1, POSITION_TOLERANCE_X, POSITION_TOLERANCE_Y, true);
+        {{"Center entrance",
+                "PokemonBDSP/Autostory/JubilifeCenter/CenterEmblem.png",
+                {0.462500000000, 0.109259259259, 0.072916666667, 0.111111111111},
+                {0, 0, 1, 1},
+                .90,
+                .20}},
+        1,
+        POSITION_TOLERANCE_X,
+        POSITION_TOLERANCE_Y,
+        true);
     OverworldMatchResult shadow = match_landmarks(frame,
-                                                  {{"Center entrance",
-                                                    "PokemonBDSP/Autostory/JubilifeCenter/CenterEmblemShadow.png",
-                                                    {0.462500000000, 0.109259259259, 0.072916666667, 0.111111111111},
-                                                    {0, 0, 1, 1},
-                                                    .90,
-                                                    .20}},
-                                                  1, POSITION_TOLERANCE_X, POSITION_TOLERANCE_Y, true);
+        {{"Center entrance",
+                "PokemonBDSP/Autostory/JubilifeCenter/CenterEmblemShadow.png",
+                {0.462500000000, 0.109259259259, 0.072916666667, 0.111111111111},
+                {0, 0, 1, 1},
+                .90,
+                .20}},
+        1,
+        POSITION_TOLERANCE_X,
+        POSITION_TOLERANCE_Y,
+        true);
     // Lighting alternatives must identify the same position when both pass.
     if (clear.located && shadow.located &&
         (std::abs(clear.dx - shadow.dx) > AGREEMENT_X || std::abs(clear.dy - shadow.dy) > AGREEMENT_Y)){
@@ -330,26 +359,29 @@ OverworldMatchResult match_route201_potion_exit(const ImageRGB32& frame){
     // Path shadows change shape, so validate the corner against four lighting states.
     // Each alternative still requires the sign and path to agree on position.
     const char* corners[] = {"PokemonBDSP/Autostory/Route201PotionExit/PathCornerHour0.png",
-                             "PokemonBDSP/Autostory/Route201PotionExit/PathCornerHour9.png",
-                             "PokemonBDSP/Autostory/Route201PotionExit/PathCornerHour12.png",
-                             "PokemonBDSP/Autostory/Route201PotionExit/PathCornerHour17.png"};
+        "PokemonBDSP/Autostory/Route201PotionExit/PathCornerHour9.png",
+        "PokemonBDSP/Autostory/Route201PotionExit/PathCornerHour12.png",
+        "PokemonBDSP/Autostory/Route201PotionExit/PathCornerHour17.png"};
     OverworldMatchResult best;
     double best_score = -1;
     for (const char* corner : corners){
         auto candidate = match_landmarks(frame,
-                                         {{"Route sign face",
-                                           "PokemonBDSP/Autostory/Route201PotionExit/RouteSignFace.png",
-                                           {0.292708333333, 0.470370370370, 0.109375, 0.072222222222},
-                                           {0, 0, 1, 1},
-                                           .94,
-                                           .20},
-                                          {"Path corner",
-                                           corner,
-                                           {0.202083333333, 0.648148148148, 0.133333333333, 0.174074074074},
-                                           {0, 0, 1, 1},
-                                           .90,
-                                           .10}},
-                                         2, POSITION_TOLERANCE_X, POSITION_TOLERANCE_Y, true);
+            {{"Route sign face",
+                    "PokemonBDSP/Autostory/Route201PotionExit/RouteSignFace.png",
+                    {0.292708333333, 0.470370370370, 0.109375, 0.072222222222},
+                    {0, 0, 1, 1},
+                    .94,
+                    .20},
+                {"Path corner",
+                    corner,
+                    {0.202083333333, 0.648148148148, 0.133333333333, 0.174074074074},
+                    {0, 0, 1, 1},
+                    .90,
+                    .10}},
+            2,
+            POSITION_TOLERANCE_X,
+            POSITION_TOLERANCE_Y,
+            true);
         if (best.located && candidate.located &&
             (std::abs(best.dx - candidate.dx) > AGREEMENT_X || std::abs(best.dy - candidate.dy) > AGREEMENT_Y)){
             best.located = false;
@@ -370,19 +402,22 @@ OverworldMatchResult match_route201_potion_exit(const ImageRGB32& frame){
 OverworldMatchResult match_sandgem_junction(const ImageRGB32& frame){
     // Building emblems contain no localized words. Ignore NPCs and door lights.
     auto result = match_landmarks(frame,
-                                  {{"Center emblem",
-                                    "PokemonBDSP/Autostory/SandgemJunction/Center.png",
-                                    {0.171875, 0.2, 0.058333333333, 0.092592592593},
-                                    {0, 0, 1, 1},
-                                    .90,
-                                    .08},
-                                   {"Mart emblem",
-                                    "PokemonBDSP/Autostory/SandgemJunction/Mart.png",
-                                    {0.726041666667, 0.222222222222, 0.0625, 0.088888888889},
-                                    {0, 0, 1, 1},
-                                    .90,
-                                    .08}},
-                                  2, POSITION_TOLERANCE_X, POSITION_TOLERANCE_Y, true);
+        {{"Center emblem",
+                "PokemonBDSP/Autostory/SandgemJunction/Center.png",
+                {0.171875, 0.2, 0.058333333333, 0.092592592593},
+                {0, 0, 1, 1},
+                .90,
+                .08},
+            {"Mart emblem",
+                "PokemonBDSP/Autostory/SandgemJunction/Mart.png",
+                {0.726041666667, 0.222222222222, 0.0625, 0.088888888889},
+                {0, 0, 1, 1},
+                .90,
+                .08}},
+        2,
+        POSITION_TOLERANCE_X,
+        POSITION_TOLERANCE_Y,
+        true);
     if (result.located || result.landmarks.size() != 2){
         return result;
     }
@@ -411,20 +446,27 @@ OverworldMatchResult match_route202_grass_exit(const ImageRGB32& frame){
     // Morning tree shadows need a second corner reference. Each alternative
     // must still agree with the sign; neither can confirm the destination alone.
     const char* corners[] = {"PokemonBDSP/Autostory/Route202GrassExit/PathCorner.png",
-                             "PokemonBDSP/Autostory/Route202GrassExit/PathCornerMorning.png"};
+        "PokemonBDSP/Autostory/Route202GrassExit/PathCornerMorning.png"};
     OverworldMatchResult best;
     double best_score = -1;
     for (const char* corner : corners){
-        auto candidate = match_landmarks(
-            frame,
+        auto candidate = match_landmarks(frame,
             {{"Route 202 sign",
-              "PokemonBDSP/Autostory/Route202GrassExit/RouteSign.png",
-              {0.59375, 0.194444444444, 0.091666666667, 0.059259259259},
-              {0, 0, 1, 1},
-              .94,
-              .20},
-             {"Path corner", corner, {0.405208333333, 0.331481481481, 0.1375, 0.062962962963}, {0, 0, 1, 1}, .90, .08}},
-            2, POSITION_TOLERANCE_X, POSITION_TOLERANCE_Y, true);
+                    "PokemonBDSP/Autostory/Route202GrassExit/RouteSign.png",
+                    {0.59375, 0.194444444444, 0.091666666667, 0.059259259259},
+                    {0, 0, 1, 1},
+                    .94,
+                    .20},
+                {"Path corner",
+                    corner,
+                    {0.405208333333, 0.331481481481, 0.1375, 0.062962962963},
+                    {0, 0, 1, 1},
+                    .90,
+                    .08}},
+            2,
+            POSITION_TOLERANCE_X,
+            POSITION_TOLERANCE_Y,
+            true);
         if (best.located && candidate.located &&
             (std::abs(best.dx - candidate.dx) > AGREEMENT_X || std::abs(best.dy - candidate.dy) > AGREEMENT_Y)){
             best.located = false;
@@ -444,11 +486,13 @@ OverworldMatchResult match_route202_grass_exit(const ImageRGB32& frame){
 }
 // Lighting alternatives describe one physical landmark, not extra votes.
 // Select one reference per landmark before requiring the two positions to agree.
-static OverworldMatchResult match_lighting_pair(const ImageRGB32& frame, const std::vector<LandmarkConfig>& variants,
-                                                const char* first, const char* second,
-                                                double tolerance_x = POSITION_TOLERANCE_X,
-                                                bool allow_vertical_acquisition = false,
-                                                double agreement_x = AGREEMENT_X){
+static OverworldMatchResult match_lighting_pair(const ImageRGB32& frame,
+    const std::vector<LandmarkConfig>& variants,
+    const char* first,
+    const char* second,
+    double tolerance_x = POSITION_TOLERANCE_X,
+    bool allow_vertical_acquisition = false,
+    double agreement_x = AGREEMENT_X){
     auto candidates =
         match_landmarks(frame, variants, variants.size() + 1, POSITION_TOLERANCE_X, POSITION_TOLERANCE_Y, true);
     OverworldMatchResult result;
@@ -472,7 +516,7 @@ static OverworldMatchResult match_lighting_pair(const ImageRGB32& frame, const s
         for (const auto& candidate : candidates.landmarks){
             if (candidate.name == name && candidate.accepted && candidate.score >= chosen.score - 0.02 &&
                 (std::abs(candidate.dx - chosen.dx) > AGREEMENT_X ||
-                 std::abs(candidate.dy - chosen.dy) > AGREEMENT_Y)){
+                    std::abs(candidate.dy - chosen.dy) > AGREEMENT_Y)){
                 chosen.accepted = false;
             }
         }
@@ -484,7 +528,7 @@ static OverworldMatchResult match_lighting_pair(const ImageRGB32& frame, const s
     result.dx = (a.dx + b.dx) / 2;
     result.dy = (a.dy + b.dy) / 2;
     result.at_target = result.located && std::abs(a.dx - b.dx) <= AGREEMENT_X && std::abs(result.dx) <= tolerance_x &&
-                       std::abs(result.dy) <= POSITION_TOLERANCE_Y;
+        std::abs(result.dy) <= POSITION_TOLERANCE_Y;
     const double spacing_difference = a.dx - b.dx;
     // At the street approach height, perspective can change column spacing.
     // Agreeing vertical offsets may guide an upward correction, but cannot
@@ -510,55 +554,55 @@ OverworldMatchResult match_eterna_center_entrance(const ImageRGB32& frame){
     for (int appearance = 0; appearance < 5; appearance++){
         for (double scale : {.90, .95, 1.0, 1.05, 1.10}){
             std::vector<LandmarkConfig> configs = {{"Center Pokeball",
-                                                    "PokemonBDSP/Autostory/EternaCenter/BallTarget.png",
-                                                    {904.0 / 1920, 144.0 / 1080, 112.0 / 1920, 104.0 / 1080},
-                                                    {0, 0, 1, .65},
-                                                    .93,
-                                                    .20},
-                                                   {"Right sign",
-                                                    "PokemonBDSP/Autostory/EternaCenter/RightSignTarget.png",
-                                                    {1762.0 / 1920, 304.0 / 1080, 128.0 / 1920, 138.0 / 1080},
-                                                    {0, 0, 1, .85},
-                                                    .93,
-                                                    .20},
-                                                   {"Lower left bush",
-                                                    "PokemonBDSP/Autostory/EternaCenter/BushTarget.png",
-                                                    {248.0 / 1920, 854.0 / 1080, 180.0 / 1920, 146.0 / 1080},
-                                                    {0, .35, 1, .65},
-                                                    .93,
-                                                    .20}};
+                    "PokemonBDSP/Autostory/EternaCenter/BallTarget.png",
+                    {904.0 / 1920, 144.0 / 1080, 112.0 / 1920, 104.0 / 1080},
+                    {0, 0, 1, .65},
+                    .93,
+                    .20},
+                {"Right sign",
+                    "PokemonBDSP/Autostory/EternaCenter/RightSignTarget.png",
+                    {1762.0 / 1920, 304.0 / 1080, 128.0 / 1920, 138.0 / 1080},
+                    {0, 0, 1, .85},
+                    .93,
+                    .20},
+                {"Lower left bush",
+                    "PokemonBDSP/Autostory/EternaCenter/BushTarget.png",
+                    {248.0 / 1920, 854.0 / 1080, 180.0 / 1920, 146.0 / 1080},
+                    {0, .35, 1, .65},
+                    .93,
+                    .20}};
             if (appearance == 1 || appearance == 2){
                 configs = {{"Center Pokeball",
-                            appearance == 1 ? "PokemonBDSP/Autostory/EternaCenter/BallEvening1.png"
-                                            : "PokemonBDSP/Autostory/EternaCenter/BallEvening2.png",
-                            {920.0 / 1920, 154.0 / 1080, 82.0 / 1920, 84.0 / 1080},
-                            {0, 0, 1, .65},
-                            .93,
-                            .20},
-                           {"Right sign",
-                            appearance == 1 ? "PokemonBDSP/Autostory/EternaCenter/RightSignEvening1.png"
-                                            : "PokemonBDSP/Autostory/EternaCenter/RightSignEvening2.png",
-                            {1770.0 / 1920, 310.0 / 1080, 116.0 / 1920, 63.0 / 1080},
-                            {0, 0, 1, .85},
-                            .93,
-                            .20},
-                           {"Lower left bush",
-                            appearance == 1 ? "PokemonBDSP/Autostory/EternaCenter/BushEvening1.png"
-                                            : "PokemonBDSP/Autostory/EternaCenter/BushEvening2.png",
-                            {248.0 / 1920, 932.0 / 1080, 180.0 / 1920, 68.0 / 1080},
-                            {0, .35, 1, .65},
-                            .93,
-                            .20}};
+                        appearance == 1 ? "PokemonBDSP/Autostory/EternaCenter/BallEvening1.png"
+                        : "PokemonBDSP/Autostory/EternaCenter/BallEvening2.png",
+                        {920.0 / 1920, 154.0 / 1080, 82.0 / 1920, 84.0 / 1080},
+                        {0, 0, 1, .65},
+                        .93,
+                        .20},
+                    {"Right sign",
+                        appearance == 1 ? "PokemonBDSP/Autostory/EternaCenter/RightSignEvening1.png"
+                        : "PokemonBDSP/Autostory/EternaCenter/RightSignEvening2.png",
+                        {1770.0 / 1920, 310.0 / 1080, 116.0 / 1920, 63.0 / 1080},
+                        {0, 0, 1, .85},
+                        .93,
+                        .20},
+                    {"Lower left bush",
+                        appearance == 1 ? "PokemonBDSP/Autostory/EternaCenter/BushEvening1.png"
+                        : "PokemonBDSP/Autostory/EternaCenter/BushEvening2.png",
+                        {248.0 / 1920, 932.0 / 1080, 180.0 / 1920, 68.0 / 1080},
+                        {0, .35, 1, .65},
+                        .93,
+                        .20}};
             }
             if (appearance >= 3){
                 // Recorded daylight changes the bush/planter contrast. These
                 // crops retain the original doorway geometry and all three votes.
                 configs[0].path = appearance == 3 ? "PokemonBDSP/Autostory/EternaCenter/BallDaytime1.png"
-                                                  : "PokemonBDSP/Autostory/EternaCenter/BallDaytime2.png";
+                    : "PokemonBDSP/Autostory/EternaCenter/BallDaytime2.png";
                 configs[1].path = appearance == 3 ? "PokemonBDSP/Autostory/EternaCenter/RightSignDaytime1.png"
-                                                  : "PokemonBDSP/Autostory/EternaCenter/RightSignDaytime2.png";
+                    : "PokemonBDSP/Autostory/EternaCenter/RightSignDaytime2.png";
                 configs[2].path = appearance == 3 ? "PokemonBDSP/Autostory/EternaCenter/BushDaytime1.png"
-                                                  : "PokemonBDSP/Autostory/EternaCenter/BushDaytime2.png";
+                    : "PokemonBDSP/Autostory/EternaCenter/BushDaytime2.png";
             }
             for (auto& config : configs){
                 const double w = config.target.width, h = config.target.height;
@@ -609,34 +653,34 @@ OverworldMatchResult match_route208_stair_top(const ImageRGB32& frame){
     const char* references[][2] = {
         {"PokemonBDSP/Autostory/Route208Stairs/UpperRock.png", "PokemonBDSP/Autostory/Route208Stairs/LowerRocks.png"},
         {"PokemonBDSP/Autostory/Route208Stairs/Hour0Frame1Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/Hour0Frame1Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/Hour0Frame1Lower.png"},
         {"PokemonBDSP/Autostory/Route208Stairs/Hour4Frame1Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/Hour4Frame1Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/Hour4Frame1Lower.png"},
         {"PokemonBDSP/Autostory/Route208Stairs/Hour17Frame1Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/Hour17Frame1Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/Hour17Frame1Lower.png"},
         {"PokemonBDSP/Autostory/Route208Stairs/Hour11Frame3Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/Hour11Frame3Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/Hour11Frame3Lower.png"},
         {"PokemonBDSP/Autostory/Route208Stairs/Hour15Frame1Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/Hour15Frame1Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/Hour15Frame1Lower.png"},
         {"PokemonBDSP/Autostory/Route208Stairs/Hour11Frame5Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/Hour11Frame5Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/Hour11Frame5Lower.png"},
         {"PokemonBDSP/Autostory/Route208Stairs/Hour15Frame3Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/Hour15Frame3Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/Hour15Frame3Lower.png"},
     };
     for (const auto& reference : references){
         for (double scale : {.90, .95, 1.0, 1.05, 1.10}){
             std::vector<LandmarkConfig> configs = {{"Stair-top upper rock",
-                                                    reference[0],
-                                                    {170.0 / 1920, 350.0 / 1080, 120.0 / 1920, 120.0 / 1080},
-                                                    {0, 0, 1, 1},
-                                                    .93,
-                                                    .20},
-                                                   {"Stair-top lower rock pair",
-                                                    reference[1],
-                                                    {240.0 / 1920, 425.0 / 1080, 130.0 / 1920, 180.0 / 1080},
-                                                    {0, 0, 1, 1},
-                                                    .93,
-                                                    .20}};
+                    reference[0],
+                    {170.0 / 1920, 350.0 / 1080, 120.0 / 1920, 120.0 / 1080},
+                    {0, 0, 1, 1},
+                    .93,
+                    .20},
+                {"Stair-top lower rock pair",
+                    reference[1],
+                    {240.0 / 1920, 425.0 / 1080, 130.0 / 1920, 180.0 / 1080},
+                    {0, 0, 1, 1},
+                    .93,
+                    .20}};
             for (auto& config : configs){
                 const double w = config.target.width, h = config.target.height;
                 config.target.width *= scale;
@@ -660,48 +704,48 @@ OverworldMatchResult match_route208_stair_top(const ImageRGB32& frame){
     }
     const char* approaches[][2] = {
         {"PokemonBDSP/Autostory/Route208Stairs/Approach0507Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/Approach0507Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/Approach0507Lower.png"},
         {"PokemonBDSP/Autostory/Route208Stairs/Approach0538Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/Approach0538Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/Approach0538Lower.png"},
         {"PokemonBDSP/Autostory/Route208Stairs/Approach0549Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/Approach0549Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/Approach0549Lower.png"},
         // The eastern cliff pose changes rock perspective and the local shadow
         // pattern. These real-run appearances guide acquisition only: retain
         // .92 acquisition NCC/.20 uniqueness and two-rock offset agreement.
         // Arrival still requires the original .93 strict reference bank.
         {"PokemonBDSP/Autostory/Route208Stairs/ApproachLive01Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/ApproachLive01Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/ApproachLive01Lower.png"},
         {"PokemonBDSP/Autostory/Route208Stairs/ApproachLive02Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/ApproachLive02Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/ApproachLive02Lower.png"},
         {"PokemonBDSP/Autostory/Route208Stairs/ApproachLive03Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/ApproachLive03Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/ApproachLive03Lower.png"},
         {"PokemonBDSP/Autostory/Route208Stairs/ApproachLive04Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/ApproachLive04Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/ApproachLive04Lower.png"},
         {"PokemonBDSP/Autostory/Route208Stairs/ApproachLive05Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/ApproachLive05Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/ApproachLive05Lower.png"},
         {"PokemonBDSP/Autostory/Route208Stairs/ApproachLive06Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/ApproachLive06Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/ApproachLive06Lower.png"},
         {"PokemonBDSP/Autostory/Route208Stairs/ApproachLive07Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/ApproachLive07Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/ApproachLive07Lower.png"},
         {"PokemonBDSP/Autostory/Route208Stairs/ApproachLive08Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/ApproachLive08Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/ApproachLive08Lower.png"},
         {"PokemonBDSP/Autostory/Route208Stairs/ApproachLive09Upper.png",
-         "PokemonBDSP/Autostory/Route208Stairs/ApproachLive09Lower.png"},
+            "PokemonBDSP/Autostory/Route208Stairs/ApproachLive09Lower.png"},
     };
     for (const auto& reference : approaches){
         for (double scale : {.90, .925, .95, .975, 1.0, 1.025, 1.05, 1.075, 1.10}){
             std::vector<LandmarkConfig> configs = {{"Stair-top approach upper rock",
-                                                    reference[0],
-                                                    {170.0 / 1920, 350.0 / 1080, 120.0 / 1920, 120.0 / 1080},
-                                                    {0, 0, .50, .85},
-                                                    .92,
-                                                    .20},
-                                                   {"Stair-top approach lower rock pair",
-                                                    reference[1],
-                                                    {240.0 / 1920, 425.0 / 1080, 130.0 / 1920, 180.0 / 1080},
-                                                    {0, 0, .50, .85},
-                                                    .92,
-                                                    .20}};
+                    reference[0],
+                    {170.0 / 1920, 350.0 / 1080, 120.0 / 1920, 120.0 / 1080},
+                    {0, 0, .50, .85},
+                    .92,
+                    .20},
+                {"Stair-top approach lower rock pair",
+                    reference[1],
+                    {240.0 / 1920, 425.0 / 1080, 130.0 / 1920, 180.0 / 1080},
+                    {0, 0, .50, .85},
+                    .92,
+                    .20}};
             for (auto& config : configs){
                 const double w = config.target.width, h = config.target.height;
                 config.target.width *= scale;
@@ -728,17 +772,17 @@ OverworldMatchResult match_route208_lower_stair_lane(const ImageRGB32& frame){
     double best_score = -1;
     for (double scale : {.90, .95, 1.0, 1.05, 1.10}){
         std::vector<LandmarkConfig> configs = {{"Lower stair cliff corner",
-                                                "PokemonBDSP/Autostory/Route208LowerLane/CliffCorner.png",
-                                                {690.0 / 1920, 540.0 / 1080, 110.0 / 1920, 150.0 / 1080},
-                                                {0, 0, 1, 1},
-                                                .93,
-                                                .20},
-                                               {"Honey tree",
-                                                "PokemonBDSP/Autostory/Route208LowerLane/HoneyTree.png",
-                                                {1510.0 / 1920, 600.0 / 1080, 100.0 / 1920, 170.0 / 1080},
-                                                {0, 0, 1, 1},
-                                                .93,
-                                                .20}};
+                "PokemonBDSP/Autostory/Route208LowerLane/CliffCorner.png",
+                {690.0 / 1920, 540.0 / 1080, 110.0 / 1920, 150.0 / 1080},
+                {0, 0, 1, 1},
+                .93,
+                .20},
+            {"Honey tree",
+                "PokemonBDSP/Autostory/Route208LowerLane/HoneyTree.png",
+                {1510.0 / 1920, 600.0 / 1080, 100.0 / 1920, 170.0 / 1080},
+                {0, 0, 1, 1},
+                .93,
+                .20}};
         for (auto& config : configs){
             const double w = config.target.width, h = config.target.height;
             config.target.width *= scale;
@@ -787,65 +831,65 @@ OverworldMatchResult match_route209_repel_point(const ImageRGB32& frame){
     static const std::array<const char*, 2> appearances[] = {
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame.png", "PokemonBDSP/Autostory/Route209Repel/RockPair.png"},
         {"PokemonBDSP/Autostory/Route209Repel/EastSignFrame.png",
-         "PokemonBDSP/Autostory/Route209Repel/EastRockPair.png"},
+            "PokemonBDSP/Autostory/Route209Repel/EastRockPair.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H04F1.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H04F1.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H04F1.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H18F4.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H18F4.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H18F4.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H12F1.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H12F1.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H12F1.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H02F3.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H02F3.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H02F3.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H11F4.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H11F4.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H11F4.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H12F4.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H12F4.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H12F4.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H12F5.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H12F5.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H12F5.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H02F5.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H02F5.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H02F5.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H10F2.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H10F2.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H10F2.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H10F3.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H10F3.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H10F3.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H10F4.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H10F4.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H10F4.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H10F5.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H10F5.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H10F5.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H11F1.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H11F1.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H11F1.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H11F2.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H11F2.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H11F2.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H11F3.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H11F3.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H11F3.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H02F4.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H02F4.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H02F4.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H03F5.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H03F5.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H03F5.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H10F1.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H10F1.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H10F1.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H11F5.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H11F5.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H11F5.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H13F5.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H13F5.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H13F5.png"},
         {"PokemonBDSP/Autostory/Route209Repel/SignFrame-H14F5.png",
-         "PokemonBDSP/Autostory/Route209Repel/RockPair-H14F5.png"},
+            "PokemonBDSP/Autostory/Route209Repel/RockPair-H14F5.png"},
     };
     for (double scale : {1.0, .95, 1.05, .90, 1.10}){
         std::vector<OverworldLandmarkResult> lighting_landmarks(2);
         for (size_t appearance = 0; appearance < std::size(appearances); appearance++){
             std::vector<LandmarkConfig> configs = {{"Sign frame",
-                                                    "PokemonBDSP/Autostory/Route209Repel/SignFrame.png",
-                                                    {1242.0 / 1920, 580.0 / 1080, 28.0 / 1920, 80.0 / 1080},
-                                                    {0, 0, 1, 1},
-                                                    .93,
-                                                    .15},
-                                                   {"Rock pair",
-                                                    "PokemonBDSP/Autostory/Route209Repel/RockPair.png",
-                                                    {580.0 / 1920, 690.0 / 1080, 155.0 / 1920, 165.0 / 1080},
-                                                    {0, 0, 1, 1},
-                                                    .93,
-                                                    .15}};
+                    "PokemonBDSP/Autostory/Route209Repel/SignFrame.png",
+                    {1242.0 / 1920, 580.0 / 1080, 28.0 / 1920, 80.0 / 1080},
+                    {0, 0, 1, 1},
+                    .93,
+                    .15},
+                {"Rock pair",
+                    "PokemonBDSP/Autostory/Route209Repel/RockPair.png",
+                    {580.0 / 1920, 690.0 / 1080, 155.0 / 1920, 165.0 / 1080},
+                    {0, 0, 1, 1},
+                    .93,
+                    .15}};
             for (size_t i = 0; i < configs.size(); i++){
                 configs[i].path = appearances[appearance][i];
             }
@@ -872,7 +916,7 @@ OverworldMatchResult match_route209_repel_point(const ImageRGB32& frame){
                 score = std::min(score, landmark.score);
             }
             candidate.at_target = appearance != 1 && candidate.located && std::abs(candidate.dx) <= 1.0 / 128 &&
-                                  std::abs(candidate.dy) <= POSITION_TOLERANCE_Y;
+                std::abs(candidate.dy) <= POSITION_TOLERANCE_Y;
             // East-side appearance is acquisition-only; the marked pose owns arrival.
             if (appearance == 1 && std::abs(candidate.dx) <= 1.0 / 128 &&
                 std::abs(candidate.dy) <= POSITION_TOLERANCE_Y){
@@ -893,7 +937,7 @@ OverworldMatchResult match_route209_repel_point(const ImageRGB32& frame){
         const auto& sign = combined.landmarks[0];
         const auto& rock = combined.landmarks[1];
         combined.located = sign.accepted && rock.accepted && std::abs(sign.dx - rock.dx) <= AGREEMENT_X &&
-                           std::abs(sign.dy - rock.dy) <= AGREEMENT_Y;
+            std::abs(sign.dy - rock.dy) <= AGREEMENT_Y;
         if (combined.located){
             combined.dx = (sign.dx + rock.dx) / 2;
             combined.dy = (sign.dy + rock.dy) / 2;
@@ -909,37 +953,37 @@ OverworldMatchResult match_route208_hannah_departure(const ImageRGB32& frame){
     for (int appearance : {0, 865, 930, 965, 978}){
         for (double scale : {.90, .95, 1.0, 1.05, 1.10}){
             std::vector<LandmarkConfig> configs = {{"Field stair foot",
-                                                    "PokemonBDSP/Autostory/Route208Hannah/StairFoot.png",
-                                                    {225.0 / 1920, 275.0 / 1080, 250.0 / 1920, 110.0 / 1080},
-                                                    {0, 0, 1, 1},
-                                                    .93,
-                                                    .20,
-                                                    LandmarkFeatures::LOCAL_CONTRAST},
-                                                   {"Field sign frame",
-                                                    "PokemonBDSP/Autostory/Route208Hannah/TreeSign.png",
-                                                    {1000.0 / 1920, 125.0 / 1080, 100.0 / 1920, 80.0 / 1080},
-                                                    {0, 0, 1, 1},
-                                                    .93,
-                                                    .20},
-                                                   {"Field house sign frame",
-                                                    "PokemonBDSP/Autostory/Route208Hannah/HouseSign.png",
-                                                    {1440.0 / 1920, 110.0 / 1080, 110.0 / 1920, 110.0 / 1080},
-                                                    {0, 0, 1, 1},
-                                                    .93,
-                                                    .20}};
+                    "PokemonBDSP/Autostory/Route208Hannah/StairFoot.png",
+                    {225.0 / 1920, 275.0 / 1080, 250.0 / 1920, 110.0 / 1080},
+                    {0, 0, 1, 1},
+                    .93,
+                    .20,
+                    LandmarkFeatures::LOCAL_CONTRAST},
+                {"Field sign frame",
+                    "PokemonBDSP/Autostory/Route208Hannah/TreeSign.png",
+                    {1000.0 / 1920, 125.0 / 1080, 100.0 / 1920, 80.0 / 1080},
+                    {0, 0, 1, 1},
+                    .93,
+                    .20},
+                {"Field house sign frame",
+                    "PokemonBDSP/Autostory/Route208Hannah/HouseSign.png",
+                    {1440.0 / 1920, 110.0 / 1080, 110.0 / 1920, 110.0 / 1080},
+                    {0, 0, 1, 1},
+                    .93,
+                    .20}};
             if (appearance){
                 // Recorded dodges stand farther east, with the stairs clipped.
                 // These agreeing signs guide acquisition only; the successful
                 // departure reference above alone may confirm arrival.
                 configs.erase(configs.begin());
-                configs[0].path = appearance == 865   ? "PokemonBDSP/Autostory/Route208Hannah/FieldSign865.png"
-                                  : appearance == 930 ? "PokemonBDSP/Autostory/Route208Hannah/FieldSign930.png"
-                                  : appearance == 965 ? "PokemonBDSP/Autostory/Route208Hannah/FieldSign965.png"
-                                                      : "PokemonBDSP/Autostory/Route208Hannah/FieldSign978.png";
-                configs[1].path = appearance == 865   ? "PokemonBDSP/Autostory/Route208Hannah/HouseSign865.png"
-                                  : appearance == 930 ? "PokemonBDSP/Autostory/Route208Hannah/HouseSign930.png"
-                                  : appearance == 965 ? "PokemonBDSP/Autostory/Route208Hannah/HouseSign965.png"
-                                                      : "PokemonBDSP/Autostory/Route208Hannah/HouseSign978.png";
+                configs[0].path = appearance == 865 ? "PokemonBDSP/Autostory/Route208Hannah/FieldSign865.png"
+                    : appearance == 930             ? "PokemonBDSP/Autostory/Route208Hannah/FieldSign930.png"
+                    : appearance == 965             ? "PokemonBDSP/Autostory/Route208Hannah/FieldSign965.png"
+                    : "PokemonBDSP/Autostory/Route208Hannah/FieldSign978.png";
+                configs[1].path = appearance == 865 ? "PokemonBDSP/Autostory/Route208Hannah/HouseSign865.png"
+                    : appearance == 930             ? "PokemonBDSP/Autostory/Route208Hannah/HouseSign930.png"
+                    : appearance == 965             ? "PokemonBDSP/Autostory/Route208Hannah/HouseSign965.png"
+                    : "PokemonBDSP/Autostory/Route208Hannah/HouseSign978.png";
             }
             for (auto& config : configs){
                 const double w = config.target.width, h = config.target.height;
@@ -982,38 +1026,50 @@ OverworldMatchResult match_hearthome_center_entrance(const ImageRGB32& frame){
         const char* awning;
         double ball_width, ball_height;
     };
-    const Reference references[] = {
-        {"PokemonBDSP/Autostory/HearthomeCenter/Lighting00Ball.png",
-         "PokemonBDSP/Autostory/HearthomeCenter/Lighting00Awning.png", 144.0 / 1920, 128.0 / 1080},
+    const Reference references[] = {{"PokemonBDSP/Autostory/HearthomeCenter/Lighting00Ball.png",
+            "PokemonBDSP/Autostory/HearthomeCenter/Lighting00Awning.png",
+            144.0 / 1920,
+            128.0 / 1080},
         {"PokemonBDSP/Autostory/HearthomeCenter/Lighting01Ball.png",
-         "PokemonBDSP/Autostory/HearthomeCenter/Lighting01Awning.png", 144.0 / 1920, 128.0 / 1080},
+            "PokemonBDSP/Autostory/HearthomeCenter/Lighting01Awning.png",
+            144.0 / 1920,
+            128.0 / 1080},
         {"PokemonBDSP/Autostory/HearthomeCenter/Lighting02Ball.png",
-         "PokemonBDSP/Autostory/HearthomeCenter/Lighting02Awning.png", 144.0 / 1920, 128.0 / 1080},
+            "PokemonBDSP/Autostory/HearthomeCenter/Lighting02Awning.png",
+            144.0 / 1920,
+            128.0 / 1080},
         {"PokemonBDSP/Autostory/HearthomeCenter/Lighting03Ball.png",
-         "PokemonBDSP/Autostory/HearthomeCenter/Lighting03Awning.png", 144.0 / 1920, 128.0 / 1080},
+            "PokemonBDSP/Autostory/HearthomeCenter/Lighting03Awning.png",
+            144.0 / 1920,
+            128.0 / 1080},
         {"PokemonBDSP/Autostory/HearthomeCenter/Lighting04Ball.png",
-         "PokemonBDSP/Autostory/HearthomeCenter/Lighting04Awning.png", 112.0 / 1920, 108.0 / 1080}};
+            "PokemonBDSP/Autostory/HearthomeCenter/Lighting04Awning.png",
+            112.0 / 1920,
+            108.0 / 1080}};
     std::vector<LandmarkConfig> variants;
     for (const auto& reference : references){
         for (double scale : {.90, .925, .95, .975, 1.0, 1.025, 1.05, 1.075, 1.10}){
             const double w = reference.ball_width * scale, h = reference.ball_height * scale;
             const double aw = 272.0 / 1920 * scale, ah = 80.0 / 1080 * scale;
             variants.push_back({"Hearthome Center roof ball",
-                                reference.ball,
-                                {972.0 / 1920 - w / 2, 208.0 / 1080 - h / 2, w, h},
-                                {0, 0, 1, .65},
-                                .95,
-                                .20});
+                reference.ball,
+                {972.0 / 1920 - w / 2, 208.0 / 1080 - h / 2, w, h},
+                {0, 0, 1, .65},
+                .95,
+                .20});
             variants.push_back({"Hearthome Center orange awning",
-                                reference.awning,
-                                {968.0 / 1920 - aw / 2, 308.0 / 1080 - ah / 2, aw, ah},
-                                {0, 0, 1, .65},
-                                .95,
-                                .20});
+                reference.awning,
+                {968.0 / 1920 - aw / 2, 308.0 / 1080 - ah / 2, aw, ah},
+                {0, 0, 1, .65},
+                .95,
+                .20});
         }
     }
-    return match_lighting_pair(frame, variants, "Hearthome Center roof ball", "Hearthome Center orange awning",
-                               1.0 / 128);
+    return match_lighting_pair(frame,
+        variants,
+        "Hearthome Center roof ball",
+        "Hearthome Center orange awning",
+        1.0 / 128);
 }
 OverworldMatchResult match_hearthome_center_interior(const ImageRGB32& frame){
     // Three observed entry-camera angles. Perspective changes the machine
@@ -1024,17 +1080,17 @@ OverworldMatchResult match_hearthome_center_interior(const ImageRGB32& frame){
         ImageFloatBox a, b;
     };
     const View views[] = {{"InteriorMachine.png",
-                           "InteriorRegister.png",
-                           {660.0 / 1920, 160.0 / 1080, 220.0 / 1920, 185.0 / 1080},
-                           {1150.0 / 1920, 155.0 / 1080, 140.0 / 1920, 175.0 / 1080}},
-                          {"EntryRightMachine.png",
-                           "EntryRightRegister.png",
-                           {390.0 / 1920, 160.0 / 1080, 240.0 / 1920, 185.0 / 1080},
-                           {905.0 / 1920, 155.0 / 1080, 130.0 / 1920, 175.0 / 1080}},
-                          {"EntryLeftMachine.png",
-                           "EntryLeftRegister.png",
-                           {1045.0 / 1920, 160.0 / 1080, 240.0 / 1920, 185.0 / 1080},
-                           {1550.0 / 1920, 220.0 / 1080, 155.0 / 1920, 110.0 / 1080}}};
+            "InteriorRegister.png",
+            {660.0 / 1920, 160.0 / 1080, 220.0 / 1920, 185.0 / 1080},
+            {1150.0 / 1920, 155.0 / 1080, 140.0 / 1920, 175.0 / 1080}},
+        {"EntryRightMachine.png",
+            "EntryRightRegister.png",
+            {390.0 / 1920, 160.0 / 1080, 240.0 / 1920, 185.0 / 1080},
+            {905.0 / 1920, 155.0 / 1080, 130.0 / 1920, 175.0 / 1080}},
+        {"EntryLeftMachine.png",
+            "EntryLeftRegister.png",
+            {1045.0 / 1920, 160.0 / 1080, 240.0 / 1920, 185.0 / 1080},
+            {1550.0 / 1920, 220.0 / 1080, 155.0 / 1920, 110.0 / 1080}}};
     OverworldMatchResult best;
     double best_score = -1;
     for (const auto& view : views){
@@ -1051,9 +1107,12 @@ OverworldMatchResult match_hearthome_center_interior(const ImageRGB32& frame){
             b.width *= scale;
             b.height *= scale;
             auto candidate = match_landmarks(frame,
-                                             {{"Center healing machine", machine.c_str(), a, {0, 0, 1, .8}, .93, .20},
-                                              {"Center register", desk.c_str(), b, {0, 0, 1, .8}, .93, .20}},
-                                             2, POSITION_TOLERANCE_X, POSITION_TOLERANCE_Y, true);
+                {{"Center healing machine", machine.c_str(), a, {0, 0, 1, .8}, .93, .20},
+                    {"Center register", desk.c_str(), b, {0, 0, 1, .8}, .93, .20}},
+                2,
+                POSITION_TOLERANCE_X,
+                POSITION_TOLERANCE_Y,
+                true);
             double score = 1;
             for (const auto& anchor : candidate.landmarks){
                 score = std::min(score, anchor.score);
@@ -1070,54 +1129,57 @@ OverworldMatchResult match_hearthome_contest_fantina(const ImageRGB32& frame){
     // Static sign rim above localized text and roof emblem; Fantina can move.
     // Hourly captures vary the sign illumination. The roof remains reliable.
     const char* signs[] = {"PokemonBDSP/Autostory/HearthomeContest/SignRim.png",
-                           "PokemonBDSP/Autostory/HearthomeContest/RimLighting00Sign.png",
-                           "PokemonBDSP/Autostory/HearthomeContest/RimLighting01Sign.png",
-                           "PokemonBDSP/Autostory/HearthomeContest/RimLighting02Sign.png",
-                           "PokemonBDSP/Autostory/HearthomeContest/RimLighting03Sign.png",
-                           "PokemonBDSP/Autostory/HearthomeContest/RimLighting04Sign.png",
-                           "PokemonBDSP/Autostory/HearthomeContest/RimLighting05Sign.png",
-                           "PokemonBDSP/Autostory/HearthomeContest/RimLighting06Sign.png",
-                           "PokemonBDSP/Autostory/HearthomeContest/RimLighting07Sign.png",
-                           "PokemonBDSP/Autostory/HearthomeContest/RimLighting08Sign.png",
-                           "PokemonBDSP/Autostory/HearthomeContest/RimLighting09Sign.png",
-                           "PokemonBDSP/Autostory/HearthomeContest/RimLighting10Sign.png"};
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting00Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting01Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting02Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting03Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting04Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting05Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting06Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting07Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting08Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting09Sign.png",
+        "PokemonBDSP/Autostory/HearthomeContest/RimLighting10Sign.png"};
     std::vector<LandmarkConfig> variants;
     for (double scale : {.90, .925, .95, .975, 1.0, 1.025, 1.05, 1.075, 1.10}){
         const double sw = 162.0 / 1920 * scale, sh = 62.0 / 1080 * scale;
         const double rw = 136.0 / 1920 * scale, rh = 98.0 / 1080 * scale;
         for (const char* sign : signs){
             variants.push_back({"Contest Hall sign frame",
-                                sign,
-                                {595.0 / 1920 - sw / 2, 467.0 / 1080 - sh / 2, sw, sh},
-                                {0, .15, .75, .65},
-                                .93,
-                                .15});
+                sign,
+                {595.0 / 1920 - sw / 2, 467.0 / 1080 - sh / 2, sw, sh},
+                {0, .15, .75, .65},
+                .93,
+                .15});
         }
         variants.push_back({"Contest Hall roof emblem",
-                            "PokemonBDSP/Autostory/HearthomeContest/RoofEmblem.png",
-                            {940.0 / 1920 - rw / 2, 175.0 / 1080 - rh / 2, rw, rh},
-                            {.1, 0, .8, .65},
-                            .93,
-                            .15});
+            "PokemonBDSP/Autostory/HearthomeContest/RoofEmblem.png",
+            {940.0 / 1920 - rw / 2, 175.0 / 1080 - rh / 2, rw, rh},
+            {.1, 0, .8, .65},
+            .93,
+            .15});
     }
     return match_lighting_pair(frame, variants, "Contest Hall sign frame", "Contest Hall roof emblem", 1.0 / 128);
 }
 // Fixed city landmarks preserve the recorded passage and western stair lane.
 OverworldMatchResult match_veilstone_city_passage(const ImageRGB32& frame){
     auto fine = match_landmarks(frame,
-                                {{"Passage house",
-                                  "PokemonBDSP/Autostory/VeilstoneDawn/PassageHouse.png",
-                                  {42.0 / 960, 222.0 / 540, 210.0 / 960, 110.0 / 540},
-                                  {0, 0, .55, 1},
-                                  .93,
-                                  .12},
-                                 {"Game Corner facade",
-                                  "PokemonBDSP/Autostory/VeilstoneDawn/PassageGameCorner.png",
-                                  {592.0 / 960, 227.0 / 540, 230.0 / 960, 110.0 / 540},
-                                  {.45, 0, .55, 1},
-                                  .93,
-                                  .12}},
-                                2, 1.0 / 128, 1.0 / 108, true);
+        {{"Passage house",
+                "PokemonBDSP/Autostory/VeilstoneDawn/PassageHouse.png",
+                {42.0 / 960, 222.0 / 540, 210.0 / 960, 110.0 / 540},
+                {0, 0, .55, 1},
+                .93,
+                .12},
+            {"Game Corner facade",
+                "PokemonBDSP/Autostory/VeilstoneDawn/PassageGameCorner.png",
+                {592.0 / 960, 227.0 / 540, 230.0 / 960, 110.0 / 540},
+                {.45, 0, .55, 1},
+                .93,
+                .12}},
+        2,
+        1.0 / 128,
+        1.0 / 108,
+        true);
     if (fine.located){
         return fine;
     }
@@ -1130,27 +1192,27 @@ OverworldMatchResult match_veilstone_city_passage(const ImageRGB32& frame){
         const double hw = 95.0 / 960 * scale, hh = 80.0 / 540 * scale;
         const double gw = 230.0 / 960 * scale, gh = 110.0 / 540 * scale;
         variants.push_back({"House window",
-                            "PokemonBDSP/Autostory/VeilstoneDawn/PassageHouseWindow.png",
-                            {(165.0 + 95.0 / 2 - 8) / 960 - hw / 2, (250.0 + 80.0 / 2 + 2) / 540 - hh / 2, hw, hh},
-                            {0, 0, .55, 1},
-                            .94,
-                            .15});
+            "PokemonBDSP/Autostory/VeilstoneDawn/PassageHouseWindow.png",
+            {(165.0 + 95.0 / 2 - 8) / 960 - hw / 2, (250.0 + 80.0 / 2 + 2) / 540 - hh / 2, hw, hh},
+            {0, 0, .55, 1},
+            .94,
+            .15});
         variants.push_back({"Game Corner facade",
-                            "PokemonBDSP/Autostory/VeilstoneDawn/PassageGameCorner.png",
-                            {(600.0 + 230.0 / 2 - 8) / 960 - gw / 2, (225.0 + 110.0 / 2 + 2) / 540 - gh / 2, gw, gh},
-                            {.25, 0, .75, 1},
-                            .93,
-                            .12});
+            "PokemonBDSP/Autostory/VeilstoneDawn/PassageGameCorner.png",
+            {(600.0 + 230.0 / 2 - 8) / 960 - gw / 2, (225.0 + 110.0 / 2 + 2) / 540 - gh / 2, gw, gh},
+            {.25, 0, .75, 1},
+            .93,
+            .12});
     }
     // At the east-side roof obstruction, perspective changes the facade.
     // Calibrate this acquisition-only view to the simultaneously visible house
     // window. It guides west off that roof corner; fine arrival stays mandatory.
     variants.push_back({"Game Corner facade",
-                        "PokemonBDSP/Autostory/VeilstoneDawn/GameCornerEastApproach.png",
-                        {644.0 / 960, 228.0 / 540, 240.0 / 960, 100.0 / 540},
-                        {.25, 0, .75, 1},
-                        .93,
-                        .12});
+        "PokemonBDSP/Autostory/VeilstoneDawn/GameCornerEastApproach.png",
+        {644.0 / 960, 228.0 / 540, 240.0 / 960, 100.0 / 540},
+        {.25, 0, .75, 1},
+        .93,
+        .12});
     auto approach = match_lighting_pair(frame, variants, "House window", "Game Corner facade", 1.0 / 128);
     approach.coarse = true;
     approach.at_target = false;
@@ -1160,47 +1222,50 @@ OverworldMatchResult match_veilstone_dawn_stairs(const ImageRGB32& frame){
     // The residential terrace to the east has similar stairs. Require its
     // distinct west corner together with the western staircase, not NPCs.
     return match_landmarks(frame,
-                           {{"Western stairs",
-                             "PokemonBDSP/Autostory/VeilstoneDawn/GymStairs.png",
-                             {445.0 / 960, 40.0 / 540, 165.0 / 960, 55.0 / 540},
-                             {.10, 0, .65, .70},
-                             .93,
-                             .12},
-                            {"East terrace corner",
-                             "PokemonBDSP/Autostory/VeilstoneDawn/EastTerraceCorner.png",
-                             {620.0 / 960, 155.0 / 540, 200.0 / 960, 110.0 / 540},
-                             {.35, 0, .65, .85},
-                             .93,
-                             .12}},
-                           2, 1.0 / 128, 1.0 / 108, true);
+        {{"Western stairs",
+                "PokemonBDSP/Autostory/VeilstoneDawn/GymStairs.png",
+                {445.0 / 960, 40.0 / 540, 165.0 / 960, 55.0 / 540},
+                {.10, 0, .65, .70},
+                .93,
+                .12},
+            {"East terrace corner",
+                "PokemonBDSP/Autostory/VeilstoneDawn/EastTerraceCorner.png",
+                {620.0 / 960, 155.0 / 540, 200.0 / 960, 110.0 / 540},
+                {.35, 0, .65, .85},
+                .93,
+                .12}},
+        2,
+        1.0 / 128,
+        1.0 / 108,
+        true);
 }
 
 OverworldMatchResult match_hearthome_gym_entrance(const ImageRGB32& frame){
     // Wider fixed facade distinguishes the window bays at night. Real hourly
     // references cover the illuminated windows; cursor, NPCs and text stay out.
     const char* facades[] = {"PokemonBDSP/Autostory/HearthomeGym/LeftFacade.png",
-                             "PokemonBDSP/Autostory/HearthomeGym/Lighting00Facade.png",
-                             "PokemonBDSP/Autostory/HearthomeGym/Lighting01Facade.png",
-                             "PokemonBDSP/Autostory/HearthomeGym/Lighting02Facade.png",
-                             "PokemonBDSP/Autostory/HearthomeGym/Lighting03Facade.png",
-                             "PokemonBDSP/Autostory/HearthomeGym/Lighting04Facade.png"};
+        "PokemonBDSP/Autostory/HearthomeGym/Lighting00Facade.png",
+        "PokemonBDSP/Autostory/HearthomeGym/Lighting01Facade.png",
+        "PokemonBDSP/Autostory/HearthomeGym/Lighting02Facade.png",
+        "PokemonBDSP/Autostory/HearthomeGym/Lighting03Facade.png",
+        "PokemonBDSP/Autostory/HearthomeGym/Lighting04Facade.png"};
     std::vector<LandmarkConfig> variants;
     for (double scale : {.90, .925, .95, .975, 1.0, 1.025, 1.05, 1.075, 1.10}){
         const double aw = 160.0 / 1920 * scale, ah = 84.0 / 1080 * scale;
         const double fw = 218.0 / 1920 * scale, fh = 222.0 / 1080 * scale;
         variants.push_back({"Hearthome Gym doorway arch",
-                            "PokemonBDSP/Autostory/HearthomeGym/DoorArch.png",
-                            {966.0 / 1920 - aw / 2, 236.0 / 1080 - ah / 2, aw, ah},
-                            {.15, 0, .75, .65},
-                            .93,
-                            .20});
+            "PokemonBDSP/Autostory/HearthomeGym/DoorArch.png",
+            {966.0 / 1920 - aw / 2, 236.0 / 1080 - ah / 2, aw, ah},
+            {.15, 0, .75, .65},
+            .93,
+            .20});
         for (const char* facade : facades){
             variants.push_back({"Hearthome Gym left facade",
-                                facade,
-                                {719.0 / 1920 - fw / 2, 315.0 / 1080 - fh / 2, fw, fh},
-                                {0, 0, .55, .65},
-                                .93,
-                                .20});
+                facade,
+                {719.0 / 1920 - fw / 2, 315.0 / 1080 - fh / 2, fw, fh},
+                {0, 0, .55, .65},
+                .93,
+                .20});
         }
     }
     return match_lighting_pair(frame, variants, "Hearthome Gym doorway arch", "Hearthome Gym left facade", 1.0 / 128);
@@ -1214,26 +1279,27 @@ OverworldMatchResult match_eterna_gym_entrance(const ImageRGB32& frame){
     for (int appearance : {19, 16}){
         for (double scale : {.90, .95, 1.0, 1.05, 1.10}){
             std::vector<LandmarkConfig> configs = {{"Left gym sign",
-                                                    appearance == 19 ? "PokemonBDSP/Autostory/EternaGym/LeftSign19.png"
-                                                                     : "PokemonBDSP/Autostory/EternaGym/LeftSign16.png",
-                                                    {458.0 / 1920, 358.0 / 1080, 140.0 / 1920, 150.0 / 1080},
-                                                    {0, 0, .65, .85},
-                                                    .93,
-                                                    .20},
-                                                   {"Gym Pokeball",
-                                                    appearance == 19 ? "PokemonBDSP/Autostory/EternaGym/Ball19.png"
-                                                                     : "PokemonBDSP/Autostory/EternaGym/Ball16.png",
-                                                    {880.0 / 1920, 264.0 / 1080, 150.0 / 1920, 80.0 / 1080},
-                                                    {.15, 0, .7, .70},
-                                                    .93,
-                                                    .20},
-                                                   {"Right bike post",
-                                                    appearance == 19 ? "PokemonBDSP/Autostory/EternaGym/BikePost19.png"
-                                                                     : "PokemonBDSP/Autostory/EternaGym/BikePost16.png",
-                                                    {1468.0 / 1920, 460.0 / 1080, 130.0 / 1920, 178.0 / 1080},
-                                                    {.35, .15, .65, .80},
-                                                    .93,
-                                                    .20}};
+                    appearance == 19
+                    ? "PokemonBDSP/Autostory/EternaGym/LeftSign19.png"
+                    : "PokemonBDSP/Autostory/EternaGym/LeftSign16.png",
+                    {458.0 / 1920, 358.0 / 1080, 140.0 / 1920, 150.0 / 1080},
+                    {0, 0, .65, .85},
+                    .93,
+                    .20},
+                {"Gym Pokeball",
+                    appearance == 19 ? "PokemonBDSP/Autostory/EternaGym/Ball19.png"
+                    : "PokemonBDSP/Autostory/EternaGym/Ball16.png",
+                    {880.0 / 1920, 264.0 / 1080, 150.0 / 1920, 80.0 / 1080},
+                    {.15, 0, .7, .70},
+                    .93,
+                    .20},
+                {"Right bike post",
+                    appearance == 19 ? "PokemonBDSP/Autostory/EternaGym/BikePost19.png"
+                    : "PokemonBDSP/Autostory/EternaGym/BikePost16.png",
+                    {1468.0 / 1920, 460.0 / 1080, 130.0 / 1920, 178.0 / 1080},
+                    {.35, .15, .65, .80},
+                    .93,
+                    .20}};
             for (auto& config : configs){
                 const double w = config.target.width, h = config.target.height;
                 config.target.width *= scale;
@@ -1253,8 +1319,9 @@ OverworldMatchResult match_eterna_gym_entrance(const ImageRGB32& frame){
                     score = std::min(score, landmark.score);
                 }
             }
-            if (candidate.located && (!best.located || (best.coarse && !candidate.coarse) ||
-                                      (best.coarse == candidate.coarse && score > best_score))){
+            if (candidate.located &&
+                (!best.located || (best.coarse && !candidate.coarse) ||
+                    (best.coarse == candidate.coarse && score > best_score))){
                 best = candidate;
                 best_score = score;
             }else if (best.landmarks.empty()){
@@ -1273,24 +1340,24 @@ OverworldMatchResult match_eterna_gym_entrance(const ImageRGB32& frame){
         for (double scale : {.85, .90, 1.0, 1.10, 1.15}){
             std::vector<LandmarkConfig> configs = {
                 {"Left gym sign",
-                 appearance == 680   ? "PokemonBDSP/Autostory/EternaGym/LeftSignApproach.png"
-                 : appearance == 19  ? "PokemonBDSP/Autostory/EternaGym/LeftSign19.png"
-                 : appearance == 333 ? "PokemonBDSP/Autostory/EternaGym/LeftSignWest.png"
-                 : appearance == 306 ? "PokemonBDSP/Autostory/EternaGym/LeftSignSouthShadow.png"
-                 : appearance == 339 ? "PokemonBDSP/Autostory/EternaGym/LeftSignWestShadow.png"
-                                     : "PokemonBDSP/Autostory/EternaGym/LeftSignSouth.png",
-                 {458.0 / 1920, 358.0 / 1080, 140.0 / 1920, 150.0 / 1080},
-                 {0, 0, 1, .95},
-                 .93,
-                 .20},
+                    appearance == 680       ? "PokemonBDSP/Autostory/EternaGym/LeftSignApproach.png"
+                    : appearance == 19  ? "PokemonBDSP/Autostory/EternaGym/LeftSign19.png"
+                    : appearance == 333 ? "PokemonBDSP/Autostory/EternaGym/LeftSignWest.png"
+                    : appearance == 306 ? "PokemonBDSP/Autostory/EternaGym/LeftSignSouthShadow.png"
+                    : appearance == 339 ? "PokemonBDSP/Autostory/EternaGym/LeftSignWestShadow.png"
+                    : "PokemonBDSP/Autostory/EternaGym/LeftSignSouth.png",
+                    {458.0 / 1920, 358.0 / 1080, 140.0 / 1920, 150.0 / 1080},
+                    {0, 0, 1, .95},
+                    .93,
+                    .20},
                 {"Gym Pokeball",
-                 appearance == 680  ? "PokemonBDSP/Autostory/EternaGym/BallApproach.png"
-                 : appearance == 19 ? "PokemonBDSP/Autostory/EternaGym/Ball19.png"
-                                    : "PokemonBDSP/Autostory/EternaGym/BallWest.png",
-                 {880.0 / 1920, 264.0 / 1080, 150.0 / 1920, 80.0 / 1080},
-                 {0, 0, 1, .90},
-                 .93,
-                 .20}};
+                    appearance == 680      ? "PokemonBDSP/Autostory/EternaGym/BallApproach.png"
+                    : appearance == 19 ? "PokemonBDSP/Autostory/EternaGym/Ball19.png"
+                    : "PokemonBDSP/Autostory/EternaGym/BallWest.png",
+                    {880.0 / 1920, 264.0 / 1080, 150.0 / 1920, 80.0 / 1080},
+                    {0, 0, 1, .90},
+                    .93,
+                    .20}};
             if (appearance == 680){
                 configs[0].target.width = 148.0 / 1920;
                 configs[0].target.height = 158.0 / 1080;
@@ -1350,21 +1417,21 @@ OverworldMatchResult match_eterna_gym_entrance(const ImageRGB32& frame){
         for (double scale : {.90, .95, 1.0, 1.05, 1.10}){
             std::vector<LandmarkConfig> configs = {
                 {"Gym approach house door",
-                 perspective == 708   ? "PokemonBDSP/Autostory/EternaGym/ApproachHouseDoorFarWest.png"
-                 : perspective == 734 ? "PokemonBDSP/Autostory/EternaGym/ApproachHouseDoorWest.png"
-                                      : "PokemonBDSP/Autostory/EternaGym/ApproachHouseDoor.png",
-                 {548.0 / 1920 - .55, 448.0 / 1080, 128.0 / 1920, 156.0 / 1080},
-                 {0, .15, .75, .70},
-                 .93,
-                 .20},
+                    perspective == 708       ? "PokemonBDSP/Autostory/EternaGym/ApproachHouseDoorFarWest.png"
+                    : perspective == 734 ? "PokemonBDSP/Autostory/EternaGym/ApproachHouseDoorWest.png"
+                    : "PokemonBDSP/Autostory/EternaGym/ApproachHouseDoor.png",
+                    {548.0 / 1920 - .55, 448.0 / 1080, 128.0 / 1920, 156.0 / 1080},
+                    {0, .15, .75, .70},
+                    .93,
+                    .20},
                 {"Gym approach house window",
-                 perspective == 708   ? "PokemonBDSP/Autostory/EternaGym/ApproachHouseWindowFarWest.png"
-                 : perspective == 734 ? "PokemonBDSP/Autostory/EternaGym/ApproachHouseWindowWest.png"
-                                      : "PokemonBDSP/Autostory/EternaGym/ApproachHouseWindow.png",
-                 {718.0 / 1920 - .55, 462.0 / 1080, 132.0 / 1920, 112.0 / 1080},
-                 {0, .15, .85, .70},
-                 .93,
-                 .20}};
+                    perspective == 708       ? "PokemonBDSP/Autostory/EternaGym/ApproachHouseWindowFarWest.png"
+                    : perspective == 734 ? "PokemonBDSP/Autostory/EternaGym/ApproachHouseWindowWest.png"
+                    : "PokemonBDSP/Autostory/EternaGym/ApproachHouseWindow.png",
+                    {718.0 / 1920 - .55, 462.0 / 1080, 132.0 / 1920, 112.0 / 1080},
+                    {0, .15, .85, .70},
+                    .93,
+                    .20}};
             if (perspective == 734){
                 configs[0].target = {338.0 / 1920 - .55, 450.0 / 1080, 132.0 / 1920, 150.0 / 1080};
                 configs[1].target = {496.0 / 1920 - .55, 464.0 / 1080, 122.0 / 1920, 102.0 / 1080};
@@ -1392,8 +1459,10 @@ OverworldMatchResult match_eterna_gym_entrance(const ImageRGB32& frame){
     }
     return best;
 }
-double overworld_entry_confidence(const OverworldMatchResult& result, double tolerance_x, double tolerance_y,
-                                  double minimum_margin){
+double overworld_entry_confidence(const OverworldMatchResult& result,
+    double tolerance_x,
+    double tolerance_y,
+    double minimum_margin){
     double confidence = 0;
     for (size_t i = 0; i < result.landmarks.size(); i++){
         const auto& a = result.landmarks[i];
@@ -1418,23 +1487,23 @@ OverworldMatchResult match_galactic_hq_jupiter(const ImageRGB32& frame){
     // Confirm the table-facing chair sides, adjacent table edges, and stairs.
     // Exclude the NPC-facing chair edges where Buneary can overlap the reference.
     const std::vector<LandmarkConfig> configs{{"LeftChairs",
-                                               "PokemonBDSP/Autostory/GalacticHQ/AboveLeftChairTableEdge.png",
-                                               {300.0 / 1920, 780.0 / 1080, 156.0 / 1920, 206.0 / 1080},
-                                               {0, .40, .45, .60},
-                                               .93,
-                                               .20},
-                                              {"RightChairs",
-                                               "PokemonBDSP/Autostory/GalacticHQ/AboveRightChairTableEdge.png",
-                                               {1286.0 / 1920, 780.0 / 1080, 154.0 / 1920, 206.0 / 1080},
-                                               {.50, .40, .50, .60},
-                                               .93,
-                                               .20},
-                                              {"StairBoundary",
-                                               "PokemonBDSP/Autostory/GalacticHQ/AboveStairs.png",
-                                               {424.0 / 1920, 310.0 / 1080, 214.0 / 1920, 198.0 / 1080},
-                                               {0, 0, 1, .85},
-                                               .93,
-                                               .20}};
+            "PokemonBDSP/Autostory/GalacticHQ/AboveLeftChairTableEdge.png",
+            {300.0 / 1920, 780.0 / 1080, 156.0 / 1920, 206.0 / 1080},
+            {0, .40, .45, .60},
+            .93,
+            .20},
+        {"RightChairs",
+            "PokemonBDSP/Autostory/GalacticHQ/AboveRightChairTableEdge.png",
+            {1286.0 / 1920, 780.0 / 1080, 154.0 / 1920, 206.0 / 1080},
+            {.50, .40, .50, .60},
+            .93,
+            .20},
+        {"StairBoundary",
+            "PokemonBDSP/Autostory/GalacticHQ/AboveStairs.png",
+            {424.0 / 1920, 310.0 / 1080, 214.0 / 1920, 198.0 / 1080},
+            {0, 0, 1, .85},
+            .93,
+            .20}};
     auto result = match_landmarks(frame, configs, 3, 1.0 / 128, POSITION_TOLERANCE_Y, true);
     if (!result.located){
         // Two agreeing points guide the approach; all three still own arrival.
@@ -1480,21 +1549,23 @@ OverworldMatchResult match_galactic_hq_cut(const ImageRGB32& frame){
     // The stronger emblem needs a corroborating sign, with a lower identity
     // gate for the smaller sign face. Both still must agree on the same pose.
     auto result = match_lighting_pair(frame,
-                                      {{"HQ sign",
-                                        "PokemonBDSP/Autostory/GalacticHQ/CutSignStructure.png",
-                                        {810.0 / 1920, 500.0 / 1080, 80.0 / 1920, 58.0 / 1080},
-                                        {0, .25, 1, .45},
-                                        .85,
-                                        .10,
-                                        LandmarkFeatures::LOCAL_CONTRAST},
-                                       {"Center Pokeball",
-                                        "PokemonBDSP/Autostory/GalacticHQ/CutCenterBallStructure.png",
-                                        {1048.0 / 1920, 1004.0 / 1080, 136.0 / 1920, 66.0 / 1080},
-                                        {0, .65, 1, .35},
-                                        .93,
-                                        .20,
-                                        LandmarkFeatures::BLUE_FRACTION}},
-                                      "HQ sign", "Center Pokeball", 1.0 / 128);
+        {{"HQ sign",
+                "PokemonBDSP/Autostory/GalacticHQ/CutSignStructure.png",
+                {810.0 / 1920, 500.0 / 1080, 80.0 / 1920, 58.0 / 1080},
+                {0, .25, 1, .45},
+                .85,
+                .10,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Center Pokeball",
+                "PokemonBDSP/Autostory/GalacticHQ/CutCenterBallStructure.png",
+                {1048.0 / 1920, 1004.0 / 1080, 136.0 / 1920, 66.0 / 1080},
+                {0, .65, 1, .35},
+                .93,
+                .20,
+                LandmarkFeatures::BLUE_FRACTION}},
+        "HQ sign",
+        "Center Pokeball",
+        1.0 / 128);
     if (!result.located && result.landmarks.size() == 2){
         const auto& sign = result.landmarks[0];
         const auto& ball = result.landmarks[1];
@@ -1519,18 +1590,19 @@ OverworldMatchResult match_galactic_hq_cut(const ImageRGB32& frame){
 }
 
 OverworldMatchResult match_eterna_cycle_shop_entrance(const ImageRGB32& frame){
-    const std::vector<LandmarkConfig> configs{{"Shop sign",
-                                               "PokemonBDSP/Autostory/EternaBikeShop/eterna_cycle_shop_entrance-0.png",
-                                               {555.0 / 1920, 350.0 / 1080, 100.0 / 1920, 120.0 / 1080},
-                                               {0, 0.1, 0.65, 0.75},
-                                               .93,
-                                               .20},
-                                              {"Shop roof braces",
-                                               "PokemonBDSP/Autostory/EternaBikeShop/ShopRoofBraces.png",
-                                               {680.0 / 1920, 145.0 / 1080, 470.0 / 1920, 36.0 / 1080},
-                                               {0, 0, .95, .75},
-                                               .93,
-                                               .20}};
+    const std::vector<LandmarkConfig> configs{
+        {"Shop sign",
+            "PokemonBDSP/Autostory/EternaBikeShop/eterna_cycle_shop_entrance-0.png",
+            {555.0 / 1920, 350.0 / 1080, 100.0 / 1920, 120.0 / 1080},
+            {0, 0.1, 0.65, 0.75},
+            .93,
+            .20},
+        {"Shop roof braces",
+            "PokemonBDSP/Autostory/EternaBikeShop/ShopRoofBraces.png",
+            {680.0 / 1920, 145.0 / 1080, 470.0 / 1920, 36.0 / 1080},
+            {0, 0, .95, .75},
+            .93,
+            .20}};
     return match_landmarks(frame, configs, 2, 1.0 / 128, POSITION_TOLERANCE_Y, true);
 }
 
@@ -1538,33 +1610,34 @@ OverworldMatchResult match_eterna_cycle_shop_interior(const ImageRGB32& frame){
     // Entry mat view: fixed wall tools and register, clear of NPCs/Pokemon.
     // This identifies the room; it is not the counter interaction position.
     const std::vector<LandmarkConfig> configs{{"Shop wall tools",
-                                               "PokemonBDSP/Autostory/EternaBikeShop/InteriorWallTools.png",
-                                               {920.0 / 1920, 20.0 / 1080, 350.0 / 1920, 150.0 / 1080},
-                                               {.15, 0, .60, .55},
-                                               .93,
-                                               .20},
-                                              {"Shop register",
-                                               "PokemonBDSP/Autostory/EternaBikeShop/InteriorRegister.png",
-                                               {760.0 / 1920, 160.0 / 1080, 120.0 / 1920, 145.0 / 1080},
-                                               {.20, 0, .55, .65},
-                                               .93,
-                                               .20}};
+            "PokemonBDSP/Autostory/EternaBikeShop/InteriorWallTools.png",
+            {920.0 / 1920, 20.0 / 1080, 350.0 / 1920, 150.0 / 1080},
+            {.15, 0, .60, .55},
+            .93,
+            .20},
+        {"Shop register",
+            "PokemonBDSP/Autostory/EternaBikeShop/InteriorRegister.png",
+            {760.0 / 1920, 160.0 / 1080, 120.0 / 1920, 145.0 / 1080},
+            {.20, 0, .55, .65},
+            .93,
+            .20}};
     auto result = match_landmarks(frame, configs, 2, 1.0 / 128, POSITION_TOLERANCE_Y, true);
     if (result.located){
         return result;
     }
-    const std::vector<LandmarkConfig> north_configs{{"Shop wall tools",
-                                                     "PokemonBDSP/Autostory/EternaBikeShop/InteriorNorthWallTools.png",
-                                                     {928.0 / 1920, 84.0 / 1080, 350.0 / 1920, 150.0 / 1080},
-                                                     {.15, 0, .60, .55},
-                                                     .93,
-                                                     .20},
-                                                    {"Shop register",
-                                                     "PokemonBDSP/Autostory/EternaBikeShop/InteriorNorthRegister.png",
-                                                     {754.0 / 1920, 230.0 / 1080, 120.0 / 1920, 145.0 / 1080},
-                                                     {.20, 0, .55, .65},
-                                                     .93,
-                                                     .20}};
+    const std::vector<LandmarkConfig> north_configs{
+        {"Shop wall tools",
+            "PokemonBDSP/Autostory/EternaBikeShop/InteriorNorthWallTools.png",
+            {928.0 / 1920, 84.0 / 1080, 350.0 / 1920, 150.0 / 1080},
+            {.15, 0, .60, .55},
+            .93,
+            .20},
+        {"Shop register",
+            "PokemonBDSP/Autostory/EternaBikeShop/InteriorNorthRegister.png",
+            {754.0 / 1920, 230.0 / 1080, 120.0 / 1920, 145.0 / 1080},
+            {.20, 0, .55, .65},
+            .93,
+            .20}};
     return match_landmarks(frame, north_configs, 2, 1.0 / 128, POSITION_TOLERANCE_Y, true);
 }
 
@@ -1572,17 +1645,17 @@ OverworldMatchResult match_eterna_cycle_shop_reward(const ImageRGB32& frame){
     // Reward returns the player outside on the bicycle, at a separate pose.
     // Reuse the stable roof braces; the nearby post changes appearance/shading.
     const std::vector<LandmarkConfig> configs{{"Shop sign",
-                                               "PokemonBDSP/Autostory/EternaBikeShop/reward-sign.png",
-                                               {580.0 / 1920, 330.0 / 1080, 100.0 / 1920, 120.0 / 1080},
-                                               {0, .1, .65, .75},
-                                               .93,
-                                               .20},
-                                              {"Shop roof braces",
-                                               "PokemonBDSP/Autostory/EternaBikeShop/ShopRoofBraces.png",
-                                               {706.0 / 1920, 128.0 / 1080, 470.0 / 1920, 36.0 / 1080},
-                                               {0, 0, .95, .75},
-                                               .93,
-                                               .20}};
+            "PokemonBDSP/Autostory/EternaBikeShop/reward-sign.png",
+            {580.0 / 1920, 330.0 / 1080, 100.0 / 1920, 120.0 / 1080},
+            {0, .1, .65, .75},
+            .93,
+            .20},
+        {"Shop roof braces",
+            "PokemonBDSP/Autostory/EternaBikeShop/ShopRoofBraces.png",
+            {706.0 / 1920, 128.0 / 1080, 470.0 / 1920, 36.0 / 1080},
+            {0, 0, .95, .75},
+            .93,
+            .20}};
     return match_landmarks(frame, configs, 2, 1.0 / 128, POSITION_TOLERANCE_Y, true);
 }
 
@@ -1590,34 +1663,35 @@ OverworldMatchResult match_eterna_bike_riding_card(const ImageRGB32& frame){
     // Fixed UI card: require both the blue illustration and B Close prompt.
     // Small search boxes tolerate capture offsets without matching other menus.
     const std::vector<LandmarkConfig> configs{{"Blue Bike illustration",
-                                               "PokemonBDSP/Autostory/EternaBikeShop/BikeRidingBlueFeature.png",
-                                               {104.0 / 1920, 314.0 / 1080, 520.0 / 1920, 450.0 / 1080},
-                                               {.035, .26, .32, .48},
-                                               .93,
-                                               .20,
-                                               LandmarkFeatures::BLUE_FRACTION},
-                                              {"B Close prompt",
-                                               "PokemonBDSP/Autostory/EternaBikeShop/BikeRidingClosePrompt.png",
-                                               {1570.0 / 1920, 730.0 / 1080, 160.0 / 1920, 60.0 / 1080},
-                                               {.79, .65, .14, .10},
-                                               .93,
-                                               .20}};
+            "PokemonBDSP/Autostory/EternaBikeShop/BikeRidingBlueFeature.png",
+            {104.0 / 1920, 314.0 / 1080, 520.0 / 1920, 450.0 / 1080},
+            {.035, .26, .32, .48},
+            .93,
+            .20,
+            LandmarkFeatures::BLUE_FRACTION},
+        {"B Close prompt",
+            "PokemonBDSP/Autostory/EternaBikeShop/BikeRidingClosePrompt.png",
+            {1570.0 / 1920, 730.0 / 1080, 160.0 / 1920, 60.0 / 1080},
+            {.79, .65, .14, .10},
+            .93,
+            .20}};
     return match_landmarks(frame, configs, 2, 1.0 / 64, 1.0 / 54, true);
 }
 
 OverworldMatchResult match_eterna_cycle_shop_counter(const ImageRGB32& frame){
-    const std::vector<LandmarkConfig> configs{{"Red frame",
-                                               "PokemonBDSP/Autostory/EternaBikeShop/eterna_cycle_shop_counter-0.png",
-                                               {620.0 / 1920, 65.0 / 1080, 390.0 / 1920, 240.0 / 1080},
-                                               {0.1, 0, 0.65, 0.55},
-                                               .93,
-                                               .20},
-                                              {"Counter detail",
-                                               "PokemonBDSP/Autostory/EternaBikeShop/eterna_cycle_shop_counter-1.png",
-                                               {1110.0 / 1920, 486.0 / 1080, 86.0 / 1920, 38.0 / 1080},
-                                               {0.3, 0.15, 0.65, 0.65},
-                                               .93,
-                                               .20}};
+    const std::vector<LandmarkConfig> configs{
+        {"Red frame",
+            "PokemonBDSP/Autostory/EternaBikeShop/eterna_cycle_shop_counter-0.png",
+            {620.0 / 1920, 65.0 / 1080, 390.0 / 1920, 240.0 / 1080},
+            {0.1, 0, 0.65, 0.55},
+            .93,
+            .20},
+        {"Counter detail",
+            "PokemonBDSP/Autostory/EternaBikeShop/eterna_cycle_shop_counter-1.png",
+            {1110.0 / 1920, 486.0 / 1080, 86.0 / 1920, 38.0 / 1080},
+            {0.3, 0.15, 0.65, 0.65},
+            .93,
+            .20}};
     return match_landmarks(frame, configs, 2, 1.0 / 128, POSITION_TOLERANCE_Y, true);
 }
 
@@ -1625,19 +1699,21 @@ OverworldMatchResult match_eterna_cycle_shop_counter(const ImageRGB32& frame){
 // The doorway and west window avoid the moving player, NPCs and localized text.
 OverworldMatchResult match_cycling_road_south_gate_interior(const ImageRGB32& frame){
     return match_landmarks(frame,
-                           {{"Gate north doorway",
-                             "PokemonBDSP/Autostory/CyclingRoadSouthGate/NorthDoorway.png",
-                             {630.0 / 1920, 118.0 / 1080, 220.0 / 1920, 270.0 / 1080},
-                             {.15, 0, .70, .55},
-                             .93,
-                             .20},
-                            {"Gate west window",
-                             "PokemonBDSP/Autostory/CyclingRoadSouthGate/WestWindow.png",
-                             {302.0 / 1920, 140.0 / 1080, 157.0 / 1920, 145.0 / 1080},
-                             {.05, 0, .35, .55},
-                             .93,
-                             .20}},
-                           2, POSITION_TOLERANCE_X, POSITION_TOLERANCE_Y);
+        {{"Gate north doorway",
+                "PokemonBDSP/Autostory/CyclingRoadSouthGate/NorthDoorway.png",
+                {630.0 / 1920, 118.0 / 1080, 220.0 / 1920, 270.0 / 1080},
+                {.15, 0, .70, .55},
+                .93,
+                .20},
+            {"Gate west window",
+                "PokemonBDSP/Autostory/CyclingRoadSouthGate/WestWindow.png",
+                {302.0 / 1920, 140.0 / 1080, 157.0 / 1920, 145.0 / 1080},
+                {.05, 0, .35, .55},
+                .93,
+                .20}},
+        2,
+        POSITION_TOLERANCE_X,
+        POSITION_TOLERANCE_Y);
 }
 OverworldMatchResult match_cycling_road_bridge_approach(const ImageRGB32& frame){
     // Use the actual bridge entrance: cyan right rail with a broad metal deck
@@ -1646,8 +1722,11 @@ OverworldMatchResult match_cycling_road_bridge_approach(const ImageRGB32& frame)
     if (!frame){
         return best;
     }
-    cv::Mat pixels((int)frame.height(), (int)frame.width(), CV_8UC4, const_cast<uint32_t*>(frame.data()),
-                   frame.bytes_per_row());
+    cv::Mat pixels((int)frame.height(),
+        (int)frame.width(),
+        CV_8UC4,
+        const_cast<uint32_t*>(frame.data()),
+        frame.bytes_per_row());
     cv::Mat small, bgr, hsv, cyan;
     cv::resize(pixels, small, cv::Size(960, 540), 0, 0, cv::INTER_AREA);
     cv::cvtColor(small, bgr, cv::COLOR_BGRA2BGR);
@@ -1801,17 +1880,17 @@ OverworldMatchResult match_cycling_road_bridge_approach(const ImageRGB32& frame)
 
 OverworldMatchResult match_galactic_hq_exterior(const ImageRGB32& frame){
     const std::vector<LandmarkConfig> configs{{"HQ sign",
-                                               "PokemonBDSP/Autostory/GalacticHQ/galactic_hq_exterior-0.png",
-                                               {660.0 / 1920, 615.0 / 1080, 118.0 / 1920, 124.0 / 1080},
-                                               {0, 0.2, 0.65, 0.8},
-                                               .93,
-                                               .20},
-                                              {"HQ doorway lintel",
-                                               "PokemonBDSP/Autostory/GalacticHQ/galactic_hq_exterior-1.png",
-                                               {874.0 / 1920, 350.0 / 1080, 172.0 / 1920, 78.0 / 1080},
-                                               {0.2, 0, 0.6, 0.7},
-                                               .93,
-                                               .20}};
+            "PokemonBDSP/Autostory/GalacticHQ/galactic_hq_exterior-0.png",
+            {660.0 / 1920, 615.0 / 1080, 118.0 / 1920, 124.0 / 1080},
+            {0, 0.2, 0.65, 0.8},
+            .93,
+            .20},
+        {"HQ doorway lintel",
+            "PokemonBDSP/Autostory/GalacticHQ/galactic_hq_exterior-1.png",
+            {874.0 / 1920, 350.0 / 1080, 172.0 / 1920, 78.0 / 1080},
+            {0.2, 0, 0.6, 0.7},
+            .93,
+            .20}};
     return match_landmarks(frame, configs, 2, 1.0 / 128, POSITION_TOLERANCE_Y, true);
 }
 
@@ -1821,7 +1900,7 @@ OverworldMatchResult match_eterna_center_departure(const ImageRGB32& frame){
     auto result = match_eterna_center_entrance(frame);
     result.dy -= .070463;
     result.at_target = result.located && !result.coarse && std::abs(result.dx) <= 1.0 / 128 &&
-                       std::abs(result.dy) <= POSITION_TOLERANCE_Y;
+        std::abs(result.dy) <= POSITION_TOLERANCE_Y;
     return result;
 }
 
@@ -1837,24 +1916,26 @@ OverworldMatchResult match_eterna_gym_statues(const ImageRGB32& frame){
     // visible statue regions before allowing those shapes to verify entry.
     const cv::Mat gray = gray_image(frame);
     const auto visible = [&](double x, double width){
-        const cv::Rect box((int)(x * gray.cols), (int)(458.0 / 1080 * gray.rows), (int)(width * gray.cols),
-                           (int)(350.0 / 1080 * gray.rows));
+        const cv::Rect box((int)(x * gray.cols),
+            (int)(458.0 / 1080 * gray.rows),
+            (int)(width * gray.cols),
+            (int)(350.0 / 1080 * gray.rows));
         return cv::mean(gray(box))[0] >= 60;
     };
     const bool statues_visible = visible(448.0 / 1920, 146.0 / 1920) && visible(1322.0 / 1920, 154.0 / 1920);
     for (double scale : {.95, 1.0, 1.05}){
         std::vector<LandmarkConfig> configs = {{"Left gym statue",
-                                                "PokemonBDSP/Autostory/EternaGym/LeftStatue.png",
-                                                {448.0 / 1920, 458.0 / 1080, 146.0 / 1920, 350.0 / 1080},
-                                                {.12, .30, .27, .53},
-                                                .93,
-                                                .20},
-                                               {"Right gym statue",
-                                                "PokemonBDSP/Autostory/EternaGym/RightStatue.png",
-                                                {1322.0 / 1920, 458.0 / 1080, 154.0 / 1920, 350.0 / 1080},
-                                                {.60, .30, .28, .53},
-                                                .93,
-                                                .20}};
+                "PokemonBDSP/Autostory/EternaGym/LeftStatue.png",
+                {448.0 / 1920, 458.0 / 1080, 146.0 / 1920, 350.0 / 1080},
+                {.12, .30, .27, .53},
+                .93,
+                .20},
+            {"Right gym statue",
+                "PokemonBDSP/Autostory/EternaGym/RightStatue.png",
+                {1322.0 / 1920, 458.0 / 1080, 154.0 / 1920, 350.0 / 1080},
+                {.60, .30, .28, .53},
+                .93,
+                .20}};
         for (auto& config : configs){
             const double w = config.target.width, h = config.target.height;
             config.target.width *= scale;
@@ -1884,17 +1965,17 @@ OverworldMatchResult match_eterna_underground_house(const ImageRGB32& frame){
     bool best_primary_only = false;
     for (double scale : {.90, .95, 1.0, 1.05, 1.10}){
         std::vector<LandmarkConfig> configs{{"Center Pokeball",
-                                             "PokemonBDSP/Autostory/EternaUndergroundMan/HouseBall.png",
-                                             {332.0 / 1920, 224.0 / 1080, 112.0 / 1920, 104.0 / 1080},
-                                             {0, 0, .65, .7},
-                                             .93,
-                                             .20},
-                                            {"House sign",
-                                             "PokemonBDSP/Autostory/EternaUndergroundMan/HouseSign.png",
-                                             {1240.0 / 1920, 396.0 / 1080, 110.0 / 1920, 106.0 / 1080},
-                                             {.35, 0, .65, .85},
-                                             .93,
-                                             .20}};
+                "PokemonBDSP/Autostory/EternaUndergroundMan/HouseBall.png",
+                {332.0 / 1920, 224.0 / 1080, 112.0 / 1920, 104.0 / 1080},
+                {0, 0, .65, .7},
+                .93,
+                .20},
+            {"House sign",
+                "PokemonBDSP/Autostory/EternaUndergroundMan/HouseSign.png",
+                {1240.0 / 1920, 396.0 / 1080, 110.0 / 1920, 106.0 / 1080},
+                {.35, 0, .65, .85},
+                .93,
+                .20}};
         for (auto& config : configs){
             const double w = config.target.width, h = config.target.height;
             config.target.width *= scale;
@@ -1935,29 +2016,29 @@ OverworldMatchResult match_eterna_underground_man(const ImageRGB32& frame){
     // Reuse fixed furniture, excluding people and the animated TV picture.
     // The right-window search excludes the identical window above the stool.
     const std::vector<LandmarkConfig> configs{{"Stool",
-                                               "PokemonBDSP/Autostory/EternaUndergroundMan/Stool.png",
-                                               {380.0 / 1920, 610.0 / 1080, 86.0 / 1920, 70.0 / 1080},
-                                               {0, .3, .65, .5},
-                                               .93,
-                                               .20},
-                                              {"Right tree top",
-                                               "PokemonBDSP/Autostory/EternaUndergroundMan/TreeTop.png",
-                                               {1372.0 / 1920, 320.0 / 1080, 102.0 / 1920, 96.0 / 1080},
-                                               {.5, 0, .4, .7},
-                                               .93,
-                                               .20},
-                                              {"Wall sign",
-                                               "PokemonBDSP/Autostory/EternaUndergroundMan/WallSign.png",
-                                               {642.0 / 1920, 354.0 / 1080, 114.0 / 1920, 70.0 / 1080},
-                                               {.2, 0, .5, .6},
-                                               .93,
-                                               .20},
-                                              {"Window beside TV",
-                                               "PokemonBDSP/Autostory/EternaUndergroundMan/RightWindow.png",
-                                               {906.0 / 1920, 260.0 / 1080, 162.0 / 1920, 160.0 / 1080},
-                                               {.35, 0, .55, .55},
-                                               .93,
-                                               .20}};
+            "PokemonBDSP/Autostory/EternaUndergroundMan/Stool.png",
+            {380.0 / 1920, 610.0 / 1080, 86.0 / 1920, 70.0 / 1080},
+            {0, .3, .65, .5},
+            .93,
+            .20},
+        {"Right tree top",
+            "PokemonBDSP/Autostory/EternaUndergroundMan/TreeTop.png",
+            {1372.0 / 1920, 320.0 / 1080, 102.0 / 1920, 96.0 / 1080},
+            {.5, 0, .4, .7},
+            .93,
+            .20},
+        {"Wall sign",
+            "PokemonBDSP/Autostory/EternaUndergroundMan/WallSign.png",
+            {642.0 / 1920, 354.0 / 1080, 114.0 / 1920, 70.0 / 1080},
+            {.2, 0, .5, .6},
+            .93,
+            .20},
+        {"Window beside TV",
+            "PokemonBDSP/Autostory/EternaUndergroundMan/RightWindow.png",
+            {906.0 / 1920, 260.0 / 1080, 162.0 / 1920, 160.0 / 1080},
+            {.35, 0, .55, .55},
+            .93,
+            .20}};
     auto result = match_landmarks(frame, configs, 4, 1.0 / 128, POSITION_TOLERANCE_Y, true);
     if (!result.located){
         // Three agreeing furniture anchors identify the room during entry and
@@ -1976,124 +2057,130 @@ OverworldMatchResult match_jubilife_street_approach(const ImageRGB32& frame){
     // screenshot. Targets preserve the original destination height.
     // Capture-derived references cover lamp, daylight, and moving tree shadows.
     return match_lighting_pair(frame,
-                               {{"BuildingCorner",
-                                 "PokemonBDSP/Autostory/JubilifeStreet/BuildingCornerHour3Frame4.png",
-                                 {0.588541666667, 0.351851851852, 0.088541666667, 0.259259259259},
-                                 {0, 0, 1, 1},
-                                 .93,
-                                 .08},
-                                {"BuildingCorner",
-                                 "PokemonBDSP/Autostory/JubilifeStreet/BuildingCornerHour14Frame2.png",
-                                 {0.588541666667, 0.351851851852, 0.088541666667, 0.259259259259},
-                                 {0, 0, 1, 1},
-                                 .93,
-                                 .08},
-                                {"BuildingCorner",
-                                 "PokemonBDSP/Autostory/JubilifeStreet/BuildingCornerHour17Frame4.png",
-                                 {0.588541666667, 0.351851851852, 0.088541666667, 0.259259259259},
-                                 {0, 0, 1, 1},
-                                 .93,
-                                 .08},
-                                {"BuildingBase",
-                                 "PokemonBDSP/Autostory/JubilifeStreet/BuildingBaseHour15Frame2.png",
-                                 {0.812500000000, 0.388888888889, 0.078125000000, 0.203703703704},
-                                 {0, 0, 1, 1},
-                                 .93,
-                                 .08},
-                                {"BuildingBase",
-                                 "PokemonBDSP/Autostory/JubilifeStreet/BuildingBaseHour17Frame5.png",
-                                 {0.812500000000, 0.388888888889, 0.078125000000, 0.203703703704},
-                                 {0, 0, 1, 1},
-                                 .93,
-                                 .08},
-                                {"BuildingBase",
-                                 "PokemonBDSP/Autostory/JubilifeStreet/BuildingBaseHour20Frame5.png",
-                                 {0.812500000000, 0.388888888889, 0.078125000000, 0.203703703704},
-                                 {0, 0, 1, 1},
-                                 .93,
-                                 .08}},
-                               "BuildingCorner", "BuildingBase", POSITION_TOLERANCE_X, true);
+        {{"BuildingCorner",
+                "PokemonBDSP/Autostory/JubilifeStreet/BuildingCornerHour3Frame4.png",
+                {0.588541666667, 0.351851851852, 0.088541666667, 0.259259259259},
+                {0, 0, 1, 1},
+                .93,
+                .08},
+            {"BuildingCorner",
+                "PokemonBDSP/Autostory/JubilifeStreet/BuildingCornerHour14Frame2.png",
+                {0.588541666667, 0.351851851852, 0.088541666667, 0.259259259259},
+                {0, 0, 1, 1},
+                .93,
+                .08},
+            {"BuildingCorner",
+                "PokemonBDSP/Autostory/JubilifeStreet/BuildingCornerHour17Frame4.png",
+                {0.588541666667, 0.351851851852, 0.088541666667, 0.259259259259},
+                {0, 0, 1, 1},
+                .93,
+                .08},
+            {"BuildingBase",
+                "PokemonBDSP/Autostory/JubilifeStreet/BuildingBaseHour15Frame2.png",
+                {0.812500000000, 0.388888888889, 0.078125000000, 0.203703703704},
+                {0, 0, 1, 1},
+                .93,
+                .08},
+            {"BuildingBase",
+                "PokemonBDSP/Autostory/JubilifeStreet/BuildingBaseHour17Frame5.png",
+                {0.812500000000, 0.388888888889, 0.078125000000, 0.203703703704},
+                {0, 0, 1, 1},
+                .93,
+                .08},
+            {"BuildingBase",
+                "PokemonBDSP/Autostory/JubilifeStreet/BuildingBaseHour20Frame5.png",
+                {0.812500000000, 0.388888888889, 0.078125000000, 0.203703703704},
+                {0, 0, 1, 1},
+                .93,
+                .08}},
+        "BuildingCorner",
+        "BuildingBase",
+        POSITION_TOLERANCE_X,
+        true);
 }
 OverworldMatchResult match_jubilife_plaza_approach(const ImageRGB32& frame){
     // Capture-derived references cover lamp, daylight, and moving tree shadows.
-    auto result =
-        match_lighting_pair(frame,
-                            {
-                                {"RoofEdge",
-                                 "PokemonBDSP/Autostory/JubilifePlaza/RoofEdgeHour2Frame2.png",
-                                 {0.614583333333, 0.203703703704, 0.299479166667, 0.111111111111},
-                                 {0, 0, 1, 1},
-                                 .93,
-                                 .08},
-                                {"RoofEdge",
-                                 "PokemonBDSP/Autostory/JubilifePlaza/RoofEdgeHour11Frame1.png",
-                                 {0.614583333333, 0.203703703704, 0.299479166667, 0.111111111111},
-                                 {0, 0, 1, 1},
-                                 .93,
-                                 .08},
-                                {"RoofEdge",
-                                 "PokemonBDSP/Autostory/JubilifePlaza/RoofEdgeHour11Frame2.png",
-                                 {0.614583333333, 0.203703703704, 0.299479166667, 0.111111111111},
-                                 {0, 0, 1, 1},
-                                 .93,
-                                 .08},
-                                {"RoofEdge",
-                                 "PokemonBDSP/Autostory/JubilifePlaza/RoofEdgeHour11Frame5.png",
-                                 {0.614583333333, 0.203703703704, 0.299479166667, 0.111111111111},
-                                 {0, 0, 1, 1},
-                                 .93,
-                                 .08},
-                                {"RoofEdge",
-                                 "PokemonBDSP/Autostory/JubilifePlaza/RoofEdgeHour16Frame5.png",
-                                 {0.614583333333, 0.203703703704, 0.299479166667, 0.111111111111},
-                                 {0, 0, 1, 1},
-                                 .93,
-                                 .08},
-                                {"RoofEdge",
-                                 "PokemonBDSP/Autostory/JubilifePlaza/RoofEdgeHour23Frame2.png",
-                                 {0.614583333333, 0.203703703704, 0.299479166667, 0.111111111111},
-                                 {0, 0, 1, 1},
-                                 .93,
-                                 .08},
-                                {"Fence",
-                                 "PokemonBDSP/Autostory/JubilifePlaza/FenceHour3Frame1.png",
-                                 {0.044270833333, 0.328703703704, 0.169270833333, 0.106481481481},
-                                 {0, 0, 1, 1},
-                                 .93,
-                                 .08},
-                                {"Fence",
-                                 "PokemonBDSP/Autostory/JubilifePlaza/FenceHour5Frame4.png",
-                                 {0.044270833333, 0.328703703704, 0.169270833333, 0.106481481481},
-                                 {0, 0, 1, 1},
-                                 .93,
-                                 .08},
-                                {"Fence",
-                                 "PokemonBDSP/Autostory/JubilifePlaza/FenceHour11Frame3.png",
-                                 {0.044270833333, 0.328703703704, 0.169270833333, 0.106481481481},
-                                 {0, 0, 1, 1},
-                                 .93,
-                                 .08},
-                                {"Fence",
-                                 "PokemonBDSP/Autostory/JubilifePlaza/FenceHour14Frame1.png",
-                                 {0.044270833333, 0.328703703704, 0.169270833333, 0.106481481481},
-                                 {0, 0, 1, 1},
-                                 .93,
-                                 .08},
-                                {"Fence",
-                                 "PokemonBDSP/Autostory/JubilifePlaza/FenceHour19Frame1.png",
-                                 {0.044270833333, 0.328703703704, 0.169270833333, 0.106481481481},
-                                 {0, 0, 1, 1},
-                                 .93,
-                                 .08},
-                                {"Fence",
-                                 "PokemonBDSP/Autostory/JubilifePlaza/FenceHour21Frame4.png",
-                                 {0.044270833333, 0.328703703704, 0.169270833333, 0.106481481481},
-                                 {0, 0, 1, 1},
-                                 .93,
-                                 .08} // Small screen-relative quantization allowance avoids bouncing across the
-                                // plaza target when one movement step spans both sides of the tolerance.
-                            },
-                            "RoofEdge", "Fence", POSITION_TOLERANCE_X, false, 1.0 / 32);
+    auto result = match_lighting_pair(frame,
+        {
+            {"RoofEdge",
+                "PokemonBDSP/Autostory/JubilifePlaza/RoofEdgeHour2Frame2.png",
+                {0.614583333333, 0.203703703704, 0.299479166667, 0.111111111111},
+                {0, 0, 1, 1},
+                .93,
+                .08},
+            {"RoofEdge",
+                "PokemonBDSP/Autostory/JubilifePlaza/RoofEdgeHour11Frame1.png",
+                {0.614583333333, 0.203703703704, 0.299479166667, 0.111111111111},
+                {0, 0, 1, 1},
+                .93,
+                .08},
+            {"RoofEdge",
+                "PokemonBDSP/Autostory/JubilifePlaza/RoofEdgeHour11Frame2.png",
+                {0.614583333333, 0.203703703704, 0.299479166667, 0.111111111111},
+                {0, 0, 1, 1},
+                .93,
+                .08},
+            {"RoofEdge",
+                "PokemonBDSP/Autostory/JubilifePlaza/RoofEdgeHour11Frame5.png",
+                {0.614583333333, 0.203703703704, 0.299479166667, 0.111111111111},
+                {0, 0, 1, 1},
+                .93,
+                .08},
+            {"RoofEdge",
+                "PokemonBDSP/Autostory/JubilifePlaza/RoofEdgeHour16Frame5.png",
+                {0.614583333333, 0.203703703704, 0.299479166667, 0.111111111111},
+                {0, 0, 1, 1},
+                .93,
+                .08},
+            {"RoofEdge",
+                "PokemonBDSP/Autostory/JubilifePlaza/RoofEdgeHour23Frame2.png",
+                {0.614583333333, 0.203703703704, 0.299479166667, 0.111111111111},
+                {0, 0, 1, 1},
+                .93,
+                .08},
+            {"Fence",
+                "PokemonBDSP/Autostory/JubilifePlaza/FenceHour3Frame1.png",
+                {0.044270833333, 0.328703703704, 0.169270833333, 0.106481481481},
+                {0, 0, 1, 1},
+                .93,
+                .08},
+            {"Fence",
+                "PokemonBDSP/Autostory/JubilifePlaza/FenceHour5Frame4.png",
+                {0.044270833333, 0.328703703704, 0.169270833333, 0.106481481481},
+                {0, 0, 1, 1},
+                .93,
+                .08},
+            {"Fence",
+                "PokemonBDSP/Autostory/JubilifePlaza/FenceHour11Frame3.png",
+                {0.044270833333, 0.328703703704, 0.169270833333, 0.106481481481},
+                {0, 0, 1, 1},
+                .93,
+                .08},
+            {"Fence",
+                "PokemonBDSP/Autostory/JubilifePlaza/FenceHour14Frame1.png",
+                {0.044270833333, 0.328703703704, 0.169270833333, 0.106481481481},
+                {0, 0, 1, 1},
+                .93,
+                .08},
+            {"Fence",
+                "PokemonBDSP/Autostory/JubilifePlaza/FenceHour19Frame1.png",
+                {0.044270833333, 0.328703703704, 0.169270833333, 0.106481481481},
+                {0, 0, 1, 1},
+                .93,
+                .08},
+            {"Fence",
+                "PokemonBDSP/Autostory/JubilifePlaza/FenceHour21Frame4.png",
+                {0.044270833333, 0.328703703704, 0.169270833333, 0.106481481481},
+                {0, 0, 1, 1},
+                .93,
+                .08} // Small screen-relative quantization allowance avoids bouncing across the
+            // plaza target when one movement step spans both sides of the tolerance.
+        },
+        "RoofEdge",
+        "Fence",
+        POSITION_TOLERANCE_X,
+        false,
+        1.0 / 32);
     if (!result.located && result.landmarks.size() == 2){
         const auto& fence = result.landmarks[1];
         // A moving roof shadow must not trigger a blind lateral sweep when the
@@ -2120,51 +2207,51 @@ OverworldMatchResult match_route204_sign(const ImageRGB32& frame){
         {"Fence corner", "PokemonBDSP/Autostory/Route204Sign/FenceCorner.png", fence_target, {0, 0, 1, 1}, .93, .10},
         {"Route sign", "PokemonBDSP/Autostory/Route204Sign/SignHour0Frame3.png", sign_target, {0, 0, 1, 1}, .93, .10},
         {"Fence corner",
-         "PokemonBDSP/Autostory/Route204Sign/FenceCornerHour0Frame3.png",
-         fence_target,
-         {0, 0, 1, 1},
-         .93,
-         .10},
+            "PokemonBDSP/Autostory/Route204Sign/FenceCornerHour0Frame3.png",
+            fence_target,
+            {0, 0, 1, 1},
+            .93,
+            .10},
         {"Route sign", "PokemonBDSP/Autostory/Route204Sign/SignHour8Frame3.png", sign_target, {0, 0, 1, 1}, .93, .10},
         {"Fence corner",
-         "PokemonBDSP/Autostory/Route204Sign/FenceCornerHour8Frame3.png",
-         fence_target,
-         {0, 0, 1, 1},
-         .93,
-         .10},
+            "PokemonBDSP/Autostory/Route204Sign/FenceCornerHour8Frame3.png",
+            fence_target,
+            {0, 0, 1, 1},
+            .93,
+            .10},
         {"Route sign", "PokemonBDSP/Autostory/Route204Sign/SignHour13Frame3.png", sign_target, {0, 0, 1, 1}, .93, .10},
         {"Fence corner",
-         "PokemonBDSP/Autostory/Route204Sign/FenceCornerHour13Frame3.png",
-         fence_target,
-         {0, 0, 1, 1},
-         .93,
-         .10},
+            "PokemonBDSP/Autostory/Route204Sign/FenceCornerHour13Frame3.png",
+            fence_target,
+            {0, 0, 1, 1},
+            .93,
+            .10},
         {"Route sign", "PokemonBDSP/Autostory/Route204Sign/SignHour17Frame3.png", sign_target, {0, 0, 1, 1}, .93, .10},
         {"Fence corner",
-         "PokemonBDSP/Autostory/Route204Sign/FenceCornerHour17Frame3.png",
-         fence_target,
-         {0, 0, 1, 1},
-         .93,
-         .10},
+            "PokemonBDSP/Autostory/Route204Sign/FenceCornerHour17Frame3.png",
+            fence_target,
+            {0, 0, 1, 1},
+            .93,
+            .10},
         {"Route sign", "PokemonBDSP/Autostory/Route204Sign/SignHour2Frame1.png", sign_target, {0, 0, 1, 1}, .93, .10},
         {"Fence corner",
-         "PokemonBDSP/Autostory/Route204Sign/FenceCornerHour2Frame1.png",
-         fence_target,
-         {0, 0, 1, 1},
-         .93,
-         .10},
+            "PokemonBDSP/Autostory/Route204Sign/FenceCornerHour2Frame1.png",
+            fence_target,
+            {0, 0, 1, 1},
+            .93,
+            .10},
         {"Fence corner",
-         "PokemonBDSP/Autostory/Route204Sign/FenceCornerHour10Frame3.png",
-         fence_target,
-         {0, 0, 1, 1},
-         .93,
-         .10},
+            "PokemonBDSP/Autostory/Route204Sign/FenceCornerHour10Frame3.png",
+            fence_target,
+            {0, 0, 1, 1},
+            .93,
+            .10},
         {"Fence corner",
-         "PokemonBDSP/Autostory/Route204Sign/FenceCornerRecordedCloud.png",
-         fence_target,
-         {0, 0, 1, 1},
-         .93,
-         .10},
+            "PokemonBDSP/Autostory/Route204Sign/FenceCornerRecordedCloud.png",
+            fence_target,
+            {0, 0, 1, 1},
+            .93,
+            .10},
     };
     auto result = match_lighting_pair(frame, variants, "Route sign", "Fence corner");
     if (!result.located && result.landmarks.size() == 2){
@@ -2188,29 +2275,32 @@ static OverworldMatchResult match_route205_marker(const ImageRGB32& frame, doubl
     // grass and water are excluded from the acquisition references.
     for (int variant : {0, 1, 2, 3, 4, 5, 6}){
         for (double scale : {.9, 1.0, 1.1, 1.2}){
-            const double w = (variant == 6   ? 188.0
-                              : variant == 5 ? 184.0
-                              : variant == 4 ? 220.0
-                              : variant == 3 ? 211.0
-                              : variant == 2 ? 208.0
-                              : variant == 1 ? 206.0
-                                             : 205.0) /
-                             1920 * scale;
+            const double w = (variant == 6          ? 188.0
+                : variant == 5 ? 184.0
+                : variant == 4 ? 220.0
+                : variant == 3 ? 211.0
+                : variant == 2 ? 208.0
+                : variant == 1 ? 206.0
+                : 205.0) /
+                1920 * scale;
             const double h = (variant == 6 ? 74.0 : variant >= 3 ? 72.0 : variant ? 80.0 : 82.0) / 1080 * scale;
             auto candidate = match_landmarks(frame,
-                                             {{"Route 205 marker",
-                                               variant == 6   ? "PokemonBDSP/Autostory/Route205/BridgeSignMidCloud.png"
-                                               : variant == 5 ? "PokemonBDSP/Autostory/Route205/BridgeSignCloud.png"
-                                               : variant == 4 ? "PokemonBDSP/Autostory/Route205/BridgeSignLow.png"
-                                               : variant == 3 ? "PokemonBDSP/Autostory/Route205/BridgeSignLive.png"
-                                               : variant == 2 ? "PokemonBDSP/Autostory/Route205/NorthSignRecorded.png"
-                                               : variant == 1 ? "PokemonBDSP/Autostory/Route205/NorthSign.png"
-                                                              : "PokemonBDSP/Autostory/Route205/BridgeSign.png",
-                                               {cx - w / 2, cy - h / 2, w, h},
-                                               {0, 0, 1, 1},
-                                               .93,
-                                               .20}},
-                                             1, POSITION_TOLERANCE_X, POSITION_TOLERANCE_Y, true);
+                {{"Route 205 marker",
+                        variant == 6       ? "PokemonBDSP/Autostory/Route205/BridgeSignMidCloud.png"
+                        : variant == 5 ? "PokemonBDSP/Autostory/Route205/BridgeSignCloud.png"
+                        : variant == 4 ? "PokemonBDSP/Autostory/Route205/BridgeSignLow.png"
+                        : variant == 3 ? "PokemonBDSP/Autostory/Route205/BridgeSignLive.png"
+                        : variant == 2 ? "PokemonBDSP/Autostory/Route205/NorthSignRecorded.png"
+                        : variant == 1 ? "PokemonBDSP/Autostory/Route205/NorthSign.png"
+                        : "PokemonBDSP/Autostory/Route205/BridgeSign.png",
+                        {cx - w / 2, cy - h / 2, w, h},
+                        {0, 0, 1, 1},
+                        .93,
+                        .20}},
+                1,
+                POSITION_TOLERANCE_X,
+                POSITION_TOLERANCE_Y,
+                true);
             if (best.landmarks.empty() || (candidate.located && !best.located) ||
                 (candidate.located == best.located && candidate.landmarks[0].score > best.landmarks[0].score)){
                 best = candidate;
@@ -2228,26 +2318,28 @@ OverworldMatchResult match_route205_zackary(const ImageRGB32& frame){
             // Include the fixed cliff edge beside both pipes: the repeated blue caps
             // alone produce a second strong peak in cloud shadow.
             const double cw = 300.0 / 1920 * scale, ch = 300.0 / 1080 * scale;
-            auto candidate =
-                match_landmarks(frame,
-                                {{"Zackary bridge sign",
-                                  view == 2   ? "PokemonBDSP/Autostory/Route205/PatrolSignCloud.png"
-                                  : view >= 1 ? "PokemonBDSP/Autostory/Route205/PatrolSignLive.png"
-                                              : "PokemonBDSP/Autostory/Route205/PatrolSign.png",
-                                  {959.5 / 1920 - sw / 2, 67.5 / 1080 - sh / 2, sw, sh},
-                                  {0, 0, 1, 1},
-                                  .93,
-                                  .20},
-                                 {"Zackary twin chimneys",
-                                  view == 3   ? "PokemonBDSP/Autostory/Route205/PatrolChimneysPartialCloud.png"
-                                  : view == 2 ? "PokemonBDSP/Autostory/Route205/PatrolChimneysCloud.png"
-                                  : view == 1 ? "PokemonBDSP/Autostory/Route205/PatrolChimneysLive.png"
-                                              : "PokemonBDSP/Autostory/Route205/PatrolChimneys.png",
-                                  {1210.0 / 1920 - cw / 2, 290.0 / 1080 - ch / 2, cw, ch},
-                                  {0, 0, 1, 1},
-                                  .93,
-                                  .20}},
-                                2, POSITION_TOLERANCE_X, POSITION_TOLERANCE_Y, true);
+            auto candidate = match_landmarks(frame,
+                {{"Zackary bridge sign",
+                        view == 2       ? "PokemonBDSP/Autostory/Route205/PatrolSignCloud.png"
+                        : view >= 1 ? "PokemonBDSP/Autostory/Route205/PatrolSignLive.png"
+                        : "PokemonBDSP/Autostory/Route205/PatrolSign.png",
+                        {959.5 / 1920 - sw / 2, 67.5 / 1080 - sh / 2, sw, sh},
+                        {0, 0, 1, 1},
+                        .93,
+                        .20},
+                    {"Zackary twin chimneys",
+                        view == 3       ? "PokemonBDSP/Autostory/Route205/PatrolChimneysPartialCloud.png"
+                        : view == 2 ? "PokemonBDSP/Autostory/Route205/PatrolChimneysCloud.png"
+                        : view == 1 ? "PokemonBDSP/Autostory/Route205/PatrolChimneysLive.png"
+                        : "PokemonBDSP/Autostory/Route205/PatrolChimneys.png",
+                        {1210.0 / 1920 - cw / 2, 290.0 / 1080 - ch / 2, cw, ch},
+                        {0, 0, 1, 1},
+                        .93,
+                        .20}},
+                2,
+                POSITION_TOLERANCE_X,
+                POSITION_TOLERANCE_Y,
+                true);
             const double score = std::min(candidate.landmarks[0].score, candidate.landmarks[1].score);
             if (best.located && candidate.located &&
                 (std::abs(best.dx - candidate.dx) > AGREEMENT_X || std::abs(best.dy - candidate.dy) > AGREEMENT_Y)){
@@ -2270,13 +2362,16 @@ OverworldMatchResult match_route205_kelsey(const ImageRGB32& frame){
     for (double scale : {.9, 1.0, 1.1}){
         const double w = 56.0 / 1920 * scale, h = 53.0 / 1080 * scale;
         auto candidate = match_landmarks(frame,
-                                         {{"Kelsey west item ball",
-                                           "PokemonBDSP/Autostory/Route205/KelseyItem.png",
-                                           {280.0 / 1920 - w / 2, 574.5 / 1080 - h / 2, w, h},
-                                           {0, .2, .48, .65},
-                                           .93,
-                                           .20}},
-                                         1, POSITION_TOLERANCE_X, POSITION_TOLERANCE_Y, true);
+            {{"Kelsey west item ball",
+                    "PokemonBDSP/Autostory/Route205/KelseyItem.png",
+                    {280.0 / 1920 - w / 2, 574.5 / 1080 - h / 2, w, h},
+                    {0, .2, .48, .65},
+                    .93,
+                    .20}},
+            1,
+            POSITION_TOLERANCE_X,
+            POSITION_TOLERANCE_Y,
+            true);
         if (best.landmarks.empty() || (candidate.located && !best.located) ||
             (candidate.located == best.located && candidate.landmarks[0].score > best.landmarks[0].score)){
             best = std::move(candidate);
@@ -2295,35 +2390,38 @@ OverworldMatchResult match_route205_bank_tree(const ImageRGB32& frame){
             const double tw = 140.0 / 1920 * scale, th = 130.0 / 1080 * scale;
             const double nw = 120.0 / 1920 * scale, nh = 170.0 / 1080 * scale;
             auto candidate = match_landmarks(frame,
-                                             {{"Bank tree crown",
-                                               view == 8   ? "PokemonBDSP/Autostory/Route205/BankTreeCrownWest.png"
-                                               : view == 7 ? "PokemonBDSP/Autostory/Route205/BankTreeCrownCloud333.png"
-                                               : view == 6 ? "PokemonBDSP/Autostory/Route205/BankTreeCrownCloud76.png"
-                                               : view == 5 ? "PokemonBDSP/Autostory/Route205/BankTreeCrownCloud336.png"
-                                               : view == 4 ? "PokemonBDSP/Autostory/Route205/BankTreeCrownCloud328.png"
-                                               : view == 3 ? "PokemonBDSP/Autostory/Route205/BankTreeCrownCloud80.png"
-                                               : view == 2 ? "PokemonBDSP/Autostory/Route205/BankTreeCrownCloud72.png"
-                                               : view == 1 ? "PokemonBDSP/Autostory/Route205/BankTreeCrownLive.png"
-                                                           : "PokemonBDSP/Autostory/Route205/BankTreeCrown.png",
-                                               {770.0 / 1920 - tw / 2, 235.0 / 1080 - th / 2, tw, th},
-                                               {0, 0, 1, 1},
-                                               .93,
-                                               .20},
-                                              {"Bank blue-hat child",
-                                               view == 8   ? "PokemonBDSP/Autostory/Route205/BankBlueHatWest.png"
-                                               : view == 7 ? "PokemonBDSP/Autostory/Route205/BankBlueHatCloud333.png"
-                                               : view == 6 ? "PokemonBDSP/Autostory/Route205/BankBlueHatCloud76.png"
-                                               : view == 5 ? "PokemonBDSP/Autostory/Route205/BankBlueHatCloud336.png"
-                                               : view == 4 ? "PokemonBDSP/Autostory/Route205/BankBlueHatCloud328.png"
-                                               : view == 3 ? "PokemonBDSP/Autostory/Route205/BankBlueHatCloud80.png"
-                                               : view == 2 ? "PokemonBDSP/Autostory/Route205/BankBlueHatCloud72.png"
-                                               : view == 1 ? "PokemonBDSP/Autostory/Route205/BankBlueHatLive.png"
-                                                           : "PokemonBDSP/Autostory/Route205/BankBlueHat.png",
-                                               {700.0 / 1920 - nw / 2, 525.0 / 1080 - nh / 2, nw, nh},
-                                               {0, 0, 1, 1},
-                                               .93,
-                                               .20}},
-                                             2, 1.0 / 96, POSITION_TOLERANCE_Y, true);
+                {{"Bank tree crown",
+                        view == 8       ? "PokemonBDSP/Autostory/Route205/BankTreeCrownWest.png"
+                        : view == 7 ? "PokemonBDSP/Autostory/Route205/BankTreeCrownCloud333.png"
+                        : view == 6 ? "PokemonBDSP/Autostory/Route205/BankTreeCrownCloud76.png"
+                        : view == 5 ? "PokemonBDSP/Autostory/Route205/BankTreeCrownCloud336.png"
+                        : view == 4 ? "PokemonBDSP/Autostory/Route205/BankTreeCrownCloud328.png"
+                        : view == 3 ? "PokemonBDSP/Autostory/Route205/BankTreeCrownCloud80.png"
+                        : view == 2 ? "PokemonBDSP/Autostory/Route205/BankTreeCrownCloud72.png"
+                        : view == 1 ? "PokemonBDSP/Autostory/Route205/BankTreeCrownLive.png"
+                        : "PokemonBDSP/Autostory/Route205/BankTreeCrown.png",
+                        {770.0 / 1920 - tw / 2, 235.0 / 1080 - th / 2, tw, th},
+                        {0, 0, 1, 1},
+                        .93,
+                        .20},
+                    {"Bank blue-hat child",
+                        view == 8       ? "PokemonBDSP/Autostory/Route205/BankBlueHatWest.png"
+                        : view == 7 ? "PokemonBDSP/Autostory/Route205/BankBlueHatCloud333.png"
+                        : view == 6 ? "PokemonBDSP/Autostory/Route205/BankBlueHatCloud76.png"
+                        : view == 5 ? "PokemonBDSP/Autostory/Route205/BankBlueHatCloud336.png"
+                        : view == 4 ? "PokemonBDSP/Autostory/Route205/BankBlueHatCloud328.png"
+                        : view == 3 ? "PokemonBDSP/Autostory/Route205/BankBlueHatCloud80.png"
+                        : view == 2 ? "PokemonBDSP/Autostory/Route205/BankBlueHatCloud72.png"
+                        : view == 1 ? "PokemonBDSP/Autostory/Route205/BankBlueHatLive.png"
+                        : "PokemonBDSP/Autostory/Route205/BankBlueHat.png",
+                        {700.0 / 1920 - nw / 2, 525.0 / 1080 - nh / 2, nw, nh},
+                        {0, 0, 1, 1},
+                        .93,
+                        .20}},
+                2,
+                1.0 / 96,
+                POSITION_TOLERANCE_Y,
+                true);
             const double score = std::min(candidate.landmarks[0].score, candidate.landmarks[1].score);
             if (best.located && candidate.located &&
                 (std::abs(best.dx - candidate.dx) > AGREEMENT_X || std::abs(best.dy - candidate.dy) > AGREEMENT_Y)){
@@ -2411,15 +2509,18 @@ OverworldMatchResult match_windworks_sign_approach(const ImageRGB32& frame){
             const double w = (view == 2 ? 124.0 : view == 1 ? 144.0 : 121.0) / 1920 * scale;
             const double h = (view == 1 ? 140.0 : 122.0) / 1080 * scale;
             auto candidate = match_landmarks(frame,
-                                             {{"Windworks approach sign",
-                                               view == 2   ? "PokemonBDSP/Autostory/WindworksApproach/SignNight.png"
-                                               : view == 1 ? "PokemonBDSP/Autostory/WindworksApproach/SignLow.png"
-                                                           : "PokemonBDSP/Autostory/WindworksApproach/Sign.png",
-                                               {836.5 / 1920 - w / 2, 515.0 / 1080 - h / 2, w, h},
-                                               {0, 0, 1, 1},
-                                               .93,
-                                               .20}},
-                                             1, POSITION_TOLERANCE_X, POSITION_TOLERANCE_Y, true);
+                {{"Windworks approach sign",
+                        view == 2       ? "PokemonBDSP/Autostory/WindworksApproach/SignNight.png"
+                        : view == 1 ? "PokemonBDSP/Autostory/WindworksApproach/SignLow.png"
+                        : "PokemonBDSP/Autostory/WindworksApproach/Sign.png",
+                        {836.5 / 1920 - w / 2, 515.0 / 1080 - h / 2, w, h},
+                        {0, 0, 1, 1},
+                        .93,
+                        .20}},
+                1,
+                POSITION_TOLERANCE_X,
+                POSITION_TOLERANCE_Y,
+                true);
             if (best.landmarks.empty() || (candidate.located && !best.located) ||
                 (candidate.located == best.located && candidate.landmarks[0].score > best.landmarks[0].score)){
                 best = candidate;
@@ -2433,14 +2534,17 @@ OverworldMatchResult match_windworks_sign_approach(const ImageRGB32& frame){
             const double w = (high_view ? 86.0 : 106.0) / 1920 * scale;
             const double h = (high_view ? 72.0 : 94.0) / 1080 * scale;
             auto candidate = match_landmarks(frame,
-                                             {{"Windworks approach sign face",
-                                               high_view ? "PokemonBDSP/Autostory/WindworksApproach/SignHighFace.png"
-                                                         : "PokemonBDSP/Autostory/WindworksApproach/SignMidFace.png",
-                                               {838.0 / 1920 - w / 2, 516.0 / 1080 - h / 2, w, h},
-                                               {0, 0, 1, 1},
-                                               .93,
-                                               .20}},
-                                             1, POSITION_TOLERANCE_X, POSITION_TOLERANCE_Y, true);
+                {{"Windworks approach sign face",
+                        high_view ? "PokemonBDSP/Autostory/WindworksApproach/SignHighFace.png"
+                        : "PokemonBDSP/Autostory/WindworksApproach/SignMidFace.png",
+                        {838.0 / 1920 - w / 2, 516.0 / 1080 - h / 2, w, h},
+                        {0, 0, 1, 1},
+                        .93,
+                        .20}},
+                1,
+                POSITION_TOLERANCE_X,
+                POSITION_TOLERANCE_Y,
+                true);
             if ((candidate.located && !best.located) ||
                 (candidate.located == best.located && candidate.landmarks[0].score > best.landmarks[0].score)){
                 best = candidate;
@@ -2459,13 +2563,16 @@ OverworldMatchResult match_route204_floaroma_turn(const ImageRGB32& frame){
         for (double scale_y : {.90, 1.0, 1.10}){
             const double w = 140.0 / 1920 * scale_x, h = 57.0 / 1080 * scale_y;
             auto candidate = match_landmarks(frame,
-                                             {{"Northern Route 204 sign",
-                                               "PokemonBDSP/Autostory/Route204Sign/SignHour13Frame3.png",
-                                               {.5 - w / 2, 420.0 / 1080 - h / 2, w, h},
-                                               {0, 0, 1, 1},
-                                               .93,
-                                               .20}},
-                                             1, POSITION_TOLERANCE_X, POSITION_TOLERANCE_Y, true);
+                {{"Northern Route 204 sign",
+                        "PokemonBDSP/Autostory/Route204Sign/SignHour13Frame3.png",
+                        {.5 - w / 2, 420.0 / 1080 - h / 2, w, h},
+                        {0, 0, 1, 1},
+                        .93,
+                        .20}},
+                1,
+                POSITION_TOLERANCE_X,
+                POSITION_TOLERANCE_Y,
+                true);
             if (best.landmarks.empty() || (candidate.located && !best.located) ||
                 (candidate.located == best.located && candidate.landmarks[0].score > best.landmarks[0].score)){
                 best = candidate;
@@ -2505,19 +2612,22 @@ OverworldMatchResult match_floaroma_house_entrance(const ImageRGB32& frame){
     // Fixed facade details above/aside the player avoid door/player occlusion.
     // Both must agree on the pose recorded just outside the central house.
     return match_landmarks(frame,
-                           {{"House window",
-                             "PokemonBDSP/Autostory/FloaromaHouse/Window.png",
-                             {1060.0 / 1920, 370.0 / 1080, 128.0 / 1920, 106.0 / 1080},
-                             {0, 0, 1, 1},
-                             .93,
-                             .10},
-                            {"House gable",
-                             "PokemonBDSP/Autostory/FloaromaHouse/Gable.png",
-                             {796.0 / 1920, 196.0 / 1080, 460.0 / 1920, 154.0 / 1080},
-                             {0, 0, 1, 1},
-                             .93,
-                             .10}},
-                           2, 1.0 / 64, 1.0 / 54, true);
+        {{"House window",
+                "PokemonBDSP/Autostory/FloaromaHouse/Window.png",
+                {1060.0 / 1920, 370.0 / 1080, 128.0 / 1920, 106.0 / 1080},
+                {0, 0, 1, 1},
+                .93,
+                .10},
+            {"House gable",
+                "PokemonBDSP/Autostory/FloaromaHouse/Gable.png",
+                {796.0 / 1920, 196.0 / 1080, 460.0 / 1920, 154.0 / 1080},
+                {0, 0, 1, 1},
+                .93,
+                .10}},
+        2,
+        1.0 / 64,
+        1.0 / 54,
+        true);
 }
 OverworldMatchResult match_floaroma_center_entrance(const ImageRGB32& frame){
     OverworldMatchResult best;
@@ -2525,13 +2635,16 @@ OverworldMatchResult match_floaroma_center_entrance(const ImageRGB32& frame){
     for (double scale : {.90, .95, 1.0, 1.05, 1.10}){
         const double w = 105.0 / 1920 * scale, h = 86.0 / 1080 * scale;
         auto candidate = match_landmarks(frame,
-                                         {{"Center emblem",
-                                           "PokemonBDSP/Autostory/FloaromaCenter/Emblem.png",
-                                           {.5 - w / 2, 135.0 / 1080 - h / 2, w, h},
-                                           {0, 0, 1, 1},
-                                           .93,
-                                           .20}},
-                                         1, 1.0 / 64, 1.0 / 36, true);
+            {{"Center emblem",
+                    "PokemonBDSP/Autostory/FloaromaCenter/Emblem.png",
+                    {.5 - w / 2, 135.0 / 1080 - h / 2, w, h},
+                    {0, 0, 1, 1},
+                    .93,
+                    .20}},
+            1,
+            1.0 / 64,
+            1.0 / 36,
+            true);
         if (best.landmarks.empty() || (candidate.located && !best.located) ||
             (candidate.located == best.located && candidate.landmarks[0].score > best.landmarks[0].score)){
             best = candidate;
@@ -2545,13 +2658,16 @@ OverworldMatchResult match_floaroma_center_entrance(const ImageRGB32& frame){
             for (double scale_y : {1.15, 1.25, 1.35, 1.45}){
                 const double w = 105.0 / 1920 * scale_x, h = 86.0 / 1080 * scale_y;
                 auto candidate = match_landmarks(frame,
-                                                 {{"Center emblem west perspective",
-                                                   "PokemonBDSP/Autostory/FloaromaCenter/Emblem.png",
-                                                   {.5 - w / 2, 135.0 / 1080 - h / 2, w, h},
-                                                   {0, 0, 1, 1},
-                                                   .93,
-                                                   .20}},
-                                                 1, 1.0 / 64, 1.0 / 36, true);
+                    {{"Center emblem west perspective",
+                            "PokemonBDSP/Autostory/FloaromaCenter/Emblem.png",
+                            {.5 - w / 2, 135.0 / 1080 - h / 2, w, h},
+                            {0, 0, 1, 1},
+                            .93,
+                            .20}},
+                    1,
+                    1.0 / 64,
+                    1.0 / 36,
+                    true);
                 candidate.coarse = true;
                 candidate.at_target = false;
                 if ((candidate.located && !best.located) ||
@@ -2564,13 +2680,16 @@ OverworldMatchResult match_floaroma_center_entrance(const ImageRGB32& frame){
     // A lower-face reference excludes the tester's burned-in overlay line
     // and covers the doorway-facing perspective, retaining score/margin gates.
     auto lower = match_landmarks(frame,
-                                 {{"Center emblem lower face",
-                                   "PokemonBDSP/Autostory/FloaromaCenter/EmblemLower.png",
-                                   {.5 - 52.0 / 1920, 114.0 / 1080, 104.0 / 1920, 65.0 / 1080},
-                                   {0, 0, 1, 1},
-                                   .93,
-                                   .20}},
-                                 1, 1.0 / 64, 1.0 / 36, true);
+        {{"Center emblem lower face",
+                "PokemonBDSP/Autostory/FloaromaCenter/EmblemLower.png",
+                {.5 - 52.0 / 1920, 114.0 / 1080, 104.0 / 1920, 65.0 / 1080},
+                {0, 0, 1, 1},
+                .93,
+                .20}},
+        1,
+        1.0 / 64,
+        1.0 / 36,
+        true);
     if ((lower.located && (!best.located || best.coarse)) ||
         (lower.located == best.located && lower.landmarks[0].score > best.landmarks[0].score)){
         best = lower;
@@ -2581,14 +2700,17 @@ OverworldMatchResult match_route204_north_stairs(const ImageRGB32& frame){
     OverworldMatchResult best;
     // Fixed rails/steps, with sunny and cloud-covered perspectives.
     for (const char* path : {"PokemonBDSP/Autostory/Route204NorthStairs/Stairs.png",
-                             "PokemonBDSP/Autostory/Route204NorthStairs/StairsCloud.png"}){
+        "PokemonBDSP/Autostory/Route204NorthStairs/StairsCloud.png"}){
         // Camera pitch changes height and width by different amounts.
         for (double scale_x : {.90, 1.0, 1.10}){
             for (double scale_y : {.80, .90, 1.0, 1.10}){
                 const double w = 298.0 / 1920 * scale_x, h = 282.0 / 1080 * scale_y;
-                auto candidate = match_landmarks(
-                    frame, {{"North route stairs", path, {.5 - w / 2, 650.0 / 1080, w, h}, {0, 0, 1, 1}, .93, .10}}, 1,
-                    1.0 / 64, 1.0 / 54, true);
+                auto candidate = match_landmarks(frame,
+                    {{"North route stairs", path, {.5 - w / 2, 650.0 / 1080, w, h}, {0, 0, 1, 1}, .93, .10}},
+                    1,
+                    1.0 / 64,
+                    1.0 / 54,
+                    true);
                 if (best.landmarks.empty() || (candidate.located && !best.located) ||
                     (candidate.located == best.located && candidate.landmarks[0].score > best.landmarks[0].score)){
                     best = candidate;
@@ -2600,18 +2722,18 @@ OverworldMatchResult match_route204_north_stairs(const ImageRGB32& frame){
         // The lower steps distort as the camera moves north. The rail tops,
         // grass edge and first steps retain a stable physical upper edge.
         for (const auto& config :
-             std::vector<LandmarkConfig>{{"North route stairs top",
-                                          "PokemonBDSP/Autostory/Route204NorthStairs/Top.png",
-                                          {.5 - 149.0 / 1920, 640.0 / 1080, 298.0 / 1920, 70.0 / 1080},
-                                          {0, 0, 1, 1},
-                                          .93,
-                                          .10},
-                                         {"North route stairs top",
-                                          "PokemonBDSP/Autostory/Route204NorthStairs/TopRaised.png",
-                                          {.5 - 157.0 / 1920, 640.0 / 1080, 314.0 / 1920, 70.0 / 1080},
-                                          {0, 0, 1, 1},
-                                          .93,
-                                          .10}}){
+            std::vector<LandmarkConfig>{{"North route stairs top",
+                    "PokemonBDSP/Autostory/Route204NorthStairs/Top.png",
+                    {.5 - 149.0 / 1920, 640.0 / 1080, 298.0 / 1920, 70.0 / 1080},
+                    {0, 0, 1, 1},
+                    .93,
+                    .10},
+                {"North route stairs top",
+                    "PokemonBDSP/Autostory/Route204NorthStairs/TopRaised.png",
+                    {.5 - 157.0 / 1920, 640.0 / 1080, 314.0 / 1920, 70.0 / 1080},
+                    {0, 0, 1, 1},
+                    .93,
+                    .10}}){
             for (double scale_x : {.95, 1.0, 1.05}){
                 for (double scale_y : {.90, 1.0, 1.10}){
                     auto variant = config;
@@ -2652,54 +2774,54 @@ OverworldMatchResult match_ravaged_path_south_entrance(const ImageRGB32& frame){
     // of sizes, keeping each physical anchor's reference center fixed.
     for (double scale : {.90, 1.0, 1.10}){
         for (const auto& config :
-             std::vector<LandmarkConfig>{{"Cave mouth",
-                                          "PokemonBDSP/Autostory/RavagedPathSouthEntrance/Mouth.png",
-                                          mouth,
-                                          {0, 0, 1, 1},
-                                          .93,
-                                          .10},
-                                         {"Entrance sign",
-                                          "PokemonBDSP/Autostory/RavagedPathSouthEntrance/Sign.png",
-                                          sign,
-                                          {0, 0, 1, 1},
-                                          .93,
-                                          .10},
-                                         {"Cave mouth",
-                                          "PokemonBDSP/Autostory/RavagedPathSouthEntrance/MouthShadow.png",
-                                          mouth,
-                                          {0, 0, 1, 1},
-                                          .93,
-                                          .10},
-                                         {"Entrance sign",
-                                          "PokemonBDSP/Autostory/RavagedPathSouthEntrance/SignShadow.png",
-                                          sign,
-                                          {0, 0, 1, 1},
-                                          .93,
-                                          .10},
-                                         {"Entrance sign",
-                                          "PokemonBDSP/Autostory/RavagedPathSouthEntrance/SignPartialShadow.png",
-                                          sign,
-                                          {0, 0, 1, 1},
-                                          .93,
-                                          .10},
-                                         {"Entrance sign",
-                                          "PokemonBDSP/Autostory/RavagedPathSouthEntrance/SignFace.png",
-                                          {828.0 / 1920, 400.0 / 1080, 64.0 / 1920, 62.0 / 1080},
-                                          {0, 0, 1, 1},
-                                          .93,
-                                          .10},
-                                         {"Entrance sign",
-                                          "PokemonBDSP/Autostory/RavagedPathSouthEntrance/SignFaceLowApproach.png",
-                                          {828.0 / 1920, 400.0 / 1080, 64.0 / 1920, 62.0 / 1080},
-                                          {0, 0, 1, 1},
-                                          .93,
-                                          .10},
-                                         {"Entrance sign",
-                                          "PokemonBDSP/Autostory/RavagedPathSouthEntrance/SignFaceCloud.png",
-                                          {828.0 / 1920, 400.0 / 1080, 64.0 / 1920, 62.0 / 1080},
-                                          {0, 0, 1, 1},
-                                          .93,
-                                          .10}}){
+            std::vector<LandmarkConfig>{{"Cave mouth",
+                    "PokemonBDSP/Autostory/RavagedPathSouthEntrance/Mouth.png",
+                    mouth,
+                    {0, 0, 1, 1},
+                    .93,
+                    .10},
+                {"Entrance sign",
+                    "PokemonBDSP/Autostory/RavagedPathSouthEntrance/Sign.png",
+                    sign,
+                    {0, 0, 1, 1},
+                    .93,
+                    .10},
+                {"Cave mouth",
+                    "PokemonBDSP/Autostory/RavagedPathSouthEntrance/MouthShadow.png",
+                    mouth,
+                    {0, 0, 1, 1},
+                    .93,
+                    .10},
+                {"Entrance sign",
+                    "PokemonBDSP/Autostory/RavagedPathSouthEntrance/SignShadow.png",
+                    sign,
+                    {0, 0, 1, 1},
+                    .93,
+                    .10},
+                {"Entrance sign",
+                    "PokemonBDSP/Autostory/RavagedPathSouthEntrance/SignPartialShadow.png",
+                    sign,
+                    {0, 0, 1, 1},
+                    .93,
+                    .10},
+                {"Entrance sign",
+                    "PokemonBDSP/Autostory/RavagedPathSouthEntrance/SignFace.png",
+                    {828.0 / 1920, 400.0 / 1080, 64.0 / 1920, 62.0 / 1080},
+                    {0, 0, 1, 1},
+                    .93,
+                    .10},
+                {"Entrance sign",
+                    "PokemonBDSP/Autostory/RavagedPathSouthEntrance/SignFaceLowApproach.png",
+                    {828.0 / 1920, 400.0 / 1080, 64.0 / 1920, 62.0 / 1080},
+                    {0, 0, 1, 1},
+                    .93,
+                    .10},
+                {"Entrance sign",
+                    "PokemonBDSP/Autostory/RavagedPathSouthEntrance/SignFaceCloud.png",
+                    {828.0 / 1920, 400.0 / 1080, 64.0 / 1920, 62.0 / 1080},
+                    {0, 0, 1, 1},
+                    .93,
+                    .10}}){
             auto variant = config;
             variant.target.width *= scale;
             variant.target.height *= scale;
@@ -2726,13 +2848,16 @@ OverworldMatchResult match_ravaged_path_south_entrance(const ImageRGB32& frame){
     // The lass is optional evidence for the southern movement boundary, never
     // a replacement for the fixed mouth/sign arrival anchors.
     auto boundary = match_landmarks(frame,
-                                    {{"Lass south boundary",
-                                      "PokemonBDSP/Autostory/RavagedPathSouthEntrance/Lass.png",
-                                      {910.0 / 1920, 788.0 / 1080, 100.0 / 1920, 142.0 / 1080},
-                                      {0, 0, 1, 1},
-                                      .88,
-                                      .08}},
-                                    1, 1.0 / 64, 1.0 / 36, true);
+        {{"Lass south boundary",
+                "PokemonBDSP/Autostory/RavagedPathSouthEntrance/Lass.png",
+                {910.0 / 1920, 788.0 / 1080, 100.0 / 1920, 142.0 / 1080},
+                {0, 0, 1, 1},
+                .88,
+                .08}},
+        1,
+        1.0 / 64,
+        1.0 / 36,
+        true);
     if (!boundary.landmarks.empty()){
         result.landmarks.push_back(boundary.landmarks[0]);
     }
@@ -2750,55 +2875,57 @@ OverworldMatchResult match_route215_bridge_renewal(const ImageRGB32& frame){
     cv::Mat pixels(540, 960, CV_8UC4, filtered.data(), filtered.bytes_per_row());
     cv::cvtColor(smoothed, pixels, cv::COLOR_GRAY2BGRA);
     auto result = match_lighting_pair(filtered,
-                                      {{"Bridge west edge",
-                                        "PokemonBDSP/Autostory/Route215Renewal/BridgeEdge.png",
-                                        {538.0 / 960, 302.0 / 540, 50.0 / 960, 100.0 / 540},
-                                        {.15, .25, .85, .75},
-                                        .90,
-                                        .10},
-                                       {"Landing cliff corner",
-                                        "PokemonBDSP/Autostory/Route215Renewal/BridgeCliff.png",
-                                        {333.0 / 960, 410.0 / 540, 64.0 / 960, 88.0 / 540},
-                                        {.10, .25, .85, .75},
-                                        .90,
-                                        .10},
-                                       {"Bridge west edge",
-                                        "PokemonBDSP/Autostory/Route215Renewal/BridgeFarEdge.png",
-                                        {538.0 / 960, 302.0 / 540, 50.0 / 960, 100.0 / 540},
-                                        {.15, .25, .85, .75},
-                                        .90,
-                                        .10},
-                                       {"Landing cliff corner",
-                                        "PokemonBDSP/Autostory/Route215Renewal/BridgeFarCliff.png",
-                                        {333.0 / 960, 410.0 / 540, 64.0 / 960, 88.0 / 540},
-                                        {.10, .25, .85, .75},
-                                        .90,
-                                        .10},
-                                       {"Bridge west edge",
-                                        "PokemonBDSP/Autostory/Route215Renewal/BridgeNightEdge.png",
-                                        {538.0 / 960, 302.0 / 540, 50.0 / 960, 100.0 / 540},
-                                        {.15, .25, .85, .75},
-                                        .90,
-                                        .10},
-                                       {"Landing cliff corner",
-                                        "PokemonBDSP/Autostory/Route215Renewal/BridgeNightCliff.png",
-                                        {333.0 / 960, 410.0 / 540, 64.0 / 960, 88.0 / 540},
-                                        {.10, .25, .85, .75},
-                                        .90,
-                                        .10},
-                                       {"Bridge west edge",
-                                        "PokemonBDSP/Autostory/Route215Renewal/BridgeNightFarEdge.png",
-                                        {538.0 / 960, 302.0 / 540, 50.0 / 960, 100.0 / 540},
-                                        {.15, .25, .85, .75},
-                                        .90,
-                                        .10},
-                                       {"Landing cliff corner",
-                                        "PokemonBDSP/Autostory/Route215Renewal/BridgeNightFarCliff.png",
-                                        {333.0 / 960, 410.0 / 540, 64.0 / 960, 88.0 / 540},
-                                        {.10, .25, .85, .75},
-                                        .90,
-                                        .10}},
-                                      "Bridge west edge", "Landing cliff corner", 1.0 / 128);
+        {{"Bridge west edge",
+                "PokemonBDSP/Autostory/Route215Renewal/BridgeEdge.png",
+                {538.0 / 960, 302.0 / 540, 50.0 / 960, 100.0 / 540},
+                {.15, .25, .85, .75},
+                .90,
+                .10},
+            {"Landing cliff corner",
+                "PokemonBDSP/Autostory/Route215Renewal/BridgeCliff.png",
+                {333.0 / 960, 410.0 / 540, 64.0 / 960, 88.0 / 540},
+                {.10, .25, .85, .75},
+                .90,
+                .10},
+            {"Bridge west edge",
+                "PokemonBDSP/Autostory/Route215Renewal/BridgeFarEdge.png",
+                {538.0 / 960, 302.0 / 540, 50.0 / 960, 100.0 / 540},
+                {.15, .25, .85, .75},
+                .90,
+                .10},
+            {"Landing cliff corner",
+                "PokemonBDSP/Autostory/Route215Renewal/BridgeFarCliff.png",
+                {333.0 / 960, 410.0 / 540, 64.0 / 960, 88.0 / 540},
+                {.10, .25, .85, .75},
+                .90,
+                .10},
+            {"Bridge west edge",
+                "PokemonBDSP/Autostory/Route215Renewal/BridgeNightEdge.png",
+                {538.0 / 960, 302.0 / 540, 50.0 / 960, 100.0 / 540},
+                {.15, .25, .85, .75},
+                .90,
+                .10},
+            {"Landing cliff corner",
+                "PokemonBDSP/Autostory/Route215Renewal/BridgeNightCliff.png",
+                {333.0 / 960, 410.0 / 540, 64.0 / 960, 88.0 / 540},
+                {.10, .25, .85, .75},
+                .90,
+                .10},
+            {"Bridge west edge",
+                "PokemonBDSP/Autostory/Route215Renewal/BridgeNightFarEdge.png",
+                {538.0 / 960, 302.0 / 540, 50.0 / 960, 100.0 / 540},
+                {.15, .25, .85, .75},
+                .90,
+                .10},
+            {"Landing cliff corner",
+                "PokemonBDSP/Autostory/Route215Renewal/BridgeNightFarCliff.png",
+                {333.0 / 960, 410.0 / 540, 64.0 / 960, 88.0 / 540},
+                {.10, .25, .85, .75},
+                .90,
+                .10}},
+        "Bridge west edge",
+        "Landing cliff corner",
+        1.0 / 128);
     result.at_target = result.located && std::abs(result.dx) <= 1.0 / 128 && std::abs(result.dy) <= 1.0 / 108;
     return result;
 }
@@ -2814,20 +2941,23 @@ OverworldMatchResult match_route215_ace_renewal(const ImageRGB32& frame){
     cv::Mat pixels(540, 960, CV_8UC4, filtered.data(), filtered.bytes_per_row());
     cv::cvtColor(smoothed, pixels, cv::COLOR_GRAY2BGRA);
     auto result = match_landmarks(filtered,
-                                  {{"Road bend",
-                                    "PokemonBDSP/Autostory/Route215Renewal/AceRoad.png",
-                                    {352.0 / 960, 180.0 / 540, 60.0 / 960, 80.0 / 540},
-                                    {.10, .15, .85, .80},
-                                    .92,
-                                    .08},
-                                   {"Fence corner",
-                                    "PokemonBDSP/Autostory/Route215Renewal/AceFence.png",
-                                    {165.0 / 960, 389.0 / 540, 110.0 / 960, 78.0 / 540},
-                                    {.05, .25, .90, .75},
-                                    .90,
-                                    .10,
-                                    LandmarkFeatures::LOCAL_CONTRAST}},
-                                  2, 1.0 / 128, 1.0 / 108, true);
+        {{"Road bend",
+                "PokemonBDSP/Autostory/Route215Renewal/AceRoad.png",
+                {352.0 / 960, 180.0 / 540, 60.0 / 960, 80.0 / 540},
+                {.10, .15, .85, .80},
+                .92,
+                .08},
+            {"Fence corner",
+                "PokemonBDSP/Autostory/Route215Renewal/AceFence.png",
+                {165.0 / 960, 389.0 / 540, 110.0 / 960, 78.0 / 540},
+                {.05, .25, .90, .75},
+                .90,
+                .10,
+                LandmarkFeatures::LOCAL_CONTRAST}},
+        2,
+        1.0 / 128,
+        1.0 / 108,
+        true);
     if (result.located){
         return result;
     }
@@ -2840,107 +2970,111 @@ OverworldMatchResult match_route215_ace_renewal(const ImageRGB32& frame){
     cv::GaussianBlur(smoothed, smoothed, cv::Size(0, 0), .8);
     cv::cvtColor(smoothed, pixels, cv::COLOR_GRAY2BGRA);
     auto approach = match_lighting_pair(filtered,
-                                        {{"Upper road bend",
-                                          "PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadGoal.png",
-                                          {352.0 / 960, 180.0 / 540, 60.0 / 960, 80.0 / 540},
-                                          {0, .25, 1, .30},
-                                          .92,
-                                          .08},
-                                         {"Upper road bend",
-                                          "PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadNear.png",
-                                          {352.0 / 960, 180.0 / 540, 60.0 / 960, 80.0 / 540},
-                                          {0, .25, 1, .30},
-                                          .92,
-                                          .08},
-                                         {"Upper road bend",
-                                          "PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadFar.png",
-                                          {352.0 / 960, 180.0 / 540, 60.0 / 960, 80.0 / 540},
-                                          {0, .25, 1, .30},
-                                          .92,
-                                          .08},
-                                         {"Upper road bend",
-                                          "PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadWestFar.png",
-                                          {352.0 / 960, 180.0 / 540, 60.0 / 960, 80.0 / 540},
-                                          {0, .25, 1, .30},
-                                          .92,
-                                          .08},
-                                         {"Upper road bend",
-                                          "PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadWestNear.png",
-                                          {352.0 / 960, 180.0 / 540, 60.0 / 960, 80.0 / 540},
-                                          {0, .25, 1, .30},
-                                          .92,
-                                          .08},
-                                         {"Upper road bend",
-                                          "PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadWest.png",
-                                          {352.0 / 960, 180.0 / 540, 60.0 / 960, 80.0 / 540},
-                                          {0, .25, 1, .30},
-                                          .92,
-                                          .08},
-                                         {"Upper road bend",
-                                          "PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadWestNearRain.png",
-                                          {352.0 / 960, 180.0 / 540, 60.0 / 960, 80.0 / 540},
-                                          {0, .25, 1, .30},
-                                          .92,
-                                          .08},
-                                         {"Upper road bend",
-                                          "PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadFarRain.png",
-                                          {352.0 / 960, 180.0 / 540, 60.0 / 960, 80.0 / 540},
-                                          {0, .25, 1, .30},
-                                          .92,
-                                          .08},
-                                         {"Lower road bend",
-                                          "PokemonBDSP/Autostory/Route215Renewal/AceAcquireLowerRoadEast.png",
-                                          {500.0 / 960, 420.0 / 540, 80.0 / 960, 70.0 / 540},
-                                          {0, .70, 1, .30},
-                                          .93,
-                                          .10},
-                                         {"Lower road bend",
-                                          "PokemonBDSP/Autostory/Route215Renewal/AceAcquireLowerRoad.png",
-                                          {500.0 / 960, 420.0 / 540, 80.0 / 960, 70.0 / 540},
-                                          {0, .70, 1, .30},
-                                          .93,
-                                          .10}},
-                                        "Upper road bend", "Lower road bend", 1.0 / 128);
+        {{"Upper road bend",
+                "PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadGoal.png",
+                {352.0 / 960, 180.0 / 540, 60.0 / 960, 80.0 / 540},
+                {0, .25, 1, .30},
+                .92,
+                .08},
+            {"Upper road bend",
+                "PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadNear.png",
+                {352.0 / 960, 180.0 / 540, 60.0 / 960, 80.0 / 540},
+                {0, .25, 1, .30},
+                .92,
+                .08},
+            {"Upper road bend",
+                "PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadFar.png",
+                {352.0 / 960, 180.0 / 540, 60.0 / 960, 80.0 / 540},
+                {0, .25, 1, .30},
+                .92,
+                .08},
+            {"Upper road bend",
+                "PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadWestFar.png",
+                {352.0 / 960, 180.0 / 540, 60.0 / 960, 80.0 / 540},
+                {0, .25, 1, .30},
+                .92,
+                .08},
+            {"Upper road bend",
+                "PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadWestNear.png",
+                {352.0 / 960, 180.0 / 540, 60.0 / 960, 80.0 / 540},
+                {0, .25, 1, .30},
+                .92,
+                .08},
+            {"Upper road bend",
+                "PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadWest.png",
+                {352.0 / 960, 180.0 / 540, 60.0 / 960, 80.0 / 540},
+                {0, .25, 1, .30},
+                .92,
+                .08},
+            {"Upper road bend",
+                "PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadWestNearRain.png",
+                {352.0 / 960, 180.0 / 540, 60.0 / 960, 80.0 / 540},
+                {0, .25, 1, .30},
+                .92,
+                .08},
+            {"Upper road bend",
+                "PokemonBDSP/Autostory/Route215Renewal/AceAcquireRoadFarRain.png",
+                {352.0 / 960, 180.0 / 540, 60.0 / 960, 80.0 / 540},
+                {0, .25, 1, .30},
+                .92,
+                .08},
+            {"Lower road bend",
+                "PokemonBDSP/Autostory/Route215Renewal/AceAcquireLowerRoadEast.png",
+                {500.0 / 960, 420.0 / 540, 80.0 / 960, 70.0 / 540},
+                {0, .70, 1, .30},
+                .93,
+                .10},
+            {"Lower road bend",
+                "PokemonBDSP/Autostory/Route215Renewal/AceAcquireLowerRoad.png",
+                {500.0 / 960, 420.0 / 540, 80.0 / 960, 70.0 / 540},
+                {0, .70, 1, .30},
+                .93,
+                .10}},
+        "Upper road bend",
+        "Lower road bend",
+        1.0 / 128);
     // At the eastern extreme, the original bends leave the screen. The two
     // corners of the same grass bed remain visible above the clear road.
     auto east = match_lighting_pair(filtered,
-                                    {{"Grass west corner",
-                                      "PokemonBDSP/Autostory/Route215Renewal/AceGrassWest.png",
-                                      {665.0 / 960, 145.0 / 540, 110.0 / 960, 75.0 / 540},
-                                      {0, .20, 1, .40},
-                                      .92,
-                                      .10},
-                                     {"Grass east corner",
-                                      "PokemonBDSP/Autostory/Route215Renewal/AceGrassEast.png",
-                                      {890.0 / 960, 175.0 / 540, 65.0 / 960, 62.0 / 540},
-                                      {0, .20, 1, .40},
-                                      .92,
-                                      .10},
-                                     {"Grass west corner",
-                                      "PokemonBDSP/Autostory/Route215Renewal/AceGrassFarWest.png",
-                                      {665.0 / 960, 145.0 / 540, 110.0 / 960, 75.0 / 540},
-                                      {0, .20, 1, .40},
-                                      .92,
-                                      .10},
-                                     {"Grass east corner",
-                                      "PokemonBDSP/Autostory/Route215Renewal/AceGrassFarEast.png",
-                                      {890.0 / 960, 175.0 / 540, 65.0 / 960, 62.0 / 540},
-                                      {0, .20, 1, .40},
-                                      .92,
-                                      .10},
-                                     {"Grass east corner",
-                                      "PokemonBDSP/Autostory/Route215Renewal/AceGrassFarEastShoulder.png",
-                                      {850.0 / 960, 145.0 / 540, 105.0 / 960, 80.0 / 540},
-                                      {0, .20, 1, .40},
-                                      .92,
-                                      .10}},
-                                    "Grass west corner", "Grass east corner", 1.0 / 128);
+        {{"Grass west corner",
+                "PokemonBDSP/Autostory/Route215Renewal/AceGrassWest.png",
+                {665.0 / 960, 145.0 / 540, 110.0 / 960, 75.0 / 540},
+                {0, .20, 1, .40},
+                .92,
+                .10},
+            {"Grass east corner",
+                "PokemonBDSP/Autostory/Route215Renewal/AceGrassEast.png",
+                {890.0 / 960, 175.0 / 540, 65.0 / 960, 62.0 / 540},
+                {0, .20, 1, .40},
+                .92,
+                .10},
+            {"Grass west corner",
+                "PokemonBDSP/Autostory/Route215Renewal/AceGrassFarWest.png",
+                {665.0 / 960, 145.0 / 540, 110.0 / 960, 75.0 / 540},
+                {0, .20, 1, .40},
+                .92,
+                .10},
+            {"Grass east corner",
+                "PokemonBDSP/Autostory/Route215Renewal/AceGrassFarEast.png",
+                {890.0 / 960, 175.0 / 540, 65.0 / 960, 62.0 / 540},
+                {0, .20, 1, .40},
+                .92,
+                .10},
+            {"Grass east corner",
+                "PokemonBDSP/Autostory/Route215Renewal/AceGrassFarEastShoulder.png",
+                {850.0 / 960, 145.0 / 540, 105.0 / 960, 80.0 / 540},
+                {0, .20, 1, .40},
+                .92,
+                .10}},
+        "Grass west corner",
+        "Grass east corner",
+        1.0 / 128);
     const auto& west = east.landmarks[0];
     const auto& right = east.landmarks[1];
     const double east_nearest = std::min(std::abs(west.dx), std::abs(right.dx));
     east.located = west.accepted && right.accepted && std::abs(west.dy - right.dy) <= AGREEMENT_Y &&
-                   west.dx < -1.0 / 12 && right.dx < -1.0 / 12 && east_nearest > 2 * std::abs(west.dx - right.dx) &&
-                   east.dy >= -1.0 / 27 && east.dy <= 1.0 / 9;
+        west.dx < -1.0 / 12 && right.dx < -1.0 / 12 && east_nearest > 2 * std::abs(west.dx - right.dx) &&
+        east.dy >= -1.0 / 27 && east.dy <= 1.0 / 9;
     if (east.located){
         east.coarse = true;
         east.at_target = false;
@@ -2950,31 +3084,33 @@ OverworldMatchResult match_route215_ace_renewal(const ImageRGB32& frame){
     // road bends are off-screen. Its virtual goal lies beyond the right edge;
     // this pair guides acquisition only and can never confirm arrival.
     auto far_east = match_lighting_pair(filtered,
-                                        {{"Grass west corner",
-                                          "PokemonBDSP/Autostory/Route215Renewal/AceGrassFarWest.png",
-                                          {665.0 / 960, 145.0 / 540, 110.0 / 960, 75.0 / 540},
-                                          {0, .20, 1, .40},
-                                          .92,
-                                          .10},
-                                         {"Route 215 sign",
-                                          "PokemonBDSP/Autostory/Route215Renewal/AceRoute215Sign.png",
-                                          {1128.0 / 960, 359.0 / 540, 90.0 / 960, 45.0 / 540},
-                                          {.50, .40, .50, .50},
-                                          .94,
-                                          .20},
-                                         {"Route 215 sign",
-                                          "PokemonBDSP/Autostory/Route215Renewal/AceRoute215SignRain.png",
-                                          {1128.0 / 960, 359.0 / 540, 90.0 / 960, 45.0 / 540},
-                                          {.50, .40, .50, .50},
-                                          .94,
-                                          .20}},
-                                        "Grass west corner", "Route 215 sign", 1.0 / 128);
+        {{"Grass west corner",
+                "PokemonBDSP/Autostory/Route215Renewal/AceGrassFarWest.png",
+                {665.0 / 960, 145.0 / 540, 110.0 / 960, 75.0 / 540},
+                {0, .20, 1, .40},
+                .92,
+                .10},
+            {"Route 215 sign",
+                "PokemonBDSP/Autostory/Route215Renewal/AceRoute215Sign.png",
+                {1128.0 / 960, 359.0 / 540, 90.0 / 960, 45.0 / 540},
+                {.50, .40, .50, .50},
+                .94,
+                .20},
+            {"Route 215 sign",
+                "PokemonBDSP/Autostory/Route215Renewal/AceRoute215SignRain.png",
+                {1128.0 / 960, 359.0 / 540, 90.0 / 960, 45.0 / 540},
+                {.50, .40, .50, .50},
+                .94,
+                .20}},
+        "Grass west corner",
+        "Route 215 sign",
+        1.0 / 128);
     const auto& corner = far_east.landmarks[0];
     const auto& sign = far_east.landmarks[1];
     const double far_nearest = std::min(std::abs(corner.dx), std::abs(sign.dx));
     far_east.located = corner.accepted && sign.accepted && std::abs(corner.dy - sign.dy) <= AGREEMENT_Y &&
-                       corner.dx < -1.0 / 4 && sign.dx < -1.0 / 4 && far_nearest > 2 * std::abs(corner.dx - sign.dx) &&
-                       far_east.dy >= -1.0 / 27 && far_east.dy <= 1.0 / 9;
+        corner.dx < -1.0 / 4 && sign.dx < -1.0 / 4 && far_nearest > 2 * std::abs(corner.dx - sign.dx) &&
+        far_east.dy >= -1.0 / 27 && far_east.dy <= 1.0 / 9;
     if (far_east.located){
         far_east.coarse = true;
         far_east.at_target = false;
@@ -2994,11 +3130,11 @@ OverworldMatchResult match_route215_ace_renewal(const ImageRGB32& frame){
     // Expiry can also finish one row south, already near the goal column.
     // Both accepted bends must agree before correcting that row vertically.
     const bool vertical_support = std::abs(upper.dx - lower.dx) <= AGREEMENT_X &&
-                                  std::max(std::abs(upper.dx), std::abs(lower.dx)) <= 1.0 / 12 &&
-                                  std::abs(upper.dy - lower_plane_dy) <= 1.0 / 108 && upper.dy * lower_plane_dy > 0 &&
-                                  std::abs(approach.dy) > 1.0 / 54;
+        std::max(std::abs(upper.dx), std::abs(lower.dx)) <= 1.0 / 12 &&
+        std::abs(upper.dy - lower_plane_dy) <= 1.0 / 108 && upper.dy * lower_plane_dy > 0 &&
+        std::abs(approach.dy) > 1.0 / 54;
     approach.located = upper.accepted && lower.accepted && std::abs(upper.dy - lower_plane_dy) <= AGREEMENT_Y &&
-                       std::abs(approach.dy) <= 1.0 / 9 && (horizontal_support || vertical_support);
+        std::abs(approach.dy) <= 1.0 / 9 && (horizontal_support || vertical_support);
     approach.coarse = true;
     approach.at_target = false;
     return approach;
@@ -3015,31 +3151,33 @@ OverworldMatchResult match_route215_derek_stairs_renewal(const ImageRGB32& frame
     cv::cvtColor(smoothed, pixels, cv::COLOR_GRAY2BGRA);
     // Clear landing below the short stairs; neither tree nor player is an anchor.
     auto result = match_lighting_pair(filtered,
-                                      {{"White stair railing",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairsRailing.png",
-                                        {500.0 / 960, 78.0 / 540, 90.0 / 960, 110.0 / 540},
-                                        {.10, .05, .85, .85},
-                                        .93,
-                                        .12},
-                                       {"Lower stair corner",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairsCorner.png",
-                                        {589.0 / 960, 315.0 / 540, 95.0 / 960, 105.0 / 540},
-                                        {.10, .20, .85, .80},
-                                        .93,
-                                        .12},
-                                       {"White stair railing",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairsNightRailing.png",
-                                        {500.0 / 960, 78.0 / 540, 90.0 / 960, 110.0 / 540},
-                                        {.10, .05, .85, .85},
-                                        .93,
-                                        .12},
-                                       {"Lower stair corner",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairsNightCorner.png",
-                                        {589.0 / 960, 315.0 / 540, 95.0 / 960, 105.0 / 540},
-                                        {.10, .20, .85, .80},
-                                        .93,
-                                        .12}},
-                                      "White stair railing", "Lower stair corner", 1.0 / 128);
+        {{"White stair railing",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairsRailing.png",
+                {500.0 / 960, 78.0 / 540, 90.0 / 960, 110.0 / 540},
+                {.10, .05, .85, .85},
+                .93,
+                .12},
+            {"Lower stair corner",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairsCorner.png",
+                {589.0 / 960, 315.0 / 540, 95.0 / 960, 105.0 / 540},
+                {.10, .20, .85, .80},
+                .93,
+                .12},
+            {"White stair railing",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairsNightRailing.png",
+                {500.0 / 960, 78.0 / 540, 90.0 / 960, 110.0 / 540},
+                {.10, .05, .85, .85},
+                .93,
+                .12},
+            {"Lower stair corner",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairsNightCorner.png",
+                {589.0 / 960, 315.0 / 540, 95.0 / 960, 105.0 / 540},
+                {.10, .20, .85, .80},
+                .93,
+                .12}},
+        "White stair railing",
+        "Lower stair corner",
+        1.0 / 128);
     result.at_target = result.located && std::abs(result.dx) <= 1.0 / 128 && std::abs(result.dy) <= 1.0 / 108;
     if (result.located){
         return result;
@@ -3048,25 +3186,28 @@ OverworldMatchResult match_route215_derek_stairs_renewal(const ImageRGB32& frame
     // different amounts. Use that view only to acquire the horizontal column;
     // the original close pair above remains the sole arrival check.
     auto approach = match_landmarks(filtered,
-                                    {{"White stair railing",
-                                      "PokemonBDSP/Autostory/Route215Renewal/DerekStairsWestRailing.png",
-                                      {500.0 / 960, 78.0 / 540, 90.0 / 960, 110.0 / 540},
-                                      {.10, .05, .85, .85},
-                                      .93,
-                                      .12},
-                                     {"Lower stair corner",
-                                      "PokemonBDSP/Autostory/Route215Renewal/DerekStairsWestCorner.png",
-                                      {589.0 / 960, 315.0 / 540, 95.0 / 960, 105.0 / 540},
-                                      {.10, .20, .85, .80},
-                                      .93,
-                                      .12}},
-                                    2, 1.0 / 128, 1.0 / 108, true);
+        {{"White stair railing",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairsWestRailing.png",
+                {500.0 / 960, 78.0 / 540, 90.0 / 960, 110.0 / 540},
+                {.10, .05, .85, .85},
+                .93,
+                .12},
+            {"Lower stair corner",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairsWestCorner.png",
+                {589.0 / 960, 315.0 / 540, 95.0 / 960, 105.0 / 540},
+                {.10, .20, .85, .80},
+                .93,
+                .12}},
+        2,
+        1.0 / 128,
+        1.0 / 108,
+        true);
     const auto& rail = approach.landmarks[0];
     const auto& stair = approach.landmarks[1];
     const double nearest = std::min(std::abs(rail.dx), std::abs(stair.dx));
     approach.located = rail.accepted && stair.accepted && std::abs(rail.dy - stair.dy) <= AGREEMENT_Y &&
-                       std::abs((rail.dy + stair.dy) / 2) <= 1.0 / 108 && rail.dx * stair.dx > 0 &&
-                       nearest > 1.0 / 64 && nearest > 2 * std::abs(rail.dx - stair.dx);
+        std::abs((rail.dy + stair.dy) / 2) <= 1.0 / 108 && rail.dx * stair.dx > 0 && nearest > 1.0 / 64 &&
+        nearest > 2 * std::abs(rail.dx - stair.dx);
     approach.dx = (rail.dx + stair.dx) / 2;
     approach.dy = (rail.dy + stair.dy) / 2;
     approach.coarse = true;
@@ -3085,120 +3226,121 @@ OverworldMatchResult match_route215_derek_stair_top_renewal(const ImageRGB32& fr
     cv::cvtColor(smoothed, pixels, cv::COLOR_GRAY2BGRA);
     // The road row above the stairs is clear west/east, below the tall grass.
     auto result = match_lighting_pair(filtered,
-                                      {{"Stair-top barrier",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopBarrier.png",
-                                        {384.0 / 960, 401.0 / 540, 127.0 / 960, 70.0 / 540},
-                                        {.05, .15, .90, .85},
-                                        .93,
-                                        .12},
-                                       {"West fence corner",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFence.png",
-                                        {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
-                                        {.05, .15, .90, .85},
-                                        .90,
-                                        .12,
-                                        LandmarkFeatures::LOCAL_CONTRAST},
-                                       {"Stair-top barrier",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopBarrierEast.png",
-                                        {384.0 / 960, 401.0 / 540, 127.0 / 960, 70.0 / 540},
-                                        {.05, .15, .90, .85},
-                                        .93,
-                                        .12},
-                                       {"West fence corner",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFenceEast.png",
-                                        {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
-                                        {.05, .15, .90, .85},
-                                        .90,
-                                        .12,
-                                        LandmarkFeatures::LOCAL_CONTRAST},
-                                       {"Stair-top barrier",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNightBarrier.png",
-                                        {384.0 / 960, 401.0 / 540, 127.0 / 960, 70.0 / 540},
-                                        {.05, .15, .90, .85},
-                                        .93,
-                                        .12},
-                                       {"West fence corner",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNightFence.png",
-                                        {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
-                                        {.05, .15, .90, .85},
-                                        .90,
-                                        .12,
-                                        LandmarkFeatures::LOCAL_CONTRAST},
-                                       {"Stair-top barrier",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNightEastBarrier.png",
-                                        {384.0 / 960, 401.0 / 540, 127.0 / 960, 70.0 / 540},
-                                        {.05, .15, .90, .85},
-                                        .93,
-                                        .12},
-                                       {"West fence corner",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNightEastFence.png",
-                                        {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
-                                        {.05, .15, .90, .85},
-                                        .90,
-                                        .12,
-                                        LandmarkFeatures::LOCAL_CONTRAST},
-                                       {"Stair-top barrier",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNightWestBarrier.png",
-                                        {384.0 / 960, 401.0 / 540, 127.0 / 960, 70.0 / 540},
-                                        {.05, .15, .90, .85},
-                                        .93,
-                                        .12},
-                                       {"West fence corner",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNightWestFence.png",
-                                        {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
-                                        {.05, .15, .90, .85},
-                                        .90,
-                                        .12,
-                                        LandmarkFeatures::LOCAL_CONTRAST},
-                                       {"West fence corner",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNorthFence.png",
-                                        {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
-                                        {.05, .15, .90, .85},
-                                        .90,
-                                        .12,
-                                        LandmarkFeatures::LOCAL_CONTRAST},
-                                       {"Stair-top barrier",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFarEastNorthBarrier.png",
-                                        {384.0 / 960, 401.0 / 540, 127.0 / 960, 70.0 / 540},
-                                        {.05, .15, .90, .85},
-                                        .93,
-                                        .12},
-                                       {"West fence corner",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFarEastNorthFence.png",
-                                        {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
-                                        {.05, .15, .90, .85},
-                                        .90,
-                                        .12,
-                                        LandmarkFeatures::LOCAL_CONTRAST},
-                                       {"Stair-top barrier",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFarEastBarrier.png",
-                                        {384.0 / 960, 401.0 / 540, 127.0 / 960, 70.0 / 540},
-                                        {.05, .15, .90, .85},
-                                        .93,
-                                        .12},
-                                       {"West fence corner",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFarEastFence.png",
-                                        {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
-                                        {.05, .15, .90, .85},
-                                        .90,
-                                        .12,
-                                        LandmarkFeatures::LOCAL_CONTRAST}
-                                       // Raw-luminance alternatives preserve fence structure when local
-                                       // contrast normalization amplifies a passing rain streak.
-                                       ,
-                                       {"West fence corner",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFarEastNorthGrayFence.png",
-                                        {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
-                                        {.05, .15, .90, .85},
-                                        .90,
-                                        .12},
-                                       {"West fence corner",
-                                        "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFarEastGrayFence.png",
-                                        {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
-                                        {.05, .15, .90, .85},
-                                        .90,
-                                        .12}},
-                                      "Stair-top barrier", "West fence corner", 1.0 / 128);
+        {{"Stair-top barrier",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopBarrier.png",
+                {384.0 / 960, 401.0 / 540, 127.0 / 960, 70.0 / 540},
+                {.05, .15, .90, .85},
+                .93,
+                .12},
+            {"West fence corner",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFence.png",
+                {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
+                {.05, .15, .90, .85},
+                .90,
+                .12,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Stair-top barrier",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopBarrierEast.png",
+                {384.0 / 960, 401.0 / 540, 127.0 / 960, 70.0 / 540},
+                {.05, .15, .90, .85},
+                .93,
+                .12},
+            {"West fence corner",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFenceEast.png",
+                {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
+                {.05, .15, .90, .85},
+                .90,
+                .12,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Stair-top barrier",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNightBarrier.png",
+                {384.0 / 960, 401.0 / 540, 127.0 / 960, 70.0 / 540},
+                {.05, .15, .90, .85},
+                .93,
+                .12},
+            {"West fence corner",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNightFence.png",
+                {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
+                {.05, .15, .90, .85},
+                .90,
+                .12,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Stair-top barrier",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNightEastBarrier.png",
+                {384.0 / 960, 401.0 / 540, 127.0 / 960, 70.0 / 540},
+                {.05, .15, .90, .85},
+                .93,
+                .12},
+            {"West fence corner",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNightEastFence.png",
+                {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
+                {.05, .15, .90, .85},
+                .90,
+                .12,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Stair-top barrier",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNightWestBarrier.png",
+                {384.0 / 960, 401.0 / 540, 127.0 / 960, 70.0 / 540},
+                {.05, .15, .90, .85},
+                .93,
+                .12},
+            {"West fence corner",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNightWestFence.png",
+                {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
+                {.05, .15, .90, .85},
+                .90,
+                .12,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"West fence corner",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopNorthFence.png",
+                {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
+                {.05, .15, .90, .85},
+                .90,
+                .12,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Stair-top barrier",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFarEastNorthBarrier.png",
+                {384.0 / 960, 401.0 / 540, 127.0 / 960, 70.0 / 540},
+                {.05, .15, .90, .85},
+                .93,
+                .12},
+            {"West fence corner",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFarEastNorthFence.png",
+                {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
+                {.05, .15, .90, .85},
+                .90,
+                .12,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Stair-top barrier",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFarEastBarrier.png",
+                {384.0 / 960, 401.0 / 540, 127.0 / 960, 70.0 / 540},
+                {.05, .15, .90, .85},
+                .93,
+                .12},
+            {"West fence corner",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFarEastFence.png",
+                {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
+                {.05, .15, .90, .85},
+                .90,
+                .12,
+                LandmarkFeatures::LOCAL_CONTRAST} // Raw-luminance alternatives preserve fence structure when local
+            // contrast normalization amplifies a passing rain streak.
+            ,
+            {"West fence corner",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFarEastNorthGrayFence.png",
+                {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
+                {.05, .15, .90, .85},
+                .90,
+                .12},
+            {"West fence corner",
+                "PokemonBDSP/Autostory/Route215Renewal/DerekStairTopFarEastGrayFence.png",
+                {274.0 / 960, 275.0 / 540, 69.0 / 960, 125.0 / 540},
+                {.05, .15, .90, .85},
+                .90,
+                .12}},
+        "Stair-top barrier",
+        "West fence corner",
+        1.0 / 128);
     result.at_target = result.located && std::abs(result.dx) <= 1.0 / 128 && std::abs(result.dy) <= 1.0 / 108;
     if (!result.located && result.landmarks.size() == 2){
         const auto& barrier = result.landmarks[0];
@@ -3237,118 +3379,118 @@ OverworldMatchResult match_route215_jogger_corner(const ImageRGB32& frame){
     // as well as a unique peak and an independently agreeing structural anchor.
     const std::vector<LandmarkConfig> appearances = {
         {"Fence top",
-         "PokemonBDSP/Autostory/Route215JoggerV2/FenceGoal.png",
-         {0.534375, 0.312962962963, 32.0 / 960, 42.0 / 540},
-         {0, .24, 1, .26},
-         .93,
-         .08,
-         LandmarkFeatures::LOCAL_CONTRAST},
+            "PokemonBDSP/Autostory/Route215JoggerV2/FenceGoal.png",
+            {0.534375, 0.312962962963, 32.0 / 960, 42.0 / 540},
+            {0, .24, 1, .26},
+            .93,
+            .08,
+            LandmarkFeatures::LOCAL_CONTRAST},
         {"Fence top",
-         "PokemonBDSP/Autostory/Route215JoggerV2/FenceRainWest.png",
-         {0.535416666667, 0.311111111111, 32.0 / 960, 42.0 / 540},
-         {0, .24, 1, .26},
-         .93,
-         .08,
-         LandmarkFeatures::LOCAL_CONTRAST},
+            "PokemonBDSP/Autostory/Route215JoggerV2/FenceRainWest.png",
+            {0.535416666667, 0.311111111111, 32.0 / 960, 42.0 / 540},
+            {0, .24, 1, .26},
+            .93,
+            .08,
+            LandmarkFeatures::LOCAL_CONTRAST},
         {"Fence top",
-         "PokemonBDSP/Autostory/Route215JoggerV2/FenceCloudWest.png",
-         {0.535416666667, 0.311111111111, 32.0 / 960, 42.0 / 540},
-         {0, .24, 1, .26},
-         .93,
-         .08,
-         LandmarkFeatures::LOCAL_CONTRAST},
+            "PokemonBDSP/Autostory/Route215JoggerV2/FenceCloudWest.png",
+            {0.535416666667, 0.311111111111, 32.0 / 960, 42.0 / 540},
+            {0, .24, 1, .26},
+            .93,
+            .08,
+            LandmarkFeatures::LOCAL_CONTRAST},
         {"Fence top",
-         "PokemonBDSP/Autostory/Route215JoggerV2/FenceLane3.png",
-         {0.535416666667, 0.312962962963, 32.0 / 960, 42.0 / 540},
-         {0, .24, 1, .26},
-         .93,
-         .08,
-         LandmarkFeatures::LOCAL_CONTRAST},
+            "PokemonBDSP/Autostory/Route215JoggerV2/FenceLane3.png",
+            {0.535416666667, 0.312962962963, 32.0 / 960, 42.0 / 540},
+            {0, .24, 1, .26},
+            .93,
+            .08,
+            LandmarkFeatures::LOCAL_CONTRAST},
         {"Fence top",
-         "PokemonBDSP/Autostory/Route215JoggerV2/FenceMid.png",
-         {0.534375, 0.312962962963, 32.0 / 960, 42.0 / 540},
-         {0, .24, 1, .26},
-         .93,
-         .08,
-         LandmarkFeatures::LOCAL_CONTRAST},
+            "PokemonBDSP/Autostory/Route215JoggerV2/FenceMid.png",
+            {0.534375, 0.312962962963, 32.0 / 960, 42.0 / 540},
+            {0, .24, 1, .26},
+            .93,
+            .08,
+            LandmarkFeatures::LOCAL_CONTRAST},
         {"Fence top",
-         "PokemonBDSP/Autostory/Route215JoggerV2/FenceNear.png",
-         {0.534375, 0.312962962963, 32.0 / 960, 42.0 / 540},
-         {0, .24, 1, .26},
-         .93,
-         .08,
-         LandmarkFeatures::LOCAL_CONTRAST},
+            "PokemonBDSP/Autostory/Route215JoggerV2/FenceNear.png",
+            {0.534375, 0.312962962963, 32.0 / 960, 42.0 / 540},
+            {0, .24, 1, .26},
+            .93,
+            .08,
+            LandmarkFeatures::LOCAL_CONTRAST},
         {"Fence top",
-         "PokemonBDSP/Autostory/Route215JoggerV2/FenceApproachFar.png",
-         {0.534375, 0.312962962963, 32.0 / 960, 42.0 / 540},
-         {0, .24, 1, .26},
-         .93,
-         .08,
-         LandmarkFeatures::LOCAL_CONTRAST},
+            "PokemonBDSP/Autostory/Route215JoggerV2/FenceApproachFar.png",
+            {0.534375, 0.312962962963, 32.0 / 960, 42.0 / 540},
+            {0, .24, 1, .26},
+            .93,
+            .08,
+            LandmarkFeatures::LOCAL_CONTRAST},
         {"Fence top",
-         "PokemonBDSP/Autostory/Route215JoggerV2/FenceApproachMiddle.png",
-         {0.534375, 0.312962962963, 32.0 / 960, 42.0 / 540},
-         {0, .24, 1, .26},
-         .93,
-         .08,
-         LandmarkFeatures::LOCAL_CONTRAST},
+            "PokemonBDSP/Autostory/Route215JoggerV2/FenceApproachMiddle.png",
+            {0.534375, 0.312962962963, 32.0 / 960, 42.0 / 540},
+            {0, .24, 1, .26},
+            .93,
+            .08,
+            LandmarkFeatures::LOCAL_CONTRAST},
         {"Fence top",
-         "PokemonBDSP/Autostory/Route215JoggerV2/FenceApproachNear.png",
-         {0.534375, 0.312962962963, 32.0 / 960, 42.0 / 540},
-         {0, .24, 1, .26},
-         .93,
-         .08,
-         LandmarkFeatures::LOCAL_CONTRAST},
+            "PokemonBDSP/Autostory/Route215JoggerV2/FenceApproachNear.png",
+            {0.534375, 0.312962962963, 32.0 / 960, 42.0 / 540},
+            {0, .24, 1, .26},
+            .93,
+            .08,
+            LandmarkFeatures::LOCAL_CONTRAST},
         {"Fence top",
-         "PokemonBDSP/Autostory/Route215JoggerV2/FenceGrayLane3.png",
-         {0.535416666667, 0.312962962963, 32.0 / 960, 24.0 / 540},
-         {0, .24, 1, .26},
-         .95,
-         .05},
+            "PokemonBDSP/Autostory/Route215JoggerV2/FenceGrayLane3.png",
+            {0.535416666667, 0.312962962963, 32.0 / 960, 24.0 / 540},
+            {0, .24, 1, .26},
+            .95,
+            .05},
         {"Road bend",
-         "PokemonBDSP/Autostory/Route215JoggerV2/RoadUpperDayGoal.png",
-         {422.0 / 960, 164.0 / 540, 80.0 / 960, 25.0 / 540},
-         {0, .24, 1, .26},
-         .90,
-         .15},
+            "PokemonBDSP/Autostory/Route215JoggerV2/RoadUpperDayGoal.png",
+            {422.0 / 960, 164.0 / 540, 80.0 / 960, 25.0 / 540},
+            {0, .24, 1, .26},
+            .90,
+            .15},
         // In lane 3 the cap overlaps the lower part of the full road patch.
         // Upper-bend alternatives keep position evidence clear of the player.
         {"Road bend",
-         "PokemonBDSP/Autostory/Route215JoggerV2/RoadUpperGoal.png",
-         {0.439583333333, 0.303703703704, 80.0 / 960, 25.0 / 540},
-         {0, .24, 1, .26},
-         .90,
-         .15},
+            "PokemonBDSP/Autostory/Route215JoggerV2/RoadUpperGoal.png",
+            {0.439583333333, 0.303703703704, 80.0 / 960, 25.0 / 540},
+            {0, .24, 1, .26},
+            .90,
+            .15},
         {"Road bend",
-         "PokemonBDSP/Autostory/Route215JoggerV2/RoadUpperRainWest.png",
-         {0.439583333333, 0.303703703704, 80.0 / 960, 25.0 / 540},
-         {0, .24, 1, .26},
-         .90,
-         .15},
+            "PokemonBDSP/Autostory/Route215JoggerV2/RoadUpperRainWest.png",
+            {0.439583333333, 0.303703703704, 80.0 / 960, 25.0 / 540},
+            {0, .24, 1, .26},
+            .90,
+            .15},
         {"Road bend",
-         "PokemonBDSP/Autostory/Route215JoggerV2/RoadUpperCloudWest.png",
-         {0.447916666667, 0.307407407407, 80.0 / 960, 25.0 / 540},
-         {0, .24, 1, .26},
-         .90,
-         .15},
+            "PokemonBDSP/Autostory/Route215JoggerV2/RoadUpperCloudWest.png",
+            {0.447916666667, 0.307407407407, 80.0 / 960, 25.0 / 540},
+            {0, .24, 1, .26},
+            .90,
+            .15},
         {"Road bend",
-         "PokemonBDSP/Autostory/Route215JoggerV2/RoadGoal.png",
-         {0.439583333333, 0.303703703704, 80.0 / 960, 41.0 / 540},
-         {0, .24, 1, .26},
-         .90,
-         .15},
+            "PokemonBDSP/Autostory/Route215JoggerV2/RoadGoal.png",
+            {0.439583333333, 0.303703703704, 80.0 / 960, 41.0 / 540},
+            {0, .24, 1, .26},
+            .90,
+            .15},
         {"Road bend",
-         "PokemonBDSP/Autostory/Route215JoggerV2/RoadRainWest.png",
-         {0.439583333333, 0.303703703704, 80.0 / 960, 41.0 / 540},
-         {0, .24, 1, .26},
-         .90,
-         .15},
+            "PokemonBDSP/Autostory/Route215JoggerV2/RoadRainWest.png",
+            {0.439583333333, 0.303703703704, 80.0 / 960, 41.0 / 540},
+            {0, .24, 1, .26},
+            .90,
+            .15},
         {"Road bend",
-         "PokemonBDSP/Autostory/Route215JoggerV2/RoadCloudWest.png",
-         {0.447916666667, 0.307407407407, 80.0 / 960, 41.0 / 540},
-         {0, .24, 1, .26},
-         .90,
-         .15},
+            "PokemonBDSP/Autostory/Route215JoggerV2/RoadCloudWest.png",
+            {0.447916666667, 0.307407407407, 80.0 / 960, 41.0 / 540},
+            {0, .24, 1, .26},
+            .90,
+            .15},
     };
     std::vector<LandmarkConfig> variants;
     for (const auto& appearance : appearances){
@@ -3412,79 +3554,79 @@ OverworldMatchResult match_route215_jogger_corner(const ImageRGB32& frame){
     // Their x coordinates are acquisition-only and can never confirm arrival.
     const std::vector<std::vector<LandmarkConfig>> approaches = {
         {// The observed lane-4 to lane-3 step changes the bridge-foot view.
-         // Both corners must agree; this pair never confirms arrival.
-         {"Bridge west corner",
-          "PokemonBDSP/Autostory/Route215JoggerV2/BridgeWestNightLane3.png",
-          {106.0 / 960 - .435625, 297.0 / 540 - 70.0 / 1080, 60.0 / 960, 75.0 / 540},
-          {0, .2, 1, .6},
-          .90,
-          .12,
-          LandmarkFeatures::LOCAL_CONTRAST},
-         {"Bridge east corner",
-          "PokemonBDSP/Autostory/Route215JoggerV2/BridgeEastNightLane3.png",
-          {260.0 / 960 - .435625, 295.0 / 540 - 70.0 / 1080, 65.0 / 960, 75.0 / 540},
-          {0, .2, 1, .6},
-          .90,
-          .12,
-          LandmarkFeatures::LOCAL_CONTRAST}},
+            // Both corners must agree; this pair never confirms arrival.
+            {"Bridge west corner",
+                "PokemonBDSP/Autostory/Route215JoggerV2/BridgeWestNightLane3.png",
+                {106.0 / 960 - .435625, 297.0 / 540 - 70.0 / 1080, 60.0 / 960, 75.0 / 540},
+                {0, .2, 1, .6},
+                .90,
+                .12,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Bridge east corner",
+                "PokemonBDSP/Autostory/Route215JoggerV2/BridgeEastNightLane3.png",
+                {260.0 / 960 - .435625, 295.0 / 540 - 70.0 / 1080, 65.0 / 960, 75.0 / 540},
+                {0, .2, 1, .6},
+                .90,
+                .12,
+                LandmarkFeatures::LOCAL_CONTRAST}},
         {// When the east fence is off-screen, these two full bridge-foot
-         // corners establish lane 4. They never authorize arrival.
-         {"Bridge west corner",
-          "PokemonBDSP/Autostory/Route215JoggerV2/BridgeWestCurrent.png",
-          {106.0 / 960 - .435, 257.0 / 540, 60.0 / 960, 75.0 / 540},
-          {0, .2, 1, .6},
-          .90,
-          .12,
-          LandmarkFeatures::LOCAL_CONTRAST},
-         {"Bridge east corner",
-          "PokemonBDSP/Autostory/Route215JoggerV2/BridgeEastCurrent.png",
-          {260.0 / 960 - .435, 255.0 / 540, 65.0 / 960, 75.0 / 540},
-          {0, .2, 1, .6},
-          .90,
-          .12,
-          LandmarkFeatures::LOCAL_CONTRAST}},
+            // corners establish lane 4. They never authorize arrival.
+            {"Bridge west corner",
+                "PokemonBDSP/Autostory/Route215JoggerV2/BridgeWestCurrent.png",
+                {106.0 / 960 - .435, 257.0 / 540, 60.0 / 960, 75.0 / 540},
+                {0, .2, 1, .6},
+                .90,
+                .12,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Bridge east corner",
+                "PokemonBDSP/Autostory/Route215JoggerV2/BridgeEastCurrent.png",
+                {260.0 / 960 - .435, 255.0 / 540, 65.0 / 960, 75.0 / 540},
+                {0, .2, 1, .6},
+                .90,
+                .12,
+                LandmarkFeatures::LOCAL_CONTRAST}},
         {
 
             {"Bridge west corner",
-             "PokemonBDSP/Autostory/Route215JoggerV2/BridgeWestBridgeFar.png",
-             {240.0 / 960 - .61, 246.0 / 540, 64.0 / 960, 60.0 / 540},
-             {0, .2, 1, .6},
-             .90,
-             .12,
-             LandmarkFeatures::LOCAL_CONTRAST},
+                "PokemonBDSP/Autostory/Route215JoggerV2/BridgeWestBridgeFar.png",
+                {240.0 / 960 - .61, 246.0 / 540, 64.0 / 960, 60.0 / 540},
+                {0, .2, 1, .6},
+                .90,
+                .12,
+                LandmarkFeatures::LOCAL_CONTRAST},
             {"Bridge east corner",
-             "PokemonBDSP/Autostory/Route215JoggerV2/BridgeEastBridgeFar.png",
-             {388.0 / 960 - .61, 246.0 / 540, 64.0 / 960, 60.0 / 540},
-             {0, .2, 1, .6},
-             .90,
-             .12,
-             LandmarkFeatures::LOCAL_CONTRAST}},
+                "PokemonBDSP/Autostory/Route215JoggerV2/BridgeEastBridgeFar.png",
+                {388.0 / 960 - .61, 246.0 / 540, 64.0 / 960, 60.0 / 540},
+                {0, .2, 1, .6},
+                .90,
+                .12,
+                LandmarkFeatures::LOCAL_CONTRAST}},
         {{"Bridge west corner",
-          "PokemonBDSP/Autostory/Route215JoggerV2/BridgeWestBridgeMid.png",
-          {108.0 / 960 - .445, 245.0 / 540, 64.0 / 960, 60.0 / 540},
-          {0, .2, 1, .6},
-          .90,
-          .12,
-          LandmarkFeatures::LOCAL_CONTRAST},
-         {"South cliff corner",
-          "PokemonBDSP/Autostory/Route215JoggerV2/SouthCliffBridgeMid.png",
-          {77.0 / 960 - .445, 295.0 / 540, 90.0 / 960, 80.0 / 540},
-          {0, .2, 1, .6},
-          .97,
-          .05}},
+                "PokemonBDSP/Autostory/Route215JoggerV2/BridgeWestBridgeMid.png",
+                {108.0 / 960 - .445, 245.0 / 540, 64.0 / 960, 60.0 / 540},
+                {0, .2, 1, .6},
+                .90,
+                .12,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"South cliff corner",
+                "PokemonBDSP/Autostory/Route215JoggerV2/SouthCliffBridgeMid.png",
+                {77.0 / 960 - .445, 295.0 / 540, 90.0 / 960, 80.0 / 540},
+                {0, .2, 1, .6},
+                .97,
+                .05}},
         {{"Bridge west corner",
-          "PokemonBDSP/Autostory/Route215JoggerV2/BridgeWestBridgeNear.png",
-          {68.0 / 960 - .405, 245.0 / 540, 64.0 / 960, 60.0 / 540},
-          {0, .2, 1, .6},
-          .90,
-          .12,
-          LandmarkFeatures::LOCAL_CONTRAST},
-         {"South cliff corner",
-          "PokemonBDSP/Autostory/Route215JoggerV2/SouthCliffBridgeNear.png",
-          {37.0 / 960 - .405, 295.0 / 540, 90.0 / 960, 80.0 / 540},
-          {0, .2, 1, .6},
-          .97,
-          .05}}};
+                "PokemonBDSP/Autostory/Route215JoggerV2/BridgeWestBridgeNear.png",
+                {68.0 / 960 - .405, 245.0 / 540, 64.0 / 960, 60.0 / 540},
+                {0, .2, 1, .6},
+                .90,
+                .12,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"South cliff corner",
+                "PokemonBDSP/Autostory/Route215JoggerV2/SouthCliffBridgeNear.png",
+                {37.0 / 960 - .405, 295.0 / 540, 90.0 / 960, 80.0 / 540},
+                {0, .2, 1, .6},
+                .97,
+                .05}}};
     for (const auto& approach : approaches){
         auto candidate = match_landmarks(filtered, approach, 2, 1.0 / 128, 1.0 / 54, true);
         const double score = std::min(candidate.landmarks[0].score, candidate.landmarks[1].score);
@@ -3535,8 +3677,9 @@ const std::vector<OverworldMatcher>& overworld_matchers(){
         {"route215-bridge-renewal", "Route 215 west bridge renewal", match_route215_bridge_renewal},
         {"route215-ace-renewal", "Route 215 renewal before Ace Trainers", match_route215_ace_renewal},
         {"route215-derek-stairs-renewal", "Route 215 renewal below Derek stairs", match_route215_derek_stairs_renewal},
-        {"route215-derek-stair-top-renewal", "Route 215 renewal above Derek stairs",
-         match_route215_derek_stair_top_renewal},
+        {"route215-derek-stair-top-renewal",
+            "Route 215 renewal above Derek stairs",
+            match_route215_derek_stair_top_renewal},
         {"route208-hannah-departure", "Route 208 field after Hannah", match_route208_hannah_departure},
         {"eterna-gym", "Eterna Gym doorway", match_eterna_gym_entrance},
         {"galactic-hq-jupiter", "Galactic HQ Jupiter interaction", match_galactic_hq_jupiter},

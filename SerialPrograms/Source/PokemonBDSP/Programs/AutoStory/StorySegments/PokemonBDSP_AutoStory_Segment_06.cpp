@@ -39,8 +39,10 @@ std::string AutoStory_Segment_06::end_text() const {
     return "End: Sixth Gym Badge acquired (Canalave City).";
 }
 
-void AutoStory_Segment_06::run_segment(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                       AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Segment_06::run_segment(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     stats.m_segment++;
     env.update_stats();
     context.wait_for_all_requests();
@@ -72,8 +74,10 @@ std::string AutoStory_Checkpoint_0601::start_text() const {
 std::string AutoStory_Checkpoint_0601::end_text() const {
     return "Flew to Jubilife City.";
 }
-void AutoStory_Checkpoint_0601::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0601::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0601(env, context, options, stats);
 }
 
@@ -86,8 +90,10 @@ std::string AutoStory_Checkpoint_0602::start_text() const {
 std::string AutoStory_Checkpoint_0602::end_text() const {
     return "Entered Jubilife City Pokemon Center.";
 }
-void AutoStory_Checkpoint_0602::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0602::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0602(env, context, options, stats);
 }
 
@@ -100,8 +106,10 @@ std::string AutoStory_Checkpoint_0603::start_text() const {
 std::string AutoStory_Checkpoint_0603::end_text() const {
     return "Healed and exited Jubilife City Pokemon Center.";
 }
-void AutoStory_Checkpoint_0603::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0603::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0603(env, context, options, stats);
 }
 
@@ -114,8 +122,10 @@ std::string AutoStory_Checkpoint_0604::start_text() const {
 std::string AutoStory_Checkpoint_0604::end_text() const {
     return "Entered west exit building of Jubilife City.";
 }
-void AutoStory_Checkpoint_0604::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0604::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0604(env, context, options, stats);
 }
 
@@ -128,8 +138,10 @@ std::string AutoStory_Checkpoint_0605::start_text() const {
 std::string AutoStory_Checkpoint_0605::end_text() const {
     return "Exited onto Route 218.";
 }
-void AutoStory_Checkpoint_0605::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0605::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0605(env, context, options, stats);
 }
 
@@ -142,8 +154,10 @@ std::string AutoStory_Checkpoint_0606::start_text() const {
 std::string AutoStory_Checkpoint_0606::end_text() const {
     return "Entered building at end of Route 218.";
 }
-void AutoStory_Checkpoint_0606::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0606::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0606(env, context, options, stats);
 }
 
@@ -156,8 +170,10 @@ std::string AutoStory_Checkpoint_0607::start_text() const {
 std::string AutoStory_Checkpoint_0607::end_text() const {
     return "Exited building into Canalave City.";
 }
-void AutoStory_Checkpoint_0607::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0607::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0607(env, context, options, stats);
 }
 
@@ -170,8 +186,10 @@ std::string AutoStory_Checkpoint_0608::start_text() const {
 std::string AutoStory_Checkpoint_0608::end_text() const {
     return "Battled Clint and entered Canalave City Pokemon Center.";
 }
-void AutoStory_Checkpoint_0608::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0608::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0608(env, context, options, stats);
 }
 
@@ -184,8 +202,10 @@ std::string AutoStory_Checkpoint_0609::start_text() const {
 std::string AutoStory_Checkpoint_0609::end_text() const {
     return "Healed and exited Canalave City Pokemon Center.";
 }
-void AutoStory_Checkpoint_0609::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0609::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0609(env, context, options, stats);
 }
 
@@ -198,8 +218,10 @@ std::string AutoStory_Checkpoint_0610::start_text() const {
 std::string AutoStory_Checkpoint_0610::end_text() const {
     return "Sixth Gym Badge acquired (Canalave City).";
 }
-void AutoStory_Checkpoint_0610::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0610::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0610(env, context, options, stats);
 }
 
@@ -212,14 +234,16 @@ std::string AutoStory_Checkpoint_0611::start_text() const {
 std::string AutoStory_Checkpoint_0611::end_text() const {
     return "Sixth Gym Badge acquired (Canalave City).";
 }
-void AutoStory_Checkpoint_0611::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0611::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0611(env, context, options, stats);
 }
 
 
-static void move_back_after_unexpected_battle(VideoStream& stream, ProControllerContext& context,
-                                              const std::string& trainerid){
+static void
+move_back_after_unexpected_battle(VideoStream& stream, ProControllerContext& context, const std::string& trainerid){
     stream.log("Finishing battle with " + trainerid, COLOR_GREEN);
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
@@ -254,11 +278,12 @@ static bool handle_battle(VideoStream& stream, ProControllerContext& context, co
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_mash_button(context, BUTTON_A, 200000ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_A, 200000ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("handle_battle_" + trainerid + ": black screen not detected!", COLOR_RED);
             return false;
@@ -319,11 +344,12 @@ static bool enter_jubilife_pokemon_center(VideoStream& stream, ProControllerCont
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("enter_jubilife_pokemon_center: black screen not detected!", COLOR_RED);
             return false;
@@ -351,11 +377,12 @@ static bool move_to_jubilife_west_exit(VideoStream& stream, ProControllerContext
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms); // 46
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms); // 46
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("move_to_jubilife_west_exit: transition not detected!", COLOR_RED);
             return false;
@@ -375,11 +402,12 @@ static bool go_through_jubilife_west_exit(VideoStream& stream, ProControllerCont
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_jubilife_west_exit: transition not detected!", COLOR_RED);
             return false;
@@ -413,24 +441,26 @@ static bool go_through_route_218(VideoStream& stream, ProControllerContext& cont
     {
         MarkDetector sailor_skyler_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
 
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 400ms, 100ms); // 2+
-                                                      pbf_move_left_joystick(context, {-1, 0}, 6000ms,
-                                                                             100ms); // 28++ (getting out of the water)
-                                                      pbf_move_left_joystick(context, {0, -1}, 2800ms, 100ms); // 14+
-                                                  },
-                                                  {{sailor_skyler_fight}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 400ms, 100ms); // 2+
+                pbf_move_left_joystick(context, {-1, 0}, 6000ms,
+                    100ms);                                              // 28++ (getting out of the water)
+                pbf_move_left_joystick(context, {0, -1}, 2800ms, 100ms); // 14+
+            },
+            {{sailor_skyler_fight}});
         if (ret == 0){
             context.wait_for_all_requests();
             pbf_wait(context, 2000ms);
 
             BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-            ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_mash_button(context, BUTTON_A, 200000ms);
-                                                  },
-                                                  {{black_screen}});
+            ret = run_until<ProControllerContext>(stream,
+                context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}});
             if (ret < 0){
                 stream.log("go_through_route_218_sailor_skyler: black screen not detected!", COLOR_RED);
                 return false;
@@ -448,11 +478,12 @@ static bool go_through_route_218(VideoStream& stream, ProControllerContext& cont
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_route_218: transition not detected!", COLOR_RED);
             return false;
@@ -471,11 +502,12 @@ static bool go_through_building_route_218(VideoStream& stream, ProControllerCont
 
     {
         ShortDialogWatcher talk_to_scientist(COLOR_BLUE);
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms);
-                                                  },
-                                                  {{talk_to_scientist}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms);
+            },
+            {{talk_to_scientist}});
         if (ret < 0){
             stream.log("go_through_building_route_218_scientist: dialog box not detected!", COLOR_RED);
             return false;
@@ -488,11 +520,12 @@ static bool go_through_building_route_218(VideoStream& stream, ProControllerCont
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_building_route_218: transition not detected!", COLOR_RED);
             return false;
@@ -519,11 +552,12 @@ static bool go_to_clint_and_pokemon_center(VideoStream& stream, ProControllerCon
 
     {
         ShortDialogWatcher repel_dialog(COLOR_RED);
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {+1, 0}, 2000ms, 100ms); // 10+
-                                                  },
-                                                  {{repel_dialog}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 2000ms, 100ms); // 10+
+            },
+            {{repel_dialog}});
         if (ret == 0){
             stream.log("go_to_clint_and_pokemon_center: Not activating repel again.", COLOR_GREEN);
             pbf_mash_button(context, BUTTON_B, 3000ms);
@@ -540,11 +574,12 @@ static bool go_to_clint_and_pokemon_center(VideoStream& stream, ProControllerCon
 
     {
         ShortDialogWatcher talk_to_clint(COLOR_BLUE);
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms);
-                                                  },
-                                                  {{talk_to_clint}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms);
+            },
+            {{talk_to_clint}});
         if (ret < 0){
             stream.log("go_to_clint_and_pokemon_center_clint: dialog box not detected!", COLOR_RED);
             return false;
@@ -554,11 +589,12 @@ static bool go_to_clint_and_pokemon_center(VideoStream& stream, ProControllerCon
             pbf_wait(context, 2000ms);
 
             BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-            ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_mash_button(context, BUTTON_A, 200000ms);
-                                                  },
-                                                  {{black_screen}});
+            ret = run_until<ProControllerContext>(stream,
+                context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}});
             if (ret < 0){
                 stream.log("go_to_clint_and_pokemon_center_clint: black screen not detected!", COLOR_RED);
                 return false;
@@ -581,11 +617,12 @@ static bool go_to_clint_and_pokemon_center(VideoStream& stream, ProControllerCon
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_to_clint_and_pokemon_center: black screen not detected!", COLOR_RED);
             return false;
@@ -620,11 +657,12 @@ static bool go_to_canalave_gym(VideoStream& stream, ProControllerContext& contex
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_to_canalave_gym: black screen not detected!", COLOR_RED);
             return false;
@@ -635,155 +673,213 @@ static bool go_to_canalave_gym(VideoStream& stream, ProControllerContext& contex
 }
 
 
-void checkpoint_0601(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0601(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             /*if (!test(env.console, context)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, "test: transition not detected.", env.console);
             }*/
             if (!cynthia_and_fly_to_jubilife(env.console, context)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "cynthia_and_fly_to_jubilife: transition not detected.",
-                                                             env.console);
+                    "cynthia_and_fly_to_jubilife: transition not detected.",
+                    env.console);
             }
         },
         true);
 }
 
-void checkpoint_0602(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0602(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!enter_jubilife_pokemon_center(env.console, context)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "enter_jubilife_pokemon_center: transition not detected.",
-                                                             env.console);
+                    "enter_jubilife_pokemon_center: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0603(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0603(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit_jubilife_pokemon_center(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT,
-                    "heal_and_exit_jubilife_pokemon_center: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "heal_and_exit_jubilife_pokemon_center: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0604(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0604(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!move_to_jubilife_west_exit(env.console, context)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "move_to_jubilife_west_exit: transition not detected.",
-                                                             env.console);
+                    "move_to_jubilife_west_exit: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0605(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0605(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!go_through_jubilife_west_exit(env.console, context)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "go_through_jubilife_west_exit: transition not detected.",
-                                                             env.console);
+                    "go_through_jubilife_west_exit: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0606(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0606(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!go_through_route_218(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "go_through_route_218: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "go_through_route_218: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0607(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0607(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!go_through_building_route_218(env.console, context)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "go_through_building_route_218: transition not detected.",
-                                                             env.console);
+                    "go_through_building_route_218: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0608(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0608(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!go_to_clint_and_pokemon_center(env.console, context)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "go_to_clint_and_pokemon_center: transition not detected.",
-                                                             env.console);
+                    "go_to_clint_and_pokemon_center: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0609(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0609(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit_canalave_pokemon_center(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT,
-                    "heal_and_exit_canalave_pokemon_center: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "heal_and_exit_canalave_pokemon_center: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0610(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0610(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!go_to_canalave_gym(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "go_to_canalave_gym: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "go_to_canalave_gym: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0611(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0611(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!go_to_canalave_gym(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "go_to_canalave_gym: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "go_to_canalave_gym: transition not detected.",
+                    env.console);
             }
         },
         false);

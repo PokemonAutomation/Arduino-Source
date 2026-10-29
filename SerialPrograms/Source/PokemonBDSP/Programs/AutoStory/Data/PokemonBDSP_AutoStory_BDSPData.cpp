@@ -30,12 +30,24 @@ static const std::string RESOURCE_DIR = "PokemonBDSP/AutoStory/";
 
 static PokemonType parse_type(const std::string& slug, const std::string& path){
     static const std::map<std::string, PokemonType> TABLE{
-        {"normal", PokemonType::NORMAL},   {"fire", PokemonType::FIRE},         {"fighting", PokemonType::FIGHTING},
-        {"water", PokemonType::WATER},     {"flying", PokemonType::FLYING},     {"grass", PokemonType::GRASS},
-        {"poison", PokemonType::POISON},   {"electric", PokemonType::ELECTRIC}, {"ground", PokemonType::GROUND},
-        {"psychic", PokemonType::PSYCHIC}, {"rock", PokemonType::ROCK},         {"ice", PokemonType::ICE},
-        {"bug", PokemonType::BUG},         {"dragon", PokemonType::DRAGON},     {"ghost", PokemonType::GHOST},
-        {"dark", PokemonType::DARK},       {"steel", PokemonType::STEEL},       {"fairy", PokemonType::FAIRY},
+        {"normal", PokemonType::NORMAL},
+        {"fire", PokemonType::FIRE},
+        {"fighting", PokemonType::FIGHTING},
+        {"water", PokemonType::WATER},
+        {"flying", PokemonType::FLYING},
+        {"grass", PokemonType::GRASS},
+        {"poison", PokemonType::POISON},
+        {"electric", PokemonType::ELECTRIC},
+        {"ground", PokemonType::GROUND},
+        {"psychic", PokemonType::PSYCHIC},
+        {"rock", PokemonType::ROCK},
+        {"ice", PokemonType::ICE},
+        {"bug", PokemonType::BUG},
+        {"dragon", PokemonType::DRAGON},
+        {"ghost", PokemonType::GHOST},
+        {"dark", PokemonType::DARK},
+        {"steel", PokemonType::STEEL},
+        {"fairy", PokemonType::FAIRY},
     };
     auto iter = TABLE.find(slug);
     if (iter == TABLE.end()){

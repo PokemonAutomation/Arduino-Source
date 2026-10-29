@@ -46,26 +46,33 @@ namespace PokemonBDSP {
 
 // Watch before movement starts, release on the fade, and hold the
 // following recorded wait until the destination is visible again.
-static void recorded_move_until_transition(VideoStream& stream, ProControllerContext& context, double x, double y,
-                                           Milliseconds duration, const std::string& label){
+static void recorded_move_until_transition(VideoStream& stream,
+    ProControllerContext& context,
+    double x,
+    double y,
+    Milliseconds duration,
+    const std::string& label){
     context.wait_for_all_requests();
     stream.log("[Tutorial transition] " + label + ": approaching fade.");
     BlackScreenWatcher black;
-    int ret = run_until<ProControllerContext>(stream, context,
-                                              [x, y, duration](ProControllerContext& ctx){
-                                                  pbf_move_left_joystick(ctx, {x, y}, duration, 0ms);
-                                                  // Keep observing a delayed fade after the recorded hold.
-                                                  pbf_wait(ctx, 5000ms);
-                                              },
-                                              {{black}});
+    int ret = run_until<ProControllerContext>(stream,
+        context,
+        [x, y, duration](ProControllerContext& ctx){
+            pbf_move_left_joystick(ctx, {x, y}, duration, 0ms);
+            // Keep observing a delayed fade after the recorded hold.
+            pbf_wait(ctx, 5000ms);
+        },
+        {{black}});
     if (ret != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     label + ": Black transition not detected.", stream);
+            label + ": Black transition not detected.",
+            stream);
     }
     BlackScreenWatcher visible(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
     if (wait_until(stream, context, 15s, {{visible}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     label + ": Transition did not finish.", stream);
+            label + ": Transition did not finish.",
+            stream);
     }
     stream.log("[Tutorial transition] " + label + ": destination visible.");
 }
@@ -77,21 +84,23 @@ static void select_turtwig(VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
 
     ShortDialogWatcher watcher(COLOR_CYAN);
-    int ret = run_until<ProControllerContext>(stream, context,
-                                              [](ProControllerContext& ctx){
-                                                  ctx.wait_for(std::chrono::milliseconds(5000));
-                                              },
-                                              {watcher});
+    int ret = run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+            ctx.wait_for(std::chrono::milliseconds(5000));
+        },
+        {watcher});
     if (ret != 0){
         ShortDialogWatcher watcher_red(COLOR_RED);
-        ret = run_until<ProControllerContext>(stream, context,
-                                              [](ProControllerContext& ctx){
-                                                  ctx.wait_for(std::chrono::milliseconds(5000));
-                                              },
-                                              {watcher_red});
+        ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& ctx){
+                ctx.wait_for(std::chrono::milliseconds(5000));
+            },
+            {watcher_red});
     }
     stream.log(ret == 0 ? "[DEBUG] Turtwig Selection: Confirmation dialogue detected"
-                        : "[WARNING] Turtwig Selection: Dialogue detection failed, proceeding anyway");
+        : "[WARNING] Turtwig Selection: Dialogue detection failed, proceeding anyway");
 
     pbf_wait(context, 400ms);
     pbf_press_dpad(context, DPAD_UP, 80ms, 400ms);
@@ -108,21 +117,23 @@ static void select_chimchar(VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
 
     ShortDialogWatcher watcher(COLOR_CYAN);
-    int ret = run_until<ProControllerContext>(stream, context,
-                                              [](ProControllerContext& ctx){
-                                                  ctx.wait_for(std::chrono::milliseconds(5000));
-                                              },
-                                              {watcher});
+    int ret = run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+            ctx.wait_for(std::chrono::milliseconds(5000));
+        },
+        {watcher});
     if (ret != 0){
         ShortDialogWatcher watcher_red(COLOR_RED);
-        ret = run_until<ProControllerContext>(stream, context,
-                                              [](ProControllerContext& ctx){
-                                                  ctx.wait_for(std::chrono::milliseconds(5000));
-                                              },
-                                              {watcher_red});
+        ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& ctx){
+                ctx.wait_for(std::chrono::milliseconds(5000));
+            },
+            {watcher_red});
     }
     stream.log(ret == 0 ? "[DEBUG] Chimchar Selection: Confirmation dialogue detected"
-                        : "[WARNING] Chimchar Selection: Dialogue detection failed, proceeding anyway");
+        : "[WARNING] Chimchar Selection: Dialogue detection failed, proceeding anyway");
 
     pbf_wait(context, 400ms);
     pbf_press_dpad(context, DPAD_UP, 80ms, 400ms);
@@ -140,21 +151,23 @@ static void select_piplup(VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
 
     ShortDialogWatcher watcher(COLOR_CYAN);
-    int ret = run_until<ProControllerContext>(stream, context,
-                                              [](ProControllerContext& ctx){
-                                                  ctx.wait_for(std::chrono::milliseconds(5000));
-                                              },
-                                              {watcher});
+    int ret = run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+            ctx.wait_for(std::chrono::milliseconds(5000));
+        },
+        {watcher});
     if (ret != 0){
         ShortDialogWatcher watcher_red(COLOR_RED);
-        ret = run_until<ProControllerContext>(stream, context,
-                                              [](ProControllerContext& ctx){
-                                                  ctx.wait_for(std::chrono::milliseconds(5000));
-                                              },
-                                              {watcher_red});
+        ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& ctx){
+                ctx.wait_for(std::chrono::milliseconds(5000));
+            },
+            {watcher_red});
     }
     stream.log(ret == 0 ? "[DEBUG] Piplup Selection: Confirmation dialogue detected"
-                        : "[WARNING] Piplup Selection: Dialogue detection failed, proceeding anyway");
+        : "[WARNING] Piplup Selection: Dialogue detection failed, proceeding anyway");
 
     pbf_wait(context, 400ms);
     pbf_press_dpad(context, DPAD_UP, 80ms, 400ms);
@@ -172,8 +185,8 @@ static void select_piplup(VideoStream& stream, ProControllerContext& context){
 // Navigates from player's room to Route 201 through Mom/Barry dialogues.
 // ---------------------------------------------------------------------------
 
-static void tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream,
-                                       ProControllerContext& context){
+static void
+tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
     DateTime t{2026, 1, 1, 0, 0, 0};
     set_time_fast(env, context, t);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 527ms, 0ms);
@@ -224,22 +237,29 @@ static void tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, Vide
     context.wait_for_all_requests();
     stream.log("[Barry house] Entering; waiting for entry fade.");
     BlackScreenWatcher entry_black;
-    int entry_ret = run_until<ProControllerContext>(stream, context,
-                                                    [](ProControllerContext& ctx){
-                                                        pbf_move_left_joystick(ctx, {0, 1}, 5000ms, 0ms);
-                                                    },
-                                                    {{entry_black}});
+    int entry_ret = run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+            pbf_move_left_joystick(ctx, {0, 1}, 5000ms, 0ms);
+        },
+        {{entry_black}});
     if (entry_ret != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Barry house: Entry fade not detected.", stream);
+            "Barry house: Entry fade not detected.",
+            stream);
     }
     // Release the joystick during loading; resume indoor movement only
     // after the screen has stayed non-black for half a second.
-    BlackScreenWatcher entry_visible(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 100, 10, BlackScreenWatcher::FinderType::GONE,
-                                     500ms);
+    BlackScreenWatcher entry_visible(COLOR_RED,
+        {0.1, 0.1, 0.8, 0.8},
+        100,
+        10,
+        BlackScreenWatcher::FinderType::GONE,
+        500ms);
     if (wait_until(stream, context, 15s, {{entry_visible}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Barry house: Entry fade did not finish.", stream);
+            "Barry house: Entry fade did not finish.",
+            stream);
     }
     pbf_wait(context, 500ms);
     context.wait_for_all_requests();
@@ -328,18 +348,20 @@ static void starter_nav(VideoStream& stream, ProControllerContext& context){
     //  Mash B until we see the briefcase.
     ImageMatchWatcher detector(briefcase, {0.5, 0.1, 0.5, 0.7}, 100, true);
 
-    int ret = run_until<ProControllerContext>(stream, context,
-                                              [](ProControllerContext& context){
-                                                  pbf_mash_button(context, BUTTON_B, 120000ms);
-                                              },
-                                              {{detector}});
+    int ret = run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_B, 120000ms);
+        },
+        {{detector}});
 
     if (ret == 0){
         stream.log("Detected briefcase!");
     }else{
         stream.log("Timed out waiting for briefcase.");
         throw OperationFailedExceptionWithScreenshot(ErrorReportMode::SEND_ERROR_REPORT,
-                                                     "Failed to detect briefcase in Segment 00.", stream);
+            "Failed to detect briefcase in Segment 00.",
+            stream);
     }
 
     //  Wait for briefcase to fully open.
@@ -358,8 +380,8 @@ static void post_starly_clenaup(VideoStream& stream, ProControllerContext& conte
 //  Navigates from Exit of lake Verity to receipt of the Pokedex
 // ---------------------------------------------------------------------------
 
-static void tutorial_part_2_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream,
-                                       ProControllerContext& context){
+static void
+tutorial_part_2_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
     pbf_wait(context, 2000ms);
     context.wait_for_all_requests();
 
@@ -416,8 +438,8 @@ static void tutorial_part_2_navigation(SingleSwitchProgramEnvironment& env, Vide
 // and send the starter to pokemon HOME.
 // ---------------------------------------------------------------------------
 
-static void tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream,
-                                       ProControllerContext& context){
+static void
+tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
     // Arm exit detection before movement and finish the fade before
     // starting the dialogue watcher, which cancels queued commands.
     recorded_move_until_transition(stream, context, 0.0, -1.0, 2010ms, "Rowan lab exit");
@@ -512,8 +534,10 @@ static void tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, Vide
 
 // Align to a route reference before continuing recorded navigation.
 // Matcher offsets and thresholds are fractions of screen width/height.
-static void align_to_tutorial_landmarks(VideoStream& stream, ProControllerContext& context,
-                                        OverworldMatchResult (*matcher)(const ImageRGB32&), const std::string& label){
+static void align_to_tutorial_landmarks(VideoStream& stream,
+    ProControllerContext& context,
+    OverworldMatchResult (*matcher)(const ImageRGB32&),
+    const std::string& label){
     context.wait_for_all_requests();
     pbf_wait(context, 700ms);
     context.wait_for_all_requests();
@@ -523,7 +547,8 @@ static void align_to_tutorial_landmarks(VideoStream& stream, ProControllerContex
         const auto frame = stream.video().snapshot();
         if (!frame){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                         label + ": No video frame.", stream);
+                label + ": No video frame.",
+                stream);
         }
         const auto result = matcher(*frame.frame);
         VideoOverlaySet overlays(stream.overlay());
@@ -533,13 +558,12 @@ static void align_to_tutorial_landmarks(VideoStream& stream, ProControllerContex
                 overlays.add(COLOR_GREEN, landmark.found);
             }
             stream.log("[" + label + "] " + landmark.name + " score=" + std::to_string(landmark.score) +
-                       " margin=" + std::to_string(landmark.margin) + " accepted=" + std::to_string(landmark.accepted) +
-                       " screen-relative offset=(" + std::to_string(landmark.dx) + "," + std::to_string(landmark.dy) +
-                       ")");
+                " margin=" + std::to_string(landmark.margin) + " accepted=" + std::to_string(landmark.accepted) +
+                " screen-relative offset=(" + std::to_string(landmark.dx) + "," + std::to_string(landmark.dy) + ")");
         }
-        stream.log("[" + label + "] located=" + std::to_string(result.located) + " mode=" +
-                   (result.coarse ? "vertical acquisition" : "fine alignment") + " reference screen-relative offset=(" +
-                   std::to_string(result.dx) + "," + std::to_string(result.dy) + ")");
+        stream.log("[" + label + "] located=" + std::to_string(result.located) +
+            " mode=" + (result.coarse ? "vertical acquisition" : "fine alignment") +
+            " reference screen-relative offset=(" + std::to_string(result.dx) + "," + std::to_string(result.dy) + ")");
         if (result.coarse && result.located){
             if (coarse_confirmations && std::abs(result.dx - previous_dx) <= 0.00625 &&
                 std::abs(result.dy - previous_dy) <= 1.0 / 90){
@@ -571,17 +595,23 @@ static void align_to_tutorial_landmarks(VideoStream& stream, ProControllerContex
             const double error = horizontal ? result.dx : result.dy * 9.0 / 16;
             const auto duration = std::abs(error) > 1.0 / 24 ? 80ms : std::abs(error) > 0.015625 ? 40ms : 16ms;
             stream.log("[" + label + "] Correcting " + std::string(horizontal ? "horizontal" : "vertical") + " axis " +
-                       (horizontal ? (result.dx > 0 ? "right" : "left") : (result.dy < 0 ? "up" : "down")) + " for " +
-                       std::to_string(duration.count()) + "ms.");
+                (horizontal ? (result.dx > 0 ? "right" : "left") : (result.dy < 0 ? "up" : "down")) + " for " +
+                std::to_string(duration.count()) + "ms.");
             // Reuse confirmed-Run encounter handling if correction enters grass.
-            walk_through_grass(stream, context, horizontal ? (result.dx > 0 ? 1 : -1) : 0,
-                               horizontal ? 0 : (result.dy < 0 ? 1 : -1), 1, label, BattleType::STANDARD, duration);
+            walk_through_grass(stream,
+                context,
+                horizontal ? (result.dx > 0 ? 1 : -1) : 0,
+                horizontal ? 0 : (result.dy < 0 ? 1 : -1),
+                1,
+                label,
+                BattleType::STANDARD,
+                duration);
         }
         context.wait_for_all_requests();
     }
     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                 label + ": Reference position not confirmed; route movement stopped.",
-                                                 stream);
+        label + ": Reference position not confirmed; route movement stopped.",
+        stream);
 }
 
 static void align_to_sandgem_junction(VideoStream& stream, ProControllerContext& context){
@@ -589,14 +619,22 @@ static void align_to_sandgem_junction(VideoStream& stream, ProControllerContext&
 }
 
 // Resumes from the save made after catching the second Pokemon.
-static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream,
-                                                   ProControllerContext& context){
+static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironment& env,
+    VideoStream& stream,
+    ProControllerContext& context){
     pbf_wait(context, 1500ms);
     //--------------------------------------------------------
     // To get potions
     // -------------------------------------------------------
-    walk_through_grass(stream, context, 1, 0, 10, "Route 202 grass exit", BattleType::STANDARD, 200ms,
-                       match_route202_grass_exit);
+    walk_through_grass(stream,
+        context,
+        1,
+        0,
+        10,
+        "Route 202 grass exit",
+        BattleType::STANDARD,
+        200ms,
+        match_route202_grass_exit);
     // Recording: the exit reference was reached after two 200ms steps.
     // Eight further steps (1600ms) reached the eastern tree boundary.
     // Continue outside grass to preserve the next down movement's start.
@@ -633,8 +671,15 @@ static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironmen
 
     // Stop on the verified Route 201 reference instead of overshooting
     // with ten fixed steps. The limit also allows small final corrections.
-    walk_through_grass(stream, context, 1, 0, 20, "Route 201 Potion exit", BattleType::STANDARD, 200ms,
-                       match_route201_potion_exit);
+    walk_through_grass(stream,
+        context,
+        1,
+        0,
+        20,
+        "Route 201 Potion exit",
+        BattleType::STANDARD,
+        200ms,
+        match_route201_potion_exit);
     context.wait_for_all_requests();
     pbf_wait(context, 1500ms);
 
@@ -726,7 +771,8 @@ static void approach_poketch_landmarks(VideoStream& stream, ProControllerContext
         auto frame = stream.video().snapshot();
         if (!frame){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                         "Poketch approach: No video frame.", stream);
+                "Poketch approach: No video frame.",
+                stream);
         }
         const auto result = match_poketch_landmarks(*frame.frame);
         VideoOverlaySet overlays(stream.overlay());
@@ -736,11 +782,11 @@ static void approach_poketch_landmarks(VideoStream& stream, ProControllerContext
                 overlays.add(COLOR_GREEN, landmark.found);
             }
             stream.log("[Poketch approach] " + landmark.name + " score=" + std::to_string(landmark.score) +
-                       " margin=" + std::to_string(landmark.margin));
+                " margin=" + std::to_string(landmark.margin));
         }
         if (result.located){
             stream.log("[Poketch approach] Landmarks acquired after " + std::to_string(walked.count()) +
-                       "ms; ending downward approach.");
+                "ms; ending downward approach.");
             return;
         }
         const Milliseconds step = std::min(200ms, 1900ms - walked);
@@ -766,7 +812,8 @@ static void align_and_talk_to_poketch_man(VideoStream& stream, ProControllerCont
         auto frame = stream.video().snapshot();
         if (!frame){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                         "Poketch interaction: No video frame.", stream);
+                "Poketch interaction: No video frame.",
+                stream);
         }
         const OverworldMatchResult result = match_poketch_landmarks(*frame.frame);
         stream.log(result.coarse ? "[Poketch landmarks] Coarse acquisition." : "[Poketch landmarks] Fine alignment.");
@@ -777,9 +824,8 @@ static void align_and_talk_to_poketch_man(VideoStream& stream, ProControllerCont
                 overlays.add(COLOR_GREEN, landmark.found);
             }
             stream.log("[Poketch landmarks] " + landmark.name + " score=" + std::to_string(landmark.score) +
-                       " margin=" + std::to_string(landmark.margin) + " accepted=" + std::to_string(landmark.accepted) +
-                       " screen-relative offset=(" + std::to_string(landmark.dx) + "," + std::to_string(landmark.dy) +
-                       ")");
+                " margin=" + std::to_string(landmark.margin) + " accepted=" + std::to_string(landmark.accepted) +
+                " screen-relative offset=(" + std::to_string(landmark.dx) + "," + std::to_string(landmark.dy) + ")");
         }
         if (result.located){
             acquisition_misses = 0;
@@ -802,7 +848,7 @@ static void align_and_talk_to_poketch_man(VideoStream& stream, ProControllerCont
                 int probe = vertical_probes[vertical_probe++];
                 acquisition_misses = 0;
                 stream.log("[Poketch landmarks] Bounded vertical visibility probe " + std::to_string(vertical_probe) +
-                           "/10: " + (probe < 0 ? "down " : "up ") + std::to_string(std::abs(probe)) + "ms.");
+                    "/10: " + (probe < 0 ? "down " : "up ") + std::to_string(std::abs(probe)) + "ms.");
                 pbf_move_left_joystick(context, {0, probe < 0 ? -1.0 : 1.0}, Milliseconds(std::abs(probe)), 0ms);
                 pbf_wait(context, 700ms);
             }else{
@@ -828,7 +874,7 @@ static void align_and_talk_to_poketch_man(VideoStream& stream, ProControllerCont
             confirmed = 0;
             const double dx = result.dx, dy = result.dy;
             stream.log("[Poketch landmarks] Reference screen-relative offset=(" + std::to_string(result.dx) + "," +
-                       std::to_string(result.dy) + ").");
+                std::to_string(result.dy) + ").");
             const bool horizontal =
                 std::abs(dx) > 7.0 / 960 && (std::abs(dy) <= 7.0 / 540 || std::abs(dx) >= std::abs(dy) * 9.0 / 16);
             double error = horizontal ? dx : dy * 9.0 / 16;
@@ -840,17 +886,18 @@ static void align_and_talk_to_poketch_man(VideoStream& stream, ProControllerCont
                 continue;
             }
             stream.log("[Poketch landmarks] Correcting " + std::string(horizontal ? "horizontal" : "vertical") +
-                       " axis for " + std::to_string(duration.count()) + "ms.");
+                " axis for " + std::to_string(duration.count()) + "ms.");
             pbf_move_left_joystick(context,
-                                   {horizontal ? (dx > 0 ? 1.0 : -1.0) : 0.0, horizontal ? 0.0 : (dy < 0 ? 1.0 : -1.0)},
-                                   duration, 0ms);
+                {horizontal ? (dx > 0 ? 1.0 : -1.0) : 0.0, horizontal ? 0.0 : (dy < 0 ? 1.0 : -1.0)},
+                duration,
+                0ms);
             pbf_wait(context, 700ms);
         }
         context.wait_for_all_requests();
     }
-    OperationFailedExceptionWithScreenshot::fire(
-        ErrorReportMode::SEND_ERROR_REPORT,
-        "Poketch interaction: Building landmarks did not confirm the reference position; A not pressed.", stream);
+    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+        "Poketch interaction: Building landmarks did not confirm the reference position; A not pressed.",
+        stream);
 }
 
 void align_and_enter_jubilife_center(VideoStream& stream, ProControllerContext& context){
@@ -862,7 +909,8 @@ void align_and_enter_jubilife_center(VideoStream& stream, ProControllerContext& 
         const auto frame = stream.video().snapshot();
         if (!frame){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                         "Jubilife Center alignment: No video frame.", stream);
+                "Jubilife Center alignment: No video frame.",
+                stream);
         }
         const auto result = match_jubilife_center_entrance(*frame.frame);
         VideoOverlaySet overlays(stream.overlay());
@@ -872,8 +920,8 @@ void align_and_enter_jubilife_center(VideoStream& stream, ProControllerContext& 
                 overlays.add(COLOR_GREEN, landmark.found);
             }
             stream.log("[Jubilife Center alignment] score=" + std::to_string(landmark.score) +
-                       " margin=" + std::to_string(landmark.margin) + " screen-relative offset=(" +
-                       std::to_string(landmark.dx) + "," + std::to_string(landmark.dy) + ")");
+                " margin=" + std::to_string(landmark.margin) + " screen-relative offset=(" +
+                std::to_string(landmark.dx) + "," + std::to_string(landmark.dy) + ")");
         }
         if (!result.located){
             confirmed = 0;
@@ -892,21 +940,21 @@ void align_and_enter_jubilife_center(VideoStream& stream, ProControllerContext& 
             bool horizontal = std::abs(result.dx) >= std::abs(result.dy) * 9.0 / 16;
             double error = horizontal ? result.dx : result.dy * 9.0 / 16;
             const auto duration = std::abs(error) > 1.0 / 24 ? 80ms : std::abs(error) > 0.015625 ? 40ms : 16ms;
-            pbf_move_left_joystick(
-                context,
+            pbf_move_left_joystick(context,
                 {horizontal ? (result.dx > 0 ? 1.0 : -1.0) : 0.0, horizontal ? 0.0 : (result.dy < 0 ? 1.0 : -1.0)},
-                duration, 0ms);
+                duration,
+                0ms);
             pbf_wait(context, 700ms);
         }
         context.wait_for_all_requests();
     }
-    OperationFailedExceptionWithScreenshot::fire(
-        ErrorReportMode::SEND_ERROR_REPORT,
-        "Jubilife Center alignment: Door reference not confirmed; entry not attempted.", stream);
+    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+        "Jubilife Center alignment: Door reference not confirmed; entry not attempted.",
+        stream);
 }
 
-static void tutorial_part_4_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream,
-                                       ProControllerContext& context){
+static void
+tutorial_part_4_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 2580ms, 0ms);
     pbf_wait(context, 504ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 830ms, 0ms);
@@ -1080,8 +1128,10 @@ std::string AutoStory_Segment_00::end_text() const {
     return "End: Starter Pokemon chosen, received, and Pokedex acquired, standing in front of the PC.";
 }
 
-void AutoStory_Segment_00::run_segment(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                       AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Segment_00::run_segment(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     stats.m_segment++;
     env.update_stats();
     context.wait_for_all_requests();
@@ -1107,28 +1157,40 @@ std::string AutoStory_Checkpoint_0000::start_text() const {
 std::string AutoStory_Checkpoint_0000::end_text() const {
     return "Required game settings verified and saved; ready for 00.01.";
 }
-void AutoStory_Checkpoint_0000::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0000::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     // Before any route movement or checkpoint save: fail visibly if
     // options cannot be read, rather than navigate with unknown settings.
     verify_tutorial_settings(env.console, context);
     context.wait_for_all_requests();
 }
 
-static void checkpoint_0001(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                            AutoStoryOptions options, AutoStoryStats& stats){
+static void checkpoint_0001(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             // Segment 00-00: Intro and starter selection
             tutorial_part_1_navigation(env, env.console, context);
         },
         true);
 }
-static void checkpoint_0002(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                            AutoStoryOptions options, AutoStoryStats& stats){
+static void checkpoint_0002(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             // Segment 00-01: Starter acquisition
             starter_nav(env.console, context);
@@ -1149,20 +1211,30 @@ static void checkpoint_0002(SingleSwitchProgramEnvironment& env, ProControllerCo
         },
         true);
 }
-static void checkpoint_0003(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                            AutoStoryOptions options, AutoStoryStats& stats){
+static void checkpoint_0003(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             // Segment 00-002: Pokedex acquisition
             tutorial_part_2_navigation(env, env.console, context);
         },
         true);
 }
-static void checkpoint_0004(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                            AutoStoryOptions options, AutoStoryStats& stats){
+static void checkpoint_0004(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             // Segment 00-003: Poketech acquisition
             tutorial_part_3_navigation(env, env.console, context);
@@ -1172,27 +1244,40 @@ static void checkpoint_0004(SingleSwitchProgramEnvironment& env, ProControllerCo
     // Save and advance progress at the catch boundary. Retries of this
     // section must start from the caught-Pokemon save, not the old route.
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             tutorial_part_3_after_catch_navigation(env, env.console, context);
         },
         true);
 }
 // DIAGNOSTIC ONLY: Remove before pushing to production.
-void diagnostic_checkpoint_0004_after_catch(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                            AutoStoryOptions options, AutoStoryStats& stats){
+void diagnostic_checkpoint_0004_after_catch(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             tutorial_part_3_after_catch_navigation(env, env.console, context);
         },
         true);
 }
 
-static void checkpoint_0005(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                            AutoStoryOptions options, AutoStoryStats& stats){
+static void checkpoint_0005(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             // Segment 00-004: Poketech acquisition
             tutorial_part_4_navigation(env, env.console, context);
@@ -1213,8 +1298,10 @@ std::string AutoStory_Checkpoint_0001::end_text() const {
     return "Standing outside Lake Verity before picking starter.";
 }
 
-void AutoStory_Checkpoint_0001::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0001::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0001(env, context, options, stats);
 }
 
@@ -1232,8 +1319,10 @@ std::string AutoStory_Checkpoint_0002::end_text() const {
     return "Standing outside Lake Verity after picking starter.";
 }
 
-void AutoStory_Checkpoint_0002::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0002::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0002(env, context, options, stats);
 }
 
@@ -1252,8 +1341,10 @@ std::string AutoStory_Checkpoint_0003::end_text() const {
     return "Standing in front of The professor after recieving the Pokedex";
 }
 
-void AutoStory_Checkpoint_0003::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0003::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0003(env, context, options, stats);
 }
 // ========================
@@ -1270,8 +1361,10 @@ std::string AutoStory_Checkpoint_0004::end_text() const {
     return "Standing in in jubilife after speaking to dawn. Next: give town map to barry";
 }
 
-void AutoStory_Checkpoint_0004::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0004::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0004(env, context, options, stats);
 }
 // ========================
@@ -1288,8 +1381,10 @@ std::string AutoStory_Checkpoint_0005::end_text() const {
     return "Standing in front of PC. Recieved the Poketech. Ready to deposit starter";
 }
 
-void AutoStory_Checkpoint_0005::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0005::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0005(env, context, options, stats);
 }
 

@@ -92,8 +92,10 @@ std::string AutoStory_Segment_08::end_text() const {
     return "End: Eighth Gym Badge acquired (Sunyshore City).";
 }
 
-void AutoStory_Segment_08::run_segment(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                       AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Segment_08::run_segment(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     stats.m_segment++;
     env.update_stats();
     context.wait_for_all_requests();
@@ -143,8 +145,8 @@ std::string AutoStory_Checkpoint_021::end_text() const {
 // ------------------------------------------------------------------ Functions logic --------------------------------------------------------- //
 
 
-static void move_back_after_unexpected_battle(VideoStream& stream, ProControllerContext& context,
-                                              const std::string& trainerid){
+static void
+move_back_after_unexpected_battle(VideoStream& stream, ProControllerContext& context, const std::string& trainerid){
     stream.log("Finishing battle with " + trainerid, COLOR_GREEN);
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
@@ -176,24 +178,24 @@ static bool handle_battle(VideoStream& stream, ProControllerContext& context, co
         // Move the battle-move cursor down.
         pbf_press_dpad(context, DPAD_DOWN, 280ms, 200ms);
     }else if (trainerid == "galactic_hq_grunt_1" or trainerid == "galactic_hq_double_grunts_1" or
-               trainerid == "route_222_sailor_luther"){
+        trainerid == "route_222_sailor_luther"){
         // Move the battle-move cursor up.
         pbf_press_dpad(context, DPAD_UP, 280ms, 200ms);
     }else if (trainerid == "veilstone_warehouse_warehouse_grunt_1" or trainerid == "galactic_hq_scientist_fredrick" or
-               trainerid == "galactic_hq_grunt_2" or trainerid == "galactic_hq_grunt_3" or
-               trainerid == "galactic_hq_cyrus" or trainerid == "galactic_hq_commander_saturn" or
-               trainerid == "route_207_hiker_justin"){
+        trainerid == "galactic_hq_grunt_2" or trainerid == "galactic_hq_grunt_3" or trainerid == "galactic_hq_cyrus" or
+        trainerid == "galactic_hq_commander_saturn" or trainerid == "route_207_hiker_justin"){
         // Keep the current battle-move selection.
     }
     context.wait_for_all_requests();
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_mash_button(context, BUTTON_A, 200000ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_A, 200000ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("handle_battle_" + trainerid + ": black screen not detected!", COLOR_RED);
             return false;
@@ -214,11 +216,12 @@ static bool leave_gym(VideoStream& stream, ProControllerContext& context){
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("leave_gym: black screen not detected!", COLOR_RED);
             return false;
@@ -241,11 +244,12 @@ static bool heal_at_snowpoint_city_pokemon_center(VideoStream& stream, ProContro
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("heal_at_snowpoint_city_pokemon_center: black screen not detected!", COLOR_RED);
             return false;
@@ -292,11 +296,12 @@ static bool go_to_lake_acuity(VideoStream& stream, ProControllerContext& context
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_to_lake_acuity: black screen not detected!", COLOR_RED);
             return false;
@@ -317,11 +322,11 @@ static bool talk_to_clint_then_go_veilstone(VideoStream& stream, ProControllerCo
         int ret = wait_until(stream, context, std::chrono::seconds(30), {{listen_to_clint_and_jupiter}});
         if (ret < 0){
             stream.log("talk_to_clint_then_go_veilstone_listen_to_clint_and_jupiter: dialog box not detected!",
-                       COLOR_RED);
+                COLOR_RED);
             return false;
         }else if (ret == 0){
             stream.log("talk_to_clint_then_go_veilstone_listen_to_clint_and_jupiter: dialog box detected.",
-                       COLOR_GREEN);
+                COLOR_GREEN);
             pbf_mash_button(context, BUTTON_B, 22000ms);
             context.wait_for_all_requests();
         }
@@ -334,11 +339,12 @@ static bool talk_to_clint_then_go_veilstone(VideoStream& stream, ProControllerCo
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("talk_to_clint_then_go_veilstone: black screen not detected!", COLOR_RED);
             return false;
@@ -366,11 +372,12 @@ static bool get_key_and_enter_warehouse(VideoStream& stream, ProControllerContex
 
     {
         ShortDialogWatcher repel_dialog(COLOR_RED);
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 4600ms, 100ms); // 23+
-                                                  },
-                                                  {{repel_dialog}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 4600ms, 100ms); // 23+
+            },
+            {{repel_dialog}});
         if (ret == 0){
             stream.log("go_through_mount_coronet: Not reactivating repel.", COLOR_GREEN);
             pbf_mash_button(context, BUTTON_B, 3000ms);
@@ -386,12 +393,13 @@ static bool get_key_and_enter_warehouse(VideoStream& stream, ProControllerContex
 
     {
         ShortDialogWatcher talk_to_grunt(COLOR_RED);
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
-                                                      ssf_mash1_button(context, BUTTON_A, 5000ms);
-                                                  },
-                                                  {{talk_to_grunt}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{talk_to_grunt}});
         if (ret == 0){
             stream.log("get_key_and_enter_warehouse: Talking to the grunt.", COLOR_GREEN);
             pbf_mash_button(context, BUTTON_B, 9000ms);
@@ -406,12 +414,13 @@ static bool get_key_and_enter_warehouse(VideoStream& stream, ProControllerContex
 
     {
         ShortDialogWatcher pick_up_key(COLOR_RED);
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
-                                                      ssf_mash1_button(context, BUTTON_A, 5000ms);
-                                                  },
-                                                  {{pick_up_key}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{pick_up_key}});
         if (ret == 0){
             stream.log("get_key_and_enter_warehouse: Got the key.", COLOR_GREEN);
             pbf_mash_button(context, BUTTON_A, 5000ms);
@@ -438,11 +447,12 @@ static bool get_key_and_enter_warehouse(VideoStream& stream, ProControllerContex
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("get_key_and_enter_warehouse: black screen not detected!", COLOR_RED);
             return false;
@@ -464,12 +474,13 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
 
     {
         ShortDialogWatcher open_door(COLOR_RED);
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
-                                                      ssf_mash1_button(context, BUTTON_A, 5000ms);
-                                                  },
-                                                  {{open_door}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{open_door}});
         if (ret == 0){
             stream.log("go_through_warehouse: Opened the door.", COLOR_GREEN);
             pbf_mash_button(context, BUTTON_A, 4000ms);
@@ -484,11 +495,12 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
             return false;
@@ -506,23 +518,25 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
     {
         MarkDetector warehouse_grunt_1_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
 
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 1200ms, 100ms);  // 5+
-                                                      pbf_move_left_joystick(context, {0, -1}, 400ms, 100ms);   // 2+
-                                                      pbf_move_left_joystick(context, {+1, 0}, 10800ms, 100ms); // 54+
-                                                  },
-                                                  {{warehouse_grunt_1_fight}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 1200ms, 100ms);  // 5+
+                pbf_move_left_joystick(context, {0, -1}, 400ms, 100ms);   // 2+
+                pbf_move_left_joystick(context, {+1, 0}, 10800ms, 100ms); // 54+
+            },
+            {{warehouse_grunt_1_fight}});
         if (ret == 0){
             context.wait_for_all_requests();
             pbf_wait(context, 2000ms);
 
             BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-            ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_mash_button(context, BUTTON_A, 200000ms);
-                                                  },
-                                                  {{black_screen}});
+            ret = run_until<ProControllerContext>(stream,
+                context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}});
             if (ret < 0){
                 stream.log("veilstone_warehouse_warehouse_grunt_1: black screen not detected!", COLOR_RED);
                 return false;
@@ -542,21 +556,23 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
     {
         MarkDetector warehouse_grunt_2_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
 
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {+1, 0}, 13000ms, 100ms); // 54+
-                                                  },
-                                                  {{warehouse_grunt_2_fight}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 13000ms, 100ms); // 54+
+            },
+            {{warehouse_grunt_2_fight}});
         if (ret == 0){
             context.wait_for_all_requests();
             pbf_wait(context, 2000ms);
 
             BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-            ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_mash_button(context, BUTTON_A, 200000ms);
-                                                  },
-                                                  {{black_screen}});
+            ret = run_until<ProControllerContext>(stream,
+                context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}});
             if (ret < 0){
                 stream.log("veilstone_warehouse_warehouse_grunt_2: black screen not detected!", COLOR_RED);
                 return false;
@@ -575,11 +591,12 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
             return false;
@@ -597,11 +614,12 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
             return false;
@@ -618,12 +636,13 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
         BlackScreenFlashWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
         MarkDetector galactic_hq_grunt_1_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
 
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {-1, 0}, 2200ms, 100ms); // 11+
-                                                      pbf_move_left_joystick(context, {0, +1}, 1200ms, 100ms); // 6
-                                                  },
-                                                  {{black_screen}, {galactic_hq_grunt_1_fight}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 2200ms, 100ms); // 11+
+                pbf_move_left_joystick(context, {0, +1}, 1200ms, 100ms); // 6
+            },
+            {{black_screen}, {galactic_hq_grunt_1_fight}});
         if (ret == 0){
             stream.log("go_through_warehouse: got into Galactic HQ 1F, second room.", COLOR_GREEN);
         }else if (ret == 1){
@@ -631,11 +650,12 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
             pbf_wait(context, 2000ms);
 
             BlackScreenOverWatcher black_screen_2(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-            ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_mash_button(context, BUTTON_A, 200000ms);
-                                                  },
-                                                  {{black_screen_2}});
+            ret = run_until<ProControllerContext>(stream,
+                context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen_2}});
             if (ret < 0){
                 stream.log("galactic_hq_grunt_1: black screen not detected!", COLOR_RED);
                 return false;
@@ -651,11 +671,12 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
 
             {
                 BlackScreenFlashWatcher room_transition(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
-                int ret1 = run_until<ProControllerContext>(stream, context,
-                                                           [](ProControllerContext& context){
-                                                               pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                           },
-                                                           {{room_transition}});
+                int ret1 = run_until<ProControllerContext>(stream,
+                    context,
+                    [](ProControllerContext& context){
+                        pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+                    },
+                    {{room_transition}});
                 if (ret1 < 0){
                     stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
                     return false;
@@ -672,11 +693,12 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
 
     {
         BlackScreenFlashWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
             return false;
@@ -691,11 +713,12 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
             return false;
@@ -711,11 +734,12 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
 
     {
         BlackScreenFlashWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
             return false;
@@ -731,11 +755,12 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
             return false;
@@ -752,22 +777,24 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
     {
         MarkDetector galactic_hq_scientist_fredrick_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
 
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {-1, 0}, 1000ms, 100ms);  // 6
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms); // 6+
-                                                  },
-                                                  {{galactic_hq_scientist_fredrick_fight}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 1000ms, 100ms);  // 6
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms); // 6+
+            },
+            {{galactic_hq_scientist_fredrick_fight}});
         if (ret == 0){
             context.wait_for_all_requests();
             pbf_wait(context, 2000ms);
 
             BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-            ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_mash_button(context, BUTTON_A, 200000ms);
-                                                  },
-                                                  {{black_screen}});
+            ret = run_until<ProControllerContext>(stream,
+                context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}});
             if (ret < 0){
                 stream.log("galactic_hq_scientist_fredrick: black screen not detected!", COLOR_RED);
                 return false;
@@ -784,11 +811,12 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
             return false;
@@ -807,12 +835,13 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
 
     {
         ShortDialogWatcher pick_up_galactic_key(COLOR_RED);
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
-                                                      ssf_mash1_button(context, BUTTON_A, 5000ms);
-                                                  },
-                                                  {{pick_up_galactic_key}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{pick_up_galactic_key}});
         if (ret == 0){
             stream.log("go_through_warehouse: Picked up the Galactic key.", COLOR_GREEN);
             pbf_mash_button(context, BUTTON_B, 3000ms);
@@ -830,12 +859,13 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
 
     {
         ShortDialogWatcher open_door(COLOR_RED);
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
-                                                      ssf_mash1_button(context, BUTTON_A, 5000ms);
-                                                  },
-                                                  {{open_door}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{open_door}});
         if (ret == 0){
             stream.log("go_through_warehouse: Opened the first door with the Galactic Key.", COLOR_GREEN);
             pbf_mash_button(context, BUTTON_A, 4000ms);
@@ -855,11 +885,12 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
             return false;
@@ -874,11 +905,12 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_warehouse: black screen not detected!", COLOR_RED);
             return false;
@@ -903,11 +935,12 @@ static bool heal_at_veilstone_pokemon_center(VideoStream& stream, ProControllerC
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("heal_at_veilstone_pokemon_center: black screen not detected!", COLOR_RED);
             return false;
@@ -939,14 +972,15 @@ static bool go_to_galactic_hq(VideoStream& stream, ProControllerContext& context
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_to_galactic_hq, entering the Galactic HQ from the front door: black screen not detected!",
-                       COLOR_RED);
+                COLOR_RED);
             return false;
         }
         stream.log("go_to_galactic_hq: entered the Galactic HQ from the front door.", COLOR_GREEN);
@@ -969,12 +1003,13 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
 
     {
         ShortDialogWatcher open_door(COLOR_RED);
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
-                                                      ssf_mash1_button(context, BUTTON_A, 5000ms);
-                                                  },
-                                                  {{open_door}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{open_door}});
         if (ret == 0){
             stream.log("go_through_galactic_hq: Opened the door.", COLOR_GREEN);
             pbf_mash_button(context, BUTTON_A, 4000ms);
@@ -990,14 +1025,15 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_galactic_hq, entering Galactic HQ's 2F, first room: black screen not detected!",
-                       COLOR_RED);
+                COLOR_RED);
             return false;
         }
         stream.log("go_through_galactic_hq: entered Galactic HQ's 2F, first room.", COLOR_GREEN);
@@ -1014,14 +1050,15 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
         MarkDetector galactic_hq_grunt_2_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
         // First run to the right, and see grunt 2 detects you
 
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {+1, 0}, 3200ms, 100ms); // 16+
-                                                      context.wait_for_all_requests();
-                                                      pbf_wait(context, 2000ms);
-                                                      context.wait_for_all_requests();
-                                                  },
-                                                  {{galactic_hq_grunt_2_fight}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 3200ms, 100ms); // 16+
+                context.wait_for_all_requests();
+                pbf_wait(context, 2000ms);
+                context.wait_for_all_requests();
+            },
+            {{galactic_hq_grunt_2_fight}});
         if (ret < 0){
             // If it doesn't, move on, but consider that grunt_2 hasn't been done
             stream.log("galactic_hq_grunt_2: mark not detected, moving on...");
@@ -1031,11 +1068,12 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
             pbf_wait(context, 2000ms);
 
             BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-            ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_mash_button(context, BUTTON_A, 200000ms);
-                                                  },
-                                                  {{black_screen}});
+            ret = run_until<ProControllerContext>(stream,
+                context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}});
             if (ret < 0){
                 stream.log("galactic_hq_grunt_2: black screen not detected!", COLOR_RED);
                 return false;
@@ -1061,12 +1099,12 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
                 // Now run downwards and check if either mark is detected (it should)
                 MarkDetector galactic_hq_grunt_2_3_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
 
-                int ret =
-                    run_until<ProControllerContext>(stream, context,
-                                                    [](ProControllerContext& context){
-                                                        pbf_move_left_joystick(context, {0, -1}, 5000ms, 100ms); // 16+
-                                                    },
-                                                    {{galactic_hq_grunt_2_3_fight}});
+                int ret = run_until<ProControllerContext>(stream,
+                    context,
+                    [](ProControllerContext& context){
+                        pbf_move_left_joystick(context, {0, -1}, 5000ms, 100ms); // 16+
+                    },
+                    {{galactic_hq_grunt_2_3_fight}});
 
                 context.wait_for_all_requests();
                 pbf_wait(context, 2000ms);
@@ -1079,11 +1117,12 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
                     context.wait_for_all_requests();
 
                     BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-                    ret = run_until<ProControllerContext>(stream, context,
-                                                          [](ProControllerContext& context){
-                                                              pbf_mash_button(context, BUTTON_A, 200000ms);
-                                                          },
-                                                          {{black_screen}});
+                    ret = run_until<ProControllerContext>(stream,
+                        context,
+                        [](ProControllerContext& context){
+                            pbf_mash_button(context, BUTTON_A, 200000ms);
+                        },
+                        {{black_screen}});
                     if (ret < 0){
                         stream.log("galactic_hq_grunt_2: black screen not detected!", COLOR_RED);
                         return false;
@@ -1098,12 +1137,13 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
 
         {
             BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-            int ret = run_until<ProControllerContext>(stream, context,
-                                                      [](ProControllerContext& context){
-                                                          ssf_press_left_joystick(context, {0, -1}, 0ms, 10000ms);
-                                                          ssf_mash1_button(context, BUTTON_A, 10000ms);
-                                                      },
-                                                      {{black_screen}});
+            int ret = run_until<ProControllerContext>(stream,
+                context,
+                [](ProControllerContext& context){
+                    ssf_press_left_joystick(context, {0, -1}, 0ms, 10000ms);
+                    ssf_mash1_button(context, BUTTON_A, 10000ms);
+                },
+                {{black_screen}});
             if (ret < 0){
                 stream.log("galactic_hq_grunt_2: black screen not detected!", COLOR_RED);
                 return false;
@@ -1128,11 +1168,12 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
 
     {
         BlackScreenFlashWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
             return false;
@@ -1147,11 +1188,12 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
             return false;
@@ -1169,22 +1211,23 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
         {
             MarkDetector galactic_hq_grunt_4_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
 
-            int ret =
-                run_until<ProControllerContext>(stream, context,
-                                                [](ProControllerContext& context){
-                                                    pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms); // 5+
-                                                },
-                                                {{galactic_hq_grunt_4_fight}});
+            int ret = run_until<ProControllerContext>(stream,
+                context,
+                [](ProControllerContext& context){
+                    pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms); // 5+
+                },
+                {{galactic_hq_grunt_4_fight}});
             if (ret == 0){
                 context.wait_for_all_requests();
                 pbf_wait(context, 3000ms);
 
                 BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-                ret = run_until<ProControllerContext>(stream, context,
-                                                      [](ProControllerContext& context){
-                                                          pbf_mash_button(context, BUTTON_A, 200000ms);
-                                                      },
-                                                      {{black_screen}});
+                ret = run_until<ProControllerContext>(stream,
+                    context,
+                    [](ProControllerContext& context){
+                        pbf_mash_button(context, BUTTON_A, 200000ms);
+                    },
+                    {{black_screen}});
                 if (ret < 0){
                     stream.log("galactic_hq_grunt_4: black screen not detected!", COLOR_RED);
                     return false;
@@ -1196,11 +1239,12 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
 
         {
             BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-            int ret = run_until<ProControllerContext>(stream, context,
-                                                      [](ProControllerContext& context){
-                                                          pbf_mash_button(context, BUTTON_A, 10000ms);
-                                                      },
-                                                      {{black_screen}});
+            int ret = run_until<ProControllerContext>(stream,
+                context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 10000ms);
+                },
+                {{black_screen}});
             if (ret < 0){
                 stream.log("galactic_hq_grunt_5: black screen not detected!", COLOR_RED);
                 return false;
@@ -1219,11 +1263,12 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
 
     {
         BlackScreenFlashWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
             return false;
@@ -1240,11 +1285,12 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
             return false;
@@ -1262,12 +1308,13 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
 
     {
         ShortDialogWatcher open_door(COLOR_RED);
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
-                                                      ssf_mash1_button(context, BUTTON_A, 5000ms);
-                                                  },
-                                                  {{open_door}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{open_door}});
         if (ret == 0){
             stream.log("go_through_galactic_hq: Opened the door with the Galactic Key.", COLOR_GREEN);
             pbf_mash_button(context, BUTTON_A, 4000ms);
@@ -1282,20 +1329,22 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
 
     {
         ShortDialogWatcher cyrus_dialog(COLOR_RED);
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms); // 5+
-                                                  },
-                                                  {{cyrus_dialog}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms); // 5+
+            },
+            {{cyrus_dialog}});
         if (ret == 0){
             stream.log("go_through_galactic_hq: Cyrus dialog box detected.", COLOR_GREEN);
 
             BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-            ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_mash_button(context, BUTTON_A, 200000ms);
-                                                  },
-                                                  {{black_screen}});
+            ret = run_until<ProControllerContext>(stream,
+                context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}});
             if (ret < 0){
                 stream.log("galactic_hq_cyrus: black screen not detected!", COLOR_RED);
                 return false;
@@ -1320,11 +1369,12 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
 
     {
         BlackScreenFlashWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
             return false;
@@ -1344,11 +1394,12 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
             return false;
@@ -1365,12 +1416,13 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
 
     {
         ShortDialogWatcher talk_to_commander_saturn(COLOR_RED);
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      ssf_press_left_joystick(context, {+1, 0}, 0ms, 5000ms);
-                                                      ssf_mash1_button(context, BUTTON_A, 5000ms);
-                                                  },
-                                                  {{talk_to_commander_saturn}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {+1, 0}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{talk_to_commander_saturn}});
         if (ret < 0){
             stream.log("go_through_galactic_hq: Didn't detect Commander Saturn dialog box!", COLOR_RED);
             return false;
@@ -1378,11 +1430,12 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
             stream.log("go_through_galactic_hq: Starting the battle with Commander Saturn.", COLOR_GREEN);
 
             BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-            ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_mash_button(context, BUTTON_A, 200000ms);
-                                                  },
-                                                  {{black_screen}});
+            ret = run_until<ProControllerContext>(stream,
+                context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}});
             if (ret < 0){
                 stream.log("galactic_hq_commander_saturn: black screen not detected!", COLOR_RED);
                 return false;
@@ -1403,12 +1456,13 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
 
     {
         ShortDialogWatcher unlock_guardians(COLOR_RED);
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
-                                                      ssf_mash1_button(context, BUTTON_A, 5000ms);
-                                                  },
-                                                  {{unlock_guardians}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {0, +1}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{unlock_guardians}});
         if (ret == 0){
             stream.log("go_through_galactic_hq: Released the Lake Guardians.", COLOR_GREEN);
             pbf_mash_button(context, BUTTON_A, 4000ms);
@@ -1429,11 +1483,12 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
             return false;
@@ -1449,11 +1504,12 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
 
     {
         BlackScreenFlashWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
             return false;
@@ -1472,11 +1528,12 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
 
     {
         BlackScreenFlashWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_galactic_hq: black screen not detected!", COLOR_RED);
             return false;
@@ -1493,11 +1550,12 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
 
     {
         WhiteScreenOverWatcher white_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
-                                                  },
-                                                  {{white_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+            },
+            {{white_screen}});
         if (ret < 0){
             stream.log("go_through_galactic_hq: white screen not detected!", COLOR_RED);
             return false;
@@ -1522,11 +1580,12 @@ static bool fly_and_heal_at_oreburgh(VideoStream& stream, ProControllerContext& 
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("fly_and_heal_at_oreburgh: black screen not detected!", COLOR_RED);
             return false;
@@ -1567,21 +1626,23 @@ static bool go_to_mount_coronet(VideoStream& stream, ProControllerContext& conte
     {
         MarkDetector hiker_justin_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
 
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {+1, 0}, 5000ms, 100ms); // 11+
-                                                  },
-                                                  {{hiker_justin_fight}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 5000ms, 100ms); // 11+
+            },
+            {{hiker_justin_fight}});
         if (ret == 0){
             context.wait_for_all_requests();
             pbf_wait(context, 2000ms);
 
             BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-            ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_mash_button(context, BUTTON_A, 200000ms);
-                                                  },
-                                                  {{black_screen}});
+            ret = run_until<ProControllerContext>(stream,
+                context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}});
             if (ret < 0){
                 stream.log("go_to_mount_coronet, route_207_hiker_justin: black screen not detected!", COLOR_RED);
                 return false;
@@ -1599,11 +1660,12 @@ static bool go_to_mount_coronet(VideoStream& stream, ProControllerContext& conte
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_to_mount_coronet: black screen not detected!", COLOR_RED);
             return false;
@@ -1638,11 +1700,12 @@ static bool fly_and_heal_at_veilstone(VideoStream& stream, ProControllerContext&
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("fly_and_heal_at_veilstone: black screen not detected!", COLOR_RED);
             return false;
@@ -1681,11 +1744,12 @@ static bool go_to_house_south_veilstone(VideoStream& stream, ProControllerContex
 
     {
         BlackScreenOverWatcher black_screen_1(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen_1}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+            },
+            {{black_screen_1}});
         if (ret < 0){
             stream.log("go_to_route_214_enter_house: black screen not detected!", COLOR_RED);
             return false;
@@ -1695,8 +1759,8 @@ static bool go_to_house_south_veilstone(VideoStream& stream, ProControllerContex
     return true;
 }
 
-static bool go_through_house_south_veilstone(VideoStream& stream, ProControllerContext& context,
-                                             AutoStoryOptions options){
+static bool
+go_through_house_south_veilstone(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
     context.wait_for_all_requests();
@@ -1704,11 +1768,12 @@ static bool go_through_house_south_veilstone(VideoStream& stream, ProControllerC
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_house_south_veilstone: black screen not detected!", COLOR_RED);
             return false;
@@ -1759,12 +1824,13 @@ static bool go_to_house_west_sunyshore(VideoStream& stream, ProControllerContext
 
     {
         ShortDialogWatcher repel_dialog(COLOR_RED);
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {-1, 0}, 2000ms, 100ms); // 10+
-                                                      pbf_move_left_joystick(context, {+1, 0}, 2000ms, 100ms); // 10+
-                                                  },
-                                                  {{repel_dialog}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 2000ms, 100ms); // 10+
+                pbf_move_left_joystick(context, {+1, 0}, 2000ms, 100ms); // 10+
+            },
+            {{repel_dialog}});
         if (ret == 0){
             stream.log("go_to_house_west_sunyshore: Reactivating repel.", COLOR_GREEN);
             pbf_mash_button(context, BUTTON_A, 3000ms);
@@ -1788,12 +1854,13 @@ static bool go_to_house_west_sunyshore(VideoStream& stream, ProControllerContext
 
     {
         ShortDialogWatcher repel_dialog(COLOR_RED);
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {-1, 0}, 7400ms, 100ms); // 37+
-                                                      pbf_move_left_joystick(context, {+1, 0}, 7400ms, 100ms); // 37+
-                                                  },
-                                                  {{repel_dialog}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {-1, 0}, 7400ms, 100ms); // 37+
+                pbf_move_left_joystick(context, {+1, 0}, 7400ms, 100ms); // 37+
+            },
+            {{repel_dialog}});
         if (ret == 0){
             stream.log("go_to_house_west_sunyshore: Not reactivating repel.", COLOR_GREEN);
             pbf_mash_button(context, BUTTON_B, 3000ms);
@@ -1822,21 +1889,23 @@ static bool go_to_house_west_sunyshore(VideoStream& stream, ProControllerContext
     {
         MarkDetector route_222_sailor_luther_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
 
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms); // 5+
-                                                  },
-                                                  {{route_222_sailor_luther_fight}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms); // 5+
+            },
+            {{route_222_sailor_luther_fight}});
         if (ret == 0){
             context.wait_for_all_requests();
             pbf_wait(context, 2000ms);
 
             BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-            ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_mash_button(context, BUTTON_A, 200000ms);
-                                                  },
-                                                  {{black_screen}});
+            ret = run_until<ProControllerContext>(stream,
+                context,
+                [](ProControllerContext& context){
+                    pbf_mash_button(context, BUTTON_A, 200000ms);
+                },
+                {{black_screen}});
             if (ret < 0){
                 stream.log("go_to_house_west_sunyshore_route_222_sailor_luther: black screen not detected!", COLOR_RED);
                 return false;
@@ -1855,11 +1924,12 @@ static bool go_to_house_west_sunyshore(VideoStream& stream, ProControllerContext
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_to_house_west_sunyshore: black screen not detected!", COLOR_RED);
             return false;
@@ -1870,8 +1940,8 @@ static bool go_to_house_west_sunyshore(VideoStream& stream, ProControllerContext
     return true;
 }
 
-static bool go_through_house_west_sunyshore(VideoStream& stream, ProControllerContext& context,
-                                            AutoStoryOptions options){
+static bool
+go_through_house_west_sunyshore(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
     context.wait_for_all_requests();
@@ -1879,11 +1949,12 @@ static bool go_through_house_west_sunyshore(VideoStream& stream, ProControllerCo
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_house_south_veilstone: black screen not detected!", COLOR_RED);
             return false;
@@ -1930,11 +2001,12 @@ static bool go_to_sunyshore_lighthouse(VideoStream& stream, ProControllerContext
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_through_house_west_sunyshore: black screen not detected!", COLOR_RED);
             return false;
@@ -1945,8 +2017,8 @@ static bool go_to_sunyshore_lighthouse(VideoStream& stream, ProControllerContext
     return true;
 }
 
-static bool talk_to_volkner_at_the_lighthouse(VideoStream& stream, ProControllerContext& context,
-                                              AutoStoryOptions options){
+static bool
+talk_to_volkner_at_the_lighthouse(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
     DpadState dpad;
     context.wait_for_all_requests();
     pbf_wait(context, 1000ms);
@@ -1975,12 +2047,13 @@ static bool talk_to_volkner_at_the_lighthouse(VideoStream& stream, ProController
 
     {
         ShortDialogWatcher talk_to_volkner(COLOR_RED);
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      ssf_press_left_joystick(context, {+1, 0}, 0ms, 5000ms);
-                                                      ssf_mash1_button(context, BUTTON_A, 5000ms);
-                                                  },
-                                                  {{talk_to_volkner}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {+1, 0}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{talk_to_volkner}});
         if (ret == 0){
             stream.log("talk_to_volkner_at_the_lighthouse: Talking to Volkner.", COLOR_GREEN);
             pbf_mash_button(context, BUTTON_B, 11000ms);
@@ -1999,14 +2072,15 @@ static bool talk_to_volkner_at_the_lighthouse(VideoStream& stream, ProController
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("talk_to_volkner_at_the_lighthouse: entering elevator to exit black screen not detected!",
-                       COLOR_RED);
+                COLOR_RED);
             return false;
         }
         stream.log("talk_to_volkner_at_the_lighthouse: entered the elevator", COLOR_GREEN);
@@ -2049,12 +2123,13 @@ static bool go_to_sunyshore_gym(VideoStream& stream, ProControllerContext& conte
 
     {
         ShortDialogWatcher talk_to_flint(COLOR_RED);
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      ssf_press_left_joystick(context, {+1, 0}, 0ms, 5000ms);
-                                                      ssf_mash1_button(context, BUTTON_A, 5000ms);
-                                                  },
-                                                  {{talk_to_flint}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                ssf_press_left_joystick(context, {+1, 0}, 0ms, 5000ms);
+                ssf_mash1_button(context, BUTTON_A, 5000ms);
+            },
+            {{talk_to_flint}});
         if (ret == 0){
             stream.log("go_to_sunyshore_gym: Talking to Flint.", COLOR_GREEN);
             pbf_mash_button(context, BUTTON_B, 9000ms);
@@ -2071,11 +2146,12 @@ static bool go_to_sunyshore_gym(VideoStream& stream, ProControllerContext& conte
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream, context,
-                                                  [](ProControllerContext& context){
-                                                      pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
-                                                  },
-                                                  {{black_screen}});
+        int ret = run_until<ProControllerContext>(stream,
+            context,
+            [](ProControllerContext& context){
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            },
+            {{black_screen}});
         if (ret < 0){
             stream.log("go_to_sunyshore_gym: black screen entering the gym not detected!", COLOR_RED);
             return false;
@@ -2090,358 +2166,495 @@ static bool go_to_sunyshore_gym(VideoStream& stream, ProControllerContext& conte
 // ------------------------------------------------------------------ Checkpoints logic --------------------------------------------------------- //
 
 
-void checkpoint_0801(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0801(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!leave_gym(env.console, context)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "leave_gym: transition not detected.", env.console);
+                    "leave_gym: transition not detected.",
+                    env.console);
             }
         },
         true);
 }
 
-void checkpoint_0802(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0802(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!heal_at_snowpoint_city_pokemon_center(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT,
-                    "heal_at_snowpoint_city_pokemon_center: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "heal_at_snowpoint_city_pokemon_center: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0803(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0803(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit(env.console, context, "Snowpoint City")){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "heal_and_exit_snowpoint_city: transition not detected.",
-                                                             env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0804(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env, context, options, stats,
-        [&](size_t /*attempt*/){
-            if (!go_to_lake_acuity(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "go_to_lake_acuity: transition not detected.", env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0805(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env, context, options, stats,
-        [&](size_t /*attempt*/){
-            if (!talk_to_clint_then_go_veilstone(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "talk_to_clint_then_go_veilstone: transition not detected.",
+                    "heal_and_exit_snowpoint_city: transition not detected.",
                     env.console);
             }
         },
         false);
 }
 
-void checkpoint_0806(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0804(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
-            if (!heal_and_exit(env.console, context, "Veilstone City")){
+            if (!go_to_lake_acuity(env.console, context)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "heal_and_exit_veilstone_city: transition not detected.",
-                                                             env.console);
+                    "go_to_lake_acuity: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0807(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0805(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
+        [&](size_t /*attempt*/){
+            if (!talk_to_clint_then_go_veilstone(env.console, context)){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "talk_to_clint_then_go_veilstone: transition not detected.",
+                    env.console);
+            }
+        },
+        false);
+}
+
+void checkpoint_0806(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
+    checkpoint_reattempt_loop(
+        env,
+        context,
+        options,
+        stats,
+        [&](size_t /*attempt*/){
+            if (!heal_and_exit(env.console, context, "Veilstone City")){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "heal_and_exit_veilstone_city: transition not detected.",
+                    env.console);
+            }
+        },
+        false);
+}
+
+void checkpoint_0807(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
+    checkpoint_reattempt_loop(
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!get_key_and_enter_warehouse(env.console, context)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "get_key_and_enter_warehouse: transition not detected.",
-                                                             env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0808(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env, context, options, stats,
-        [&](size_t /*attempt*/){
-            if (!go_through_warehouse(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "go_through_warehouse: transition not detected.", env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0809(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env, context, options, stats,
-        [&](size_t /*attempt*/){
-            if (!heal_at_veilstone_pokemon_center(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "heal_at_veilstone_pokemon_center: transition not detected.",
+                    "get_key_and_enter_warehouse: transition not detected.",
                     env.console);
             }
         },
         false);
 }
 
-void checkpoint_0810(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0808(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
+        [&](size_t /*attempt*/){
+            if (!go_through_warehouse(env.console, context)){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "go_through_warehouse: transition not detected.",
+                    env.console);
+            }
+        },
+        false);
+}
+
+void checkpoint_0809(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
+    checkpoint_reattempt_loop(
+        env,
+        context,
+        options,
+        stats,
+        [&](size_t /*attempt*/){
+            if (!heal_at_veilstone_pokemon_center(env.console, context)){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "heal_at_veilstone_pokemon_center: transition not detected.",
+                    env.console);
+            }
+        },
+        false);
+}
+
+void checkpoint_0810(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
+    checkpoint_reattempt_loop(
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit(env.console, context, "Veilstone City")){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "heal_and_exit_veilstone_city: transition not detected.",
-                                                             env.console);
+                    "heal_and_exit_veilstone_city: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0811(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0811(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!go_to_galactic_hq(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "go_to_galactic_hq: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "go_to_galactic_hq: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0812(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0812(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!go_through_galactic_hq(env.console, context, options)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "go_through_galactic_hq: transition not detected.",
-                                                             env.console);
+                    "go_through_galactic_hq: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0813(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0813(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!fly_and_heal_at_oreburgh(env.console, context, options)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "fly_and_heal_at_oreburgh: transition not detected.",
-                                                             env.console);
+                    "fly_and_heal_at_oreburgh: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0814(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0814(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit(env.console, context, "Oreburgh City")){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "heal_and_exit_oreburgh_city: transition not detected.",
-                                                             env.console);
+                    "heal_and_exit_oreburgh_city: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0815(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0815(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!go_to_mount_coronet(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "go_to_mount_coronet: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "go_to_mount_coronet: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0816(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0816(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!go_through_mount_coronet(env.console, context, options)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "go_through_mount_coronet: transition not detected.",
-                                                             env.console);
+                    "go_through_mount_coronet: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0817(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0817(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!fly_and_heal_at_veilstone(env.console, context, options)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "fly_and_heal_at_veilstone: transition not detected.",
-                                                             env.console);
+                    "fly_and_heal_at_veilstone: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0818(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0818(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!heal_and_exit(env.console, context, "Veilstone City")){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "heal_and_exit_veilstone_city: transition not detected.",
-                                                             env.console);
+                    "heal_and_exit_veilstone_city: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0819(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0819(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!go_to_house_south_veilstone(env.console, context, options)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "go_to_house_south_veilstone: transition not detected.",
-                                                             env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0820(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env, context, options, stats,
-        [&](size_t /*attempt*/){
-            if (!go_through_house_south_veilstone(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "go_through_house_south_veilstone: transition not detected.",
+                    "go_to_house_south_veilstone: transition not detected.",
                     env.console);
             }
         },
         false);
 }
 
-void checkpoint_0821(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0820(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
+        [&](size_t /*attempt*/){
+            if (!go_through_house_south_veilstone(env.console, context, options)){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "go_through_house_south_veilstone: transition not detected.",
+                    env.console);
+            }
+        },
+        false);
+}
+
+void checkpoint_0821(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
+    checkpoint_reattempt_loop(
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!go_to_house_west_sunyshore(env.console, context, options)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "go_to_house_west_sunyshore: transition not detected.",
-                                                             env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0822(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env, context, options, stats,
-        [&](size_t /*attempt*/){
-            if (!go_through_house_west_sunyshore(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "go_through_house_west_sunyshore: transition not detected.",
+                    "go_to_house_west_sunyshore: transition not detected.",
                     env.console);
             }
         },
         false);
 }
 
-void checkpoint_0823(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0822(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
+        [&](size_t /*attempt*/){
+            if (!go_through_house_west_sunyshore(env.console, context, options)){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "go_through_house_west_sunyshore: transition not detected.",
+                    env.console);
+            }
+        },
+        false);
+}
+
+void checkpoint_0823(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
+    checkpoint_reattempt_loop(
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!go_to_sunyshore_lighthouse(env.console, context, options)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                                             "go_to_sunyshore_lighthouse: transition not detected.",
-                                                             env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0824(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env, context, options, stats,
-        [&](size_t /*attempt*/){
-            if (!talk_to_volkner_at_the_lighthouse(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "talk_to_volkner_at_the_lighthouse: transition not detected.",
+                    "go_to_sunyshore_lighthouse: transition not detected.",
                     env.console);
             }
         },
         false);
 }
 
-void checkpoint_0825(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0824(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
-            if (!go_to_sunyshore_gym(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "go_to_sunyshore_gym: transition not detected.", env.console);
+            if (!talk_to_volkner_at_the_lighthouse(env.console, context, options)){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "talk_to_volkner_at_the_lighthouse: transition not detected.",
+                    env.console);
             }
         },
         false);
 }
 
-void checkpoint_0826(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                     AutoStoryStats& stats){
+void checkpoint_0825(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             if (!go_to_sunyshore_gym(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT, "go_to_sunyshore_gym: transition not detected.", env.console);
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "go_to_sunyshore_gym: transition not detected.",
+                    env.console);
+            }
+        },
+        false);
+}
+
+void checkpoint_0826(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
+    checkpoint_reattempt_loop(
+        env,
+        context,
+        options,
+        stats,
+        [&](size_t /*attempt*/){
+            if (!go_to_sunyshore_gym(env.console, context, options)){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "go_to_sunyshore_gym: transition not detected.",
+                    env.console);
             }
         },
         false);
@@ -2457,8 +2670,10 @@ std::string AutoStory_Checkpoint_0801::start_text() const {
 std::string AutoStory_Checkpoint_0801::end_text() const {
     return "Leave Snowpoint Gym.";
 }
-void AutoStory_Checkpoint_0801::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0801::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0801(env, context, options, stats);
 }
 
@@ -2471,8 +2686,10 @@ std::string AutoStory_Checkpoint_0802::start_text() const {
 std::string AutoStory_Checkpoint_0802::end_text() const {
     return "Arrived at Snowpoint City Pokémon Center.";
 }
-void AutoStory_Checkpoint_0802::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0802::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0802(env, context, options, stats);
 }
 
@@ -2485,8 +2702,10 @@ std::string AutoStory_Checkpoint_0803::start_text() const {
 std::string AutoStory_Checkpoint_0803::end_text() const {
     return "Healed at Snowpoint City Pokemon Center.";
 }
-void AutoStory_Checkpoint_0803::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0803::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0803(env, context, options, stats);
 }
 
@@ -2499,8 +2718,10 @@ std::string AutoStory_Checkpoint_0804::start_text() const {
 std::string AutoStory_Checkpoint_0804::end_text() const {
     return "Entered Lake Acuity Lakefront.";
 }
-void AutoStory_Checkpoint_0804::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0804::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0804(env, context, options, stats);
 }
 
@@ -2513,8 +2734,10 @@ std::string AutoStory_Checkpoint_0805::start_text() const {
 std::string AutoStory_Checkpoint_0805::end_text() const {
     return "Arrived at Veilstone City Pokemon Center.";
 }
-void AutoStory_Checkpoint_0805::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0805::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0805(env, context, options, stats);
 }
 
@@ -2527,8 +2750,10 @@ std::string AutoStory_Checkpoint_0806::start_text() const {
 std::string AutoStory_Checkpoint_0806::end_text() const {
     return "Healed at Veilstone City Pokemon Center.";
 }
-void AutoStory_Checkpoint_0806::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0806::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0806(env, context, options, stats);
 }
 
@@ -2541,8 +2766,10 @@ std::string AutoStory_Checkpoint_0807::start_text() const {
 std::string AutoStory_Checkpoint_0807::end_text() const {
     return "Entered Team Galactic Warehouse.";
 }
-void AutoStory_Checkpoint_0807::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0807::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0807(env, context, options, stats);
 }
 
@@ -2555,8 +2782,10 @@ std::string AutoStory_Checkpoint_0808::start_text() const {
 std::string AutoStory_Checkpoint_0808::end_text() const {
     return "Got out of the warehouse with the key.";
 }
-void AutoStory_Checkpoint_0808::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0808::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0808(env, context, options, stats);
 }
 
@@ -2569,8 +2798,10 @@ std::string AutoStory_Checkpoint_0809::start_text() const {
 std::string AutoStory_Checkpoint_0809::end_text() const {
     return "Entered Veilstone Pokemon Center for healing.";
 }
-void AutoStory_Checkpoint_0809::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0809::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0809(env, context, options, stats);
 }
 
@@ -2583,8 +2814,10 @@ std::string AutoStory_Checkpoint_0810::start_text() const {
 std::string AutoStory_Checkpoint_0810::end_text() const {
     return "Exited Veilstone Pokemon Center.";
 }
-void AutoStory_Checkpoint_0810::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0810::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0810(env, context, options, stats);
 }
 
@@ -2597,8 +2830,10 @@ std::string AutoStory_Checkpoint_0811::start_text() const {
 std::string AutoStory_Checkpoint_0811::end_text() const {
     return "Entered Galactic HQ.";
 }
-void AutoStory_Checkpoint_0811::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0811::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0811(env, context, options, stats);
 }
 
@@ -2611,8 +2846,10 @@ std::string AutoStory_Checkpoint_0812::start_text() const {
 std::string AutoStory_Checkpoint_0812::end_text() const {
     return "Dealt with Cyrus and left the Galactic HQ.";
 }
-void AutoStory_Checkpoint_0812::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0812::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0812(env, context, options, stats);
 }
 
@@ -2625,8 +2862,10 @@ std::string AutoStory_Checkpoint_0813::start_text() const {
 std::string AutoStory_Checkpoint_0813::end_text() const {
     return "Flew to Oreburgh city and entered Pokemon Center.";
 }
-void AutoStory_Checkpoint_0813::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0813::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0813(env, context, options, stats);
 }
 
@@ -2639,8 +2878,10 @@ std::string AutoStory_Checkpoint_0814::start_text() const {
 std::string AutoStory_Checkpoint_0814::end_text() const {
     return "Healed Pokemon at Oreburgh City Pokemon Center.";
 }
-void AutoStory_Checkpoint_0814::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0814::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0814(env, context, options, stats);
 }
 
@@ -2653,8 +2894,10 @@ std::string AutoStory_Checkpoint_0815::start_text() const {
 std::string AutoStory_Checkpoint_0815::end_text() const {
     return "Entered Mount Coronet.";
 }
-void AutoStory_Checkpoint_0815::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0815::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0815(env, context, options, stats);
 }
 
@@ -2667,8 +2910,10 @@ std::string AutoStory_Checkpoint_0816::start_text() const {
 std::string AutoStory_Checkpoint_0816::end_text() const {
     return "Exited Mt. Coronet, having dealt with Cyrus.";
 }
-void AutoStory_Checkpoint_0816::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0816::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0816(env, context, options, stats);
 }
 
@@ -2681,8 +2926,10 @@ std::string AutoStory_Checkpoint_0817::start_text() const {
 std::string AutoStory_Checkpoint_0817::end_text() const {
     return "Entered the Veilstone Pokemon Center.";
 }
-void AutoStory_Checkpoint_0817::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0817::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0817(env, context, options, stats);
 }
 
@@ -2695,8 +2942,10 @@ std::string AutoStory_Checkpoint_0818::start_text() const {
 std::string AutoStory_Checkpoint_0818::end_text() const {
     return "Exited the Veilstone Pokemon Center.";
 }
-void AutoStory_Checkpoint_0818::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0818::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0818(env, context, options, stats);
 }
 
@@ -2709,8 +2958,10 @@ std::string AutoStory_Checkpoint_0819::start_text() const {
 std::string AutoStory_Checkpoint_0819::end_text() const {
     return "Arrived at the house South of Veilstone City.";
 }
-void AutoStory_Checkpoint_0819::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0819::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0819(env, context, options, stats);
 }
 
@@ -2723,8 +2974,10 @@ std::string AutoStory_Checkpoint_0820::start_text() const {
 std::string AutoStory_Checkpoint_0820::end_text() const {
     return "Exited the house South of Veilstone City.";
 }
-void AutoStory_Checkpoint_0820::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0820::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0820(env, context, options, stats);
 }
 
@@ -2737,8 +2990,10 @@ std::string AutoStory_Checkpoint_0821::start_text() const {
 std::string AutoStory_Checkpoint_0821::end_text() const {
     return "Entered the house West of Sunyshore City.";
 }
-void AutoStory_Checkpoint_0821::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0821::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0821(env, context, options, stats);
 }
 
@@ -2751,8 +3006,10 @@ std::string AutoStory_Checkpoint_0822::start_text() const {
 std::string AutoStory_Checkpoint_0822::end_text() const {
     return "Entered Sunyshore City.";
 }
-void AutoStory_Checkpoint_0822::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0822::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0822(env, context, options, stats);
 }
 
@@ -2765,8 +3022,10 @@ std::string AutoStory_Checkpoint_0823::start_text() const {
 std::string AutoStory_Checkpoint_0823::end_text() const {
     return "Entered Sunyshore City's lighthouse.";
 }
-void AutoStory_Checkpoint_0823::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0823::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0823(env, context, options, stats);
 }
 
@@ -2779,8 +3038,10 @@ std::string AutoStory_Checkpoint_0824::start_text() const {
 std::string AutoStory_Checkpoint_0824::end_text() const {
     return "Exited Sunyshore City's lighthouse.";
 }
-void AutoStory_Checkpoint_0824::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0824::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0824(env, context, options, stats);
 }
 
@@ -2793,8 +3054,10 @@ std::string AutoStory_Checkpoint_0825::start_text() const {
 std::string AutoStory_Checkpoint_0825::end_text() const {
     return "Entered Sunyshore City's gym.";
 }
-void AutoStory_Checkpoint_0825::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0825::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0825(env, context, options, stats);
 }
 
@@ -2807,31 +3070,45 @@ std::string AutoStory_Checkpoint_0826::start_text() const {
 std::string AutoStory_Checkpoint_0826::end_text() const {
     return "Entered Sunyshore City's gym.";
 }
-void AutoStory_Checkpoint_0826::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                               AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_0826::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_0826(env, context, options, stats);
 }
 
-void AutoStory_Checkpoint_021::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                                              AutoStoryOptions options, AutoStoryStats& stats) const {
+void AutoStory_Checkpoint_021::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
     checkpoint_021(env, context, options, stats);
 }
 
 
-void checkpoint_021(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options,
-                    AutoStoryStats& stats){
+void checkpoint_021(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             // TODO: implement Segment 08 gameplay logic (seventh badge area)
         },
         true);
 }
 
-void checkpoint_021_legendary(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-                              AutoStoryOptions options, AutoStoryStats& stats){
+void checkpoint_021_legendary(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
     checkpoint_reattempt_loop(
-        env, context, options, stats,
+        env,
+        context,
+        options,
+        stats,
         [&](size_t /*attempt*/){
             approach_legendary(env.console, context);
             enter_legendary_battle(env.console, context);
