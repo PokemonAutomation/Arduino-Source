@@ -700,6 +700,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Startup/SetupSettings.h
     Source/CommonFramework/Tools/DebugDumper.cpp
     Source/CommonFramework/Tools/DebugDumper.h
+    Source/CommonFramework/Tools/DeviceDropdownAliases.cpp
+    Source/CommonFramework/Tools/DeviceDropdownAliases.h
     Source/CommonFramework/Tools/ErrorDumper.cpp
     Source/CommonFramework/Tools/ErrorDumper.h
     Source/CommonFramework/Tools/FileDownloader.cpp

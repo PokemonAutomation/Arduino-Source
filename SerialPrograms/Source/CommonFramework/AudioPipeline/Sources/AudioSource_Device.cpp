@@ -8,11 +8,34 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/AudioInputChoice.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
+#include "CommonFramework/Tools/DeviceDropdownAliases.h"
 #include "AudioSource_Device.h"
 
 namespace PokemonAutomation{
 
 
+
+AudioSourceDescriptor_Device::AudioSourceDescriptor_Device(const std::string& device_name)
+    : AudioSourceDescriptor_Device(AudioDeviceInfo(device_name))
+{}
+AudioSourceDescriptor_Device::AudioSourceDescriptor_Device(AudioDeviceInfo info)
+    : AudioSourceDescriptor(AudioSourceType::Device)
+    , m_info(std::move(info))
+{
+    update_display_name();
+}
+
+void AudioSourceDescriptor_Device::update_display_name(){
+    if (!m_info){
+        m_display_name.clear();
+        return;
+    }
+    if (auto alias = device_dropdown_name("AudioInputs", m_info.device_name())){
+        m_display_name = *alias;
+    }else{
+        m_display_name = m_info.display_name();
+    }
+}
 
 bool AudioSourceDescriptor_Device::operator==(const AudioSourceDescriptor& x) const{
     if (typeid(*this) != typeid(x)){
@@ -21,7 +44,7 @@ bool AudioSourceDescriptor_Device::operator==(const AudioSourceDescriptor& x) co
     return m_info == static_cast<const AudioSourceDescriptor_Device&>(x).m_info;
 }
 std::string AudioSourceDescriptor_Device::display_name() const{
-    return m_info.display_name();
+    return m_display_name;
 }
 
 std::vector<AudioInputChoice> AudioSourceDescriptor_Device::supported_formats() const{
@@ -57,6 +80,7 @@ void AudioSourceDescriptor_Device::load_json(const JsonValue& json){
     const std::string* name = json.to_string();
     if (name != nullptr){
         m_info = AudioDeviceInfo(*name);
+        update_display_name();
     }
 }
 

@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioSource_Device_H
 #define PokemonAutomation_AudioPipeline_AudioSource_Device_H
 
+#include <string>
 #include "CommonFramework/AudioPipeline/AudioSourceDescriptor.h"
 #include "CommonFramework/AudioPipeline/AudioSource.h"
 #include "CommonFramework/AudioPipeline/Backends/AudioDeviceInfo.h"
@@ -20,14 +21,8 @@ public:
     AudioSourceDescriptor_Device()
         : AudioSourceDescriptor(AudioSourceType::Device)
     {}
-    AudioSourceDescriptor_Device(const std::string& device_name)
-        : AudioSourceDescriptor(AudioSourceType::Device)
-        , m_info(std::move(device_name))
-    {}
-    AudioSourceDescriptor_Device(AudioDeviceInfo info)
-        : AudioSourceDescriptor(AudioSourceType::Device)
-        , m_info(std::move(info))
-    {}
+    AudioSourceDescriptor_Device(const std::string& device_name);
+    AudioSourceDescriptor_Device(AudioDeviceInfo info);
 
 
 public:
@@ -51,7 +46,10 @@ public:
 
 
 private:
+    void update_display_name();
+
     AudioDeviceInfo m_info;
+    std::string m_display_name;
 };
 
 
