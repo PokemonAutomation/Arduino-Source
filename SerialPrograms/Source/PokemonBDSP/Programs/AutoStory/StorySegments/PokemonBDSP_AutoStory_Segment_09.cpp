@@ -5,6 +5,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Globals.h"
@@ -32,44 +33,9 @@ namespace PokemonAutomation {
 namespace NintendoSwitch {
 namespace PokemonBDSP {
 
-
-std::string AutoStory_Segment_09::name() const {
-    return "09: Eighth Badge to Champion";
-}
-std::string AutoStory_Segment_09::start_text() const {
-    return "Start: Eighth Gym Badge acquired (Sunyshore City).";
-}
-std::string AutoStory_Segment_09::end_text() const {
-    return "End: Elite Four and Champion defeated, credits roll.";
-}
-
-void AutoStory_Segment_09::run_segment(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    stats.m_segment++;
-    env.update_stats();
-    context.wait_for_all_requests();
-    env.console.log("Start Segment " + name(), COLOR_ORANGE);
-
-    AutoStory_Checkpoint_0901().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0902().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0903().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0904().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0905().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0906().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0907().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0908().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0909().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0910().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0911().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0912().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0913().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0914().run_checkpoint(env, context, options, stats);
-
-    context.wait_for_all_requests();
-    env.console.log("End Segment " + name(), COLOR_GREEN);
-}
+// ---------------------------------------------------------------------------
+//  Helpers
+// ---------------------------------------------------------------------------
 
 static void
 move_back_after_unexpected_battle(VideoStream& stream, ProControllerContext& context, const std::string& trainerid){
@@ -88,57 +54,28 @@ move_back_after_unexpected_battle(VideoStream& stream, ProControllerContext& con
     }
 }
 
-static bool handle_battle(VideoStream& stream, ProControllerContext& context, const std::string& trainerid){
-    context.wait_for_all_requests();
-    stream.log("Battling " + trainerid + "...", COLOR_GREEN);
-    BattleMenuWatcher battle_menu(BattleType::TRAINER);
-    int ret_menu = wait_until(stream, context, std::chrono::seconds(30), {{battle_menu}});
-    if (ret_menu < 0){
-        stream.log("handle_battle_" + trainerid + ": battle menu not detected!", COLOR_RED);
-        return false;
-    }
-    pbf_wait(context, 500ms);
-    pbf_press_button(context, BUTTON_A, 80ms, 300ms);
-    pbf_wait(context, 500ms);
-
-    if (trainerid == "victory_road_ace_mariah" or trainerid == "victory_road_blackbelt_miles" or
-        trainerid == "victory_road_dragontamer_andre" or trainerid == "victory_road_veteran_edgar"){
-        // Move the battle-move cursor down.
-        pbf_press_dpad(context, DPAD_DOWN, 280ms, 200ms);
-    }else if (trainerid == "route_223_swimmer_miranda" or trainerid == "route_223_swimmer_oscar" or
-        trainerid == "route_223_swimmer_crystal" or trainerid == "route_223_swimmer_gabrielle" or
-        trainerid == "route_223_swimmer_troy" or trainerid == "victory_road_ace_sydney" or
-        trainerid == "victory_road_psychic_valencia"){
-        // Move the battle-move cursor up.
-        pbf_press_dpad(context, DPAD_UP, 280ms, 200ms);
-    }else if (trainerid == "victory_road_ace_omar" or trainerid == "victory_road_veteran_clayton" or
-        trainerid == "victory_road_dragontamer_clinton"){
-        // Keep the current battle-move selection.
-    }
-    context.wait_for_all_requests();
-
-    {
-        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream,
-            context,
-            [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_A, 200000ms);
-            },
-            {{black_screen}});
-        if (ret < 0){
-            stream.log("handle_battle_" + trainerid + ": black screen not detected!", COLOR_RED);
-            return false;
-        }
-    }
-
-    context.wait_for_all_requests();
-    pbf_mash_button(context, BUTTON_B, 2000ms);
-    stream.log("handle_battle_" + trainerid + ": transition confirmed.");
+static bool handle_battle(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, const std::string& trainerid){
+    fight_trainer_using_moves(stream, context, stats, trainerid, true);
     return true;
 }
 
+static bool heal_and_exit(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, const std::string& label){
+    return heal_pokemon(stream, context, label, &stats);
+}
+
+// ---------------------------------------------------------------------------
+//  Named route navigation blocks
+// ---------------------------------------------------------------------------
+
 static bool
-enter_sunyshore_pokemon_center(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
+enter_sunyshore_pokemon_center(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options, bool start_inside_gym = true){
+    if (start_inside_gym){
+        // TODO(09.01): Record the watched Gym exit before the retained outdoor flight.
+        throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
+            "09.01 incomplete: Sunyshore Gym exit path needs recording before flying to the Center.",
+            stream);
+    }
+
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
     context.wait_for_all_requests();
@@ -168,7 +105,7 @@ enter_sunyshore_pokemon_center(VideoStream& stream, ProControllerContext& contex
 }
 
 static bool
-go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
+go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, AutoStoryOptions options){
     DpadState dpad;
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
@@ -250,7 +187,7 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "route_223_swimmer_miranda");
+                handle_battle(stream, context, stats, "route_223_swimmer_miranda");
                 context.wait_for_all_requests();
                 pbf_wait(context, 3000ms);
                 move_back_after_unexpected_battle(stream, context, "route_223_swimmer_miranda");
@@ -287,7 +224,7 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "route_223_swimmer_oscar");
+                handle_battle(stream, context, stats, "route_223_swimmer_oscar");
             }
         }
     }
@@ -322,7 +259,7 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "route_223_swimmer_crystal");
+                handle_battle(stream, context, stats, "route_223_swimmer_crystal");
                 context.wait_for_all_requests();
                 pbf_wait(context, 3000ms);
                 move_back_after_unexpected_battle(stream, context, "route_223_swimmer_crystal");
@@ -409,7 +346,7 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "route_223_swimmer_gabrielle");
+                handle_battle(stream, context, stats, "route_223_swimmer_gabrielle");
                 context.wait_for_all_requests();
                 pbf_wait(context, 3000ms);
                 move_back_after_unexpected_battle(stream, context, "route_223_swimmer_gabrielle");
@@ -454,7 +391,7 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "route_223_swimmer_troy");
+                handle_battle(stream, context, stats, "route_223_swimmer_troy");
                 context.wait_for_all_requests();
                 pbf_wait(context, 3000ms);
                 move_back_after_unexpected_battle(stream, context, "route_223_swimmer_troy");
@@ -519,10 +456,6 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
     return true;
 }
 
-static bool heal_and_exit(VideoStream& stream, ProControllerContext& context, const std::string& label){
-    return heal_pokemon(stream, context, label);
-}
-
 static bool enter_victory_road_cave(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
     DpadState dpad;
     context.wait_for_all_requests();
@@ -551,7 +484,7 @@ static bool enter_victory_road_cave(VideoStream& stream, ProControllerContext& c
     return true;
 }
 
-static bool go_through_victory_road_cave(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
+static bool go_through_victory_road_cave(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, AutoStoryOptions options){
     DpadState dpad;
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
@@ -604,7 +537,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "victory_road_ace_mariah");
+                handle_battle(stream, context, stats, "victory_road_ace_mariah");
             }
         }
     }
@@ -698,7 +631,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "victory_road_ace_omar");
+                handle_battle(stream, context, stats, "victory_road_ace_omar");
             }
         }
     }
@@ -755,7 +688,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "victory_road_ace_sydney");
+                handle_battle(stream, context, stats, "victory_road_ace_sydney");
             }
         }
     }
@@ -795,7 +728,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "victory_road_veteran_clayton");
+                handle_battle(stream, context, stats, "victory_road_veteran_clayton");
             }
         }
     }
@@ -887,7 +820,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "victory_road_blackbelt_miles");
+                handle_battle(stream, context, stats, "victory_road_blackbelt_miles");
             }
         }
     }
@@ -950,7 +883,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "victory_road_psychic_valencia");
+                handle_battle(stream, context, stats, "victory_road_psychic_valencia");
             }
         }
     }
@@ -1023,7 +956,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "victory_road_dragontamer_andre");
+                handle_battle(stream, context, stats, "victory_road_dragontamer_andre");
             }
         }
     }
@@ -1110,7 +1043,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "victory_road_veteran_edgar");
+                handle_battle(stream, context, stats, "victory_road_veteran_edgar");
             }
         }
     }
@@ -1155,7 +1088,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "victory_road_dragontamer_clinton");
+                handle_battle(stream, context, stats, "victory_road_dragontamer_clinton");
             }
         }
     }
@@ -1225,7 +1158,15 @@ static bool enter_elite_4_pokemon_center(VideoStream& stream, ProControllerConte
     return true;
 }
 
-static bool ready_in_front_of_elite_4(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
+static bool ready_in_front_of_elite_4(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats, bool before_rival = true){
+    if (before_rival){
+        // TODO(09.04): Record the rival encounter and return to the healing position.
+        // The retained nurse/shop route below starts after that missing encounter.
+        throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
+            "09.04 incomplete: League rival battle and recovery path need recording before final preparation.",
+            stream);
+    }
+
     DpadState dpad;
     context.wait_for_all_requests();
     pbf_wait(context, 6000ms);
@@ -1265,6 +1206,7 @@ static bool ready_in_front_of_elite_4(VideoStream& stream, ProControllerContext&
     wait_for_dialogue(stream, context, "Elite 4 Pokemon Center - Pokemon healing");
     mash_until_dialogue_ends(stream, context, BUTTON_B);
     context.wait_for_all_requests();
+    stats.move_pp_remaining = stats.move_pp_capacity;
     pbf_wait(context, 1000ms);
 
     pbf_move_left_joystick(context, {+1, 0}, 3200ms, 100ms); // 16+
@@ -1285,7 +1227,10 @@ get_into_the_elite_4_entrance(VideoStream& stream, ProControllerContext& context
     context.wait_for_all_requests();
     stream.log("get_into_the_elite_4_entrance: entered the Elite 4...");
 
-    return true;
+    // TODO(09.04): Record this route and its verified ending position.
+    throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
+        "09.04 League admission and the first-room handoff need recorded pathing; checkpoint is incomplete.",
+        stream);
 }
 
 static bool deal_with_aaron_elite_4(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
@@ -1294,7 +1239,10 @@ static bool deal_with_aaron_elite_4(VideoStream& stream, ProControllerContext& c
     context.wait_for_all_requests();
     stream.log("deal_with_aaron_elite_4: battling Aaron of the Elite 4 and passing the gate...");
 
-    return true;
+    // TODO(09.05): Record this route and its verified ending position.
+    throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
+        "09.05 Aaron battle and next-room handoff need recorded pathing; checkpoint is incomplete.",
+        stream);
 }
 
 static bool deal_with_bertha_elite_4(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
@@ -1303,7 +1251,10 @@ static bool deal_with_bertha_elite_4(VideoStream& stream, ProControllerContext& 
     context.wait_for_all_requests();
     stream.log("deal_with_bertha_elite_4: battling Bertha of the Elite 4 and passing the gate...");
 
-    return true;
+    // TODO(09.06): Record this route and its verified ending position.
+    throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
+        "09.06 Bertha battle and next-room handoff need recorded pathing; checkpoint is incomplete.",
+        stream);
 }
 
 static bool deal_with_flint_elite_4(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
@@ -1312,7 +1263,10 @@ static bool deal_with_flint_elite_4(VideoStream& stream, ProControllerContext& c
     context.wait_for_all_requests();
     stream.log("deal_with_flint_elite_4: battling Flint of the Elite 4 and passing the gate...");
 
-    return true;
+    // TODO(09.07): Record this route and its verified ending position.
+    throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
+        "09.07 Flint battle and next-room handoff need recorded pathing; checkpoint is incomplete.",
+        stream);
 }
 
 static bool deal_with_lucian_elite_4(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
@@ -1321,7 +1275,10 @@ static bool deal_with_lucian_elite_4(VideoStream& stream, ProControllerContext& 
     context.wait_for_all_requests();
     stream.log("deal_with_lucian_elite_4: battling Lucian of the Elite 4 and passing the gate...");
 
-    return true;
+    // TODO(09.08): Record this route and its verified ending position.
+    throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
+        "09.08 Lucian battle and Champion-room handoff need recorded pathing; checkpoint is incomplete.",
+        stream);
 }
 
 static bool deal_with_cynthia_and_finish(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
@@ -1330,7 +1287,70 @@ static bool deal_with_cynthia_and_finish(VideoStream& stream, ProControllerConte
     context.wait_for_all_requests();
     stream.log("deal_with_cynthia_and_finish: battling Cynthia and finishing the game...");
 
-    return true;
+    // TODO(09.09): Record this route and its verified ending position.
+    throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
+        "09.09 Cynthia battle, Hall of Fame and final completion need recorded pathing; checkpoint is incomplete.",
+        stream);
+}
+
+// ---------------------------------------------------------------------------
+//  Segment wrappers
+// ---------------------------------------------------------------------------
+
+std::string AutoStory_Segment_09::name() const {
+    return "09: Sunyshore to Champion";
+}
+
+std::string AutoStory_Segment_09::start_text() const {
+    return "Start: Inside Sunyshore Gym at the entrance, with eighth-badge rewards and dialogue finished.";
+}
+
+std::string AutoStory_Segment_09::end_text() const {
+    return "Target: Cynthia defeated and Hall of Fame completion confirmed. Battle and ending pathing are missing.";
+}
+
+void AutoStory_Segment_09::run_segment(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    stats.m_segment++;
+    env.update_stats();
+    context.wait_for_all_requests();
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
+    AutoStory_Checkpoint_0901().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0902().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0903().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0904().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0905().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0906().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0907().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0908().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0909().run_checkpoint(env, context, options, stats);
+    context.wait_for_all_requests();
+    env.console.log("End Segment " + name(), COLOR_GREEN);
+}
+
+// ---------------------------------------------------------------------------
+//  Checkpoint wrappers
+// ---------------------------------------------------------------------------
+
+std::string AutoStory_Checkpoint_0901::name() const {
+    return "09.01 - Sunyshore recovery (exit pending)";
+}
+
+std::string AutoStory_Checkpoint_0901::start_text() const {
+    return "Inside Sunyshore Gym at the entrance, with eighth-badge rewards and dialogue finished.";
+}
+
+std::string AutoStory_Checkpoint_0901::end_text() const {
+    return "Target: Healed and outside Sunyshore Pokemon Center. Gym exit pathing is missing.";
+}
+
+void AutoStory_Checkpoint_0901::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0901(env, context, options, stats);
 }
 
 void checkpoint_0901(SingleSwitchProgramEnvironment& env,
@@ -1343,13 +1363,42 @@ void checkpoint_0901(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!enter_sunyshore_pokemon_center(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "enter_sunyshore_pokemon_center: transition not detected.",
-                    env.console);
+            {
+                if (!enter_sunyshore_pokemon_center(env.console, context, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "enter_sunyshore_pokemon_center: transition not detected.",
+                        env.console);
+                }
             }
+            {
+                if (!heal_and_exit(env.console, context, stats, "Sunyshore City")){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "heal_and_exit_1: transition not detected.",
+                        env.console);
+                }
+            }
+            context.wait_for_all_requests();
         },
         true);
+}
+
+std::string AutoStory_Checkpoint_0902::name() const {
+    return "09.02 - Route 223 and Victory Road";
+}
+
+std::string AutoStory_Checkpoint_0902::start_text() const {
+    return "Healed and outside Sunyshore Pokemon Center at the doorway.";
+}
+
+std::string AutoStory_Checkpoint_0902::end_text() const {
+    return "Healed and outside Victory Road Pokemon Center after Jasmine and Route 223.";
+}
+
+void AutoStory_Checkpoint_0902::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0902(env, context, options, stats);
 }
 
 void checkpoint_0902(SingleSwitchProgramEnvironment& env,
@@ -1362,13 +1411,42 @@ void checkpoint_0902(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!heal_and_exit(env.console, context, "Sunyshore City")){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "heal_and_exit_1: transition not detected.",
-                    env.console);
+            {
+                if (!go_to_victory_road_pokemon_center(env.console, context, stats, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_to_victory_road_pokemon_center: transition not detected.",
+                        env.console);
+                }
             }
+            {
+                if (!heal_and_exit(env.console, context, stats, "Victory Road")){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "heal_and_exit_2: transition not detected.",
+                        env.console);
+                }
+            }
+            context.wait_for_all_requests();
         },
-        false);
+        true);
+}
+
+std::string AutoStory_Checkpoint_0903::name() const {
+    return "09.03 - Victory Road traversal";
+}
+
+std::string AutoStory_Checkpoint_0903::start_text() const {
+    return "Healed and outside Victory Road Pokemon Center at the doorway.";
+}
+
+std::string AutoStory_Checkpoint_0903::end_text() const {
+    return "Inside the Pokemon League building at its arrival position.";
+}
+
+void AutoStory_Checkpoint_0903::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0903(env, context, options, stats);
 }
 
 void checkpoint_0903(SingleSwitchProgramEnvironment& env,
@@ -1381,13 +1459,49 @@ void checkpoint_0903(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!go_to_victory_road_pokemon_center(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_to_victory_road_pokemon_center: transition not detected.",
-                    env.console);
+            {
+                if (!enter_victory_road_cave(env.console, context, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "enter_victory_road_cave: transition not detected.",
+                        env.console);
+                }
             }
+            {
+                if (!go_through_victory_road_cave(env.console, context, stats, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_through_victory_road_cave: transition not detected.",
+                        env.console);
+                }
+            }
+            {
+                if (!enter_elite_4_pokemon_center(env.console, context, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "enter_elite_4_pokemon_center: transition not detected.",
+                        env.console);
+                }
+            }
+            context.wait_for_all_requests();
         },
-        false);
+        true);
+}
+
+std::string AutoStory_Checkpoint_0904::name() const {
+    return "09.04 - League preparation (path pending)";
+}
+
+std::string AutoStory_Checkpoint_0904::start_text() const {
+    return "Inside the Pokemon League building at its arrival position.";
+}
+
+std::string AutoStory_Checkpoint_0904::end_text() const {
+    return "Target: Rival defeated, final healing and supplies confirmed, ready for admission. Rival and admission pathing are missing.";
+}
+
+void AutoStory_Checkpoint_0904::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0904(env, context, options, stats);
 }
 
 void checkpoint_0904(SingleSwitchProgramEnvironment& env,
@@ -1400,13 +1514,42 @@ void checkpoint_0904(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!heal_and_exit(env.console, context, "Victory Road")){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "heal_and_exit_2: transition not detected.",
-                    env.console);
+            {
+                if (!ready_in_front_of_elite_4(env.console, context, options, stats)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "ready_in_front_of_elite_4: transition not detected.",
+                        env.console);
+                }
             }
+            {
+                if (!get_into_the_elite_4_entrance(env.console, context, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "get_into_the_elite_4_entrance: transition not detected.",
+                        env.console);
+                }
+            }
+            context.wait_for_all_requests();
         },
-        false);
+        true);
+}
+
+std::string AutoStory_Checkpoint_0905::name() const {
+    return "09.05 - Aaron (path pending)";
+}
+
+std::string AutoStory_Checkpoint_0905::start_text() const {
+    return "At the recorded Aaron room entry position; admission and position are pending recording.";
+}
+
+std::string AutoStory_Checkpoint_0905::end_text() const {
+    return "Target: Aaron defeated, dialogue cleared, at the next room entry. Battle and handoff pathing are missing.";
+}
+
+void AutoStory_Checkpoint_0905::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0905(env, context, options, stats);
 }
 
 void checkpoint_0905(SingleSwitchProgramEnvironment& env,
@@ -1419,13 +1562,35 @@ void checkpoint_0905(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!enter_victory_road_cave(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "enter_victory_road_cave: transition not detected.",
-                    env.console);
+            {
+                if (!deal_with_aaron_elite_4(env.console, context, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "deal_with_aaron_elite_4: transition not detected.",
+                        env.console);
+                }
             }
+            context.wait_for_all_requests();
         },
-        false);
+        true);
+}
+
+std::string AutoStory_Checkpoint_0906::name() const {
+    return "09.06 - Bertha (path pending)";
+}
+
+std::string AutoStory_Checkpoint_0906::start_text() const {
+    return "At the recorded Bertha room entry position, after Aaron; exact position is pending recording.";
+}
+
+std::string AutoStory_Checkpoint_0906::end_text() const {
+    return "Target: Bertha defeated, dialogue cleared, at the next room entry. Battle and handoff pathing are missing.";
+}
+
+void AutoStory_Checkpoint_0906::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0906(env, context, options, stats);
 }
 
 void checkpoint_0906(SingleSwitchProgramEnvironment& env,
@@ -1438,13 +1603,35 @@ void checkpoint_0906(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!go_through_victory_road_cave(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_through_victory_road_cave: transition not detected.",
-                    env.console);
+            {
+                if (!deal_with_bertha_elite_4(env.console, context, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "deal_with_bertha_elite_4: transition not detected.",
+                        env.console);
+                }
             }
+            context.wait_for_all_requests();
         },
-        false);
+        true);
+}
+
+std::string AutoStory_Checkpoint_0907::name() const {
+    return "09.07 - Flint (path pending)";
+}
+
+std::string AutoStory_Checkpoint_0907::start_text() const {
+    return "At the recorded Flint room entry position, after Bertha; exact position is pending recording.";
+}
+
+std::string AutoStory_Checkpoint_0907::end_text() const {
+    return "Target: Flint defeated, dialogue cleared, at the next room entry. Battle and handoff pathing are missing.";
+}
+
+void AutoStory_Checkpoint_0907::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0907(env, context, options, stats);
 }
 
 void checkpoint_0907(SingleSwitchProgramEnvironment& env,
@@ -1457,13 +1644,35 @@ void checkpoint_0907(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!enter_elite_4_pokemon_center(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "enter_elite_4_pokemon_center: transition not detected.",
-                    env.console);
+            {
+                if (!deal_with_flint_elite_4(env.console, context, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "deal_with_flint_elite_4: transition not detected.",
+                        env.console);
+                }
             }
+            context.wait_for_all_requests();
         },
-        false);
+        true);
+}
+
+std::string AutoStory_Checkpoint_0908::name() const {
+    return "09.08 - Lucian (path pending)";
+}
+
+std::string AutoStory_Checkpoint_0908::start_text() const {
+    return "At the recorded Lucian room entry position, after Flint; exact position is pending recording.";
+}
+
+std::string AutoStory_Checkpoint_0908::end_text() const {
+    return "Target: Lucian defeated, dialogue cleared, at the Champion room entry. Battle and handoff pathing are missing.";
+}
+
+void AutoStory_Checkpoint_0908::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0908(env, context, options, stats);
 }
 
 void checkpoint_0908(SingleSwitchProgramEnvironment& env,
@@ -1476,13 +1685,35 @@ void checkpoint_0908(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!ready_in_front_of_elite_4(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "ready_in_front_of_elite_4: transition not detected.",
-                    env.console);
+            {
+                if (!deal_with_lucian_elite_4(env.console, context, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "deal_with_lucian_elite_4: transition not detected.",
+                        env.console);
+                }
             }
+            context.wait_for_all_requests();
         },
-        false);
+        true);
+}
+
+std::string AutoStory_Checkpoint_0909::name() const {
+    return "09.09 - Cynthia and Hall of Fame (path pending)";
+}
+
+std::string AutoStory_Checkpoint_0909::start_text() const {
+    return "At the recorded Champion room entry position, after Lucian; exact position is pending recording.";
+}
+
+std::string AutoStory_Checkpoint_0909::end_text() const {
+    return "Target: Cynthia defeated and Hall of Fame completion confirmed. Battle and ending pathing are missing.";
+}
+
+void AutoStory_Checkpoint_0909::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0909(env, context, options, stats);
 }
 
 void checkpoint_0909(SingleSwitchProgramEnvironment& env,
@@ -1495,335 +1726,17 @@ void checkpoint_0909(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!get_into_the_elite_4_entrance(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "get_into_the_elite_4_entrance: transition not detected.",
-                    env.console);
+            {
+                if (!deal_with_cynthia_and_finish(env.console, context, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "deal_with_cynthia_and_finish: transition not detected.",
+                        env.console);
+                }
             }
+            context.wait_for_all_requests();
         },
         true);
 }
-
-void checkpoint_0910(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!deal_with_aaron_elite_4(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "deal_with_aaron_elite_4: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0911(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!deal_with_bertha_elite_4(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "deal_with_bertha_elite_4: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0912(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!deal_with_flint_elite_4(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "deal_with_flint_elite_4: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0913(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!deal_with_lucian_elite_4(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "deal_with_lucian_elite_4: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0914(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!deal_with_cynthia_and_finish(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "deal_with_cynthia_and_finish: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-std::string AutoStory_Checkpoint_0901::name() const {
-    return "09.01 - Leave the gym and fly to the Sunyshore Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0901::start_text() const {
-    return "Eighth Gym Badge acquired (Sunyshore City).";
-}
-std::string AutoStory_Checkpoint_0901::end_text() const {
-    return "Enter the Sunyshore Pokemon Center.";
-}
-void AutoStory_Checkpoint_0901::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0901(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0902::name() const {
-    return "09.02 - Heal the Pokemon at the Sunyshore Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0902::start_text() const {
-    return "Entered the Sunyshore Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0902::end_text() const {
-    return "Exit the Sunyshore Pokemon Center.";
-}
-void AutoStory_Checkpoint_0902::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0902(env, context, options, stats);
-}
-
-
-std::string AutoStory_Checkpoint_0903::name() const {
-    return "09.03 - Start at the Sunyshore Pokemon Center and go to the Victory Road Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0903::start_text() const {
-    return "Exited the Sunyshore Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0903::end_text() const {
-    return "Enter the Victory Road Pokemon Center.";
-}
-void AutoStory_Checkpoint_0903::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0903(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0904::name() const {
-    return "09.04 - Heal at the Victory Road Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0904::start_text() const {
-    return "Entered Victory Road Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0904::end_text() const {
-    return "Exit Victory Road Pokemon Center.";
-}
-void AutoStory_Checkpoint_0904::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0904(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0905::name() const {
-    return "09.05 - Enter the Victory Road cave.";
-}
-std::string AutoStory_Checkpoint_0905::start_text() const {
-    return "Exited Victory Road Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0905::end_text() const {
-    return "Enter the Victory Road cave.";
-}
-void AutoStory_Checkpoint_0905::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0905(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0906::name() const {
-    return "09.06 - Go through the Victory Road cave.";
-}
-std::string AutoStory_Checkpoint_0906::start_text() const {
-    return "Entered Victory Road cave.";
-}
-std::string AutoStory_Checkpoint_0906::end_text() const {
-    return "Exit Victory Road cave.";
-}
-void AutoStory_Checkpoint_0906::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0906(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0907::name() const {
-    return "09.07 - Go through the end of Victory Road into the Elite 4 building";
-}
-std::string AutoStory_Checkpoint_0907::start_text() const {
-    return "Exited Victory Road cave.";
-}
-std::string AutoStory_Checkpoint_0907::end_text() const {
-    return "Enter the Elite 4 building.";
-}
-void AutoStory_Checkpoint_0907::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0907(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0908::name() const {
-    return "09.08 - Enter the Elite 4 building and get ready to enter.";
-}
-std::string AutoStory_Checkpoint_0908::start_text() const {
-    return "Entered the Elite 4 building.";
-}
-std::string AutoStory_Checkpoint_0908::end_text() const {
-    return "Ready in front of the Elite 4.";
-}
-void AutoStory_Checkpoint_0908::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0908(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0909::name() const {
-    return "09.09 - Enter the first room of the Elite 4.";
-}
-std::string AutoStory_Checkpoint_0909::start_text() const {
-    return "Readied in front of the Elite 4.";
-}
-std::string AutoStory_Checkpoint_0909::end_text() const {
-    return "Enter the Elite 4's first room.";
-}
-void AutoStory_Checkpoint_0909::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0909(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0910::name() const {
-    return "09.10 - Deal with Aaron and go to the second room.";
-}
-std::string AutoStory_Checkpoint_0910::start_text() const {
-    return "Entered the Elite 4's first room.";
-}
-std::string AutoStory_Checkpoint_0910::end_text() const {
-    return "Deal with Aaron and enter the second room.";
-}
-void AutoStory_Checkpoint_0910::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0910(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0911::name() const {
-    return "09.11 - Deal with Bertha and go to the third room.";
-}
-std::string AutoStory_Checkpoint_0911::start_text() const {
-    return "Dealt with Aaron and entered the second room.";
-}
-std::string AutoStory_Checkpoint_0911::end_text() const {
-    return "Deal with Bertha and enter the third room.";
-}
-void AutoStory_Checkpoint_0911::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0911(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0912::name() const {
-    return "09.12 - Deal with Flint and go to the fourth room.";
-}
-std::string AutoStory_Checkpoint_0912::start_text() const {
-    return "Dealt with Bertha and entered the third room.";
-}
-std::string AutoStory_Checkpoint_0912::end_text() const {
-    return "Deal with Flint and enter the fourth room.";
-}
-void AutoStory_Checkpoint_0912::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0912(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0913::name() const {
-    return "09.13 - Deal with Lucian and go to the last room.";
-}
-std::string AutoStory_Checkpoint_0913::start_text() const {
-    return "Dealt with Flint and entered the fourth room.";
-}
-std::string AutoStory_Checkpoint_0913::end_text() const {
-    return "Deal with Lucian and enter the last room.";
-}
-void AutoStory_Checkpoint_0913::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0913(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0914::name() const {
-    return "09.14 - Deal with Cynthia and finish the game.";
-}
-std::string AutoStory_Checkpoint_0914::start_text() const {
-    return "Dealt with Lucian and entered the last room.";
-}
-std::string AutoStory_Checkpoint_0914::end_text() const {
-    return "Deal with Cynthia and finish the game.";
-}
-void AutoStory_Checkpoint_0914::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0914(env, context, options, stats);
-}
-
 
 }
 }

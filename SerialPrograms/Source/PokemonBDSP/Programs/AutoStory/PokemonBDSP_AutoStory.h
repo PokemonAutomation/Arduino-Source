@@ -38,6 +38,8 @@ public:
     ~BDSPAutoStory();
     BDSPAutoStory();
 
+    virtual std::string check_validity() const override;
+    virtual void load_json(const JsonValue& json) override;
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 
@@ -46,8 +48,6 @@ private:
     void update_ui_state();
 
 private:
-    // DIAGNOSTIC ONLY: Remove before pushing to production.
-    BooleanCheckBoxOption DIAGNOSTIC_POST_CATCH_ONLY;
     // DIAGNOSTIC ONLY: Remove before pushing to production.
     BooleanCheckBoxOption DIAGNOSTIC_FAKE_CHECKPOINT_SAVE;
     EnumDropdownOption<StorySection> STORY_SECTION;
