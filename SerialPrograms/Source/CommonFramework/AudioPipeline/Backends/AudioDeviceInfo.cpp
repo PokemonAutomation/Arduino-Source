@@ -12,6 +12,7 @@
 #include "CommonFramework/AudioPipeline/AudioInputChoice.h"
 #include "CommonFramework/AudioPipeline/Backends/NativeAudioFormats.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Options/DeviceDropdownAliases.h"
 #include "AudioDeviceInfo.h"
 
 namespace PokemonAutomation{
@@ -192,7 +193,16 @@ AudioDeviceInfo::AudioDeviceInfo(const std::string& device_name){
 AudioDeviceInfo::operator bool() const{
     return m_body && !m_body->device_name.empty();
 }
-const std::string& AudioDeviceInfo::display_name() const{
+std::string AudioDeviceInfo::display_name() const{
+    if (!*this){
+        return std::string();
+    }
+    if (auto alias = device_dropdown_name(DeviceAliasType::AUDIO, m_body->device_name)){
+        return *alias;
+    }
+    return m_body->display_name;
+}
+const std::string& AudioDeviceInfo::original_name() const{
     return m_body->display_name;
 }
 const std::string& AudioDeviceInfo::device_name() const{

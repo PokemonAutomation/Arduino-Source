@@ -23,7 +23,7 @@ bool VideoSourceDescriptor_Camera::operator==(const VideoSourceDescriptor& x) co
     return m_info == static_cast<const VideoSourceDescriptor_Camera&>(x).m_info;
 }
 std::string VideoSourceDescriptor_Camera::display_name() const{
-    return get_camera_name(m_info);
+    return m_info.display_name();
 }
 
 JsonValue VideoSourceDescriptor_Camera::to_json() const{

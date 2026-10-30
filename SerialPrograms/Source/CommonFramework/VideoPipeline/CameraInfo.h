@@ -24,6 +24,8 @@ public:
     explicit operator bool() const{ return !m_device_name.empty(); }
     const std::string& device_name() const{ return m_device_name; }
 
+    std::string display_name() const;
+
     bool operator==(const CameraInfo& info) const{
         return m_device_name == info.m_device_name;
     }

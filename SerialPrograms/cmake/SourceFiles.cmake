@@ -634,6 +634,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Notifications/SenderNotificationTable.h
     Source/CommonFramework/Options/BoxOption.cpp
     Source/CommonFramework/Options/BoxOption.h
+    Source/CommonFramework/Options/DeviceDropdownAliases.cpp
+    Source/CommonFramework/Options/DeviceDropdownAliases.h
     Source/CommonFramework/Options/Environment/OnnxOptions.h
     Source/CommonFramework/Options/Environment/SleepSuppressOption.cpp
     Source/CommonFramework/Options/Environment/SleepSuppressOption.h
@@ -745,6 +747,7 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/VideoPipeline/Backends/SnapshotManager.h
     Source/CommonFramework/VideoPipeline/Backends/VideoFrameQt.cpp
     Source/CommonFramework/VideoPipeline/Backends/VideoFrameQt.h
+    Source/CommonFramework/VideoPipeline/CameraInfo.cpp
     Source/CommonFramework/VideoPipeline/CameraInfo.h
     Source/CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.cpp
     Source/CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h
