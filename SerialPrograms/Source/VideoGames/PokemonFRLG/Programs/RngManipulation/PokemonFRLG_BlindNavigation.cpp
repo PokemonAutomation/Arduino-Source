@@ -61,6 +61,9 @@ static uint64_t magikarp_fixed_duration(Language language){
     if (language == Language::French){
         duration -= 1500;
     }
+    if (language == Language::Japanese){
+        duration += 1500;
+    }
     return duration;
 }
 
@@ -182,6 +185,9 @@ void collect_magikarp_after_delay(ProControllerContext& context, uint64_t ingame
     // Advance through starter dialogue and wait on YES/NO
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     if (language != Language::French){
+        pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    }
+    if (language == Language::Japanese){
         pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     }
     pbf_press_button(context, BUTTON_A, 200ms, std::chrono::milliseconds(ingame_delay - magikarp_fixed_duration(language)));
