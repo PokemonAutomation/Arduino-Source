@@ -1061,7 +1061,8 @@ static void fight_using_move_list(VideoStream& stream,
     const std::vector<size_t>& move_slots,
     const std::string& label,
     bool confirm_default_target,
-    bool post_battle_dialogue_cleanup){
+    bool post_battle_dialogue_cleanup,
+    std::array<size_t, 4>* remaining_pp = nullptr){
     if (move_slots.empty() || std::any_of(move_slots.begin(), move_slots.end(), [](size_t slot){
             return slot < 1 || slot > 4;
         })){
@@ -1111,27 +1112,65 @@ static void fight_using_move_list(VideoStream& stream,
             // -------------------------------------------------
             // Battle menu detected.
             // -------------------------------------------------
-        case 0:
+        case 0: {
             battle_menu_seen = true;
+            size_t selected_move = move_slots[move_index];
+            if (remaining_pp){
+                selected_move = 0;
+                for (size_t slot : move_slots){
+                    if ((*remaining_pp)[slot - 1] > 0){
+                        selected_move = slot;
+                        break;
+                    }
+                }
+                if (selected_move == 0){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        label + ": Allowed move PP budgets exhausted; heal before continuing.",
+                        stream);
+                }
+            }
 
             stream.log("[AutoStory] Battle menu detected.", COLOR_BLUE);
 
-            stream.log("[" + label + "] Move list position " + std::to_string(move_index + 1) + ": use move " +
-                std::to_string(move_slots[move_index]) + ".");
+            if (remaining_pp){
+                stream.log("[" + label + "] Using available move slot " + std::to_string(selected_move) +
+                    " from this battle's priority list.");
+            }else{
+                stream.log("[" + label + "] Move list position " + std::to_string(move_index + 1) + ": use move " +
+                    std::to_string(selected_move) + ".");
+            }
             select_battle_move_slot(stream,
                 context,
                 battle_type,
-                move_slots[move_index],
+                selected_move,
                 label,
                 confirm_default_target,
                 current_move);
-            current_move = move_slots[move_index];
+            // A disabled move leaves the Fight list open and consumes no PP.
+            // The single-slot policy has no legal alternative: retry the checkpoint
+            // rather than repeatedly charging an input the game rejected.
+            if (remaining_pp && move_slots.size() == 1){
+                context.wait_for_all_requests();
+                const auto frame = stream.video().snapshot();
+                if (frame && detect_battle_move_menu(frame).move_count){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        label + ": Move selection was rejected; PP budget unchanged. Retrying from the saved checkpoint.",
+                        stream);
+                }
+            }
+            current_move = selected_move;
+            if (remaining_pp){
+                --(*remaining_pp)[selected_move - 1];
+                stream.log("[Move PP] Slot " + std::to_string(selected_move) + ": " +
+                    std::to_string((*remaining_pp)[selected_move - 1]) + " remaining in the current budget.");
+            }
             // Advance once per move selection; retain the final entry.
-            if (move_index + 1 < move_slots.size()){
+            if (!remaining_pp && move_index + 1 < move_slots.size()){
                 move_index++;
             }
 
             break;
+        }
 
             // -------------------------------------------------
             // End battle detected.
@@ -1577,6 +1616,75 @@ void fight_trainer_using_moves(VideoStream& stream,
     const std::string& label,
     bool post_battle_dialogue_cleanup){
     fight_trainer_using_moves(stream, context, std::vector<size_t>{move}, label, post_battle_dialogue_cleanup);
+}
+
+void fight_trainer_using_moves(VideoStream& stream,
+    ProControllerContext& context,
+    AutoStoryStats& stats,
+    const std::string& label,
+    bool post_battle_dialogue_cleanup){
+    // Preserve the list-based selection/target/exit handling. These priorities
+    // refer to the wiki's standardized slot roles, not move-name OCR.
+    std::vector<size_t> priorities{1, 2, 4, 3};
+    const bool grass_gym = label == "Gardenia" || label == "Lass Caroline" ||
+        label == "Aroma Lady Jenna" || label == "Aroma Lady Angela" ||
+        label == "Beauty Lindsay" || label == "Aroma Lady Teighler";
+    const bool rock_battle = label == "Roark" || label.find("Hiker") != std::string::npos ||
+        label.find("hiker_") != std::string::npos;
+    const bool water_battle = label == "Crasher Wake" || label.find("Pastoria Gym trainer") != std::string::npos ||
+        label.find("tuber_") != std::string::npos || label.find("swimmer_") != std::string::npos;
+    const bool flying_battle = label.find("Bird") != std::string::npos ||
+        label.find("birdkeeper_") != std::string::npos || label.find("Cycling Road") != std::string::npos;
+    const bool fighting_battle = label.find("Black Belt") != std::string::npos ||
+        label.find("blackbelt_") != std::string::npos;
+
+    switch (stats.starter_choice){
+    case StarterChoice::TURTWIG:
+        if (label == "Fantina" || flying_battle){
+            priorities = {1, 2, 4};
+        }else if (rock_battle || water_battle){
+            priorities = {2, 4, 1, 3};
+        }else if (label == "Maylene"){
+            priorities = {3, 1, 2, 4};
+        }
+        break;
+    case StarterChoice::CHIMCHAR:
+        if (label == "Fantina" || label.find("psychic_") != std::string::npos ||
+            label.find("Psychics ") != std::string::npos){
+            // Psychic/Ghost parties rule out Fighting slots; Levitate users also
+            // rule out Earthquake. Do not spend a different slot on exhaustion.
+            priorities = {2};
+        }else if (grass_gym || fighting_battle || label == "Maylene" ||
+            label == "Route 215 Ruin Maniac Calvin" ||
+            label == "Bug Catchers Donald and Phillip" || label == "victory_road_ace_sydney"){
+            priorities = {2, 1, 4};
+        }else if (flying_battle){
+            priorities = {1, 4, 2};
+        }else if (water_battle || rock_battle){
+            priorities = {1, 4, 3, 2};
+        }
+        break;
+    case StarterChoice::PIPLUP:
+        if (grass_gym || flying_battle || label.find("dragontamer_") != std::string::npos ||
+            label == "victory_road_ace_sydney"){
+            priorities = {2, 1, 4, 3};
+        }else if (rock_battle || label == "Maylene" || label == "Fantina" ||
+            label.find(" and ") != std::string::npos ||
+            label == "veilstone_galactic_grunts_1" || label == "Route 215 Ruin Maniac Calvin"){
+            priorities = {3, 2, 1, 4};
+        }else if (water_battle || fighting_battle){
+            priorities = {1, 4, 2, 3};
+        }
+        break;
+    }
+    fight_using_move_list(stream,
+        context,
+        BattleType::TRAINER,
+        priorities,
+        label,
+        true,
+        post_battle_dialogue_cleanup,
+        &stats.move_pp_remaining);
 }
 
 void fight_trainer_using_move_slot(VideoStream& stream,

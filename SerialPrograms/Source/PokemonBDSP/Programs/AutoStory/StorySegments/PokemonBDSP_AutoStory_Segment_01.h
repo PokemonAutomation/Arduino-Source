@@ -38,9 +38,9 @@ struct MineRouteTestOptions {
     bool reset_on_failure = false;
 };
 
-void jubilife_to_oreburgh_gate(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context);
+void jubilife_to_oreburgh_gate(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats);
 
-void oreburgh_gate_nav(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context);
+void oreburgh_gate_nav(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats);
 
 void oreburgh_gate_to_mine(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context);
 
@@ -48,7 +48,7 @@ void oreburgh_mine_nav(VideoStream& stream, ProControllerContext& context);
 
 void oreburgh_mine_to_gym(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context);
 
-void gym_Puzzle_01(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context);
+void gym_Puzzle_01(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats);
 
 // Starts inside the mine at an entrance position; stops outside after
 // talking to Roark and using Escape Rope. Does not reset on failure.

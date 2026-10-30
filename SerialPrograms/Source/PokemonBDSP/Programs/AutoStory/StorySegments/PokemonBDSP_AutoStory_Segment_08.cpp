@@ -5,6 +5,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Globals.h"
@@ -32,9 +33,8 @@ namespace PokemonAutomation {
 namespace NintendoSwitch {
 namespace PokemonBDSP {
 
-
 // ---------------------------------------------------------------------------
-//  Legendary encounter (from Routes/Legendary_Segment.cpp)
+//  Helpers
 // ---------------------------------------------------------------------------
 
 static void approach_legendary(VideoStream& /*stream*/, ProControllerContext& context){
@@ -77,74 +77,6 @@ static void exit_legendary_encounter(VideoStream& /*stream*/, ProControllerConte
     pbf_wait(context, 2000ms);
 }
 
-
-// ---------------------------------------------------------------------------
-//  Segment / Checkpoint classes
-// ---------------------------------------------------------------------------
-
-std::string AutoStory_Segment_08::name() const {
-    return "08: Seventh Badge to Eighth Badge";
-}
-std::string AutoStory_Segment_08::start_text() const {
-    return "Start: Seventh Gym Badge acquired (Snowpoint City).";
-}
-std::string AutoStory_Segment_08::end_text() const {
-    return "End: Eighth Gym Badge acquired (Sunyshore City).";
-}
-
-void AutoStory_Segment_08::run_segment(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    stats.m_segment++;
-    env.update_stats();
-    context.wait_for_all_requests();
-    env.console.log("Start Segment " + name(), COLOR_ORANGE);
-
-    AutoStory_Checkpoint_0801().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0802().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0803().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0804().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0805().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0806().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0807().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0808().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0809().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0810().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0811().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0812().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0813().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0814().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0815().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0816().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0817().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0818().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0819().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0820().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0821().run_checkpoint(env, context, options, stats);
-
-    /*AutoStory_Checkpoint_021().run_checkpoint(env, context, options, stats);
-    checkpoint_021_legendary(env, context, options, stats);*/
-
-    context.wait_for_all_requests();
-    env.console.log("End Segment " + name(), COLOR_GREEN);
-}
-
-
-std::string AutoStory_Checkpoint_021::name() const {
-    return "021 - " + AutoStory_Segment_08().name();
-}
-std::string AutoStory_Checkpoint_021::start_text() const {
-    return "Seventh Gym Badge acquired (Snowpoint City).";
-}
-std::string AutoStory_Checkpoint_021::end_text() const {
-    return "Eighth Gym Badge acquired (Sunyshore City).";
-}
-
-
-// ------------------------------------------------------------------ Functions logic --------------------------------------------------------- //
-
-
 static void
 move_back_after_unexpected_battle(VideoStream& stream, ProControllerContext& context, const std::string& trainerid){
     stream.log("Finishing battle with " + trainerid, COLOR_GREEN);
@@ -160,53 +92,18 @@ move_back_after_unexpected_battle(VideoStream& stream, ProControllerContext& con
     }
 }
 
-static bool handle_battle(VideoStream& stream, ProControllerContext& context, const std::string& trainerid){
-    context.wait_for_all_requests();
-    stream.log("Battling " + trainerid + "...", COLOR_GREEN);
-    BattleMenuWatcher battle_menu(BattleType::TRAINER);
-    int ret_menu = wait_until(stream, context, std::chrono::seconds(30), {{battle_menu}});
-    if (ret_menu < 0){
-        stream.log("handle_battle_" + trainerid + ": battle menu not detected!", COLOR_RED);
-        return false;
-    }
-    pbf_wait(context, 500ms);
-    pbf_press_button(context, BUTTON_A, 80ms, 300ms);
-    pbf_wait(context, 500ms);
-
-    if (trainerid == "veilstone_warehouse_warehouse_grunt_2" or trainerid == "galactic_hq_grunt_4" or
-        trainerid == "galactic_hq_grunt_5"){
-        // Move the battle-move cursor down.
-        pbf_press_dpad(context, DPAD_DOWN, 280ms, 200ms);
-    }else if (trainerid == "galactic_hq_grunt_1" or trainerid == "galactic_hq_double_grunts_1" or
-        trainerid == "route_222_sailor_luther"){
-        // Move the battle-move cursor up.
-        pbf_press_dpad(context, DPAD_UP, 280ms, 200ms);
-    }else if (trainerid == "veilstone_warehouse_warehouse_grunt_1" or trainerid == "galactic_hq_scientist_fredrick" or
-        trainerid == "galactic_hq_grunt_2" or trainerid == "galactic_hq_grunt_3" or trainerid == "galactic_hq_cyrus" or
-        trainerid == "galactic_hq_commander_saturn" or trainerid == "route_207_hiker_justin"){
-        // Keep the current battle-move selection.
-    }
-    context.wait_for_all_requests();
-
-    {
-        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream,
-            context,
-            [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_A, 200000ms);
-            },
-            {{black_screen}});
-        if (ret < 0){
-            stream.log("handle_battle_" + trainerid + ": black screen not detected!", COLOR_RED);
-            return false;
-        }
-    }
-
-    context.wait_for_all_requests();
-    pbf_mash_button(context, BUTTON_B, 2000ms);
-    stream.log("handle_battle_" + trainerid + ": transition confirmed.");
+static bool handle_battle(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, const std::string& trainerid){
+    fight_trainer_using_moves(stream, context, stats, trainerid, true);
     return true;
 }
+
+static bool heal_and_exit(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, const std::string& label){
+    return heal_pokemon(stream, context, label, &stats);
+}
+
+// ---------------------------------------------------------------------------
+//  Named route navigation blocks
+// ---------------------------------------------------------------------------
 
 static bool leave_gym(VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
@@ -257,10 +154,6 @@ static bool heal_at_snowpoint_city_pokemon_center(VideoStream& stream, ProContro
         stream.log("heal_at_snowpoint_city_pokemon_center: entered Pokemon Center.", COLOR_GREEN);
     };
     return true;
-}
-
-static bool heal_and_exit(VideoStream& stream, ProControllerContext& context, const std::string& label){
-    return heal_pokemon(stream, context, label);
 }
 
 static bool go_to_lake_acuity(VideoStream& stream, ProControllerContext& context){
@@ -353,7 +246,6 @@ static bool talk_to_clint_then_go_veilstone(VideoStream& stream, ProControllerCo
     };
     return true;
 }
-
 
 static bool get_key_and_enter_warehouse(VideoStream& stream, ProControllerContext& context){
     DpadState dpad;
@@ -462,7 +354,7 @@ static bool get_key_and_enter_warehouse(VideoStream& stream, ProControllerContex
     return true;
 }
 
-static bool go_through_warehouse(VideoStream& stream, ProControllerContext& context){
+static bool go_through_warehouse(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     DpadState dpad;
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
@@ -541,7 +433,7 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
                 stream.log("veilstone_warehouse_warehouse_grunt_1: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "veilstone_warehouse_warehouse_grunt_1");
+                handle_battle(stream, context, stats, "veilstone_warehouse_warehouse_grunt_1");
                 context.wait_for_all_requests();
                 pbf_wait(context, 3000ms);
                 move_back_after_unexpected_battle(stream, context, "veilstone_warehouse_warehouse_grunt_1");
@@ -577,7 +469,7 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
                 stream.log("veilstone_warehouse_warehouse_grunt_2: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "veilstone_warehouse_warehouse_grunt_2");
+                handle_battle(stream, context, stats, "veilstone_warehouse_warehouse_grunt_2");
                 context.wait_for_all_requests();
                 pbf_wait(context, 3000ms);
                 move_back_after_unexpected_battle(stream, context, "veilstone_warehouse_warehouse_grunt_2");
@@ -660,7 +552,7 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
                 stream.log("galactic_hq_grunt_1: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "galactic_hq_grunt_1");
+                handle_battle(stream, context, stats, "galactic_hq_grunt_1");
                 context.wait_for_all_requests();
                 pbf_wait(context, 3000ms);
                 move_back_after_unexpected_battle(stream, context, "galactic_hq_grunt_1");
@@ -799,7 +691,7 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
                 stream.log("galactic_hq_scientist_fredrick: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "galactic_hq_scientist_fredrick");
+                handle_battle(stream, context, stats, "galactic_hq_scientist_fredrick");
             }
         }
     }
@@ -921,7 +813,6 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
     return true;
 }
 
-
 static bool heal_at_veilstone_pokemon_center(VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
@@ -989,7 +880,7 @@ static bool go_to_galactic_hq(VideoStream& stream, ProControllerContext& context
     return true;
 }
 
-static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
+static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, AutoStoryOptions options){
     // ------- This has returned one error and I couldn't reproduce it. It was somewhere at the other comment I left behind ----------- //
 
     DpadState dpad;
@@ -1078,7 +969,7 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
                 stream.log("galactic_hq_grunt_2: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "galactic_hq_grunt_2");
+                handle_battle(stream, context, stats, "galactic_hq_grunt_2");
                 grunt_2_done = true;
             }
         }
@@ -1127,7 +1018,7 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
                         stream.log("galactic_hq_grunt_2: black screen not detected!", COLOR_RED);
                         return false;
                     }else if (ret == 0){
-                        handle_battle(stream, context, "galactic_hq_grunt_2");
+                        handle_battle(stream, context, stats, "galactic_hq_grunt_2");
                     }
                 }
             }
@@ -1150,7 +1041,7 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
             }else if (ret == 0){
                 context.wait_for_all_requests();
 
-                handle_battle(stream, context, "galactic_hq_grunt_3");
+                handle_battle(stream, context, stats, "galactic_hq_grunt_3");
                 context.wait_for_all_requests();
                 pbf_wait(context, 2000ms);
             }
@@ -1232,7 +1123,7 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
                     stream.log("galactic_hq_grunt_4: black screen not detected!", COLOR_RED);
                     return false;
                 }else if (ret == 0){
-                    handle_battle(stream, context, "galactic_hq_grunt_4");
+                    handle_battle(stream, context, stats, "galactic_hq_grunt_4");
                 }
             }
         }
@@ -1249,7 +1140,7 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
                 stream.log("galactic_hq_grunt_5: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "galactic_hq_grunt_5");
+                handle_battle(stream, context, stats, "galactic_hq_grunt_5");
             }
         }
     };
@@ -1349,7 +1240,7 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
                 stream.log("galactic_hq_cyrus: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "galactic_hq_cyrus");
+                handle_battle(stream, context, stats, "galactic_hq_cyrus");
             }
         }
     }
@@ -1440,7 +1331,7 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
                 stream.log("galactic_hq_commander_saturn: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "galactic_hq_commander_saturn");
+                handle_battle(stream, context, stats, "galactic_hq_commander_saturn");
             }
         }
     }
@@ -1566,7 +1457,6 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
     return true;
 }
 
-
 static bool fly_and_heal_at_oreburgh(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
@@ -1596,7 +1486,7 @@ static bool fly_and_heal_at_oreburgh(VideoStream& stream, ProControllerContext& 
     return true;
 }
 
-static bool go_to_mount_coronet(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
+static bool go_to_mount_coronet(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, AutoStoryOptions options){
     DpadState dpad;
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
@@ -1647,7 +1537,7 @@ static bool go_to_mount_coronet(VideoStream& stream, ProControllerContext& conte
                 stream.log("go_to_mount_coronet, route_207_hiker_justin: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "route_207_hiker_justin");
+                handle_battle(stream, context, stats, "route_207_hiker_justin");
                 context.wait_for_all_requests();
                 pbf_wait(context, 3000ms);
                 move_back_after_unexpected_battle(stream, context, "route_207_hiker_justin");
@@ -1676,16 +1566,19 @@ static bool go_to_mount_coronet(VideoStream& stream, ProControllerContext& conte
     return true;
 }
 
-
-static bool go_through_mount_coronet(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
+static bool go_through_mount_coronet(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options, bool summit_events = false){
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
     context.wait_for_all_requests();
     stream.log("go_through_mount_coronet: Going through Mount Coronet...");
 
-    // @GumGum: Here the code, you can add more of these if you need them, but remember to adapt the numbering.
-
-    return true;
+    // TODO(08.05/08.06): Record the ascent and a stable pre-boss position,
+    // then the summit battles, story dialogue, and legendary approach/exit.
+    throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
+        summit_events
+            ? "08.06 incomplete: Spear Pillar battles, story and legendary route need recording."
+            : "08.05 incomplete: Coronet ascent and the pre-boss handoff need recording.",
+        stream);
 }
 
 static bool fly_and_heal_at_veilstone(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
@@ -1784,7 +1677,7 @@ go_through_house_south_veilstone(VideoStream& stream, ProControllerContext& cont
     return true;
 }
 
-static bool go_to_house_west_sunyshore(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
+static bool go_to_house_west_sunyshore(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, AutoStoryOptions options){
     DpadState dpad;
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
@@ -1910,7 +1803,7 @@ static bool go_to_house_west_sunyshore(VideoStream& stream, ProControllerContext
                 stream.log("go_to_house_west_sunyshore_route_222_sailor_luther: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, "route_222_sailor_luther");
+                handle_battle(stream, context, stats, "route_222_sailor_luther");
             }
         }
     }
@@ -2159,12 +2052,84 @@ static bool go_to_sunyshore_gym(VideoStream& stream, ProControllerContext& conte
         stream.log("go_to_sunyshore_gym: entered the gym.", COLOR_GREEN);
     }
 
-    return true;
+    // TODO(08.09): Record the puzzle, trainers, Volkner, rewards and return
+    // to the inside entrance for Segment 09. The old second entry was not a puzzle.
+    context.wait_for_all_requests();
+    throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
+        "08.09 incomplete: Sunyshore Gym entered. Puzzle, Volkner battle, rewards and return need recording.",
+        stream);
 }
 
+// Retained box-legendary inputs; approach and exit positions require the summit recording.
+static void recorded_box_legendary_encounter(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context){
+    approach_legendary(env.console, context);
+    enter_legendary_battle(env.console, context);
+    weaken_legendary(env.console, context);
+    throw_pokeball_at_legendary(env.console, context);
+    confirm_legendary_catch(env.console, context);
+    exit_legendary_encounter(env.console, context);
+}
 
-// ------------------------------------------------------------------ Checkpoints logic --------------------------------------------------------- //
+// ---------------------------------------------------------------------------
+//  Segment wrappers
+// ---------------------------------------------------------------------------
 
+std::string AutoStory_Segment_08::name() const {
+    return "08: Snowpoint to Sunyshore";
+}
+
+std::string AutoStory_Segment_08::start_text() const {
+    return "Start: Inside Snowpoint Gym at the entrance, with seventh-badge rewards and dialogue finished.";
+}
+
+std::string AutoStory_Segment_08::end_text() const {
+    return "Target: Inside Sunyshore Gym entrance with eighth-badge rewards finished. Currently stops at the missing puzzle.";
+}
+
+void AutoStory_Segment_08::run_segment(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    stats.m_segment++;
+    env.update_stats();
+    context.wait_for_all_requests();
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
+    AutoStory_Checkpoint_0801().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0802().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0803().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0804().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0805().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0806().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0807().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0808().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0809().run_checkpoint(env, context, options, stats);
+    context.wait_for_all_requests();
+    env.console.log("End Segment " + name(), COLOR_GREEN);
+}
+
+// ---------------------------------------------------------------------------
+//  Checkpoint wrappers
+// ---------------------------------------------------------------------------
+
+std::string AutoStory_Checkpoint_0801::name() const {
+    return "08.01 - Snowpoint recovery";
+}
+
+std::string AutoStory_Checkpoint_0801::start_text() const {
+    return "Inside Snowpoint Gym at the entrance, with seventh-badge rewards and dialogue finished.";
+}
+
+std::string AutoStory_Checkpoint_0801::end_text() const {
+    return "Healed and outside Snowpoint Pokemon Center at the doorway.";
+}
+
+void AutoStory_Checkpoint_0801::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0801(env, context, options, stats);
+}
 
 void checkpoint_0801(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -2176,13 +2141,49 @@ void checkpoint_0801(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!leave_gym(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "leave_gym: transition not detected.",
-                    env.console);
+            {
+                if (!leave_gym(env.console, context)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "leave_gym: transition not detected.",
+                        env.console);
+                }
             }
+            {
+                if (!heal_at_snowpoint_city_pokemon_center(env.console, context)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "heal_at_snowpoint_city_pokemon_center: transition not detected.",
+                        env.console);
+                }
+            }
+            {
+                if (!heal_and_exit(env.console, context, stats, "Snowpoint City")){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "heal_and_exit_snowpoint_city: transition not detected.",
+                        env.console);
+                }
+            }
+            context.wait_for_all_requests();
         },
         true);
+}
+
+std::string AutoStory_Checkpoint_0802::name() const {
+    return "08.02 - Lake Acuity and Veilstone";
+}
+
+std::string AutoStory_Checkpoint_0802::start_text() const {
+    return "Healed and outside Snowpoint Pokemon Center at the doorway.";
+}
+
+std::string AutoStory_Checkpoint_0802::end_text() const {
+    return "Healed and outside Veilstone Pokemon Center after the Lake Acuity events.";
+}
+
+void AutoStory_Checkpoint_0802::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0802(env, context, options, stats);
 }
 
 void checkpoint_0802(SingleSwitchProgramEnvironment& env,
@@ -2195,13 +2196,49 @@ void checkpoint_0802(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!heal_at_snowpoint_city_pokemon_center(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "heal_at_snowpoint_city_pokemon_center: transition not detected.",
-                    env.console);
+            {
+                if (!go_to_lake_acuity(env.console, context)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_to_lake_acuity: transition not detected.",
+                        env.console);
+                }
             }
+            {
+                if (!talk_to_clint_then_go_veilstone(env.console, context)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "talk_to_clint_then_go_veilstone: transition not detected.",
+                        env.console);
+                }
+            }
+            {
+                if (!heal_and_exit(env.console, context, stats, "Veilstone City")){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "heal_and_exit_veilstone_city: transition not detected.",
+                        env.console);
+                }
+            }
+            context.wait_for_all_requests();
         },
-        false);
+        true);
+}
+
+std::string AutoStory_Checkpoint_0803::name() const {
+    return "08.03 - Galactic Warehouse";
+}
+
+std::string AutoStory_Checkpoint_0803::start_text() const {
+    return "Healed and outside Veilstone Pokemon Center after the Lake Acuity events.";
+}
+
+std::string AutoStory_Checkpoint_0803::end_text() const {
+    return "Healed and outside Veilstone Pokemon Center with the Galactic Key obtained.";
+}
+
+void AutoStory_Checkpoint_0803::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0803(env, context, options, stats);
 }
 
 void checkpoint_0803(SingleSwitchProgramEnvironment& env,
@@ -2214,13 +2251,56 @@ void checkpoint_0803(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!heal_and_exit(env.console, context, "Snowpoint City")){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "heal_and_exit_snowpoint_city: transition not detected.",
-                    env.console);
+            {
+                if (!get_key_and_enter_warehouse(env.console, context)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "get_key_and_enter_warehouse: transition not detected.",
+                        env.console);
+                }
             }
+            {
+                if (!go_through_warehouse(env.console, context, stats)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_through_warehouse: transition not detected.",
+                        env.console);
+                }
+            }
+            {
+                if (!heal_at_veilstone_pokemon_center(env.console, context)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "heal_at_veilstone_pokemon_center: transition not detected.",
+                        env.console);
+                }
+            }
+            {
+                if (!heal_and_exit(env.console, context, stats, "Veilstone City")){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "heal_and_exit_veilstone_city: transition not detected.",
+                        env.console);
+                }
+            }
+            context.wait_for_all_requests();
         },
-        false);
+        true);
+}
+
+std::string AutoStory_Checkpoint_0804::name() const {
+    return "08.04 - Galactic HQ and Oreburgh";
+}
+
+std::string AutoStory_Checkpoint_0804::start_text() const {
+    return "Healed and outside Veilstone Pokemon Center with the Galactic Key obtained.";
+}
+
+std::string AutoStory_Checkpoint_0804::end_text() const {
+    return "Healed and outside Oreburgh Pokemon Center after the Galactic HQ events.";
+}
+
+void AutoStory_Checkpoint_0804::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0804(env, context, options, stats);
 }
 
 void checkpoint_0804(SingleSwitchProgramEnvironment& env,
@@ -2233,13 +2313,56 @@ void checkpoint_0804(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!go_to_lake_acuity(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_to_lake_acuity: transition not detected.",
-                    env.console);
+            {
+                if (!go_to_galactic_hq(env.console, context)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_to_galactic_hq: transition not detected.",
+                        env.console);
+                }
             }
+            {
+                if (!go_through_galactic_hq(env.console, context, stats, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_through_galactic_hq: transition not detected.",
+                        env.console);
+                }
+            }
+            {
+                if (!fly_and_heal_at_oreburgh(env.console, context, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "fly_and_heal_at_oreburgh: transition not detected.",
+                        env.console);
+                }
+            }
+            {
+                if (!heal_and_exit(env.console, context, stats, "Oreburgh City")){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "heal_and_exit_oreburgh_city: transition not detected.",
+                        env.console);
+                }
+            }
+            context.wait_for_all_requests();
         },
-        false);
+        true);
+}
+
+std::string AutoStory_Checkpoint_0805::name() const {
+    return "08.05 - Coronet ascent (path pending)";
+}
+
+std::string AutoStory_Checkpoint_0805::start_text() const {
+    return "Healed and outside Oreburgh Pokemon Center after the Galactic HQ events.";
+}
+
+std::string AutoStory_Checkpoint_0805::end_text() const {
+    return "Target: Stable pre-boss position at Spear Pillar. Currently stops at the missing Coronet ascent.";
+}
+
+void AutoStory_Checkpoint_0805::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0805(env, context, options, stats);
 }
 
 void checkpoint_0805(SingleSwitchProgramEnvironment& env,
@@ -2252,13 +2375,42 @@ void checkpoint_0805(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!talk_to_clint_then_go_veilstone(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "talk_to_clint_then_go_veilstone: transition not detected.",
-                    env.console);
+            {
+                if (!go_to_mount_coronet(env.console, context, stats, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_to_mount_coronet: transition not detected.",
+                        env.console);
+                }
             }
+            {
+                if (!go_through_mount_coronet(env.console, context, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_through_mount_coronet: transition not detected.",
+                        env.console);
+                }
+            }
+            context.wait_for_all_requests();
         },
-        false);
+        true);
+}
+
+std::string AutoStory_Checkpoint_0806::name() const {
+    return "08.06 - Spear Pillar (path pending)";
+}
+
+std::string AutoStory_Checkpoint_0806::start_text() const {
+    return "At the recorded pre-boss Spear Pillar position; exact position is pending recording.";
+}
+
+std::string AutoStory_Checkpoint_0806::end_text() const {
+    return "Target: Summit story and legendary encounter finished; healed outside Veilstone Center. Summit pathing is missing.";
+}
+
+void AutoStory_Checkpoint_0806::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0806(env, context, options, stats);
 }
 
 void checkpoint_0806(SingleSwitchProgramEnvironment& env,
@@ -2271,13 +2423,50 @@ void checkpoint_0806(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!heal_and_exit(env.console, context, "Veilstone City")){
+            // Same existing helper, now split at the proposed summit boundary.
+            if (!go_through_mount_coronet(env.console, context, options, true)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "heal_and_exit_veilstone_city: transition not detected.",
-                    env.console);
+                    "08.06: Summit story did not complete.", env.console);
             }
+            // Retain the former encounter sequence for review with the summit recording.
+            // Capture/skip behavior must be verified before this missing route is enabled.
+            recorded_box_legendary_encounter(env, context);
+            {
+                if (!fly_and_heal_at_veilstone(env.console, context, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "fly_and_heal_at_veilstone: transition not detected.",
+                        env.console);
+                }
+            }
+            {
+                if (!heal_and_exit(env.console, context, stats, "Veilstone City")){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "heal_and_exit_veilstone_city: transition not detected.",
+                        env.console);
+                }
+            }
+            context.wait_for_all_requests();
         },
-        false);
+        true);
+}
+
+std::string AutoStory_Checkpoint_0807::name() const {
+    return "08.07 - Route 222 to Sunyshore";
+}
+
+std::string AutoStory_Checkpoint_0807::start_text() const {
+    return "Healed and outside Veilstone Pokemon Center after completing the summit story.";
+}
+
+std::string AutoStory_Checkpoint_0807::end_text() const {
+    return "In Sunyshore after the west gate and arrival dialogue.";
+}
+
+void AutoStory_Checkpoint_0807::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0807(env, context, options, stats);
 }
 
 void checkpoint_0807(SingleSwitchProgramEnvironment& env,
@@ -2290,13 +2479,56 @@ void checkpoint_0807(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!get_key_and_enter_warehouse(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "get_key_and_enter_warehouse: transition not detected.",
-                    env.console);
+            {
+                if (!go_to_house_south_veilstone(env.console, context, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_to_house_south_veilstone: transition not detected.",
+                        env.console);
+                }
             }
+            {
+                if (!go_through_house_south_veilstone(env.console, context, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_through_house_south_veilstone: transition not detected.",
+                        env.console);
+                }
+            }
+            {
+                if (!go_to_house_west_sunyshore(env.console, context, stats, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_to_house_west_sunyshore: transition not detected.",
+                        env.console);
+                }
+            }
+            {
+                if (!go_through_house_west_sunyshore(env.console, context, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_through_house_west_sunyshore: transition not detected.",
+                        env.console);
+                }
+            }
+            context.wait_for_all_requests();
         },
-        false);
+        true);
+}
+
+std::string AutoStory_Checkpoint_0808::name() const {
+    return "08.08 - Volkner at the lighthouse";
+}
+
+std::string AutoStory_Checkpoint_0808::start_text() const {
+    return "In Sunyshore after the west gate and arrival dialogue.";
+}
+
+std::string AutoStory_Checkpoint_0808::end_text() const {
+    return "Outside Sunyshore lighthouse after Volkner dialogue.";
+}
+
+void AutoStory_Checkpoint_0808::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0808(env, context, options, stats);
 }
 
 void checkpoint_0808(SingleSwitchProgramEnvironment& env,
@@ -2309,13 +2541,42 @@ void checkpoint_0808(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!go_through_warehouse(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_through_warehouse: transition not detected.",
-                    env.console);
+            {
+                if (!go_to_sunyshore_lighthouse(env.console, context, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_to_sunyshore_lighthouse: transition not detected.",
+                        env.console);
+                }
             }
+            {
+                if (!talk_to_volkner_at_the_lighthouse(env.console, context, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "talk_to_volkner_at_the_lighthouse: transition not detected.",
+                        env.console);
+                }
+            }
+            context.wait_for_all_requests();
         },
-        false);
+        true);
+}
+
+std::string AutoStory_Checkpoint_0809::name() const {
+    return "08.09 - Sunyshore Gym (path pending)";
+}
+
+std::string AutoStory_Checkpoint_0809::start_text() const {
+    return "Outside Sunyshore lighthouse after Volkner dialogue.";
+}
+
+std::string AutoStory_Checkpoint_0809::end_text() const {
+    return "Target: Inside Sunyshore Gym entrance with eighth-badge rewards finished. Currently stops at the missing puzzle.";
+}
+
+void AutoStory_Checkpoint_0809::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0809(env, context, options, stats);
 }
 
 void checkpoint_0809(SingleSwitchProgramEnvironment& env,
@@ -2328,798 +2589,17 @@ void checkpoint_0809(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!heal_at_veilstone_pokemon_center(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "heal_at_veilstone_pokemon_center: transition not detected.",
-                    env.console);
+            {
+                if (!go_to_sunyshore_gym(env.console, context, options)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_to_sunyshore_gym: transition not detected.",
+                        env.console);
+                }
             }
-        },
-        false);
-}
-
-void checkpoint_0810(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!heal_and_exit(env.console, context, "Veilstone City")){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "heal_and_exit_veilstone_city: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0811(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!go_to_galactic_hq(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_to_galactic_hq: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0812(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!go_through_galactic_hq(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_through_galactic_hq: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0813(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!fly_and_heal_at_oreburgh(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "fly_and_heal_at_oreburgh: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0814(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!heal_and_exit(env.console, context, "Oreburgh City")){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "heal_and_exit_oreburgh_city: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0815(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!go_to_mount_coronet(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_to_mount_coronet: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0816(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!go_through_mount_coronet(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_through_mount_coronet: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0817(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!fly_and_heal_at_veilstone(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "fly_and_heal_at_veilstone: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0818(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!heal_and_exit(env.console, context, "Veilstone City")){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "heal_and_exit_veilstone_city: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0819(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!go_to_house_south_veilstone(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_to_house_south_veilstone: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0820(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!go_through_house_south_veilstone(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_through_house_south_veilstone: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0821(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!go_to_house_west_sunyshore(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_to_house_west_sunyshore: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0822(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!go_through_house_west_sunyshore(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_through_house_west_sunyshore: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0823(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!go_to_sunyshore_lighthouse(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_to_sunyshore_lighthouse: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0824(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!talk_to_volkner_at_the_lighthouse(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "talk_to_volkner_at_the_lighthouse: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0825(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!go_to_sunyshore_gym(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_to_sunyshore_gym: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0826(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!go_to_sunyshore_gym(env.console, context, options)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_to_sunyshore_gym: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-
-std::string AutoStory_Checkpoint_0801::name() const {
-    return "08.01 - Gym badge acquired";
-}
-std::string AutoStory_Checkpoint_0801::start_text() const {
-    return "Seventh Gym Badge acquired (Snowpoint City).";
-}
-std::string AutoStory_Checkpoint_0801::end_text() const {
-    return "Leave Snowpoint Gym.";
-}
-void AutoStory_Checkpoint_0801::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0801(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0802::name() const {
-    return "08.02 - Left Snowpoint Gym";
-}
-std::string AutoStory_Checkpoint_0802::start_text() const {
-    return "Left Snowpoint Gym.";
-}
-std::string AutoStory_Checkpoint_0802::end_text() const {
-    return "Arrived at Snowpoint City Pokémon Center.";
-}
-void AutoStory_Checkpoint_0802::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0802(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0803::name() const {
-    return "08.03 - Arrived at Snowpoint Pokemon Center";
-}
-std::string AutoStory_Checkpoint_0803::start_text() const {
-    return "Arrived at Snowpoint City Pokémon Center.";
-}
-std::string AutoStory_Checkpoint_0803::end_text() const {
-    return "Healed at Snowpoint City Pokemon Center.";
-}
-void AutoStory_Checkpoint_0803::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0803(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0804::name() const {
-    return "08.04 - Healed at Snowpoint City Pokemon Center";
-}
-std::string AutoStory_Checkpoint_0804::start_text() const {
-    return "Healed at Snowpoint City Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0804::end_text() const {
-    return "Entered Lake Acuity Lakefront.";
-}
-void AutoStory_Checkpoint_0804::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0804(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0805::name() const {
-    return "08.05 - Entered Acuity Lakefront";
-}
-std::string AutoStory_Checkpoint_0805::start_text() const {
-    return "Entered Lake Acuity Lakefront.";
-}
-std::string AutoStory_Checkpoint_0805::end_text() const {
-    return "Arrived at Veilstone City Pokemon Center.";
-}
-void AutoStory_Checkpoint_0805::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0805(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0806::name() const {
-    return "08.06 - Arrived at Veilstone Pokemon Center";
-}
-std::string AutoStory_Checkpoint_0806::start_text() const {
-    return "Arrived at Veilstone City Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0806::end_text() const {
-    return "Healed at Veilstone City Pokemon Center.";
-}
-void AutoStory_Checkpoint_0806::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0806(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0807::name() const {
-    return "08.07 - Healed at Veilstone Pokemon Center";
-}
-std::string AutoStory_Checkpoint_0807::start_text() const {
-    return "Healed at Veilstone City Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0807::end_text() const {
-    return "Entered Team Galactic Warehouse.";
-}
-void AutoStory_Checkpoint_0807::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0807(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0808::name() const {
-    return "08.08 - Entered Team Galactic Warehouse";
-}
-std::string AutoStory_Checkpoint_0808::start_text() const {
-    return "Entered Team Galactic Warehouse.";
-}
-std::string AutoStory_Checkpoint_0808::end_text() const {
-    return "Got out of the warehouse with the key.";
-}
-void AutoStory_Checkpoint_0808::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0808(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0809::name() const {
-    return "08.09 - Fly back to Veilstone Pokemon Center for healing";
-}
-std::string AutoStory_Checkpoint_0809::start_text() const {
-    return "Got out of the warehouse with the key.";
-}
-std::string AutoStory_Checkpoint_0809::end_text() const {
-    return "Entered Veilstone Pokemon Center for healing.";
-}
-void AutoStory_Checkpoint_0809::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0809(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0810::name() const {
-    return "08.10 - Heal Pokemon";
-}
-std::string AutoStory_Checkpoint_0810::start_text() const {
-    return "Entered Veilstone Pokemon Center for healing.";
-}
-std::string AutoStory_Checkpoint_0810::end_text() const {
-    return "Exited Veilstone Pokemon Center.";
-}
-void AutoStory_Checkpoint_0810::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0810(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0811::name() const {
-    return "08.11 - Go to Galactic HQ";
-}
-std::string AutoStory_Checkpoint_0811::start_text() const {
-    return "Exited Veilstone Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0811::end_text() const {
-    return "Entered Galactic HQ.";
-}
-void AutoStory_Checkpoint_0811::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0811(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0812::name() const {
-    return "08.12 - Deal with Cyrus at the Galactic HQ";
-}
-std::string AutoStory_Checkpoint_0812::start_text() const {
-    return "Entered Galactic HQ.";
-}
-std::string AutoStory_Checkpoint_0812::end_text() const {
-    return "Dealt with Cyrus and left the Galactic HQ.";
-}
-void AutoStory_Checkpoint_0812::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0812(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0813::name() const {
-    return "08.13 - Fly to Oreburgh City";
-}
-std::string AutoStory_Checkpoint_0813::start_text() const {
-    return "Dealt with Cyrus and left the Galactic HQ.";
-}
-std::string AutoStory_Checkpoint_0813::end_text() const {
-    return "Flew to Oreburgh city and entered Pokemon Center.";
-}
-void AutoStory_Checkpoint_0813::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0813(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0814::name() const {
-    return "08.14 - Heal Pokemon at Oreburgh City Pokemon Center";
-}
-std::string AutoStory_Checkpoint_0814::start_text() const {
-    return "Flew to Oreburgh City and entered Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0814::end_text() const {
-    return "Healed Pokemon at Oreburgh City Pokemon Center.";
-}
-void AutoStory_Checkpoint_0814::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0814(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0815::name() const {
-    return "08.15 - Go from Oreburgh City to Mount Coronet entrance";
-}
-std::string AutoStory_Checkpoint_0815::start_text() const {
-    return "Healed Pokemon at Oreburgh City Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0815::end_text() const {
-    return "Entered Mount Coronet.";
-}
-void AutoStory_Checkpoint_0815::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0815(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0816::name() const {
-    return "08.16 - Go through Mt. Coronet to deal with Cyrus and Dialga/Palkia";
-}
-std::string AutoStory_Checkpoint_0816::start_text() const {
-    return "Entered Mount Coronet.";
-}
-std::string AutoStory_Checkpoint_0816::end_text() const {
-    return "Exited Mt. Coronet, having dealt with Cyrus.";
-}
-void AutoStory_Checkpoint_0816::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0816(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0817::name() const {
-    return "08.17 - Fly to Veilstone City";
-}
-std::string AutoStory_Checkpoint_0817::start_text() const {
-    return "Exited Mt. Coronet, having dealt with Cyrus.";
-}
-std::string AutoStory_Checkpoint_0817::end_text() const {
-    return "Entered the Veilstone Pokemon Center.";
-}
-void AutoStory_Checkpoint_0817::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0817(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0818::name() const {
-    return "08.18 - Heal and exit";
-}
-std::string AutoStory_Checkpoint_0818::start_text() const {
-    return "Entered the Veilstone Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0818::end_text() const {
-    return "Exited the Veilstone Pokemon Center.";
-}
-void AutoStory_Checkpoint_0818::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0818(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0819::name() const {
-    return "08.19 - Go to house South of Veilstone City";
-}
-std::string AutoStory_Checkpoint_0819::start_text() const {
-    return "Exited the Veilstone Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0819::end_text() const {
-    return "Arrived at the house South of Veilstone City.";
-}
-void AutoStory_Checkpoint_0819::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0819(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0820::name() const {
-    return "08.20 - Go through the house South of Veilstone City";
-}
-std::string AutoStory_Checkpoint_0820::start_text() const {
-    return "Arrived at the house South of Veilstone City.";
-}
-std::string AutoStory_Checkpoint_0820::end_text() const {
-    return "Exited the house South of Veilstone City.";
-}
-void AutoStory_Checkpoint_0820::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0820(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0821::name() const {
-    return "08.21 - Go through routes 214 and 222 to the house West of Sunyshore City";
-}
-std::string AutoStory_Checkpoint_0821::start_text() const {
-    return "Exited house South of Veilstone City.";
-}
-std::string AutoStory_Checkpoint_0821::end_text() const {
-    return "Entered the house West of Sunyshore City.";
-}
-void AutoStory_Checkpoint_0821::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0821(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0822::name() const {
-    return "08.22 - Go through the house West of Sunyshore City";
-}
-std::string AutoStory_Checkpoint_0822::start_text() const {
-    return "Entered the house West of Sunyshore City.";
-}
-std::string AutoStory_Checkpoint_0822::end_text() const {
-    return "Entered Sunyshore City.";
-}
-void AutoStory_Checkpoint_0822::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0822(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0823::name() const {
-    return "08.23 - Go to Sunyshore City's lighthouse";
-}
-std::string AutoStory_Checkpoint_0823::start_text() const {
-    return "Entered Sunyshore City.";
-}
-std::string AutoStory_Checkpoint_0823::end_text() const {
-    return "Entered Sunyshore City's lighthouse.";
-}
-void AutoStory_Checkpoint_0823::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0823(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0824::name() const {
-    return "08.24 - Talk to Volkner at the lighthouse";
-}
-std::string AutoStory_Checkpoint_0824::start_text() const {
-    return "Entered Sunyshore City's lighthouse.";
-}
-std::string AutoStory_Checkpoint_0824::end_text() const {
-    return "Exited Sunyshore City's lighthouse.";
-}
-void AutoStory_Checkpoint_0824::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0824(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0825::name() const {
-    return "08.25 - Go to the Sunyshore City gym";
-}
-std::string AutoStory_Checkpoint_0825::start_text() const {
-    return "Exited Sunyshore City's lighthouse.";
-}
-std::string AutoStory_Checkpoint_0825::end_text() const {
-    return "Entered Sunyshore City's gym.";
-}
-void AutoStory_Checkpoint_0825::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0825(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0826::name() const {
-    return "08.26 - Sunnyshore Gym Puzzle";
-}
-std::string AutoStory_Checkpoint_0826::start_text() const {
-    return "Exited Sunyshore City's lighthouse.";
-}
-std::string AutoStory_Checkpoint_0826::end_text() const {
-    return "Entered Sunyshore City's gym.";
-}
-void AutoStory_Checkpoint_0826::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0826(env, context, options, stats);
-}
-
-void AutoStory_Checkpoint_021::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_021(env, context, options, stats);
-}
-
-
-void checkpoint_021(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            // TODO: implement Segment 08 gameplay logic (seventh badge area)
+            context.wait_for_all_requests();
         },
         true);
 }
-
-void checkpoint_021_legendary(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            approach_legendary(env.console, context);
-            enter_legendary_battle(env.console, context);
-            weaken_legendary(env.console, context);
-            throw_pokeball_at_legendary(env.console, context);
-            confirm_legendary_catch(env.console, context);
-            exit_legendary_encounter(env.console, context);
-        },
-        true);
-}
-
 
 }
 }

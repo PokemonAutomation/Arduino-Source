@@ -1118,16 +1118,19 @@ tutorial_part_4_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
 //  Segment / Checkpoint classes
 // ---------------------------------------------------------------------------
 
+// ---------------------------------------------------------------------------
+//  Segment wrappers
+// ---------------------------------------------------------------------------
+
 std::string AutoStory_Segment_00::name() const {
-    return "00: Intro to Poketech";
+    return "00: Intro to Poketch";
 }
 std::string AutoStory_Segment_00::start_text() const {
     return "Start: Game launched, Standing in the player's room after tv stops playing";
 }
 std::string AutoStory_Segment_00::end_text() const {
-    return "End: Starter Pokemon chosen, received, and Pokedex acquired, standing in front of the PC.";
+    return "End: Poketch received; standing at the Jubilife Pokemon Center PC, ready to deposit the starter for the HOME transfer.";
 }
-
 void AutoStory_Segment_00::run_segment(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -1143,10 +1146,15 @@ void AutoStory_Segment_00::run_segment(SingleSwitchProgramEnvironment& env,
     AutoStory_Checkpoint_0003().run_checkpoint(env, context, options, stats);
     AutoStory_Checkpoint_0004().run_checkpoint(env, context, options, stats);
     AutoStory_Checkpoint_0005().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0006().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 }
+
+// ---------------------------------------------------------------------------
+//  Checkpoint wrappers
+// ---------------------------------------------------------------------------
 
 std::string AutoStory_Checkpoint_0000::name() const {
     return "00.00 - Verify Settings";
@@ -1161,13 +1169,36 @@ void AutoStory_Checkpoint_0000::run_checkpoint(SingleSwitchProgramEnvironment& e
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats) const {
+    checkpoint_0000(env, context, options, stats);
+}
+
+void checkpoint_0000(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions /*options*/,
+    AutoStoryStats& /*stats*/){
     // Before any route movement or checkpoint save: fail visibly if
     // options cannot be read, rather than navigate with unknown settings.
     verify_tutorial_settings(env.console, context);
     context.wait_for_all_requests();
 }
 
-static void checkpoint_0001(SingleSwitchProgramEnvironment& env,
+std::string AutoStory_Checkpoint_0001::name() const {
+    return "00.01 - After TV";
+}
+std::string AutoStory_Checkpoint_0001::start_text() const {
+    return "Game launched, Standing in the player's room after tv stops playing";
+}
+std::string AutoStory_Checkpoint_0001::end_text() const {
+    return "Standing outside Lake Verity before picking starter.";
+}
+void AutoStory_Checkpoint_0001::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0001(env, context, options, stats);
+}
+
+void checkpoint_0001(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats){
@@ -1182,7 +1213,24 @@ static void checkpoint_0001(SingleSwitchProgramEnvironment& env,
         },
         true);
 }
-static void checkpoint_0002(SingleSwitchProgramEnvironment& env,
+
+std::string AutoStory_Checkpoint_0002::name() const {
+    return "00.02 - Outside Verity before starter";
+}
+std::string AutoStory_Checkpoint_0002::start_text() const {
+    return AutoStory_Checkpoint_0001().end_text();
+}
+std::string AutoStory_Checkpoint_0002::end_text() const {
+    return "Standing outside Lake Verity after picking starter.";
+}
+void AutoStory_Checkpoint_0002::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0002(env, context, options, stats);
+}
+
+void checkpoint_0002(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats){
@@ -1211,7 +1259,24 @@ static void checkpoint_0002(SingleSwitchProgramEnvironment& env,
         },
         true);
 }
-static void checkpoint_0003(SingleSwitchProgramEnvironment& env,
+
+std::string AutoStory_Checkpoint_0003::name() const {
+    return "00.03 - Outside Verity after starter";
+}
+std::string AutoStory_Checkpoint_0003::start_text() const {
+    return AutoStory_Checkpoint_0002().end_text();
+}
+std::string AutoStory_Checkpoint_0003::end_text() const {
+    return "Standing in front of The professor after recieving the Pokedex";
+}
+void AutoStory_Checkpoint_0003::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0003(env, context, options, stats);
+}
+
+void checkpoint_0003(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats){
@@ -1226,7 +1291,24 @@ static void checkpoint_0003(SingleSwitchProgramEnvironment& env,
         },
         true);
 }
-static void checkpoint_0004(SingleSwitchProgramEnvironment& env,
+
+std::string AutoStory_Checkpoint_0004::name() const {
+    return "00.04 - After Pokedex";
+}
+std::string AutoStory_Checkpoint_0004::start_text() const {
+    return AutoStory_Checkpoint_0003().end_text();
+}
+std::string AutoStory_Checkpoint_0004::end_text() const {
+    return "On Route 202 after catching the second Pokemon, with the catch sequence finished.";
+}
+void AutoStory_Checkpoint_0004::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0004(env, context, options, stats);
+}
+
+void checkpoint_0004(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats){
@@ -1240,21 +1322,25 @@ static void checkpoint_0004(SingleSwitchProgramEnvironment& env,
             tutorial_part_3_navigation(env, env.console, context);
         },
         true);
-
-    // Save and advance progress at the catch boundary. Retries of this
-    // section must start from the caught-Pokemon save, not the old route.
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            tutorial_part_3_after_catch_navigation(env, env.console, context);
-        },
-        true);
 }
-// DIAGNOSTIC ONLY: Remove before pushing to production.
-void diagnostic_checkpoint_0004_after_catch(SingleSwitchProgramEnvironment& env,
+
+std::string AutoStory_Checkpoint_0005::name() const {
+    return "00.05 - Route 202 after catch to Jubilife";
+}
+std::string AutoStory_Checkpoint_0005::start_text() const {
+    return AutoStory_Checkpoint_0004().end_text();
+}
+std::string AutoStory_Checkpoint_0005::end_text() const {
+    return "In Jubilife after speaking to Dawn, ready to deliver the Town Map to Barry.";
+}
+void AutoStory_Checkpoint_0005::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0005(env, context, options, stats);
+}
+
+void checkpoint_0005(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats){
@@ -1269,7 +1355,23 @@ void diagnostic_checkpoint_0004_after_catch(SingleSwitchProgramEnvironment& env,
         true);
 }
 
-static void checkpoint_0005(SingleSwitchProgramEnvironment& env,
+std::string AutoStory_Checkpoint_0006::name() const {
+    return "00.06 - Jubilife to Poketch";
+}
+std::string AutoStory_Checkpoint_0006::start_text() const {
+    return AutoStory_Checkpoint_0005().end_text();
+}
+std::string AutoStory_Checkpoint_0006::end_text() const {
+    return "Standing at the Jubilife Pokemon Center PC with the Poketch received, ready to deposit the starter.";
+}
+void AutoStory_Checkpoint_0006::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0006(env, context, options, stats);
+}
+
+void checkpoint_0006(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats){
@@ -1283,109 +1385,6 @@ static void checkpoint_0005(SingleSwitchProgramEnvironment& env,
             tutorial_part_4_navigation(env, env.console, context);
         },
         true);
-}
-
-// ========================
-// Checkpoint 0001 Wrapper
-// ========================
-std::string AutoStory_Checkpoint_0001::name() const {
-    return "00.01 - After TV";
-}
-std::string AutoStory_Checkpoint_0001::start_text() const {
-    return "Game launched, Standing in the player's room after tv stops playing";
-}
-std::string AutoStory_Checkpoint_0001::end_text() const {
-    return "Standing outside Lake Verity before picking starter.";
-}
-
-void AutoStory_Checkpoint_0001::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0001(env, context, options, stats);
-}
-
-// ========================
-// Checkpoint 0002 Wrapper
-// ========================
-
-std::string AutoStory_Checkpoint_0002::name() const {
-    return "00.02 - Outside Verity before starter";
-}
-std::string AutoStory_Checkpoint_0002::start_text() const {
-    return AutoStory_Checkpoint_0001().end_text();
-}
-std::string AutoStory_Checkpoint_0002::end_text() const {
-    return "Standing outside Lake Verity after picking starter.";
-}
-
-void AutoStory_Checkpoint_0002::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0002(env, context, options, stats);
-}
-
-
-// ========================
-// Checkpoint 0003 Wrapper
-// ========================
-
-std::string AutoStory_Checkpoint_0003::name() const {
-    return "00.03 - Outside Verity after starter";
-}
-std::string AutoStory_Checkpoint_0003::start_text() const {
-    return AutoStory_Checkpoint_0002().end_text();
-}
-std::string AutoStory_Checkpoint_0003::end_text() const {
-    return "Standing in front of The professor after recieving the Pokedex";
-}
-
-void AutoStory_Checkpoint_0003::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0003(env, context, options, stats);
-}
-// ========================
-// Checkpoint 0004 Wrapper
-// ========================
-
-std::string AutoStory_Checkpoint_0004::name() const {
-    return "00.04 - After Pokedex";
-}
-std::string AutoStory_Checkpoint_0004::start_text() const {
-    return AutoStory_Checkpoint_0003().end_text();
-}
-std::string AutoStory_Checkpoint_0004::end_text() const {
-    return "Standing in in jubilife after speaking to dawn. Next: give town map to barry";
-}
-
-void AutoStory_Checkpoint_0004::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0004(env, context, options, stats);
-}
-// ========================
-// Checkpoint 0005 Wrapper
-// ========================
-
-std::string AutoStory_Checkpoint_0005::name() const {
-    return "00.05 - Jubilife After Dawn";
-}
-std::string AutoStory_Checkpoint_0005::start_text() const {
-    return AutoStory_Checkpoint_0004().end_text();
-}
-std::string AutoStory_Checkpoint_0005::end_text() const {
-    return "Standing in front of PC. Recieved the Poketech. Ready to deposit starter";
-}
-
-void AutoStory_Checkpoint_0005::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0005(env, context, options, stats);
 }
 
 }
