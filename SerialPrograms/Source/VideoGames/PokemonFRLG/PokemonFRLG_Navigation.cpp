@@ -1575,12 +1575,13 @@ int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftr
 
     context.wait_for_all_requests();
     console.log("Starting grass spin.");
-    WallClock deadline = current_time() + timeout;
+
+    const size_t spins = (size_t)(timeout / 366ms);
 
     int ret = run_until<ProControllerContext>(
         console, context,
-        [leftright, deadline](ProControllerContext& context){
-            while (current_time() < deadline){
+        [leftright, spins](ProControllerContext& context){
+            for (size_t c = 0; c < spins; c++){
                 if (leftright){
                     pbf_move_left_joystick(context, {+1, 0}, 33ms, 150ms);
                     pbf_move_left_joystick(context, {-1, 0}, 33ms, 150ms);
@@ -1597,7 +1598,17 @@ int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftr
         return -1;
     }
 
-    bool encounter_shiny = handle_encounter(console, context, true);
+    bool encounter_shiny;
+    try{
+        encounter_shiny = handle_encounter(console, context, true);
+    }catch (OperationFailedException&){
+        // check to see if it was a false positive
+        if (!in_overworld(console, context)){
+            throw;
+        }
+        console.log("grass_spin(): No battle started. Still in the overworld.", COLOR_RED);
+        return -1;
+    }
     return encounter_shiny ? 1 : 0;
 }
 
