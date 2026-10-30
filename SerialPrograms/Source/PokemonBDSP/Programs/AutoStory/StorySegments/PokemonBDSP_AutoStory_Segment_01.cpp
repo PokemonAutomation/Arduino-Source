@@ -202,7 +202,7 @@ static std::chrono::milliseconds walk_until_doorway(VideoStream& stream,
 // ---------------------------------------------------------------------------
 void jubilife_to_oreburgh_gate(SingleSwitchProgramEnvironment& env,
     VideoStream& stream,
-    ProControllerContext& context){
+    ProControllerContext& context, AutoStoryStats& stats){
     // Wait for game to fully accept input after save/overworld return
     pbf_wait(context, 2000ms);
     context.wait_for_all_requests();
@@ -221,7 +221,7 @@ void jubilife_to_oreburgh_gate(SingleSwitchProgramEnvironment& env,
 
     wait_for_dialogue(stream, context, "Phase 1 (Barry 1 fight dialog)");
     pbf_mash_button(context, BUTTON_B, 5000ms);
-    Barry_1_fight(env, stream, context);
+    fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
     pbf_mash_button(context, BUTTON_B, 5000ms);
     context.wait_for_all_requests();
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 2761ms, 0ms);
@@ -229,7 +229,7 @@ void jubilife_to_oreburgh_gate(SingleSwitchProgramEnvironment& env,
     walk_through_grass(stream, context, 1, 0, 5, "right through grass");
     wait_for_dialogue(stream, context, "Dallas fight dialog)");
     pbf_mash_button(context, BUTTON_B, 5000ms);
-    Barry_1_fight(env, stream, context); //fighting Dallas
+    fight_trainer_using_moves(stream, context, stats, "Route trainer", false); //fighting Dallas
     context.wait_for_all_requests();
     walk_through_grass(stream, context, 1, 0, 5, "right through grass");
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 600ms, 0ms);
@@ -238,7 +238,7 @@ void jubilife_to_oreburgh_gate(SingleSwitchProgramEnvironment& env,
     //function addresses that edge case
     if (try_detect_dialogue(stream, context, "Sebastian fight")){
         pbf_mash_button(context, BUTTON_B, 5000ms);
-        Barry_1_fight(env, stream, context); //fighting Sebastian
+        fight_trainer_using_moves(stream, context, stats, "Route trainer", false); //fighting Sebastian
         context.wait_for_all_requests();
     }else{
         stream.log("Sebastian dialogue never appeared. Skipping fight.", COLOR_ORANGE);
@@ -249,7 +249,7 @@ void jubilife_to_oreburgh_gate(SingleSwitchProgramEnvironment& env,
     context.wait_for_all_requests();
     enter_cave_with_down_right_search(stream, context, "jubilife_to_oreburgh_gate", 10000ms);
 }
-void oreburgh_gate_nav(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
+void oreburgh_gate_nav(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     pbf_wait(context, 2000ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 879ms, 0ms);
     wait_for_dialogue(stream, context, "HM Rock Smash Dialog");
@@ -261,13 +261,13 @@ void oreburgh_gate_nav(SingleSwitchProgramEnvironment& env, VideoStream& stream,
         walk_through_grass(stream, context, 1, 0, 1, "right through gate");
     }
     pbf_mash_button(context, BUTTON_B, 5000ms);
-    Barry_1_fight(env, stream, context); //fighting Curtis
+    fight_trainer_using_moves(stream, context, stats, "Route trainer", false); //fighting Curtis
     walk_through_grass(stream, context, 1, 0, 10, "right through gate");
     while (!try_detect_dialogue(stream, context, "Diana fight", 1, 3000ms)){
         walk_through_grass(stream, context, 1, 0, 1, "right through gate");
     }
     pbf_mash_button(context, BUTTON_B, 5000ms);
-    Barry_1_fight(env, stream, context); //fighting Diana
+    fight_trainer_using_moves(stream, context, stats, "Route trainer", false); //fighting Diana
     //  Walk right until the gate exit transition (white screen, or black screen without a battle menu).
     //  Wild battles are escaped without using up the budget. Throws on failure so the
     //  checkpoint is retried.
@@ -1601,7 +1601,7 @@ void oreburgh_mine_to_gym(SingleSwitchProgramEnvironment& env, VideoStream& stre
 //  Navigates the player through the first Gym in Oreburgh City and completes the Gym battle.
 // ---------------------------------------------------------------------------
 
-void gym_Puzzle_01(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
+void gym_Puzzle_01(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
 
     //Upon entering the Gym.
     // The entry camera sequence lasts about 7.5 seconds in the reference
@@ -1636,7 +1636,7 @@ void gym_Puzzle_01(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
     wait_for_dialogue(stream, context, "Phase 3 (Roark fight dialog)");
     pbf_mash_button(context, BUTTON_B, 5000ms);
     //Barry 1 battle logic can be used here since the moves don't matter this early.
-    Barry_1_fight(env, stream, context);
+    fight_trainer_using_moves(stream, context, stats, "Roark", false);
 
     context.wait_for_all_requests();
     wait_for_dialogue(stream, context, "Phase 4 (Roark post battle dialog)");
@@ -1735,8 +1735,8 @@ void checkpoint_0101(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            jubilife_to_oreburgh_gate(env, env.console, context);
-            oreburgh_gate_nav(env, env.console, context);
+            jubilife_to_oreburgh_gate(env, env.console, context, stats);
+            oreburgh_gate_nav(env, env.console, context, stats);
         },
         true);
 }
@@ -1817,7 +1817,7 @@ void checkpoint_0103(SingleSwitchProgramEnvironment& env,
         stats,
         [&](size_t /*attempt*/){
             //#. Oreburgh Gym navigation and battle
-            gym_Puzzle_01(env, env.console, context);
+            gym_Puzzle_01(env, env.console, context, stats);
         },
 
         true);

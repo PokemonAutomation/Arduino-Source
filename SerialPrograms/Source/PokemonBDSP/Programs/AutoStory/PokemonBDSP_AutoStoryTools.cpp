@@ -120,6 +120,30 @@ bool save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& contex
                 pbf_mash_button(context, BUTTON_B, 1000ms);
             }
 
+            // BlackScreenOverWatcher can finish while the destination is still
+            // fading in. Drain movement and wait before sending the menu input.
+            context.wait_for_all_requests();
+            BlackScreenWatcher destination_visible(COLOR_RED,
+                {0.1, 0.1, 0.8, 0.8},
+                100,
+                10,
+                BlackScreenWatcher::FinderType::GONE,
+                1000ms);
+            if (wait_until(env.console, context, 15s, {{destination_visible}}) != 0){
+                throw OperationFailedExceptionWithScreenshot(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Checkpoint destination did not become visible before saving.",
+                    env.console);
+            }
+            pbf_wait(context, 1000ms);
+            context.wait_for_all_requests();
+
+            OverworldWatcher ready_to_save;
+            if (wait_until(env.console, context, 15s, {{ready_to_save}}) != 0){
+                throw OperationFailedExceptionWithScreenshot(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Checkpoint destination did not return to the overworld before saving.",
+                    env.console);
+            }
+
             // Reuse existing feedback-based save: opens menu with MenuWatcher
             // + respects GameSettings::OVERWORLD_TO_MENU_DELAY0 internally.
             save_game(env.console, context);
@@ -199,6 +223,7 @@ void checkpoint_reattempt_loop(SingleSwitchProgramEnvironment& env,
     bool save,
     CheckpointSaveMode save_mode,
     CheckpointRetryScope retry_scope){
+    const auto pp_at_checkpoint = stats.move_pp_remaining;
     static constexpr size_t MAX_ATTEMPTS = 20;
 
     for (size_t i = 0;; i++){
@@ -234,6 +259,8 @@ void checkpoint_reattempt_loop(SingleSwitchProgramEnvironment& env,
                         "Failed to reset game from HOME during checkpoint retry.",
                         env.console);
                 }
+                // Only a real game reload restores the corresponding PP balance.
+                stats.move_pp_remaining = pp_at_checkpoint;
             }else{
                 env.console.log("Reloading from backup save before retry...", COLOR_ORANGE);
                 reload_backup_save(env, context);
@@ -595,7 +622,10 @@ bool buy_items(VideoStream& stream,
 }
 
 
-bool heal_pokemon(VideoStream& stream, ProControllerContext& context, const std::string& label){
+bool heal_pokemon(VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& label,
+    AutoStoryStats* stats){
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
 
@@ -623,6 +653,11 @@ bool heal_pokemon(VideoStream& stream, ProControllerContext& context, const std:
         return false;
     }
 
+    context.wait_for_all_requests();
+    if (stats){
+        stats->move_pp_remaining = stats->move_pp_capacity;
+        stream.log("[Move PP] " + label + ": restored the selected starter's PP budgets.");
+    }
     return true;
 }
 
@@ -720,10 +755,10 @@ bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place){
     case FlyPoint::CelesticTown:
         pbf_move_left_joystick(context, {-1, +1}, 4000ms, 500ms);
         break;
-    case FlyPoint::HearthomeCity:
     case FlyPoint::OreburghCity:
         pbf_move_left_joystick(context, {-1, -1}, 4000ms, 500ms);
         break;
+    case FlyPoint::HearthomeCity:
     case FlyPoint::PastoriaCity:
     case FlyPoint::PokemonLeagueLower:
     case FlyPoint::PokemonLeagueUpper:

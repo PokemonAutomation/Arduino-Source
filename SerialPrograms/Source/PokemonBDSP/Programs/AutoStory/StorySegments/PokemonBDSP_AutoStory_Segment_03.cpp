@@ -101,7 +101,7 @@ static void segment03_confirm_location(VideoStream& stream,
 // Watch the approach itself, cancelling queued movement as soon as the
 // trainer speaks or a battle starts. The existing battle engine owns combat.
 static void segment03_expected_encounter(VideoStream& stream,
-    ProControllerContext& context,
+    ProControllerContext& context, AutoStoryStats& stats,
     const std::string& label,
     const std::function<void(ProControllerContext&)>& approach,
     Milliseconds encounter_wait = 45000ms,
@@ -129,7 +129,7 @@ static void segment03_expected_encounter(VideoStream& stream,
             stream);
     }
     stream.log("[" + label + "] Encounter detected; route movement cancelled.");
-    fight_trainer_using_moves(stream, context, 2, label, false);
+    fight_trainer_using_moves(stream, context, stats, label, false);
 }
 
 static void segment03_wait_image(VideoStream& stream,
@@ -228,7 +228,7 @@ static void segment03_align_lower_stair_lane(VideoStream& stream, ProControllerC
 }
 
 static bool segment03_cycling_move(VideoStream& stream,
-    ProControllerContext& context,
+    ProControllerContext& context, AutoStoryStats& stats,
     double x,
     double y,
     Milliseconds duration,
@@ -247,7 +247,7 @@ static bool segment03_cycling_move(VideoStream& stream,
         },
         {{black}, {white}, {battle}});
     if (result == 2){
-        fight_trainer_using_moves(stream, context, 2, label + " encounter", false);
+        fight_trainer_using_moves(stream, context, stats, label + " encounter", false);
         return false;
     }
     if (result < 0){
@@ -392,7 +392,7 @@ static bool segment03_align_cycle_start(VideoStream& stream, ProControllerContex
 }
 
 
-static void segment03_cycle_road_battles(VideoStream& stream, ProControllerContext& context, bool encounter_pending){
+static void segment03_cycle_road_battles(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, bool encounter_pending){
     size_t completed = 0;
     auto watch = [&](bool initial){
         context.wait_for_all_requests();
@@ -424,7 +424,7 @@ static void segment03_cycle_road_battles(VideoStream& stream, ProControllerConte
                 "Cycling Road: Expected at least three battles before the south gate.",
                 stream);
         }
-        fight_trainer_using_moves(stream, context, 2, "Cycling Road encounter " + std::to_string(completed + 1), false);
+        fight_trainer_using_moves(stream, context, stats, "Cycling Road encounter " + std::to_string(completed + 1), false);
         ++completed;
         stream.log("[Cycling Road] Completed battles: " + std::to_string(completed) + "/4.");
     }
@@ -485,9 +485,9 @@ static void segment03_doorway(VideoStream& stream,
     segment03_finish_transition(stream, context, label);
 }
 
-void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context){
+void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     auto fight = [&](const std::string& label, bool post_battle_dialogue_cleanup = false){
-        fight_trainer_using_moves(stream, context, 2, label, post_battle_dialogue_cleanup);
+        fight_trainer_using_moves(stream, context, stats, label, post_battle_dialogue_cleanup);
     };
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1060ms, 0ms);
     pbf_wait(context, 225ms);
@@ -499,7 +499,7 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context){
     pbf_wait(context, 237ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 1140ms, 0ms);
     pbf_wait(context, 2621ms);
-    if (!heal_pokemon(stream, context, "Eterna before Galactic HQ")){
+    if (!heal_pokemon(stream, context, "Eterna before Galactic HQ", &stats)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Eterna Center exit was not confirmed.",
             stream);
@@ -824,7 +824,7 @@ static void segment03_enter_cycle_shop(VideoStream& stream, ProControllerContext
     stream.log("[Eterna bicycle shop] Interior confirmed; outdoor alignment stopped.", COLOR_GREEN);
 }
 
-void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context){
+void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     // Continue from 03.01 outside HQ, directly in front of the Cut bush.
     use_HM(stream, context, "Galactic HQ exit Cut");
     clear_post_battle_dialogue(stream, context, BUTTON_A, 6000ms);
@@ -843,7 +843,7 @@ void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context){
         false,
         true);
     segment03_doorway(stream, context, true, 4000ms, "Eterna Center entrance after Jupiter");
-    if (!heal_pokemon(stream, context, "Eterna after Jupiter")){
+    if (!heal_pokemon(stream, context, "Eterna after Jupiter", &stats)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Eterna Center exit not confirmed.",
             stream);
@@ -892,9 +892,9 @@ void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context){
         true,
         match_eterna_bike_riding_card);
     segment03_register_bike(stream, context);
-    segment03_cycling_move(stream, context, -1, 0, 733ms, 316ms, "Cycling Road approach");
-    segment03_cycling_move(stream, context, 0, -1, 3280ms, 3000ms, "Cycling Road north gate entrance", true);
-    segment03_cycling_move(stream, context, 0, -1, 1789ms, 3000ms, "Cycling Road north gate exit", true);
+    segment03_cycling_move(stream, context, stats, -1, 0, 733ms, 316ms, "Cycling Road approach");
+    segment03_cycling_move(stream, context, stats, 0, -1, 3280ms, 3000ms, "Cycling Road north gate entrance", true);
+    segment03_cycling_move(stream, context, stats, 0, -1, 1789ms, 3000ms, "Cycling Road north gate exit", true);
     // Fade completion can precede restored player control. Settle and
     // clear the steps before acquiring the bridge, not the cliff wall.
     pbf_wait(context, 2000ms);
@@ -923,27 +923,27 @@ void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context){
             stream);
     }
     const bool cycling_encounter = clearance >= 2 || segment03_align_cycle_start(stream, context);
-    segment03_cycle_road_battles(stream, context, cycling_encounter);
+    segment03_cycle_road_battles(stream, context, stats, cycling_encounter);
     // Any approach movement may already enter the south gate. Preserve
     // that transition instead of requesting two more doorway crossings.
     bool south_gate_entered =
-        segment03_cycling_move(stream, context, -1, 0, 129ms, 1499ms, "Cycling Road south gate approach");
+        segment03_cycling_move(stream, context, stats, -1, 0, 129ms, 1499ms, "Cycling Road south gate approach");
     if (!south_gate_entered){
         south_gate_entered =
-            segment03_cycling_move(stream, context, -1, 0, 361ms, 3345ms, "Cycling Road south gate approach");
+            segment03_cycling_move(stream, context, stats, -1, 0, 361ms, 3345ms, "Cycling Road south gate approach");
     }
     if (!south_gate_entered){
         south_gate_entered =
-            segment03_cycling_move(stream, context, 0, -1, 472ms, 2574ms, "Cycling Road south gate approach");
+            segment03_cycling_move(stream, context, stats, 0, -1, 472ms, 2574ms, "Cycling Road south gate approach");
     }
     if (!south_gate_entered){
-        segment03_cycling_move(stream, context, 0, -1, 1977ms, 1544ms, "Cycling Road south gate entrance", true);
+        segment03_cycling_move(stream, context, stats, 0, -1, 1977ms, 1544ms, "Cycling Road south gate entrance", true);
     }
     segment03_confirm_location(stream,
         context,
         match_cycling_road_south_gate_interior,
         "Cycling Road south gate interior");
-    segment03_cycling_move(stream, context, 0, -1, 1977ms, 1544ms, "Cycling Road south gate exit", true);
+    segment03_cycling_move(stream, context, stats, 0, -1, 1977ms, 1544ms, "Cycling Road south gate exit", true);
     OverworldWatcher south_gate_overworld;
     if (wait_until(stream, context, 10s, {{south_gate_overworld}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
@@ -1012,18 +1012,18 @@ void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context){
     stream.log("[Route 207 Dawn] Dialogue cleared; continuing to Camper Anthony.", COLOR_GREEN);
     // restof206.txt begins after Dawn. Recorded battle/menu inputs are
     // replaced by the encounter watchers and existing move-2 battle engine.
-    segment03_expected_encounter(stream, context, "Route 207 Camper Anthony", [](ProControllerContext& ctx){
+    segment03_expected_encounter(stream, context, stats, "Route 207 Camper Anthony", [](ProControllerContext& ctx){
         pbf_move_left_joystick(ctx, {0, -1}, 1013ms, 1667ms);
         pbf_move_left_joystick(ctx, {1, 0}, 3309ms, 1011ms);
     });
     // The recorded approach triggers Lauren next without further steering.
-    segment03_expected_encounter(stream, context, "Route 207 Picnicker Lauren", [](ProControllerContext&){
+    segment03_expected_encounter(stream, context, stats, "Route 207 Picnicker Lauren", [](ProControllerContext&){
     });
     // Justin can be dodged. After the recorded approach, wait three seconds
     // for an encounter; otherwise keep the remaining Coronet route.
     segment03_expected_encounter(
         stream,
-        context,
+        context, stats,
         "Route 207 Hiker Justin",
         [](ProControllerContext& ctx){
             pbf_move_left_joystick(ctx, {1, 0}, 994ms, 508ms);
@@ -1034,15 +1034,15 @@ void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context){
         false);
     // Keep the recorded route after Justin; replace its final blind doorway
     // excerpt with the same watched down/right search used at Oreburgh Gate.
-    bool coronet_entered = segment03_cycling_move(stream, context, 1, 0, 942ms, 443ms, "Mount Coronet approach");
+    bool coronet_entered = segment03_cycling_move(stream, context, stats, 1, 0, 942ms, 443ms, "Mount Coronet approach");
     if (!coronet_entered){
-        coronet_entered = segment03_cycling_move(stream, context, 0, -1, 776ms, 119ms, "Mount Coronet approach");
+        coronet_entered = segment03_cycling_move(stream, context, stats, 0, -1, 776ms, 119ms, "Mount Coronet approach");
     }
     if (!coronet_entered){
-        coronet_entered = segment03_cycling_move(stream, context, 1, 0, 627ms, 147ms, "Mount Coronet approach");
+        coronet_entered = segment03_cycling_move(stream, context, stats, 1, 0, 627ms, 147ms, "Mount Coronet approach");
     }
     if (!coronet_entered){
-        coronet_entered = segment03_cycling_move(stream, context, 0, 1, 725ms, 1008ms, "Mount Coronet approach");
+        coronet_entered = segment03_cycling_move(stream, context, stats, 0, 1, 725ms, 1008ms, "Mount Coronet approach");
     }
     if (!coronet_entered){
         enter_cave_with_down_right_search(stream, context, "Mount Coronet west entrance");
@@ -1125,7 +1125,7 @@ void coronet1(VideoStream& stream, ProControllerContext& context){
     pbf_wait(context, 2038ms);
     context.wait_for_all_requests();
 }
-void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
+void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     // The expiry routine starts west. Step east first to leave room for
     // its west/east pairs, then clear the old Repel before route movement.
     context.wait_for_all_requests();
@@ -1203,7 +1203,7 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
                 continue;
             }
         }
-        fight_trainer_using_moves(stream, context, 2, "Route 208 Hiker", false);
+        fight_trainer_using_moves(stream, context, stats, "Route 208 Hiker", false);
         if (++bridge_battles > 2){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 "Route 208 bridge: Unexpected additional Hiker battle.",
@@ -1288,21 +1288,21 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
     // inside the gatehouse. The existing watcher cancels at black/white,
     // waits for GONE500ms, then settles for2s before the next input.
     bool hearthome_gate_entered =
-        segment03_cycling_move(stream, context, 1, 0, 3500ms, 443ms, "Hearthome west gate approach");
+        segment03_cycling_move(stream, context, stats, 1, 0, 3500ms, 443ms, "Hearthome west gate approach");
     if (!hearthome_gate_entered){
         hearthome_gate_entered =
-            segment03_cycling_move(stream, context, 0, 1, 250ms, 405ms, "Hearthome west gate doorway alignment");
+            segment03_cycling_move(stream, context, stats, 0, 1, 250ms, 405ms, "Hearthome west gate doorway alignment");
     }
     if (!hearthome_gate_entered){
         hearthome_gate_entered =
-            segment03_cycling_move(stream, context, 1, 0, 600ms, 1617ms, "Hearthome west gate entrance", true);
+            segment03_cycling_move(stream, context, stats, 1, 0, 600ms, 1617ms, "Hearthome west gate entrance", true);
     }
     if (!hearthome_gate_entered){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Hearthome west gate: Interior transition not confirmed.",
             stream);
     }
-    if (!segment03_cycling_move(stream, context, 1, 0, 1800ms, 1588ms, "Hearthome west gate exit", true)){
+    if (!segment03_cycling_move(stream, context, stats, 1, 0, 1800ms, 1588ms, "Hearthome west gate exit", true)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Hearthome west gate: Exterior transition not confirmed.",
             stream);
@@ -1313,7 +1313,7 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
             "Hearthome west gate: Overworld not ready after exit.",
             stream);
     }
-    if (segment03_cycling_move(stream, context, 1, 0, 2200ms, 6189ms, "Hearthome Buneary approach")){
+    if (segment03_cycling_move(stream, context, stats, 1, 0, 2200ms, 6189ms, "Hearthome Buneary approach")){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Hearthome Buneary approach: Unexpected extra transition.",
             stream);
@@ -1405,7 +1405,7 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
     pbf_wait(context, 1500ms);
     context.wait_for_all_requests();
     segment03_confirm_location(stream, context, match_hearthome_center_interior, "Hearthome Center interior");
-    if (!heal_pokemon(stream, context, "Hearthome")){
+    if (!heal_pokemon(stream, context, "Hearthome", &stats)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Hearthome Center exit not confirmed.",
             stream);
@@ -1469,7 +1469,7 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
     pbf_wait(context, 2000ms);
     clear_post_battle_dialogue(stream, context, BUTTON_B);
     // Keep Hall entry separate from Fantina's outdoor conversation.
-    segment03_cycling_move(stream, context, 0, 1, 1179ms, 4268ms, "Hearthome Contest Hall entrance", true);
+    segment03_cycling_move(stream, context, stats, 0, 1, 1179ms, 4268ms, "Hearthome Contest Hall entrance", true);
     pbf_press_button(context, BUTTON_A, 181ms, 219ms);
     context.wait_for_all_requests();
     ShortDialogWatcher contest_dialogue;
@@ -1501,7 +1501,7 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
     }
     // Own the exit before handing off the checkpoint. The transition watcher
     // cancels southward movement at the fade, leaving the fixed outdoor spawn.
-    if (!segment03_cycling_move(stream, context, 0, -1, 903ms, 1455ms, "Hearthome Contest Hall exit", true)){
+    if (!segment03_cycling_move(stream, context, stats, 0, -1, 903ms, 1455ms, "Hearthome Contest Hall exit", true)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Hearthome Contest Hall: Exit transition not confirmed.",
             stream);
@@ -1518,7 +1518,7 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context){
     // End 03.04 / start 03.05: just outside the Hall, south-facing, Repel off.
 }
 
-void heartholme_to_lost_tower(VideoStream& stream, ProControllerContext& context){
+void heartholme_to_lost_tower(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     OverworldWatcher hall_start;
     if (wait_until(stream, context, 10s, {{hall_start}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
@@ -1534,7 +1534,7 @@ void heartholme_to_lost_tower(VideoStream& stream, ProControllerContext& context
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2068ms, 0ms);
     pbf_wait(context, 456ms);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1065ms, 0ms);
-    fight_trainer_using_moves(stream, context, std::vector<size_t>{2, 1}, "Barry in Hearthome", true);
+    fight_trainer_using_moves(stream, context, stats, "Barry in Hearthome", true);
     // butters' recorded rival-to-Lost Tower route.
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1088ms, 0ms);
     pbf_wait(context, 95ms);
@@ -1712,7 +1712,7 @@ void heartholme_to_lost_tower(VideoStream& stream, ProControllerContext& context
     context.wait_for_all_requests();
     stream.log("[Lost Tower handoff] Outside doorway, facing south; checkpoint complete.", COLOR_GREEN);
 }
-void lost_tower(VideoStream& stream, ProControllerContext& context){
+void lost_tower(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     // Checkpoint 03.06 starts outside the doorway, facing south, with Repel active.
     // Turn north, then enter using the same single-step timing as Segment 02.
     context.wait_for_all_requests();
@@ -1939,7 +1939,7 @@ void lost_tower(VideoStream& stream, ProControllerContext& context){
     if (biker_challenged){
         stream.log("[Lost Tower biker] Dialogue detected after " + std::to_string(biker_up_completed) +
             " up presses; handling the trainer battle.");
-        fight_trainer_using_moves(stream, context, std::vector<size_t>{2}, "Lost Tower biker", false);
+        fight_trainer_using_moves(stream, context, stats, "Lost Tower biker", false);
         clear_post_battle_dialogue(stream, context, BUTTON_B);
 
         // The trainer conversation turns the player toward the biker.
@@ -2062,7 +2062,7 @@ void lost_tower(VideoStream& stream, ProControllerContext& context){
     stream.log("[Lost Tower] Reward dialogue cleared; Escape Rope exit settled.", COLOR_GREEN);
 }
 
-void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& context){
+void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     // Recorded Tower-to-Gym path; shared helpers handle prompts and battles.
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 336ms, 0ms);
     pbf_wait(context, 590ms);
@@ -2151,7 +2151,7 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
             "Route 215 Calvin: Trainer encounter did not start.",
             stream);
     }
-    fight_trainer_using_moves(stream, context, std::vector<size_t>{2}, "Route 215 Ruin Maniac Calvin", false);
+    fight_trainer_using_moves(stream, context, stats, "Route 215 Ruin Maniac Calvin", false);
     // Renew in the clear area after Calvin, before the next walking strip.
     force_repel_expiry(stream, context, RepelRenewalChoice::YES, false, true);
     // Cover at most one unfinished 500ms westward expiry pulse.
@@ -2207,7 +2207,7 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
             // The recorded failure is the jogger's trainer introduction.
             // Complete it with the shared move-list handler, then measure
             // the current lane again; the trainer may have approached us.
-            fight_trainer_using_moves(stream, context, std::vector<size_t>{2}, "Route 215 jogger", false);
+            fight_trainer_using_moves(stream, context, stats, "Route 215 jogger", false);
             context.wait_for_all_requests();
             fresh_after = current_time();
             last_frame_time = WallClock::min();
@@ -2370,7 +2370,7 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
             "Route 215 Derek: Trainer encounter did not start.",
             stream);
     }
-    fight_trainer_using_moves(stream, context, std::vector<size_t>{2}, "Route 215 Black Belt Derek", false);
+    fight_trainer_using_moves(stream, context, stats, "Route 215 Black Belt Derek", false);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1929ms, 0ms);
     pbf_wait(context, 5ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 2195ms, 0ms);
@@ -2443,8 +2443,8 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
             stream);
     }
     // Dennis and Maya are separate consecutive battles.
-    fight_trainer_using_moves(stream, context, std::vector<size_t>{2}, "Route 215 Ace Trainer Dennis", false);
-    fight_trainer_using_moves(stream, context, std::vector<size_t>{2}, "Route 215 Ace Trainer Maya", false);
+    fight_trainer_using_moves(stream, context, stats, "Route 215 Ace Trainer Dennis", false);
+    fight_trainer_using_moves(stream, context, stats, "Route 215 Ace Trainer Maya", false);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 10884ms, 0ms);
     pbf_wait(context, 48ms);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 2314ms, 0ms);
@@ -2532,7 +2532,7 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
     context.wait_for_all_requests();
 }
 
-static void gym_Puzzle_03(VideoStream& stream, ProControllerContext& context){
+static void gym_Puzzle_03(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
 
     //Upon entering the Gym.
 
@@ -2667,7 +2667,7 @@ static void gym_Puzzle_03(VideoStream& stream, ProControllerContext& context){
     //Button presses to initiate Trainer battle 01 (Black Belt Rafael).
 
     pbf_press_button(context, BUTTON_A, 150ms, 300ms);
-    fight_trainer_using_moves(stream, context, 2, "Black Belt Rafael", false);
+    fight_trainer_using_moves(stream, context, stats, "Black Belt Rafael", false);
 
     pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue
 
@@ -2683,7 +2683,7 @@ static void gym_Puzzle_03(VideoStream& stream, ProControllerContext& context){
     //Button presses to initiate Trainer battle 02 (Black Belt Jeffrey).
 
     pbf_press_button(context, BUTTON_A, 150ms, 300ms);
-    fight_trainer_using_moves(stream, context, 2, "Black Belt Jeffrey", false);
+    fight_trainer_using_moves(stream, context, stats, "Black Belt Jeffrey", false);
 
     pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue
 
@@ -2699,7 +2699,7 @@ static void gym_Puzzle_03(VideoStream& stream, ProControllerContext& context){
     //Button presses to initiate Trainer battle 03 (Black Belt Darren).
 
     pbf_press_button(context, BUTTON_A, 150ms, 300ms);
-    fight_trainer_using_moves(stream, context, 2, "Black Belt Darren", false);
+    fight_trainer_using_moves(stream, context, stats, "Black Belt Darren", false);
 
     pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue
 
@@ -2715,7 +2715,7 @@ static void gym_Puzzle_03(VideoStream& stream, ProControllerContext& context){
     //Button presses to initiate Trainer battle 04 (Black Belt Colby).
 
     pbf_press_button(context, BUTTON_A, 150ms, 300ms);
-    fight_trainer_using_moves(stream, context, 1, "Black Belt Colby", false);
+    fight_trainer_using_moves(stream, context, stats, "Black Belt Colby", false);
 
     pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue
 
@@ -2731,7 +2731,7 @@ static void gym_Puzzle_03(VideoStream& stream, ProControllerContext& context){
     //Button presses to initiate the Gym battle.
 
     pbf_press_button(context, BUTTON_A, 150ms, 300ms);
-    fight_trainer_using_moves(stream, context, 1, "Maylene", true);
+    fight_trainer_using_moves(stream, context, stats, "Maylene", true);
 
     // Clear badge and reward dialogue before handing off inside the Gym.
     // Match Gardenia's quiet period so gaps between rewards do not end cleanup.
@@ -2800,7 +2800,7 @@ void Checkpoint_0301(SingleSwitchProgramEnvironment& env,
         stats,
         [&](size_t /*attempt*/){
             // Recorded route with feedback battle handling.
-            eterna_gym_to_jupiter(env.console, context);
+            eterna_gym_to_jupiter(env.console, context, stats);
         },
 
         true);
@@ -2845,7 +2845,7 @@ void Checkpoint_0302(SingleSwitchProgramEnvironment& env,
             pbf_wait(context, 5000ms);
             context.wait_for_all_requests();
             // Recorded route with feedback battle handling.
-            jupiter_to_coronet(env.console, context);
+            jupiter_to_coronet(env.console, context, stats);
         },
 
         true);
@@ -2913,7 +2913,7 @@ void Checkpoint_0304(SingleSwitchProgramEnvironment& env,
         stats,
         [&](size_t /*attempt*/){
             // Recorded route with feedback battle handling.
-            coronet_to_heartholme(env.console, context);
+            coronet_to_heartholme(env.console, context, stats);
         },
 
         true);
@@ -2957,7 +2957,7 @@ void Checkpoint_0305(SingleSwitchProgramEnvironment& env,
             pbf_wait(context, 5000ms);
             context.wait_for_all_requests();
             // Recorded route with feedback battle handling.
-            heartholme_to_lost_tower(env.console, context);
+            heartholme_to_lost_tower(env.console, context, stats);
             // Stop here. Checkpoint 03.06 saves outside and owns the Tower visit.
         },
 
@@ -3003,8 +3003,8 @@ void Checkpoint_0306(SingleSwitchProgramEnvironment& env,
             pbf_wait(context, 5000ms);
             context.wait_for_all_requests();
             // Save/retry begins outside the Tower, at the end of 03.05.
-            lost_tower(env.console, context);
-            lost_tower_to_veilstone_gym(env.console, context);
+            lost_tower(env.console, context, stats);
+            lost_tower_to_veilstone_gym(env.console, context, stats);
         },
         true);
 }
@@ -3038,7 +3038,7 @@ void Checkpoint_0307(SingleSwitchProgramEnvironment& env,
         stats,
         [&](size_t /*attempt*/){
             //#. Veilstone Gym navigation and battle
-            gym_Puzzle_03(env.console, context);
+            gym_Puzzle_03(env.console, context, stats);
         },
         true);
 }

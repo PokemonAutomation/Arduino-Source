@@ -855,7 +855,7 @@ static bool align_to_route204_sign(VideoStream& stream, ProControllerContext& co
 
 static void enter_ravaged_path_from_route204(SingleSwitchProgramEnvironment& env,
     VideoStream& stream,
-    ProControllerContext& context){
+    ProControllerContext& context, AutoStoryStats& stats){
     context.wait_for_all_requests();
     // The cave's brown corridor and black map void distinguish an
     // indoor return from a battle fade or an outdoor scene. All ROIs
@@ -876,7 +876,7 @@ static void enter_ravaged_path_from_route204(SingleSwitchProgramEnvironment& env
     auto handle_trainer = [&] {
         stream.log("[Ravaged Path approach] Lass Samantha triggered; completing battle before continuing.");
         wait_for_trainer_battle_menu(stream, context);
-        Barry_1_fight(env, stream, context);
+        fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
         clear_post_battle_dialogue(stream, context);
     };
     Route204ArrivalTracker arrival;
@@ -1137,7 +1137,7 @@ static void exit_ravaged_path_to_route204(VideoStream& stream, ProControllerCont
     context.wait_for_all_requests();
 }
 
-void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
+void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 550ms, 0ms);
     pbf_wait(context, 1046ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 2000ms, 0ms);
@@ -1256,7 +1256,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     align_to_overworld_landmarks(stream, context, match_jubilife_plaza_approach, "Jubilife plaza alignment", true);
     approach_galactic_dialogue(stream, context);
     wait_for_trainer_battle_menu(stream, context);
-    Barry_1_fight(env, stream, context);
+    fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
     clear_post_battle_dialogue(stream, context);
     pbf_wait(context, 2000ms);
     clear_post_battle_dialogue(stream, context);
@@ -1280,7 +1280,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     // entered the building before exterior alignment even started.
     // Repel is inactive here; no expiry search is needed before the Center.
     align_and_enter_jubilife_center(stream, context);
-    if (!heal_pokemon(stream, context, "Jubilife")){
+    if (!heal_pokemon(stream, context, "Jubilife", &stats)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Jubilife Center: Healing/exit did not complete.",
             stream);
@@ -1296,7 +1296,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
         recover_route204_female_trainer(stream, context);
     }
     wait_for_trainer_battle_menu(stream, context);
-    Barry_1_fight(env, stream, context);
+    fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
     clear_post_battle_dialogue(stream, context);
     // Resume encounter protection after the Center and the following battle.
     if (!activate_repel(stream, context, 6)){
@@ -1322,7 +1322,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     // An early locator interruption still has to complete combat;
     // it must never fall through into overworld movement mid-battle.
     wait_for_trainer_battle_menu(stream, context);
-    Barry_1_fight(env, stream, context);
+    fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
     clear_post_battle_dialogue(stream, context);
     // Keep the recently activated Repel through Ravaged Path.
     // Reacquire west of the sign after Tyler before moving north;
@@ -1334,7 +1334,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
             break;
         }
         wait_for_trainer_battle_menu(stream, context);
-        Barry_1_fight(env, stream, context);
+        fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
         clear_post_battle_dialogue(stream, context);
     }
     if (!northbound_aligned){
@@ -1342,7 +1342,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
             "Route 204 north approach: Trainer interruptions exhausted.",
             stream);
     }
-    enter_ravaged_path_from_route204(env, stream, context);
+    enter_ravaged_path_from_route204(env, stream, context, stats);
     //cave navigation
 
     // Ravaged Path -> Floaroma -> Valley Windworks -> Mars.
@@ -1356,7 +1356,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     auto battle = [&](const std::string& label){
         stream.log("[Segment 02 battle] " + label);
         wait_for_trainer_battle_menu(stream, context);
-        Barry_1_fight(env, stream, context);
+        fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
         clear_post_battle_dialogue(stream, context);
     };
     // Break the blocking rock using the existing HM confirmation helper.
@@ -1396,7 +1396,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     }
     stream.log("[Segment 02 battle] Aroma Lady Teighler: move slot 2.");
     wait_for_trainer_battle_menu(stream, context);
-    fight_trainer_using_move_slot(stream, context, 2, "Aroma Lady Teighler");
+    fight_trainer_using_moves(stream, context, stats, "Aroma Lady Teighler", false);
     clear_post_battle_dialogue(stream, context);
 
     // Omit the Awakening. The grass north of Teighler can trigger
@@ -1477,7 +1477,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     stream.log("[Segment 02] Floaroma house exit established; ready for town checkpoint.", COLOR_GREEN);
 }
 
-static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
+static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     auto move = [&](double x, double y, Milliseconds duration, Milliseconds settle = 250ms){
         pbf_move_left_joystick(context, {x, y}, duration, 0ms);
         pbf_wait(context, settle);
@@ -1535,7 +1535,7 @@ static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& s
     auto battle = [&](const std::string& label){
         stream.log("[Segment 02 battle] " + label);
         wait_for_trainer_battle_menu(stream, context);
-        Barry_1_fight(env, stream, context);
+        fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
         clear_post_battle_dialogue(stream, context);
     };
     auto talk = [&](const std::string& label, Button response = BUTTON_B){
@@ -1559,7 +1559,7 @@ static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& s
     }
     transition(0, 1, 950ms, "Floaroma Pokemon Center entrance");
     // heal_pokemon includes a watched exit; do not exit a second time.
-    if (!heal_pokemon(stream, context, "Floaroma")){
+    if (!heal_pokemon(stream, context, "Floaroma", &stats)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Floaroma Center: Healing/exit did not complete.",
             stream);
@@ -1588,7 +1588,7 @@ static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& s
     pbf_press_button(context, BUTTON_A, 150ms, 500ms);
     stream.log("[Segment 02 battle] Floaroma Meadow first Galactic grunt.");
     wait_for_trainer_battle_menu(stream, context);
-    Barry_1_fight(env, stream, context);
+    fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
     // The second grunt starts another battle automatically. Do not
     // wait for quiet overworld or send movement between the fights.
     battle("Floaroma Meadow second Galactic grunt");
@@ -1907,7 +1907,7 @@ static void align_route205_patrol_position(VideoStream& stream,
         stream);
 }
 
-void mars_to_eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
+void mars_to_eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     auto move = [&](double x, double y, Milliseconds duration, Milliseconds settle = 250ms){
         pbf_move_left_joystick(context, {x, y}, duration, 0ms);
         pbf_wait(context, settle);
@@ -1916,7 +1916,7 @@ void mars_to_eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& str
     auto battle = [&](const std::string& label){
         stream.log("[Route 205 battle] " + label);
         wait_for_trainer_battle_menu(stream, context);
-        Barry_1_fight(env, stream, context);
+        fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
         clear_post_battle_dialogue(stream, context);
     };
     auto patrol_battle = [&](const std::string& label,
@@ -2065,7 +2065,7 @@ void mars_to_eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& str
 }
 // Cheryl controls her own Pokemon. Select move slot 2 visually,
 // then A advances target selection and battle text, as in the recording.
-void eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
+void eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     (void)env;
     // Second recorded run, beginning at the northern Route 205 sign.
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 1466ms, 0ms);
@@ -2087,7 +2087,9 @@ void eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
         stream.log("[Eterna Forest battle] " + label);
         wait_for_trainer_battle_menu(stream, context);
         // Ordinary trainers return after the confirmed battle-exit transition.
-        fight_trainer_using_moves(stream, context, 2, label, false);
+        fight_trainer_using_moves(stream, context, stats, label, false);
+        // Cheryl restores the party after each completed partner battle.
+        stats.move_pp_remaining = stats.move_pp_capacity;
     };
     encounter("Lass Briana and Bug Catcher Jack", [&](ProControllerContext& context){
         pbf_move_left_joystick(context, {1.000000, -0.000000}, 579ms, 0ms);
@@ -2168,7 +2170,7 @@ void eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
 }
 void eterna_forest_exit_to_gym(SingleSwitchProgramEnvironment& env,
     VideoStream& stream,
-    ProControllerContext& context){
+    ProControllerContext& context, AutoStoryStats& stats){
     (void)env;
     // Clear Repel on the open street before locator corrections.
     // Reuse the helper's horizontal wiggles and decline renewal.
@@ -2190,7 +2192,7 @@ void eterna_forest_exit_to_gym(SingleSwitchProgramEnvironment& env,
             stream);
     }
     context.wait_for_all_requests();
-    if (!heal_pokemon(stream, context, "Eterna")){
+    if (!heal_pokemon(stream, context, "Eterna", &stats)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Eterna Center exit was not confirmed.",
             stream);
@@ -2419,7 +2421,7 @@ void eterna_forest_exit_to_gym(SingleSwitchProgramEnvironment& env,
     }
     stream.log("[Eterna City] Watched Explorer Kit/Cynthia events and verified gym entry complete.", COLOR_GREEN);
 }
-static void gym_Puzzle_02(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
+static void gym_Puzzle_02(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
 
     //Upon entering the Gym.
 
@@ -2537,7 +2539,7 @@ static void gym_Puzzle_02(SingleSwitchProgramEnvironment& env, VideoStream& stre
 
     pbf_press_button(context, BUTTON_A, 150ms, 300ms);
     wait_for_trainer_battle_menu(stream, context);
-    fight_trainer_using_moves(stream, context, 2, "Lass Caroline", false);
+    fight_trainer_using_moves(stream, context, stats, "Lass Caroline", false);
 
     pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue.
 
@@ -2551,7 +2553,7 @@ static void gym_Puzzle_02(SingleSwitchProgramEnvironment& env, VideoStream& stre
 
     pbf_press_button(context, BUTTON_A, 150ms, 300ms);
     wait_for_trainer_battle_menu(stream, context);
-    fight_trainer_using_moves(stream, context, 2, "Aroma Lady Jenna", false);
+    fight_trainer_using_moves(stream, context, stats, "Aroma Lady Jenna", false);
 
     pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue.
 
@@ -2565,7 +2567,7 @@ static void gym_Puzzle_02(SingleSwitchProgramEnvironment& env, VideoStream& stre
 
     pbf_press_button(context, BUTTON_A, 150ms, 300ms);
     wait_for_trainer_battle_menu(stream, context);
-    fight_trainer_using_moves(stream, context, 2, "Aroma Lady Angela", false);
+    fight_trainer_using_moves(stream, context, stats, "Aroma Lady Angela", false);
 
     pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue
 
@@ -2579,7 +2581,7 @@ static void gym_Puzzle_02(SingleSwitchProgramEnvironment& env, VideoStream& stre
 
     pbf_press_button(context, BUTTON_A, 150ms, 300ms);
     wait_for_trainer_battle_menu(stream, context);
-    fight_trainer_using_moves(stream, context, 2, "Beauty Lindsay", false);
+    fight_trainer_using_moves(stream, context, stats, "Beauty Lindsay", false);
 
     pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue
 
@@ -2593,7 +2595,7 @@ static void gym_Puzzle_02(SingleSwitchProgramEnvironment& env, VideoStream& stre
 
     pbf_press_button(context, BUTTON_A, 150ms, 300ms);
     wait_for_trainer_battle_menu(stream, context);
-    fight_trainer_using_moves(stream, context, 2, "Gardenia", true);
+    fight_trainer_using_moves(stream, context, stats, "Gardenia", true);
 
     // The shared battle handler already advances reward dialogue
     // while confirming the overworld. Do not require the badge
@@ -2677,7 +2679,7 @@ void checkpoint_0201(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            roark_to_floaroma(env, env.console, context);
+            roark_to_floaroma(env, env.console, context, stats);
         },
 
         true);
@@ -2701,7 +2703,7 @@ void AutoStory_checkpoint_0202::run_checkpoint(SingleSwitchProgramEnvironment& e
         options,
         stats,
         [&](size_t /*attempt*/){
-            floaroma_to_mars(env, env.console, context);
+            floaroma_to_mars(env, env.console, context, stats);
         },
         true);
 }
@@ -2734,7 +2736,7 @@ void checkpoint_0203(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            mars_to_eterna_forest(env, env.console, context);
+            mars_to_eterna_forest(env, env.console, context, stats);
         },
 
         true);
@@ -2769,7 +2771,7 @@ void checkpoint_0204(SingleSwitchProgramEnvironment& env,
         stats,
         [&](size_t /*attempt*/){
             // TODO: implement Segment 02 gameplay logic
-            eterna_forest(env, env.console, context);
+            eterna_forest(env, env.console, context, stats);
         },
 
         true);
@@ -2804,7 +2806,7 @@ void checkpoint_0205(SingleSwitchProgramEnvironment& env,
         stats,
         [&](size_t /*attempt*/){
             // TODO: implement Segment 02 gameplay logic
-            eterna_forest_exit_to_gym(env, env.console, context);
+            eterna_forest_exit_to_gym(env, env.console, context, stats);
         },
         true);
 }
@@ -2838,7 +2840,7 @@ void checkpoint_0206(SingleSwitchProgramEnvironment& env,
         stats,
         [&](size_t /*attempt*/){
             //#. Eterna Gym navigation and battle
-            gym_Puzzle_02(env, env.console, context);
+            gym_Puzzle_02(env, env.console, context, stats);
         },
         true);
 }

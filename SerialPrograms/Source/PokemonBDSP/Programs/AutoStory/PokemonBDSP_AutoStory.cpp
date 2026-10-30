@@ -3,6 +3,10 @@
 #include <algorithm>
 #include <memory>
 
+#include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/Json/JsonValue.h"
+
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 
@@ -65,6 +69,7 @@ static std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_checkpoint_list()
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0003>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0004>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0005>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0006>());
 
     //Segment 01
     checkpoint_list.emplace_back(std::make_unique<AutoStory_checkpoint_0101>());
@@ -94,19 +99,6 @@ static std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_checkpoint_list()
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0403>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0404>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0405>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0406>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0407>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0408>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0409>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0410>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0411>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0412>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0413>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0414>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0415>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0416>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0417>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0418>());
 
     // Segment 05
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0501>());
@@ -114,31 +106,12 @@ static std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_checkpoint_list()
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0503>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0504>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0505>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0506>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0507>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0508>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0509>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0510>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0511>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0512>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0513>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0514>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0515>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0516>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0517>());
 
     // Segment 06
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0601>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0602>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0603>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0604>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0605>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0606>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0607>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0608>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0609>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0610>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0611>());
 
     // Segment 07
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0701>());
@@ -148,17 +121,6 @@ static std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_checkpoint_list()
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0705>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0706>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0707>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0708>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0709>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0710>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0711>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0712>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0713>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0714>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0715>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0716>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0718>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0719>());
 
     // Segment 08
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0801>());
@@ -170,23 +132,6 @@ static std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_checkpoint_list()
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0807>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0808>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0809>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0810>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0811>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0812>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0813>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0814>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0815>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0816>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0817>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0818>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0819>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0820>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0821>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0822>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0823>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0824>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0825>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0826>());
 
     // Segment 09
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0901>());
@@ -198,11 +143,6 @@ static std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_checkpoint_list()
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0907>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0908>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0909>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0910>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0911>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0912>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0913>());
-    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0914>());
 
 
     //checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_021>());
@@ -254,9 +194,12 @@ static const std::vector<std::unique_ptr<AutoStory_Checkpoint>>& ALL_CHECKPOINTS
 //  Segment database
 // ---------------------------------------------------------------------------
 
-// Section databases retain global index slugs. Never execute across the
-// tutorial/main-story boundary: the starter must be returned from HOME first.
-static constexpr size_t TUTORIAL_CHECKPOINT_COUNT = 6;
+// Preserve Tutorial and Segments 01-03 numeric selections. Revised Segments
+// 04-09 use explicit slugs, and obsolete selections require reselection.
+// Keep Tutorial and Main Story separate for the manual HOME transfer.
+static constexpr size_t TUTORIAL_CHECKPOINT_COUNT = 7;
+// Keep existing Main Story option IDs stable after splitting the tutorial.
+static constexpr size_t LEGACY_MAIN_CHECKPOINT_START = 6;
 static const StringSelectDatabase& section_database(bool checkpoints, bool tutorial){
     static const StringSelectDatabase tutorial_segments = [] {
         StringSelectDatabase db;
@@ -273,15 +216,23 @@ static const StringSelectDatabase& section_database(bool checkpoints, bool tutor
     static const StringSelectDatabase tutorial_checkpoints = [] {
         StringSelectDatabase db;
         for (size_t i = 0; i < TUTORIAL_CHECKPOINT_COUNT; i++){
-            db.add_entry(StringSelectEntry(std::to_string(i), ALL_CHECKPOINTS()[i]->name()));
+            const std::string name = ALL_CHECKPOINTS()[i]->name();
+            db.add_entry(StringSelectEntry(name.substr(0, 5), name));
         }
         return db;
     }();
     static const StringSelectDatabase main_checkpoints = [] {
         StringSelectDatabase db;
+        size_t legacy_index = LEGACY_MAIN_CHECKPOINT_START;
         for (size_t i = TUTORIAL_CHECKPOINT_COUNT; i < ALL_CHECKPOINTS().size(); i++){
-            db.add_entry(StringSelectEntry(std::to_string(i), ALL_CHECKPOINTS()[i]->name()));
+            const std::string name = ALL_CHECKPOINTS()[i]->name();
+            if (name.compare(0, 3, "04.") >= 0 && name.compare(0, 3, "09.") <= 0){
+                db.add_entry(StringSelectEntry(name.substr(0, 5), name));
+            }else{
+                db.add_entry(StringSelectEntry(std::to_string(legacy_index++), name));
+            }
         }
+        db.add_entry(StringSelectEntry("checkpoint-reselect", "Select a revised checkpoint (old selection)"));
         return db;
     }();
     return checkpoints ? (tutorial ? tutorial_checkpoints : main_checkpoints)
@@ -338,14 +289,6 @@ BDSPAutoStory::~BDSPAutoStory(){
 BDSPAutoStory::BDSPAutoStory()
     : SingleSwitchProgramInstance()
     // DIAGNOSTIC ONLY: Remove before pushing to production.
-    , DIAGNOSTIC_POST_CATCH_ONLY(
-        "<b>Diagnostic only: Run 00.04 after catch through 00.05</b><br>"
-        "Start at the saved position immediately after catching the second Pokemon. "
-        "Applies only in advanced Tutorial mode when Start Checkpoint is 00.04. Runs its post-catch part, then 00.05. Other starting checkpoints run normally. "
-        "Remove before pushing to production.",
-        LockMode::LOCK_WHILE_RUNNING,
-        false)
-    // DIAGNOSTIC ONLY: Remove before pushing to production.
     , DIAGNOSTIC_FAKE_CHECKPOINT_SAVE(
         "<b>Diagnostic only: Fake checkpoint saves</b><br>"
         "Use the fake save helper instead of normal checkpoint saving. "
@@ -368,11 +311,11 @@ BDSPAutoStory::BDSPAutoStory()
     , START_CHECKPOINT_TUTORIAL("<b>Start Checkpoint:</b>",
         section_database(true, true),
         LockMode::LOCK_WHILE_RUNNING,
-        "0")
+        "00.00")
     , END_CHECKPOINT_TUTORIAL("<b>End Checkpoint:</b>",
         section_database(true, true),
         LockMode::UNLOCK_WHILE_RUNNING,
-        "5")
+        "00.06")
 
     , START_DESCRIPTION_SEGMENT("<b>Start:</b><br>", "")
     , END_DESCRIPTION_SEGMENT("<b>End:</b><br>", "")
@@ -388,7 +331,7 @@ BDSPAutoStory::BDSPAutoStory()
     , END_CHECKPOINT_MAINSTORY("<b>End Checkpoint (Main):</b>",
         section_database(true, false),
         LockMode::UNLOCK_WHILE_RUNNING,
-        std::to_string(ALL_CHECKPOINTS().size() - 1))
+        section_database(true, false)[ALL_CHECKPOINTS().size() - TUTORIAL_CHECKPOINT_COUNT - 1].slug)
 
     , START_SEGMENT("<b>Start Segment:</b>", section_database(false, true), LockMode::LOCK_WHILE_RUNNING, "0")
 
@@ -523,7 +466,6 @@ BDSPAutoStory::BDSPAutoStory()
     //  Options
     // -----------------------------------------------------------------------
 
-    PA_ADD_OPTION(DIAGNOSTIC_POST_CATCH_ONLY);
     PA_ADD_OPTION(DIAGNOSTIC_FAKE_CHECKPOINT_SAVE);
     PA_ADD_OPTION(STORY_SECTION);
     PA_ADD_OPTION(MAINSTORY_NOTE);
@@ -576,6 +518,74 @@ BDSPAutoStory::BDSPAutoStory()
     END_CHECKPOINT_MAINSTORY.add_listener(*this);
     on_config_value_changed(nullptr);
 }
+std::string BDSPAutoStory::check_validity() const {
+    const std::string error = SingleSwitchProgramInstance::check_validity();
+    if (!error.empty()){
+        return error;
+    }
+    if (ENABLE_ADVANCED_MODE && STORY_SECTION == StorySection::MAIN_STORY &&
+        (START_CHECKPOINT_MAINSTORY.slug() == "checkpoint-reselect" ||
+            END_CHECKPOINT_MAINSTORY.slug() == "checkpoint-reselect")){
+        return "Checkpoints in Segments 04 through 09 have been consolidated. Select the revised start and end "
+            "checkpoints that match your in-game save before starting.";
+    }
+    return {};
+}
+
+void BDSPAutoStory::load_json(const JsonValue& json){
+    SingleSwitchProgramInstance::load_json(json);
+    const JsonObject* object = json.to_object();
+    if (!object){
+        return;
+    }
+    const char* keys[] = {"START_CHECKPOINT_MAINSTORY", "END_CHECKPOINT_MAINSTORY"};
+    StringSelectOption* selections[] = {&START_CHECKPOINT_MAINSTORY, &END_CHECKPOINT_MAINSTORY};
+    for (size_t selection = 0; selection < 2; selection++){
+        const std::string* slug = object->get_string(keys[selection]);
+        if (!slug){
+            continue;
+        }
+        if (*slug == "07.17" || *slug == "06-reselect" || *slug == "07-reselect"){
+            selections[selection]->set_by_slug("checkpoint-reselect");
+            continue;
+        }
+        for (size_t old_index = 22; old_index <= 125; old_index++){
+            if (*slug == std::to_string(old_index)){
+                selections[selection]->set_by_slug("checkpoint-reselect");
+                break;
+            }
+        }
+    }
+    const char* tutorial_keys[] = {"START_CHECKPOINT_TUTORIAL", "END_CHECKPOINT_TUTORIAL"};
+    StringSelectOption* tutorial_selections[] = {&START_CHECKPOINT_TUTORIAL, &END_CHECKPOINT_TUTORIAL};
+    for (size_t selection = 0; selection < 2; selection++){
+        const std::string* slug = object->get_string(tutorial_keys[selection]);
+        if (!slug){
+            continue;
+        }
+        for (size_t old_index = 0; old_index <= 5; old_index++){
+            if (*slug == std::to_string(old_index)){
+                size_t revised_index = old_index;
+                if (old_index == 5){
+                    revised_index = 6;
+                }else if (old_index == 4 && selection == 1){
+                    // Old 00.04 included both the catch and post-catch route.
+                    revised_index = 5;
+                }
+                tutorial_selections[selection]->set_by_slug("00.0" + std::to_string(revised_index));
+                break;
+            }
+        }
+    }
+    // Preserve the intent of a saved post-catch diagnostic configuration.
+    const std::string* old_tutorial_start = object->get_string("START_CHECKPOINT_TUTORIAL");
+    if (object->get_boolean_default("DIAGNOSTIC_POST_CATCH_ONLY") && old_tutorial_start && *old_tutorial_start == "4"){
+        START_CHECKPOINT_TUTORIAL.set_by_slug("00.05");
+        END_CHECKPOINT_TUTORIAL.set_by_slug("00.06");
+    }
+    on_config_value_changed(nullptr);
+}
+
 void BDSPAutoStory::update_ui_state(){
     const bool advanced = ENABLE_ADVANCED_MODE;
     const bool tutorial = STORY_SECTION == StorySection::TUTORIAL;
@@ -610,14 +620,20 @@ void BDSPAutoStory::on_config_value_changed(void*){
     if (ENABLE_ADVANCED_MODE){
         const auto& checkpoints = ALL_CHECKPOINTS();
 
-        size_t start = std::stoul((tutorial ? START_CHECKPOINT_TUTORIAL : START_CHECKPOINT_MAINSTORY).slug());
-        size_t end = std::stoul((tutorial ? END_CHECKPOINT_TUTORIAL : END_CHECKPOINT_MAINSTORY).slug());
+        size_t start = tutorial ? START_CHECKPOINT_TUTORIAL.index()
+            : START_CHECKPOINT_MAINSTORY.index() + TUTORIAL_CHECKPOINT_COUNT;
+        size_t end = tutorial ? END_CHECKPOINT_TUTORIAL.index()
+            : END_CHECKPOINT_MAINSTORY.index() + TUTORIAL_CHECKPOINT_COUNT;
 
         if (start < checkpoints.size()){
             START_DESCRIPTION_CHECKPOINT.set_text("Start: " + checkpoints[start]->start_text());
+        }else{
+            START_DESCRIPTION_CHECKPOINT.set_text("Select a revised checkpoint matching your in-game save.");
         }
         if (end < checkpoints.size()){
             END_DESCRIPTION_CHECKPOINT.set_text("End: " + checkpoints[end]->end_text());
+        }else{
+            END_DESCRIPTION_CHECKPOINT.set_text("Select a revised ending checkpoint.");
         }
 
     }else{
@@ -641,6 +657,10 @@ void BDSPAutoStory::on_config_value_changed(void*){
 // ---------------------------------------------------------------------------
 
 void BDSPAutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    const std::string error = check_validity();
+    if (!error.empty()){
+        throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT, error);
+    }
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     AutoStoryOptions options{Language::English,
@@ -656,30 +676,41 @@ void BDSPAutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             }},
         DIAGNOSTIC_FAKE_CHECKPOINT_SAVE ? CheckpointSaveMode::FAKE : CheckpointSaveMode::REAL};
 
+    stats.starter_choice = options.starter_choice;
+    switch (options.starter_choice){
+    case StarterChoice::TURTWIG:
+        stats.move_pp_capacity = {15, 15, 10, 25};
+        break;
+    case StarterChoice::CHIMCHAR:
+        stats.move_pp_capacity = {15, 15, 10, 30};
+        break;
+    case StarterChoice::PIPLUP:
+        stats.move_pp_capacity = {20, 10, 15, 35};
+        break;
+    }
+    // A direct main-story start requires full HP/PP, as described in the wiki.
+    // After startup, only confirmed healing or a successful save reload refills it.
+    stats.move_pp_remaining = stats.move_pp_capacity;
+
     const bool fake_saves = options.checkpoint_save_mode == CheckpointSaveMode::FAKE;
     if (fake_saves){
         options.checkpoint_retry_scope = CheckpointRetryScope::DEFER_TO_SELECTED_RANGE;
     }
+    bool tutorial_completed = false;
     auto run_selected_range = [&](size_t attempt){
         if (attempt > 0){
             env.log("[Fake saves] Reloaded initial save; restarting the entire selected range from its start.");
         }
-        // DIAGNOSTIC ONLY: Remove this branch before pushing to production.
-        if (DIAGNOSTIC_POST_CATCH_ONLY && ENABLE_ADVANCED_MODE && STORY_SECTION == StorySection::TUTORIAL &&
-            START_CHECKPOINT_TUTORIAL.slug() == "4"){
-            env.log("Diagnostic only: Running checkpoint 00.04 after catch.");
-            diagnostic_checkpoint_0004_after_catch(env, context, options, stats);
-            env.log("Diagnostic continuation: Running checkpoint 00.05.");
-            AutoStory_Checkpoint_0005().run_checkpoint(env, context, options, stats);
-            return;
-        }
+
 
         const bool tutorial = STORY_SECTION == StorySection::TUTORIAL;
         const auto& segments = ALL_SEGMENTS();
 
         if (ENABLE_ADVANCED_MODE){
-            size_t start = std::stoul((tutorial ? START_CHECKPOINT_TUTORIAL : START_CHECKPOINT_MAINSTORY).slug());
-            size_t end = std::stoul((tutorial ? END_CHECKPOINT_TUTORIAL : END_CHECKPOINT_MAINSTORY).slug());
+            size_t start = tutorial ? START_CHECKPOINT_TUTORIAL.index()
+                : START_CHECKPOINT_MAINSTORY.index() + TUTORIAL_CHECKPOINT_COUNT;
+            size_t end = tutorial ? END_CHECKPOINT_TUTORIAL.index()
+                : END_CHECKPOINT_MAINSTORY.index() + TUTORIAL_CHECKPOINT_COUNT;
 
             env.log("Starting AutoStory from checkpoint " + std::to_string(start) + " to " + std::to_string(end));
 
@@ -688,6 +719,9 @@ void BDSPAutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             for (size_t i = start; i <= end && i < checkpoints.size(); i++){
                 env.log("Running Checkpoint: " + std::to_string(i));
                 checkpoints[i]->run_checkpoint(env, context, options, stats);
+                if (tutorial && i + 1 == TUTORIAL_CHECKPOINT_COUNT){
+                    tutorial_completed = true;
+                }
             }
 
         }else{
@@ -697,6 +731,9 @@ void BDSPAutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             for (size_t i = start; i <= end && i < segments.size(); i++){
                 env.log("Running Segment: " + std::to_string(i));
                 segments[i]->run_segment(env, context, options, stats);
+                if (tutorial && i == 0){
+                    tutorial_completed = true;
+                }
             }
         }
     };
@@ -713,7 +750,19 @@ void BDSPAutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         run_selected_range(0);
     }
 
-    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+    std::string completion_message;
+    if (tutorial_completed){
+        context.wait_for_all_requests();
+        completion_message = "Tutorial complete. Deposit your starter in the Jubilife Pokemon Center PC, "
+            "save and close BDSP, then transfer it through Pokemon HOME. Return your fully evolved "
+            "level-100 starter to the first party slot with the wiki moveset and full HP and PP "
+            "before starting Main Story.";
+        MAINSTORY_NOTE.set_text(completion_message);
+        MAINSTORY_NOTE.set_visibility(ConfigOptionState::ENABLED);
+        env.log_to_ui(completion_message, COLOR_GREEN);
+        env.console.log(completion_message, COLOR_GREEN);
+    }
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH, completion_message);
 }
 
 
