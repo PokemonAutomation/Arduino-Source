@@ -40,6 +40,12 @@ namespace PokemonBDSP {
 //  Stats
 // ---------------------------------------------------------------------------
 
+enum class StarterChoice {
+    TURTWIG,
+    CHIMCHAR,
+    PIPLUP,
+};
+
 struct AutoStoryStats : public StatsTracker {
     AutoStoryStats()
         : m_checkpoint(m_stats["Checkpoint"])
@@ -53,18 +59,16 @@ struct AutoStoryStats : public StatsTracker {
     std::atomic<uint64_t>& m_segment;
     std::atomic<uint64_t>& m_reset;
     bool m_first_run = true;
+    // Main-story slots: contact, non-contact, spread, high-PP backup.
+    StarterChoice starter_choice = StarterChoice::CHIMCHAR;
+    std::array<size_t, 4> move_pp_capacity{15, 15, 10, 30};
+    std::array<size_t, 4> move_pp_remaining = move_pp_capacity;
 };
 
 
 // ---------------------------------------------------------------------------
 //  Options passed to every segment/checkpoint
 // ---------------------------------------------------------------------------
-
-enum class StarterChoice {
-    TURTWIG,
-    CHIMCHAR,
-    PIPLUP,
-};
 
 enum class HelpMode {
     NO_OUTSIDE_HELP,
@@ -272,6 +276,16 @@ void fight_trainer_using_moves(VideoStream& stream,
     const std::string& label,
     bool post_battle_dialogue_cleanup);
 
+// Use the selected starter's slot-role priorities and retain PP across battles.
+// Slots 1/2/3/4 are contact/non-contact/spread/backup. Exhausted slots are
+// skipped only within this battle's allowed priorities. One confirmed selection
+// reserves one PP; this budget does not replace actual-PP OCR or model Pressure.
+void fight_trainer_using_moves(VideoStream& stream,
+    ProControllerContext& context,
+    AutoStoryStats& stats,
+    const std::string& label,
+    bool post_battle_dialogue_cleanup);
+
 // A full Bag screenshot with the desired item highlighted. Paths are relative
 // to RESOURCE_PATH(); quantities and selection borders are excluded.
 struct BagItemTemplate {
@@ -372,7 +386,10 @@ void use_HM(VideoStream& stream, ProControllerContext& context, const std::strin
 //  Walk to the nurse, heal the party, and exit the Pokemon Center.
 //  `label` names the center for log messages (e.g. "Veilstone").
 //  Returns false if the exit black screen was not detected.
-bool heal_pokemon(VideoStream& stream, ProControllerContext& context, const std::string& label);
+bool heal_pokemon(VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& label,
+    AutoStoryStats* stats = nullptr);
 
 enum class FlyPoint {
     CanalavCity,

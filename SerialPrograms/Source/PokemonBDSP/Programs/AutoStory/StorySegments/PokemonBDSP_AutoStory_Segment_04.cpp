@@ -33,486 +33,9 @@ namespace PokemonAutomation {
 namespace NintendoSwitch {
 namespace PokemonBDSP {
 
-
-std::string AutoStory_Segment_04::name() const {
-    return "04: Third Badge to Fourth Badge";
-}
-std::string AutoStory_Segment_04::start_text() const {
-    return "Start: Inside Veilstone Gym in front of Maylene, facing north, after acquiring the third badge and clearing her reward dialogue.";
-}
-std::string AutoStory_Segment_04::end_text() const {
-    return "End: Fourth Gym Badge acquired (Pastoria City).";
-}
-
-
-void AutoStory_Segment_04::run_segment(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    stats.m_segment++;
-    env.update_stats();
-    context.wait_for_all_requests();
-    env.console.log("Start Segment " + name(), COLOR_ORANGE);
-
-    AutoStory_Checkpoint_0401().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0402().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0403().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0404().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0405().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0406().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0407().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0408().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0409().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0410().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0411().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0412().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0413().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0414().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0415().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0416().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0417().run_checkpoint(env, context, options, stats);
-    AutoStory_Checkpoint_0418().run_checkpoint(env, context, options, stats);
-
-    context.wait_for_all_requests();
-    env.console.log("End Segment " + name(), COLOR_GREEN);
-}
-
-
-std::string AutoStory_Checkpoint_0401::name() const {
-    return "04.01 - leave_gym";
-}
-std::string AutoStory_Checkpoint_0401::start_text() const {
-    return "Inside Veilstone Gym in front of Maylene, facing north, after acquiring the third badge and clearing her reward dialogue.";
-}
-std::string AutoStory_Checkpoint_0401::end_text() const {
-    return "Outside Veilstone Gym, before clearing Dawn's post-Gym conversation.";
-}
-void AutoStory_Checkpoint_0401::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0401(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0402::name() const {
-    return "04.02 - go_to_veilstone_pokemon_center";
-}
-std::string AutoStory_Checkpoint_0402::start_text() const {
-    return "Outside Veilstone Gym, before clearing Dawn's post-Gym conversation.";
-}
-std::string AutoStory_Checkpoint_0402::end_text() const {
-    return "Entered Veilstone City Pokemon Center.";
-}
-void AutoStory_Checkpoint_0402::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0402(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0403::name() const {
-    return "04.03 - heal_at_pokemon_center (Veilstone)";
-}
-std::string AutoStory_Checkpoint_0403::start_text() const {
-    return "Inside Veilstone City Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0403::end_text() const {
-    return "Healed and exited Veilstone City Pokemon Center.";
-}
-void AutoStory_Checkpoint_0403::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0403(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0404::name() const {
-    return "04.04 - go_to_galactic_warehouse";
-}
-std::string AutoStory_Checkpoint_0404::start_text() const {
-    return "Outside Veilstone City Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0404::end_text() const {
-    return "Reached Galactic Warehouse, battle started.";
-}
-void AutoStory_Checkpoint_0404::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0404(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0405::name() const {
-    return "04.05 - handle_battle (veilstone_galactic_grunts_1)";
-}
-std::string AutoStory_Checkpoint_0405::start_text() const {
-    return "In battle against Galactic Grunt at Veilstone.";
-}
-std::string AutoStory_Checkpoint_0405::end_text() const {
-    return "Defeated Galactic Grunt at Veilstone.";
-}
-void AutoStory_Checkpoint_0405::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0405(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0406::name() const {
-    return "04.06 - enter_galactic_warehouse";
-}
-std::string AutoStory_Checkpoint_0406::start_text() const {
-    return "Outside Galactic Warehouse.";
-}
-std::string AutoStory_Checkpoint_0406::end_text() const {
-    return "Entered Galactic Warehouse.";
-}
-void AutoStory_Checkpoint_0406::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0406(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0407::name() const {
-    return "04.07 - exit_galactic_warehouse";
-}
-std::string AutoStory_Checkpoint_0407::start_text() const {
-    return "Inside Galactic Warehouse.";
-}
-std::string AutoStory_Checkpoint_0407::end_text() const {
-    return "Exited Galactic Warehouse with TM Fly.";
-}
-void AutoStory_Checkpoint_0407::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0407(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0408::name() const {
-    return "04.08 - go_to_route_214";
-}
-std::string AutoStory_Checkpoint_0408::start_text() const {
-    return "Outside Galactic Warehouse.";
-}
-std::string AutoStory_Checkpoint_0408::end_text() const {
-    return "Arrived at Route 214, battle started.";
-}
-void AutoStory_Checkpoint_0408::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0408(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0409::name() const {
-    return "04.09 - handle_battle (route_214_psychic_abigail)";
-}
-std::string AutoStory_Checkpoint_0409::start_text() const {
-    return "In battle against Psychic Abigail on Route 214.";
-}
-std::string AutoStory_Checkpoint_0409::end_text() const {
-    return "Defeated Psychic Abigail on Route 214.";
-}
-void AutoStory_Checkpoint_0409::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0409(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0410::name() const {
-    return "04.10 - walk_through_route_214";
-}
-std::string AutoStory_Checkpoint_0410::start_text() const {
-    return "On Route 214 after Psychic Abigail.";
-}
-std::string AutoStory_Checkpoint_0410::end_text() const {
-    return "Walked through Route 214.";
-}
-void AutoStory_Checkpoint_0410::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0410(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0411::name() const {
-    return "04.11 - pass_by_valor_lakefront";
-}
-std::string AutoStory_Checkpoint_0411::start_text() const {
-    return "End of Route 214.";
-}
-std::string AutoStory_Checkpoint_0411::end_text() const {
-    return "Passed Valor Lakefront, entered building.";
-}
-void AutoStory_Checkpoint_0411::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0411(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0412::name() const {
-    return "04.12 - go_through_building_route_213";
-}
-std::string AutoStory_Checkpoint_0412::start_text() const {
-    return "Inside building between Route 214 and Route 213.";
-}
-std::string AutoStory_Checkpoint_0412::end_text() const {
-    return "Exited building onto Route 213.";
-}
-void AutoStory_Checkpoint_0412::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0412(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0413::name() const {
-    return "04.13 - go_through_route_213";
-}
-std::string AutoStory_Checkpoint_0413::start_text() const {
-    return "On Route 213.";
-}
-std::string AutoStory_Checkpoint_0413::end_text() const {
-    return "Walked through Route 213, entered east Pastoria building.";
-}
-void AutoStory_Checkpoint_0413::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0413(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0414::name() const {
-    return "04.14 - go_through_house_east_pastoria";
-}
-std::string AutoStory_Checkpoint_0414::start_text() const {
-    return "Inside east Pastoria building.";
-}
-std::string AutoStory_Checkpoint_0414::end_text() const {
-    return "Exited east Pastoria building into Pastoria City.";
-}
-void AutoStory_Checkpoint_0414::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0414(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0415::name() const {
-    return "04.15 - go_through_pastoria";
-}
-std::string AutoStory_Checkpoint_0415::start_text() const {
-    return "In Pastoria City.";
-}
-std::string AutoStory_Checkpoint_0415::end_text() const {
-    return "Entered Pastoria City Pokemon Center.";
-}
-void AutoStory_Checkpoint_0415::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0415(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0416::name() const {
-    return "04.16 - heal_at_pokemon_center (Pastoria)";
-}
-std::string AutoStory_Checkpoint_0416::start_text() const {
-    return "Inside Pastoria City Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0416::end_text() const {
-    return "Healed and exited Pastoria City Pokemon Center.";
-}
-void AutoStory_Checkpoint_0416::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0416(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0417::name() const {
-    return "04.17 - go_to_pastoria_gym";
-}
-std::string AutoStory_Checkpoint_0417::start_text() const {
-    return "Outside Pastoria City Pokemon Center.";
-}
-std::string AutoStory_Checkpoint_0417::end_text() const {
-    return "Inside Pastoria Gym at the entrance, facing north.";
-}
-void AutoStory_Checkpoint_0417::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0417(env, context, options, stats);
-}
-
-std::string AutoStory_Checkpoint_0418::name() const {
-    return "04.18 - Pastoria Gym Puzzle";
-}
-std::string AutoStory_Checkpoint_0418::start_text() const {
-    return "Inside Pastoria Gym at the entrance, facing north.";
-}
-std::string AutoStory_Checkpoint_0418::end_text() const {
-    return "Outside Pastoria Gym at the doorway, facing south, after acquiring the fourth badge and clearing the reward dialogue.";
-}
-void AutoStory_Checkpoint_0418::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            VideoStream& stream = env.console;
-            struct Move {
-                DpadPosition dir;
-                int count;
-                Milliseconds delay;
-            };
-
-            // Trial: use the supplied counts without an extra facing press.
-            const std::vector<Move> sequences[] = {
-                {
-                    // Trainer 1
-                    {DPAD_UP, 16, 0ms},
-                    {DPAD_LEFT, 11, 0ms},
-                    {DPAD_DOWN, 8, 0ms},
-                    {DPAD_DOWN, 1, 2000ms},
-                    {DPAD_RIGHT, 5, 0ms},
-                    {DPAD_UP, 7, 0ms},
-                    {DPAD_RIGHT, 10, 0ms},
-                    {DPAD_UP, 7, 0ms},
-                    {DPAD_LEFT, 4, 0ms},
-                    {DPAD_UP, 14, 0ms},
-                    {DPAD_RIGHT, 4, 0ms},
-                    {DPAD_RIGHT, 1, 2000ms},
-                    {DPAD_LEFT, 4, 0ms},
-                    {DPAD_DOWN, 6, 0ms},
-                    {DPAD_RIGHT, 3, 0ms},
-                    {DPAD_DOWN, 7, 0ms},
-                    {DPAD_LEFT, 12, 0ms},
-                    {DPAD_DOWN, 5, 0ms},
-                    {DPAD_RIGHT, 3, 0ms},
-                },
-                {
-                    // Trainer 2
-                    {DPAD_RIGHT, 2, 0ms},
-                    {DPAD_RIGHT, 1, 2000ms},
-                    {DPAD_LEFT, 4, 0ms},
-                    {DPAD_DOWN, 11, 0ms},
-                    {DPAD_RIGHT, 6, 0ms},
-                },
-                {
-                    // Trainer 3
-                    {DPAD_RIGHT, 10, 0ms},
-                    {DPAD_UP, 2, 0ms},
-                },
-                {
-                    // Trainer 4
-                    {DPAD_UP, 21, 0ms},
-                    {DPAD_LEFT, 1, 0ms},
-                    {DPAD_LEFT, 1, 2000ms},
-                    {DPAD_DOWN, 2, 0ms},
-                    {DPAD_RIGHT, 5, 0ms},
-                    {DPAD_DOWN, 17, 0ms},
-                    {DPAD_DOWN, 1, 2000ms},
-                    {DPAD_UP, 25, 0ms},
-                    {DPAD_LEFT, 18, 0ms},
-                    {DPAD_DOWN, 11, 0ms},
-                    {DPAD_LEFT, 4, 0ms},
-                    {DPAD_UP, 10, 0ms},
-                },
-                {
-                    // Crasher Wake approach
-                    {DPAD_UP, 2, 0ms},
-                    {DPAD_UP, 1, 4000ms},
-                    {DPAD_DOWN, 4, 0ms},
-                    {DPAD_RIGHT, 11, 0ms},
-                    {DPAD_UP, 5, 0ms},
-                },
-                {
-                    // Return from Crasher Wake
-                    {DPAD_UP, 3, 0ms},
-                    {DPAD_LEFT, 3, 0ms},
-                    {DPAD_UP, 3, 0ms},
-                    {DPAD_LEFT, 11, 0ms},
-                    {DPAD_DOWN, 35, 0ms},
-                    {DPAD_RIGHT, 10, 0ms},
-                    {DPAD_DOWN, 5, 0ms},
-                    {DPAD_RIGHT, 4, 0ms},
-                    {DPAD_DOWN, 2, 0ms},
-                },
-            };
-
-            for (size_t stage = 0; stage < 6; stage++){
-                stream.log("[Pastoria Gym puzzle] Movement stage " + std::to_string(stage + 1) + ".");
-                if (stage == 5){
-                    // Observe the supplied return route and stop movement at the Gym exit fade.
-                    BlackScreenWatcher exit_black(COLOR_RED);
-                    if (run_until<ProControllerContext>(stream,
-                        context,
-                        [&](ProControllerContext& ctx){
-                            for (const auto& move : sequences[stage]){
-                                // repeat_dpad(ctx, dpad, move.dir, 80ms, 300ms, move.count, true);
-                                for (int press = 0; press < move.count; press++){
-                                    pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
-                                    if (move.delay > 0ms){
-                                        pbf_wait(ctx, move.delay);
-                                    }
-                                }
-                            }
-                            pbf_wait(ctx, 5000ms);
-                        },
-                        {{exit_black}}) != 0){
-                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                            "Pastoria Gym return: Exit transition did not start.",
-                            stream);
-                    }
-                    BlackScreenWatcher outside(COLOR_RED,
-                        {0.1, 0.1, 0.8, 0.8},
-                        100,
-                        10,
-                        BlackScreenWatcher::FinderType::GONE,
-                        500ms);
-                    if (wait_until(stream, context, 30s, {{outside}}) != 0){
-                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                            "Pastoria Gym return: Exit transition did not finish.",
-                            stream);
-                    }
-                    pbf_wait(context, 500ms);
-                    context.wait_for_all_requests();
-                    break;
-                }
-                for (const auto& move : sequences[stage]){
-                    // repeat_dpad(context, dpad, move.dir, 80ms, 300ms, move.count, true);
-                    for (int press = 0; press < move.count; press++){
-                        pbf_press_dpad(context, move.dir, 80ms, 300ms);
-                        if (move.delay > 0ms){
-                            pbf_wait(context, move.delay);
-                        }
-                    }
-                }
-                context.wait_for_all_requests();
-
-                const bool gym_leader = stage == 4;
-                const std::string label =
-                    gym_leader ? "Crasher Wake" : "Pastoria Gym trainer " + std::to_string(stage + 1);
-                pbf_press_button(context, BUTTON_A, 150ms, 300ms);
-                fight_trainer_using_moves(stream, context, 1, label, gym_leader);
-                clear_post_battle_dialogue(stream, context, BUTTON_B, gym_leader ? 6000ms : 3000ms);
-            }
-            stream.log(
-                "[Pastoria Gym puzzle] Reward dialogue cleared; outside the Gym doorway, ready for 05.01.",
-                COLOR_GREEN);
-        },
-        true);
-}
+// ---------------------------------------------------------------------------
+//  Helpers
+// ---------------------------------------------------------------------------
 
 static void
 move_back_after_unexpected_battle(VideoStream& stream, ProControllerContext& context, const std::string& trainerid){
@@ -531,55 +54,21 @@ move_back_after_unexpected_battle(VideoStream& stream, ProControllerContext& con
     }
 }
 
-
-static bool handle_battle(VideoStream& stream, ProControllerContext& context, const std::string& trainerid){
-    context.wait_for_all_requests();
-    stream.log("Battling " + trainerid + "...", COLOR_GREEN);
-    BattleMenuWatcher battle_menu(BattleType::TRAINER);
-    int ret_menu = wait_until(stream, context, std::chrono::seconds(30), {{battle_menu}});
-    if (ret_menu < 0){
-        stream.log("handle_battle_" + trainerid + ": battle menu not detected!", COLOR_RED);
-        return false;
-    }
-    pbf_wait(context, 500ms);
-    pbf_press_button(context, BUTTON_A, 80ms, 300ms);
-    pbf_wait(context, 500ms);
-
-    if (trainerid == "veilstone_galactic_grunts_1" or trainerid == "route_213_tuber_chelsea" or
-        trainerid == "route_213_tuber_jared" or trainerid == "route_213_beauty_cindy"){
-        // Move the battle-move cursor up.
-        pbf_press_dpad(context, DPAD_UP, 280ms, 200ms);
-    }else if (trainerid == "route_214_collector_brady" or trainerid == "route_214_collector_douglas"){
-        // Move the battle-move cursor down.
-        pbf_press_dpad(context, DPAD_DOWN, 280ms, 200ms);
-    }else if (trainerid == "route_214_psychic_abigail" or trainerid == "route_214_psychic_mitchell"){
-        // Keep the current battle-move selection.
-    }
-    context.wait_for_all_requests();
-
-    {
-        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream,
-            context,
-            [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_A, 200000ms);
-            },
-            {{black_screen}});
-        if (ret < 0){
-            stream.log("handle_battle_" + trainerid + ": black screen not detected!", COLOR_RED);
-            return false;
-        }
-    }
-
-    context.wait_for_all_requests();
-    pbf_mash_button(context, BUTTON_B, 2000ms);
-    if (trainerid == "route_213_tuber_chelsea" or trainerid == "route_213_tuber_jared" or
+static bool handle_battle(VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& trainerid,
+    AutoStoryStats& stats){
+    fight_trainer_using_moves(stream, context, stats, trainerid, true);
+    if (trainerid == "route_213_tuber_chelsea" || trainerid == "route_213_tuber_jared" ||
         trainerid == "route_213_beauty_cindy"){
         move_back_after_unexpected_battle(stream, context, trainerid);
     }
-    stream.log("handle_battle_" + trainerid + ": transition confirmed.");
     return true;
 }
+
+// ---------------------------------------------------------------------------
+//  Named route navigation blocks
+// ---------------------------------------------------------------------------
 
 static bool leave_gym(VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
@@ -657,8 +146,8 @@ static bool go_to_veilstone_pokemon_center(VideoStream& stream, ProControllerCon
     return true;
 }
 
-static bool heal_at_pokemon_center(VideoStream& stream, ProControllerContext& context){
-    return heal_pokemon(stream, context, "Veilstone");
+static bool heal_at_pokemon_center(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
+    return heal_pokemon(stream, context, "Veilstone", &stats);
 }
 
 static bool go_to_galactic_warehouse(VideoStream& stream, ProControllerContext& context){
@@ -741,6 +230,7 @@ static bool exit_galactic_warehouse(VideoStream& stream, ProControllerContext& c
         {{getting_fly_TM}});
     if (ret < 0){
         stream.log("enter_galactic_warehouse_getting_fly_TM: dialog box not detected!", COLOR_RED);
+        return false;
     }
     if (ret == 0){
         stream.log("enter_galactic_warehouse_getting_fly_TM: getting TM Fly not detected!");
@@ -839,7 +329,8 @@ static bool go_to_route_214(VideoStream& stream, ProControllerContext& context){
     return true;
 }
 
-static bool walk_through_route_214(VideoStream& stream, ProControllerContext& context){
+static bool
+walk_through_route_214(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     context.wait_for_all_requests();
     stream.log("walk_through_route_214: Continuing on the first part of route 214");
     pbf_wait(context, 3000ms);
@@ -850,7 +341,9 @@ static bool walk_through_route_214(VideoStream& stream, ProControllerContext& co
     dpad.last_dir = DPAD_RIGHT;
     repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 3, true);
 
-    activate_repel(stream, context);
+    if (!activate_repel(stream, context)){
+        return false;
+    }
 
     {
         MarkDetector battle_dialogue_1(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
@@ -873,7 +366,7 @@ static bool walk_through_route_214(VideoStream& stream, ProControllerContext& co
                 stream.log("walk_through_route_214_collector_brady: black screen not detected!", COLOR_RED);
                 return false;
             };
-            handle_battle(stream, context, "route_214_collector_brady");
+            handle_battle(stream, context, "route_214_collector_brady", stats);
         }
     }
     context.wait_for_all_requests();
@@ -911,7 +404,7 @@ static bool walk_through_route_214(VideoStream& stream, ProControllerContext& co
                 stream.log("walk_through_route_214_psychic_mitchell: black screen not detected!", COLOR_RED);
                 return false;
             };
-            handle_battle(stream, context, "route_214_psychic_mitchell");
+            handle_battle(stream, context, "route_214_psychic_mitchell", stats);
         }
     }
 
@@ -1019,7 +512,8 @@ static bool go_through_building_route_213(VideoStream& stream, ProControllerCont
     return true;
 }
 
-static bool go_through_route_213(VideoStream& stream, ProControllerContext& context){
+static bool
+go_through_route_213(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     context.wait_for_all_requests();
     stream.log("Going through route 213");
     pbf_wait(context, 2000ms);
@@ -1051,7 +545,7 @@ static bool go_through_route_213(VideoStream& stream, ProControllerContext& cont
             return false;
         }else if (ret == 0){
             stream.log("go_through_route_213_tuber_chelsea: Starting battle.");
-            handle_battle(stream, context, "route_213_tuber_chelsea");
+            handle_battle(stream, context, "route_213_tuber_chelsea", stats);
             context.wait_for_all_requests();
             pbf_wait(context, 3000ms);
         }
@@ -1082,7 +576,7 @@ static bool go_through_route_213(VideoStream& stream, ProControllerContext& cont
             return false;
         }else if (ret == 0){
             stream.log("go_through_route_213_tuber_jared: Starting battle.");
-            handle_battle(stream, context, "route_213_tuber_jared");
+            handle_battle(stream, context, "route_213_tuber_jared", stats);
             context.wait_for_all_requests();
             pbf_wait(context, 3000ms);
         }
@@ -1115,7 +609,7 @@ static bool go_through_route_213(VideoStream& stream, ProControllerContext& cont
         }else if (ret == 0){
             context.wait_for_all_requests();
             stream.log("go_through_route_213_beauty_cindy: Starting battle.");
-            handle_battle(stream, context, "route_213_beauty_cindy");
+            handle_battle(stream, context, "route_213_beauty_cindy", stats);
             context.wait_for_all_requests();
             pbf_wait(context, 3000ms);
         }
@@ -1126,7 +620,9 @@ static bool go_through_route_213(VideoStream& stream, ProControllerContext& cont
     pbf_move_left_joystick(context, {+1, 0}, 800ms, 100ms);  // 5
     pbf_move_left_joystick(context, {0, +1}, 1000ms, 100ms); // 8
 
-    activate_repel(stream, context);
+    if (!activate_repel(stream, context)){
+        return false;
+    }
 
     context.wait_for_all_requests();
     pbf_wait(context, 1000ms);
@@ -1243,6 +739,210 @@ static bool go_to_pastoria_gym(VideoStream& stream, ProControllerContext& contex
     return true;
 }
 
+// Start inside Pastoria Gym at its entrance; finish outside after Wake rewards.
+static void pastoria_gym_puzzle_and_wake(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryStats& stats){
+    VideoStream& stream = env.console;
+    struct Move {
+        DpadPosition dir;
+        int count;
+        Milliseconds delay;
+    };
+
+    // Trial: use the supplied counts without an extra facing press.
+    const std::vector<Move> sequences[] = {
+        {
+            // Trainer 1
+            {DPAD_UP, 16, 0ms},
+            {DPAD_LEFT, 11, 0ms},
+            {DPAD_DOWN, 8, 0ms},
+            {DPAD_DOWN, 1, 2000ms},
+            {DPAD_RIGHT, 5, 0ms},
+            {DPAD_UP, 7, 0ms},
+            {DPAD_RIGHT, 10, 0ms},
+            {DPAD_UP, 7, 0ms},
+            {DPAD_LEFT, 4, 0ms},
+            {DPAD_UP, 14, 0ms},
+            {DPAD_RIGHT, 4, 0ms},
+            {DPAD_RIGHT, 1, 2000ms},
+            {DPAD_LEFT, 4, 0ms},
+            {DPAD_DOWN, 6, 0ms},
+            {DPAD_RIGHT, 3, 0ms},
+            {DPAD_DOWN, 7, 0ms},
+            {DPAD_LEFT, 12, 0ms},
+            {DPAD_DOWN, 5, 0ms},
+            {DPAD_RIGHT, 3, 0ms},
+        },
+        {
+            // Trainer 2
+            {DPAD_RIGHT, 2, 0ms},
+            {DPAD_RIGHT, 1, 2000ms},
+            {DPAD_LEFT, 4, 0ms},
+            {DPAD_DOWN, 11, 0ms},
+            {DPAD_RIGHT, 6, 0ms},
+        },
+        {
+            // Trainer 3
+            {DPAD_RIGHT, 10, 0ms},
+            {DPAD_UP, 2, 0ms},
+        },
+        {
+            // Trainer 4
+            {DPAD_UP, 21, 0ms},
+            {DPAD_LEFT, 1, 0ms},
+            {DPAD_LEFT, 1, 2000ms},
+            {DPAD_DOWN, 2, 0ms},
+            {DPAD_RIGHT, 5, 0ms},
+            {DPAD_DOWN, 17, 0ms},
+            {DPAD_DOWN, 1, 2000ms},
+            {DPAD_UP, 25, 0ms},
+            {DPAD_LEFT, 18, 0ms},
+            {DPAD_DOWN, 11, 0ms},
+            {DPAD_LEFT, 4, 0ms},
+            {DPAD_UP, 10, 0ms},
+        },
+        {
+            // Crasher Wake approach
+            {DPAD_UP, 2, 0ms},
+            {DPAD_UP, 1, 4000ms},
+            {DPAD_DOWN, 4, 0ms},
+            {DPAD_RIGHT, 11, 0ms},
+            {DPAD_UP, 5, 0ms},
+        },
+        {
+            // Return from Crasher Wake
+            {DPAD_UP, 3, 0ms},
+            {DPAD_LEFT, 3, 0ms},
+            {DPAD_UP, 3, 0ms},
+            {DPAD_LEFT, 11, 0ms},
+            {DPAD_DOWN, 35, 0ms},
+            {DPAD_RIGHT, 10, 0ms},
+            {DPAD_DOWN, 5, 0ms},
+            {DPAD_RIGHT, 4, 0ms},
+            {DPAD_DOWN, 2, 0ms},
+        },
+    };
+
+    for (size_t stage = 0; stage < 6; stage++){
+        stream.log("[Pastoria Gym puzzle] Movement stage " + std::to_string(stage + 1) + ".");
+        if (stage == 5){
+            // Observe the supplied return route and stop movement at the Gym exit fade.
+            BlackScreenWatcher exit_black(COLOR_RED);
+            if (run_until<ProControllerContext>(stream,
+                context,
+                [&](ProControllerContext& ctx){
+                        for (const auto& move : sequences[stage]){
+                            // repeat_dpad(ctx, dpad, move.dir, 80ms, 300ms, move.count, true);
+                            for (int press = 0; press < move.count; press++){
+                                pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
+                                if (move.delay > 0ms){
+                                    pbf_wait(ctx, move.delay);
+                                }
+                            }
+                        }
+                        pbf_wait(ctx, 5000ms);
+                    },
+                {{exit_black}}) != 0){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Pastoria Gym return: Exit transition did not start.",
+                    stream);
+            }
+            BlackScreenWatcher outside(COLOR_RED,
+                {0.1, 0.1, 0.8, 0.8},
+                100,
+                10,
+                BlackScreenWatcher::FinderType::GONE,
+                500ms);
+            if (wait_until(stream, context, 30s, {{outside}}) != 0){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Pastoria Gym return: Exit transition did not finish.",
+                    stream);
+            }
+            pbf_wait(context, 500ms);
+            context.wait_for_all_requests();
+            // Let any automatic exit dialogue finish before 05.01 saves or opens the map.
+            clear_post_battle_dialogue(stream, context, BUTTON_B, 4000ms);
+            break;
+        }
+        for (const auto& move : sequences[stage]){
+            // repeat_dpad(context, dpad, move.dir, 80ms, 300ms, move.count, true);
+            for (int press = 0; press < move.count; press++){
+                pbf_press_dpad(context, move.dir, 80ms, 300ms);
+                if (move.delay > 0ms){
+                    pbf_wait(context, move.delay);
+                }
+            }
+        }
+        context.wait_for_all_requests();
+
+        const bool gym_leader = stage == 4;
+        const std::string label =
+            gym_leader ? "Crasher Wake" : "Pastoria Gym trainer " + std::to_string(stage + 1);
+        pbf_press_button(context, BUTTON_A, 150ms, 300ms);
+        fight_trainer_using_moves(stream, context, stats, label, gym_leader);
+        clear_post_battle_dialogue(stream, context, BUTTON_B, gym_leader ? 6000ms : 3000ms);
+    }
+    stream.log("[Pastoria Gym puzzle] Reward dialogue cleared; outside the Gym doorway, ready for 05.01.",
+        COLOR_GREEN);
+}
+
+// ---------------------------------------------------------------------------
+//  Segment wrappers
+// ---------------------------------------------------------------------------
+
+std::string AutoStory_Segment_04::name() const {
+    return "04: Veilstone to Pastoria";
+}
+
+std::string AutoStory_Segment_04::start_text() const {
+    return "Start: Inside Veilstone Gym in front of Maylene, facing north, with third-badge rewards and dialogue finished.";
+}
+
+std::string AutoStory_Segment_04::end_text() const {
+    return "Outside Pastoria Gym at the doorway, facing south, with fourth-badge rewards and dialogue finished.";
+}
+
+void AutoStory_Segment_04::run_segment(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    stats.m_segment++;
+    env.update_stats();
+    context.wait_for_all_requests();
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
+    AutoStory_Checkpoint_0401().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0402().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0403().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0404().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0405().run_checkpoint(env, context, options, stats);
+    context.wait_for_all_requests();
+    env.console.log("End Segment " + name(), COLOR_GREEN);
+}
+
+// ---------------------------------------------------------------------------
+//  Checkpoint wrappers
+// ---------------------------------------------------------------------------
+
+std::string AutoStory_Checkpoint_0401::name() const {
+    return "04.01 - Veilstone recovery";
+}
+
+std::string AutoStory_Checkpoint_0401::start_text() const {
+    return "Inside Veilstone Gym in front of Maylene, facing north, with third-badge rewards and dialogue finished.";
+}
+
+std::string AutoStory_Checkpoint_0401::end_text() const {
+    return "Healed and outside Veilstone Pokemon Center, with Dawn's post-Gym dialogue finished.";
+}
+
+void AutoStory_Checkpoint_0401::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0401(env, context, options, stats);
+}
+
 void checkpoint_0401(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -1253,13 +953,49 @@ void checkpoint_0401(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!leave_gym(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "leave_gym: transition not detected.",
-                    env.console);
+            {
+                if (!leave_gym(env.console, context)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "leave_gym: transition not detected.",
+                        env.console);
+                }
             }
+            {
+                if (!go_to_veilstone_pokemon_center(env.console, context)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_to_veilstone_pokemon_center: transition not detected.",
+                        env.console);
+                }
+            }
+            {
+                if (!heal_at_pokemon_center(env.console, context, stats)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "heal_at_pokemon_center: transition not detected.",
+                        env.console);
+                }
+            }
+            context.wait_for_all_requests();
         },
         true);
+}
+
+std::string AutoStory_Checkpoint_0402::name() const {
+    return "04.02 - Galactic grunts and Fly";
+}
+
+std::string AutoStory_Checkpoint_0402::start_text() const {
+    return "Healed and outside Veilstone Pokemon Center, with Dawn's post-Gym dialogue finished.";
+}
+
+std::string AutoStory_Checkpoint_0402::end_text() const {
+    return "Outside Galactic Warehouse with Fly obtained and dialogue cleared.";
+}
+
+void AutoStory_Checkpoint_0402::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0402(env, context, options, stats);
 }
 
 void checkpoint_0402(SingleSwitchProgramEnvironment& env,
@@ -1272,13 +1008,56 @@ void checkpoint_0402(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!go_to_veilstone_pokemon_center(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_to_veilstone_pokemon_center: transition not detected.",
-                    env.console);
+            {
+                if (!go_to_galactic_warehouse(env.console, context)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_to_galactic_warehouse: transition not detected.",
+                        env.console);
+                }
             }
+            {
+                if (!handle_battle(env.console, context, "veilstone_galactic_grunts_1", stats)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "handle_battle_veilstone_galactic_grunts_1: transition not detected.",
+                        env.console);
+                }
+            }
+            {
+                if (!enter_galactic_warehouse(env.console, context)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "enter_galactic_warehouse: transition not detected.",
+                        env.console);
+                }
+            }
+            {
+                if (!exit_galactic_warehouse(env.console, context)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "exit_galactic_warehouse: transition not detected.",
+                        env.console);
+                }
+            }
+            context.wait_for_all_requests();
         },
-        false);
+        true);
+}
+
+std::string AutoStory_Checkpoint_0403::name() const {
+    return "04.03 - Route 214 and Valor Lakefront";
+}
+
+std::string AutoStory_Checkpoint_0403::start_text() const {
+    return "Outside Galactic Warehouse with Fly obtained and dialogue cleared.";
+}
+
+std::string AutoStory_Checkpoint_0403::end_text() const {
+    return "Outside the Valor Lakefront south gate on Route 213.";
+}
+
+void AutoStory_Checkpoint_0403::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0403(env, context, options, stats);
 }
 
 void checkpoint_0403(SingleSwitchProgramEnvironment& env,
@@ -1291,13 +1070,63 @@ void checkpoint_0403(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!heal_at_pokemon_center(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "heal_at_pokemon_center: transition not detected.",
-                    env.console);
+            {
+                if (!go_to_route_214(env.console, context)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_to_route_214: transition not detected.",
+                        env.console);
+                }
             }
+            {
+                if (!handle_battle(env.console, context, "route_214_psychic_abigail", stats)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "handle_battle_route_214_psychic_abigail: transition not detected.",
+                        env.console);
+                }
+            }
+            {
+                if (!walk_through_route_214(env.console, context, stats)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "walk_through_route_214: transition not detected.",
+                        env.console);
+                }
+            }
+            {
+                if (!pass_by_valor_lakefront(env.console, context)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "pass_by_valor_lakefront: transition not detected.",
+                        env.console);
+                }
+            }
+            {
+                if (!go_through_building_route_213(env.console, context)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_through_building_route_213: transition not detected.",
+                        env.console);
+                }
+            }
+            context.wait_for_all_requests();
         },
-        false);
+        true);
+}
+
+std::string AutoStory_Checkpoint_0404::name() const {
+    return "04.04 - Route 213 to Pastoria";
+}
+
+std::string AutoStory_Checkpoint_0404::start_text() const {
+    return "Outside the Valor Lakefront south gate on Route 213.";
+}
+
+std::string AutoStory_Checkpoint_0404::end_text() const {
+    return "Healed and outside Pastoria Pokemon Center at the doorway.";
+}
+
+void AutoStory_Checkpoint_0404::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0404(env, context, options, stats);
 }
 
 void checkpoint_0404(SingleSwitchProgramEnvironment& env,
@@ -1310,13 +1139,56 @@ void checkpoint_0404(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!go_to_galactic_warehouse(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_to_galactic_warehouse: transition not detected.",
-                    env.console);
+            {
+                if (!go_through_route_213(env.console, context, stats)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_through_route_213: transition not detected.",
+                        env.console);
+                }
             }
+            {
+                if (!go_through_house_east_pastoria(env.console, context)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_through_house_east_pastoria: transition not detected.",
+                        env.console);
+                }
+            }
+            {
+                if (!go_through_pastoria(env.console, context)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_through_pastoria: transition not detected.",
+                        env.console);
+                }
+            }
+            {
+                if (!heal_at_pokemon_center(env.console, context, stats)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "heal_at_pokemon_center: transition not detected.",
+                        env.console);
+                }
+            }
+            context.wait_for_all_requests();
         },
-        false);
+        true);
+}
+
+std::string AutoStory_Checkpoint_0405::name() const {
+    return "04.05 - Pastoria Gym and Wake";
+}
+
+std::string AutoStory_Checkpoint_0405::start_text() const {
+    return "Healed and outside Pastoria Pokemon Center at the doorway.";
+}
+
+std::string AutoStory_Checkpoint_0405::end_text() const {
+    return "Outside Pastoria Gym at the doorway, facing south, with fourth-badge rewards and dialogue finished.";
+}
+
+void AutoStory_Checkpoint_0405::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0405(env, context, options, stats);
 }
 
 void checkpoint_0405(SingleSwitchProgramEnvironment& env,
@@ -1329,243 +1201,18 @@ void checkpoint_0405(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!handle_battle(env.console, context, "veilstone_galactic_grunts_1")){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "handle_battle_veilstone_galactic_grunts_1: transition not detected.",
-                    env.console);
+            {
+                if (!go_to_pastoria_gym(env.console, context)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "go_to_pastoria_gym: transition not detected.",
+                        env.console);
+                }
             }
+            pastoria_gym_puzzle_and_wake(env, context, stats);
+            context.wait_for_all_requests();
         },
-        false);
+        true);
 }
-
-void checkpoint_0406(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!enter_galactic_warehouse(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "enter_galactic_warehouse: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0407(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!exit_galactic_warehouse(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "exit_galactic_warehouse: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0408(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!go_to_route_214(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_to_route_214: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0409(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!handle_battle(env.console, context, "route_214_psychic_abigail")){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "handle_battle_route_214_psychic_abigail: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0410(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!walk_through_route_214(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "walk_through_route_214: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0411(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!pass_by_valor_lakefront(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "pass_by_valor_lakefront: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0412(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!go_through_building_route_213(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_through_building_route_213: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0413(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!go_through_route_213(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_through_route_213: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0414(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!go_through_house_east_pastoria(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_through_house_east_pastoria: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0415(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!go_through_pastoria(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_through_pastoria: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0416(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!heal_at_pokemon_center(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "heal_at_pokemon_center: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
-void checkpoint_0417(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            if (!go_to_pastoria_gym(env.console, context)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "go_to_pastoria_gym: transition not detected.",
-                    env.console);
-            }
-        },
-        false);
-}
-
 
 }
 }

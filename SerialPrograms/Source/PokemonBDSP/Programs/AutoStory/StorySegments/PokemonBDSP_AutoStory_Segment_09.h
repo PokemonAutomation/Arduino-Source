@@ -101,7 +101,6 @@ void checkpoint_0905(SingleSwitchProgramEnvironment& env,
     AutoStoryOptions options,
     AutoStoryStats& stats);
 
-
 class AutoStory_Checkpoint_0906 : public AutoStory_Checkpoint {
 public:
     virtual std::string name() const override;
@@ -116,7 +115,6 @@ void checkpoint_0906(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats);
-
 
 class AutoStory_Checkpoint_0907 : public AutoStory_Checkpoint {
 public:
@@ -133,7 +131,6 @@ void checkpoint_0907(SingleSwitchProgramEnvironment& env,
     AutoStoryOptions options,
     AutoStoryStats& stats);
 
-
 class AutoStory_Checkpoint_0908 : public AutoStory_Checkpoint {
 public:
     virtual std::string name() const override;
@@ -149,7 +146,6 @@ void checkpoint_0908(SingleSwitchProgramEnvironment& env,
     AutoStoryOptions options,
     AutoStoryStats& stats);
 
-
 class AutoStory_Checkpoint_0909 : public AutoStory_Checkpoint {
 public:
     virtual std::string name() const override;
@@ -164,85 +160,6 @@ void checkpoint_0909(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats);
-
-
-class AutoStory_Checkpoint_0910 : public AutoStory_Checkpoint {
-public:
-    virtual std::string name() const override;
-    virtual std::string start_text() const override;
-    virtual std::string end_text() const override;
-    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env,
-        ProControllerContext& context,
-        AutoStoryOptions options,
-        AutoStoryStats& stats) const override;
-};
-void checkpoint_0910(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats);
-
-
-class AutoStory_Checkpoint_0911 : public AutoStory_Checkpoint {
-public:
-    virtual std::string name() const override;
-    virtual std::string start_text() const override;
-    virtual std::string end_text() const override;
-    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env,
-        ProControllerContext& context,
-        AutoStoryOptions options,
-        AutoStoryStats& stats) const override;
-};
-void checkpoint_0911(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats);
-
-
-class AutoStory_Checkpoint_0912 : public AutoStory_Checkpoint {
-public:
-    virtual std::string name() const override;
-    virtual std::string start_text() const override;
-    virtual std::string end_text() const override;
-    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env,
-        ProControllerContext& context,
-        AutoStoryOptions options,
-        AutoStoryStats& stats) const override;
-};
-void checkpoint_0912(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats);
-
-class AutoStory_Checkpoint_0913 : public AutoStory_Checkpoint {
-public:
-    virtual std::string name() const override;
-    virtual std::string start_text() const override;
-    virtual std::string end_text() const override;
-    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env,
-        ProControllerContext& context,
-        AutoStoryOptions options,
-        AutoStoryStats& stats) const override;
-};
-void checkpoint_0913(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats);
-
-class AutoStory_Checkpoint_0914 : public AutoStory_Checkpoint {
-public:
-    virtual std::string name() const override;
-    virtual std::string start_text() const override;
-    virtual std::string end_text() const override;
-    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env,
-        ProControllerContext& context,
-        AutoStoryOptions options,
-        AutoStoryStats& stats) const override;
-};
-void checkpoint_0914(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats);
-
 
 }
 }
