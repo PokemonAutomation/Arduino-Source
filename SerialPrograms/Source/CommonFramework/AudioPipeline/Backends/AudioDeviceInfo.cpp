@@ -9,6 +9,7 @@
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Time.h"
+#include "CommonFramework/AudioPipeline/AudioInputChoice.h"
 #include "CommonFramework/AudioPipeline/Backends/NativeAudioFormats.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "AudioDeviceInfo.h"

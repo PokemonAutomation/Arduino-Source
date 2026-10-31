@@ -14,6 +14,7 @@ namespace PokemonAutomation{
 
 struct FFTListener;
 class AudioDeviceInfo;
+class AudioInputChoice;
 
 namespace Kernels{
 namespace AudioPipeline{

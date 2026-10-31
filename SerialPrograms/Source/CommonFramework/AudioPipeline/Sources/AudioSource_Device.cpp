@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/AudioPipeline/AudioInputChoice.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "AudioSource_Device.h"
 

@@ -497,6 +497,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/AudioPipeline/AudioInfo.h
     Source/CommonFramework/AudioPipeline/AudioInfo_Tests.cpp
     Source/CommonFramework/AudioPipeline/AudioInfo_Tests.h
+    Source/CommonFramework/AudioPipeline/AudioInputChoice.cpp
+    Source/CommonFramework/AudioPipeline/AudioInputChoice.h
     Source/CommonFramework/AudioPipeline/AudioOption.cpp
     Source/CommonFramework/AudioPipeline/AudioOption.h
     Source/CommonFramework/AudioPipeline/AudioPassthroughPair.h

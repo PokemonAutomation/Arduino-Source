@@ -7,7 +7,10 @@
 #ifndef PokemonAutomation_AudioPipeline_Backends_AudioDeviceInfo_H
 #define PokemonAutomation_AudioPipeline_Backends_AudioDeviceInfo_H
 
+#include <string>
+#include <vector>
 #include "CommonFramework/AudioPipeline/AudioInfo.h"
+#include "CommonFramework/AudioPipeline/AudioInputChoice.h"
 
 namespace PokemonAutomation{
 
