@@ -19,6 +19,7 @@
 #include <QAudioDecoder>
 #include <QEventLoop>
 #include <QTimer>
+#include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/GlobalAutoPaths.h"
@@ -476,6 +477,97 @@ public:
 };
 
 
+//
+//  load_full_audio() on the mp3 fixture, with the kind of target that
+//  load_audio_template() uses for the mp3 templates (mono float): the decode
+//  path must return about 2 s of audio.
+//
+class LoadFullMp3Test : public UnitTest{
+public:
+    LoadFullMp3Test()
+        : UnitTest("AudioFileLoader - LoadFull_Mp3")
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope&) const override{
+        const std::string fixture = decoded_probe_fixture();
+        if (!Filesystem::exists(fixture)){
+            return "Missing mp3 fixture: " + fixture + ".";
+        }
+        if (!QAudioDecoder(nullptr).isSupported()){
+            return UnitTestResult(
+                UnitTestResult::SKIPPED,
+                "No audio decode backend (Qt Multimedia media plugin missing or failing to load)."
+            );
+        }
+
+        //  load_full_audio() does not resample, so the target is at the
+        //  fixture's own 44100 Hz.
+        QAudioFormat target;
+        target.setSampleFormat(QAudioFormat::SampleFormat::Float);
+        target.setSampleRate(44100);
+        target.setChannelCount(1);
+
+        AudioFileLoader loader(nullptr, fixture, target);
+        const auto ret = loader.load_full_audio();
+        const size_t frame_count = std::get<1>(ret) / sizeof(float);
+        if (frame_count > 88200 + 4000 || frame_count < 88200 - 4000){
+            return "Expected about 88200 frames (2 s at 44100 Hz), got "
+                + std::to_string(frame_count) + ".";
+        }
+
+        return true;
+    }
+};
+
+
+//
+//  A missing mp3 fails right away on both decode paths. Qt reports a missing
+//  file as an error inside QAudioDecoder::start(), before start() returns:
+//  - load_full_audio() returns no data. It must not wait in its event loop
+//    for a decoder signal that already fired, or it would never return.
+//  - start() returns false. It used to read the start result before the
+//    decoder's thread had set it, so it always returned true.
+//
+class Mp3MissingFileTest : public UnitTest{
+public:
+    Mp3MissingFileTest()
+        : UnitTest("AudioFileLoader - Mp3_MissingFile")
+    {}
+
+    virtual UnitTestResult run(Logger&, CancellableScope&) const override{
+        if (!QAudioDecoder(nullptr).isSupported()){
+            return UnitTestResult(
+                UnitTestResult::SKIPPED,
+                "No audio decode backend (Qt Multimedia media plugin missing or failing to load)."
+            );
+        }
+
+        const std::string missing = "/nonexistent/pa_audio_file_loader_missing.mp3";
+        QAudioFormat format;
+        format.setSampleFormat(QAudioFormat::SampleFormat::Float);
+        format.setSampleRate(44100);
+        format.setChannelCount(1);
+
+        {
+            AudioFileLoader loader(nullptr, missing, format);
+            const auto ret = loader.load_full_audio();
+            if (std::get<1>(ret) != 0){
+                return "load_full_audio() should return no data for a missing mp3, got "
+                    + std::to_string(std::get<1>(ret)) + " bytes.";
+            }
+        }
+        {
+            AudioFileLoader loader(nullptr, missing, format);
+            if (loader.start()){
+                return "start() should fail for a missing mp3.";
+            }
+        }
+
+        return true;
+    }
+};
+
+
 
 }
 
@@ -490,6 +582,8 @@ void add_tests_AudioFileLoader(UnitTestDatabase& database){
     database.add<LoadFullRateMismatchTest>();
     database.add<DecodedNativeProbeTest>();
     database.add<DecodedNativePlaybackTest>();
+    database.add<LoadFullMp3Test>();
+    database.add<Mp3MissingFileTest>();
 }
 
 
