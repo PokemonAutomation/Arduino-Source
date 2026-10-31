@@ -12,6 +12,7 @@
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonFRLG_BagDetector.h"
 
 
@@ -23,7 +24,9 @@ namespace PokemonFRLG{
 BagDetector::BagDetector(Color color)
     : m_bag_shadow_box(0.131250, 0.608173, 0.068269, 0.001442)
     , m_pocket_underline_box(0.043269, 0.137259, 0.279808, 0.005769)
-    , m_menu_top_box(0.029808, 0.029086, 0.947115, 0.003606)
+    //  Stops short of the red arrow drawn over the frame once the list is
+    //  scrolled down.
+    , m_menu_top_box(0.029808, 0.029086, 0.550000, 0.003606)
     , m_menu_right_box(0.977404, 0.034134, 0.005288, 0.597837)
 {}
 void BagDetector::make_overlays(VideoOverlaySet& items) const{
@@ -51,6 +54,49 @@ bool BagDetector::detect(const ImageViewRGB32& screen){
         return true;
     }
     return false;
+}
+
+
+class Test_BagDetector : public ImageUnitTest{
+public:
+    Test_BagDetector(const std::string& image, bool expected)
+        : ImageUnitTest("PokemonFRLG::BagDetector - " + image, {image})
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run_on_images(
+        Logger&, CancellableScope&,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        BagDetector detector(COLOR_RED);
+        const ImageRGB32& image = images[0];
+        const bool result = detector.detect(image);
+        if (result != m_expected){
+            return std::string("Expected bag = ") + (m_expected ? "true" : "false") +
+                ", got " + (result ? "true" : "false");
+        }
+        return true;
+    }
+
+private:
+    bool m_expected;
+};
+
+void add_tests_BagDetector(UnitTestDatabase& database){
+    database.add<Test_BagDetector>("PokemonFRLG/Bag/Items_Top_True.png", true);
+    database.add<Test_BagDetector>("PokemonFRLG/Bag/KeyItems_Top_True.png", true);
+    //  Scrolled down: a red up-arrow covers the middle of the top frame.
+    database.add<Test_BagDetector>("PokemonFRLG/Bag/Items_Scrolled_True.png", true);
+
+    //  A girl's bag, drawn differently from the boy's.
+    database.add<Test_BagDetector>("PokemonFRLG/Bag/Items_Top_Girl_True.png", true);
+    database.add<Test_BagDetector>("PokemonFRLG/Bag/Items_Potion_Girl_True.png", true);
+    database.add<Test_BagDetector>("PokemonFRLG/Bag/KeyItems_Top_Girl_True.png", true);
+    database.add<Test_BagDetector>("PokemonFRLG/Bag/PokeBalls_Top_Girl_True.png", true);
+
+    database.add<Test_BagDetector>("PokemonFRLG/Bag/Overworld_Route24_False.png", false);
+    database.add<Test_BagDetector>("PokemonFRLG/Bag/Overworld_Bedroom_Girl_False.png", false);
+    database.add<Test_BagDetector>("PokemonFRLG/Bag/StartMenu_Girl_False.png", false);
 }
 
 
