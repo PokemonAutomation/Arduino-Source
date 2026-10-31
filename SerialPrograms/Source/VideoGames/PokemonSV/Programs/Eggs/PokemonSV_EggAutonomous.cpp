@@ -610,19 +610,21 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, ProCon
         env.console.overlay().add_log("Shiny " + std::to_string(egg_index+1) + "/" + std::to_string(num_eggs_in_party), COLOR_GREEN);
         stats.m_shinies++;
         env.update_stats();
-        send_encounter_notification(
-            env,
-            m_notification_noop,
-            NOTIFICATION_SHINY,
-            false, true, {{{}, ShinyType::UNKNOWN_SHINY}}, std::nan(""),
-            env.console.video().snapshot()
-        );
     }else{
         env.console.overlay().add_log("Not shiny " + std::to_string(egg_index+1) + "/" + std::to_string(num_eggs_in_party), COLOR_WHITE);
     }
 
+    //  Only notify for Pokemon that the filters keep. A shiny that the filters discard is not reported.
     auto send_keep_notification = [&](){
-        if (!found_shiny){
+        if (found_shiny){
+            send_encounter_notification(
+                env,
+                m_notification_noop,
+                NOTIFICATION_SHINY,
+                false, true, {{{}, ShinyType::UNKNOWN_SHINY}}, std::nan(""),
+                env.console.video().snapshot()
+            );
+        }else{
             send_encounter_notification(
                 env,
                 NOTIFICATION_NONSHINY_KEEP,
@@ -663,6 +665,9 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, ProCon
 
     case StatsHuntAction::Discard:
         default:
+            if (found_shiny){
+                env.log("Shiny does not match any keep filter. Not sending a notification.", COLOR_PURPLE);
+            }
             // If the auto save mode is AfterStartAndKeep, which allows resetting the game in case no eggs in the box are kept,
             // then we can save the time of releasing hatched pokemon in case we will reset the game later.
             // Otherwise, release the pokemon now.

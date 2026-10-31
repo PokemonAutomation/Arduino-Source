@@ -838,13 +838,6 @@ bool EggAutonomous::process_hatched_pokemon(
                 env.console.overlay().add_log("Pokemon " + std::to_string(i_hatched+1) + "/5 is shiny!", COLOR_YELLOW);
                 stats.m_shinies++;
                 env.update_stats();
-                send_encounter_notification(
-                    env,
-                    m_notification_noop,
-                    NOTIFICATION_SHINY,
-                    false, true, {{{}, ShinyType::UNKNOWN_SHINY}}, std::nan(""),
-                    screen
-                );
             }else{
                 env.log("Pokemon " + std::to_string(i_hatched) + " is not shiny.", COLOR_PURPLE);
                 env.console.overlay().add_log("Pokemon " + std::to_string(i_hatched+1) + "/5 not shiny", COLOR_WHITE);
@@ -860,8 +853,17 @@ bool EggAutonomous::process_hatched_pokemon(
 
             StatsHuntAction action = FILTERS0.get_action(shiny, gender, nature.nature, IVs);
 
+            //  Only notify for Pokemon that the filters keep. A shiny that the filters discard is not reported.
             auto send_keep_notification = [&](){
-                if (!shiny){
+                if (shiny){
+                    send_encounter_notification(
+                        env,
+                        m_notification_noop,
+                        NOTIFICATION_SHINY,
+                        false, true, {{{}, ShinyType::UNKNOWN_SHINY}}, std::nan(""),
+                        screen
+                    );
+                }else{
                     send_encounter_notification(
                         env,
                         NOTIFICATION_NONSHINY_KEEP,
@@ -929,6 +931,9 @@ bool EggAutonomous::process_hatched_pokemon(
                 }
                 break;
             case StatsHuntAction::Discard:
+                if (shiny){
+                    env.log("Shiny does not match any keep filter. Not sending a notification.", COLOR_PURPLE);
+                }
                 env.log("Releasing Pokemon...", COLOR_PURPLE);
                 env.console.overlay().add_log("Release Pokemon", COLOR_WHITE);
 
