@@ -68,7 +68,7 @@ public:
     KeyboardMappingOption KEYBOARD_MAPPINGS;
 
 private:
-    bool m_loaded;
+    bool m_loaded = false;
 };
 
 
