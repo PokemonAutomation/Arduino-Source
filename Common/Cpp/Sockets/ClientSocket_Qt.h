@@ -40,8 +40,7 @@ class ClientSocket_Qt final : public QObject, public AbstractClientSocket{
 
 
 public:
-    ClientSocket_Qt(ThreadPool&)
-    {}
+    ClientSocket_Qt(ThreadPool&){}
 
     virtual ~ClientSocket_Qt(){
         close();
@@ -108,9 +107,7 @@ public:
         //  has ended cannot be reconnected.
         QTcpSocket* socket = static_cast<QTcpSocket*>(
             GlobalThreadPools::qt_event_threadpool().add_object(
-                [this]{
-                    return make_socket();
-                }
+                [this]{ return make_socket(); }
             )
         );
         {
@@ -218,15 +215,13 @@ private:
                 //  "errorOccurred". So only report success once a short grace
                 //  period has passed without an error.
                 QTimer::singleShot(
-                    50,
-                    sock,
-                    [this, sock]{
+                    50, sock,
+                    [this]{
                         bool fire;
                         {
                             std::lock_guard<Mutex> lg(m_lock);
-                            fire =
-                                (m_state.load(std::memory_order_relaxed) == State::CONNECTED)
-                                && m_success_pending;
+                            fire = m_success_pending;
+                            fire &= m_state.load(std::memory_order_relaxed) == State::CONNECTED;
                             if (fire){
                                 m_success_pending = false;
                             }
