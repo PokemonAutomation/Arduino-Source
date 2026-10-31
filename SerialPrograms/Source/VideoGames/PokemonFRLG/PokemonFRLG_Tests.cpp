@@ -8,6 +8,7 @@
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/StaticGlobals.h"
+#include "Inference/Box/PokemonFRLG_BoxCellOccupiedDetector.h"
 #include "Inference/Box/PokemonFRLG_BoxGenderReader.h"
 #include "Inference/Box/PokemonFRLG_BoxSelectionModeDetector.h"
 #include "Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
@@ -263,6 +264,7 @@ void add_tests_ExitWildBattle(UnitTestDatabase& database){
 
 void add_tests(UnitTestDatabase& database){
     add_tests_AdvanceWhiteDialogDetector(database);
+    add_tests_BoxCellOccupiedDetector(database);
     add_tests_BoxGenderReader(database);
     add_tests_BoxSelectionModeDetector(database);
     add_tests_SelectionDialogDetector(database);
