@@ -261,7 +261,7 @@ This makes a new folder called "build_mac" in "Arduino-Source" and moves the Ter
 
 Execute the command in Terminal:
 ```
-cmake ../SerialPrograms/ -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/6.10.2/macos -Wall
+cmake ../SerialPrograms/ -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/6.10.2/macos
 ```
 This command uses CMake to configure our code to prepare for compilation. `-DCMAKE_PREFIX_PATH` tells CMake where the Qt you installed is. If successful, it should print texts like
 ```
