@@ -13,12 +13,43 @@
 #include "NintendoSwitch/Inference/NintendoSwitch_StartGameUserSelectDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_BlindNavigation.h"
 #include "PokemonFRLG_HardReset.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
+
+namespace{
+
+//  Press A on the selected profile. Return true only if the startup black screen
+//  was observed here. False means no observation: either license handling is
+//  disabled (the fixed delay is used without checking video), or the wait timed
+//  out. False does not by itself mean launch failed; the caller still checks
+//  startup and the resulting screen after pressing HOME.
+bool start_game_and_wait(
+    ConsoleHandle& console, ProControllerContext& context,
+    Milliseconds launch_delay
+){
+    if (!GameSettings::instance().HANDLE_ONLINE_LICENSE_CHECK){
+        pbf_press_button(context, BUTTON_A, 50ms, launch_delay);
+        return false;
+    }
+    pbf_press_button(context, BUTTON_A, 50ms, 0ms);
+    context.wait_for_all_requests();
+    BlackScreenWatcher black_screen(COLOR_BLUE, {0.1, 0.15, 0.8, 0.7});
+    const int result = wait_until(
+        console, context, std::chrono::seconds(30), { black_screen },
+        /* default_video_period */ 1ms
+    );
+    if (result < 0){
+        console.log("Game did not start within 30 seconds of the online license check.", COLOR_RED);
+    }
+    return result == 0;
+}
+
+}
 
 void rng_reset_and_return_home(
     ConsoleHandle& console, ProControllerContext& context,
@@ -102,25 +133,23 @@ void rng_reset_and_return_home(
         // Waiting for all requests and using inference should be avoided for any button presses that happen *while the game is open*, 
         // but we can make sure we've gotten back to the home screen and pause there
 
-        // open the game and go back home ASAP
         if (update_popup){
             pbf_press_button(context, BUTTON_A, 160ms, 840ms);
             pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
         }
-        pbf_press_button(context, BUTTON_A, 50ms, launch_delay);
+        // Preserve startup seen before HOME: the later watcher may only see HOME.
+        bool black_screen_detected = start_game_and_wait(console, context, launch_delay);
         pbf_press_button(context, BUTTON_HOME, 200ms, 1800ms);
 
         while(current_time() < deadline){
             // make sure a black screen appeared as a result of the button presses
             // if a popup appears, flag that it happened even if it gets closed by the home button press
-            // Not sure how to handle the online check, so leaving it out for now
             int ret3 = wait_until(
                 console, context,
                 std::chrono::seconds(2 + (update_popup ? 1 : 0)),
                 { black_screen, update_menu },
-                1ms
+                /* default_video_period */ 1ms
             );
-            bool black_screen_detected = false;
             switch (ret3){
             case 0:
                 console.log("Black screen detected.");
@@ -158,13 +187,13 @@ void rng_reset_and_return_home(
             case 1:
                 console.log("Detected user-select screen. Trying again...", COLOR_BLUE);
                 move_to_user(context, user_slot);
-                pbf_press_button(context, BUTTON_A, 50ms, launch_delay);
+                black_screen_detected = start_game_and_wait(console, context, launch_delay);
                 pbf_press_button(context, BUTTON_HOME, 200ms, 2800ms);
                 continue;
             case 2:
                 console.log("Detected update menu. Trying again...", COLOR_BLUE);
                 pbf_press_dpad(context, DPAD_UP, 40ms, 0ms);
-                pbf_press_button(context, BUTTON_A, 50ms, launch_delay);
+                black_screen_detected = start_game_and_wait(console, context, launch_delay);
                 pbf_press_button(context, BUTTON_HOME, 200ms, 2800ms);
                 continue;
             default:

@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonFRLG_Settings_H
 #define PokemonAutomation_PokemonFRLG_Settings_H
 
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
@@ -40,6 +41,7 @@ public:
     MillisecondsOption SELECT_BUTTON_MASH0;
     MillisecondsOption ENTER_GAME_WAIT0;
     MillisecondsOption ENTER_GAME_MASH0;
+    BooleanCheckBoxOption HANDLE_ONLINE_LICENSE_CHECK;
 
     SectionDividerOption m_shiny_audio_settings;
     FloatingPointOption SHINY_SOUND_THRESHOLD;
@@ -49,6 +51,7 @@ public:
     FloatingPointOption CATCH_FANFARE_THRESHOLD;
 
 private:
+    void add_options();
     virtual void on_config_value_changed(void* object) override;
 };
 
