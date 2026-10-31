@@ -8,6 +8,7 @@
 #define PokemonAutomation_ClientSocket_WinSocket_H
 
 #include <atomic>
+#include <mutex>
 #include <iostream>
 #include <winsock.h>
 #include "Common/Cpp/Concurrency/Mutex.h"
@@ -72,6 +73,8 @@ public:
             //  A socket whose previous connection has ended cannot be
             //  reconnected, so always start from a fresh socket.
             close_socket_locked();
+
+            ensure_wsa_started();
 
             SOCKET socket = ::socket(AF_INET, SOCK_STREAM, 0);
             if (socket == INVALID_SOCKET){
@@ -160,6 +163,24 @@ public:
 
 
 private:
+    //  Winsock has to be started before any of its functions can be used, and
+    //  nothing else in the program calls WSAStartup, so call it exactly once
+    //  before the first socket is created. We deliberately never call
+    //  WSACleanup: it is a process-wide, reference-counted operation, and
+    //  other parts of the process (Qt) may be using Winsock as well.
+    static void ensure_wsa_started(){
+        static std::once_flag flag;
+        std::call_once(flag, [](){
+            WSADATA wsa_data;
+            int ret = WSAStartup(MAKEWORD(2, 2), &wsa_data);
+            if (ret != 0){
+                try{
+                    std::cout << "WSAStartup() failed: WSA Error Code = " << ret << std::endl;
+                }catch (...){}
+            }
+        });
+    }
+
     //  Closes the underlying socket, if any. Requires "m_lock" to be held.
     void close_socket_locked(){
         SOCKET socket = m_socket.exchange(INVALID_SOCKET, std::memory_order_acquire);
