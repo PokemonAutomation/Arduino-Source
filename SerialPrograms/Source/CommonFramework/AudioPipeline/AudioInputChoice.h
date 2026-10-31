@@ -1,62 +1,17 @@
-/*  Audio Device Info
+/*  Audio Input Choice
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_AudioPipeline_AudioInfo_H
-#define PokemonAutomation_AudioPipeline_AudioInfo_H
+#ifndef PokemonAutomation_AudioPipeline_AudioInputChoice_H
+#define PokemonAutomation_AudioPipeline_AudioInputChoice_H
 
 #include <string>
 #include <vector>
-#include "Common/Cpp/Containers/Pimpl.h"
-
-class QAudioFormat;
-
-class QAudioDevice;
-using NativeAudioInfo = QAudioDevice;
-
-
+#include "AudioFormat.h"
 
 namespace PokemonAutomation{
-namespace Kernels{
-namespace AudioPipeline{
-    enum class SampleFormat;
-}
-}
-
-
-enum class AudioSampleFormat{
-    INVALID,
-    UINT8,
-    SINT16,
-    SINT32,
-    FLOAT32,
-};
-size_t sample_size(AudioSampleFormat format);
-
-Kernels::AudioPipeline::SampleFormat to_sample_format(AudioSampleFormat format);
-
-
-AudioSampleFormat get_sample_format(const QAudioFormat& native_format);
-
-
-
-class AudioFormat{
-public:
-    AudioFormat();
-    AudioFormat(QAudioFormat native_format);
-
-    AudioSampleFormat sample_format() const;
-    size_t sample_rate() const;
-    size_t channels() const;
-
-    const QAudioFormat& native_format() const;
-    QAudioFormat& native_format();
-
-private:
-    Pimpl<QAudioFormat> m_native_format;
-};
 
 
 //
@@ -111,48 +66,19 @@ struct AudioInputChoiceList{
 };
 
 //  Builds the input format choices for a device from its supported formats
-//  (any order, duplicates allowed) and its preferred format.
+//  and its preferred format.
+//
+//  1. Deduplicates formats that has the same shape but only differ in
+//  sample dtype.
+//  2. Sorted by channel count, then sample rate, both descending.
+//  3. A 1ch x 96000 entry is followed by its two reinterpreted stereo
+//     choices, "Interleaved Stereo L/R" then "Interleaved Stereo R/L".
+//  4. `AudioInputChoiceList.preferred_index` is the exact match of
+//     `preferred`, or the highest-scoring choice when nothing matches.
 AudioInputChoiceList input_choices(
     std::vector<AudioFormat> supported,
     const AudioFormat& preferred
 );
-
-
-
-
-class AudioDeviceInfo{
-public:
-    ~AudioDeviceInfo();
-    AudioDeviceInfo(const AudioDeviceInfo& x);
-    void operator=(const AudioDeviceInfo& x);
-
-public:
-    AudioDeviceInfo();
-    explicit AudioDeviceInfo(const std::string& device_name);
-
-    explicit operator bool() const;
-
-    const std::string& display_name() const;
-    const std::string& device_name() const;
-
-    //  The device-driven format list (see input_choices()). Populated for
-    //  input devices only; empty for output devices (the sink opens in its
-    //  native format).
-    const std::vector<AudioInputChoice>& supported_choices() const;
-    size_t preferred_choice_index() const;
-
-    const NativeAudioInfo& native_info() const;
-
-    bool operator==(const AudioDeviceInfo& info) const;
-
-    static std::vector<AudioDeviceInfo> all_input_devices();
-    static std::vector<AudioDeviceInfo> all_output_devices();
-
-private:
-    struct Data;
-    Pimpl<Data> m_body;
-};
-
 
 
 

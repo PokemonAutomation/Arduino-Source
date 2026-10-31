@@ -6,11 +6,11 @@
 
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonSV_MapDetector.h"
 #include "PokemonSV_MapPokeCenterIconDetector.h"
 
@@ -115,23 +115,24 @@ bool MapPokeCenterIconWatcher::process_frame(const ImageViewRGB32& screen, WallC
 }
 
 
-class Test_MapPokeCenterIconDetector : public UnitTest{
+class Test_MapPokeCenterIconDetector : public ImageUnitTest{
 public:
     Test_MapPokeCenterIconDetector(const std::string& image, int target)
-        : UnitTest("PokemonSV::MapPokeCenterIconDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::MapPokeCenterIconDetector - " + image, {image})
         , m_target(target)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         MapPokeCenterIconDetector detector(COLOR_RED, MAP_READABLE_AREA);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         const auto result = detector.detect_all(image);
         return (int)result.size() == m_target;
     }
 
 private:
-    std::string m_image;
     int m_target;
 };
 

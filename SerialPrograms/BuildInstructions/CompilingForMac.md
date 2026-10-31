@@ -92,6 +92,13 @@ CMake is a software tool that helps compile programs. Install it using Homebrew 
 brew install cmake
 ```
 
+### Install Ninja
+
+Ninja is a build tool that CMake can use to find out quickly what files need rebuilding. Install it using Homebrew by running in Terminal
+```
+brew install ninja
+```
+
 ### Install Qt6
 
 We use Qt6 software library to build UI (windows, panels, buttons...) for **SerialPrograms**. It also plays and decodes audio.
@@ -261,9 +268,9 @@ This makes a new folder called "build_mac" in "Arduino-Source" and moves the Ter
 
 Execute the command in Terminal:
 ```
-cmake ../SerialPrograms/ -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/6.10.2/macos -Wall
+cmake ../SerialPrograms/ -G Ninja -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/6.10.2/macos
 ```
-This command uses CMake to configure our code to prepare for compilation. `-DCMAKE_PREFIX_PATH` tells CMake where the Qt you installed is. If successful, it should print texts like
+This command uses CMake to configure our code to prepare for compilation. `-G Ninja` tells CMake to compile with Ninja, and `-DCMAKE_PREFIX_PATH` tells CMake where the Qt you installed is. If successful, it should print texts like
 ```
 ...
 -- Configuring done
@@ -280,11 +287,13 @@ cmake --build . -j 10
 to compile and build the program in "build_mac" folder.
 It will take a while to build depending on your computer's speed.
 
-If successful, it will print 
+Each line starts with a counter like `[25/1613]`. If successful, the counter reaches the total, and the last lines in Terminal look like
 ```
-[100%] Built target SerialPrograms
+[1613/1613] Linking CXX executable SerialPrograms.app/Contents/MacOS/SerialPrograms
+[Deploy] Copying resources ...
+[Deploy] Copying firmware
+[Deploy] Copying scripts
 ```
-at the end in Terminal.
 
 We have built the program on our mac computers, so in most cases you won't see any error during building.
 But in case your machine has very different hardware or software environment as ours,
@@ -319,6 +328,8 @@ instead of ...
 ```
 mkdir -p build_mac; cd build_mac
 ```
+
+> Note: if your "build_mac" folder was made before we switched to Ninja, the CMake command stops with `Does not match the generator used previously: Unix Makefiles`. [Install Ninja](#install-ninja) if you haven't yet, then in the "Arduino-Source" folder run `rm -rf build_mac` to delete the old folder, and start the build again with Ninja.
 
 ### Package updating
 In rare cases when we add new software library dependencies, just follow the guide to install those new libraries.

@@ -6,8 +6,8 @@
 
 #include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/AudioPipeline/AudioInputChoice.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
-#include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioSource_Device.h"
 
 namespace PokemonAutomation{
@@ -89,12 +89,6 @@ AudioSource_Device::AudioSource_Device(
     QAudioFormat native_format = format.physical_format().native_format();
 
     m_stream_format = format.format().sample_format();
-    if (m_stream_format == AudioSampleFormat::INVALID){
-        //  Defensive: the choices built from input_choices() always carry
-        //  a sample format the device supports.
-        set_sample_format_to_float(native_format);
-        m_stream_format = AudioSampleFormat::FLOAT32;
-    }
 
     m_input_device = std::make_unique<AudioInputDevice>(
         logger,

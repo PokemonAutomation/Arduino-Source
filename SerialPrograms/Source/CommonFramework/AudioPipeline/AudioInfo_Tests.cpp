@@ -13,7 +13,8 @@
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/AudioPipeline/AudioInfo.h"
+#include "CommonFramework/AudioPipeline/AudioFormat.h"
+#include "AudioInputChoice.h"
 #include "AudioInfo_Tests.h"
 
 namespace PokemonAutomation{
@@ -265,6 +266,29 @@ public:
                 + std::to_string(list3.preferred_index) + ".";
         }
 
+        //  The preferred format wins its own shape over a higher quality
+        //  sample format, so the device opens in the format it runs in.
+        const AudioFormat preferred_int16 = make_format(48000, 2, QAudioFormat::ChannelConfig::ChannelConfigStereo);
+        AudioInputChoiceList list4 = input_choices({
+            make_format(48000, 2, QAudioFormat::ChannelConfig::ChannelConfigStereo, QAudioFormat::SampleFormat::Float),
+            preferred_int16,
+            make_format(44100, 2, QAudioFormat::ChannelConfig::ChannelConfigStereo, QAudioFormat::SampleFormat::Int32),
+            make_format(44100, 2, QAudioFormat::ChannelConfig::ChannelConfigStereo, QAudioFormat::SampleFormat::Float),
+        }, preferred_int16);
+        if (list4.choices.size() != 2){
+            return "Expected 2 choices, got " + std::to_string(list4.choices.size()) + ".";
+        }
+        if (list4.choices[0].format().sample_format() != AudioSampleFormat::SINT16){
+            return "The preferred int16 format should beat float for its own shape.";
+        }
+        if (list4.choices[1].format().sample_format() != AudioSampleFormat::FLOAT32){
+            return "Float should still win the other shape's collapse.";
+        }
+        if (list4.preferred_index != 0){
+            return "preferred_index should point at the preferred int16 entry (index 0), got "
+                + std::to_string(list4.preferred_index) + ".";
+        }
+
         return true;
     }
 };
@@ -335,17 +359,57 @@ public:
             return "A 2ch x 48000 stereo preferred format should match the L/R reinterpretation (index 1).";
         }
 
-        //  No reinterpretations when other formats are supported...
-        AudioInputChoiceList mixed = input_choices(
-            {card, make_format(48000, 2, QAudioFormat::ChannelConfig::ChannelConfigStereo)}, card
-        );
-        if (mixed.choices[0].display_name() != "2 x 48,000 Hz (Stereo)" ||
-            mixed.choices[1].display_name() != "1 x 96,000 Hz (Mono)"
-        ){
-            return "Mixed device should list the native entries sorted by channel count desc, then sample rate desc.";
+        //  Other supported formats don't hide the reinterpretations: they
+        //  follow the native 1ch x 96000 entry wherever it sorts.
+        AudioInputChoiceList mixed = input_choices({
+            make_format(48000, 1, QAudioFormat::ChannelConfig::ChannelConfigMono),
+            card,
+            make_format(48000, 2, QAudioFormat::ChannelConfig::ChannelConfigStereo),
+        }, card);
+        const std::vector<std::string> mixed_names = {
+            "2 x 48,000 Hz (Stereo)",
+            "1 x 96,000 Hz (Mono)",
+            "2 x 48,000 Hz (Interleaved Stereo L/R)",
+            "2 x 48,000 Hz (Interleaved Stereo R/L)",
+            "1 x 48,000 Hz (Mono)",
+        };
+        if (mixed.choices.size() != mixed_names.size()){
+            return "Expected " + std::to_string(mixed_names.size()) + " choices for a device with other formats, got "
+                + std::to_string(mixed.choices.size()) + ".";
+        }
+        for (size_t i = 0; i < mixed_names.size(); i++){
+            if (mixed.choices[i].display_name() != mixed_names[i]){
+                return "Mixed device choice " + std::to_string(i) + " should be \"" + mixed_names[i]
+                    + "\", got \"" + mixed.choices[i].display_name() + "\".";
+            }
+        }
+        if (mixed.choices[2].physical_format().native_format() != card.native_format()
+            || mixed.choices[3].physical_format().native_format() != card.native_format()){
+            return "The mixed device's reinterpretations should read the 1ch x 96000 entry.";
+        }
+        if (mixed.preferred_index != 1){
+            return "A 1ch x 96000 preferred format should match the mixed device's native entry (index 1), got "
+                + std::to_string(mixed.preferred_index) + ".";
         }
 
-        //  ...and the rule is specific to 1ch x 96000.
+        //  The card's own sample format wins its shape, and the
+        //  reinterpretations read the stream in it: a 16-bit card stays
+        //  16-bit even when float is listed for the same shape.
+        AudioInputChoiceList int16_card = input_choices({
+            make_format(96000, 1, QAudioFormat::ChannelConfig::ChannelConfigMono, QAudioFormat::SampleFormat::Float),
+            card,
+        }, card);
+        if (int16_card.choices.size() != 3){
+            return "Expected 3 choices for a card listing two sample formats for 1ch x 96000, got "
+                + std::to_string(int16_card.choices.size()) + ".";
+        }
+        for (const AudioInputChoice& choice : int16_card.choices){
+            if (choice.physical_format().sample_format() != AudioSampleFormat::SINT16){
+                return "\"" + choice.display_name() + "\" should open the card in its own 16-bit format.";
+            }
+        }
+
+        //  The rule is specific to 1ch x 96000.
         if (input_choices(
             {make_format(44100, 1, QAudioFormat::ChannelConfig::ChannelConfigMono)},
             make_format(44100, 1, QAudioFormat::ChannelConfig::ChannelConfigMono)

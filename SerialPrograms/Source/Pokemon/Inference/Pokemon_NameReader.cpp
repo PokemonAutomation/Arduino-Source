@@ -4,8 +4,8 @@
  *
  */
 
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "Tests/ImageUnitTest.h"
 #include "Pokemon_NameReader.h"
 
 namespace PokemonAutomation{
@@ -39,21 +39,23 @@ OCR::StringMatchResult PokemonNameReader::read_substring(
     );  
 }
 
-class Test_PokemonNameReader : public UnitTest{
+class Test_PokemonNameReader : public ImageUnitTest{
 public:
     Test_PokemonNameReader(
         const std::string& image,
         Language language,
         const std::string& expected
     )
-        : UnitTest("OCR::RawOCR - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("OCR::RawOCR - " + image, {image})
         , m_language(language)
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
 
         OCR::StringMatchResult ocr_result = Pokemon::PokemonNameReader::instance().read_substring(
             logger, m_language, image, OCR::BLACK_OR_WHITE_TEXT_FILTERS()
@@ -80,7 +82,6 @@ public:
     };
 
 private:
-    std::string m_image;
     Language m_language;
     std::string m_expected;
 };

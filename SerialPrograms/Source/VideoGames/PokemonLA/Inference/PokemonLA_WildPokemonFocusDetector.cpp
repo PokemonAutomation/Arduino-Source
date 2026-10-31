@@ -5,13 +5,13 @@
  */
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/ImageGradient.h"
 #include "CommonTools/OCR/OCR_Routines.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "VideoGames/PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
@@ -167,18 +167,20 @@ bool detect_change_focus(Logger& logger, VideoOverlay& overlay, const ImageViewR
 
 
 
-class Test_WildPokemonFocusDetector : public UnitTest{
+class Test_WildPokemonFocusDetector : public ImageUnitTest{
 public:
     Test_WildPokemonFocusDetector(
         const std::string& image,
         std::vector<std::string> keywords
     )
-        : UnitTest("PokemonLA::WildPokemonFocusDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonLA::WildPokemonFocusDetector - " + image, {image})
         , m_keywords(std::move(keywords))
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         std::stringstream ss;
 
         // two keywords: <True/False> <True/False>
@@ -190,7 +192,7 @@ public:
         DummyVideoOverlay overlay;
 
         WildPokemonFocusDetector detector(logger, overlay);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         bool result_has_focus = detector.process_frame(image, current_time());
 
         auto check_can_change_focus = [&](const std::string& word) -> std::string {
@@ -247,7 +249,6 @@ public:
     };
 
 private:
-    std::string m_image;
     std::vector<std::string> m_keywords;
 };
 

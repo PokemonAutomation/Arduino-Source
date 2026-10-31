@@ -493,10 +493,12 @@ file(GLOB LIBRARY_SOURCES
     ../Common/SerialPABotBase/SerialPABotBase_Protocol.h
     Source/CommonFramework/AudioPipeline/AudioConstants.h
     Source/CommonFramework/AudioPipeline/AudioFeed.h
-    Source/CommonFramework/AudioPipeline/AudioInfo.cpp
-    Source/CommonFramework/AudioPipeline/AudioInfo.h
+    Source/CommonFramework/AudioPipeline/AudioFormat.cpp
+    Source/CommonFramework/AudioPipeline/AudioFormat.h
     Source/CommonFramework/AudioPipeline/AudioInfo_Tests.cpp
     Source/CommonFramework/AudioPipeline/AudioInfo_Tests.h
+    Source/CommonFramework/AudioPipeline/AudioInputChoice.cpp
+    Source/CommonFramework/AudioPipeline/AudioInputChoice.h
     Source/CommonFramework/AudioPipeline/AudioOption.cpp
     Source/CommonFramework/AudioPipeline/AudioOption.h
     Source/CommonFramework/AudioPipeline/AudioPassthroughPair.h
@@ -514,10 +516,15 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/AudioPipeline/AudioSource.h
     Source/CommonFramework/AudioPipeline/AudioTemplate.cpp
     Source/CommonFramework/AudioPipeline/AudioTemplate.h
+    Source/CommonFramework/AudioPipeline/Backends/AudioDeviceInfo.cpp
+    Source/CommonFramework/AudioPipeline/Backends/AudioDeviceInfo.h
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.cpp
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.h
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQtThread.cpp
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQtThread.h
+    Source/CommonFramework/AudioPipeline/Backends/NativeAudioFormats.cpp
+    Source/CommonFramework/AudioPipeline/Backends/NativeAudioFormats.h
+    Source/CommonFramework/AudioPipeline/Backends/NativeAudioFormats_Apple.tpp
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader.cpp
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader.h
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader_Tests.cpp

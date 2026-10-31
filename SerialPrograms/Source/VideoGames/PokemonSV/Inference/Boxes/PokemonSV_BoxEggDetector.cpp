@@ -7,12 +7,12 @@
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/ImageUnitTest.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV_BoxEggDetector.h"
 
@@ -158,36 +158,39 @@ uint8_t BoxEggPartyColumnWatcher::num_non_egg_pokemon_found() const{
 }
 
 
-class Test_BoxCurrentEggDetector : public UnitTest{
+class Test_BoxCurrentEggDetector : public ImageUnitTest{
 public:
     Test_BoxCurrentEggDetector(const std::string& image, bool expected)
-        : UnitTest("PokemonSV::BoxCurrentEggDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::BoxCurrentEggDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         BoxCurrentEggDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     }
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 
-class Test_BoxPartyEggDetector : public UnitTest{
+class Test_BoxPartyEggDetector : public ImageUnitTest{
 public:
     Test_BoxPartyEggDetector(const std::string& image, int target)
-        : UnitTest("PokemonSV::BoxPartyEggDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::BoxPartyEggDetector - " + image, {image})
         , m_target(target)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         uint8_t num_eggs = 0;
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         for (uint8_t i = 0; i < 5; i++){
             BoxEggDetector detector(BoxCursorLocation::PARTY, i + 1, 0);
             if (detector.detect(image)){
@@ -198,7 +201,6 @@ public:
     }
 
 private:
-    std::string m_image;
     int m_target;
 };
 

@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -12,6 +11,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/ImageFilter.h"
+#include "Tests/ImageUnitTest.h"
 #include "VideoGames/PokemonRSE/PokemonRSE_Settings.h"
 #include "PokemonRSE_DialogDetector.h"
 
@@ -248,26 +248,27 @@ ConfirmSlotDetector::ConfirmSlotDetector(Color color, ConfirmSlot slot, ConfirmP
 
 
 
-class Test_SelectionDialogDetector : public UnitTest {
+class Test_SelectionDialogDetector : public ImageUnitTest {
 public:
 
     Test_SelectionDialogDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonRSE::SelectionDialogDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonRSE::SelectionDialogDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override {
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override {
         SelectionDialogDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 
@@ -286,7 +287,7 @@ void add_tests_SelectionDialogDetector(UnitTestDatabase& database){
 }
 
 
-class Test_ConfirmSlotDetector : public UnitTest {
+class Test_ConfirmSlotDetector : public ImageUnitTest {
 public:
 
     Test_ConfirmSlotDetector(
@@ -295,22 +296,23 @@ public:
         ConfirmPosition position,
         bool expected
     )
-        : UnitTest("PokemonRSE::ConfirmSlotDetector - " + std::to_string((int)slot) + " - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonRSE::ConfirmSlotDetector - " + std::to_string((int)slot) + " - " + image, {image})
         , m_slot(slot)
         , m_position(position)
         , m_expected(expected)
     {
     }
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override {
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override {
         ConfirmSlotDetector detector(COLOR_RED, m_slot, m_position);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     ConfirmSlot m_slot;
     ConfirmPosition m_position;
     bool m_expected;

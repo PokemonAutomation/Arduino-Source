@@ -6,9 +6,9 @@
 
 //#include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonLZA_AlertEyeDetector.h"
 
@@ -147,26 +147,27 @@ bool AlertEyeTracker::process_frame(const ImageViewRGB32& frame, WallClock times
 
 
 
-class Test_AlertEyeDetector : public UnitTest{
+class Test_AlertEyeDetector : public ImageUnitTest{
 public:
     Test_AlertEyeDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonPLZA::AlertEyeDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonPLZA::AlertEyeDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay overlay;
         AlertEyeDetector detector(COLOR_RED, &overlay);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

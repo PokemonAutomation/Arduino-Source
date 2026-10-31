@@ -11,8 +11,10 @@
 #include <vector>
 #include <QWidget>
 #include <QSlider>
+#include "CommonFramework/AudioPipeline/AudioInputChoice.h"
 #include "CommonFramework/AudioPipeline/AudioOption.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
+#include "CommonFramework/AudioPipeline/Backends/AudioDeviceInfo.h"
 
 class QComboBox;
 class QPushButton;

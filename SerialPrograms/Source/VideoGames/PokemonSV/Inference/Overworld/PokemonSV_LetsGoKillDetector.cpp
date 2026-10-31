@@ -12,6 +12,7 @@
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "CommonTools/Audio/SpectrogramMatcher.h"
 #include "CommonTools/Audio/AudioTemplateCache.h"
+#include "Tests/ImageUnitTest.h"
 #include "VideoGames/PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV_LetsGoKillDetector.h"
 
@@ -210,22 +211,23 @@ bool LetsGoKillWatcher::process_frame(const ImageViewRGB32& frame, WallClock tim
 }
 
 
-class Test_LetsGoKillDetector : public UnitTest{
+class Test_LetsGoKillDetector : public ImageUnitTest{
 public:
     Test_LetsGoKillDetector(const std::string& image, bool expected)
-        : UnitTest("PokemonSV::LetsGoKillDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::LetsGoKillDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         LetsGoKillDetector detector(COLOR_RED, {0.23, 0.23, 0.04, 0.20});
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     }
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

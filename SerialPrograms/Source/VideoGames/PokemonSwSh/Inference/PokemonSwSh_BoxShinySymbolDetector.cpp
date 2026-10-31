@@ -9,11 +9,11 @@
 #include <iostream>
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/StaticGlobals.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonSwSh_BoxShinySymbolDetector.h"
 
 using std::cout;
@@ -40,25 +40,26 @@ bool BoxShinySymbolDetector::detect(const ImageViewRGB32& screen){
 
 
 
-class Test_BoxShinySymbolDetector : public UnitTest{
+class Test_BoxShinySymbolDetector : public ImageUnitTest{
 public:
     Test_BoxShinySymbolDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonSwSh::BoxShinySymbolDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSwSh::BoxShinySymbolDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         BoxShinySymbolDetector detector;
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

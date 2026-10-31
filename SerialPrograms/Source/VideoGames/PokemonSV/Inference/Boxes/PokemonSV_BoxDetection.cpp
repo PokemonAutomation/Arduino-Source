@@ -7,10 +7,10 @@
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_BoxGenderDetector.h"
@@ -435,18 +435,20 @@ bool BoxSelectionBoxModeWatcher::in_box_selection_mode() const{
 
 
 
-class Test_BoxInfoDetector : public UnitTest{
+class Test_BoxInfoDetector : public ImageUnitTest{
 public:
     Test_BoxInfoDetector(
         const std::string& image,
         std::vector<std::string> words
     )
-        : UnitTest("PokemonSV::BoxInfoDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::BoxInfoDetector - " + image, {image})
         , m_words(std::move(words))
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         // two words: <shiny or not> <gender (1: male, 2: female, 3: genderless)
         if (m_words.size() < 2){
             std::stringstream ss;
@@ -468,7 +470,7 @@ public:
         }
 
         SomethingInBoxSlotDetector sth_detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         bool sth = sth_detector.detect(image);
         TEST_RESULT_EQUAL_STR(sth, true);
 
@@ -485,40 +487,42 @@ public:
     };
 
 private:
-    std::string m_image;
     const std::vector<std::string> m_words;
 };
 
-class Test_SomethingInBoxSlotDetector : public UnitTest{
+class Test_SomethingInBoxSlotDetector : public ImageUnitTest{
 public:
     Test_SomethingInBoxSlotDetector(const std::string& image, bool expected)
-        : UnitTest("PokemonSV::SomethingInBoxSlotDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::SomethingInBoxSlotDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         SomethingInBoxSlotDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     }
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 
-class Test_BoxBottomButtonDetector : public UnitTest{
+class Test_BoxBottomButtonDetector : public ImageUnitTest{
 public:
     Test_BoxBottomButtonDetector(const std::string& image, bool target_y, bool target_b)
-        : UnitTest("PokemonSV::BoxBottomButtonDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::BoxBottomButtonDetector - " + image, {image})
         , m_target_y(target_y)
         , m_target_b(target_b)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
         BoxBottomButtonYDetector y_detector;
         TEST_RESULT_COMPONENT_EQUAL_STR(y_detector.detect(image), m_target_y, "button Y");
 
@@ -528,7 +532,6 @@ public:
     }
 
 private:
-    std::string m_image;
     bool m_target_y;
     bool m_target_b;
 };

@@ -485,7 +485,7 @@ int encounter_roamer(
 
         context.wait_for_all_requests();
         pbf_move_left_joystick(context, {0, +1}, 200ms, 800ms);
-        int ret = grass_spin(console, context, true, 5s);
+        int ret = grass_spin(console, context, true, 8s);
         if (ret < 0){
             attempts++;
             pbf_move_left_joystick(context, {0, -1}, 200ms, 800ms);

@@ -9,7 +9,8 @@
 
 #include <memory>
 #include <map>
-#include "AudioInfo.h"
+#include "CommonFramework/AudioPipeline/Backends/AudioDeviceInfo.h"
+#include "AudioInputChoice.h"
 #include "AudioSourceDescriptor.h"
 
 namespace PokemonAutomation{

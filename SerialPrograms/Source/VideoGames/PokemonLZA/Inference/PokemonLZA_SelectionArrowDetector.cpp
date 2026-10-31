@@ -6,9 +6,9 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonLZA_SelectionArrowDetector.h"
 
@@ -115,28 +115,29 @@ bool SelectionArrowDetector::detect(const ImageViewRGB32& screen){
 
 
 
-class Test_SelectionArrowDetector : public UnitTest{
+class Test_SelectionArrowDetector : public ImageUnitTest{
 public:
     Test_SelectionArrowDetector(
         const std::string& image,
         SelectionArrowType expected_arrow,
         bool expected
     )
-        : UnitTest("PokemonPLZA::SelectionArrowDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonPLZA::SelectionArrowDetector - " + image, {image})
         , m_expected_arrow(expected_arrow)
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay overlay;
         SelectionArrowDetector detector(COLOR_RED, &overlay, m_expected_arrow, ImageFloatBox(0, 0, 1, 1));
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     SelectionArrowType m_expected_arrow;
     bool m_expected;
 };

@@ -14,6 +14,7 @@
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/OCR/OCR_Routines.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "VideoGames/PokemonSV/Resources/PokemonSV_Ingredients.h"
 
@@ -415,15 +416,17 @@ OCR::StringMatchResult SandwichIngredientReader::read_with_ocr(
 }
 
 
-class Test_SandwichIngredientsDetector : public UnitTest{
+class Test_SandwichIngredientsDetector : public ImageUnitTest{
 public:
     Test_SandwichIngredientsDetector(const std::string& image, std::vector<std::string> words)
-        : UnitTest("PokemonSV::SandwichIngredientsDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::SandwichIngredientsDetector - " + image, {image})
         , m_words(std::move(words))
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         if (m_words.size() < 3){
             return "Error: not enough number of words in the filename.";
         }
@@ -444,7 +447,7 @@ public:
             return "Error: invalid condiments count.";
         }
 
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         SandwichCondimentsPageDetector condiments_detector;
         SandwichPicksPageDetector picks_detector;
 
@@ -462,19 +465,20 @@ public:
     }
 
 private:
-    std::string m_image;
     std::vector<std::string> m_words;
 };
 
-class Test_SandwichIngredientReader : public UnitTest{
+class Test_SandwichIngredientReader : public ImageUnitTest{
 public:
     Test_SandwichIngredientReader(const std::string& image)
-        : UnitTest("PokemonSV::SandwichIngredientReader - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::SandwichIngredientReader - " + image, {image})
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        Filesystem::Path file_path(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        Filesystem::Path file_path(UNIT_TEST_RESOURCE_PATH() + image_paths()[0]);
         Filesystem::Path parent_dir = file_path.parent_path();
         std::string base_name = file_path.stem().string();
         const std::vector<std::string> words = parse_words(base_name);
@@ -511,7 +515,7 @@ public:
             return "Error: need exactly 10 ingredients in golden file.";
         }
 
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         SandwichIngredientReader reader(sandwich_type);
         for (size_t i = 0; i < 10; ++i){
             if (selected_ingredient == i){
@@ -531,9 +535,6 @@ public:
 
         return true;
     }
-
-private:
-    std::string m_image;
 };
 
 

@@ -6,8 +6,8 @@
 
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/DetectedBoxes.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "VideoGames/PokemonLA/Inference/Battles/PokemonLA_BattleSpriteWatcher.h"
 #include "PokemonLA_BattleSpriteArrowDetector.h"
@@ -109,20 +109,22 @@ bool BattleSpriteArrowDetector::process_frame(const ImageViewRGB32& frame, WallC
 
 
 
-class Test_BattleSpriteArrowDetector : public UnitTest{
+class Test_BattleSpriteArrowDetector : public ImageUnitTest{
 public:
     Test_BattleSpriteArrowDetector(
         const std::string& image,
         int target
     )
-        : UnitTest("PokemonLA::BattleSpriteArrowDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonLA::BattleSpriteArrowDetector - " + image, {image})
         , m_target(target)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay overlay;
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
 
         const size_t target_index = m_target;
         for (size_t sprite_index = 0; sprite_index < MAX_WILD_POKEMON_IN_MULTI_BATTLE; sprite_index++){
@@ -144,7 +146,6 @@ public:
     };
 
 private:
-    std::string m_image;
     int m_target;
 };
 

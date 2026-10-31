@@ -10,10 +10,10 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "Tests/ImageUnitTest.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_PartyMenuDetector.h"
 
@@ -101,17 +101,19 @@ bool PartySlotDetector::detect(const ImageViewRGB32& screen){
 }
 
 
-class Test_PartyMenuDetector : public UnitTest{
+class Test_PartyMenuDetector : public ImageUnitTest{
 public:
     Test_PartyMenuDetector(const std::string& image, bool expected)
-        : UnitTest("PokemonFRLG::PartyMenuDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonFRLG::PartyMenuDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger&, CancellableScope&) const override{
+    virtual UnitTestResult run_on_images(
+        Logger&, CancellableScope&,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         PartyMenuDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         bool result = detector.detect(image);
         if (result != m_expected){
             return std::string("Expected party menu = ") + (m_expected ? "true" : "false") +
@@ -121,7 +123,6 @@ public:
     }
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 
@@ -141,25 +142,26 @@ void add_tests_PartyMenuDetector(UnitTestDatabase& database){
 }
 
 
-class Test_PartySlotDetector : public UnitTest{
+class Test_PartySlotDetector : public ImageUnitTest{
 public:
     Test_PartySlotDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonFRLG::PartySlotDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonFRLG::PartySlotDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         PartySlotWatcher detector(COLOR_RED, PartySlot::SIX);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

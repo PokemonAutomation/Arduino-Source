@@ -5,8 +5,8 @@
  */
 
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonHome_AlphaDetector.h"
 
 namespace PokemonAutomation{
@@ -36,22 +36,23 @@ bool AlphaDetector::detect(const ImageViewRGB32& screen){
     return found;
 }
 
-class Test_AlphaDetector : public UnitTest{
+class Test_AlphaDetector : public ImageUnitTest{
 public:
     Test_AlphaDetector(const std::string& image, bool expected)
-        : UnitTest("PokemonHome::AlphaDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonHome::AlphaDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
         AlphaDetector detector;
         return detector.detect(image) == m_expected;
     }
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

@@ -9,6 +9,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/AudioPipeline/AudioInputChoice.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioSource_File.h"
@@ -100,7 +101,7 @@ AudioSource_File::AudioSource_File(
         //  Native WAV: the stream is the file's own format (rate, channels,
         //  sample type). The tree's decoder / resampler / mixer convert it to
         //  the sink's format; no 96k reinterpretation for files.
-        m_stream_format = get_sample_format(native_format);
+        m_stream_format = sample_format_of(native_format);
     }else{
         //  Compressed formats: probe the decoder's native output format
         //  and stream the file at its own rate / channels / sample type,
@@ -110,7 +111,7 @@ AudioSource_File::AudioSource_File(
         //  48k stereo float target; the loader logs the decode failure as
         //  before. An unreadable .wav falls through here too.
         if (probe_decoded_native_format(file, native_format)){
-            m_stream_format = get_sample_format(native_format);
+            m_stream_format = sample_format_of(native_format);
         }else{
             //  The channel count must be set before the channel config:
             //  QAudioFormat::setChannelCount() resets the config.

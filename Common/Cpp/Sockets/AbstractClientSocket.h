@@ -35,13 +35,18 @@ public:
 
         //  Called when the socket receives data from the server.
         virtual void on_receive_data(const void* data, size_t bytes){}
+
+        //  Called when an established connection is lost (the server closed
+        //  the connection or a socket error occurred). It is not called by
+        //  "close()".
+        virtual void on_disconnect(const std::string& error_message){}
     };
 
     void add_listener(Listener& listener){
         m_listeners.add(listener);
     }
     void remove_listener(Listener& listener){
-        m_listeners.add(listener);
+        m_listeners.remove(listener);
     }
 
 
