@@ -22,18 +22,6 @@ namespace PokemonAutomation{
 
 
 
-namespace{
-
-Kernels::AudioPipeline::SampleFormat sample_format_of(const QAudioFormat& format){
-    QAudioFormat copy = format;
-    return to_sample_format(get_sample_format(copy));
-}
-
-
-}
-
-
-
 bool probe_wav_native_format(const std::string& filename, QAudioFormat& out_format){
     WavFile wav_file;
     if (!wav_file.open(QString::fromStdString(filename))){
