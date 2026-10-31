@@ -2,9 +2,17 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  Loopback tests that combine the generic ClientSocket and ServerSocket
- *  against each other on 127.0.0.1, using whichever backends the generic
- *  classes map to on the current platform.
+ *  Loopback tests that combine a ClientSocket and a ServerSocket against
+ *  each other on 127.0.0.1. The test logic is written against the abstract
+ *  classes, and is instantiated for every backend that compiles on the
+ *  current platform:
+ *
+ *  - Qt: always.
+ *  - POSIX: on non-Windows.
+ *  - WinSocket: on Windows.
+ *
+ *  So every platform runs 2 of the 3 backends, and CI as a whole covers
+ *  all 3.
  *
  */
 
@@ -21,8 +29,16 @@
 #include <vector>
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
-#include "Common/Cpp/Sockets/ClientSocket.h"
-#include "Common/Cpp/Sockets/ServerSocket.h"
+#include "Common/Cpp/Sockets/ClientSocket_Qt.h"
+#include "Common/Cpp/Sockets/ServerSocket_Qt.h"
+#ifndef _WIN32
+#include "Common/Cpp/Sockets/ClientSocket_POSIX.h"
+#include "Common/Cpp/Sockets/ServerSocket_POSIX.h"
+#endif
+#ifdef _WIN32
+#include "Common/Cpp/Sockets/ClientSocket_WinSocket.h"
+#include "Common/Cpp/Sockets/ServerSocket_WinSocket.h"
+#endif
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Sockets_Tests.h"
 
@@ -120,10 +136,11 @@ struct ServerListener : AbstractServerSocket::Listener{
 };
 
 
+template <typename ClientSocketType, typename ServerSocketType>
 class TestSockets : public UnitTest{
 public:
     TestSockets(ThreadPool& thread_pool, std::string name)
-        : UnitTest("Sockets - " + std::move(name))
+        : UnitTest(std::move(name))
         , m_thread_pool(thread_pool)
     {
         m_threads = 2;
@@ -131,7 +148,7 @@ public:
 
 
 protected:
-    bool start_server(ServerSocket& server, ServerListener& listener, uint16_t& port) const{
+    bool start_server(ServerSocketType& server, ServerListener& listener, uint16_t& port) const{
         for (int attempt = 0; attempt < 8; attempt++){
             uint16_t candidate;
             {
@@ -154,7 +171,7 @@ protected:
     }
 
     bool connect_client(
-        ClientSocket& client,
+        ClientSocketType& client,
         ClientListener& listener,
         uint16_t port,
         int expected_connect
@@ -179,31 +196,30 @@ private:
 
 //  Connect, send a packet, verify the echo, disconnect, and check that the
 //  server observed both the connect and the disconnect.
-class Test_Sockets_Echo : public TestSockets{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_Sockets_Echo : public TestSockets<ClientSocketType, ServerSocketType>{
 public:
-    Test_Sockets_Echo(ThreadPool& thread_pool)
-        : TestSockets(thread_pool, "Client/server echo round trip")
-    {}
+    using TestSockets<ClientSocketType, ServerSocketType>::TestSockets;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ServerSocket server(m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         ServerListener server_listener;
         server_listener.server = &server;
         server.add_listener(server_listener);
 
         uint16_t port;
-        if (!start_server(server, server_listener, port)){
+        if (!this->start_server(server, server_listener, port)){
             return "Failed to start the server";
         }
 
         bool ok = false;
         std::string error;
         {
-            ClientSocket client(m_thread_pool);
+            ClientSocketType client(this->m_thread_pool);
             ClientListener client_listener;
             client.add_listener(client_listener);
 
-            if (!connect_client(client, client_listener, port, 1)){
+            if (!this->connect_client(client, client_listener, port, 1)){
                 error = "The client did not finish connecting";
             }else if (!client_listener.last_connect_error.empty()){
                 error = "The client failed to connect: " + client_listener.last_connect_error;
@@ -252,31 +268,30 @@ public:
 
 //  Zero-length sends must be a valid no-op that returns 0 without
 //  touching the connection.
-class Test_Sockets_ZeroLengthSend : public TestSockets{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_Sockets_ZeroLengthSend : public TestSockets<ClientSocketType, ServerSocketType>{
 public:
-    Test_Sockets_ZeroLengthSend(ThreadPool& thread_pool)
-        : TestSockets(thread_pool, "Zero-length send")
-    {}
+    using TestSockets<ClientSocketType, ServerSocketType>::TestSockets;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ServerSocket server(m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         ServerListener server_listener;
         server_listener.server = &server;
         server.add_listener(server_listener);
 
         uint16_t port;
-        if (!start_server(server, server_listener, port)){
+        if (!this->start_server(server, server_listener, port)){
             return "Failed to start the server";
         }
 
         bool ok = false;
         std::string error;
         {
-            ClientSocket client(m_thread_pool);
+            ClientSocketType client(this->m_thread_pool);
             ClientListener client_listener;
             client.add_listener(client_listener);
 
-            if (!connect_client(client, client_listener, port, 1)){
+            if (!this->connect_client(client, client_listener, port, 1)){
                 error = "The client did not finish connecting";
             }else if (client.send("", 0) != 0){
                 error = "A zero-length client send did not return 0";
@@ -318,11 +333,10 @@ public:
 
 //  Transfer a megabyte each way (the server echoes it back) and verify the
 //  data integrity.
-class Test_Sockets_LargeTransfer : public TestSockets{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_Sockets_LargeTransfer : public TestSockets<ClientSocketType, ServerSocketType>{
 public:
-    Test_Sockets_LargeTransfer(ThreadPool& thread_pool)
-        : TestSockets(thread_pool, "Large transfer")
-    {}
+    using TestSockets<ClientSocketType, ServerSocketType>::TestSockets;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         constexpr size_t SIZE = 1 << 20;
@@ -331,24 +345,24 @@ public:
             payload[i] = (uint8_t)(i % 251);
         }
 
-        ServerSocket server(m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         ServerListener server_listener;
         server_listener.server = &server;
         server.add_listener(server_listener);
 
         uint16_t port;
-        if (!start_server(server, server_listener, port)){
+        if (!this->start_server(server, server_listener, port)){
             return "Failed to start the server";
         }
 
         bool ok = false;
         std::string error;
         {
-            ClientSocket client(m_thread_pool);
+            ClientSocketType client(this->m_thread_pool);
             ClientListener client_listener;
             client.add_listener(client_listener);
 
-            if (!connect_client(client, client_listener, port, 1)){
+            if (!this->connect_client(client, client_listener, port, 1)){
                 error = "The client did not finish connecting";
             }else if (!server_listener.waiter.wait_for(
                 std::chrono::seconds(5),
@@ -388,22 +402,21 @@ public:
 
 //  Rapidly connect and disconnect many times. Each cycle transfers a
 //  packet to make sure the new connection actually works.
-class Test_Sockets_RapidReconnect : public TestSockets{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_Sockets_RapidReconnect : public TestSockets<ClientSocketType, ServerSocketType>{
 public:
-    Test_Sockets_RapidReconnect(ThreadPool& thread_pool)
-        : TestSockets(thread_pool, "Rapid reconnect")
-    {}
+    using TestSockets<ClientSocketType, ServerSocketType>::TestSockets;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         constexpr int CYCLES = 50;
 
-        ServerSocket server(m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         ServerListener server_listener;
         server_listener.server = &server;
         server.add_listener(server_listener);
 
         uint16_t port;
-        if (!start_server(server, server_listener, port)){
+        if (!this->start_server(server, server_listener, port)){
             return "Failed to start the server";
         }
 
@@ -411,14 +424,14 @@ public:
         std::string error;
         size_t expected_echo = 0;
         {
-            ClientSocket client(m_thread_pool);
+            ClientSocketType client(this->m_thread_pool);
             ClientListener client_listener;
             client.add_listener(client_listener);
 
             for (int cycle = 0; cycle < CYCLES; cycle++){
                 int cycle_no = cycle + 1;
 
-                if (!connect_client(client, client_listener, port, cycle_no)){
+                if (!this->connect_client(client, client_listener, port, cycle_no)){
                     error = "The client did not finish connecting (cycle " + std::to_string(cycle_no) + ")";
                     break;
                 }
@@ -478,34 +491,33 @@ public:
 //  it: the send must finish (returning however much was written), the
 //  server must go back to listening, and the client must observe the
 //  disconnect. Then the server must accept a new connection.
-class Test_Sockets_SendCloseRace : public TestSockets{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_Sockets_SendCloseRace : public TestSockets<ClientSocketType, ServerSocketType>{
 public:
-    Test_Sockets_SendCloseRace(ThreadPool& thread_pool)
-        : TestSockets(thread_pool, "Send/close race")
-    {}
+    using TestSockets<ClientSocketType, ServerSocketType>::TestSockets;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         constexpr size_t SIZE = 1 << 20;
         std::vector<uint8_t> payload(SIZE, 0xAB);
 
-        ServerSocket server(m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         ServerListener server_listener;
         server_listener.server = &server;
         server.add_listener(server_listener);
 
         uint16_t port;
-        if (!start_server(server, server_listener, port)){
+        if (!this->start_server(server, server_listener, port)){
             return "Failed to start the server";
         }
 
         bool ok = false;
         std::string error;
         {
-            ClientSocket client(m_thread_pool);
+            ClientSocketType client(this->m_thread_pool);
             ClientListener client_listener;
             client.add_listener(client_listener);
 
-            if (!connect_client(client, client_listener, port, 1)){
+            if (!this->connect_client(client, client_listener, port, 1)){
                 error = "The client did not finish connecting";
             }else if (!server_listener.waiter.wait_for(
                 std::chrono::seconds(5),
@@ -514,7 +526,7 @@ public:
                 error = "The server did not call on_connect";
             }else{
                 std::atomic<size_t> bytes_sent{0};
-                AsyncTask send_task = m_thread_pool.dispatch([&client, &payload, &bytes_sent]{
+                AsyncTask send_task = this->m_thread_pool.dispatch([&client, &payload, &bytes_sent]{
                     bytes_sent = client.send(payload.data(), payload.size());
                 });
 
@@ -536,7 +548,7 @@ public:
                     error = "The client reported sending more bytes than the packet size";
                 }else{
                     //  The server must accept a new connection.
-                    if (!connect_client(client, client_listener, port, 2)){
+                    if (!this->connect_client(client, client_listener, port, 2)){
                         error = "The client did not reconnect";
                     }else if (!client_listener.last_connect_error.empty()){
                         error = "The client failed to reconnect: " + client_listener.last_connect_error;
@@ -568,35 +580,34 @@ public:
 
 //  While a client is connected, a second client must be rejected, and the
 //  first client must keep working.
-class Test_Sockets_RejectSecondClient : public TestSockets{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_Sockets_RejectSecondClient : public TestSockets<ClientSocketType, ServerSocketType>{
 public:
-    Test_Sockets_RejectSecondClient(ThreadPool& thread_pool)
-        : TestSockets(thread_pool, "Reject a second client")
-    {}
+    using TestSockets<ClientSocketType, ServerSocketType>::TestSockets;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ServerSocket server(m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         ServerListener server_listener;
         server_listener.server = &server;
         server.add_listener(server_listener);
 
         uint16_t port;
-        if (!start_server(server, server_listener, port)){
+        if (!this->start_server(server, server_listener, port)){
             return "Failed to start the server";
         }
 
         bool ok = false;
         std::string error;
         {
-            ClientSocket client_a(m_thread_pool);
+            ClientSocketType client_a(this->m_thread_pool);
             ClientListener client_a_listener;
             client_a.add_listener(client_a_listener);
 
-            ClientSocket client_b(m_thread_pool);
+            ClientSocketType client_b(this->m_thread_pool);
             ClientListener client_b_listener;
             client_b.add_listener(client_b_listener);
 
-            if (!connect_client(client_a, client_a_listener, port, 1)){
+            if (!this->connect_client(client_a, client_a_listener, port, 1)){
                 error = "Client A did not finish connecting";
             }else if (!server_listener.waiter.wait_for(
                 std::chrono::seconds(5),
@@ -652,24 +663,23 @@ public:
 
 //  Starting a second server on an already-bound port must fail through
 //  on_listen_finished and leave the server not running.
-class Test_Sockets_PortInUse : public TestSockets{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_Sockets_PortInUse : public TestSockets<ClientSocketType, ServerSocketType>{
 public:
-    Test_Sockets_PortInUse(ThreadPool& thread_pool)
-        : TestSockets(thread_pool, "Port in use")
-    {}
+    using TestSockets<ClientSocketType, ServerSocketType>::TestSockets;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ServerSocket server(m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         ServerListener server_listener;
         server_listener.server = &server;
         server.add_listener(server_listener);
 
         uint16_t port;
-        if (!start_server(server, server_listener, port)){
+        if (!this->start_server(server, server_listener, port)){
             return "Failed to start the server";
         }
 
-        ServerSocket second_server(m_thread_pool);
+        ServerSocketType second_server(this->m_thread_pool);
         ServerListener second_listener;
         second_server.add_listener(second_listener);
         second_server.start("127.0.0.1", port);
@@ -694,11 +704,11 @@ public:
         //  The original server must still work.
         bool ok = false;
         {
-            ClientSocket client(m_thread_pool);
+            ClientSocketType client(this->m_thread_pool);
             ClientListener client_listener;
             client.add_listener(client_listener);
 
-            if (!connect_client(client, client_listener, port, 1)){
+            if (!this->connect_client(client, client_listener, port, 1)){
                 ok = false;
             }else if (client.send("ok", 2) != 2){
                 ok = false;
@@ -725,18 +735,46 @@ public:
 };
 
 
+template <typename ClientSocketType, typename ServerSocketType>
+void add_socket_tests(UnitTestDatabase& database, ThreadPool& thread_pool, const char* backend_name){
+    const std::string prefix = "Sockets (" + std::string(backend_name) + ") - ";
+
+    database.add<Test_Sockets_Echo<ClientSocketType, ServerSocketType>>(
+        thread_pool, prefix + "Client/server echo round trip"
+    );
+    database.add<Test_Sockets_ZeroLengthSend<ClientSocketType, ServerSocketType>>(
+        thread_pool, prefix + "Zero-length send"
+    );
+    database.add<Test_Sockets_LargeTransfer<ClientSocketType, ServerSocketType>>(
+        thread_pool, prefix + "Large transfer"
+    );
+    database.add<Test_Sockets_RapidReconnect<ClientSocketType, ServerSocketType>>(
+        thread_pool, prefix + "Rapid reconnect"
+    );
+    database.add<Test_Sockets_SendCloseRace<ClientSocketType, ServerSocketType>>(
+        thread_pool, prefix + "Send/close race"
+    );
+    database.add<Test_Sockets_RejectSecondClient<ClientSocketType, ServerSocketType>>(
+        thread_pool, prefix + "Reject a second client"
+    );
+    database.add<Test_Sockets_PortInUse<ClientSocketType, ServerSocketType>>(
+        thread_pool, prefix + "Port in use"
+    );
+}
+
+
 
 } // anonymous namespace
 
 
 void add_tests_Sockets(UnitTestDatabase& database, ThreadPool& thread_pool){
-    database.add<Test_Sockets_Echo>(thread_pool);
-    database.add<Test_Sockets_ZeroLengthSend>(thread_pool);
-    database.add<Test_Sockets_LargeTransfer>(thread_pool);
-    database.add<Test_Sockets_RapidReconnect>(thread_pool);
-    database.add<Test_Sockets_SendCloseRace>(thread_pool);
-    database.add<Test_Sockets_RejectSecondClient>(thread_pool);
-    database.add<Test_Sockets_PortInUse>(thread_pool);
+    add_socket_tests<ClientSocket_Qt, ServerSocket_Qt>(database, thread_pool, "Qt");
+#ifndef _WIN32
+    add_socket_tests<ClientSocket_POSIX, ServerSocket_POSIX>(database, thread_pool, "POSIX");
+#endif
+#ifdef _WIN32
+    add_socket_tests<ClientSocket_WinSocket, ServerSocket_WinSocket>(database, thread_pool, "WinSocket");
+#endif
 }
 
 

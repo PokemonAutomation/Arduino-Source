@@ -21,6 +21,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "AbstractServerSocket.h"
@@ -42,24 +43,45 @@ public:
     }
 
     virtual void start(const std::string& address, uint16_t port) override{
-        try{
-            //  Use the plain dispatch() rather than dispatch_now_blocking():
-            //  start() may be called from a thread that is itself running on
-            //  this pool, and blocking here until a pool thread is free could
-            //  deadlock a capped pool. The returned AsyncTask still lets
-            //  close() join the listener thread. The dispatch happens under
-            //  the lock so two "start()" calls cannot race into it.
+        {
             std::lock_guard<Mutex> lg(m_lock);
             if (m_state.load(std::memory_order_relaxed) != State::NOT_RUNNING
-                || m_accept_thread){
+                || m_starting){
                 return;
             }
-            m_accept_thread = m_thread_pool.dispatch([=, this]{
+            m_starting = true;
+        }
+
+        //  Use the plain dispatch() rather than dispatch_now_blocking():
+        //  start() may be called from a thread that is itself running on
+        //  this pool, and blocking here until a pool thread is free could
+        //  deadlock a capped pool. The returned AsyncTask still lets
+        //  close() join the listener thread.
+        try{
+            AsyncTask task = m_thread_pool.dispatch([=, this]{
                 accept_thread_loop(address, port);
             });
+            {
+                //  m_task_lock, not m_lock: close() only reads the slot
+                //  after it has waited for m_starting to clear, so this
+                //  assignment is the only writer besides close().
+                std::lock_guard<Mutex> lg(m_task_lock);
+                m_accept_thread = std::move(task);
+            }
         }catch (...){
+            {
+                std::lock_guard<Mutex> lg(m_lock);
+                m_starting = false;
+                m_cv.notify_all();
+            }
             m_listeners.run_method(&Listener::on_listen_finished, "Failed to start the listener thread.");
             throw;
+        }
+
+        {
+            std::lock_guard<Mutex> lg(m_lock);
+            m_starting = false;
+            m_cv.notify_all();
         }
     }
 
@@ -82,18 +104,42 @@ public:
     }
 
     virtual void close() noexcept override{
+        {
+            std::unique_lock<Mutex> lg(m_lock);
+            //  Wait for an in-progress start() to publish the listener task
+            //  before we take the task slots.
+            m_cv.wait(lg, [&]{ return !m_starting; });
+            if (m_state.load(std::memory_order_relaxed) != State::NOT_RUNNING){
+                m_close_requested = true;
+                m_state.store(State::DESTRUCTING, std::memory_order_release);
+                m_closing++;
+            }
+        }
+
+        bool drain = false;
+        {
+            std::lock_guard<Mutex> lg(m_lock);
+            drain = (m_closing == 1);
+        }
+        if (!drain){
+            //  Either nothing was running (m_closing == 0), or another
+            //  close() is already draining the threads (m_closing > 1).
+            //  In the second case, wait for it to finish.
+            std::unique_lock<Mutex> lg(m_lock);
+            m_cv.wait(lg, [&]{
+                return m_state.load(std::memory_order_relaxed) == State::NOT_RUNNING;
+            });
+            return;
+        }
+
         AsyncTask accept_thread;
         AsyncTask client_thread;
         {
-            std::lock_guard<Mutex> lg(m_lock);
-            if (m_state.load(std::memory_order_relaxed) == State::NOT_RUNNING
-                && !m_accept_thread
-                && !m_client_thread){
-                //  Never started, or already fully closed.
-                return;
-            }
-            m_close_requested = true;
-            m_state.store(State::DESTRUCTING, std::memory_order_release);
+            //  m_task_lock, not m_lock: moving the tasks out destroys the
+            //  old AsyncTask objects, and their destructors wait for the
+            //  tasks to finish - which they can only do if they can acquire
+            //  m_lock.
+            std::lock_guard<Mutex> lg(m_task_lock);
             accept_thread = std::move(m_accept_thread);
             m_accept_thread = AsyncTask();
             client_thread = std::move(m_client_thread);
@@ -105,9 +151,13 @@ public:
         accept_thread.wait_and_ignore_exceptions();
         client_thread.wait_and_ignore_exceptions();
 
-        std::lock_guard<Mutex> lg(m_lock);
-        m_state.store(State::NOT_RUNNING, std::memory_order_release);
-        m_close_requested = false;
+        {
+            std::lock_guard<Mutex> lg(m_lock);
+            m_state.store(State::NOT_RUNNING, std::memory_order_release);
+            m_close_requested = false;
+            m_closing = 0;
+            m_cv.notify_all();
+        }
     }
 
     virtual size_t send(const void* data, size_t bytes) override{
@@ -257,6 +307,7 @@ private:
             }
 
             bool rejected = false;
+            bool accepted = false;
             {
                 std::lock_guard<Mutex> lg(m_lock);
                 State state = m_state.load(std::memory_order_relaxed);
@@ -273,18 +324,29 @@ private:
                     m_client = client_socket;
                     m_close_requested = false;
                     m_state.store(State::CONNECTED, std::memory_order_release);
-                    try{
-                        m_client_thread = m_thread_pool.dispatch([this]{
-                            connection_thread_loop();
-                        });
-                    }catch (...){
-                        //  The connection thread could not be started. Drop
-                        //  this connection and keep listening.
-                        ::close(m_client);
-                        m_client = -1;
-                        m_client_thread = AsyncTask();
-                        m_state.store(State::LISTENING, std::memory_order_release);
-                    }
+                    accepted = true;
+                }
+            }
+
+            if (accepted){
+                //  Start the connection thread without holding m_lock.
+                //  The assignment to m_client_thread destroys the previous
+                //  connection task's AsyncTask, whose destructor waits for
+                //  that task to finish - and that task may be blocked on
+                //  m_lock.
+                try{
+                    AsyncTask task = m_thread_pool.dispatch([this]{
+                        connection_thread_loop();
+                    });
+                    std::lock_guard<Mutex> lg(m_task_lock);
+                    m_client_thread = std::move(task);
+                }catch (...){
+                    //  The connection thread could not be started. Drop
+                    //  this connection and keep listening.
+                    std::lock_guard<Mutex> lg(m_lock);
+                    ::close(client_socket);
+                    m_client = -1;
+                    m_state.store(State::LISTENING, std::memory_order_release);
                 }
             }
 
@@ -397,6 +459,15 @@ private:
 private:
     ThreadPool& m_thread_pool;
     Mutex m_lock;
+    ConditionVariable m_cv;
+    bool m_starting = false;
+    int m_closing = 0;
+
+    //  Protects m_accept_thread and m_client_thread. Kept separate from
+    //  m_lock: assigning to a task slot destroys the previous task's
+    //  AsyncTask, and its destructor waits for that task to finish - which
+    //  requires m_lock, so the two locks must never be held at once.
+    Mutex m_task_lock;
 
     int m_listen = -1;
     int m_client = -1;
