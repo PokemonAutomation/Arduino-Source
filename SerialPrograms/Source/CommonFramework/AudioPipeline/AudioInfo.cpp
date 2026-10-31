@@ -58,10 +58,10 @@ AudioSampleFormat sample_format_of(const QAudioFormat& format){
         return AudioSampleFormat::SINT32;
     default:
         throw InternalProgramError(
-			nullptr,
-			PA_CURRENT_FUNCTION,
-			"Unsupported audio sample format."
-		);
+            nullptr,
+            PA_CURRENT_FUNCTION,
+            "Unsupported audio sample format."
+        );
     }
 }
 
