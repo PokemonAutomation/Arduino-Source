@@ -13,7 +13,7 @@
 #include "Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.h"
 #include "Inference/Map/PokemonFRLG_PokemonLeagueDetectors.h"
-#include "Inference/Menus/PokemonFRLG_BagDetector_Tests.h"
+#include "Inference/Menus/PokemonFRLG_BagDetector.h"
 #include "Inference/Menus/PokemonFRLG_PartyEmptySlotDetector.h"
 #include "Inference/Menus/PokemonFRLG_PartyHeldItemDetector.h"
 #include "Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
