@@ -514,6 +514,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/AudioPipeline/AudioSource.h
     Source/CommonFramework/AudioPipeline/AudioTemplate.cpp
     Source/CommonFramework/AudioPipeline/AudioTemplate.h
+    Source/CommonFramework/AudioPipeline/Backends/AudioDeviceInfo.cpp
+    Source/CommonFramework/AudioPipeline/Backends/AudioDeviceInfo.h
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.cpp
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.h
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQtThread.cpp
