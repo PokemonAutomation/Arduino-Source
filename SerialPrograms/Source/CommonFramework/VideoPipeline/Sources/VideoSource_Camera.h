@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_VideoPipeline_VideoSource_Camera_H
 #define PokemonAutomation_VideoPipeline_VideoSource_Camera_H
 
+#include <string>
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
 #include "CommonFramework/VideoPipeline/VideoSourceDescriptor.h"
 
@@ -18,10 +19,7 @@ public:
     VideoSourceDescriptor_Camera()
         : VideoSourceDescriptor(VideoSourceType::Camera)
     {}
-    VideoSourceDescriptor_Camera(CameraInfo info)
-        : VideoSourceDescriptor(VideoSourceType::Camera)
-        , m_info(std::move(info))
-    {}
+    VideoSourceDescriptor_Camera(CameraInfo info);
 
 
 public:
@@ -40,7 +38,10 @@ public:
 
 
 private:
+    void update_display_name();
+
     CameraInfo m_info;
+    std::string m_display_name;
 };
 
 
