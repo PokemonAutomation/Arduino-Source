@@ -13,7 +13,7 @@
 #include <QTimer>
 #include "3rdParty/QtWavFile/WavFile.h"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/AudioPipeline/AudioInfo.h"
+#include "CommonFramework/AudioPipeline/AudioFormat.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioFileLoader.h"
 #include "AudioInputFile.h"

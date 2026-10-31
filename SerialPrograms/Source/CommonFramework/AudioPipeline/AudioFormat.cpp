@@ -1,4 +1,4 @@
-/*  Audio Input Device Info
+/*  Audio Format
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -8,7 +8,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Kernels/AudioPipeline/Kernels_AudioPipeline.h"
-#include "AudioInfo.h"
+#include "AudioFormat.h"
 
 //#include <iostream>
 //using std::cout;

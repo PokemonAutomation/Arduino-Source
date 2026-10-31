@@ -11,7 +11,7 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioSource_H
 #define PokemonAutomation_AudioPipeline_AudioSource_H
 
-#include "CommonFramework/AudioPipeline/AudioInfo.h"
+#include "CommonFramework/AudioPipeline/AudioFormat.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
