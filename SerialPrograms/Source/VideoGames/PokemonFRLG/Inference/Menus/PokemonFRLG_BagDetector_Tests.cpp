@@ -47,9 +47,8 @@ private:
 void add_tests_BagDetector(UnitTestDatabase& database){
     database.add<Test_BagDetector>("PokemonFRLG/Bag/Items_Top.png", true);
     database.add<Test_BagDetector>("PokemonFRLG/Bag/KeyItems_Top.png", true);
-    //  Scrolled down: a bag, but a red up-arrow covers the middle of the top
-    //  frame, and the detector's strip there runs under it, so it reads no bag.
-    database.add<Test_BagDetector>("PokemonFRLG/Bag/Items_Scrolled.png", false);
+    //  Scrolled down: a red up-arrow covers the middle of the top frame.
+    database.add<Test_BagDetector>("PokemonFRLG/Bag/Items_Scrolled.png", true);
 
     database.add<Test_BagDetector>("PokemonFRLG/Party/Party_1.png", false);
     database.add<Test_BagDetector>("PokemonFRLG/Box/BoxSelection_White.png", false);
