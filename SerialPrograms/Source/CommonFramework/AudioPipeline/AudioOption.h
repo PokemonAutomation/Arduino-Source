@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <map>
+#include "CommonFramework/AudioPipeline/Backends/AudioDeviceInfo.h"
 #include "AudioInfo.h"
 #include "AudioSourceDescriptor.h"
 

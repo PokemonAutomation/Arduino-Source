@@ -15,6 +15,7 @@
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/AudioPipeline/AudioPassthroughPair.h"
+#include "CommonFramework/AudioPipeline/Backends/AudioDeviceInfo.h"
 
 namespace PokemonAutomation{
 

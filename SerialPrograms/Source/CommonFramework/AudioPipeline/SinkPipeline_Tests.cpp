@@ -42,6 +42,7 @@
 #include "Kernels/AudioResampler/Kernels_AudioResampler.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/AudioPipeline/AudioInfo.h"
+#include "CommonFramework/AudioPipeline/Backends/AudioDeviceInfo.h"
 #include "CommonFramework/AudioPipeline/Tools/ChannelMixer.h"
 #include "CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.h"
 #include "CommonFramework/AudioPipeline/Sources/AudioSource_File.h"
