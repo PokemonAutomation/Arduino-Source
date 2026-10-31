@@ -11,6 +11,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/AudioInfo.h"
+#include "CommonFramework/AudioPipeline/AudioInputChoice.h"
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 #include "CommonFramework/Recording/StreamHistoryOption.h"
 

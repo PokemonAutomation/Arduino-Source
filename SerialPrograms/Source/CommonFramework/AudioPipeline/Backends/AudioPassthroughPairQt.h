@@ -14,6 +14,7 @@
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "CommonFramework/AudioPipeline/AudioInputChoice.h"
 #include "CommonFramework/AudioPipeline/AudioPassthroughPair.h"
 #include "CommonFramework/AudioPipeline/Backends/AudioDeviceInfo.h"
 

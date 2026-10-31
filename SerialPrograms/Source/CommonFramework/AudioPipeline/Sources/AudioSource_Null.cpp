@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Json/JsonValue.h"
+#include "CommonFramework/AudioPipeline/AudioInputChoice.h"
 #include "AudioSource_Null.h"
 
 namespace PokemonAutomation{
