@@ -42,20 +42,8 @@ size_t sample_size(AudioSampleFormat format){
 }
 
 
-Kernels::AudioPipeline::SampleFormat to_sample_format(AudioSampleFormat format){
-    switch (format){
-    case AudioSampleFormat::UINT8:   return Kernels::AudioPipeline::SampleFormat::UINT8;
-    case AudioSampleFormat::SINT16:  return Kernels::AudioPipeline::SampleFormat::SINT16;
-    case AudioSampleFormat::SINT32:  return Kernels::AudioPipeline::SampleFormat::SINT32;
-    case AudioSampleFormat::FLOAT32: return Kernels::AudioPipeline::SampleFormat::FLOAT32;
-    default:
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unsupported audio sample format.");
-    }
-}
-
-
-AudioSampleFormat get_sample_format(const QAudioFormat& native_format){
-    switch (native_format.sampleFormat()){
+AudioSampleFormat sample_format_of(const QAudioFormat& format){
+    switch (format.sampleFormat()){
     case QAudioFormat::SampleFormat::Float:
         return AudioSampleFormat::FLOAT32;
     case QAudioFormat::SampleFormat::UInt8:
@@ -65,7 +53,7 @@ AudioSampleFormat get_sample_format(const QAudioFormat& native_format){
     case QAudioFormat::SampleFormat::Int32:
         return AudioSampleFormat::SINT32;
     default:
-        return AudioSampleFormat::INVALID;
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unsupported audio sample format.");
     }
 }
 
@@ -79,7 +67,7 @@ AudioFormat::AudioFormat(QAudioFormat native_format)
 {}
 
 AudioSampleFormat AudioFormat::sample_format() const{
-    return get_sample_format(*m_native_format);
+    return sample_format_of(*m_native_format);
 }
 size_t AudioFormat::sample_rate() const{
     return m_native_format->sampleRate();
