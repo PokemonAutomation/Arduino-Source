@@ -10,6 +10,7 @@
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
+#include "Tests/ImageUnitTest.h"
 #include "Pokemon/Pokemon_Types.h"
 #include "PokemonHome_GigantamaxDetector.h"
 #include "PokemonHome_TeraTypeReader.h"
@@ -296,20 +297,22 @@ PokemonTeraType read_pokemon_tera_type(
     return filtered.begin()->second.first;
 }
 
-class Test_TeraTypeReader : public UnitTest{
+class Test_TeraTypeReader : public ImageUnitTest{
 public:
 
     Test_TeraTypeReader(
         const std::string& image,
         PokemonTeraType expected
     )
-        : UnitTest("PokemonHome::TeraTypeReader - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonHome::TeraTypeReader - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
         PokemonTeraType result = read_pokemon_tera_type(image);
         
         if (result == m_expected)
@@ -319,7 +322,6 @@ public:
     };
 
 private:
-    std::string m_image;
     PokemonTeraType m_expected;
 };
 

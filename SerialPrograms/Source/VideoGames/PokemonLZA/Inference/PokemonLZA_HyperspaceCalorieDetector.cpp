@@ -11,6 +11,7 @@
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/OCR/OCR_Routines.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonLZA_HyperspaceCalorieDetector.h"
 
@@ -129,21 +130,23 @@ bool HyperspaceCalorieLimitWatcher::process_frame(const ImageViewRGB32& frame, W
 }
 
 
-class Test_HyperspaceCalorieDetector : public UnitTest{
+class Test_HyperspaceCalorieDetector : public ImageUnitTest{
 public:
     Test_HyperspaceCalorieDetector(const std::string& image, int expected_calorie)
-        : UnitTest("PokemonPLZA::HyperspaceCalorieDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonPLZA::HyperspaceCalorieDetector - " + image, {image})
         , m_expected_calorie(expected_calorie)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         if (m_expected_calorie <= 0 || m_expected_calorie > 9999){
             return "Error: expected calorie must be in range [1, 9999].";
         }
 
         HyperspaceCalorieDetector detector(logger);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         if (!detector.detect(image)){
             return "Error: detector failed to detect calorie number in image.";
         }
@@ -153,7 +156,6 @@ public:
     }
 
 private:
-    std::string m_image;
     int m_expected_calorie;
 };
 

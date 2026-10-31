@@ -6,8 +6,8 @@
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonSwSh_MainMenuDetector.h"
 
 //#include <iostream>
@@ -104,26 +104,27 @@ bool PartyMenuDetector::detect(const ImageViewRGB32& screen){
     return true;
 }
 
-class Test_PartyMenuDetector : public UnitTest{
+class Test_PartyMenuDetector : public ImageUnitTest{
 public:
     Test_PartyMenuDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonSwSh::PartyMenuDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSwSh::PartyMenuDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
         PartyMenuDetector detector;
 
         return m_expected == detector.detect(image);
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

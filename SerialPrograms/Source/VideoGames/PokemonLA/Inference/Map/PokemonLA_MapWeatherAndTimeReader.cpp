@@ -8,12 +8,12 @@
 #include <sstream>
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "CommonTools/ImageMatch/SilhouetteDictionaryMatcher.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "VideoGames/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h"
 #include "PokemonLA_MapWeatherAndTimeReader.h"
@@ -133,18 +133,20 @@ TimeOfDay detect_time_of_day_on_map(Logger& logger, const ImageViewRGB32& screen
 
 
 
-class Test_MapWeatherAndTimeReader : public UnitTest{
+class Test_MapWeatherAndTimeReader : public ImageUnitTest{
 public:
     Test_MapWeatherAndTimeReader(
         const std::string& image,
         std::vector<std::string> keywords
     )
-        : UnitTest("PokemonLA::MapWeatherAndTimeReader - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonLA::MapWeatherAndTimeReader - " + image, {image})
         , m_keywords(std::move(keywords))
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         // two keywords: <Weather name> <Time of day name>
         if (m_keywords.size() < 2){
             std::stringstream ss;
@@ -155,7 +157,7 @@ public:
         const auto& target_weather = m_keywords[m_keywords.size()-2];
         const auto& target_time = m_keywords[m_keywords.size()-1];
 
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         const std::string weather_result = WEATHER_NAMES[(int)detect_weather_on_map(logger, image)];
         const std::string time_result = TIME_OF_DAY_NAMES[(int)detect_time_of_day_on_map(logger, image)];
 
@@ -166,7 +168,6 @@ public:
     };
 
 private:
-    std::string m_image;
     std::vector<std::string> m_keywords;
 };
 

@@ -8,10 +8,10 @@
 #include <random>
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Common/Cpp/Strings/Unicode.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
+#include "Tests/ImageUnitTest.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "OCR_Routines.h"
 #include "OCR_StringNormalization.h"
@@ -35,21 +35,23 @@ void add_tests(UnitTestDatabase& database){
     add_tests_multiline_OCR(database);
 }
 
-class Test_RawOCR : public UnitTest{
+class Test_RawOCR : public ImageUnitTest{
 public:
     Test_RawOCR(
         const std::string& image,
         Language language,
         const std::string& expected
     )
-        : UnitTest("OCR::RawOCR - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("OCR::RawOCR - " + image, {image})
         , m_language(language)
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
 
         std::string result = ocr_read(m_language, image);
         logger.log("Raw OCR read: " + result);
@@ -58,12 +60,11 @@ public:
     };
 
 private:
-    std::string m_image;
     Language m_language;
     std::string m_expected;
 };
 
-class Test_NumberWaterfillOCR : public UnitTest{
+class Test_NumberWaterfillOCR : public ImageUnitTest{
 public:
     Test_NumberWaterfillOCR(
         const std::string& image_path,
@@ -71,16 +72,18 @@ public:
         uint32_t rgb32_min, uint32_t rgb32_max,
         bool text_inside_range
     )
-        : UnitTest("OCR::NumberWaterfillOCR - " + image_path)
-        , m_image_path(UNIT_TEST_RESOURCE_PATH() + image_path)
+        : ImageUnitTest("OCR::NumberWaterfillOCR - " + image_path, {image_path})
         , m_expected(expected)
         , m_rgb32_min(rgb32_min)
         , m_rgb32_max(rgb32_max)
         , m_text_inside_range(text_inside_range)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image_path);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
 
         int result = OCR::read_number_waterfill(
             logger, image,
@@ -92,7 +95,6 @@ public:
     };
 
 private:
-    std::string m_image_path;
     int m_expected;
     uint32_t m_rgb32_min;
     uint32_t m_rgb32_max;
@@ -136,7 +138,7 @@ void add_tests_number_waterfill_OCR(UnitTestDatabase& database){
 // Crop `box` out of a screenshot, run multi-line OCR on it, and check that it finds
 // exactly the expected lines in order. Each line is compared after
 // `normalize_utf32()`, which ignores punctuation and whitespace.
-class Test_MultilineOCR : public UnitTest{
+class Test_MultilineOCR : public ImageUnitTest{
 public:
     Test_MultilineOCR(
         const std::string& image,
@@ -144,15 +146,17 @@ public:
         Language language,
         std::vector<std::string> expected_lines
     )
-        : UnitTest("OCR::MultilineOCR - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("OCR::MultilineOCR - " + image, {image})
         , m_box(box)
         , m_language(language)
         , m_expected_lines(std::move(expected_lines))
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
         ImageViewRGB32 cropped = extract_box_reference(image, m_box);
 
         std::string result = ocr_read(m_language, cropped, PageSegMode::SINGLE_BLOCK);
@@ -186,7 +190,6 @@ public:
     };
 
 private:
-    std::string m_image;
     ImagePixelBox m_box;
     Language m_language;
     std::vector<std::string> m_expected_lines;

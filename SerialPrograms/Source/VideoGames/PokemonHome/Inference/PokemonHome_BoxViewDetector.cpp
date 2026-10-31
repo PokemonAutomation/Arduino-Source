@@ -6,11 +6,11 @@
 
 #include <string>
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_ButtonDetector.h"
 #include "PokemonHome_BoxViewDetector.h"
@@ -31,27 +31,28 @@ bool BoxViewDetector::detect(const ImageViewRGB32& screen){
 
 
 
-class Test_BoxViewDetector : public UnitTest{
+class Test_BoxViewDetector : public ImageUnitTest{
 public:
 
     Test_BoxViewDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonHome::BoxViewDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonHome::BoxViewDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay overlay;
         BoxViewDetector detector(&overlay);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

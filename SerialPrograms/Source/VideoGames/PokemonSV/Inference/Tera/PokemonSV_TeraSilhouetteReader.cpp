@@ -6,10 +6,10 @@
 
 #include <opencv2/imgproc.hpp>
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "VideoGames/PokemonSV/Resources/PokemonSV_PokemonSprites.h"
 #include "PokemonSV_TeraSilhouetteReader.h"
@@ -131,21 +131,23 @@ ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& sc
 
 
 
-class Test_TeraSilhouetteReader : public UnitTest{
+class Test_TeraSilhouetteReader : public ImageUnitTest{
 public:
     Test_TeraSilhouetteReader(
         const std::string& image,
         std::string expected
     )
-        : UnitTest("PokemonSV::TeraSilhouetteReader - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::TeraSilhouetteReader - " + image, {image})
         , m_expected(std::move(expected))
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         TeraSilhouetteReader reader(COLOR_RED);
 
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         ImageMatch::ImageMatchResult slugs = reader.read(image);
         if (slugs.results.empty()){
             std::stringstream ss;
@@ -160,7 +162,6 @@ public:
     };
 
 private:
-    std::string m_image;
     std::string m_expected;
 };
 

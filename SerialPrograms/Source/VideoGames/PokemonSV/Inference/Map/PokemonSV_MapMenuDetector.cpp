@@ -4,11 +4,11 @@
  *
  */
 
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonSV_MapMenuDetector.h"
 
@@ -102,25 +102,26 @@ bool MapDestinationMenuWatcher::process_frame(const ImageViewRGB32& screen, Wall
 }
 
 
-class Test_MapFlyMenuDetector : public UnitTest{
+class Test_MapFlyMenuDetector : public ImageUnitTest{
 public:
     Test_MapFlyMenuDetector(const std::string& image, bool expected)
-        : UnitTest("PokemonSV::MapFlyMenuDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::MapFlyMenuDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         MapFlyMenuDetector fly_menu(COLOR_RED);
         MapDestinationMenuDetector dest_menu(COLOR_RED);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         TEST_RESULT_EQUAL_STR(fly_menu.detect(image), m_expected);
         TEST_RESULT_EQUAL_STR(dest_menu.detect(image), !m_expected);
         return true;
     }
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

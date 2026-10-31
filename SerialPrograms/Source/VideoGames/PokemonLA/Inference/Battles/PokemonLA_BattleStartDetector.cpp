@@ -5,12 +5,12 @@
  */
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageGradient.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonLA_BattleStartDetector.h"
 
@@ -74,26 +74,27 @@ bool BattleStartDetector::process_frame(const ImageViewRGB32& frame, WallClock t
 
 
 
-class Test_BattleStartDetector : public UnitTest{
+class Test_BattleStartDetector : public ImageUnitTest{
 public:
     Test_BattleStartDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonLA::BattleStartDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonLA::BattleStartDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay overlay;
         BattleStartDetector detector(logger, overlay);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.process_frame(image, current_time()) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

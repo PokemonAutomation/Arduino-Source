@@ -7,10 +7,10 @@
 #include <iostream>
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/StaticGlobals.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonLZA_ButtonDetector.h"
 
@@ -283,28 +283,29 @@ bool ButtonDetector::detect(const ImageViewRGB32& screen){
 
 
 
-class Test_ButtonDetector : public UnitTest{
+class Test_ButtonDetector : public ImageUnitTest{
 public:
     Test_ButtonDetector(
         const std::string& image,
         ButtonType expected_button,
         bool expected
     )
-        : UnitTest("PokemonPLZA::ButtonDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonPLZA::ButtonDetector - " + image, {image})
         , m_expected_button(expected_button)
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay overlay;
         ButtonDetector detector(COLOR_RED, m_expected_button, ImageFloatBox(0.0, 0.0, 1.0, 1.0), &overlay);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     ButtonType m_expected_button;
     bool m_expected;
 };

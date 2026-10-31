@@ -20,6 +20,7 @@
 #include "CommonTools/OCR/OCR_DictionaryMatcher.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/OCR/OCR_StringNormalization.h"
+#include "Tests/ImageUnitTest.h"
 #include "Pokemon/Inference/Pokemon_AbilityReader.h"
 #include "Pokemon/Inference/Pokemon_NatureReader.h"
 #include "PokemonHome_SummaryReader.h"
@@ -220,18 +221,20 @@ int SummaryReader::read_level(Logger& logger, const ImageViewRGB32& screen) cons
     }
 }
 
-class Test_SummaryReader_Numbers : public UnitTest{
+class Test_SummaryReader_Numbers : public ImageUnitTest{
 public:
     Test_SummaryReader_Numbers(const std::string& image, int expected_dex, int expected_ot_id, int expected_level)
-        : UnitTest("PokemonHome::SummaryReader_Numbers - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonHome::SummaryReader_Numbers - " + image, {image})
         , m_expected_dex(expected_dex)
         , m_expected_ot_id(expected_ot_id)
         , m_expected_level(expected_level)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
         SummaryReader reader;
         int dex = reader.read_national_dex(logger, image);
         int ot_id = reader.read_original_trainer_id(logger, image);
@@ -251,24 +254,25 @@ public:
     }
 
 private:
-    std::string m_image;
     int m_expected_dex;
     int m_expected_ot_id;
     int m_expected_level;
 };
 
-class Test_SummaryReader_Text : public UnitTest{
+class Test_SummaryReader_Text : public ImageUnitTest{
 public:
     Test_SummaryReader_Text(const std::string& image, std::string expected_nature, std::string expected_ability, Language language)
-        : UnitTest("PokemonHome::SummaryReader_Text - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonHome::SummaryReader_Text - " + image, {image})
         , m_expected_nature(expected_nature)
         , m_expected_ability(expected_ability)
         , m_language(language)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
         SummaryReader reader;
 
         std::string nature = reader.read_nature(logger, m_language, image);
@@ -285,23 +289,24 @@ public:
     }
 
 private:
-    std::string m_image;
     std::string m_expected_nature;
     std::string m_expected_ability;
     Language m_language;
 };
 
-class Test_SummaryReader_OtName : public UnitTest{
+class Test_SummaryReader_OtName : public ImageUnitTest{
 public:
     Test_SummaryReader_OtName(const std::string& image, std::string expected_ot_name, Language language)
-        : UnitTest("PokemonHome::SummaryReader_OtName - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonHome::SummaryReader_OtName - " + image, {image})
         , m_expected_ot_name(expected_ot_name)
         , m_language(language)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
         SummaryReader reader;
         std::string ot_name = reader.read_original_trainer_name(m_language, image);
         if (ot_name == m_expected_ot_name){
@@ -312,21 +317,22 @@ public:
     }
 
 private:
-    std::string m_image;
     std::string m_expected_ot_name;
     Language m_language;
 };
 
-class Test_SummaryReader_LanguageOfOrigin : public UnitTest{
+class Test_SummaryReader_LanguageOfOrigin : public ImageUnitTest{
 public:
     Test_SummaryReader_LanguageOfOrigin(const std::string& image, std::string expected)
-        : UnitTest("PokemonHome::SummaryReader_LanguageOfOrigin - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonHome::SummaryReader_LanguageOfOrigin - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
         std::string language = SummaryReader().read_language_of_origin(image);
         if (language == m_expected){
             return true;
@@ -336,7 +342,6 @@ public:
     }
 
 private:
-    std::string m_image;
     std::string m_expected;
 };
 

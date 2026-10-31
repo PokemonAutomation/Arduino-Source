@@ -7,10 +7,10 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonSV_SandwichHandDetector.h"
 
@@ -160,18 +160,20 @@ bool SandwichHandWatcher::recover_sandwich_hand_position(const ImageViewRGB32& f
 
 
 
-class Test_SandwichHandWatcher : public UnitTest{
+class Test_SandwichHandWatcher : public ImageUnitTest{
 public:
     Test_SandwichHandWatcher(
         const std::string& image,
         std::vector<std::string> words
     )
-        : UnitTest("PokemonSV::SandwichHandWatcher - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::SandwichHandWatcher - " + image, {image})
         , m_words(std::move(words))
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         // five words: hand_type("Free"/"Grabbing"), <image float box (four words total)>
         if (m_words.size() < 5){
             std::stringstream ss;
@@ -212,7 +214,7 @@ public:
             }
         }
 
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         auto result = detector.detect(image);
         bool has_hand = result.first >= 0.0;
 
@@ -222,7 +224,6 @@ public:
     };
 
 private:
-    std::string m_image;
     std::vector<std::string> m_words;
 };
 

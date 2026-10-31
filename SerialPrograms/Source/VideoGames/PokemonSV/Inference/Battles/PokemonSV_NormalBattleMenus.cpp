@@ -5,12 +5,12 @@
  */
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "Tests/ImageUnitTest.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSV_NormalBattleMenus.h"
@@ -377,47 +377,49 @@ bool WipeoutDetector::detect(const ImageViewRGB32& screen){
 
 
 
-class Test_SwapMenuDetector : public UnitTest{
+class Test_SwapMenuDetector : public ImageUnitTest{
 public:
     Test_SwapMenuDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonSV::SwapMenuDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::SwapMenuDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         SwapMenuDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 
-class Test_TerastallizingDetector : public UnitTest{
+class Test_TerastallizingDetector : public ImageUnitTest{
 public:
     Test_TerastallizingDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonSV::TerastallizingDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::TerastallizingDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         TerastallizingDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

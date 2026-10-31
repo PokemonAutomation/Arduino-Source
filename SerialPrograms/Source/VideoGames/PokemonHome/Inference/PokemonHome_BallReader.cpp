@@ -8,13 +8,13 @@
 #include <map>
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "VideoGames/PokemonHome/Resources/PokemonHome_PokeballSprites.h"
 #include "PokemonHome_BallReader.h"
@@ -311,25 +311,27 @@ std::string BallReader::read_ball(const ImageViewRGB32& screen) const{
     return sprite_result.results.begin()->second;
 }
 
-class Test_BallReader : public UnitTest{
+class Test_BallReader : public ImageUnitTest{
 public:
 
     Test_BallReader(
         const std::string& image,
         const std::string& expected
     )
-        : UnitTest("PokemonHome::BallReader - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonHome::BallReader - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyAudioFeed audio_feed;
         DummyVideoFeed video_feed;
         StreamHistorySession history(logger);
         DummyVideoOverlay video_overlay;
         VideoStream stream(logger, audio_feed, video_feed, history, video_overlay);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         BallReader reader(stream);
         std::string result = reader.read_ball(image);
 
@@ -340,7 +342,6 @@ public:
     };
 
 private:
-    std::string m_image;
     std::string m_expected;
 };
 
