@@ -1667,6 +1667,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.cpp
     Source/PokemonBDSP/Resources/PokemonBDSP_NameDatabase.h
+    Source/VideoGames/PokemonFRLG/Inference/Box/PokemonFRLG_BoxGenderReader.cpp
+    Source/VideoGames/PokemonFRLG/Inference/Box/PokemonFRLG_BoxGenderReader.h
     Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.cpp
     Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h
     Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.cpp

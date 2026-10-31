@@ -8,7 +8,7 @@
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/StaticGlobals.h"
-#include "Tests/TestUtils.h"
+#include "Inference/Box/PokemonFRLG_BoxGenderReader.h"
 #include "Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.h"
@@ -25,6 +25,7 @@
 #include "Inference/PokemonFRLG_TrainerIdReader.h"
 #include "Inference/PokemonFRLG_WildEncounterReader.h"
 #include "PokemonFRLG_Navigation.h"
+#include "Tests/TestUtils.h"
 
 #include "PokemonFRLG_Tests.h"
 namespace PokemonAutomation{
@@ -261,6 +262,7 @@ void add_tests_ExitWildBattle(UnitTestDatabase& database){
 
 void add_tests(UnitTestDatabase& database){
     add_tests_AdvanceWhiteDialogDetector(database);
+    add_tests_BoxGenderReader(database);
     add_tests_SelectionDialogDetector(database);
     add_tests_ShinySymbolDetector(database);
     add_tests_PrizeSelectDetector(database);
