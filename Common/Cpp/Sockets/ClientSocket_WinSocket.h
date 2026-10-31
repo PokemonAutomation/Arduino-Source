@@ -238,42 +238,79 @@ private:
             server.sin_addr.s_addr = inet_addr(address.c_str());
 
             //  Connect
+            SOCKET socket = m_socket.load(std::memory_order_acquire);
+            if (socket == INVALID_SOCKET){
+                return;
+            }
+
+            bool in_progress = false;
             while (true){
                 State state = m_state.load(std::memory_order_relaxed);
                 if (state == State::DESTRUCTING){
                     return;
                 }
 
-                SOCKET socket = m_socket.load(std::memory_order_acquire);
-                if (socket == INVALID_SOCKET){
-                    return;
+                if (!in_progress){
+                    int ret = ::connect(socket, (struct sockaddr*)&server, sizeof(server));
+                    if (ret != SOCKET_ERROR){
+                        break;
+                    }
+
+                    int error = WSAGetLastError();
+//                    cout << "error = " << error << endl;
+                    if (error != WSAEWOULDBLOCK && error != WSAEINPROGRESS){
+                        if (error == WSAETIMEDOUT){
+                            connection_lost_locked(lg, "Connection timed out.", false);
+                        }else{
+                            connection_lost_locked(lg, "WSA Error Code: " + std::to_string(error), false);
+                        }
+                        return;
+                    }
+                    in_progress = true;
                 }
 
-                if (::connect(socket, (struct sockaddr*)&server, sizeof(server)) != SOCKET_ERROR){
-                    break;
+                //  Once the connect is in progress, calling connect() again
+                //  is not safe on Windows: when the attempt fails, the
+                //  second connect() returns WSAEINVAL instead of starting a
+                //  new attempt. So wait for the socket to become writable
+                //  and read the result with getsockopt(SO_ERROR).
+                fd_set write_set;
+                FD_ZERO(&write_set);
+                FD_SET(socket, &write_set);
+                timeval tv;
+                tv.tv_sec = 0;
+                tv.tv_usec = 10000;
+                int ret = ::select(0, nullptr, &write_set, nullptr, &tv);
+                if (ret == SOCKET_ERROR){
+                    int error = WSAGetLastError();
+                    if (error != WSAEINTR){
+                        connection_lost_locked(lg, "select() failed: WSA Error Code: " + std::to_string(error), false);
+                        return;
+                    }
+                    continue;
+                }
+                if (ret == 0){
+                    continue;
                 }
 
-                int error = WSAGetLastError();
-//                cout << "error = " << error << endl;
-
-                switch (error){
-                case WSAEISCONN:
-                    goto Connected;
-                case WSAEWOULDBLOCK:
+                int so_error = 0;
+                int so_len = sizeof(so_error);
+                if (getsockopt(socket, SOL_SOCKET, SO_ERROR, (char*)&so_error, &so_len) == SOCKET_ERROR){
+                    so_error = WSAGetLastError();
+                }
+                if (so_error == 0){
                     break;
-                case WSAETIMEDOUT:
+                }
+                if (so_error == WSAETIMEDOUT){
                     connection_lost_locked(lg, "Connection timed out.", false);
-                    return;
-                default:
-                    connection_lost_locked(lg, "WSA Error Code: " + std::to_string(error), false);
-                    return;
+                }else if (so_error == WSAECONNREFUSED){
+                    connection_lost_locked(lg, "Connection refused.", false);
+                }else{
+                    connection_lost_locked(lg, "WSA Error Code: " + std::to_string(so_error), false);
                 }
-
-                m_cv.wait_for(lg, std::chrono::milliseconds(10));
-
+                return;
             }
 
-Connected:
             m_state.store(State::CONNECTED, std::memory_order_relaxed);
         }
 
