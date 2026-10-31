@@ -37,7 +37,11 @@ size_t sample_size(AudioSampleFormat format){
     case AudioSampleFormat::FLOAT32:
         return sizeof(float);
     default:
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid AudioSampleFormat: " + std::to_string((size_t)format));
+        throw InternalProgramError(
+            nullptr,
+            PA_CURRENT_FUNCTION,
+            "Invalid AudioSampleFormat: " + std::to_string((size_t)format)
+        );
     }
 }
 
@@ -53,7 +57,11 @@ AudioSampleFormat sample_format_of(const QAudioFormat& format){
     case QAudioFormat::SampleFormat::Int32:
         return AudioSampleFormat::SINT32;
     default:
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unsupported audio sample format.");
+        throw InternalProgramError(
+			nullptr,
+			PA_CURRENT_FUNCTION,
+			"Unsupported audio sample format."
+		);
     }
 }
 
@@ -113,8 +121,9 @@ bool audio_format_valid(const QAudioFormat& format){
 //
 const char* standard_layout_name(size_t channels, QAudioFormat::ChannelConfig config){
     const QAudioFormat::ChannelConfig standard = standard_channel_config(channels);
-    if (standard == QAudioFormat::ChannelConfigUnknown
-        || (config != QAudioFormat::ChannelConfigUnknown && config != standard)){
+    if (standard == QAudioFormat::ChannelConfigUnknown ||
+        (config != QAudioFormat::ChannelConfigUnknown && config != standard)
+    ){
         return "";
     }
     switch (channels){
@@ -251,7 +260,10 @@ std::string AudioInputChoice::display_name() const{
     if (m_reinterpreted){
         layout = m_swap_channels ? "Interleaved Stereo R/L" : "Interleaved Stereo L/R";
     }else{
-        layout = standard_layout_name((size_t)format.channelCount(), format.channelConfig());
+        layout = standard_layout_name(
+            (size_t)format.channelCount(),
+            format.channelConfig()
+        );
     }
     if (!layout.empty()){
         name += " (" + layout + ")";
@@ -288,9 +300,10 @@ AudioInputChoiceList input_choices(std::vector<AudioFormat> supported, const Aud
         for (AudioFormat& kept : deduped){
             const QAudioFormat& k = kept.native_format();
             const QAudioFormat& f = format.native_format();
-            if (k.sampleRate() == f.sampleRate()
-                && k.channelCount() == f.channelCount()
-                && k.channelConfig() == f.channelConfig()){
+            if (k.sampleRate() == f.sampleRate() &&
+                k.channelCount() == f.channelCount() &&
+                k.channelConfig() == f.channelConfig()
+            ){
                 found = true;
                 if (rank_audio_format(f, preferred.native_format()) > rank_audio_format(k, preferred.native_format())){
                     kept = format;
@@ -409,7 +422,9 @@ AudioInputChoiceList build_input_choices(
     if (running.channelCount() == 1 && running.sampleRate() == 96000){
         const bool swap = display_name.find("MiraBox") != std::string::npos;
         for (size_t i = 0; i < ret.choices.size(); i++){
-            if (ret.choices[i].is_reinterpreted() && ret.choices[i].swap_channels() == swap){
+            if (ret.choices[i].is_reinterpreted() &&
+                ret.choices[i].swap_channels() == swap
+            ){
                 ret.preferred_index = i;
                 break;
             }
@@ -466,7 +481,10 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
 
     WallClock end = current_time();
     double seconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() / 1000.;
-    global_logger_tagged().log("Done querying audio inputs... " + tostr_fixed(seconds, 3) + " seconds", COLOR_CYAN);
+    global_logger_tagged().log(
+        "Done querying audio inputs... " + tostr_fixed(seconds, 3) + " seconds",
+        COLOR_CYAN
+    );
 
     return list;
 }
