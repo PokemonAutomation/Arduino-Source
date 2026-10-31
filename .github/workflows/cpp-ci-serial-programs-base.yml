@@ -31,15 +31,20 @@ jobs:
         shell: bash
         run: |
           BUILD_PARALLEL=10
+          # Build with Ninja on every OS. The Ubuntu and macOS runner images already have it, so
+          # it needs no install step. It also finds what to rebuild much faster than Make, which
+          # walks CMake's nested makefiles first.
+          CMAKE_GENERATOR="Ninja"
           if [[ "${{inputs.os}}" == windows* ]]; then
-            # Build with Ninja: ccache can't wrap the compiler under the Visual Studio generator.
+            # On Windows, Ninja also lets ccache work: ccache can't wrap the compiler under the
+            # Visual Studio generator.
             # "Ninja Multi-Config" keeps Visual Studio's output layout (bin/RelWithDebInfo/).
             # ccache also can't cache /FAs listings, so turn them off.
             # CI needs no debug info, so keep RelWithDebInfo's optimization but leave out its
             # debug info: with policy CMP0141, an empty CMAKE_MSVC_DEBUG_INFORMATION_FORMAT
             # drops /Zi, and linking without /debug writes no PDB. Release builds made outside
             # CI keep their debug info.
-            echo "CMAKE_GENERATOR=Ninja Multi-Config" >> $GITHUB_ENV
+            CMAKE_GENERATOR="Ninja Multi-Config"
             CMAKE_ADDITIONAL_FLAGS="-DCMAKE_POLICY_DEFAULT_CMP0141=NEW -DCMAKE_MSVC_DEBUG_INFORMATION_FORMAT= -DCMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO=/INCREMENTAL:NO -DPA_ASSEMBLY_LISTINGS=OFF"
             if [[ "${{inputs.compiler}}" == "clang" ]]; then
               CMAKE_ADDITIONAL_FLAGS="$CMAKE_ADDITIONAL_FLAGS -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl"
@@ -54,6 +59,7 @@ jobs:
             CMAKE_ADDITIONAL_FLAGS="-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=RelWithDebInfo '-DCMAKE_C_FLAGS_RELWITHDEBINFO=-O2 -DNDEBUG' '-DCMAKE_CXX_FLAGS_RELWITHDEBINFO=-O2 -DNDEBUG'"
           fi
           CMAKE_ADDITIONAL_FLAGS="$CMAKE_ADDITIONAL_FLAGS -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache"
+          echo "CMAKE_GENERATOR=$CMAKE_GENERATOR" >> $GITHUB_ENV
           echo "CMAKE_ADDITIONAL_FLAGS=$CMAKE_ADDITIONAL_FLAGS" >> $GITHUB_ENV
           echo "BUILD_PARALLEL=$BUILD_PARALLEL" >> $GITHUB_ENV
 
@@ -203,7 +209,10 @@ jobs:
           mkdir bin
           cd bin
           cmake .. -DQT_MAJOR:STRING=6 ${{env.CMAKE_ADDITIONAL_FLAGS}}
-          cmake --build . --config RelWithDebInfo --parallel ${{env.BUILD_PARALLEL}}
+          # By default Ninja reads each compile's .d dependency file into its own database, then deletes it.
+          # To keep them for the downstream clang-query cache (see .github/scripts/clang-query-cached.py), add
+          # -d keepdepfile
+          cmake --build . --config RelWithDebInfo --parallel ${{env.BUILD_PARALLEL}} -- -d keepdepfile
 
       - name: Prepare upload build
         if: inputs.upload-build
