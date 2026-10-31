@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <QAudioFormat>
-#include "CommonFramework/AudioPipeline/AudioInfo.h"
+#include "CommonFramework/AudioPipeline/AudioFormat.h"
 
 namespace PokemonAutomation{
 

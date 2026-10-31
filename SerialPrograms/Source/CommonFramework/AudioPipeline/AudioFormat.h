@@ -1,11 +1,11 @@
-/*  Audio Device Info
+/*  Audio Format
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_AudioPipeline_AudioInfo_H
-#define PokemonAutomation_AudioPipeline_AudioInfo_H
+#ifndef PokemonAutomation_AudioPipeline_AudioFormat_H
+#define PokemonAutomation_AudioPipeline_AudioFormat_H
 
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Kernels/AudioPipeline/Kernels_AudioPipeline.h"

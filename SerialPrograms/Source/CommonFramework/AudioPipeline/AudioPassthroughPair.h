@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioPassthroughPair_H
 #define PokemonAutomation_AudioPipeline_AudioPassthroughPair_H
 
-#include "AudioInfo.h"
+#include "AudioFormat.h"
 #include "AudioSourceDescriptor.h"
 
 namespace PokemonAutomation{

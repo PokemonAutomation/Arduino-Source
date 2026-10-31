@@ -13,7 +13,7 @@
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/AudioPipeline/AudioInfo.h"
+#include "CommonFramework/AudioPipeline/AudioFormat.h"
 #include "AudioInputChoice.h"
 #include "AudioInfo_Tests.h"
 

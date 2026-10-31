@@ -493,8 +493,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/SerialPABotBase/SerialPABotBase_Protocol.h
     Source/CommonFramework/AudioPipeline/AudioConstants.h
     Source/CommonFramework/AudioPipeline/AudioFeed.h
-    Source/CommonFramework/AudioPipeline/AudioInfo.cpp
-    Source/CommonFramework/AudioPipeline/AudioInfo.h
+    Source/CommonFramework/AudioPipeline/AudioFormat.cpp
+    Source/CommonFramework/AudioPipeline/AudioFormat.h
     Source/CommonFramework/AudioPipeline/AudioInfo_Tests.cpp
     Source/CommonFramework/AudioPipeline/AudioInfo_Tests.h
     Source/CommonFramework/AudioPipeline/AudioInputChoice.cpp

@@ -9,7 +9,7 @@
 
 #include <string>
 #include <vector>
-#include "CommonFramework/AudioPipeline/AudioInfo.h"
+#include "CommonFramework/AudioPipeline/AudioFormat.h"
 #include "CommonFramework/AudioPipeline/AudioInputChoice.h"
 
 namespace PokemonAutomation{
