@@ -1165,6 +1165,12 @@ file(GLOB LIBRARY_SOURCES
     Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_AVX2.cpp
     Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_AVX512.cpp
     Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_SSE42.cpp
+    Source/Kernels/YUVConversion/Kernels_YUVConversion.cpp
+    Source/Kernels/YUVConversion/Kernels_YUVConversion.h
+    Source/Kernels/YUVConversion/Kernels_YUVConversion_Core.h
+    Source/Kernels/YUVConversion/Kernels_YUVConversion_Default.cpp
+    Source/Kernels/YUVConversion/Kernels_YUVConversion_x64_AVX2.cpp
+    Source/Kernels/YUVConversion/Kernels_YUVConversion_x64_SSE41.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_arm64_NEON.cpp
