@@ -27,10 +27,12 @@ class StreamHistorySession
 public:
     ~StreamHistorySession();
     StreamHistorySession(Logger& logger);
-    //  "device" / "format" are the audio session's active input state:
-    //  the tracker's shape and the working-stream attach shape are derived
-    //  from the resolved input choice (invalid when there is no device
-    //  input, i.e. file input or no input at all).
+    //  Starts recording (if no tracker exists yet) and attaches to the audio
+    //  session's working stream. "choice" is the resolved input choice of the
+    //  audio session's active input (invalid when there is no device input,
+    //  i.e. file input or no input at all): with the ffmpeg ring it only
+    //  decides whether audio is recorded; otherwise it also sets the shape
+    //  the tracker records and the working stream is attached at.
     void start(const AudioInputChoice& choice, bool has_video);
     bool save(const std::string& filename) const;
 
@@ -40,7 +42,8 @@ public:
 
 public:
     //  Working stream, delivered in the shape requested at attach time
-    //  (the active preset's physical shape), split (planar) channels.
+    //  (48 kHz stereo for the ffmpeg ring, the active preset's physical
+    //  shape otherwise), split (planar) channels.
     virtual void push_samples(size_t samples, size_t stride, const float* data) override;
     virtual void on_frame(std::shared_ptr<const VideoFrame> frame) override;
 
@@ -58,11 +61,16 @@ public:
     virtual void post_resolution_change(Resolution resolution) override;
 
 private:
+    //  Drop the current tracker / build a new one for the current settings.
+    //  Must be called without the lock: building and destroying a tracker
+    //  opens encoders and starts or joins threads, and the audio and video
+    //  threads spin on the lock (push_samples(), on_frame()) meanwhile.
     void clear();
     void initialize();
 
-    //  Attaches this session to the audio session's working stream at the
-    //  active preset's physical shape (removing any prior attach first).
+    //  Attaches this session to the audio session's working stream
+    //  (removing any prior attach first): at a fixed 48 kHz stereo for the
+    //  ffmpeg ring, at the active preset's physical shape otherwise.
     //  Must be called with no locks held.
     void attach_working_listener();
 

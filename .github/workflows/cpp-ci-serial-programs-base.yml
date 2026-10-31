@@ -103,6 +103,7 @@ jobs:
           cd Arduino-Source
           sudo apt update
           sudo apt install ccache clang-tools libopencv-dev libsystemd-dev
+          sudo apt install libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev
 
           sudo apt install ./3rdPartyBinaries/libdpp-10.1.5-linux-x64.deb
 
@@ -112,7 +113,7 @@ jobs:
           cd Arduino-Source
           # libsodium, openssl@3, opus and pkgconf are libdpp's dependencies, installed here so
           # their versions can go into the libdpp cache key below.
-          brew install opencv@4 onnxruntime ccache libsodium openssl@3 opus pkgconf
+          brew install opencv@4 onnxruntime ccache libsodium openssl@3 opus pkgconf ffmpeg
 
           brew tap-new --no-git PA/libdpp
           brew trust PA/libdpp

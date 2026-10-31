@@ -10,7 +10,11 @@ Install the following packages:
 sudo apt install cmake
 sudo apt install libglx-dev libgl1-mesa-dev
 sudo apt install libopencv-dev
+sudo apt install libavcodec-dev libavformat-dev libavutil-dev libswscale-dev libswresample-dev
 ```
+
+The FFmpeg packages (`libav*`, `libsw*`) are needed for the stream history (the recent video kept in memory and saved as a video file).
+To build without them, configure with `-DPA_STREAM_HISTORY_FFMPEG=OFF`.
 
 
 ## Install Qt 6.8.2:
