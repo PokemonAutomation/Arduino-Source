@@ -7,6 +7,8 @@
 #ifndef PokemonAutomation_ClientSocket_WinSocket_H
 #define PokemonAutomation_ClientSocket_WinSocket_H
 
+#include <atomic>
+#include <mutex>
 #include <iostream>
 #include <winsock.h>
 #include "Common/Cpp/Concurrency/Mutex.h"
@@ -25,65 +27,121 @@ class ClientSocket_WinSocket final : public AbstractClientSocket{
 public:
     ClientSocket_WinSocket(ThreadPool& thread_pool)
         : m_thread_pool(thread_pool)
-        , m_socket(::socket(AF_INET, SOCK_STREAM, 0))
-    {
-        u_long non_blocking = 1;
-        if (ioctlsocket(m_socket, FIONBIO, &non_blocking)){
-//            cout << "ioctlsocket() Failed" << endl;
-            close_socket();
-            return;
-        }
-    }
+    {}
 
     virtual ~ClientSocket_WinSocket(){
         close();
-        m_thread.wait_and_ignore_exceptions();
-        close_socket();
     }
+
+    //  Stops the receive thread, closes the socket, and returns the socket to
+    //  State::NOT_RUNNING so "connect()" can be called again. This is safe to
+    //  call multiple times.
+    //
+    //  This blocks until the receive thread has exited, so it must not be
+    //  called from within a listener callback (which runs on that thread).
     virtual void close() noexcept override{
+        AsyncTask thread;
         {
-            std::lock_guard<Mutex> lg1(m_lock);
-            m_state.store(State::DESTRUCTING, std::memory_order_relaxed);
+            std::lock_guard<Mutex> lg(m_lock);
+            if (m_state.load(std::memory_order_relaxed) == State::NOT_RUNNING && !m_thread){
+                //  Never connected, or already fully closed.
+                return;
+            }
+            m_state.store(State::DESTRUCTING, std::memory_order_release);
+            m_cv.notify_all();
+            thread = std::move(m_thread);
+        }
+
+        thread.wait_and_ignore_exceptions();
+
+        {
+            std::lock_guard<Mutex> lg(m_lock);
+            close_socket_locked();
+            m_state.store(State::NOT_RUNNING, std::memory_order_release);
             m_cv.notify_all();
         }
     }
 
     virtual void connect(const std::string& address, uint16_t port) override{
-        std::lock_guard<Mutex> lg1(m_lock);
-        if (m_state.load(std::memory_order_relaxed) != State::NOT_RUNNING){
+        std::string error;
+        {
+            std::lock_guard<Mutex> lg(m_lock);
+            if (m_state.load(std::memory_order_relaxed) != State::NOT_RUNNING){
+                return;
+            }
+
+            //  A socket whose previous connection has ended cannot be
+            //  reconnected, so always start from a fresh socket.
+            close_socket_locked();
+
+            ensure_wsa_started();
+
+            SOCKET socket = ::socket(AF_INET, SOCK_STREAM, 0);
+            if (socket == INVALID_SOCKET){
+                error = "socket() failed: WSA Error Code: " + std::to_string(WSAGetLastError());
+            }else{
+                u_long non_blocking = 1;
+                if (ioctlsocket(socket, FIONBIO, &non_blocking) != 0){
+                    error = "ioctlsocket() failed: WSA Error Code: " + std::to_string(WSAGetLastError());
+                    ::closesocket(socket);
+                }else{
+                    m_socket.store(socket, std::memory_order_release);
+                }
+            }
+            if (!error.empty()){
+                m_error = error;
+                return;
+            }
+
+            m_state.store(State::CONNECTING, std::memory_order_relaxed);
+        }
+        if (!error.empty()){
+            m_listeners.run_method(&Listener::on_connect_finished, error);
             return;
         }
+
+        //  Use the plain dispatch() rather than dispatch_now_blocking():
+        //  connect() may be called from a thread that is itself running on
+        //  this pool, and blocking here until a pool thread is free could
+        //  deadlock a capped pool. The returned AsyncTask still lets
+        //  close() join the receive thread.
         try{
-            m_state.store(State::CONNECTING, std::memory_order_relaxed);
-            m_thread = m_thread_pool.blocking_dispatch([=, this]{
+            m_thread = m_thread_pool.dispatch([=, this]{
                 thread_loop(address, port);
             });
         }catch (...){
-            m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
+            {
+                std::lock_guard<Mutex> lg(m_lock);
+                m_error = "Failed to start the receive thread.";
+                close_socket_locked();
+                m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
+            }
+            m_listeners.run_method(&Listener::on_connect_finished, m_error);
             throw;
         }
     }
 
 
     virtual size_t send(const void* data, size_t bytes) override{
-        if (m_socket == INVALID_SOCKET){
-            return 0;
-        }
-
-        constexpr int BLOCK_SIZE = (int)1 << 30;
         const char* ptr = (const char*)data;
         size_t sent = 0;
 
         while (bytes > 0 && state() == State::CONNECTED){
-            size_t current = std::min<size_t>(bytes, BLOCK_SIZE);
-            int current_sent = ::send(m_socket, ptr, (int)current, 0);
+            SOCKET socket = m_socket.load(std::memory_order_acquire);
+            if (socket == INVALID_SOCKET){
+                return sent;
+            }
+
+            constexpr size_t BLOCK_SIZE = (size_t)1 << 30;
+            int current = (int)std::min<size_t>(bytes, BLOCK_SIZE);
+            int current_sent = ::send(socket, ptr, current, 0);
             if (current_sent != SOCKET_ERROR){
-                sent += current;
-                if ((size_t)current_sent < current){
+                sent += current_sent;
+                if (current_sent != current){
                     return sent;
                 }
-                ptr += current;
-                bytes -= current;
+                ptr += current_sent;
+                bytes -= current_sent;
                 continue;
             }
 
@@ -110,17 +168,57 @@ public:
 
 
 private:
-    void close_socket(){
-        if (m_socket == INVALID_SOCKET){
+    //  Winsock has to be started before any of its functions can be used, and
+    //  nothing else in the program calls WSAStartup, so call it exactly once
+    //  before the first socket is created. We deliberately never call
+    //  WSACleanup: it is a process-wide, reference-counted operation, and
+    //  other parts of the process (Qt) may be using Winsock as well.
+    static void ensure_wsa_started(){
+        static std::once_flag flag;
+        std::call_once(flag, [](){
+            WSADATA wsa_data;
+            int ret = WSAStartup(MAKEWORD(2, 2), &wsa_data);
+            if (ret != 0){
+                try{
+                    std::cout << "WSAStartup() failed: WSA Error Code = " << ret << std::endl;
+                }catch (...){}
+            }
+        });
+    }
+
+    //  Closes the underlying socket, if any. Requires "m_lock" to be held.
+    void close_socket_locked(){
+        SOCKET socket = m_socket.exchange(INVALID_SOCKET, std::memory_order_acquire);
+        if (socket == INVALID_SOCKET){
             return;
         }
-        int ret = closesocket(m_socket);
-        if (ret == 0){
-            return;
+        if (::closesocket(socket) != 0){
+            try{
+                std::cout << "Failed closesocket(): WSA Error Code = " + std::to_string(WSAGetLastError()) << std::endl;
+            }catch (...){}
         }
-        try{
-            std::cout << "Failed closesocket(): WSA Error Code = " + std::to_string(ret) << std::endl;
-        }catch (...){}
+    }
+
+    //  A connection ended on its own (the connect attempt failed, the server
+    //  closed the connection, or a socket error occurred). This returns the
+    //  socket to State::NOT_RUNNING so "connect()" can be called again, and
+    //  fires the appropriate callback outside of "m_lock".
+    //  Requires "lg" to be locked. It unlocks it.
+    void connection_lost_locked(
+        std::unique_lock<Mutex>& lg,
+        const std::string& error_message,
+        bool was_connected
+    ){
+        m_error = error_message;
+        m_state.store(State::NOT_RUNNING, std::memory_order_release);
+        close_socket_locked();
+        lg.unlock();
+
+        if (was_connected){
+            m_listeners.run_method(&Listener::on_disconnect, error_message);
+        }else{
+            m_listeners.run_method(&Listener::on_connect_finished, error_message);
+        }
     }
 
     void thread_loop(const std::string& address, uint16_t port){
@@ -145,44 +243,79 @@ private:
             server.sin_addr.s_addr = inet_addr(address.c_str());
 
             //  Connect
+            SOCKET socket = m_socket.load(std::memory_order_acquire);
+            if (socket == INVALID_SOCKET){
+                return;
+            }
+
+            bool in_progress = false;
             while (true){
                 State state = m_state.load(std::memory_order_relaxed);
                 if (state == State::DESTRUCTING){
                     return;
                 }
 
-                if (::connect(m_socket, (struct sockaddr*)&server, sizeof(server)) != SOCKET_ERROR){
-                    break;
+                if (!in_progress){
+                    int ret = ::connect(socket, (struct sockaddr*)&server, sizeof(server));
+                    if (ret != SOCKET_ERROR){
+                        break;
+                    }
+
+                    int error = WSAGetLastError();
+//                    cout << "error = " << error << endl;
+                    if (error != WSAEWOULDBLOCK && error != WSAEINPROGRESS){
+                        if (error == WSAETIMEDOUT){
+                            connection_lost_locked(lg, "Connection timed out.", false);
+                        }else{
+                            connection_lost_locked(lg, "WSA Error Code: " + std::to_string(error), false);
+                        }
+                        return;
+                    }
+                    in_progress = true;
                 }
 
-                int error = WSAGetLastError();
-//                cout << "error = " << error << endl;
-
-                switch (error){
-                case WSAEISCONN:
-                    goto Connected;
-                case WSAEWOULDBLOCK:
-                case WSAEINVAL:
-                    break;
-                case WSAETIMEDOUT:
-                    m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
-                    m_error = "Connection timed out.";
-                    m_lock.unlock();
-                    m_listeners.run_method(&Listener::on_connect_finished, m_error);
-                    return;
-                default:
-                    m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
-                    m_error = "WSA Error Code: " + std::to_string(error);
-                    m_lock.unlock();
-                    m_listeners.run_method(&Listener::on_connect_finished, m_error);
-                    return;
+                //  Once the connect is in progress, calling connect() again
+                //  is not safe on Windows: when the attempt fails, the
+                //  second connect() returns WSAEINVAL instead of starting a
+                //  new attempt. So wait for the socket to become writable
+                //  and read the result with getsockopt(SO_ERROR).
+                fd_set write_set;
+                FD_ZERO(&write_set);
+                FD_SET(socket, &write_set);
+                timeval tv;
+                tv.tv_sec = 0;
+                tv.tv_usec = 10000;
+                int ret = ::select(0, nullptr, &write_set, nullptr, &tv);
+                if (ret == SOCKET_ERROR){
+                    int error = WSAGetLastError();
+                    if (error != WSAEINTR){
+                        connection_lost_locked(lg, "select() failed: WSA Error Code: " + std::to_string(error), false);
+                        return;
+                    }
+                    continue;
+                }
+                if (ret == 0){
+                    continue;
                 }
 
-                m_cv.wait_for(lg, std::chrono::milliseconds(10));
-
+                int so_error = 0;
+                int so_len = sizeof(so_error);
+                if (getsockopt(socket, SOL_SOCKET, SO_ERROR, (char*)&so_error, &so_len) == SOCKET_ERROR){
+                    so_error = WSAGetLastError();
+                }
+                if (so_error == 0){
+                    break;
+                }
+                if (so_error == WSAETIMEDOUT){
+                    connection_lost_locked(lg, "Connection timed out.", false);
+                }else if (so_error == WSAECONNREFUSED){
+                    connection_lost_locked(lg, "Connection refused.", false);
+                }else{
+                    connection_lost_locked(lg, "WSA Error Code: " + std::to_string(so_error), false);
+                }
+                return;
             }
 
-Connected:
             m_state.store(State::CONNECTED, std::memory_order_relaxed);
         }
 
@@ -200,7 +333,13 @@ Connected:
                 if (state == State::DESTRUCTING){
                     return;
                 }
-                bytes = ::recv(m_socket, buffer, BUFFER_SIZE, 0);
+
+                SOCKET socket = m_socket.load(std::memory_order_acquire);
+                if (socket == INVALID_SOCKET){
+                    return;
+                }
+
+                bytes = ::recv(socket, buffer, BUFFER_SIZE, 0);
                 if (bytes == SOCKET_ERROR){
                     error = WSAGetLastError();
                 }
@@ -216,13 +355,17 @@ Connected:
                 return;
             }
 
+            if (bytes == 0){
+                connection_lost_locked(lg, "Connection closed by server.", true);
+                return;
+            }
+
             if (bytes == SOCKET_ERROR){
-//                cout << "error = " << error << endl;
                 switch (error){
                 case WSAEWOULDBLOCK:
                     break;
                 default:
-                    m_error = "WSA Error Code: " + std::to_string(error);
+                    connection_lost_locked(lg, "Connection lost: WSA Error Code: " + std::to_string(error), true);
                     return;
                 }
             }
@@ -235,7 +378,7 @@ Connected:
 
 private:
     ThreadPool& m_thread_pool;
-    const SOCKET m_socket;
+    std::atomic<SOCKET> m_socket{INVALID_SOCKET};
 
     std::string m_error;
 
