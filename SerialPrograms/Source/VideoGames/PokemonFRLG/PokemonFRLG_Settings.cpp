@@ -65,6 +65,14 @@ GameSettings::GameSettings()
         LockMode::LOCK_WHILE_RUNNING,
         "3000 ms"
     )
+    , HANDLE_ONLINE_LICENSE_CHECK(
+        "<b>Handle Online License Check:</b><br>"
+        "Turn this on if your console checks the game's license online when it starts the game: "
+        "the game goes back to the Home menu for a few seconds before it starts. "
+        "The RNG programs' hard reset then waits for the game to start instead of using a fixed delay.",
+        LockMode::LOCK_WHILE_RUNNING,
+        false // default
+    )
     , m_shiny_audio_settings("<font size=4><b>Shiny Audio Settings:</b></font>")
     , SHINY_SOUND_THRESHOLD(
         "<b>Shiny Sound Threshold:</b><br>Maximum error coefficient to trigger a shiny detection.",
@@ -83,18 +91,7 @@ GameSettings::GameSettings()
         0.80, 0, 1.0
     )
 {
-    PA_ADD_STATIC(m_game_device_settings);
-    PA_ADD_OPTION(DEVICE);
-    PA_ADD_OPTION(GAME_BOX);
-    PA_ADD_STATIC(m_soft_reset_timings);
-    PA_ADD_OPTION(SELECT_BUTTON_MASH0);
-    PA_ADD_OPTION(ENTER_GAME_WAIT0);
-    PA_ADD_OPTION(ENTER_GAME_MASH0);
-    PA_ADD_STATIC(m_shiny_audio_settings);
-    PA_ADD_OPTION(SHINY_SOUND_THRESHOLD);
-    PA_ADD_OPTION(SHINY_SOUND_LOW_FREQUENCY);
-    PA_ADD_OPTION(m_catch_audio_settings);
-    PA_ADD_OPTION(CATCH_FANFARE_THRESHOLD);
+    add_options();
 
     GameSettings::on_config_value_changed(this);
     DEVICE.add_listener(*this);
@@ -103,6 +100,22 @@ GameSettings::GameSettings()
     GAME_BOX.Y.add_listener(*this);
     GAME_BOX.WIDTH.add_listener(*this);
     GAME_BOX.HEIGHT.add_listener(*this);
+}
+
+void GameSettings::add_options(){
+    PA_ADD_STATIC(m_game_device_settings);
+    PA_ADD_OPTION(DEVICE);
+    PA_ADD_OPTION(GAME_BOX);
+    PA_ADD_STATIC(m_soft_reset_timings);
+    PA_ADD_OPTION(SELECT_BUTTON_MASH0);
+    PA_ADD_OPTION(ENTER_GAME_WAIT0);
+    PA_ADD_OPTION(ENTER_GAME_MASH0);
+    PA_ADD_OPTION(HANDLE_ONLINE_LICENSE_CHECK);
+    PA_ADD_STATIC(m_shiny_audio_settings);
+    PA_ADD_OPTION(SHINY_SOUND_THRESHOLD);
+    PA_ADD_OPTION(SHINY_SOUND_LOW_FREQUENCY);
+    PA_ADD_OPTION(m_catch_audio_settings);
+    PA_ADD_OPTION(CATCH_FANFARE_THRESHOLD);
 }
 
 void GameSettings::on_config_value_changed(void* object){
