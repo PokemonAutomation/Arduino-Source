@@ -264,6 +264,7 @@ void add_tests_ExitWildBattle(UnitTestDatabase& database){
 
 
 void add_tests(UnitTestDatabase& database){
+    add_tests_BoxCellOccupiedDetector(database);
     add_tests_BoxSelectionModeDetector(database);
     add_tests_AdvanceWhiteDialogDetector(database);
     add_tests_BoxCellOccupiedDetector(database);
