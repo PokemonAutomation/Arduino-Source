@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_BattleMenuDetector_H
 #define PokemonAutomation_PokemonBDSP_BattleMenuDetector_H
 
+#include <array>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
@@ -25,12 +26,35 @@ enum class BattleType{
 };
 
 
+// Vertical command order in the BDSP battle menu.
+enum class BattleMenuOption{
+    UNKNOWN = -1,
+    BATTLE = 0,
+    POKEMON = 1,
+    BAG = 2,
+    RUN = 3,
+};
+
+// Logical move slots are ordered top-to-bottom among populated move buttons.
+// selected_slot is 1-4, or 0 when missing/ambiguous. Never guess on uncertainty.
+struct BattleMoveMenuState {
+    size_t move_count = 0;
+    size_t selected_slot = 0;
+    std::array<ImageFloatBox, 4> buttons;
+};
+BattleMoveMenuState detect_battle_move_menu(const ImageViewRGB32& screen);
+
 class BattleMenuDetector : public StaticScreenDetector{
 public:
     BattleMenuDetector(BattleType battle_type, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
+
+    // Requires the battle menu and white selection brackets at all four corners.
+    // Missing or ambiguous brackets return UNKNOWN; never infer the cursor.
+    BattleMenuOption selected_option(const ImageViewRGB32& screen);
+
 
 private:
     bool is_battle_button(const ImageViewRGB32& screen) const;
