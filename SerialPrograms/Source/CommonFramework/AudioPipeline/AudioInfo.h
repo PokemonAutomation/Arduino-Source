@@ -111,7 +111,15 @@ struct AudioInputChoiceList{
 };
 
 //  Builds the input format choices for a device from its supported formats
-//  (any order, duplicates allowed) and its preferred format.
+//  and its preferred format.
+//
+//  1. Deduplicates formats that has the same shape but only differ in
+//  sample dtype.
+//  2. Sorted by channel count, then sample rate, both descending.
+//  3. A 1ch x 96000 entry is followed by its two reinterpreted stereo
+//     choices, "Interleaved Stereo L/R" then "Interleaved Stereo R/L".
+//  4. `AudioInputChoiceList.preferred_index` is the exact match of
+//     `preferred`, or the highest-scoring choice when nothing matches.
 AudioInputChoiceList input_choices(
     std::vector<AudioFormat> supported,
     const AudioFormat& preferred

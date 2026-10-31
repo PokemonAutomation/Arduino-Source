@@ -642,8 +642,9 @@ else() # macOS and Linux
 
     if(APPLE)
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
-        # on macOS, need this framework to query OS API to control display sleep and system sleep behavior
-        target_link_libraries(SerialProgramsLib PRIVATE "-framework IOKit -framework CoreFoundation")
+        # on macOS, need these frameworks to query OS APIs: IOKit to control display sleep and system
+        # sleep behavior, CoreAudio to read the formats audio devices natively run in
+        target_link_libraries(SerialProgramsLib PRIVATE "-framework IOKit -framework CoreFoundation -framework CoreAudio")
     else() # Linux
         # Assume GCC
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)

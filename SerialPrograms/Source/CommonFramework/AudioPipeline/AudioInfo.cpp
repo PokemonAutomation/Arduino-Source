@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <QAudioDevice>
 #include <QMediaDevices>
 #include "Common/Cpp/Exceptions.h"
@@ -14,6 +15,7 @@
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Kernels/AudioPipeline/Kernels_AudioPipeline.h"
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/AudioPipeline/Backends/NativeAudioFormats.h"
 #include "AudioInfo.h"
 
 //#include <iostream>
@@ -121,21 +123,6 @@ bool audio_format_valid(const QAudioFormat& format){
 //  fallback_channel_config() in ChannelMixer.cpp. Returns "" for
 //  non-standard layouts and channel counts with no standard layout.
 //
-QAudioFormat::ChannelConfig standard_channel_config(size_t channels){
-    switch (channels){
-    case 1: return QAudioFormat::ChannelConfig::ChannelConfigMono;
-    case 2: return QAudioFormat::ChannelConfig::ChannelConfigStereo;
-    case 3: return QAudioFormat::ChannelConfig::ChannelConfig2Dot1;
-    case 4: return QAudioFormat::ChannelConfig::ChannelConfig3Dot1;
-    case 5: return QAudioFormat::ChannelConfig::ChannelConfigSurround5Dot0;
-    case 6: return QAudioFormat::ChannelConfig::ChannelConfigSurround5Dot1;
-    case 7: return QAudioFormat::ChannelConfig::ChannelConfigSurround7Dot0;
-    case 8: return QAudioFormat::ChannelConfig::ChannelConfigSurround7Dot1;
-    default: return QAudioFormat::ChannelConfig::ChannelConfigUnknown;
-    }
-}
-
-
 const char* standard_layout_name(size_t channels, QAudioFormat::ChannelConfig config){
     const QAudioFormat::ChannelConfig standard = standard_channel_config(channels);
     if (standard == QAudioFormat::ChannelConfigUnknown
@@ -167,7 +154,6 @@ int choice_type_priority(QAudioFormat::SampleFormat sample_format){
     default: return 0;
     }
 }
-
 
 //  Fallback quality score for the choice list, used to pick
 //  preferred_index when the device's preferred format is not among the
@@ -298,8 +284,16 @@ AudioInputChoiceList input_choices(std::vector<AudioFormat> supported, const Aud
     }
 
     //  2. Collapse duplicates by (rate, channels, channel config). When
-    //  several sample formats are supported for the same shape, the
-    //  highest quality sample format wins: float > int32 > int16 > uint8.
+    //  several sample formats are listed for the same shape, "preferred"
+    //  is prioritized. For any other shape the highest quality sample
+    //  format wins: float > int32 > int16 > uint8.
+    auto rank_audio_format = [](const QAudioFormat& format, const QAudioFormat& preferred) -> int{
+        if (audio_format_equal(format, preferred)){
+            return std::numeric_limits<int>::max();
+        }
+        return choice_type_priority(format.sampleFormat());
+    };
+
     std::vector<AudioFormat> deduped;
     for (const AudioFormat& format : valid){
         bool found = false;
@@ -310,7 +304,7 @@ AudioInputChoiceList input_choices(std::vector<AudioFormat> supported, const Aud
                 && k.channelCount() == f.channelCount()
                 && k.channelConfig() == f.channelConfig()){
                 found = true;
-                if (choice_type_priority(f.sampleFormat()) > choice_type_priority(k.sampleFormat())){
+                if (rank_audio_format(f, preferred.native_format()) > rank_audio_format(k, preferred.native_format())){
                     kept = format;
                 }
                 break;
@@ -374,72 +368,64 @@ AudioInputChoiceList input_choices(std::vector<AudioFormat> supported, const Aud
 }
 
 
-
-
-//
-//  QAudioDevice (Qt6) does not enumerate full formats, only
-//  isFormatSupported() / preferredFormat() / supportedSampleFormats(), so
-//  the supported list is probed over the standard grid of sample rates
-//  and channel counts. For each (rate, channels) shape the sample
-//  formats are tried in fixed quality order (float, int32, int16,
-//  uint8) and the first supported one is kept, so our preferred types
-//  beat the device's preferred sample format.
-//
-std::vector<AudioFormat> enumerate_supported_formats(const NativeAudioInfo& info){
-    std::vector<AudioFormat> supported;
-
-    const QAudioFormat& preferred = info.preferredFormat();
-
-    const QAudioFormat::SampleFormat sample_formats[] = {
-        QAudioFormat::SampleFormat::Float,
-        QAudioFormat::SampleFormat::Int32,
-        QAudioFormat::SampleFormat::Int16,
-        QAudioFormat::SampleFormat::UInt8,
-    };
-
-    for (int rate : {8000, 11025, 16000, 22050, 32000, 44100, 48000, 88200, 96000, 176400, 192000}){
-        for (int channels : {1, 2, 3, 4, 5, 6, 7, 8}){
-            for (QAudioFormat::SampleFormat sample_format : sample_formats){
-                QAudioFormat candidate;
-                candidate.setSampleRate(rate);
-                candidate.setSampleFormat(sample_format);
-                candidate.setChannelCount(channels);
-                candidate.setChannelConfig(standard_channel_config((size_t)channels));
-                if (info.isFormatSupported(candidate)){
-                    supported.emplace_back(candidate);
-                    break;
-                }
-            }
-        }
+//  A format for the log: its display name and sample format, e.g.
+//  "1 x 96,000 Hz (Mono) Int16".
+std::string format_to_log_str(const AudioFormat& format){
+    std::string str = AudioInputChoice(format).display_name();
+    switch (format.native_format().sampleFormat()){
+    case QAudioFormat::SampleFormat::UInt8: return str + " UInt8";
+    case QAudioFormat::SampleFormat::Int16: return str + " Int16";
+    case QAudioFormat::SampleFormat::Int32: return str + " Int32";
+    case QAudioFormat::SampleFormat::Float: return str + " Float";
+    default: return str;
     }
-
-    if (supported.empty()){
-        //  Backends that reject everything (or report no sample formats)
-        //  still get an entry so there is always a selection.
-        supported.emplace_back(preferred);
-    }
-
-    return supported;
 }
 
 
+//  One line for the log listing a device's input formats, e.g.
+//  "MiraBox Capture: input formats: 1 x 96,000 Hz (Mono) Int16. Current: 1 x 96,000 Hz (Mono) Int16."
+std::string native_formats_to_str(
+    const std::string& audio_source_display_name,
+    const std::vector<AudioFormat>& source_native_formats,
+    const AudioFormat& current
+){
+    std::string str = audio_source_display_name + ": input formats: ";
+    for (size_t i = 0; i < source_native_formats.size(); i++){
+        str += (i == 0 ? "" : ", ") + format_to_log_str(source_native_formats[i]);
+    }
+    str += ". Current: " + format_to_log_str(current) + ".";
+    return str;
+}
+
+
+//  Build the input format choices for a device.
+//  If the device is a Mirabox, set the preferred index to be 1x96k interpreted as interleaved 2x48k R/L.
 AudioInputChoiceList build_input_choices(
     const NativeAudioInfo& info,
     const std::string& display_name
 ){
-    AudioInputChoiceList ret = input_choices(
-        enumerate_supported_formats(info), AudioFormat(info.preferredFormat())
-    );
+    // Get native audio formats
+    NativeAudioFormats native = native_input_formats(info);
+    global_logger_tagged().log(native_formats_to_str(display_name, native.formats, native.current));
 
-    //  A misreporting card's preferred format is the physical
-    //  1ch x 96000; the sensible default is the L/R reinterpretation
-    //  (R/L for MiraBox, whose physical channel order is reversed).
-    const QAudioFormat& preferred = info.preferredFormat();
-    if (ret.choices.size() == 3
-        && ret.choices[2].is_reinterpreted()
-        && ret.choices[2].swap_channels()
-        && preferred.channelCount() == 1 && preferred.sampleRate() == 96000){
-        ret.preferred_index = display_name.find("MiraBox") != std::string::npos ? 2 : 1;
+    //  Build input choice list:
+    //  Note A 1ch x 96000 entry will be appened by its two reinterpreted stereo
+    //  choices, "Interleaved Stereo L/R" then "Interleaved Stereo R/L".
+    AudioInputChoiceList ret = input_choices(std::move(native.formats), native.current);
+
+    //  A capture card that runs in 1ch x 96000 is really sending two
+    //  48 kHz channels interleaved, so the sensible default is a stereo
+    //  reading of it: R/L for MiraBox, whose physical channel order is
+    //  reversed, and L/R for other cards.
+    const QAudioFormat& running = native.current.native_format();
+    if (running.channelCount() == 1 && running.sampleRate() == 96000){
+        const bool swap = display_name.find("MiraBox") != std::string::npos;
+        for (size_t i = 0; i < ret.choices.size(); i++){
+            if (ret.choices[i].is_reinterpreted() && ret.choices[i].swap_channels() == swap){
+                ret.preferred_index = i;
+                break;
+            }
+        }
     }
 
     return ret;

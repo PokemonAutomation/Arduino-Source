@@ -518,6 +518,9 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.h
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQtThread.cpp
     Source/CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQtThread.h
+    Source/CommonFramework/AudioPipeline/Backends/NativeAudioFormats.cpp
+    Source/CommonFramework/AudioPipeline/Backends/NativeAudioFormats.h
+    Source/CommonFramework/AudioPipeline/Backends/NativeAudioFormats_Apple.tpp
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader.cpp
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader.h
     Source/CommonFramework/AudioPipeline/IO/AudioFileLoader_Tests.cpp
