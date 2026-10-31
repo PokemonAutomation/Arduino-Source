@@ -287,6 +287,14 @@ void read_summary_screen(
         ot_name_language, screen
     );
 
+    const int level = summary_reader.read_level(env.console, screen);
+    if (level < 0 || level > 100){
+        dump_image(env.console, ProgramInfo(), "ReadSummary_Level", screen);
+        env.console.log("Failed to read level from summary screen.", COLOR_RED);
+    }else{
+        cur_pokemon_info.level = static_cast<uint8_t>(level);
+    }
+
     if (home_language != Language::None){
         cur_pokemon_info.nature = summary_reader.read_nature(
             env.console, home_language, screen

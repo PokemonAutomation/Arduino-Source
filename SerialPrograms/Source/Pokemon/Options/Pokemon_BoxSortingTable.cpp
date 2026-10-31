@@ -13,6 +13,7 @@ namespace Pokemon{
 const EnumDropdownDatabase<SortingRuleType>& SortingRuleType_Database(){
     static const EnumDropdownDatabase<SortingRuleType> database({
         {SortingRuleType::DexNo,     "dex",     "Dex Number"},
+        {SortingRuleType::Level,     "level",   "Level"},
         {SortingRuleType::Shiny,    "shiny",    "Shiny"},
         {SortingRuleType::Gigantamax,    "gigantamax",    "Gigantamax"},
         {SortingRuleType::Alpha, "alpha", "Alpha"},
