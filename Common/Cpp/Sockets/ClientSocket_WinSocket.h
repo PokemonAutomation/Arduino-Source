@@ -100,8 +100,13 @@ public:
             return;
         }
 
+        //  Use the plain dispatch() rather than dispatch_now_blocking():
+        //  connect() may be called from a thread that is itself running on
+        //  this pool, and blocking here until a pool thread is free could
+        //  deadlock a capped pool. The returned AsyncTask still lets
+        //  close() join the receive thread.
         try{
-            m_thread = m_thread_pool.dispatch_now_blocking([=, this]{
+            m_thread = m_thread_pool.dispatch([=, this]{
                 thread_loop(address, port);
             });
         }catch (...){
