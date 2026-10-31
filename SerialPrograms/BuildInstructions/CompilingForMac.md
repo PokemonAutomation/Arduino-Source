@@ -12,6 +12,11 @@ If you have any questions regarding the documentation or find any errors in the 
 
 Warning: if you don't have software development experience and deviate from the guide steps, you are at your own risk.
 
+## Faster rebuilds for developers
+
+After the normal build works, the optional [ccache guide](Build-Mac-CompilerCache.md)
+makes rebuilds and new worktrees reuse earlier compiles.
+
 ## Part 1: Install Pre-requisites
 ### Install XCode App
 
