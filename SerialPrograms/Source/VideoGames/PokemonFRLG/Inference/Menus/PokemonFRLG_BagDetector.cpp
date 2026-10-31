@@ -7,13 +7,12 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonFRLG_BagDetector.h"
 
 
@@ -58,17 +57,19 @@ bool BagDetector::detect(const ImageViewRGB32& screen){
 }
 
 
-class Test_BagDetector : public UnitTest{
+class Test_BagDetector : public ImageUnitTest{
 public:
     Test_BagDetector(const std::string& image, bool expected)
-        : UnitTest("PokemonFRLG::BagDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonFRLG::BagDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger&, CancellableScope&) const override{
+    virtual UnitTestResult run_on_images(
+        Logger&, CancellableScope&,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         BagDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         const bool result = detector.detect(image);
         if (result != m_expected){
             return std::string("Expected bag = ") + (m_expected ? "true" : "false") +
@@ -78,7 +79,6 @@ public:
     }
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 
