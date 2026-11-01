@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include "CommonFramework/Logging/Logger.h"
+#include "CommonTools/OCR/OCR_PaddleOCR.h"
 #include "ComputerPrograms/ComputerPrograms_UnitTestRunner.h"
 
 #include "CommandLineTests.h"
@@ -71,10 +72,26 @@ int run_command_line_tests(bool augment_color_distortions){
     //  Windows CI runner).
     setvbuf(stdout, nullptr, _IOLBF, 8192);
     cout << "Running parallel unit tests..." << endl;
-    ComputerPrograms::CommandLineUnitTestRunner runner(global_logger_command_line());
-    if (runner.run(augment_color_distortions)){
-        return 1;
+
+    //  [ORT-DIAG] The Mac Intel crash is probabilistic (~60% of CI runs) and happens at
+    //  PaddleOCR's ONNX session creation, which normally happens only once per process
+    //  (the sessions are cached). To raise the odds of reproducing it in CI, run the full
+    //  suite several times, clearing the PaddleOCR cache between runs so the sessions are
+    //  re-created each time.
+    constexpr int k_repeat_runs = 3;
+    for (int run_index = 1; run_index <= k_repeat_runs; ++run_index){
+        std::cerr << "[ORT-DIAG] Test suite run " << run_index << " of " << k_repeat_runs << std::endl;
+        if (run_index > 1){
+            OCR::clear_paddle_ocr_cache();  //  Force PaddleOCR to re-create its ONNX sessions.
+        }
+        ComputerPrograms::CommandLineUnitTestRunner runner(global_logger_command_line());
+        if (runner.run(augment_color_distortions)){
+            std::cerr << "[ORT-DIAG] Test suite run " << run_index << " reported failures; stopping."
+                      << std::endl;
+            return 1;
+        }
     }
+
     cout << "Running parallel unit tests... Done!" << endl;
     return 0;
 }
