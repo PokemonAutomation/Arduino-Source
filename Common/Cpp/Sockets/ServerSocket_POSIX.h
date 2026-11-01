@@ -14,7 +14,6 @@
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "AbstractServerSocket.h"
 
-
 namespace PokemonAutomation{
 
 class ThreadPool;
@@ -25,31 +24,22 @@ public:
 
     ServerSocket_POSIX(ThreadPool& thread_pool);
 
-
     virtual ~ServerSocket_POSIX(){
         close();
     }
 
-
-
     virtual void start(const std::string& address, uint16_t port) override;
-
 
     virtual void close_connection() override;
 
-
-
     virtual void close() noexcept override;
-
 
     virtual size_t send(const void* data, size_t bytes) override;
 
 
 private:
 
-
     void accept_thread_loop(std::string address, uint16_t port);
-
 
     void connection_thread_loop();
 
