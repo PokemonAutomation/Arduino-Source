@@ -241,7 +241,7 @@ LabelImages::~LabelImages(){
 }
 
 JsonValue LabelImages::to_json() const{
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
     save_annotation_to_file();
     return ConsolePanelInstance::to_json();
 }
@@ -259,7 +259,7 @@ void LabelImages::init_sam_session(bool use_gpu){
 }
 
 void LabelImages::save_annotation_to_file() const{
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
     if (m_annotation_file_path.size() == 0 || m_fail_to_load_annotation_file){
         return;
     }
@@ -284,7 +284,7 @@ void LabelImages::save_annotation_to_file() const{
 void LabelImages::open_annotation_folder(){
     std::string folder_path;
     {
-        std::lock_guard<std::recursive_mutex> lg(m_lock);
+        std::lock_guard<RecursiveMutex> lg(m_lock);
         save_annotation_to_file();
         folder_path = m_image_folder_path;
     }
@@ -298,7 +298,7 @@ void LabelImages::open_annotation_folder(){
 }
 
 void LabelImages::clear_for_new_image(){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
     m_overlay_manager->clear();
     source_image_width = source_image_height = 0;
     m_image_embedding.clear();
@@ -312,7 +312,7 @@ void LabelImages::clear_for_new_image(){
 
 // assuming clear_for_new_image() is already called
 void LabelImages::load_image_related_data(const std::string& image_path, size_t source_image_width, size_t source_image_height){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
 
     m_system.logger().log(
         "Image source: " + image_path + ", " +
@@ -387,12 +387,12 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
 }
 
 void LabelImages::update_rendered_objects(){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
     m_overlay_manager->update_rendered_annotations();
 }
 
 void LabelImages::add_new_annotation_from_user_box(){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
 
     ImageFloatBox user_float_box(X, Y, WIDTH, HEIGHT);
     ImagePixelBox user_box = floatbox_to_pixelbox(source_image_width, source_image_height, user_float_box);
@@ -414,7 +414,7 @@ void LabelImages::add_new_annotation_from_user_box(){
 }
 
 void LabelImages::update_mask_for_selected_annotation(){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
     if (m_selected_obj_idx >= m_annotations.size()){
         return;
     }
@@ -531,7 +531,7 @@ bool LabelImages::run_sam_to_create_annotation(
 }
 
 void LabelImages::add_segmentation_inclusion_point(double x, double y){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
     if (source_image_width == 0 || source_image_height == 0 || m_annotations.size() == 0
         || m_selected_obj_idx >= m_annotations.size()){
         return;
@@ -546,7 +546,7 @@ void LabelImages::add_segmentation_inclusion_point(double x, double y){
 }
 
 void LabelImages::add_segmentation_exclusion_point(double x, double y){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
     if (source_image_width == 0 || source_image_height == 0 || m_annotations.size() == 0
         || m_selected_obj_idx >= m_annotations.size()){
         return;
@@ -584,7 +584,7 @@ void LabelImages::remove_closest_point(std::vector<std::pair<size_t, size_t>>& p
 }
 
 void LabelImages::remove_segmentation_inclusion_point(double x, double y){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
     if (source_image_width == 0 || source_image_height == 0 || m_annotations.size() == 0
         || m_selected_obj_idx >= m_annotations.size()){
         return;
@@ -596,7 +596,7 @@ void LabelImages::remove_segmentation_inclusion_point(double x, double y){
 }
 
 void LabelImages::remove_segmentation_exclusion_point(double x, double y){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
     if (source_image_width == 0 || source_image_height == 0 || m_annotations.size() == 0
         || m_selected_obj_idx >= m_annotations.size()){
         return;
@@ -619,7 +619,7 @@ void LabelImages::compute_embeddings_for_folder(const std::string& image_folder_
 }
 
 void LabelImages::delete_selected_annotation(){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
     if (m_annotations.size() == 0 || m_selected_obj_idx >= m_annotations.size()){
         return;
     }
@@ -639,7 +639,7 @@ void LabelImages::delete_selected_annotation(){
 }
 
 void LabelImages::change_annotation_selection_by_mouse(double x, double y){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
 
     // no image or no annotation
     if (source_image_width == 0 || source_image_height == 0 || m_annotations.size() == 0){
@@ -697,7 +697,7 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
 }
 
 void LabelImages::select_prev_annotation(){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
 
     // no image or no annotation
     if (source_image_width == 0 || source_image_height == 0 || m_annotations.size() == 0){
@@ -717,7 +717,7 @@ void LabelImages::select_prev_annotation(){
     update_rendered_objects();
 }
 void LabelImages::select_next_annotation(){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
 
     // no image or no annotation
     if (source_image_width == 0 || source_image_height == 0 || m_annotations.size() == 0){
@@ -738,7 +738,7 @@ void LabelImages::select_next_annotation(){
 }
 
 void LabelImages::on_config_value_changed(void* object){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
 
     if (object == &CUSTOM_LABEL_SET){
         const std::string path = CUSTOM_LABEL_SET;
@@ -804,7 +804,7 @@ void LabelImages::on_press(ButtonCell& button){
         return;
     }
     if (&button == &TOGGLE_ANNOTATIONS){
-        std::lock_guard<std::recursive_mutex> lg(m_lock);
+        std::lock_guard<RecursiveMutex> lg(m_lock);
         m_annotations_hidden = !m_annotations_hidden;
         TOGGLE_ANNOTATIONS.set_text(m_annotations_hidden ? "Show Annotations" : "Hide Annotations");
         update_rendered_objects();
@@ -819,7 +819,7 @@ void LabelImages::on_press(ButtonCell& button){
         return;
     }
     if (&button == &EXPORT_TO_YOLO){
-        std::lock_guard<std::recursive_mutex> lg(m_lock);
+        std::lock_guard<RecursiveMutex> lg(m_lock);
         const std::string dataset_path = YOLO_CONFIG;
         if (m_image_folder_path.empty()){
             m_system.logger().log("Cannot export: no image is loaded.", COLOR_RED);
@@ -836,7 +836,7 @@ void LabelImages::on_press(ButtonCell& button){
     if (&button == &COMPUTE_EMBEDDINGS){
         std::string image_folder_path;
         {
-            std::lock_guard<std::recursive_mutex> lg(m_lock);
+            std::lock_guard<RecursiveMutex> lg(m_lock);
             image_folder_path = m_image_folder_path;
         }
         if (image_folder_path.empty()){
@@ -877,7 +877,7 @@ void LabelImages::set_selected_label(const std::string& slug){
 }
 
 void LabelImages::load_custom_label_set(const std::string& json_path){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
 
     StringSelectDatabase new_database;
     try{
@@ -945,7 +945,7 @@ void LabelImages::post_startup(VideoSource* source){
 //  that depends on it. If the console is not displaying a still image (e.g. it
 //  is set to a camera or to nothing), we have no image to label.
 void LabelImages::load_current_image_source(){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
 
     save_annotation_to_file();  // save the annotation of the previously loaded image
     clear_for_new_image();
@@ -1039,7 +1039,7 @@ void LabelImages::go_to_image_by_index_offset(int offset){
     //  block on the UI thread, which may itself be waiting on this lock.
     std::string path;
     {
-        std::lock_guard<std::recursive_mutex> lg(m_lock);
+        std::lock_guard<RecursiveMutex> lg(m_lock);
         if (m_cur_image_file_idx_in_folder == SIZE_MAX || m_image_paths_in_folder.empty()){
             return;
         }
@@ -1076,7 +1076,7 @@ void LabelImages::go_to_image_by_index_offset(int offset){
 //
 
 void LabelImages::on_mouse_press(double x, double y){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
 
     m_cur_mouse_x.store(x, std::memory_order_relaxed);
     m_cur_mouse_y.store(y, std::memory_order_relaxed);
@@ -1093,7 +1093,7 @@ void LabelImages::on_mouse_press(double x, double y){
 }
 
 void LabelImages::on_mouse_release(double x, double y){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
 
     m_cur_mouse_x.store(x, std::memory_order_relaxed);
     m_cur_mouse_y.store(y, std::memory_order_relaxed);
@@ -1130,7 +1130,7 @@ void LabelImages::on_mouse_release(double x, double y){
 }
 
 void LabelImages::on_mouse_move(double x, double y){
-    std::lock_guard<std::recursive_mutex> lg(m_lock);
+    std::lock_guard<RecursiveMutex> lg(m_lock);
 
     m_cur_mouse_x.store(x, std::memory_order_relaxed);
     m_cur_mouse_y.store(y, std::memory_order_relaxed);
