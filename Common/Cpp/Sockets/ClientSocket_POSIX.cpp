@@ -4,7 +4,7 @@
  *
  */
 
-#ifdef _POSIX_C_SOURCE
+#if !_WIN32
 
 #include <poll.h>
 #include <signal.h>
