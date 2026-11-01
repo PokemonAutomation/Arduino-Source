@@ -405,7 +405,9 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Sockets/ClientSocket_Qt.h
     ../Common/Cpp/Sockets/ClientSocket_WinSocket.cpp
     ../Common/Cpp/Sockets/ClientSocket_WinSocket.h
+    ../Common/Cpp/Sockets/ServerSocket_POSIX.cpp
     ../Common/Cpp/Sockets/ServerSocket_Qt.cpp
+    ../Common/Cpp/Sockets/ServerSocket_POSIX.h
     ../Common/Cpp/Sockets/ServerSocket_Qt.h
     ../Common/Cpp/Sockets/Sockets_Tests.cpp
     ../Common/Cpp/Sockets/Sockets_Tests.h
