@@ -13,7 +13,6 @@
 
 #include <atomic>
 #include <chrono>
-#include <condition_variable>
 #include <cstdint>
 #include <cstring>
 #include <functional>
@@ -23,6 +22,8 @@
 #include <thread>
 #include <vector>
 #include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ConditionVariable.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "Common/Cpp/Sockets/ClientSocket_Qt.h"
 #include "Common/Cpp/Sockets/ServerSocket_Qt.h"
@@ -35,16 +36,16 @@ namespace{
 
 
 struct Waiter{
-    std::mutex lock;
-    std::condition_variable cv;
+    Mutex lock;
+    ConditionVariable cv;
 
     bool wait_for(std::chrono::milliseconds timeout, const std::function<bool()>& pred){
-        std::unique_lock<std::mutex> lg(lock);
+        std::unique_lock<Mutex> lg(lock);
         return cv.wait_for(lg, timeout, pred);
     }
 
     void notify(){
-        std::lock_guard<std::mutex> lg(lock);
+        std::lock_guard<Mutex> lg(lock);
         cv.notify_all();
     }
 };
@@ -139,7 +140,7 @@ protected:
         for (int attempt = 0; attempt < 8; attempt++){
             uint16_t candidate;
             {
-                std::lock_guard<std::mutex> lg(m_rng_lock);
+                std::lock_guard<Mutex> lg(m_rng_lock);
                 candidate = (uint16_t)(40000 + m_rng() % 20000);
             }
             server.start("127.0.0.1", candidate);
@@ -176,7 +177,7 @@ protected:
     ThreadPool& m_thread_pool;
 
 private:
-    mutable std::mutex m_rng_lock;
+    mutable Mutex m_rng_lock;
     mutable std::mt19937 m_rng{std::random_device{}()};
 };
 

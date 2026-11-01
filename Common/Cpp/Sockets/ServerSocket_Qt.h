@@ -9,7 +9,6 @@
 
 #include <string>
 #include <atomic>
-#include <condition_variable>
 #include <QObject>
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
@@ -34,14 +33,14 @@ class ServerSocket_Qt final : public QObject, public AbstractServerSocket{
         bool done = false;
 
         Mutex lock;
-        std::condition_variable cv;
+        ConditionVariable cv;
     };
 
     //  Synchronizes "close_connection()" with the QTcpServer's event thread
     //  when called from another thread.
     struct CloseCompletion{
         Mutex lock;
-        std::condition_variable cv;
+        ConditionVariable cv;
         bool done = false;
     };
 
