@@ -133,10 +133,11 @@ size_t ClientSocket_POSIX::send(const void* data, size_t bytes){
         size_t current = std::min<size_t>(bytes, BLOCK_SIZE);
         ssize_t current_sent = ::send(socket, ptr, (int)current, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (current_sent != -1){
+            //  send() may return after writing only part of the
+            //  buffer (macOS does this when the kernel's send
+            //  buffer is full); loop until everything has been
+            //  written, the same way the Qt backend does.
             sent += current_sent;
-            if ((size_t)current_sent < current){
-                return sent;
-            }
             ptr += current_sent;
             bytes -= current_sent;
             continue;

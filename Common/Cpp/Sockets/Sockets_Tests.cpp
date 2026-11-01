@@ -27,6 +27,10 @@
 #include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "Common/Cpp/Sockets/ClientSocket_Qt.h"
 #include "Common/Cpp/Sockets/ServerSocket_Qt.h"
+#ifndef _WIN32
+#include "Common/Cpp/Sockets/ClientSocket_POSIX.h"
+#include "Common/Cpp/Sockets/ServerSocket_POSIX.h"
+#endif
 #ifdef _WIN32
 #include "Common/Cpp/Sockets/ClientSocket_WinSocket.h"
 #include "Common/Cpp/Sockets/ServerSocket_WinSocket.h"
@@ -881,6 +885,9 @@ void add_tests_Sockets(UnitTestDatabase& database, ThreadPool& thread_pool){
         "Sockets (Qt) - Completion lifetime under event-thread stall"
     );
 
+#ifndef _WIN32
+    add_socket_tests<ClientSocket_POSIX, ServerSocket_POSIX>(database, thread_pool, "POSIX");
+#endif
 #ifdef _WIN32
     add_socket_tests<ClientSocket_WinSocket, ServerSocket_WinSocket>(database, thread_pool, "WinSocket");
 #endif
