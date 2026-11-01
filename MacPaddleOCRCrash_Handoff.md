@@ -76,8 +76,8 @@ Fetch logs with `gh run view <runId> --log-failed` (failed runs) or
    had PASSED; the crash is in the PaddleOCR/ONNX init window. The socket
    implementation was diffed byte-identical to a revision that previously
    passed both Mac CIs. #1794 (same 7 Qt socket tests; its WinSocket code is
-  `#ifdef`'d out of the Mac build, and it does not include the POSIX
-  tests at all) passed Mac Intel; main passed Mac
+   `#ifdef`'d out of the Mac build, and it does not include the POSIX
+   tests at all) passed Mac Intel; main passed Mac
    Intel repeatedly in the same window.
 2. **GPU/CoreML path.** CI is CPU-only: `OnnxOptions::USE_GPU` defaults to
    `false` and no `Using CoreML execution provider` line appears in any log.
