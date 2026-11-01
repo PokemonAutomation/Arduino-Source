@@ -10,6 +10,7 @@
 #include <string>
 #include <atomic>
 #include <QObject>
+#include <QSharedPointer>
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "AbstractServerSocket.h"
@@ -27,6 +28,11 @@ class ThreadPool;
 class ServerSocket_Qt final : public QObject, public AbstractServerSocket{
     Q_OBJECT
 
+    //  Carries shared ownership (the signals pass it by value) so that a call still
+    //  queued when the caller times out, or when "close()" destroys the server and
+    //  Qt discards the pending call, keeps the payload alive exactly as long as the
+    //  event itself: the handler's copy outlives a timed-out caller, and a
+    //  discarded event leaves the caller's copy as the last reference.
     struct SendData{
         std::string packet;
         size_t bytes_sent = 0;
@@ -36,8 +42,8 @@ class ServerSocket_Qt final : public QObject, public AbstractServerSocket{
         ConditionVariable cv;
     };
 
-    //  Synchronizes "close_connection()" with the QTcpServer's event thread
-    //  when called from another thread.
+    //  Synchronizes "close_connection()" with the QTcpServer's event thread when
+    //  called from another thread. Lifetime as SendData.
     struct CloseCompletion{
         Mutex lock;
         ConditionVariable cv;
@@ -76,8 +82,8 @@ public:
 
 
 signals:
-    void internal_send(SendData* send_data);
-    void internal_close_connection(CloseCompletion* completion);
+    void internal_send(QSharedPointer<SendData> send_data);
+    void internal_close_connection(QSharedPointer<CloseCompletion> completion);
 
 
 private:
@@ -92,12 +98,12 @@ private:
     void connection_lost(QTcpSocket* sock, const std::string& error_message);
 
     //  Runs on the QTcpServer's event thread.
-    void on_close_connection(CloseCompletion* completion);
+    void on_close_connection(QSharedPointer<CloseCompletion> completion);
 
     //  Runs on the QTcpServer's event thread. The context object is the
     //  server, so the call still runs if the connection socket has already
     //  been aborted, and it just reports 0 bytes in that case.
-    void on_send(SendData* send_data);
+    void on_send(QSharedPointer<SendData> send_data);
 
     std::unique_ptr<QTcpServer> make_server(const std::string& address, uint16_t port);
 

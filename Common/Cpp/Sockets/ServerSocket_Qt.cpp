@@ -80,20 +80,23 @@ void ServerSocket_Qt::close_connection(){
         }
     }
 
-    CloseCompletion completion;
-    emit internal_close_connection(&completion);
+    QSharedPointer<CloseCompletion> completion = QSharedPointer<CloseCompletion>::create();
+    emit internal_close_connection(completion);
 
     //  If called from a thread other than the server's event thread, the
     //  call is queued: wait until it has run, so the state is up to date
     //  when this returns (same as the POSIX backend). If called from the
     //  event thread (e.g. a listener callback), the call ran directly and
     //  this does not block.
+    //
+    //  The shared ownership makes the timeout safe: if it expires, the
+    //  queued call's own copy keeps the completion alive until it runs.
     if (QThread::currentThread() != event_thread){
-        std::unique_lock<Mutex> lg(completion.lock);
-        completion.cv.wait_for(
+        std::unique_lock<Mutex> lg(completion->lock);
+        completion->cv.wait_for(
             lg,
             std::chrono::seconds(5),
-            [&completion]{ return completion.done; }
+            [&completion]{ return completion->done; }
         );
     }
 }
@@ -150,25 +153,26 @@ size_t ServerSocket_Qt::send(const void* data, size_t bytes){
         return 0;
     }
 
-    SendData send_data;
-    send_data.packet.assign((const char*)data, bytes);
+    QSharedPointer<SendData> send_data = QSharedPointer<SendData>::create();
+    send_data->packet.assign((const char*)data, bytes);
 
-    emit internal_send(&send_data);
+    emit internal_send(send_data);
 
     //  Wait for the server's event thread to finish writing the packet.
     //  The timeout covers the case where "close()" destroys the server
     //  before the queued call ever runs, in which case it will never
-    //  complete on its own.
+    //  complete on its own; the shared ownership keeps the packet alive
+    //  until the queued call runs (or is discarded with the server).
     {
-        std::unique_lock<Mutex> lg(send_data.lock);
-        send_data.cv.wait_for(
+        std::unique_lock<Mutex> lg(send_data->lock);
+        send_data->cv.wait_for(
             lg,
             std::chrono::seconds(5),
-            [&send_data]{ return send_data.done; }
+            [&send_data]{ return send_data->done; }
         );
     }
 
-    return send_data.bytes_sent;
+    return send_data->bytes_sent;
 }
 
 void ServerSocket_Qt::on_new_connection(){
@@ -282,7 +286,7 @@ void ServerSocket_Qt::connection_lost(QTcpSocket* sock, const std::string& error
     }
 }
 
-void ServerSocket_Qt::on_close_connection(CloseCompletion* completion){
+void ServerSocket_Qt::on_close_connection(QSharedPointer<CloseCompletion> completion){
     QTcpSocket* sock;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -306,7 +310,7 @@ void ServerSocket_Qt::on_close_connection(CloseCompletion* completion){
     completion->cv.notify_all();
 }
 
-void ServerSocket_Qt::on_send(SendData* send_data){
+void ServerSocket_Qt::on_send(QSharedPointer<SendData> send_data){
     QTcpSocket* sock;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -361,13 +365,13 @@ std::unique_ptr<QTcpServer> ServerSocket_Qt::make_server(const std::string& addr
 
     QObject::connect(
         this, &ServerSocket_Qt::internal_send,
-        server.get(), [this](SendData* send_data){
+        server.get(), [this](QSharedPointer<SendData> send_data){
             on_send(send_data);
         }
     );
     QObject::connect(
         this, &ServerSocket_Qt::internal_close_connection,
-        server.get(), [this](CloseCompletion* completion){
+        server.get(), [this](QSharedPointer<CloseCompletion> completion){
             on_close_connection(completion);
         }
     );

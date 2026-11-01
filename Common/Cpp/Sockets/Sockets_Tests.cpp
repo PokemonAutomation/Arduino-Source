@@ -723,6 +723,118 @@ public:
 };
 
 
+//  Qt backend only. Stall the server's event thread for longer than the 5 s
+//  completion wait (by blocking inside an on_receive_data callback, which
+//  runs on that thread). close_connection() must then time out and return
+//  cleanly, and the queued handler, which runs after the caller has gone
+//  back, must be able to complete: the completion's shared ownership keeps
+//  it alive until then. Previously this was a stack-use-after-return: the
+//  handler wrote to the dead stack-local CloseCompletion.
+class Test_Sockets_Qt_CompletionLifetime : public UnitTest{
+public:
+    Test_Sockets_Qt_CompletionLifetime(ThreadPool& thread_pool, std::string name)
+        : UnitTest(std::move(name))
+        , m_thread_pool(thread_pool)
+    {
+        m_threads = 2;
+    }
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        //  Blocks the event thread while it receives data.
+        struct StallListener : AbstractServerSocket::Listener{
+            virtual void on_receive_data(const void*, size_t) override{
+                std::this_thread::sleep_for(std::chrono::seconds(6));
+            }
+        };
+
+        ServerSocket_Qt server(m_thread_pool);
+        ServerListener server_listener;
+        server_listener.server = &server;
+        server.add_listener(server_listener);
+        StallListener stall_listener;
+        server.add_listener(stall_listener);
+
+        uint16_t port = 0;
+        {
+            std::mt19937 rng{std::random_device{}()};
+            for (int attempt = 0; attempt < 8; attempt++){
+                uint16_t candidate = (uint16_t)(40000 + rng() % 20000);
+                server.start("127.0.0.1", candidate);
+                if (server_listener.waiter.wait_for(
+                    std::chrono::seconds(5),
+                    [&server_listener]{ return server_listener.listen_finished.load() > 0; }
+                ) && server_listener.last_listen_error.empty()){
+                    port = candidate;
+                    break;
+                }
+            }
+        }
+        if (port == 0){
+            return "Failed to start the server";
+        }
+
+        bool ok = false;
+        std::string error;
+        {
+            ClientSocket_Qt client(m_thread_pool);
+            ClientListener client_listener;
+            client.add_listener(client_listener);
+            client.connect("127.0.0.1", port);
+            if (!client_listener.waiter.wait_for(
+                std::chrono::seconds(5),
+                [&client_listener]{ return client_listener.connect_finished.load() >= 1; }
+            )){
+                error = "The client did not finish connecting";
+            }else if (!server_listener.waiter.wait_for(
+                std::chrono::seconds(5),
+                [&server_listener]{ return server_listener.connected.load() >= 1; }
+            )){
+                error = "The server did not call on_connect";
+            }else{
+                //  One byte in: the event thread blocks in on_receive_data for 6 s.
+                char byte = 'x';
+                if (client.send(&byte, 1) != 1){
+                    error = "The client did not send the byte";
+                }else{
+                    std::this_thread::sleep_for(std::chrono::milliseconds(300));
+
+                    auto start = std::chrono::steady_clock::now();
+                    server.close_connection();
+                    auto waited = std::chrono::steady_clock::now() - start;
+                    if (waited < std::chrono::seconds(4) || waited >= std::chrono::seconds(8)){
+                        error = "close_connection() did not time out as expected (" +
+                            std::to_string(
+                                (long long)std::chrono::duration_cast<std::chrono::milliseconds>(waited).count()
+                            ) + " ms)";
+                    }else{
+                        //  Wait for the stall to finish so the late handler actually
+                        //  runs, then check that it restored the state.
+                        std::this_thread::sleep_for(std::chrono::seconds(6));
+                        if (server.state() != AbstractServerSocket::State::LISTENING){
+                            error = "The late handler did not restore LISTENING";
+                        }else{
+                            ok = true;
+                        }
+                    }
+                }
+            }
+
+            client.close();
+        }
+
+        server.close();
+
+        if (!ok && !error.empty()){
+            return error;
+        }
+        return true;
+    }
+
+private:
+    ThreadPool& m_thread_pool;
+};
+
+
 template <typename ClientSocketType, typename ServerSocketType>
 void add_socket_tests(UnitTestDatabase& database, ThreadPool& thread_pool, const char* backend_name){
     const std::string prefix = "Sockets (" + std::string(backend_name) + ") - ";
@@ -757,6 +869,13 @@ void add_socket_tests(UnitTestDatabase& database, ThreadPool& thread_pool, const
 
 void add_tests_Sockets(UnitTestDatabase& database, ThreadPool& thread_pool){
     add_socket_tests<ClientSocket_Qt, ServerSocket_Qt>(database, thread_pool, "Qt");
+
+    //  Qt-specific: the completion-lifetime guarantee is only at risk in the
+    //  Qt backend (a queued call can outlive its caller there).
+    database.add<Test_Sockets_Qt_CompletionLifetime>(
+        thread_pool,
+        "Sockets (Qt) - Completion lifetime under event-thread stall"
+    );
 }
 
 
