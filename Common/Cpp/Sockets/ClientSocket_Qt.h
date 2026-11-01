@@ -9,7 +9,6 @@
 
 #include <string>
 #include <atomic>
-#include <condition_variable>
 #include <QObject>
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
@@ -32,7 +31,7 @@ class ClientSocket_Qt final : public QObject, public AbstractClientSocket{
         bool done = false;
 
         Mutex lock;
-        std::condition_variable cv;
+        ConditionVariable cv;
     };
 
 
