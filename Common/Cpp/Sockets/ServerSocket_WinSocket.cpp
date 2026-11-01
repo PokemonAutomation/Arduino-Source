@@ -213,9 +213,9 @@ void ServerSocket_WinSocket::accept_thread_loop(std::string address, uint16_t po
             return;
         }
 
-        int yes = 1;
-        setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR, (const char*)&yes, sizeof(yes));
-
+        //  No SO_REUSEADDR: on Windows, that option lets another
+        //  socket bind to the same address and port, so a second
+        //  server could steal our port.
         u_long non_blocking = 1;
         ioctlsocket(listen_socket, FIONBIO, &non_blocking);
 
