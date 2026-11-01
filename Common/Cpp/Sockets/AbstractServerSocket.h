@@ -78,7 +78,10 @@ public:
     //  State::LISTENING on success or State::NOT_RUNNING on failure.
     virtual void start(const std::string& address, uint16_t port) = 0;
 
-    //  Closes the active connection, if any, and keeps listening.
+    //  Closes the active connection, if any, and keeps listening. Unlike
+    //  "close()", this does not wait for the worker threads, so it is safe
+    //  to call from within a listener callback. "Listener::on_disconnect"
+    //  is not called for the connection closed this way.
     virtual void close_connection() = 0;
 
     //  Stops the server: it stops accepting new connections, closes the
