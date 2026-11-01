@@ -27,6 +27,7 @@
 #include "Inference/PokemonFRLG_StatsReader.h"
 #include "Inference/PokemonFRLG_TrainerIdReader.h"
 #include "Inference/PokemonFRLG_WildEncounterReader.h"
+#include "Programs/BoxOrganization/PokemonFRLG_BoxSorter_Tests.h"
 #include "PokemonFRLG_Navigation.h"
 #include "Tests/TestUtils.h"
 
@@ -267,6 +268,7 @@ void add_tests(UnitTestDatabase& database){
     add_tests_BoxCellOccupiedDetector(database);
     add_tests_BoxCellReader(database);
     add_tests_BoxGenderReader(database);
+    add_tests_BoxSorter(database);
     add_tests_BoxSelectionModeDetector(database);
     add_tests_AdvanceWhiteDialogDetector(database);
     add_tests_BoxCellOccupiedDetector(database);

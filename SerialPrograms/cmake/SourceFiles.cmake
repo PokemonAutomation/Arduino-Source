@@ -1767,6 +1767,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonFRLG/Programs/BoxOrganization/PokemonFRLG_BoxSorter.h
     Source/VideoGames/PokemonFRLG/Programs/BoxOrganization/PokemonFRLG_BoxSorterLivingDex.cpp
     Source/VideoGames/PokemonFRLG/Programs/BoxOrganization/PokemonFRLG_BoxSorterLivingDex.h
+    Source/VideoGames/PokemonFRLG/Programs/BoxOrganization/PokemonFRLG_BoxSorter_Tests.cpp
+    Source/VideoGames/PokemonFRLG/Programs/BoxOrganization/PokemonFRLG_BoxSorter_Tests.h
     Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_EliteFourFarmer.cpp
     Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_EliteFourFarmer.h
     Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_EvTrainer.cpp
