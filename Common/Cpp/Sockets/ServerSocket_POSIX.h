@@ -29,9 +29,7 @@ public:
     }
 
     virtual void start(const std::string& address, uint16_t port) override;
-
     virtual void close_connection() override;
-
     virtual void close() noexcept override;
 
     virtual size_t send(const void* data, size_t bytes) override;
@@ -40,8 +38,8 @@ public:
 private:
 
     void accept_thread_loop(std::string address, uint16_t port);
-
     void connection_thread_loop();
+
 
 private:
     ThreadPool& m_thread_pool;
