@@ -5,9 +5,9 @@
  *  Loopback tests that combine a ClientSocket and a ServerSocket against
  *  each other on 127.0.0.1. The test logic is written against the abstract
  *  classes, and is instantiated for every backend that compiles on the
- *  current platform. Qt is instantiated here; the POSIX and WinSocket
- *  backends add their own instantiations in separate PRs, so that every
- *  platform runs 2 of the 3 backends and CI as a whole covers all 3.
+ *  current platform (Qt: always, POSIX: on non-Windows, WinSocket: on
+ *  Windows; each backend lands in its own PR), so that every platform
+ *  runs 2 of the 3 backends and CI as a whole covers all 3.
  *
  */
 
@@ -27,6 +27,10 @@
 #include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "Common/Cpp/Sockets/ClientSocket_Qt.h"
 #include "Common/Cpp/Sockets/ServerSocket_Qt.h"
+#ifndef _WIN32
+#include "Common/Cpp/Sockets/ClientSocket_POSIX.h"
+#include "Common/Cpp/Sockets/ServerSocket_POSIX.h"
+#endif
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Sockets_Tests.h"
 
@@ -876,6 +880,10 @@ void add_tests_Sockets(UnitTestDatabase& database, ThreadPool& thread_pool){
         thread_pool,
         "Sockets (Qt) - Completion lifetime under event-thread stall"
     );
+
+#ifndef _WIN32
+    add_socket_tests<ClientSocket_POSIX, ServerSocket_POSIX>(database, thread_pool, "POSIX");
+#endif
 }
 
 
