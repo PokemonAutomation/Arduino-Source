@@ -43,14 +43,7 @@ static void crash_backtrace_handler(int sig){
 
     void* frames[128];
     int n = backtrace(frames, 128);
-    //  Writes one symbolized frame per line to fd 2. glibc declares it void; Apple's returns int.
-#if defined(__linux__)
-    backtrace_symbols_fd(frames, n, 2);
-#else
-    if (backtrace_symbols_fd(frames, n, 2) < 0){
-        //  Nothing more we can do.
-    }
-#endif
+    backtrace_symbols_fd(frames, n, 2);  //  writes one symbolized frame per line to fd 2
 
     //  Let the OS do its normal crash handling (crash report + exit code).
     signal(sig, SIG_DFL);
