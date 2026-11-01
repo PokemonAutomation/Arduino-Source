@@ -38,7 +38,7 @@ GimmighoulChestFarmer_Descriptor::GimmighoulChestFarmer_Descriptor()
         STRING_POKEMON + " SV", "Gimmighoul Chest Farmer",
         "Programs/PokemonSV/GimmighoulChestFarmer.html",
         "Farm Chest Gimmighoul for coins.",
-        PanelQualityStanding::OFFICIAL,
+        PanelQualityStanding::DEPRECATED,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
