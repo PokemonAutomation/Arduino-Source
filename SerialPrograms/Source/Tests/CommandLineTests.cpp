@@ -66,7 +66,10 @@ int run_command_line_tests(bool augment_color_distortions){
     //  [ORT-DIAG] Keep stdout line-buffered in CI: when piped, stdio defaults to full
     //  buffering, so the last few KB of test output (and where the crash happened) is lost
     //  in the buffer when the process dies.
-    setvbuf(stdout, nullptr, _IOLBF, 0);
+    //  8192 bytes: 0 means "implementation-defined" and MSVC's ucrt can end up with a
+    //  zero-size buffer, which corrupts the next stdout write (observed 0xC0000409 on the
+    //  Windows CI runner).
+    setvbuf(stdout, nullptr, _IOLBF, 8192);
     cout << "Running parallel unit tests..." << endl;
     ComputerPrograms::CommandLineUnitTestRunner runner(global_logger_command_line());
     if (runner.run(augment_color_distortions)){
