@@ -167,9 +167,11 @@ Ort::Session create_session(
     const std::string& model_cache_path,
     bool try_gpu
 ){
+    std::cerr << "[ORT-DIAG] create_session(" << model_path << ", try_gpu=" << (try_gpu ? 1 : 0) << ")" << std::endl;
     bool write_flag_file = true;
     std::string file_hash;
     std::tie(write_flag_file, file_hash) = clean_up_old_model_cache(model_cache_path, model_path);
+    std::cerr << "[ORT-DIAG] clean_up_old_model_cache done, write_flag_file=" << write_flag_file << std::endl;
     
     auto onnx_path = str_to_onnx_str(model_path);
 
@@ -205,7 +207,9 @@ Ort::Session create_session(
         Ort::SessionOptions cpu_options = create_session_options(model_cache_path, false);
         cpu_options.DisablePerSessionThreads();
         
+        std::cerr << "[ORT-DIAG] calling Ort::Session constructor (CPU, per-session threads disabled)..." << std::endl;
         Ort::Session session{global_ort_env(), onnx_path.c_str(), cpu_options};
+        std::cerr << "[ORT-DIAG] Ort::Session constructor returned: " << model_path << std::endl;
         logger.log("Ort::Session created");
         return session;
     }

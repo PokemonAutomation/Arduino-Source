@@ -87,6 +87,7 @@ PaddleOCRPipeline::PaddleOCRPipeline(
     , m_det_path(std::move(det_path))
 {
     load_dictionary(Filesystem::Path(dict_path));
+    std::cerr << "[ORT-DIAG] PaddleOCRPipeline ctor finished: " << rec_path << std::endl;
 }
 
 PaddleOCRDetector& PaddleOCRPipeline::detector(){
@@ -381,6 +382,10 @@ std::string PaddleOCRPipeline::recognize_line(const cv::Mat& cropped_image){
     const char* input_names[] = {m_input_name.c_str()};
     const char* output_names[] = {m_output_name.c_str()};  
 
+    static int diag_run_count = 0;
+    if (++diag_run_count <= 20){
+        std::cerr << "[ORT-DIAG] recognize_line: about to call session->Run() (call " << diag_run_count << ")" << std::endl;
+    }
     try{
         if (debugging){
             m_logger.log("[OCR-DEBUG] Calling m_rec_session.Run() now...");
