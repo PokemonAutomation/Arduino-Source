@@ -15,42 +15,33 @@
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "AbstractServerSocket.h"
 
-
-
 namespace PokemonAutomation{
+
 
 class ThreadPool;
 
 
+
 class ServerSocket_WinSocket final : public AbstractServerSocket{
 public:
-
     ServerSocket_WinSocket(ThreadPool& thread_pool)
         : m_thread_pool(thread_pool)
     {}
-
 
     virtual ~ServerSocket_WinSocket(){
         close();
     }
 
-
-
     virtual void start(const std::string& address, uint16_t port) override;
-
 
     virtual void close_connection() override;
 
-
-
     virtual void close() noexcept override;
-
 
     virtual size_t send(const void* data, size_t bytes) override;
 
 
 private:
-
     //  Winsock has to be started before any of its functions can be used, and
     //  nothing else in the program calls WSAStartup, so call it exactly once
     //  before the first socket is created. We deliberately never call
@@ -58,11 +49,10 @@ private:
     //  other parts of the process (Qt) may be using Winsock as well.
     static void ensure_wsa_started();
 
-
     void accept_thread_loop(std::string address, uint16_t port);
 
-
     void connection_thread_loop();
+
 
 private:
     ThreadPool& m_thread_pool;
