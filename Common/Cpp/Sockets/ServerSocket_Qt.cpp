@@ -38,8 +38,7 @@ void ServerSocket_Qt::start(const std::string& address, uint16_t port){
                 }
             )
         );
-    }
-    catch (...){
+    }catch (...){
         {
             std::lock_guard<Mutex> lg(m_lock);
             m_starting = false;
@@ -146,8 +145,9 @@ size_t ServerSocket_Qt::send(const void* data, size_t bytes){
     QTcpSocket* socket;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        socket =
-            (m_state.load(std::memory_order_relaxed) == State::CONNECTED) ? m_socket : nullptr;
+        socket = m_state.load(std::memory_order_relaxed) == State::CONNECTED
+            ? m_socket
+            : nullptr;
     }
     if (socket == nullptr){
         return 0;
