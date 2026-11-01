@@ -2,13 +2,13 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *      This file is mostly untested!
- *
  */
 
 #ifndef PokemonAutomation_ClientSocket_POSIX_H
 #define PokemonAutomation_ClientSocket_POSIX_H
 
+#include <atomic>
+#include <poll.h>
 #include <signal.h>
 #include <iostream>
 #include <cerrno>
@@ -32,58 +32,115 @@ class ClientSocket_POSIX final : public AbstractClientSocket{
 public:
     ClientSocket_POSIX(ThreadPool& thread_pool)
         : m_thread_pool(thread_pool)
-        , m_socket(socket(AF_INET, SOCK_STREAM, 0)){
+    {
         // Ignore SIGPIPE. Handle errors via errno instead
         signal(SIGPIPE, SIG_IGN);
-
-        if (m_socket != -1){
-            fcntl(m_socket, F_SETFL, O_NONBLOCK);
-        }
     }
 
     virtual ~ClientSocket_POSIX(){
         close();
-        m_thread.wait_and_ignore_exceptions();
-        close_socket();
     }
 
+    //  Stops the receive thread, closes the socket, and returns the socket to
+    //  State::NOT_RUNNING so "connect()" can be called again. This is safe to
+    //  call multiple times.
+    //
+    //  This blocks until the receive thread has exited, so it must not be
+    //  called from within a listener callback (which runs on that thread).
     virtual void close() noexcept override{
+        AsyncTask thread;
         {
-            std::lock_guard<Mutex> lg1(m_lock);
-            m_state.store(State::DESTRUCTING, std::memory_order_relaxed);
+            std::lock_guard<Mutex> lg(m_lock);
+            if (m_state.load(std::memory_order_relaxed) == State::NOT_RUNNING && !m_thread){
+                //  Never connected, or already fully closed.
+                return;
+            }
+            m_state.store(State::DESTRUCTING, std::memory_order_release);
+            m_cv.notify_all();
+            thread = std::move(m_thread);
+        }
+
+        thread.wait_and_ignore_exceptions();
+
+        {
+            std::lock_guard<Mutex> lg(m_lock);
+            close_socket_locked();
+            m_state.store(State::NOT_RUNNING, std::memory_order_release);
             m_cv.notify_all();
         }
     }
 
     virtual void connect(const std::string& address, uint16_t port) override{
-        std::lock_guard<Mutex> lg1(m_lock);
-        if (m_state.load(std::memory_order_relaxed) != State::NOT_RUNNING){
+        std::string error;
+        {
+            std::lock_guard<Mutex> lg(m_lock);
+            if (m_state.load(std::memory_order_relaxed) != State::NOT_RUNNING){
+                return;
+            }
+
+            //  A socket whose previous connection has ended cannot be
+            //  reconnected, so always start from a fresh socket.
+            close_socket_locked();
+
+            int socket = ::socket(AF_INET, SOCK_STREAM, 0);
+            if (socket == -1){
+                error = "socket() failed: " + std::string(strerror(errno));
+            }else{
+                int flags = fcntl(socket, F_GETFL, 0);
+                if (flags == -1 || fcntl(socket, F_SETFL, flags | O_NONBLOCK) == -1){
+                    error = "fcntl() failed: " + std::string(strerror(errno));
+                    ::close(socket);
+                }else{
+                    m_socket.store(socket, std::memory_order_release);
+                }
+            }
+            if (!error.empty()){
+                m_error = error;
+                return;
+            }
+
+            m_state.store(State::CONNECTING, std::memory_order_relaxed);
+        }
+        if (!error.empty()){
+            m_listeners.run_method(&Listener::on_connect_finished, error);
             return;
         }
+
+        //  Use the plain dispatch() rather than dispatch_now_blocking():
+        //  connect() may be called from a thread that is itself running on
+        //  this pool, and blocking here until a pool thread is free could
+        //  deadlock a capped pool. The returned AsyncTask still lets
+        //  close() join the receive thread.
         try{
-            m_state.store(State::CONNECTING, std::memory_order_relaxed);
-            m_thread = m_thread_pool.dispatch_now_blocking([=, this]{
+            m_thread = m_thread_pool.dispatch([=, this]{
                 thread_loop(address, port);
             });
         }catch (...){
-            m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
+            {
+                std::lock_guard<Mutex> lg(m_lock);
+                m_error = "Failed to start the receive thread.";
+                close_socket_locked();
+                m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
+            }
+            m_listeners.run_method(&Listener::on_connect_finished, m_error);
             throw;
         }
     }
 
 
     virtual size_t send(const void* data, size_t bytes) override{
-        if (m_socket == -1){
-            return 0;
-        }
-
-        constexpr int BLOCK_SIZE = (int)1 << 30;
         const char* ptr = (const char*)data;
         size_t sent = 0;
 
         while (bytes > 0 && state() == State::CONNECTED){
+            int socket = m_socket.load(std::memory_order_acquire);
+            if (socket == -1){
+                return sent;
+            }
+
+            constexpr int BLOCK_SIZE = (int)1 << 30;
             size_t current = std::min<size_t>(bytes, BLOCK_SIZE);
-            ssize_t current_sent = ::send(m_socket, ptr, (int)current, MSG_DONTWAIT | MSG_NOSIGNAL);
+            ssize_t current_sent = ::send(socket, ptr, (int)current, MSG_DONTWAIT | MSG_NOSIGNAL);
             if (current_sent != -1){
                 sent += current_sent;
                 if ((size_t)current_sent < current){
@@ -94,13 +151,14 @@ public:
                 continue;
             }
 
+            int error = errno;
+//            cout << "error = " << error << endl;
+
             std::unique_lock<Mutex> lg(m_lock);
             if (state() == State::DESTRUCTING){
                 break;
             }
 
-            int error = errno;
-//            cout << "error = " << error << endl;
             switch (error){
             case EAGAIN:
 #if EAGAIN != EWOULDBLOCK
@@ -124,15 +182,38 @@ public:
 
 
 private:
-    void close_socket(){
-        if (m_socket == -1){
+    //  Closes the underlying socket, if any. Requires "m_lock" to be held.
+    void close_socket_locked(){
+        int socket = m_socket.exchange(-1, std::memory_order_acquire);
+        if (socket == -1){
             return;
         }
-        int ret = ::close(m_socket);
-        if (ret != 0){
+        if (::close(socket) != 0){
             try{
                 std::cout << "Failed close(): errno = " << errno << " (" << strerror(errno) << ")" << std::endl;
             }catch (...){}
+        }
+    }
+
+    //  A connection ended on its own (the connect attempt failed, the server
+    //  closed the connection, or a socket error occurred). This returns the
+    //  socket to State::NOT_RUNNING so "connect()" can be called again, and
+    //  fires the appropriate callback outside of "m_lock".
+    //  Requires "lg" to be locked. It unlocks it.
+    void connection_lost_locked(
+        std::unique_lock<Mutex>& lg,
+        const std::string& error_message,
+        bool was_connected
+    ){
+        m_error = error_message;
+        m_state.store(State::NOT_RUNNING, std::memory_order_release);
+        close_socket_locked();
+        lg.unlock();
+
+        if (was_connected){
+            m_listeners.run_method(&Listener::on_disconnect, error_message);
+        }else{
+            m_listeners.run_method(&Listener::on_connect_finished, error_message);
         }
     }
 
@@ -159,51 +240,74 @@ private:
             server.sin_addr.s_addr = inet_addr(address.c_str());
 
             //  Connect
+            int socket = m_socket.load(std::memory_order_acquire);
+            if (socket == -1){
+                return;
+            }
+
+            bool in_progress = false;
             while (true){
                 State state = m_state.load(std::memory_order_relaxed);
                 if (state == State::DESTRUCTING){
                     return;
                 }
 
-                if (::connect(m_socket, (struct sockaddr*)&server, sizeof(server)) != -1){
-                    break;
+                if (!in_progress){
+                    int ret = ::connect(socket, (struct sockaddr*)&server, sizeof(server));
+                    if (ret == 0){
+                        break;
+                    }
+
+                    int error = errno;
+//                    cout << "error = " << error << endl;
+                    if (error != EAGAIN && error != EALREADY && error != EINPROGRESS){
+                        if (error == ETIMEDOUT){
+                            connection_lost_locked(lg, "Connection timed out.", false);
+                        }else{
+                            connection_lost_locked(lg, "Connect error (errno " + std::to_string(error) + "): " + std::string(strerror(error)), false);
+                        }
+                        return;
+                    }
+                    in_progress = true;
                 }
 
-                int error = errno;
-//                cout << "error = " << error << endl;
-
-                switch (error){
-                case EISCONN:
-                    goto Connected;
-                case EAGAIN:
-                case EALREADY:
-                case EINPROGRESS:
-                    break;
-                case ETIMEDOUT:
-                    m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
-                    m_error = "Connection timed out.";
-                    lg.unlock();
-                    m_listeners.run_method(&Listener::on_connect_finished, m_error);
-                    return;
-                case ECONNREFUSED:
-                    m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
-                    m_error = "Connection refused.";
-                    lg.unlock();
-                    m_listeners.run_method(&Listener::on_connect_finished, m_error);
-                    return;
-                default:
-                    m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
-                    m_error = "Connect error (errno " + std::to_string(error) + "): " + std::string(strerror(error));
-                    lg.unlock();
-                    m_listeners.run_method(&Listener::on_connect_finished, m_error);
-                    return;
+                //  While the connect is in progress, calling connect() again
+                //  returns EISCONN, so instead wait for the socket to become
+                //  writable, then check SO_ERROR for the result.
+                pollfd pf;
+                pf.fd = socket;
+                pf.events = POLLOUT;
+                pf.revents = 0;
+                int pret = poll(&pf, 1, 10);
+                if (pret == -1){
+                    if (errno != EINTR){
+                        connection_lost_locked(lg, "poll() error: " + std::string(strerror(errno)), false);
+                        return;
+                    }
+                    continue;
+                }
+                if (pret == 0){
+                    continue;
                 }
 
-                m_cv.wait_for(lg, std::chrono::milliseconds(10));
-
+                int so_error = 0;
+                socklen_t slen = sizeof(so_error);
+                if (getsockopt(socket, SOL_SOCKET, SO_ERROR, &so_error, &slen) != 0){
+                    so_error = errno;
+                }
+                if (so_error == 0){
+                    break;
+                }
+                if (so_error == ETIMEDOUT){
+                    connection_lost_locked(lg, "Connection timed out.", false);
+                }else if (so_error == ECONNREFUSED){
+                    connection_lost_locked(lg, "Connection refused.", false);
+                }else{
+                    connection_lost_locked(lg, "Connect error (errno " + std::to_string(so_error) + "): " + std::string(strerror(so_error)), false);
+                }
+                return;
             }
 
-Connected:
             m_state.store(State::CONNECTED, std::memory_order_relaxed);
         }
 
@@ -222,7 +326,13 @@ Connected:
                 if (state == State::DESTRUCTING){
                     return;
                 }
-                bytes = ::recv(m_socket, buffer, BUFFER_SIZE, 0);
+
+                int socket = m_socket.load(std::memory_order_acquire);
+                if (socket == -1){
+                    return;
+                }
+
+                bytes = ::recv(socket, buffer, BUFFER_SIZE, 0);
 //                cout << "error = " << error << endl;
                 if (bytes == -1){
                     error = errno;
@@ -239,7 +349,11 @@ Connected:
                 return;
             }
 
-//            cout << "error = " << error << endl;
+            if (bytes == 0){
+                connection_lost_locked(lg, "Connection closed by server.", true);
+                return;
+            }
+
             if (bytes == -1){
                 switch (error){
                 case EAGAIN:
@@ -247,13 +361,8 @@ Connected:
                 case EWOULDBLOCK:
 #endif
                     break;
-                case ECONNRESET:
-                case ENOTCONN:
-                case EPIPE:
-                    m_error = "Receive error (errno " + std::to_string(error) + "): " + std::string(strerror(error));
-                    return;
                 default:
-                    m_error = "Receive error (errno " + std::to_string(error) + "): " + std::string(strerror(error));
+                    connection_lost_locked(lg, "Receive error (errno " + std::to_string(error) + "): " + std::string(strerror(error)), true);
                     return;
                 }
             }
@@ -266,7 +375,7 @@ Connected:
 
 private:
     ThreadPool& m_thread_pool;
-    const int m_socket;
+    std::atomic<int> m_socket{-1};
 
     std::string m_error;
 

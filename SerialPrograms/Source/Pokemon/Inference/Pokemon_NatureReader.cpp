@@ -10,44 +10,6 @@
 namespace PokemonAutomation{
 namespace Pokemon{
 
-namespace{
-
-std::string nature_checker_value_to_string(NatureCheckerValue value){
-    const char* names[] = {
-        "UnableToDetect",
-        "Any",
-        "Adamant",
-        "Bashful",
-        "Bold",
-        "Brave",
-        "Calm",
-        "Careful",
-        "Docile",
-        "Gentle",
-        "Hardy",
-        "Hasty",
-        "Impish",
-        "Jolly",
-        "Lax",
-        "Lonely",
-        "Mild",
-        "Modest",
-        "Naive",
-        "Naughty",
-        "Quiet",
-        "Quirky",
-        "Rash",
-        "Relaxed",
-        "Sassy",
-        "Serious",
-        "Timid",
-        "Last"
-    };
-
-    return names[int(value)];
-}
-}
-
 NatureReader::NatureReader(const std::string& json_path)
     : SmallDictionaryMatcher(json_path)
 {}
@@ -67,7 +29,7 @@ OCR::StringMatchResult NatureReader::read_substring(
 }
 
 std::string NatureReader::Results::to_string() const{
-    return  "Nature: " + nature_checker_value_to_string(nature);
+    return "Nature: " + NATURE_CHECKER_VALUE_STRINGS().get_string(nature);
 }
 
 

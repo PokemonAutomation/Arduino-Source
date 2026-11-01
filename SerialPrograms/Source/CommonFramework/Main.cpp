@@ -18,6 +18,7 @@
 #include "StaticRegistration.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "CommonFramework/Panels/OptionsPanel.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "Tests/CommandLineTests.h"
@@ -41,6 +42,7 @@
 #include "GlobalSettingsPanel.h"
 #include "GlobalServices.h"
 #include "PersistentSettings.h"
+#include "NintendoSwitch/NintendoSwitch_SettingsPanel.h"
 
 using namespace PokemonAutomation;
 
@@ -156,6 +158,9 @@ int run_program(int argc, char *argv[]){
     }catch (const ParseException& error){
         logger.log(error.message(), COLOR_RED);
     }
+
+    //  Load the Switch framework settings now, not only when their panel is opened.
+    OptionsPanelWrapper<NintendoSwitch::ConsoleSettingsPanel>().make_panel()->load_json_from_global();
 
     //  Preload a bunch of stuff now so they are ready later.
     SerialPortPoller::instance().ports();

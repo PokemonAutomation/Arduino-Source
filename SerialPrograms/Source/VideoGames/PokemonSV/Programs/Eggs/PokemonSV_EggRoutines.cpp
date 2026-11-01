@@ -917,7 +917,7 @@ bool check_baby_info(
         stream.log("IVs: not read (no filter checks IVs, or no game language set).", COLOR_GREEN);
     }
     stream.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
-    stream.log("Nature: " + nature.to_string(), COLOR_GREEN);
+    stream.log(nature.to_string(), COLOR_GREEN);
 
     action = FILTERS.get_action(shiny, gender, nature.nature, IVs);
 
