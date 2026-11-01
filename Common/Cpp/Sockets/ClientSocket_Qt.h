@@ -10,6 +10,7 @@
 #include <string>
 #include <atomic>
 #include <QObject>
+#include <QSharedPointer>
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "AbstractClientSocket.h"
@@ -60,7 +61,7 @@ public:
 
 signals:
     void internal_connect(const std::string& address, uint16_t port);
-    void internal_send(SendData* send_data);
+    void internal_send(QSharedPointer<SendData> send_data);
 
 
 private:

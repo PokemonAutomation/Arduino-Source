@@ -5,6 +5,7 @@
  */
 
 #include <chrono>
+#include <QSharedPointer>
 #include <QTimer>
 #include <QTcpSocket>
 #include "Common/Qt/QtThreadPool.h"
@@ -93,25 +94,27 @@ size_t ClientSocket_Qt::send(const void* data, size_t bytes){
         return 0;
     }
 
-    SendData send_data;
-    send_data.packet.assign((const char*)data, bytes);
+    QSharedPointer<SendData> send_data = QSharedPointer<SendData>::create();
+    send_data->packet.assign((const char*)data, bytes);
 
-    emit internal_send(&send_data);
+    emit internal_send(send_data);
 
     //  Wait for the socket's event thread to finish writing the packet.
     //  The timeout covers the case where "close()" destroys the socket
     //  before the queued call ever runs, in which case it will never
-    //  complete on its own.
+    //  complete on its own. The shared ownership makes the timeout
+    //  safe: if it expires, the queued call's own copy keeps the
+    //  payload alive until it runs.
     {
-        std::unique_lock<Mutex> lg(send_data.lock);
-        send_data.cv.wait_for(
+        std::unique_lock<Mutex> lg(send_data->lock);
+        send_data->cv.wait_for(
             lg,
             std::chrono::seconds(5),
-            [&send_data]{ return send_data.done; }
+            [&send_data]{ return send_data->done; }
         );
     }
 
-    return send_data.bytes_sent;
+    return send_data->bytes_sent;
 }
 
 void ClientSocket_Qt::connection_failed(const std::string& error_message){
@@ -238,7 +241,7 @@ std::unique_ptr<QTcpSocket> ClientSocket_Qt::make_socket(){
     );
     QObject::connect(
         this, &ClientSocket_Qt::internal_send,
-        socket.get(), [this, sock = socket.get()](SendData* send_data){
+        socket.get(), [this, sock = socket.get()](QSharedPointer<SendData> send_data){
             {
                 std::lock_guard<Mutex> lg(m_lock);
                 m_sends_in_flight.fetch_add(1, std::memory_order_acq_rel);
