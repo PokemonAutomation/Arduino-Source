@@ -34,6 +34,11 @@ function(pa_apply_base_target_properties target_name)
 
     #add defines
     target_compile_definitions(${target_name} PRIVATE NOMINMAX DPP_NO_DEPRECATED)
+    if(WIN32)
+        #  Keep <Windows.h> from pulling in the legacy <winsock.h>; the socket
+        #  layer uses <winsock2.h>, which is mutually exclusive with it.
+        target_compile_definitions(${target_name} PRIVATE WIN32_LEAN_AND_MEAN)
+    endif()
 
     #add include directory
     target_include_directories(${target_name} SYSTEM PRIVATE ${PA_SERIAL_PROGRAMS_DIR}/../3rdParty-Core)
