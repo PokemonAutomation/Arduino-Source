@@ -9,7 +9,7 @@
 
 #include <atomic>
 #include <mutex>
-#include <winsock.h>
+#include <winsock2.h>
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"

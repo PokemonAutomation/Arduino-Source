@@ -5,6 +5,10 @@
  */
 
 #ifdef _WIN64
+//  WIN32_LEAN_AND_MEAN stops <Windows.h> from pulling in the legacy
+//  <winsock.h>; the socket layer uses <winsock2.h>, which is mutually
+//  exclusive with <winsock.h>.
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #elif defined(__linux) || defined(__APPLE__)
 #include <unistd.h>
