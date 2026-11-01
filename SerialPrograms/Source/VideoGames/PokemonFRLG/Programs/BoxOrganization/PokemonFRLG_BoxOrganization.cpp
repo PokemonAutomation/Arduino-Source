@@ -8,11 +8,15 @@
 #include <sstream>
 #include <utility>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/FrozenImageDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "VideoGames/PokemonFRLG/Inference/Box/PokemonFRLG_BoxCellOccupiedDetector.h"
 #include "VideoGames/PokemonFRLG/Inference/Box/PokemonFRLG_BoxCellReader.h"
@@ -217,7 +221,7 @@ void scan_box_summaries(
     }
 }
 
-}
+} // namespace
 
 BoxOrganizationStats::BoxOrganizationStats()
     : pokemon(m_stats["Pokemon"])
@@ -304,6 +308,116 @@ BoxSortingPlan make_box_sorting_plan(
     return plan;
 }
 
+bool is_viable_for_dex(
+    const LivingDexEntry& entry, const CollectedPokemonInfo& pokemon,
+    bool obey_gender_differences, bool shiny_dex
+){
+    if (entry.nat_id != pokemon.dex_number || (shiny_dex && !pokemon.shiny)){
+        return false;
+    }
+    if (obey_gender_differences && entry.has_gender_difference){
+        if (entry.slug.ends_with("-female") && pokemon.gender != StatsHuntGenderFilter::Female){
+            return false;
+        }
+        if (entry.slug.ends_with("-male") && pokemon.gender != StatsHuntGenderFilter::Male){
+            return false;
+        }
+    }
+    return true;
+}
+
+std::vector<std::optional<CollectedPokemonInfo>> make_living_dex_order(
+    Logger& logger,
+    const std::vector<std::optional<CollectedPokemonInfo>>& boxes_data,
+    const std::vector<LivingDexEntry>& living_dex_order,
+    bool obey_gender_differences, bool shiny_dex
+){
+    if (living_dex_order.size() > boxes_data.size()){
+        throw UserSetupError(logger, "Select enough boxes to hold the living dex template.");
+    }
+    std::vector<std::optional<CollectedPokemonInfo>> ordered(boxes_data.size());
+    std::vector<bool> used(boxes_data.size(), false);
+    // Reserve all viable Pokemon already in place before considering duplicates.
+    for (size_t i = 0; i < living_dex_order.size(); i++){
+        if (boxes_data[i] && is_viable_for_dex(living_dex_order[i], *boxes_data[i], obey_gender_differences, shiny_dex)){
+            ordered[i] = boxes_data[i];
+            used[i] = true;
+        }
+    }
+    for (size_t i = 0; i < living_dex_order.size(); i++){
+        if (ordered[i]){
+            continue;
+        }
+        for (size_t source = 0; source < boxes_data.size(); source++){
+            if (!used[source] && boxes_data[source] &&
+                is_viable_for_dex(living_dex_order[i], *boxes_data[source], obey_gender_differences, shiny_dex)
+                ){
+                ordered[i] = boxes_data[source];
+                used[source] = true;
+                break;
+            }
+        }
+    }
+    size_t destination = living_dex_order.size();
+    for (size_t source = 0; source < boxes_data.size(); source++){
+        if (used[source] || !boxes_data[source]){
+            continue;
+        }
+        if (destination == ordered.size()){
+            throw UserSetupError(logger,
+                "Not enough space after the living dex template for duplicates and other Pokemon. "
+                "Increase the number of boxes or remove extra Pokemon."
+            );
+        }
+        ordered[destination++] = boxes_data[source];
+    }
+    return ordered;
+}
+
+std::vector<LivingDexEntry> load_living_dex_template(const std::string& path){
+    const JsonValue json = load_json_file(path);
+    const JsonArray& entries = json.to_array_throw(path);
+    std::vector<LivingDexEntry> order;
+    order.reserve(entries.size());
+    for (const JsonValue& value : entries){
+        const JsonObject& entry = value.to_object_throw(path);
+        const int64_t nat_id = entry.get_integer_throw("natID", path);
+        if (nat_id < 1 || nat_id > 386){
+            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid FRLG National Dex number.", path);
+        }
+        order.push_back({
+            (uint16_t)nat_id,
+            entry.get_string_throw("slug", path),
+            entry.get_boolean_throw("has_gender_difference", path),
+            });
+    }
+    if (order.empty()){
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Living dex template is empty.", path);
+    }
+    return order;
+}
+
+std::string make_missing_living_dex_report(
+    const std::vector<std::optional<CollectedPokemonInfo>>& boxes_sorted,
+    const std::vector<LivingDexEntry>& living_dex_order
+){
+    if (living_dex_order.size() > boxes_sorted.size()){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Living dex template exceeds organized box slots.");
+    }
+    std::vector<uint16_t> missing;
+    for (size_t i = 0; i < living_dex_order.size(); i++){
+        if (!boxes_sorted[i]){
+            missing.push_back(living_dex_order[i].nat_id);
+        }
+    }
+    std::sort(missing.begin(), missing.end());
+    std::string report;
+    for (uint16_t dex_number : missing){
+        const std::string& slug = NATIONAL_DEX_SLUGS().at(dex_number - 1);
+        report += std::to_string(dex_number) + " " + get_pokemon_name(slug).display_name() + "\n";
+    }
+    return report;
+}
 
 BoxOrganizationScan scan_box_data(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
