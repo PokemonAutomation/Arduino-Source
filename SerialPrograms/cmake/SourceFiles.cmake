@@ -398,8 +398,11 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Sockets/AbstractClientSocket.h
     ../Common/Cpp/Sockets/ClientSocket.cpp
     ../Common/Cpp/Sockets/ClientSocket.h
+    ../Common/Cpp/Sockets/ClientSocket_POSIX.cpp
     ../Common/Cpp/Sockets/ClientSocket_POSIX.h
+    ../Common/Cpp/Sockets/ClientSocket_Qt.cpp
     ../Common/Cpp/Sockets/ClientSocket_Qt.h
+    ../Common/Cpp/Sockets/ClientSocket_WinSocket.cpp
     ../Common/Cpp/Sockets/ClientSocket_WinSocket.h
     ../Common/Cpp/StreamConnections/MockDevice.cpp
     ../Common/Cpp/StreamConnections/MockDevice.h
