@@ -11,14 +11,69 @@
 
 #include "CommandLineTests.h"
 
+#if defined(__APPLE__) || defined(__linux__)
+#include <execinfo.h>
+#include <signal.h>
+#include <unistd.h>
+#endif
+
 using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
 
 
+#if defined(__APPLE__) || defined(__linux__)
+//  On a fatal signal, dump a native backtrace of the crashing thread straight to stderr
+//  (fd 2, unbuffered) so it survives in the CI log even though stdout's buffer is lost when
+//  the process segfaults. Then restore the default disposition and re-raise, so the OS still
+//  writes its crash report (.ips on macOS) and the exit code still reflects the crash.
+static void crash_backtrace_handler(int sig){
+    //  Re-entrancy guard: if we crash while handling a signal, just die.
+    static volatile sig_atomic_t in_handler = 0;
+    if (in_handler){
+        _exit(128 + sig);
+    }
+    in_handler = 1;
+
+    const char msg[] = "\n[PA-CRASH] Fatal signal, backtrace of the crashing thread:\n";
+    if (write(2, msg, sizeof(msg) - 1) < 0){
+        //  Nothing more we can do.
+    }
+
+    void* frames[128];
+    int n = backtrace(frames, 128);
+    //  Writes one symbolized frame per line to fd 2. glibc declares it void; Apple's returns int.
+#if defined(__linux__)
+    backtrace_symbols_fd(frames, n, 2);
+#else
+    if (backtrace_symbols_fd(frames, n, 2) < 0){
+        //  Nothing more we can do.
+    }
+#endif
+
+    //  Let the OS do its normal crash handling (crash report + exit code).
+    signal(sig, SIG_DFL);
+    raise(sig);
+}
+
+static void install_crash_backtrace_handlers(){
+    static const int sigs[] = { SIGSEGV, SIGBUS, SIGABRT, SIGILL, SIGFPE };
+    for (int sig : sigs){
+        signal(sig, crash_backtrace_handler);
+    }
+}
+#else
+static void install_crash_backtrace_handlers(){}
+#endif
+
 
 int run_command_line_tests(bool augment_color_distortions){
+    install_crash_backtrace_handlers();
+    //  [ORT-DIAG] Keep stdout line-buffered in CI: when piped, stdio defaults to full
+    //  buffering, so the last few KB of test output (and where the crash happened) is lost
+    //  in the buffer when the process dies.
+    setvbuf(stdout, nullptr, _IOLBF, 0);
     cout << "Running parallel unit tests..." << endl;
     ComputerPrograms::CommandLineUnitTestRunner runner(global_logger_command_line());
     if (runner.run(augment_color_distortions)){
