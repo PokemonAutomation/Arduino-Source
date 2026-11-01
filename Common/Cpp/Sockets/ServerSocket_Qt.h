@@ -50,7 +50,6 @@ class ServerSocket_Qt final : public QObject, public AbstractServerSocket{
         bool done = false;
     };
 
-
 public:
     ServerSocket_Qt(ThreadPool&){}
 
@@ -62,9 +61,7 @@ public:
     //  blocks until the QTcpServer has been created on that thread.
     virtual void start(const std::string& address, uint16_t port) override;
 
-
     virtual void close_connection() override;
-
 
     //  Stops the server, destroys the QTcpServer (and its connection
     //  socket), and returns the socket to State::NOT_RUNNING so "start()"
@@ -76,7 +73,6 @@ public:
     //  callbacks run on the QTcpServer's event thread and this destroys the
     //  server that is running them.
     virtual void close() noexcept override;
-
 
     virtual size_t send(const void* data, size_t bytes) override;
 
