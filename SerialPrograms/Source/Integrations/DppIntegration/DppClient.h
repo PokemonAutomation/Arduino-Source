@@ -10,6 +10,7 @@
 #ifdef PA_DPP
 #include <atomic>
 #include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
 #include "Integrations/DppIntegration/DppCommandHandler.h"
@@ -52,8 +53,8 @@ private:
     std::unique_ptr<dpp::commandhandler> m_handler = nullptr;
     std::atomic<bool> m_is_connected;
     bool m_stopped = false;
-    std::mutex m_client_lock;
-    std::mutex m_register_lock;
+    Mutex m_client_lock;
+    Mutex m_register_lock;
     AsyncTask m_start_thread;
 };
 

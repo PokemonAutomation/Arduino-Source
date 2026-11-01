@@ -1179,7 +1179,7 @@ void LabelImages::on_focus_in(){
 void LabelImages::on_focus_out(){
     global_input_remove_listener(*this);
     {
-        std::lock_guard<std::mutex> lg(m_keyboard_lock);
+        std::lock_guard<Mutex> lg(m_keyboard_lock);
         m_held_keys.clear();
     }
     m_shift_pressed.store(false, std::memory_order_relaxed);
@@ -1208,7 +1208,7 @@ void LabelImages::run_controller_input(ControllerInputState& state){
 
     bool delete_annotation, remove_point, prev_image, next_image;
     {
-        std::lock_guard<std::mutex> lg(m_keyboard_lock);
+        std::lock_guard<Mutex> lg(m_keyboard_lock);
 
         //  A key counts as pressed the first time we see it in the held set.
         auto pressed = [&](KeyboardKey key){

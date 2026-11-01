@@ -33,6 +33,7 @@
 #include <string>
 #include <vector>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "Common/Cpp/Options/EnumDropdownDatabase.h"
@@ -364,7 +365,7 @@ private:
     //  and cleared by the UI thread when focus is lost, so it has its own lock.
     //  It is never held while calling into anything else, so it cannot deadlock
     //  against `m_lock`.
-    std::mutex m_keyboard_lock;
+    Mutex m_keyboard_lock;
     std::set<KeyboardKey> m_held_keys;
     std::atomic<bool> m_shift_pressed;
     std::atomic<bool> m_control_pressed;

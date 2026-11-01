@@ -258,7 +258,7 @@ void ReliableStreamConnection::on_packet(const PacketHeader* packet){
     uint8_t status = packet->magic_number;
 
 //    {
-//        std::lock_guard<std::mutex> lg(PokemonAutomation::print_lock);
+//        std::lock_guard<Mutex> lg(PokemonAutomation::print_lock);
 //        cout << "on_packet(): seqnum = [" << (int)packet->seqnum << "], opcode = " << (int)packet->opcode << endl;
 //    }
 

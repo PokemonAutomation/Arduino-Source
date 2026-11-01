@@ -86,7 +86,7 @@ void Handler::initialize(cluster& bot, commandhandler& handler){
             std::string id = std::to_string(event.created->id);
             log_dpp("Loaded guild: " + event.created->name + " (" + id + ").", "Guild Create", ll_info);
 #endif
-            std::lock_guard<std::mutex> lg(m_count_lock);
+            std::lock_guard<Mutex> lg(m_count_lock);
             Utility::get_user_counts(bot, event);
         }catch (std::exception& e){
             log_dpp("Failed to get user counts: " + (std::string)e.what(), "Guild Create", ll_error);

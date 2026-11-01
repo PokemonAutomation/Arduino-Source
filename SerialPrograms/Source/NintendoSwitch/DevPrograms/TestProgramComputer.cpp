@@ -13,7 +13,6 @@
 #include <set>
 #include <mutex>
 #include <fstream>
-#include <condition_variable>
 #include <iostream>
 #include <QImage>
 #include "3rdParty-Core/nlohmann/json.hpp"
@@ -25,6 +24,7 @@
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Containers/BoxSet.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "Common/Cpp/Concurrency/Watchdog.h"
 #include "Common/Cpp/Containers/CircularBuffer.h"
@@ -333,7 +333,7 @@ void stress_test(Logger& logger, CancellableScope& scope){
 }
 
 
-std::mutex print_lock;
+Mutex print_lock;
 
 
 class SampleTest : public UnitTest{
