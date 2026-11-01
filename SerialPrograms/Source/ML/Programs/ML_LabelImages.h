@@ -33,7 +33,6 @@
 #include <vector>
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
-#include "Common/Cpp/Concurrency/RecursiveMutex.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "Common/Cpp/Options/EnumDropdownDatabase.h"

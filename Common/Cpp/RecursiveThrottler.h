@@ -11,7 +11,7 @@
 #define PokemonAutomation_RecursiveThrottler_H
 
 #include <mutex>
-#include "Common/Cpp/Concurrency/RecursiveMutex.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
 
 namespace PokemonAutomation{
 

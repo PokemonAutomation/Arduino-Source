@@ -16,8 +16,10 @@
 
 #include <mutex>
 #include <QMutex>
+#include <QRecursiveMutex>
 namespace PokemonAutomation{
     using Mutex = QMutex;
+    using RecursiveMutex = QRecursiveMutex;
 }
 
 #else
@@ -25,6 +27,7 @@ namespace PokemonAutomation{
 #include <mutex>
 namespace PokemonAutomation{
     using Mutex = std::mutex;
+    using RecursiveMutex = std::recursive_mutex;
 }
 
 #endif
