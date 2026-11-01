@@ -377,45 +377,54 @@ void ServerSocket_POSIX::connection_thread_loop(){
     std::string error;
 
     while (true){
-        ssize_t bytes;
-        int error_no = 0;
-        bool no_data;
         {
             std::lock_guard<Mutex> lg(m_lock);
             if (m_state.load(std::memory_order_relaxed) != State::CONNECTED){
                 break;
             }
-            bytes = ::recv(socket, buffer, BUFFER_SIZE, 0);
-            no_data = (bytes == -1);
-            if (no_data){
-                error_no = errno;
-                no_data = (error_no == EAGAIN);
-#if EAGAIN != EWOULDBLOCK
-                no_data = no_data || (error_no == EWOULDBLOCK);
-#endif
-            }
         }
 
+        //  The socket is non-blocking, so this returns immediately. It is
+        //  deliberately called without holding m_lock: the state check
+        //  above and the result handling below are the only parts that
+        //  need the lock, and no socket call should stretch it.
+        ssize_t bytes = ::recv(socket, buffer, BUFFER_SIZE, 0);
+
         if (bytes > 0){
+            //  A new connection may have taken over while we were
+            //  reading: only dispatch the data if we still are the
+            //  active connection.
+            bool still_active;
+            {
+                std::lock_guard<Mutex> lg(m_lock);
+                still_active = (m_client == socket);
+            }
+            if (!still_active){
+                break;
+            }
             m_listeners.run_method(&Listener::on_receive_data, buffer, bytes);
             continue;
         }
 
-        if (no_data){
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            continue;
-        }
-
-        if (bytes == 0){
-            error = "Connection closed by client.";
-        }else{
-            switch (error_no){
-            case EINTR:
+        if (bytes == -1){
+            int error_no = errno;
+            if (error_no == EAGAIN){
+                //  No data yet.
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 continue;
-            default:
-                error = "Receive error (errno " + std::to_string(error_no) + "): " + std::string(strerror(error_no));
-                break;
             }
+#if EAGAIN != EWOULDBLOCK
+            if (error_no == EWOULDBLOCK){
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                continue;
+            }
+#endif
+            if (error_no == EINTR){
+                continue;
+            }
+            error = "Receive error (errno " + std::to_string(error_no) + "): " + std::string(strerror(error_no));
+        }else if (bytes == 0){
+            error = "Connection closed by client.";
         }
         break;
     }
