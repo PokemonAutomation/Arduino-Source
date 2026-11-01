@@ -5,6 +5,7 @@
  */
 
 #include <chrono>
+#include <cstdio>
 #include <QSharedPointer>
 #include <QTimer>
 #include <QTcpSocket>
@@ -97,6 +98,11 @@ size_t ClientSocket_Qt::send(const void* data, size_t bytes){
     QSharedPointer<SendData> send_data = QSharedPointer<SendData>::create();
     send_data->packet.assign((const char*)data, bytes);
 
+    //  [SOCK-DIAG] Temporary: how long did the event thread take to
+    //  deliver the queued send? A wait that reaches the 5 s timeout
+    //  means the event thread never ran it. Remove with the rest of
+    //  the diagnostics.
+    const auto send_start = std::chrono::steady_clock::now();
     emit internal_send(send_data);
 
     //  Wait for the socket's event thread to finish writing the packet.
@@ -112,6 +118,16 @@ size_t ClientSocket_Qt::send(const void* data, size_t bytes){
             std::chrono::seconds(5),
             [&send_data]{ return send_data->done; }
         );
+    }
+
+    //  [SOCK-DIAG] Temporary: how long the event thread took. Remove
+    //  with the rest of the diagnostics.
+    {
+        const long long ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+            std::chrono::steady_clock::now() - send_start
+        ).count();
+        fprintf(stderr, "[SOCK-DIAG] client send %zu bytes: event thread took %lld ms%s\n",
+            bytes, ms, send_data->done ? "" : " (TIMED OUT - event thread never ran it)");
     }
 
     return send_data->bytes_sent;

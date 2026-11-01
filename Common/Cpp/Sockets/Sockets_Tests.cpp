@@ -12,6 +12,7 @@
  */
 
 #include <atomic>
+#include <cstdio>
 #include <chrono>
 #include <cstdint>
 #include <cstring>
@@ -426,6 +427,10 @@ public:
 
             for (int cycle = 0; cycle < CYCLES; cycle++){
                 int cycle_no = cycle + 1;
+
+                //  [SOCK-DIAG] Temporary: where the test was when the
+                //  process died. Remove with the rest of the diagnostics.
+                fprintf(stderr, "[SOCK-DIAG] rapid reconnect cycle %d/%d\n", cycle_no, CYCLES);
 
                 if (!this->connect_client(client, client_listener, port, cycle_no)){
                     error = "The client did not finish connecting (cycle " + std::to_string(cycle_no) + ")";

@@ -106,8 +106,14 @@ int run_command_line_tests(bool augment_color_distortions){
     setvbuf(stdout, nullptr, _IOLBF, 8192);
     cout << "Running parallel unit tests..." << endl;
     ComputerPrograms::CommandLineUnitTestRunner runner(global_logger_command_line());
-    if (runner.run(augment_color_distortions)){
-        return 1;
+    //  [SOCK-DIAG] Temporary: run the suite 3x to raise the odds of
+    //  catching the Mac Intel crash in a single CI run. Remove with the
+    //  rest of the diagnostics.
+    for (int run_no = 1; run_no <= 3; run_no++){
+        fprintf(stderr, "\n[SOCK-DIAG] Test suite run %d of 3\n", run_no);
+        if (runner.run(augment_color_distortions)){
+            return 1;
+        }
     }
     cout << "Running parallel unit tests... Done!" << endl;
     return 0;
