@@ -51,6 +51,19 @@ program is usually in #automation-chat and #automation-help.
 - If you also tested on real hardware, say so in the PR description: what you ran, and for how
   long.
 
+## CI
+
+- Every PR runs the full C++ CI matrix (see `.github/workflows/cpp-ci-serial-programs-*.yml`):
+  Ubuntu (default and clang), Windows (default and clang), and both macOS flavors
+  (`macos-15` arm64 and `macos-15-intel`). The Mac and Ubuntu jobs also run the command-line
+  test suite; Windows/clang additionally fail on any compiler warning (`/W4 /WX`).
+- macOS arm64 (`macos-15`) hosted runners are the scarcest pool. When GitHub cannot place a
+  job on one, the run is cancelled after ~15 minutes with the annotation "The job was not
+  acquired by Runner of type hosted even after multiple attempts" and no logs are produced.
+  In the Actions UI such a job shows "Internal server error. Correlation ID: ..." in place of
+  its log. This is a GitHub runner-capacity issue, not a build or test failure and not an
+  out-of-memory condition; re-run the job rather than investigating the code.
+
 ## Limits and Response Time
 
 - Our devs work on the repo in their free time, so reviews can take a week or more — don't
