@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_ServerSocket_Qt_H
 #define PokemonAutomation_ServerSocket_Qt_H
 
+#include <chrono>
 #include <string>
 #include <atomic>
 #include <QObject>
@@ -35,6 +36,11 @@ class ServerSocket_Qt final : public QObject, public AbstractServerSocket{
     //  discarded event leaves the caller's copy as the last reference.
     struct SendData{
         std::string packet;
+        //  The event-thread write loop stops at this deadline, so a send
+        //  that can never complete (a client that never reads) cannot pin
+        //  the server's event thread forever and block "close()". "max()"
+        //  means no deadline (the infinite default).
+        std::chrono::steady_clock::time_point deadline = std::chrono::steady_clock::time_point::max();
         size_t bytes_sent = 0;
         bool done = false;
 
@@ -74,7 +80,11 @@ public:
     //  server that is running them.
     virtual void close() noexcept override;
 
-    virtual size_t send(const void* data, size_t bytes) override;
+    virtual size_t send(
+        const void* data,
+        size_t bytes,
+        std::chrono::milliseconds timeout = std::chrono::milliseconds::max()
+    ) override;
 
 
 signals:
