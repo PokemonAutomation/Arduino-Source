@@ -845,15 +845,29 @@ private:
 
 
 //  The peer accepts the connection but stalls reading: a send() with a
-//  deadline must give up at the deadline with a partial count, and
-//  close() must still be able to finish afterwards (on the Qt backend the
-//  in-flight write stops at the deadline, releasing the socket's event
-//  thread, which is what close() has to run on).
+//  deadline must stop at the deadline with a partial count, and
+//  close() must still be able to finish afterwards (on the Qt backend
+//  the in-flight write stops at the deadline, releasing the socket's
+//  event thread, which is what close() has to run on).
+//
+//  The stall lasts 12 s - longer than the 10 s send threshold below - so
+//  the peer is still stalled for the whole duration of every send in the
+//  retry loop. It is interruptible ("stop"), so shutting the peer down
+//  does not wait for it.
+//
+//  An OS with unusually large autotuned socket buffers (observed on
+//  Windows CI, where the kernel buffered the entire 256 MB payload
+//  against a non-reading peer) lets the first send "complete" by parking
+//  the data in the kernel. Those buffers are now full, so a follow-up
+//  send to the same stalled peer cannot complete and must stop at the
+//  deadline with a partial count; the loop retries until that happens
+//  (up to 4 times, i.e. unless the OS can buffer over 1 GiB).
 //
 //  Note: QTcpSocket::write() accepts the whole payload into Qt's internal
 //  buffer and reports it as written, so kernel backpressure never reaches
-//  the Qt write loop and the send legitimately "completes" there. On that
-//  backend only the timing and close() behavior are asserted.
+//  the Qt write loop and the send legitimately "completes" there; a
+//  retry cannot exercise the deadline on that backend. On that backend
+//  only the timing and close() behavior are asserted.
 template <typename ClientSocketType, typename ServerSocketType>
 class Test_Sockets_ClientSendTimeout : public TestSockets<ClientSocketType, ServerSocketType>{
 public:
@@ -862,14 +876,20 @@ public:
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         constexpr bool QT = std::is_same_v<ClientSocketType, ClientSocket_Qt>;
 
-        //  Stalls the server's reading for 4 s on the first data, keeping
-        //  the client's send buffer full for the duration of the send test.
+        //  Stalls the server's reading for 12 s on the first data (or
+        //  until "stop" is set), keeping the client's send buffer full
+        //  for the duration of the send test.
         struct StallingServerListener : ServerListener{
             std::atomic<bool> stalled{false};
+            std::atomic<bool> stop{false};
 
             virtual void on_receive_data(const void* data, size_t bytes) override{
                 if (!stalled.exchange(true)){
-                    std::this_thread::sleep_for(std::chrono::seconds(4));
+                    const auto end = std::chrono::steady_clock::now() + std::chrono::seconds(12);
+                    while (std::chrono::steady_clock::now() < end
+                        && !stop.load(std::memory_order_acquire)){
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    }
                 }
                 ServerListener::on_receive_data(data, bytes);
             }
@@ -899,35 +919,58 @@ public:
             )){
                 error = "The server did not call on_connect";
             }else{
-                //  Far larger than any kernel send/receive buffer (the loopback
-                //  qdisc is unlimited on most systems, so this must exceed the
-                //  per-socket autotuning caps), so the send must stall on the
-                //  stalled reader.
+                //  Far larger than the kernel send/receive buffering that
+                //  the send loop can rely on being absent, so the send
+                //  must stop on the stalled reader (see the comment on
+                //  the class for the large-buffer OS case).
                 constexpr size_t SIZE = 1 << 28;
                 std::vector<uint8_t> payload(SIZE, 0xAB);
 
-                auto t0 = std::chrono::steady_clock::now();
-                size_t sent = client.send(
-                    payload.data(),
-                    payload.size(),
-                    std::chrono::milliseconds(100)
-                );
-                auto send_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-                    std::chrono::steady_clock::now() - t0
-                ).count();
+                //  The deadline is 100 ms, but this test also allocates
+                //  and moves 256 MB (the Qt backend additionally copies it
+                //  into its packet buffer), and on a loaded CI runner that
+                //  page traffic - or the calling thread being descheduled
+                //  - can take seconds. The pre-fix behavior was an infinite
+                //  hang, so the threshold only has to prove boundedness;
+                //  10 s keeps the test meaningful while tolerating CI
+                //  load.
+                int completed = 0;
+                while (true){
+                    auto t0 = std::chrono::steady_clock::now();
+                    size_t sent = client.send(
+                        payload.data(),
+                        payload.size(),
+                        std::chrono::milliseconds(100)
+                    );
+                    auto send_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::steady_clock::now() - t0
+                    ).count();
 
-                //  The deadline is 100 ms, but this test also allocates and
-                //  moves 256 MB (the Qt backend additionally copies it into
-                //  its packet buffer), and on a loaded CI runner that page
-                //  traffic - or the calling thread being descheduled - can
-                //  take seconds. The pre-fix behavior was an infinite hang,
-                //  so the threshold only has to prove boundedness; 10 s
-                //  keeps the test meaningful while tolerating CI load.
-                if (send_ms > 10000){
-                    error = "send() did not return within 10 s of its 100 ms deadline (" + std::to_string(send_ms) + " ms)";
-                }else if (!QT && sent >= payload.size()){
-                    error = "send() unexpectedly completed against the stalled peer";
-                }else{
+                    if (send_ms > 10000){
+                        error = "send() did not return within 10 s of its 100 ms deadline (" + std::to_string(send_ms) + " ms)";
+                        break;
+                    }else if (sent < payload.size()){
+                        //  The deadline engaged with bytes left unwritten.
+                        break;
+                    }else if (QT){
+                        //  Qt's "completion" is its userspace buffer, not
+                        //  kernel delivery; a retry cannot exercise the
+                        //  deadline on that backend.
+                        break;
+                    }
+
+                    //  The whole payload was written, so the kernel's
+                    //  socket buffers absorbed it (unusually large
+                    //  autotuned buffers). They are now full, so the
+                    //  next send to the same stalled peer cannot
+                    //  complete.
+                    if (++completed >= 4){
+                        error = "All 4 sends of 256 MB completed: the OS buffered over 1 GiB against the stalled peer, so the deadline cannot be verified";
+                        break;
+                    }
+                }
+
+                if (error.empty()){
                     auto c0 = std::chrono::steady_clock::now();
                     client.close();
                     auto close_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -945,9 +988,10 @@ public:
             client.close();
         }
 
-        //  The stalled reader blocks the server's connection thread for 4 s;
-        //  wait it out before shutting the server down.
-        std::this_thread::sleep_for(std::chrono::seconds(5));
+        //  Release the stalled reader so the server's close() (which
+        //  joins its connection thread, currently inside the stall) does
+        //  not wait for it.
+        server_listener.stop.store(true, std::memory_order_release);
 
         server.close();
 
