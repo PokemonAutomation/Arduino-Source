@@ -6,6 +6,8 @@
 
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonBDSP_DialogDetector.h"
 
 //#include <iostream>
@@ -23,6 +25,7 @@ ShortDialogDetector::ShortDialogDetector(Color color)
     , m_left_white(0.21, 0.835, 0.008, 0.12)
     , m_left(0.18, 0.835, 0.02, 0.12)
     , m_right_white(0.785, 0.835, 0.008, 0.12)
+    , m_right_white_low(0.785, 0.915, 0.008, 0.04)
     , m_right(0.822, 0.835, 0.02, 0.12)
 {}
 void ShortDialogDetector::make_overlays(VideoOverlaySet& items) const{
@@ -40,7 +43,9 @@ bool ShortDialogDetector::detect(const ImageViewRGB32& screen){
     }
     ImageStats right_white = image_stats(extract_box_reference(screen, m_right_white));
 //    cout << right_white.average << right_white.stddev << endl;
-    if (!is_white(right_white)){
+    //  A long first line runs into m_right_white (Rowan's "Now, go on, and
+    //  leap into the world of Pokemon!"): then the box's right end below it.
+    if (!is_white(right_white) && !is_white(image_stats(extract_box_reference(screen, m_right_white_low)))){
         return false;
     }
 //    ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
@@ -123,6 +128,39 @@ bool ShortDialogPromptDetector::process_frame(const ImageViewRGB32& screen, Wall
 
 
 
+
+
+
+
+class Test_ShortDialogDetector : public ImageUnitTest{
+public:
+    Test_ShortDialogDetector(const std::string& image, bool expected)
+        : ImageUnitTest("PokemonBDSP::ShortDialogDetector - " + image, {image})
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run_on_images(
+        Logger&, CancellableScope&,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        return ShortDialogDetector().detect(images[0]) == m_expected;
+    }
+
+private:
+    bool m_expected;
+};
+
+void add_tests_DialogDetector(UnitTestDatabase& database){
+    database.add<Test_ShortDialogDetector>("PokemonBDSP/DialogDetector/IntroRowanNameTab_True.png", true);
+    database.add<Test_ShortDialogDetector>("PokemonBDSP/DialogDetector/IntroRowanNoArrow_True.png", true);
+    //  A short line: the box's right end is white where the old check looks.
+    database.add<Test_ShortDialogDetector>("PokemonBDSP/DialogDetector/IntroRowanShortLine_True.png", true);
+    //  A "???" name tab, in Jubilife's yellow plaza after the tag battle.
+    database.add<Test_ShortDialogDetector>("PokemonBDSP/DialogDetector/JubilifeUnknownNameTab_True.png", true);
+    //  One line, no name tab, over Floaroma's flowers.
+    database.add<Test_ShortDialogDetector>("PokemonBDSP/DialogDetector/FloaromaOldManOneLine_True.png", true);
+    database.add<Test_ShortDialogDetector>("PokemonBDSP/DialogDetector/FloaromaCloudShadows_False.png", false);
+}
 
 
 }
