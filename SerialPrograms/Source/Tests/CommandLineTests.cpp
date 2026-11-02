@@ -18,6 +18,10 @@
 #include <execinfo.h>
 #include <pthread.h>
 #include <signal.h>
+#include <sys/ucontext.h>
+#if defined(__linux__) && defined(__x86_64__)
+#include <sys/reg.h>
+#endif
 #include <unistd.h>
 #endif
 
@@ -39,12 +43,32 @@ namespace PokemonAutomation{
 //  backtrace() and backtrace_symbols_fd() are not strictly async-signal-
 //  safe, so a re-entrancy guard stops a crash inside the handler from
 //  looping: if we re-enter, just die immediately.
-static void crash_backtrace_handler(int sig, siginfo_t* info, void*){
+static void crash_backtrace_handler(int sig, siginfo_t* info, void* ucontext_raw){
     static volatile sig_atomic_t in_handler = 0;
     if (in_handler){
         _exit(128 + sig);
     }
     in_handler = 1;
+
+    //  The faulting program counter: the exact instruction that died.
+    uintptr_t pc = 0;
+    if (ucontext_raw != nullptr){
+        ucontext_t* ucontext = (ucontext_t*)ucontext_raw;
+        #if defined(__APPLE__)
+        //  On Apple, uc_mcontext is a pointer (struct __darwin_mcontext64 *).
+        #if defined(__x86_64__)
+            pc = ucontext->uc_mcontext->__ss.__rip;
+        #elif defined(__aarch64__)
+            pc = ucontext->uc_mcontext->__ss.__pc;
+        #endif
+        #elif defined(__linux__)
+        #if defined(__x86_64__)
+            pc = (uintptr_t)ucontext->uc_mcontext.gregs[REG_RIP];
+        #elif defined(__aarch64__)
+            pc = (uintptr_t)ucontext->uc_mcontext.pc;
+        #endif
+        #endif
+    }
 
     //  For SIGSEGV/SIGBUS, si_addr is the faulting virtual address: which
     //  region the bad pointer landed in (stack, heap, a library) narrows
@@ -53,8 +77,9 @@ static void crash_backtrace_handler(int sig, siginfo_t* info, void*){
     int len = snprintf(
         msg,
         sizeof(msg),
-        "\n[PA-CRASH] Fatal signal %d, fault address 0x%lx, thread 0x%lx; backtrace:\n",
+        "\n[PA-CRASH] Fatal signal %d, pc 0x%lx, fault address 0x%lx, thread 0x%lx; backtrace:\n",
         sig,
+        (unsigned long)pc,
         (sig == SIGSEGV || sig == SIGBUS)
             ? (unsigned long)(uintptr_t)info->si_addr
             : 0UL,
