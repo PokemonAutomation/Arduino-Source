@@ -1485,7 +1485,14 @@ public:
 template <typename ClientSocketType, typename ServerSocketType>
 class Test_Sockets_CloseCancelsSend : public TestSockets<ClientSocketType, ServerSocketType>{
 public:
-    using TestSockets<ClientSocketType, ServerSocketType>::TestSockets;
+    Test_Sockets_CloseCancelsSend(ThreadPool& thread_pool, std::string name)
+        : TestSockets<ClientSocketType, ServerSocketType>(thread_pool, std::move(name))
+    {
+        //  The 256 MiB payload below, plus a transient 256 MiB copy in the
+        //  Qt backend's in-flight send data (overreported on the other
+        //  backends, which don't copy the payload).
+        this->m_memory = 2ull * (1ull << 28);
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (timing_unreliable()){
@@ -1648,7 +1655,14 @@ public:
 template <typename ClientSocketType, typename ServerSocketType>
 class Test_Sockets_CloseConnectionCancelsSend : public TestSockets<ClientSocketType, ServerSocketType>{
 public:
-    using TestSockets<ClientSocketType, ServerSocketType>::TestSockets;
+    Test_Sockets_CloseConnectionCancelsSend(ThreadPool& thread_pool, std::string name)
+        : TestSockets<ClientSocketType, ServerSocketType>(thread_pool, std::move(name))
+    {
+        //  The 256 MiB payload below, plus a transient 256 MiB copy in the
+        //  Qt backend's in-flight send data (overreported on the other
+        //  backends, which don't copy the payload).
+        this->m_memory = 2ull * (1ull << 28);
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (timing_unreliable()){
