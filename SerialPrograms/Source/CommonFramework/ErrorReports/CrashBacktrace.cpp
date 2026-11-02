@@ -40,10 +40,11 @@ static void crash_backtrace_handler(int sig, siginfo_t* info, void* ucontext_raw
     if (ucontext_raw != nullptr){
         ucontext_t* ucontext = (ucontext_t*)ucontext_raw;
         #if defined(__APPLE__)
+        //  On Apple, uc_mcontext is a pointer (struct __darwin_mcontext64 *).
         #if defined(__x86_64__)
-            pc = ucontext->uc_mcontext.__ss.__rip;
+            pc = ucontext->uc_mcontext->__ss.__rip;
         #elif defined(__aarch64__)
-            pc = ucontext->uc_mcontext.__ss.__pc;
+            pc = ucontext->uc_mcontext->__ss.__pc;
         #endif
         #elif defined(__linux__)
         #if defined(__x86_64__)
