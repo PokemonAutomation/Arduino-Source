@@ -1028,23 +1028,11 @@ void AutoStory::test_checkpoints(
 }
 
 std::string AutoStory::start_segment_description(){
-    size_t segment_index = 0;
-    if (STORY_SECTION == StorySection::TUTORIAL){
-        segment_index = STARTPOINT_TUTORIAL.index();
-    }else if (STORY_SECTION == StorySection::MAIN_STORY){
-        segment_index = STARTPOINT_MAINSTORY.index() + (INDEX_OF_LAST_TUTORIAL_SEGMENT + 1);
-    }
-    return "    " + ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->start_text();
+    return "    " + ALL_AUTO_STORY_SEGMENT_LIST()[get_start_segment_index()]->start_text();
 }
 
 std::string AutoStory::end_segment_description(){
-    size_t segment_index = 0;
-    if (STORY_SECTION == StorySection::TUTORIAL){
-        segment_index = ENDPOINT_TUTORIAL.index();
-    }else if (STORY_SECTION == StorySection::MAIN_STORY){
-        segment_index = ENDPOINT_MAINSTORY.index() + (INDEX_OF_LAST_TUTORIAL_SEGMENT + 1);
-    }    
-    return "    " + ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->end_text();
+    return "    " + ALL_AUTO_STORY_SEGMENT_LIST()[get_end_segment_index()]->end_text();
 }
 
 size_t AutoStory::get_start_segment_index(){
