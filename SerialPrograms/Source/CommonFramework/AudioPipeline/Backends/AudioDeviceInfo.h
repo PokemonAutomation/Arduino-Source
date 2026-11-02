@@ -27,7 +27,8 @@ public:
 
     explicit operator bool() const;
 
-    const std::string& display_name() const;
+    std::string display_name() const;
+    const std::string& original_name() const;
     const std::string& device_name() const;
 
     //  The device-driven format list (see input_choices()). Populated for
