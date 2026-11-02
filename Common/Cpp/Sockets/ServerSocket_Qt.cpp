@@ -165,12 +165,21 @@ size_t ServerSocket_Qt::send(const void* data, size_t bytes, std::chrono::millis
     emit internal_send(send_data);
 
     //  Wait for the server's event thread to finish writing the packet.
-    //  The write loop itself stops at "deadline", so this bound only
-    //  covers the queued call's start-up delay. The infinite default
-    //  keeps a bounded 5 s safety: if "close()" destroys the server
-    //  before the queued call ever runs, it will never complete on its
-    //  own; the shared ownership keeps the packet alive until the queued
-    //  call runs (or is discarded with the server).
+    //  A finite "timeout" waits for the deadline plus 1 s of queueing
+    //  margin: the write loop stops at the deadline, so anything beyond
+    //  that is just the queued call waiting to start.
+    //
+    //  The infinite default cannot wait indefinitely - a limitation of
+    //  this wrapper, not of Qt: if "close()"/"close_connection()" runs
+    //  from another thread and the event loop is destroyed while this
+    //  call is still queued (posted after the destruction event), Qt
+    //  silently discards the pending event, the handler never runs, and
+    //  "done" is never set; an unbounded wait would then hang the
+    //  caller forever. A send queued before the close is safe: the
+    //  event loop is FIFO, so it runs first. The 5 s bound turns that
+    //  post-close race into a "0 bytes written" result instead of a
+    //  hang. The shared ownership keeps the packet alive until the
+    //  queued call runs (or is discarded with the server).
     const std::chrono::milliseconds wait_time =
         (timeout == std::chrono::milliseconds::max())
             ? std::chrono::milliseconds(5000)

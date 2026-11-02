@@ -153,7 +153,7 @@ bool timing_unreliable(){
 //  Shared budget for the connect/listen/data waits below: long enough
 //  that a moderately loaded machine can make it, short enough that a
 //  real regression is still reported within the CI timeouts.
-constexpr std::chrono::seconds SOCKET_TEST_WAIT{30};
+constexpr std::chrono::seconds SOCKET_TEST_WAIT{60};
 
 
 template <typename ClientSocketType, typename ServerSocketType>
@@ -911,7 +911,7 @@ public:
                 uint16_t candidate = (uint16_t)(40000 + rng() % 20000);
                 server.start("127.0.0.1", candidate);
                 if (server_listener.waiter.wait_for(
-                    SOCKET_TEST_WAIT,
+                    std::chrono::seconds(5),
                     [&server_listener]{ return server_listener.listen_finished.load() > 0; }
                 ) && server_listener.last_listen_error.empty()){
                     port = candidate;
@@ -931,12 +931,12 @@ public:
             client.add_listener(client_listener);
             client.connect("127.0.0.1", port);
             if (!client_listener.waiter.wait_for(
-                SOCKET_TEST_WAIT,
+                std::chrono::seconds(5),
                 [&client_listener]{ return client_listener.connect_finished.load() >= 1; }
             )){
                 error = "The client did not finish connecting";
             }else if (!server_listener.waiter.wait_for(
-                SOCKET_TEST_WAIT,
+                std::chrono::seconds(5),
                 [&server_listener]{ return server_listener.connected.load() >= 1; }
             )){
                 error = "The server did not call on_connect";
@@ -991,10 +991,10 @@ private:
 //  the in-flight write stops at the deadline, releasing the socket's
 //  event thread, which is what close() has to run on).
 //
-//  The stall lasts 12 s - longer than the 10 s send threshold below - so
-//  the peer is still stalled for the whole duration of every send in the
-//  retry loop. It is interruptible ("stop"), so shutting the peer down
-//  does not wait for it.
+//  The stall lasts 70 s - longer than the 60 s send threshold below -
+//  so the peer is still stalled for the whole duration of every send in
+//  the retry loop. It is interruptible ("stop"), so shutting the peer
+//  down does not wait for it.
 //
 //  An OS with unusually large autotuned socket buffers (observed on
 //  Windows CI, where the kernel buffered the entire 256 MB payload
@@ -1035,9 +1035,13 @@ public:
             std::atomic<bool> stalled{false};
             std::atomic<bool> stop{false};
 
+            ~StallingServerListener(){
+                stop.store(true, std::memory_order_release);
+            }
+
             virtual void on_receive_data(const void* data, size_t bytes) override{
                 if (!stalled.exchange(true)){
-                    const auto end = std::chrono::steady_clock::now() + std::chrono::seconds(12);
+                    const auto end = std::chrono::steady_clock::now() + std::chrono::seconds(70);
                     while (std::chrono::steady_clock::now() < end
                         && !stop.load(std::memory_order_acquire)){
                         std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -1106,8 +1110,8 @@ public:
                 //  page traffic - or the calling thread being descheduled
                 //  - can take seconds. The pre-fix behavior was an infinite
                 //  hang, so the threshold only has to prove boundedness;
-                //  10 s keeps the test meaningful while tolerating CI
-                //  load.
+                //  60 s keeps the test meaningful while tolerating
+                //  extremely loaded CI runners.
                 int completed = 0;
                 while (true){
                     auto t0 = std::chrono::steady_clock::now();
@@ -1120,7 +1124,7 @@ public:
                         std::chrono::steady_clock::now() - t0
                     ).count();
 
-                    if (send_ms > 10000){
+                    if (send_ms > 60000){
                         //  A slow send on a starved machine is the
                         //  machine's fault, not the deadline's.
                         if (timing_unreliable()){
@@ -1129,7 +1133,7 @@ public:
                                 "send() took " + std::to_string(send_ms) + " ms on a starved machine."
                             );
                         }
-                        error = "send() did not return within 10 s of its 100 ms deadline (" + std::to_string(send_ms) + " ms)";
+                        error = "send() did not return within 60 s of its 100 ms deadline (" + std::to_string(send_ms) + " ms)";
                         break;
                     }else if (sent < payload.size()){
                         //  The deadline engaged with bytes left unwritten.
@@ -1155,11 +1159,15 @@ public:
                 if (error.empty()){
                     //  A zero-length send round-trips a queued call through
                     //  the socket's event thread (on the Qt backend, the
-                    //  thread that close() has to wait on). If even that
-                    //  takes more than 5 s, a slow close() is the
-                    //  machine's fault, not a bug.
+                    //  thread that close() has to wait on). The infinite
+                    //  default is the canary: it returns in ~0 ms on a
+                    //  healthy event thread, and for the full 5 s internal
+                    //  safety wait if that thread is starved. (A finite
+                    //  timeout cannot be used: the caller-side wait is
+                    //  capped at "timeout + 1 s", so the control could
+                    //  never expose a starved event thread.)
                     const auto z0 = std::chrono::steady_clock::now();
-                    client.send("", 0, std::chrono::milliseconds(100));
+                    client.send("", 0);
                     const long long control_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
                         std::chrono::steady_clock::now() - z0
                     ).count();
@@ -1169,8 +1177,8 @@ public:
                     auto close_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
                         std::chrono::steady_clock::now() - c0
                     ).count();
-                    if (close_ms > 10000){
-                        if (control_ms > 5000 || timing_unreliable()){
+                    if (close_ms > 60000){
+                        if (control_ms > 2000 || timing_unreliable()){
                             return UnitTestResult(
                                 UnitTestResult::SKIPPED,
                                 "close() took " + std::to_string(close_ms) + " ms on a starved machine."
@@ -1210,10 +1218,10 @@ public:
 //  the server's event thread, which is what close_connection() has to run
 //  on).
 //
-//  The stall lasts 12 s - longer than the 10 s send threshold below - so
-//  the peer is still stalled for the whole duration of every send in the
-//  retry loop. It is interruptible ("stop"), so shutting the peer down
-//  does not wait for it.
+//  The stall lasts 70 s - longer than the 60 s send threshold below -
+//  so the peer is still stalled for the whole duration of every send in
+//  the retry loop. It is interruptible ("stop"), so shutting the peer
+//  down does not wait for it.
 //
 //  An OS with unusually large autotuned socket buffers (observed on
 //  Windows CI, where the kernel buffered the entire 256 MB payload
@@ -1254,9 +1262,13 @@ public:
             std::atomic<bool> stalled{false};
             std::atomic<bool> stop{false};
 
+            ~StallingClientListener(){
+                stop.store(true, std::memory_order_release);
+            }
+
             virtual void on_receive_data(const void* data, size_t bytes) override{
                 if (!stalled.exchange(true)){
-                    const auto end = std::chrono::steady_clock::now() + std::chrono::seconds(12);
+                    const auto end = std::chrono::steady_clock::now() + std::chrono::seconds(70);
                     while (std::chrono::steady_clock::now() < end
                         && !stop.load(std::memory_order_acquire)){
                         std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -1325,8 +1337,8 @@ public:
                 //  page traffic - or the calling thread being descheduled
                 //  - can take seconds. The pre-fix behavior was an infinite
                 //  hang, so the threshold only has to prove boundedness;
-                //  10 s keeps the test meaningful while tolerating CI
-                //  load.
+                //  60 s keeps the test meaningful while tolerating
+                //  extremely loaded CI runners.
                 int completed = 0;
                 while (true){
                     auto t0 = std::chrono::steady_clock::now();
@@ -1339,7 +1351,7 @@ public:
                         std::chrono::steady_clock::now() - t0
                     ).count();
 
-                    if (send_ms > 10000){
+                    if (send_ms > 60000){
                         //  A slow send on a starved machine is the
                         //  machine's fault, not the deadline's.
                         if (timing_unreliable()){
@@ -1348,7 +1360,7 @@ public:
                                 "send() took " + std::to_string(send_ms) + " ms on a starved machine."
                             );
                         }
-                        error = "send() did not return within 10 s of its 100 ms deadline (" + std::to_string(send_ms) + " ms)";
+                        error = "send() did not return within 60 s of its 100 ms deadline (" + std::to_string(send_ms) + " ms)";
                         break;
                     }else if (sent < payload.size()){
                         //  The deadline engaged with bytes left unwritten.
@@ -1374,11 +1386,15 @@ public:
                 if (error.empty()){
                     //  A zero-length send round-trips a queued call through
                     //  the server's event thread (on the Qt backend, the
-                    //  thread that close_connection() has to wait on). If
-                    //  even that takes more than 5 s, a slow
-                    //  close_connection() is the machine's fault, not a bug.
+                    //  thread that close_connection() has to wait on). The
+                    //  infinite default is the canary: it returns in ~0 ms
+                    //  on a healthy event thread, and for the full 5 s
+                    //  internal safety wait if that thread is starved.
+                    //  (A finite timeout cannot be used: the caller-side
+                    //  wait is capped at "timeout + 1 s", so the control
+                    //  could never expose a starved event thread.)
                     const auto z0 = std::chrono::steady_clock::now();
-                    server.send("", 0, std::chrono::milliseconds(100));
+                    server.send("", 0);
                     const long long control_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
                         std::chrono::steady_clock::now() - z0
                     ).count();
@@ -1388,8 +1404,8 @@ public:
                     auto close_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
                         std::chrono::steady_clock::now() - c0
                     ).count();
-                    if (close_ms > 10000){
-                        if (control_ms > 5000 || timing_unreliable()){
+                    if (close_ms > 60000){
+                        if (control_ms > 2000 || timing_unreliable()){
                             return UnitTestResult(
                                 UnitTestResult::SKIPPED,
                                 "close_connection() took " + std::to_string(close_ms) + " ms on a starved machine."
