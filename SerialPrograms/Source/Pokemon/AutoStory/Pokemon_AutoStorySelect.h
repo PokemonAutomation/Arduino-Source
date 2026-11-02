@@ -34,9 +34,11 @@ StringSelectDatabase make_story_select_database(
 
 //  The index in the whole story list of entry `index_in_section` of the
 //  tutorial or the main story, whose first entry is `first_main_story_index`.
-//  NOTE: assumes two consecutive sections (tutorial, then the main story),
-//  which is all SV AutoStory covers. A postgame or DLC that branches off
-//  the main story will need a different model than one global index.
+//  NOTE: a section ends where the user must step in (e.g. level up the
+//  Pokemon between the tutorial and the main story). SV has two sections.
+//  Later content (postgame, DLC) appends to the last section, run only after
+//  the main story; if it needs its own break (e.g. grinding before a DLC),
+//  it becomes a third section and `main_story` here becomes a section index.
 inline size_t story_index(bool main_story, size_t index_in_section, size_t first_main_story_index){
     return main_story ? first_main_story_index + index_in_section : index_in_section;
 }
