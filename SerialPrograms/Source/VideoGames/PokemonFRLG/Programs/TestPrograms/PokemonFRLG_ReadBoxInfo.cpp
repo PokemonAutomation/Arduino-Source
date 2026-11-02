@@ -25,8 +25,8 @@ ReadBoxInfo_Descriptor::ReadBoxInfo_Descriptor()
         "PokemonFRLG:ReadBoxInfo",
         Pokemon::STRING_POKEMON + " FRLG", "Read Box Info", "",
         "Start on the box screen. Read one frame and log the selection hand, "
-        "cursor location, occupancy, species, level, and gender. "
-        "Detection regions remain visible for 10 seconds.",
+        "cursor location, occupancy, species, level, and gender. ",
+        PanelQualityStanding::DEVELOPER,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
