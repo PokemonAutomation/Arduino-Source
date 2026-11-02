@@ -100,11 +100,23 @@ void ClientSocket_WinSocket::connect(const std::string& address, uint16_t port){
 }
 
 
-size_t ClientSocket_WinSocket::send(const void* data, size_t bytes){
+size_t ClientSocket_WinSocket::send(const void* data, size_t bytes, std::chrono::milliseconds timeout){
     const char* ptr = (const char*)data;
     size_t sent = 0;
 
+    //  "time_point::max()" (the infinite default) is never reached; using
+    //  it also avoids overflowing "now() + timeout".
+    const std::chrono::steady_clock::time_point deadline =
+        (timeout == std::chrono::milliseconds::max())
+            ? std::chrono::steady_clock::time_point::max()
+            : std::chrono::steady_clock::now() + timeout;
+
     while (bytes > 0 && state() == State::CONNECTED){
+        if (std::chrono::steady_clock::now() >= deadline){
+            //  The deadline elapsed with bytes still unwritten; the
+            //  connection is still fine, so just report the partial count.
+            return sent;
+        }
         SOCKET socket = m_socket.load(std::memory_order_acquire);
         if (socket == INVALID_SOCKET){
             return sent;

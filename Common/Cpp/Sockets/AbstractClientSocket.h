@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Sockets_AbstractClientSocket_H
 #define PokemonAutomation_Sockets_AbstractClientSocket_H
 
+#include <chrono>
 #include <string>
 #include "Common/Cpp/ListenerSet.h"
 
@@ -63,7 +64,16 @@ public:
     virtual void close() noexcept = 0;
     virtual void connect(const std::string& address, uint16_t port) = 0;
 
-    virtual size_t send(const void* data, size_t bytes) = 0;
+    //  Sends data on the active connection. This blocks until every byte
+    //  has been written, the connection is lost, or "timeout" elapses.
+    //  "std::chrono::milliseconds::max()" (the default) waits indefinitely.
+    //  Returns the number of bytes actually written, which may be less
+    //  than "bytes" if the deadline elapsed or the connection was lost.
+    virtual size_t send(
+        const void* data,
+        size_t bytes,
+        std::chrono::milliseconds timeout = std::chrono::milliseconds::max()
+    ) = 0;
 
 
 protected:
