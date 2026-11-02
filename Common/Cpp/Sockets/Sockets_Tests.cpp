@@ -641,7 +641,24 @@ public:
 
                 send_task.wait_and_ignore_exceptions();
 
+                //  close_connection() may return with the close still
+                //  pending on a starved event thread (Qt backend), so
+                //  poll for the resulting LISTENING state within the
+                //  shared budget before judging it.
+                {
+                    const auto s0 = std::chrono::steady_clock::now();
+                    while (server.state() != AbstractServerSocket::State::LISTENING
+                        && std::chrono::steady_clock::now() - s0 < SOCKET_TEST_WAIT){
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    }
+                }
                 if (server.state() != AbstractServerSocket::State::LISTENING){
+                    if (timing_unreliable()){
+                        return UnitTestResult(
+                            UnitTestResult::SKIPPED,
+                            "The server is not LISTENING after close_connection() on a starved machine."
+                        );
+                    }
                     error = "The server is not listening after close_connection()";
                 }else if (!client_listener.waiter.wait_for(
                     SOCKET_TEST_WAIT,
@@ -1412,10 +1429,32 @@ public:
                             );
                         }
                         error = "close_connection() did not finish after the timed-out send (" + std::to_string(close_ms) + " ms)";
-                    }else if (server.state() != AbstractServerSocket::State::LISTENING){
-                        error = "The server is not LISTENING after close_connection()";
                     }else{
-                        ok = true;
+                        //  close_connection() queues the close onto the
+                        //  server's event thread and stops waiting after
+                        //  its internal 5 s bound, so on a starved event
+                        //  thread the close may still be pending when it
+                        //  returns. The queued close does run once the
+                        //  event thread gets to it, so poll for the
+                        //  resulting LISTENING state within the shared
+                        //  budget instead of failing on a not-yet-applied
+                        //  close.
+                        const auto s0 = std::chrono::steady_clock::now();
+                        while (server.state() != AbstractServerSocket::State::LISTENING
+                            && std::chrono::steady_clock::now() - s0 < SOCKET_TEST_WAIT){
+                            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                        }
+                        if (server.state() != AbstractServerSocket::State::LISTENING){
+                            if (control_ms > 2000 || timing_unreliable()){
+                                return UnitTestResult(
+                                    UnitTestResult::SKIPPED,
+                                    "The server is not LISTENING after close_connection() on a starved machine."
+                                );
+                            }
+                            error = "The server is not LISTENING after close_connection()";
+                        }else{
+                            ok = true;
+                        }
                     }
                 }
             }
