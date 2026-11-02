@@ -4,8 +4,8 @@
  *
  */
 
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonSV_DialogArrowDetector.h"
 #include "PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV_DialogDetector.h"
@@ -125,41 +125,43 @@ bool PromptDialogDetector::detect(const ImageViewRGB32& screen){
 }
 
 
-class Test_AdvanceDialogDetector : public UnitTest{
+class Test_AdvanceDialogDetector : public ImageUnitTest{
 public:
     Test_AdvanceDialogDetector(const std::string& image, bool expected)
-        : UnitTest("PokemonSV::AdvanceDialogDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::AdvanceDialogDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         AdvanceDialogDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     }
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 
-class Test_DialogBoxDetector : public UnitTest{
+class Test_DialogBoxDetector : public ImageUnitTest{
 public:
     Test_DialogBoxDetector(const std::string& image, bool expected)
-        : UnitTest("PokemonSV::DialogBoxDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::DialogBoxDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DialogBoxDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     }
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

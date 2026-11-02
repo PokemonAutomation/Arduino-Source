@@ -13,7 +13,7 @@
 #include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/AudioPipeline/AudioOption.h"
-#include "CommonFramework/VideoPipeline/VideoSourceDescriptor.h"
+#include "CommonFramework/VideoPipeline/VideoSourceOption.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayOption.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "Controllers/ControllerOption.h"

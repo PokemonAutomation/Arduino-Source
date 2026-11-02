@@ -23,12 +23,6 @@ namespace{
 const size_t RAW_BUFFER_CAPACITY = 4096;
 
 
-Kernels::AudioPipeline::SampleFormat sample_format_of(const QAudioFormat& format){
-    QAudioFormat copy = format;
-    return to_sample_format(get_sample_format(copy));
-}
-
-
 //  When the preset says the physical 1ch x 96000 stream is really the
 //  card's two 48 kHz channels, the raw listener output is that same byte
 //  stream reinterpreted as 2ch x 48000 (aligned to 2-sample stereo-frame

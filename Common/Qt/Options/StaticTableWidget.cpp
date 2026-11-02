@@ -7,10 +7,8 @@
 #include <QFileDialog>
 #include <QVBoxLayout>
 #include <QHeaderView>
-#include <QScrollBar>
 #include <QLabel>
 #include <QPushButton>
-#include <QTableWidget>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/AutoHeightTable.h"
 #include "StaticTableWidget.h"

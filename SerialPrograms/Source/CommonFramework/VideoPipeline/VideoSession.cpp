@@ -9,7 +9,7 @@
 #include "CommonFramework/GlobalServices.h"
 #include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
 #include "Backends/VideoFrameQt.h"
-#include "VideoSources/VideoSource_Null.h"
+#include "Sources/VideoSource_Null.h"
 #include "VideoSession.h"
 
 //#include <iostream>

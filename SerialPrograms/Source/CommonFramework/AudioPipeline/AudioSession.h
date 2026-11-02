@@ -62,6 +62,8 @@ public:
     void save(AudioOption& option) const;
     void load(const AudioOption& option);
 
+    Logger& logger(){ return m_logger; }
+
     std::shared_ptr<AudioSourceDescriptor> input_source() const;
     AudioInputChoice input_choice() const;
 

@@ -4,8 +4,6 @@
  *
  */
 
-#include <QCoreApplication>
-#include <QMessageBox>
 #include <QMenuBar>
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "WindowTracker.h"

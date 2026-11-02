@@ -31,6 +31,7 @@ class ResolutionOption;
 class KeyboardLayoutOption;
 class StreamHistoryOption;
 class SleepSuppressOptions;
+class DeviceAliasOptions;
 namespace Integration{
     class DiscordSettingsOption;
 }
@@ -93,6 +94,8 @@ public:
     BooleanCheckBoxOption LOG_WINDOW_STARTUP;
 
     Pimpl<KeyboardLayoutOption> KEYBOARD_CONTROLS_LAYOUT;
+
+    Pimpl<DeviceAliasOptions> DEVICE_ALIASES;
 
     Pimpl<StreamHistoryOption> STREAM_HISTORY;
     Pimpl<SleepSuppressOptions> SLEEP_SUPPRESS;

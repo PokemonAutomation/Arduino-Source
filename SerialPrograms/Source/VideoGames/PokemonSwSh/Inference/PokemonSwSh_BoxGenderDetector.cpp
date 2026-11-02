@@ -5,8 +5,8 @@
  */
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonSwSh_BoxGenderDetector.h"
 
 namespace PokemonAutomation{
@@ -26,25 +26,26 @@ BoxGenderDetector::BoxGenderDetector(Color color)
 
 
 
-class Test_BoxGenderDetector : public UnitTest{
+class Test_BoxGenderDetector : public ImageUnitTest{
 public:
     Test_BoxGenderDetector(
         const std::string& image,
         StatsHuntGenderFilter expected
     )
-        : UnitTest("PokemonSwSh::BoxGenderDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSwSh::BoxGenderDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         BoxGenderDetector detector;
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     StatsHuntGenderFilter m_expected;
 };
 

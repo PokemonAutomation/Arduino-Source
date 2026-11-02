@@ -5,9 +5,9 @@
  */
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "VideoGames/PokemonLA/Inference/PokemonLA_CommonColorCheck.h"
 #include "PokemonLA_BattlePokemonSwitchDetector.h"
@@ -103,26 +103,27 @@ bool BattlePokemonSwitchDetector::process_frame(const ImageViewRGB32& frame, Wal
 
 
 
-class Test_BattlePokemonSwitchDetector : public UnitTest{
+class Test_BattlePokemonSwitchDetector : public ImageUnitTest{
 public:
     Test_BattlePokemonSwitchDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonLA::BattlePokemonSwitchDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonLA::BattlePokemonSwitchDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay overlay;
         BattlePokemonSwitchDetector detector(logger, overlay, true);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.process_frame(image, current_time()) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

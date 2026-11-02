@@ -8,13 +8,15 @@
 #define PokemonAutomation_AudioPipeline_AudioSourceDescriptor_H
 
 #include <memory>
-#include "AudioInfo.h"
+#include <string>
+#include <vector>
 
 namespace PokemonAutomation{
 
 class Logger;
 class JsonValue;
 class AudioSource;
+class AudioInputChoice;
 
 
 

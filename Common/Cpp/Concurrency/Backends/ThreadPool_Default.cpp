@@ -99,6 +99,13 @@ AsyncTask ThreadPool_Default::dispatch(std::function<void()>&& func){
             task = AsyncTask(std::make_unique<AsyncTask_Cpp>(std::move(func)));
             ptr = task.core();
             ptr->report_started();
+
+            //  Spawn threads to pick up the work. Without this, a pool that
+            //  has not reached its maximum thread count (or has no threads
+            //  at all, as the global pools start out) would never grow, and
+            //  with no threads the notify_one() below would wake nothing and
+            //  the task would never run.
+            spawn_threads();
         }catch (...){
             m_queue.pop_back();
             throw;

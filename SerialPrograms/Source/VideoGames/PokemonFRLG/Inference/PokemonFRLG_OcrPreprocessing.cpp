@@ -9,6 +9,8 @@
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
+#include "CommonTools/ImageMatch/ImageCropper.h"
+#include "CommonTools/Images/ImageFilter.h"
 
 #include "PokemonFRLG_OcrPreprocessing.h"
 
@@ -79,6 +81,85 @@ const std::vector<OCR::TextColorRange>& BRIGHT_TEXT_FILTERS(){
         {combine_rgb(240, 240, 240), combine_rgb(255, 255, 255)},
     };
     return filters;
+}
+
+
+std::string read_nidoran_symbol(
+    const ImageViewRGB32& name, const std::vector<OCR::TextColorRange>& text_color_ranges
+){
+    // OCR drops the monochrome gender suffix, so match its shape separately.
+    for (const auto& filter : text_color_ranges){
+        const ImageRGB32 filtered = filter_rgb32_range(name, filter.mins, filter.maxs, Color(0), false);
+        const ImageViewRGB32 text = ImageMatch::trim_image_alpha(filtered);
+        if (!text){
+            continue;
+        }
+
+        // Isolate the last glyph by the empty column separating it from the name.
+        size_t left = text.width();
+        while (left > 0){
+            bool foreground = false;
+            for (size_t y = 0; y < text.height(); y++){
+                if (Color(text.pixel(left - 1, y)).alpha() != 0){
+                    foreground = true;
+                    break;
+                }
+            }
+            if (!foreground){
+                break;
+            }
+            left--;
+        }
+        const ImageViewRGB32 symbol = ImageMatch::trim_image_alpha(
+            text.sub_image(left, 0, text.width() - left, text.height())
+        );
+        const double aspect_ratio = (double)symbol.width() / symbol.height();
+        // Japanese summary glyphs are wider than the Latin-font glyphs.
+        if (aspect_ratio < 0.4 || aspect_ratio > 0.8){
+            continue;
+        }
+
+        // The Latin font uses 5 x 10 glyphs; the Japanese font uses 7 x 10
+        // glyphs with a wider female cross and a taller male arrow.
+        struct SymbolFont{
+            size_t width;
+            const char* symbols[2];  // Female, male.
+        };
+        static constexpr SymbolFont fonts[] = {
+            {5, {
+                ".###." "#...#" "#...#" "#...#" ".###." "..#.." "#####" "..#.." "..#.." "..#..",
+                "..#.." ".###." "#.#.#" "..#.." "..#.." ".###." "#...#" "#...#" "#...#" ".###."
+            }},
+            {7, {
+                "..###.." ".#...#." ".#...#." ".#...#." "..###.." "...#..." "#######" "...#..." "...#..." "...#...",
+                "...#..." "..###.." ".#.#.#." "#..#..#" "...#..." "..###.." ".#...#." ".#...#." ".#...#." "..###.."
+            }}
+        };
+        double errors[2] = {255, 255};
+        for (const SymbolFont& font : fonts){
+            const ImageRGB32 scaled = symbol.scale_to(font.width, 10);
+            double font_errors[2] = {};
+            for (size_t y = 0; y < 10; y++){
+                for (size_t x = 0; x < font.width; x++){
+                    const uint8_t alpha = Color(scaled.pixel(x, y)).alpha();
+                    for (size_t gender = 0; gender < 2; gender++){
+                        font_errors[gender] += font.symbols[gender][y * font.width + x] == '#' ? 255 - alpha : alpha;
+                    }
+                }
+            }
+            // Compare the best match for each gender across both fonts.
+            for (size_t gender = 0; gender < 2; gender++){
+                errors[gender] = std::min(errors[gender], font_errors[gender] / (font.width * 10));
+            }
+        }
+        if (errors[0] < 50 && errors[0] + 20 < errors[1]){
+            return "nidoran-f";
+        }
+        if (errors[1] < 50 && errors[1] + 20 < errors[0]){
+            return "nidoran-m";
+        }
+    }
+    return "";
 }
 
 

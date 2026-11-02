@@ -4,7 +4,6 @@
  *
  */
 
-#include <QEventLoop>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/ColoredText.h"
 #include "CommonFramework/Logging/Logger.h"
@@ -152,7 +151,7 @@ void TcpSysbotBase_Connection::thread_loop(){
 void TcpSysbotBase_Connection::on_connect_finished(const std::string& error_message){
     try{
         if (!error_message.empty()){
-            m_logger.log(m_connecting_message, COLOR_RED);
+            m_logger.log(m_connecting_message + " - " + error_message, COLOR_RED);
             set_status_line0(m_connecting_message, COLOR_RED);
             return;
         }
@@ -161,6 +160,12 @@ void TcpSysbotBase_Connection::on_connect_finished(const std::string& error_mess
 
         write_data("configure echoCommands 0\r\n");
         write_data("getVersion\r\n");
+    }catch (...){}
+}
+void TcpSysbotBase_Connection::on_disconnect(const std::string& error_message){
+    try{
+        m_logger.log("sys-botbase disconnected: " + error_message, COLOR_RED);
+        set_status_line1("Disconnected: " + error_message, COLOR_RED);
     }catch (...){}
 }
 void TcpSysbotBase_Connection::on_receive_data(const void* data, size_t bytes){

@@ -6,11 +6,11 @@
 
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonSV_FastTravelDetector.h"
 
 // #include <iostream>
@@ -134,22 +134,23 @@ bool FastTravelWatcher::process_frame(const ImageViewRGB32& screen, WallClock ti
 }
 
 
-class Test_FastTravelDetector : public UnitTest{
+class Test_FastTravelDetector : public ImageUnitTest{
 public:
     Test_FastTravelDetector(const std::string& image, bool expected)
-        : UnitTest("PokemonSV::FastTravelDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::FastTravelDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         FastTravelDetector detector(COLOR_RED, MINIMAP_AREA);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     }
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

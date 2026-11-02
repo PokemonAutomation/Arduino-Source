@@ -8,11 +8,11 @@
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/StaticGlobals.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonLA_BattleSpriteWatcher.h"
 
@@ -88,26 +88,27 @@ bool BattleSpriteWatcher::set_detected_sprites(const ImageViewRGB32& frame, std:
 
 
 
-class Test_BattleSpriteWatcher : public UnitTest{
+class Test_BattleSpriteWatcher : public ImageUnitTest{
 public:
     Test_BattleSpriteWatcher(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonLA::BattleSpriteWatcher - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonLA::BattleSpriteWatcher - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay overlay;
         BattleSpriteWatcher detector(logger, overlay);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.process_frame(image, current_time()) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

@@ -18,6 +18,7 @@
 #include "Common/Cpp/Hardware/FloatingPointMode.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
@@ -295,7 +296,7 @@ void compute_embeddings_for_folder(
     // Per-image errors are collected here and reported after all images are processed, instead of
     // popping up a QMessageBox per image (which is not allowed from worker threads and would stall
     // the whole batch on one bad file).
-    std::mutex error_lock;
+    Mutex error_lock;
     std::vector<std::string> images_failed_to_load;
     std::vector<std::string> images_with_unsupported_channels;
     std::vector<std::string> images_failed_inference;
@@ -309,12 +310,12 @@ void compute_embeddings_for_folder(
             return;
         }
         case EmbedImageResult::FAILED_TO_LOAD:{
-            std::lock_guard<std::mutex> lg(error_lock);
+            std::lock_guard<Mutex> lg(error_lock);
             images_failed_to_load.emplace_back(image_path);
             return;
         }
         case EmbedImageResult::UNSUPPORTED_CHANNELS:{
-            std::lock_guard<std::mutex> lg(error_lock);
+            std::lock_guard<Mutex> lg(error_lock);
             images_with_unsupported_channels.emplace_back(image_path);
             return;
         }
@@ -368,7 +369,7 @@ void compute_embeddings_for_folder(
                 record_result(image_path, embed_one_image(*embedding_session, image_path));
             }catch (const std::exception& e){
                 logger.log("Error: failed to compute embedding for " + image_path + ": " + e.what(), COLOR_RED);
-                std::lock_guard<std::mutex> lg(error_lock);
+                std::lock_guard<Mutex> lg(error_lock);
                 images_failed_inference.emplace_back(image_path);
             }
         },

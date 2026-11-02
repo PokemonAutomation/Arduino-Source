@@ -17,6 +17,7 @@
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "VideoGames/PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
 
@@ -177,15 +178,17 @@ OCR::StringMatchResult DonutBerriesReader::read_with_ocr(
 }
 
 
-class Test_DonutBerriesReader : public UnitTest{
+class Test_DonutBerriesReader : public ImageUnitTest{
 public:
     Test_DonutBerriesReader(const std::string& image)
-        : UnitTest("PokemonPLZA::DonutBerriesReader - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonPLZA::DonutBerriesReader - " + image, {image})
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        Filesystem::Path file_path(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        Filesystem::Path file_path(UNIT_TEST_RESOURCE_PATH() + image_paths()[0]);
         Filesystem::Path parent_dir = file_path.parent_path();
         std::string base_name = file_path.stem().string();
 
@@ -213,7 +216,7 @@ public:
             return "Error: selected_berry must be in range [0, 7].";
         }
 
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         Filesystem::Path target_berries_path = parent_dir / ("_" + base_name + ".txt");
 
         if (STATIC_GLOBALS.GENERATE_TEST_GOLDEN_FILES){
@@ -252,9 +255,6 @@ public:
 
         return true;
     }
-
-private:
-    std::string m_image;
 };
 
 

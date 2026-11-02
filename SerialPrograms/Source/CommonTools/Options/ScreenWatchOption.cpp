@@ -7,7 +7,6 @@
 #include <QGuiApplication>
 #include <QPixmap>
 #include <QScreen>
-#include <QWidget>
 #include <QPainter>
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "CommonFramework/Logging/Logger.h"

@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "NestedBoxDrawOption.h"
 
 //#include <iostream>

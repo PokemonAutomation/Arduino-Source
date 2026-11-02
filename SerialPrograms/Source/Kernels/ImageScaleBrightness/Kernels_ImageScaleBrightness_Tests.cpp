@@ -9,9 +9,9 @@
 #include <format>
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Tests/GuardPageImage.h"
+#include "Tests/ImageUnitTest.h"
 #include "Kernels_ImageScaleBrightness_Tests.h"
 
 namespace PokemonAutomation{
@@ -82,19 +82,21 @@ bool is_right_pixel(uint32_t result, uint32_t pixel, float scaleR, float scaleG,
 //  scale a copy of the image in place and check every pixel with `is_right_pixel()`.
 //  The copy is a guard-page image, so the test also crashes if the implementation
 //  reads or writes past the last pixel.
-class Test_ImageScaleBrightness : public UnitTest{
+class Test_ImageScaleBrightness : public ImageUnitTest{
 public:
     Test_ImageScaleBrightness(
         const ScaleBrightnessImplementation& implementation,
         const std::string& image
     )
-        : UnitTest("Kernels::ImageScaleBrightness - " + implementation.name + " - " + image)
+        : ImageUnitTest("Kernels::ImageScaleBrightness - " + implementation.name + " - " + image, {image})
         , m_implementation(implementation)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
 
         for (const auto& scale : SCALES){
             GuardPageImageRGB32 scaled(image);
@@ -119,7 +121,6 @@ public:
 
 private:
     ScaleBrightnessImplementation m_implementation;
-    std::string m_image;
 };
 
 }

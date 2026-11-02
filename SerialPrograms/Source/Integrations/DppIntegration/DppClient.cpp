@@ -50,7 +50,7 @@ void Client::stop(){
 
 
 bool Client::is_initialized(){
-    std::lock_guard<std::mutex> lg(m_client_lock);
+    std::lock_guard<Mutex> lg(m_client_lock);
     return m_bot != nullptr;
 }
 bool Client::is_running(){
@@ -58,7 +58,7 @@ bool Client::is_running(){
 }
 
 void Client::connect(){
-    std::lock_guard<std::mutex> lg(m_client_lock);
+    std::lock_guard<Mutex> lg(m_client_lock);
     if (m_bot == nullptr && !m_is_connected.load(std::memory_order_relaxed)){
         DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
         if (!Handler::check_if_empty(settings))
@@ -89,7 +89,7 @@ void Client::connect(){
 }
 
 void Client::disconnect(){
-    std::lock_guard<std::mutex> lg(m_client_lock);
+    std::lock_guard<Mutex> lg(m_client_lock);
 //    cout << "Client::disconnect()" << endl;
 
     m_start_thread.wait_and_ignore_exceptions();
@@ -114,7 +114,7 @@ void Client::send_embed_dpp(
     const JsonObject& json_obj,
     std::shared_ptr<PendingFileSend> file
 ){
-    std::lock_guard<std::mutex> lg(m_client_lock);
+    std::lock_guard<Mutex> lg(m_client_lock);
     DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
     if (!settings.integration.enabled()){
         return;
@@ -171,7 +171,7 @@ void Client::send_embed_dpp(
 }
 
 void Client::run(const std::string& token){
-    std::lock_guard<std::mutex> lg(m_client_lock);
+    std::lock_guard<Mutex> lg(m_client_lock);
     if (!m_bot){
         Handler::log_dpp("DPP has been disconnected.", "run()", ll_warning);
         return;
@@ -192,7 +192,7 @@ void Client::run(const std::string& token){
 //    cout << "Client::run() - ending" << endl;
 }
 void Client::on_press(ButtonCell& button){
-    std::lock_guard<std::mutex> lg(m_register_lock);
+    std::lock_guard<Mutex> lg(m_register_lock);
     if (m_handler && m_handler->slash_commands_enabled){
         GlobalSettings::instance().DISCORD->integration.register_slash_button.set_enabled(false);
         log_dpp("Registering commands...", "Slash Command Registration", dpp::ll_info);

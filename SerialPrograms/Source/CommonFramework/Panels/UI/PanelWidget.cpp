@@ -4,9 +4,6 @@
  *
  */
 
-#include <QVBoxLayout>
-#include <QGroupBox>
-#include <QLabel>
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Panels/PanelDescriptor.h"
 #include "CommonFramework/Panels/PanelSession.h"

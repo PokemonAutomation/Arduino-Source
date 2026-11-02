@@ -9,10 +9,10 @@
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonLA_DialogYellowArrowDetector.h"
 
@@ -109,26 +109,27 @@ bool DialogYellowArrowDetector::process_frame(const ImageViewRGB32& frame, WallC
 
 
 
-class Test_DialogYellowArrowDetector : public UnitTest{
+class Test_DialogYellowArrowDetector : public ImageUnitTest{
 public:
     Test_DialogYellowArrowDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonLA::DialogYellowArrowDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonLA::DialogYellowArrowDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay overlay;
         DialogYellowArrowDetector detector(logger, overlay, true);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.process_frame(image, current_time()) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

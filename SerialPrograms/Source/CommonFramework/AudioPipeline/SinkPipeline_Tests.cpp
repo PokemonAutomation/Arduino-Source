@@ -41,29 +41,17 @@
 #include "Kernels/AudioPipeline/Kernels_ChannelMixer.h"
 #include "Kernels/AudioResampler/Kernels_AudioResampler.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/AudioPipeline/ChannelMixer.h"
-#include "CommonFramework/AudioPipeline/AudioInfo.h"
+#include "CommonFramework/AudioPipeline/AudioFormat.h"
+#include "CommonFramework/AudioPipeline/AudioInputChoice.h"
+#include "CommonFramework/AudioPipeline/Backends/AudioDeviceInfo.h"
+#include "CommonFramework/AudioPipeline/Tools/ChannelMixer.h"
 #include "CommonFramework/AudioPipeline/Backends/AudioPassthroughPairQt.h"
-#include "CommonFramework/AudioPipeline/AudioSources/AudioSource_File.h"
+#include "CommonFramework/AudioPipeline/Sources/AudioSource_File.h"
 #include "SinkPipeline_Tests.h"
 
 namespace PokemonAutomation{
 
 namespace{
-
-
-
-Kernels::AudioPipeline::SampleFormat to_kernels_format(AudioSampleFormat format){
-    switch (format){
-    case AudioSampleFormat::UINT8:   return Kernels::AudioPipeline::SampleFormat::UINT8;
-    case AudioSampleFormat::SINT16:  return Kernels::AudioPipeline::SampleFormat::SINT16;
-    case AudioSampleFormat::SINT32:  return Kernels::AudioPipeline::SampleFormat::SINT32;
-    case AudioSampleFormat::FLOAT32: return Kernels::AudioPipeline::SampleFormat::FLOAT32;
-    default:
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unsupported audio sample format.");
-    }
-}
-
 
 
 //  QAudioFormat with just a channel count and, for 1 and 2 channels, the
@@ -163,7 +151,7 @@ float measure_amplitude(const std::vector<float>& interleaved, size_t channels, 
 class RecordingRawListener : public Kernels::AudioPipeline::RawAudioStreamListener{
 public:
     RecordingRawListener(AudioSampleFormat format, size_t rate, size_t channels)
-        : Kernels::AudioPipeline::RawAudioStreamListener(to_kernels_format(format), rate, channels)
+        : Kernels::AudioPipeline::RawAudioStreamListener(format, rate, channels)
         , m_frame_bytes(sample_size(format) * channels)
     {}
     virtual void push_samples(size_t frames, const void* data) override{
@@ -192,10 +180,10 @@ std::vector<char> run_tree(
     AudioSampleFormat out_format, size_t out_rate, size_t out_channels
 ){
     Kernels::AudioPipeline::RawAudio2WorkingAudio decoder(
-        to_kernels_format(in_format), in_rate, in_channels, 1.0f
+        in_format, in_rate, in_channels, 1.0f
     );
     Kernels::AudioPipeline::WorkingAudio2RawAudio encoder(
-        to_kernels_format(out_format), out_rate, out_channels, 1.0f
+        out_format, out_rate, out_channels, 1.0f
     );
     RecordingRawListener out(out_format, out_rate, out_channels);
     encoder.add_listener(out);

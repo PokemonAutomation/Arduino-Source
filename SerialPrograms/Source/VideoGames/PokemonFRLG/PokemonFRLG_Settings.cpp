@@ -65,6 +65,14 @@ GameSettings::GameSettings()
         LockMode::LOCK_WHILE_RUNNING,
         "3000 ms"
     )
+    , HANDLE_ONLINE_LICENSE_CHECK(
+        "<b>Handle Online License Check:</b><br>"
+        "Turn this on if your console checks the game's license online when it starts the game: "
+        "the game goes back to the Home menu for a few seconds before it starts. "
+        "The RNG programs' hard reset then waits for the game to start instead of using a fixed delay.",
+        LockMode::LOCK_WHILE_RUNNING,
+        false // default
+    )
     , m_shiny_audio_settings("<font size=4><b>Shiny Audio Settings:</b></font>")
     , SHINY_SOUND_THRESHOLD(
         "<b>Shiny Sound Threshold:</b><br>Maximum error coefficient to trigger a shiny detection.",
@@ -90,6 +98,7 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(SELECT_BUTTON_MASH0);
     PA_ADD_OPTION(ENTER_GAME_WAIT0);
     PA_ADD_OPTION(ENTER_GAME_MASH0);
+    PA_ADD_OPTION(HANDLE_ONLINE_LICENSE_CHECK);
     PA_ADD_STATIC(m_shiny_audio_settings);
     PA_ADD_OPTION(SHINY_SOUND_THRESHOLD);
     PA_ADD_OPTION(SHINY_SOUND_LOW_FREQUENCY);

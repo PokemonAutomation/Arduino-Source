@@ -9,7 +9,6 @@
 #include <sstream>
 #include <algorithm>
 #include <set>
-#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "PokemonFRLG_BlindNavigation.h"
 #include "PokemonFRLG_RngCalibration.h"
 

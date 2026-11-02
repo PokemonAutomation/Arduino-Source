@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "VideoGames/PokemonLZA/Resources/PokemonLZA_DonutBerries.h"
 #include "PokemonLZA_DonutBerriesOption.h"

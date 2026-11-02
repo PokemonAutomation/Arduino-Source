@@ -6,11 +6,11 @@
 
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Tests/ImageUnitTest.h"
 #include "VideoGames/PokemonRSE/PokemonRSE_Settings.h"
 #include "PokemonRSE_StartMenuDetector.h"
 
@@ -87,7 +87,7 @@ StartMenuSlotDetector::StartMenuSlotDetector(Color color, StartMenuSlot slot, St
 
 
 
-class Test_StartMenuDetector : public UnitTest {
+class Test_StartMenuDetector : public ImageUnitTest {
 public:
 
     Test_StartMenuDetector(
@@ -95,21 +95,22 @@ public:
         StartMenuState state,
         bool expected
     )
-        : UnitTest("PokemonRSE::StartMenuDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonRSE::StartMenuDetector - " + image, {image})
         , m_state(state)
         , m_expected(expected)
     {
     }
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override {
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override {
         StartMenuDetector detector(COLOR_RED, m_state);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     StartMenuState m_state;
     bool m_expected;
 };
@@ -136,7 +137,7 @@ void add_tests_StartMenuDetector(UnitTestDatabase & database){
 }
 
 
-class Test_StartMenuSlotDetector : public UnitTest {
+class Test_StartMenuSlotDetector : public ImageUnitTest {
 public:
 
     Test_StartMenuSlotDetector(
@@ -145,22 +146,23 @@ public:
         StartMenuState state,
         bool expected
     )
-        : UnitTest("PokemonRSE::StartMenuSlotDetector - " + std::to_string((int)slot) + " - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonRSE::StartMenuSlotDetector - " + std::to_string((int)slot) + " - " + image, {image})
         , m_slot(slot)
         , m_state(state)
         , m_expected(expected)
     {
     }
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override {
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override {
         StartMenuSlotDetector detector(COLOR_RED, m_slot, m_state);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     StartMenuSlot m_slot;
     StartMenuState m_state;
     bool m_expected;

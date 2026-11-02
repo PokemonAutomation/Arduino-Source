@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Integrations_DppCommandHandler_H
 #define PokemonAutomation_Integrations_DppCommandHandler_H
 
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -40,7 +41,7 @@ private:
         std::function<void(const dpp::slashcommand_t&)> func;
     };
 
-    std::mutex m_count_lock;
+    Mutex m_count_lock;
     static dpp::user owner;
     static Color color;
     ScheduledTaskRunner m_queue;

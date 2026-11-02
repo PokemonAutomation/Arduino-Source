@@ -13,10 +13,9 @@
 #include "Kernels/AudioPipeline/Kernels_WorkingAudio2RawAudio.h"
 #include "Kernels/AudioPipeline/Kernels_WorkingAudio2WorkingAudio.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
-#include "CommonFramework/AudioPipeline/ChannelMixer.h"
-#include "CommonFramework/AudioPipeline/IO/AudioSource.h"
+#include "CommonFramework/AudioPipeline/Tools/ChannelMixer.h"
+#include "CommonFramework/AudioPipeline/AudioSource.h"
 #include "CommonFramework/AudioPipeline/IO/AudioOutputDevice.h"
 #include "CommonFramework/AudioPipeline/Spectrum/FFTStreamer.h"
 #include "AudioPassthroughPairQt.h"
@@ -273,7 +272,7 @@ void AudioPassthroughPairQt::build_tree(float input_volume){
     size_t raw_channels = m_reader->raw_channels();
 
     m_source_decoder.reset(new Kernels::AudioPipeline::RawAudio2WorkingAudio(
-        to_sample_format(m_reader->raw_sample_format()),
+        m_reader->raw_sample_format(),
         raw_rate, raw_channels, input_volume
     ));
     m_reader->add_raw_listener(*m_source_decoder);
@@ -509,21 +508,18 @@ void AudioPassthroughPairQt::init_audio_sink(){
     //  the device stays at full volume.
     NativeAudioInfo native_info = m_output_device.native_info();
     QAudioFormat target_format = native_info.preferredFormat();
-    AudioSampleFormat sample_format = get_sample_format(target_format);
-    if (sample_format == AudioSampleFormat::INVALID){
+    if (target_format.sampleFormat() == QAudioFormat::SampleFormat::Unknown){
         //  The native sample format isn't one we can convert to; fall
         //  back to a supported one we can.
         QAudioFormat float_format = target_format;
         set_sample_format_to_float(float_format);
         if (native_info.isFormatSupported(float_format)){
             target_format = float_format;
-            sample_format = AudioSampleFormat::FLOAT32;
         }else{
             QAudioFormat sint16_format = target_format;
             sint16_format.setSampleFormat(QAudioFormat::SampleFormat::Int16);
             if (native_info.isFormatSupported(sint16_format)){
                 target_format = sint16_format;
-                sample_format = AudioSampleFormat::SINT16;
             }else{
                 m_logger.log(
                     "Audio output device's native sample format is not supported, "
@@ -538,7 +534,7 @@ void AudioPassthroughPairQt::init_audio_sink(){
     m_logger.log("AudioOutputDevice(): Native: " + dump_audio_format(native_info.preferredFormat()));
     m_sink_device.reset(new AudioOutputDevice(
         m_logger, native_info, target_format,
-        to_sample_format(sample_format),
+        sample_format_of(target_format),
         (size_t)target_format.sampleRate(),
         (size_t)target_format.channelCount()
     ));

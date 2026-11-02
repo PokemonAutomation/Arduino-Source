@@ -4,7 +4,6 @@
  *
  */
 
-#include "CpuUtilization.h"
 
 
 #if _WIN32

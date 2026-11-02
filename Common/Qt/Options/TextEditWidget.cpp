@@ -4,7 +4,6 @@
  *
  */
 
-#include <QStyle>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QTextEdit>

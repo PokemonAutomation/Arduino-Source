@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -14,6 +13,7 @@
 #include "CommonTools/Images/ImageFilter.h"
 //#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 //#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonFRLG_DialogDetector.h"
 
 //#include <iostream>
@@ -127,26 +127,27 @@ bool SelectionDialogDetector::detect(const ImageViewRGB32& screen){
     return false;
 }
 
-class Test_AdvanceWhiteDialogDetector : public UnitTest{
+class Test_AdvanceWhiteDialogDetector : public ImageUnitTest{
 public:
 
     Test_AdvanceWhiteDialogDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonFRLG::AdvanceWhiteDialogDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonFRLG::AdvanceWhiteDialogDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         AdvanceWhiteDialogDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 
@@ -163,26 +164,27 @@ void add_tests_AdvanceWhiteDialogDetector(UnitTestDatabase& database){
     database.add<Test_AdvanceWhiteDialogDetector>("PokemonFRLG/AdvanceWhiteDialogDetector/Spanish-AlejaKaiser-Squirtl_True.png", true);
 }
 
-class Test_SelectionDialogDetector : public UnitTest{
+class Test_SelectionDialogDetector : public ImageUnitTest{
 public:
 
     Test_SelectionDialogDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonFRLG::SelectionDialogDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonFRLG::SelectionDialogDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         SelectionDialogDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

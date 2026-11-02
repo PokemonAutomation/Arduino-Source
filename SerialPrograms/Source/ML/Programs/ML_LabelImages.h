@@ -27,12 +27,12 @@
 
 #include <atomic>
 #include <memory>
-#include <mutex>
 #include <optional>
 #include <set>
 #include <string>
 #include <vector>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "Common/Cpp/Options/EnumDropdownDatabase.h"
@@ -249,7 +249,7 @@ private:
     //  and from the keyboard tracker thread (`run_controller_input()`), so all
     //  the entry points that touch it take this lock. It is recursive because
     //  changing an option value re-enters us through `on_config_value_changed()`.
-    mutable std::recursive_mutex m_lock;
+    mutable RecursiveMutex m_lock;
 
     // manages overlay rendering that shows annotations overlayed on the image
     std::unique_ptr<LabelImages_OverlayManager> m_overlay_manager;
@@ -364,7 +364,7 @@ private:
     //  and cleared by the UI thread when focus is lost, so it has its own lock.
     //  It is never held while calling into anything else, so it cannot deadlock
     //  against `m_lock`.
-    std::mutex m_keyboard_lock;
+    Mutex m_keyboard_lock;
     std::set<KeyboardKey> m_held_keys;
     std::atomic<bool> m_shift_pressed;
     std::atomic<bool> m_control_pressed;

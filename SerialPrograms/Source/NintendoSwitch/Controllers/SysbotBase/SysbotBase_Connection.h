@@ -49,6 +49,7 @@ private:
 
     virtual void on_connect_finished(const std::string& error_message) override;
     virtual void on_receive_data(const void* data, size_t bytes) override;
+    virtual void on_disconnect(const std::string& error_message) override;
 
     void process_message(const std::string& message, WallClock timestamp);
     void set_mode(const std::string& sbb_version);

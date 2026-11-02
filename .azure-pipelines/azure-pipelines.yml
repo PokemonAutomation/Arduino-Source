@@ -366,6 +366,7 @@ stages:
           cp "$SRC_DIR/IconResource/SerialPrograms.png" "$APP_DIR/usr/share/icons/hicolor/256x256/apps/"
           cp "$SRC_DIR/IconResource/SerialPrograms.appdata.xml" "$APP_DIR/usr/share/metainfo/"
           cp "$BUILD_DIR/SerialPrograms" "$APP_DIR/usr/bin"
+          cp "$SRC_DIR/3rdPartyBinaries/dpp-cacert.pem" "$APP_DIR/usr/bin/"
 
           echo "=== Extracting Discord Social SDK ==="
           DISCORD_ZIP="$SRC_DIR/3rdPartyBinaries/discord_social_sdk_linux.zip"
@@ -510,7 +511,7 @@ stages:
     macos_path: '/opt/Qt/6.10.2/macos/lib/cmake:/opt/Qt/6.10.2/macos/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/opt/homebrew:$PATH'
     openssl_pkcs_args: '-legacy'
     cmake_version_params: '-DVERSION_MAJOR=${{ parameters.versionMajor }} -DVERSION_MINOR=${{ parameters.versionMinor }} -DVERSION_PATCH=${{ parameters.versionPatch }} -DIS_BETA=${{ lower(eq(parameters.buildType, ''PrivateBeta'')) }}'
-    cmake_additional_param: '-DPACKAGE_BUILD=true -DUNIX_LINK_TESSERACT:BOOL=true -DIS_AZURE_BUILD=TRUE'
+    cmake_additional_param: '-DPACKAGE_BUILD=true -DIS_AZURE_BUILD=TRUE'
     versionMajor: ${{ parameters.versionMajor }}
     versionMinor: ${{ parameters.versionMinor }}
     versionPatch: ${{ parameters.versionPatch }}
@@ -534,7 +535,7 @@ stages:
     macos_path: '/usr/local/Qt/6.10.2/macos/lib/cmake:/usr/local/Qt/6.10.2/macos/bin:/usr/local/bin:/usr/local/sbin:/usr/local:$PATH'
     openssl_pkcs_args: '-legacy'
     cmake_version_params: '-DVERSION_MAJOR=${{ parameters.versionMajor }} -DVERSION_MINOR=${{ parameters.versionMinor }} -DVERSION_PATCH=${{ parameters.versionPatch }} -DIS_BETA=${{ lower(eq(parameters.buildType, ''PrivateBeta'')) }}'
-    cmake_additional_param: '-DPACKAGE_BUILD=true -DUNIX_LINK_TESSERACT:BOOL=true -DIS_AZURE_BUILD=TRUE'
+    cmake_additional_param: '-DPACKAGE_BUILD=true -DIS_AZURE_BUILD=TRUE'
     versionMajor: ${{ parameters.versionMajor }}
     versionMinor: ${{ parameters.versionMinor }}
     versionPatch: ${{ parameters.versionPatch }}

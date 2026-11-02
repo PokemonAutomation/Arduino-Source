@@ -6,7 +6,6 @@
 
 #include <iostream>
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
@@ -14,6 +13,7 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageFilter.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonHome_BoxGenderDetector.h"
 
 using std::cout;
@@ -68,20 +68,22 @@ Pokemon::StatsHuntGenderFilter BoxGenderDetector::detect(const ImageViewRGB32& s
     return Pokemon::StatsHuntGenderFilter::Genderless;
 }
 
-class Test_BoxGenderDetector : public UnitTest{
+class Test_BoxGenderDetector : public ImageUnitTest{
 public:
 
     Test_BoxGenderDetector(
         const std::string& image,
         Pokemon::StatsHuntGenderFilter expected
     )
-        : UnitTest("PokemonHome::BoxGenderDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonHome::BoxGenderDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
         Pokemon::StatsHuntGenderFilter result = BoxGenderDetector::detect(image);
 
         if (result == m_expected)
@@ -91,7 +93,6 @@ public:
     };
 
 private:
-    std::string m_image;
     Pokemon::StatsHuntGenderFilter m_expected;
 };
 

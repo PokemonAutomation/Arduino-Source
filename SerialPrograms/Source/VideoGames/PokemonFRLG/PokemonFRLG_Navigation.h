@@ -168,6 +168,7 @@ void heal_at_pokecenter(ConsoleHandle& console, ProControllerContext& context);
 // Can be used to alternate left/right and up/down. It is important that the player is not facing
 // the same direction as the first thumbstick press.
 // returns -1 if no encounter is triggered, 0 if a non-shiny is encounter, and 1 if a shiny is encountered
+// A spin that stops without starting a battle also returns -1, as long as the player is still in the overworld.
 int grass_spin(ConsoleHandle& console, ProControllerContext& context, bool leftright, Seconds timeout = 60s);
 
 // Trigger encounters by fishing with a registered rod. The player must be facing water.

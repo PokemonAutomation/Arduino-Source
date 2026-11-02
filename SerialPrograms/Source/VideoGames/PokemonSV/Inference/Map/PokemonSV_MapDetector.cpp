@@ -6,10 +6,10 @@
 
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonSV_MapDetector.h"
 
@@ -159,18 +159,20 @@ bool MapWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp)
 
 
 
-class Test_MapDetector : public UnitTest{
+class Test_MapDetector : public ImageUnitTest{
 public:
     Test_MapDetector(
         const std::string& image,
         std::vector<std::string> words
     )
-        : UnitTest("PokemonSV::MapDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::MapDetector - " + image, {image})
         , m_words(std::move(words))
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         // two words: <Map ready to exit> <In fixed view (instead of the rotated view)>
         if (m_words.size() < 2){
             std::stringstream ss;
@@ -193,7 +195,7 @@ public:
         }
 
         WhiteButtonDetector map_exit_detector(COLOR_RED, WhiteButton::ButtonY, {0.800, 0.118, 0.030, 0.060});
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         bool result_map = map_exit_detector.detect(image);
 
         TEST_RESULT_EQUAL_STR(result_map, target_map_existence);
@@ -214,7 +216,6 @@ public:
     };
 
 private:
-    std::string m_image;
     const std::vector<std::string> m_words;
 };
 

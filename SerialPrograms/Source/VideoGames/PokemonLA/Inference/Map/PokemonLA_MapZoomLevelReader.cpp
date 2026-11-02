@@ -6,12 +6,12 @@
 
 #include <cmath>
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/Images/ImageFilter.h"
 //#include "Tests/TestUtils.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonLA_MapZoomLevelReader.h"
 
 //#include <iostream>
@@ -75,25 +75,26 @@ int read_map_zoom_level(const ImageViewRGB32& screen){
 
 
 
-class Test_MapZoomLevelReader : public UnitTest{
+class Test_MapZoomLevelReader : public ImageUnitTest{
 public:
     Test_MapZoomLevelReader(
         const std::string& image,
         int expected
     )
-        : UnitTest("PokemonLA::MapZoomLevelReader - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonLA::MapZoomLevelReader - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
         int zoom = read_map_zoom_level(image);
         return zoom == m_expected;
     };
 
 private:
-    std::string m_image;
     int m_expected;
 };
 

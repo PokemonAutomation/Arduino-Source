@@ -140,8 +140,10 @@ void reset_position_at_zero_gate(const ProgramInfo& info, VideoStream& stream, P
 // Assuming the current selected slot in box system is a hatched pokemon, not empty space or egg,
 // check the hatched pokemon's info to determine what to do with it.
 // Return if the pokemon is shiny. The action to handle the pokemon is returned in `action`.
-// The function will try to switch to judge view if possible so that it can read IVs.
-// If judge view is not unlocked, it will settle onto stats view, and the pokemon's IVs will be regarded as unknown.
+// If any row in `FILTERS` checks an IV, the function switches to judge view to read IVs, and
+// throws OperationFailedException if the judge view can't be reached (e.g. it's not unlocked in game).
+// Otherwise it settles onto stats or judge view, whichever comes first, skips reading IVs and
+// regards them as unknown. So players who don't filter on IVs don't need the judge unlocked.
 bool check_baby_info(
     const ProgramInfo& info,
     VideoStream& stream, ProControllerContext& context,

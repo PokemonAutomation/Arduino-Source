@@ -41,6 +41,7 @@ struct CollectedPokemonInfo{
     PokemonTeraType tera_type = PokemonTeraType::NONE;
     OriginMark origin_mark = OriginMark::NONE;
     std::string language_of_origin = "";
+    uint8_t level = 0; // 0 when not read by the program.
 };
 
 bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs);
@@ -51,6 +52,7 @@ bool operator==(const CollectedPokemonInfo& lhs, const CollectedPokemonInfo& rhs
 // to the second rule, and so on.
 // Available rules:
 // - Dex number: smaller ID should be at front.
+// - Level: lower level should be at front.
 // - Shiny: shiny pokemon should be at front.
 // - Gigantamax: Gigantamax pokemon should be at front.
 // - Alpha: Alpha pokemon should be at front.

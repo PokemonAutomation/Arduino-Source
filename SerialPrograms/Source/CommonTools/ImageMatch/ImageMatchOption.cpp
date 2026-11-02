@@ -4,7 +4,6 @@
  *
  */
 
-#include "ImageMatchOption.h"
 
 namespace PokemonAutomation{
 namespace ImageMatch{

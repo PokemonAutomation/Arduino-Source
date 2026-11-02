@@ -7,12 +7,14 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioPassthroughPair_H
 #define PokemonAutomation_AudioPipeline_AudioPassthroughPair_H
 
-#include "AudioInfo.h"
+#include "AudioFormat.h"
 #include "AudioSourceDescriptor.h"
 
 namespace PokemonAutomation{
 
 struct FFTListener;
+class AudioDeviceInfo;
+class AudioInputChoice;
 
 namespace Kernels{
 namespace AudioPipeline{

@@ -5,12 +5,12 @@
  */
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 //#include "Tests/TestUtils.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonLA_MapMissionTabReader.h"
 
 namespace PokemonAutomation{
@@ -34,24 +34,25 @@ bool is_map_mission_tab_raised(const ImageViewRGB32& screen){
 
 
 
-class Test_MapMissionTabReader : public UnitTest{
+class Test_MapMissionTabReader : public ImageUnitTest{
 public:
     Test_MapMissionTabReader(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonLA::MapMissionTabReader - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonLA::MapMissionTabReader - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
         return is_map_mission_tab_raised(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

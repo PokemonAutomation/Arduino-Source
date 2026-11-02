@@ -15,7 +15,6 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon/Inference/Pokemon_TypeReader.h"
@@ -287,6 +286,14 @@ void read_summary_screen(
     cur_pokemon_info.ot_name = summary_reader.read_original_trainer_name(
         ot_name_language, screen
     );
+
+    const int level = summary_reader.read_level(env.console, screen);
+    if (level < 0 || level > 100){
+        dump_image(env.console, ProgramInfo(), "ReadSummary_Level", screen);
+        env.console.log("Failed to read level from summary screen.", COLOR_RED);
+    }else{
+        cur_pokemon_info.level = static_cast<uint8_t>(level);
+    }
 
     if (home_language != Language::None){
         cur_pokemon_info.nature = summary_reader.read_nature(

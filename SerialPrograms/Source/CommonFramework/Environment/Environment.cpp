@@ -4,7 +4,6 @@
  *
  */
 
-#include "Environment.h"
 
 #if _WIN32
 #include "Environment_Windows.tpp"

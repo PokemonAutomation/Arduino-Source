@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonFramework/Logging/Logger.h"
 #include "VideoGames/PokemonLZA/Resources/PokemonLZA_HyperspaceRewardNames.h"
 #include "PokemonLZA_HyperspaceRewardOption.h"
 

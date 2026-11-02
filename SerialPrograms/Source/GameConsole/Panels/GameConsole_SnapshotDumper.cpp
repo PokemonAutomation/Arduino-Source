@@ -4,7 +4,6 @@
  *
  */
 
-#include <QKeyEvent>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
 #include "Common/Cpp/PrettyPrint.h"

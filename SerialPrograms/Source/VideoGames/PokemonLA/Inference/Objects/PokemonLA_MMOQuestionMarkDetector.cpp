@@ -8,10 +8,10 @@
 #include <iostream>
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "VideoGames/PokemonLA/PokemonLA_Locations.h"
 #include "PokemonLA_MMOQuestionMarkDetector.h"
@@ -220,18 +220,20 @@ void add_hisui_MMO_detection_to_overlay(const std::array<bool, 5>& detection_res
 
 
 
-class Test_MMOQuestionMarkDetector : public UnitTest{
+class Test_MMOQuestionMarkDetector : public ImageUnitTest{
 public:
     Test_MMOQuestionMarkDetector(
         const std::string& image,
         std::vector<std::string> keywords
     )
-        : UnitTest("PokemonLA::MMOQuestionMarkDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonLA::MMOQuestionMarkDetector - " + image, {image})
         , m_keywords(std::move(keywords))
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         bool hisui_kw_found = false;
         std::array<bool, 5> target_hisui_region_has_MMO = {false};
 
@@ -296,7 +298,7 @@ public:
         }
 
         MMOQuestionMarkDetector detector(logger);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
 
         if (hisui_kw_found){
             const auto region_has_MMO = detector.detect_MMO_on_hisui_map(image);
@@ -324,7 +326,6 @@ public:
     };
 
 private:
-    std::string m_image;
     std::vector<std::string> m_keywords;
 };
 

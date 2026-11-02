@@ -5,16 +5,15 @@
  */
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "VideoGames/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
@@ -126,18 +125,20 @@ bool save_game_from_overworld(
 
 
 
-class Test_GameSave : public UnitTest{
+class Test_GameSave : public ImageUnitTest{
 public:
     Test_GameSave(
         const std::string& image,
         std::vector<std::string> keywords
     )
-        : UnitTest("PokemonLA::GameSave - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonLA::GameSave - " + image, {image})
         , m_keywords(std::move(keywords))
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
 
         // two keywords: <True/False> <True/False>
         if (m_keywords.size() < 2){
@@ -159,7 +160,7 @@ public:
             return ss.str();
         }
 
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         bool save_tab = save_tab_selected(image);
         bool save_disabled = save_tab_disabled(image);
 
@@ -170,7 +171,6 @@ public:
     };
 
 private:
-    std::string m_image;
     std::vector<std::string> m_keywords;
 };
 

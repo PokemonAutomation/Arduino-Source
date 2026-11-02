@@ -413,7 +413,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
     // `BoxCurrentEggDetector`. 
     // This function is called in two cases:
     // 1. When we recover from error and don't know which column is the next egg column.
-    //    In this case, `change_stats_view_to_judge()` is called as part of the error recovery code before this function,
+    //    In this case, `change_view_to_stats_or_judge()` is called as part of the error recovery code before this function,
     //    so that `BoxCurrentEggDetector` in this function can function correctly to find that the egg column.
     // 2. When we finish processing one hatched party and want to load the next egg column.
     //    In this case, `next_egg_column` already point to the next possible column, that cannot be hatched pokemon.
@@ -442,13 +442,9 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         // Move box cursor to party lead
         move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 0, 0);
 
-        // Change box view to judge or stats
-        Language language = LANGUAGE;
-        if (language == Language::None){
-            change_view_to_stats_or_judge(env.console, context);
-        }else{
-            change_view_to_judge(env.console, context, language);
-        }
+        // Change box view to stats or judge, so that `BoxCurrentEggDetector` in `go_to_next_egg_column()`
+        // works. Either view is fine here since no IVs are read, and the judge may not be unlocked in game.
+        change_view_to_stats_or_judge(env.console, context);
 
         const uint8_t expected_non_eggs_count_in_party = HAS_CLONE_RIDE_POKEMON ? 1 : 0;
         num_eggs_in_party = check_non_eggs_count_in_party(env.program_info(), env.console, context, expected_non_eggs_count_in_party);

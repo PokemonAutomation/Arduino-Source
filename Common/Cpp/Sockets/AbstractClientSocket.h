@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Sockets_AbstractClientSocket_H
 #define PokemonAutomation_Sockets_AbstractClientSocket_H
 
+#include <chrono>
 #include <string>
 #include "Common/Cpp/ListenerSet.h"
 
@@ -35,13 +36,18 @@ public:
 
         //  Called when the socket receives data from the server.
         virtual void on_receive_data(const void* data, size_t bytes){}
+
+        //  Called when an established connection is lost (the server closed
+        //  the connection or a socket error occurred). It is not called by
+        //  "close()".
+        virtual void on_disconnect(const std::string& error_message){}
     };
 
     void add_listener(Listener& listener){
         m_listeners.add(listener);
     }
     void remove_listener(Listener& listener){
-        m_listeners.add(listener);
+        m_listeners.remove(listener);
     }
 
 
@@ -58,7 +64,16 @@ public:
     virtual void close() noexcept = 0;
     virtual void connect(const std::string& address, uint16_t port) = 0;
 
-    virtual size_t send(const void* data, size_t bytes) = 0;
+    //  Sends data on the active connection. This blocks until every byte
+    //  has been written, the connection is lost, or "timeout" elapses.
+    //  "std::chrono::milliseconds::max()" (the default) waits indefinitely.
+    //  Returns the number of bytes actually written, which may be less
+    //  than "bytes" if the deadline elapsed or the connection was lost.
+    virtual size_t send(
+        const void* data,
+        size_t bytes,
+        std::chrono::milliseconds timeout = std::chrono::milliseconds::max()
+    ) = 0;
 
 
 protected:

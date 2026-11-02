@@ -9,12 +9,12 @@
 #include <iostream>
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonLA_MapMarkerLocator.h"
 
@@ -143,27 +143,28 @@ double get_orientation_on_map(const ImageViewRGB32& screen, bool avoid_lava_area
 
 
 
-class Test_MapMarkerLocator : public UnitTest{
+class Test_MapMarkerLocator : public ImageUnitTest{
 public:
     Test_MapMarkerLocator(
         const std::string& image,
         float target_angle, float threshold
     )
-        : UnitTest("PokemonLA::MapMarkerLocator - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonLA::MapMarkerLocator - " + image, {image})
         , m_target_angle(target_angle)
         , m_threshold(threshold)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
         double angle = get_orientation_on_map(image);
         TEST_RESULT_APPROXIMATE_STR(angle, m_target_angle, m_threshold);
         return true;
     };
 
 private:
-    std::string m_image;
     float m_target_angle;
     float m_threshold;
 };

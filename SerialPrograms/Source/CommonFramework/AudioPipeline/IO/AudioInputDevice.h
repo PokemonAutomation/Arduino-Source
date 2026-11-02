@@ -16,7 +16,7 @@ using NativeAudioSource = QAudioSource;
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/StreamConverters.h"
 #include "Kernels/AudioPipeline/Kernels_AudioPipeline.h"
-#include "CommonFramework/AudioPipeline/AudioInfo.h"
+#include "CommonFramework/AudioPipeline/AudioFormat.h"
 
 class QAudioFormat;
 

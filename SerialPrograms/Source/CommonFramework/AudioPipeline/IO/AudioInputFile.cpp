@@ -13,24 +13,12 @@
 #include <QTimer>
 #include "3rdParty/QtWavFile/WavFile.h"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/AudioPipeline/AudioInfo.h"
+#include "CommonFramework/AudioPipeline/AudioFormat.h"
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioFileLoader.h"
 #include "AudioInputFile.h"
 
 namespace PokemonAutomation{
-
-
-
-namespace{
-
-Kernels::AudioPipeline::SampleFormat sample_format_of(const QAudioFormat& format){
-    QAudioFormat copy = format;
-    return to_sample_format(get_sample_format(copy));
-}
-
-
-}
 
 
 
@@ -62,29 +50,33 @@ bool probe_decoded_native_format(const std::string& filename, QAudioFormat& out_
     decoder.setSource(QUrl::fromLocalFile(QString::fromStdString(filename)));
 
     QEventLoop loop;
+    bool answered = false;
     bool got_format = false;
     bool finished_without_audio = false;
     QObject::connect(
         &decoder, &QAudioDecoder::bufferReady,
-        &decoder, [&decoder, &out_format, &got_format, &loop]{
+        &decoder, [&decoder, &out_format, &got_format, &answered, &loop]{
             const QAudioBuffer buffer = decoder.read();
             if (buffer.isValid() && buffer.format().isValid()){
                 out_format = buffer.format();
                 got_format = true;
             }
+            answered = true;
             loop.quit();
         }
     );
     QObject::connect(
         &decoder, QOverload<QAudioDecoder::Error>::of(&QAudioDecoder::error),
-        &decoder, [&loop](QAudioDecoder::Error){
+        &decoder, [&answered, &loop](QAudioDecoder::Error){
+            answered = true;
             loop.quit();
         }
     );
     QObject::connect(
         &decoder, &QAudioDecoder::finished,
-        &decoder, [&finished_without_audio, &loop]{
+        &decoder, [&finished_without_audio, &answered, &loop]{
             finished_without_audio = true;
+            answered = true;
             loop.quit();
         }
     );
@@ -93,9 +85,14 @@ bool probe_decoded_native_format(const std::string& filename, QAudioFormat& out_
     timer.setSingleShot(true);
     QObject::connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
     decoder.start();
-    timer.start(3000);
-    loop.exec();
-    timer.stop();
+
+    //  The decoder can set `answered` inside `start()`: it reports a
+    //  missing file as an error right away.
+    if (!answered){
+        timer.start(3000);
+        loop.exec();
+        timer.stop();
+    }
     decoder.stop();
     decoder.deleteLater();
 

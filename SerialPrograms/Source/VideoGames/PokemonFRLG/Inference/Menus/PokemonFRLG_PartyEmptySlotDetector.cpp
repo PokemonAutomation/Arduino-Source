@@ -6,9 +6,9 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Tests/ImageUnitTest.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_PartyEmptySlotDetector.h"
 
@@ -55,18 +55,20 @@ bool PartyEmptySlotDetector::detect(const ImageViewRGB32& screen){
 }
 
 
-class Test_PartyEmptySlotDetector : public UnitTest{
+class Test_PartyEmptySlotDetector : public ImageUnitTest{
 public:
     Test_PartyEmptySlotDetector(const std::string& image, PartySlot slot, bool expected)
-        : UnitTest("PokemonFRLG::PartyEmptySlotDetector - " + image + " - slot " + std::to_string(static_cast<unsigned>(slot) + 1))
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonFRLG::PartyEmptySlotDetector - " + image + " - slot " + std::to_string(static_cast<unsigned>(slot) + 1), {image})
         , m_slot(slot)
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger&, CancellableScope&) const override{
+    virtual UnitTestResult run_on_images(
+        Logger&, CancellableScope&,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         PartyEmptySlotDetector detector(COLOR_RED, m_slot);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         bool result = detector.detect(image);
         if (result != m_expected){
             return std::string("Expected empty slot = ") + (m_expected ? "true" : "false") +
@@ -76,7 +78,6 @@ public:
     }
 
 private:
-    std::string m_image;
     PartySlot m_slot;
     bool m_expected;
 };

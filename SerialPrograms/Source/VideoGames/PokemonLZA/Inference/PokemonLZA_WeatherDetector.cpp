@@ -19,6 +19,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonLZA_WeatherDetector.h"
 
@@ -359,26 +360,28 @@ bool WeatherIconDetector::detect(const ImageViewRGB32& screen){
 
 
 
-class Test_WeatherIconDetector : public UnitTest{
+class Test_WeatherIconDetector : public ImageUnitTest{
 public:
     Test_WeatherIconDetector(
         const std::string& image,
         WeatherIconType expected_weather,
         bool expected_result
     )
-        : UnitTest("PokemonPLZA::WeatherIconDetector - " + image + " [" + weather_name(expected_weather) + "]")
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonPLZA::WeatherIconDetector - " + image + " [" + weather_name(expected_weather) + "]", {image})
         , m_expected_weather(expected_weather)
         , m_expected_result(expected_result)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         (void)scope;
 
         DummyVideoOverlay overlay;
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         if (image.width() == 0 || image.height() == 0){
-            return "Failed to load test image: " + m_image;
+            return "Failed to load test image: " + image_paths()[0];
         }
 
         std::vector<WeatherIconType> detected_weathers;
@@ -436,7 +439,6 @@ public:
     }
 
 private:
-    std::string m_image;
     WeatherIconType m_expected_weather;
     bool m_expected_result;
 };

@@ -6,12 +6,12 @@
 
 #include <iostream>
 #include "CommonFramework/StaticGlobals.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonLZA_OverworldPartySelectionDetector.h"
 
@@ -138,20 +138,22 @@ bool OverworldPartySelectionWatcher::process_frame(const VideoSnapshot& frame){
 }
 
 
-class Test_OverworldPartySelectionDetector : public UnitTest{
+class Test_OverworldPartySelectionDetector : public ImageUnitTest{
 public:
     Test_OverworldPartySelectionDetector(
         const std::string& image,
         int expected_up_idx,
         int expected_down_idx
     )
-        : UnitTest("PokemonPLZA::OverworldPartySelectionDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonPLZA::OverworldPartySelectionDetector - " + image, {image})
         , m_expected_up_idx(expected_up_idx)
         , m_expected_down_idx(expected_down_idx)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         if (m_expected_up_idx < 0 || m_expected_up_idx > 6){
             return "Error: dpad_up_idx must be between 0 and 6.";
         }
@@ -162,7 +164,7 @@ public:
         DummyVideoOverlay overlay;
         OverworldPartySelectionDetector detector(COLOR_RED, &overlay);
         detector.set_debug_mode(true);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         bool detected = detector.detect(image);
 
         if (m_expected_up_idx == 6 && m_expected_down_idx == 6){
@@ -179,7 +181,6 @@ public:
     }
 
 private:
-    std::string m_image;
     int m_expected_up_idx;
     int m_expected_down_idx;
 };

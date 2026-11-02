@@ -5,10 +5,10 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "Tests/ImageUnitTest.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_BattleSelectionArrowDetector.h"
 
@@ -197,19 +197,21 @@ bool BattleSelectionArrowDetector::detect(const ImageViewRGB32& screen){
 //  must be found in that move's box and in none of the other three. Searching
 //  the whole move list (as the cursor navigation does) must also find it in
 //  the right place, not on the move names.
-class Test_BattleMoveSelectionArrow : public UnitTest{
+class Test_BattleMoveSelectionArrow : public ImageUnitTest{
 public:
     Test_BattleMoveSelectionArrow(
         const std::string& image,
         BattleMoveOption expected
     )
-        : UnitTest("PokemonFRLG::BattleMoveSelectionArrow - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonFRLG::BattleMoveSelectionArrow - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
         for (int i = 0; i < BATTLE_MOVE_OPTION_COUNT; i++){
             BattleMoveOption option = static_cast<BattleMoveOption>(i);
             BattleSelectionArrowDetector detector(COLOR_RED, nullptr, option);
@@ -231,7 +233,6 @@ public:
     };
 
 private:
-    std::string m_image;
     BattleMoveOption m_expected;
 };
 

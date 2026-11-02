@@ -23,7 +23,7 @@ using std::endl;
 
 namespace PokemonAutomation{
 
-//extern std::mutex print_lock;
+//extern Mutex print_lock;
 
 
 

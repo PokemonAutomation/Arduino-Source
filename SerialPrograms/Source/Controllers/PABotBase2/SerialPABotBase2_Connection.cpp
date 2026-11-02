@@ -240,8 +240,7 @@ bool SerialPABotBase2_Connection::connect_to_device(){
 
     std::string str =
         "Unable to connect to controller.<br>"
-        "Please make sure your microcontroller is flashed properly and<br>"
-        "you are using the correct mode (PABotBase vs. PABotBase2).<br>" +
+        "Please make sure your microcontroller is flashed properly.<br>" +
         make_text_url(ONLINE_DOC_URL_BASE + "SetupGuide/Reflash.html", "See documentation for more details.");
     set_status_line0(str, COLOR_RED);
     return false;

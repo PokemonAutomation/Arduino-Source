@@ -11,9 +11,9 @@
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Tests/GuardPageImage.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "Kernels_Waterfill_Tests.h"
 
@@ -58,21 +58,23 @@ struct WaterfillImplementation{
 //     out in tile order, and the two layouts have different tile sizes.
 //  3. Compare the two lists, object by object.
 //  The test fails if the reference finds no objects, because then the image tests nothing.
-class Test_Waterfill : public UnitTest{
+class Test_Waterfill : public ImageUnitTest{
 public:
     Test_Waterfill(
         const WaterfillImplementation& implementation,
         const std::string& image
     )
-        : UnitTest("Kernels::Waterfill - " + implementation.name + " - " + image)
+        : ImageUnitTest("Kernels::Waterfill - " + implementation.name + " - " + image, {image})
         , m_implementation(implementation)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         //  Copy the test image into guard-page memory with packed rows, so a
         //  kernel that reads or writes past the last pixel faults.
-        ImageRGB32 file_image(m_image);
+        const ImageRGB32& file_image = images[0];
         GuardPageImageRGB32 image(file_image);
 
         std::vector<Waterfill::WaterfillObject> expected = find_sorted_objects(
@@ -128,7 +130,6 @@ private:
 
 private:
     WaterfillImplementation m_implementation;
-    std::string m_image;
 };
 
 

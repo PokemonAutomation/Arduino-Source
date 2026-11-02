@@ -5,9 +5,9 @@
  */
 
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonHome_GigantamaxDetector.h"
 
@@ -87,21 +87,23 @@ bool GigantamaxDetector::detect(const ImageViewRGB32& screen){
     return found;
 }
 
-class Test_GigantamaxDetector : public UnitTest{
+class Test_GigantamaxDetector : public ImageUnitTest{
 public:
 
     Test_GigantamaxDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonHome::GigantamaxDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonHome::GigantamaxDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay video_overlay;
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         GigantamaxDetector detector(COLOR_BLACK, &video_overlay);
         bool result = detector.detect(image);
 
@@ -112,7 +114,6 @@ public:
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

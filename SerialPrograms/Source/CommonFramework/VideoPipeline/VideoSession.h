@@ -12,7 +12,7 @@
 #include "Common/Cpp/EventRateTracker.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Watchdog.h"
-#include "VideoSourceDescriptor.h"
+#include "VideoSourceOption.h"
 #include "VideoSource.h"
 
 namespace PokemonAutomation{

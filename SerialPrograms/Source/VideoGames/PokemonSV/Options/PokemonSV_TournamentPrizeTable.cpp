@@ -4,7 +4,6 @@
  *
  */
 
-#include "VideoGames/PokemonSV/Resources/PokemonSV_TournamentPrizeNames.h"
 #include "PokemonSV_TournamentPrizeTable.h"
 
 namespace PokemonAutomation{

@@ -8,8 +8,8 @@
 #include <map>
 #include <iostream>
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonLA_FlagTracker.h"
 
@@ -134,21 +134,23 @@ bool FlagTracker::process_frame(const ImageViewRGB32& frame, WallClock timestamp
 
 
 
-class Test_FlagTrackerPerformance : public UnitTest{
+class Test_FlagTrackerPerformance : public ImageUnitTest{
 public:
     Test_FlagTrackerPerformance(
         const std::string& image,
         size_t num_iterations
     )
-        : UnitTest("PokemonLA::FlagTrackerPerformance - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonLA::FlagTrackerPerformance - " + image, {image})
         , m_num_iterations(num_iterations)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay overlay;
         FlagTracker tracker(logger, overlay);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
 
         auto time_start = current_time();
         for (size_t i = 0; i < m_num_iterations; i++){
@@ -162,7 +164,6 @@ public:
     };
 
 private:
-    std::string m_image;
     size_t m_num_iterations;
 };
 

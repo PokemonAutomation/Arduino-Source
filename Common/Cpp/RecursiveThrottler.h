@@ -11,6 +11,7 @@
 #define PokemonAutomation_RecursiveThrottler_H
 
 #include <mutex>
+#include "Common/Cpp/Concurrency/Mutex.h"
 
 namespace PokemonAutomation{
 
@@ -18,13 +19,13 @@ class RecursiveThrottler{
 public:
     //  Returns true if ok to run. (not throttled)
     operator bool() const{
-        std::lock_guard<std::recursive_mutex> lg(m_lock);
+        std::lock_guard<RecursiveMutex> lg(m_lock);
         return m_depth == 0;
     }
 
 private:
     friend class ThrottleScope;
-    mutable std::recursive_mutex m_lock;
+    mutable RecursiveMutex m_lock;
     size_t m_depth = 0;
 };
 
@@ -49,7 +50,7 @@ public:
 
 private:
     RecursiveThrottler& m_throttler;
-    std::lock_guard<std::recursive_mutex> m_guard;
+    std::lock_guard<RecursiveMutex> m_guard;
 };
 
 }

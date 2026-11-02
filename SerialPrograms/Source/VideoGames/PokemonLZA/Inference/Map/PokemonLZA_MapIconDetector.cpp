@@ -13,6 +13,7 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA_MapIconDetector.h"
@@ -405,15 +406,17 @@ const std::vector<DetectedBox>& MapIconDetector::last_detected(){
 
 
 
-class Test_MapIconDetector : public UnitTest{
+class Test_MapIconDetector : public ImageUnitTest{
 public:
     Test_MapIconDetector(const std::string& image)
-        : UnitTest("PokemonPLZA::MapIconDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonPLZA::MapIconDetector - " + image, {image})
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        Filesystem::Path file_path(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        Filesystem::Path file_path(UNIT_TEST_RESOURCE_PATH() + image_paths()[0]);
         Filesystem::Path parent_dir = file_path.parent_path();
         std::string base_name = file_path.stem().string();
         Filesystem::Path target_detections_path = parent_dir / ("_" + base_name + ".txt");
@@ -450,7 +453,7 @@ public:
             }
         }
 
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         std::map<MapIconType, std::vector<DetectedBox>> detected_boxes;
         for (const auto& pair : expected_counts){
             MapIconDetector detector(COLOR_RED, pair.first, ImageFloatBox(0.0, 0.0, 1.0, 1.0));
@@ -465,9 +468,6 @@ public:
 
         return true;
     }
-
-private:
-    std::string m_image;
 };
 
 

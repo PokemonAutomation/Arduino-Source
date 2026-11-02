@@ -7,7 +7,6 @@
 #include <iostream>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
-#include "SerialConnection.h"
 
 namespace PokemonAutomation{
 

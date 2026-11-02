@@ -74,6 +74,101 @@ generated PRs. We have the following policy as a response:
 - [AGENTS.md](AGENTS.md) contains the project's build/test steps and hard rules, so coding
   agents follow the same rules as human contributors.
 
+## Coding Conventions and Program Patterns
+
+Follow the conventions of nearby code. The notes below cover formatting and the recurring
+patterns used by automation programs; the hard rules in [AGENTS.md](AGENTS.md) also apply.
+For background, see the wiki's [development knowledge guide](https://pokemonautomation.github.io/Developer/Knowledge.html)
+and [Git contribution guide](https://pokemonautomation.github.io/Developer/Git.html).
+
+### Formatting and Naming
+
+- Use four spaces for indentation, no tabs, and preserve the file's existing line endings
+  (usually CRLF). Avoid reformatting unrelated code.
+- Always use braces and multiline bodies for conditionals and loops, even for a single
+  statement; do not write single-line `if` statements, with or without braces. Do not use
+  `goto`. Put opening braces on the same line with no space between `)` and `{`, as in
+  `if (condition){`; write `}else{` and `}else if (condition){`. See the explicit
+  [control flow formatting rules](AGENTS.md#control-flow-formatting).
+- Types generally use `PascalCase`; functions and local variables use `snake_case`.
+  Ordinary member variables generally use an `m_` prefix. Program option members use
+  `UPPER_SNAKE_CASE`, such as `NUM_ROUNDS` or `GO_HOME_WHEN_DONE`, even when mutable.
+- Game files use names such as `PokemonLZA_RestaurantFarmer.h` and `.cpp`, under the
+  corresponding game namespace inside `PokemonAutomation::NintendoSwitch`. Follow the
+  existing file-header and `PokemonAutomation_<Name>_H` include-guard conventions.
+- Follow [Include Sort Order](CodingAgentContext/IncludeOrder.md): library and framework
+  headers precede game headers, and same-folder headers come last. A `.cpp` file's own
+  header is normally last. The guide covers exceptions, including panel lists whose
+  includes follow registration order. Include what you use and remove unused includes.
+
+### Program Structure and Reuse
+
+- A typical single-console program has a `ProgramName_Descriptor` derived from
+  `SingleSwitchProgramDescriptor` and a `ProgramName` derived from
+  `SingleSwitchProgramInstance`, with `using Descriptor = ProgramName_Descriptor`.
+  The descriptor holds metadata and creates statistics; the instance holds options and
+  implements `program(env, context)`. Use the corresponding multi-console framework when
+  needed. See [Automation Program Patterns](CodingAgentContext/AutomationProgramPatterns.md)
+  for a basic scaffold, and current programs for the APIs in use.
+- Keep the main loop readable by extracting meaningful steps into helpers. Reuse existing
+  navigation, battle, box, and inference routines before adding another implementation.
+  Helpers used by several programs belong in a shared game module. Document their starting
+  screen, ending screen, return values, and failure behavior so callers can compose them.
+- Keep screen recognition in `Inference/`, reusable option definitions in `Options/`, and
+  program orchestration in `Programs/`. A screen detector typically implements
+  `StaticScreenDetector`; a watcher, often using `DetectorToFinder`, adds detection over
+  time. Use existing image, OCR, and overlay helpers rather than embedding detection code
+  in the main program loop.
+- Program code must remain Qt-free. Use the option and session abstractions instead of
+  creating widgets or storing program state in UI objects. Follow the UI/state separation
+  rules in [AGENTS.md](AGENTS.md) when working on shared infrastructure.
+- Add new source and header files to
+  [SourceFiles.cmake](SerialPrograms/cmake/SourceFiles.cmake). Register a new program in its
+  game's `*_Panels.cpp`; current single-console panels use
+  `make_SingleSwitchProgram<ProgramName>()`.
+
+### Options, Statistics, and Notifications
+
+- Use the existing option types, initialize them in the constructor, and register them with
+  `PA_ADD_OPTION`. Give options clear labels, useful defaults, and bounds where applicable.
+  Choose `LockMode` deliberately: unlock an option during a run only if the program safely
+  handles changes. When several decisions depend on one value, read it once for that step.
+- Use the descriptor's `StatsTracker` and its atomic counters for progress and errors;
+  call `env.update_stats()` at meaningful progress points. Use `env.log()` or the console
+  logger for messages that help explain the current action or a failure.
+- Use the framework's notification options and send helpers for status, completion, and
+  errors. Reuse options such as `GoHomeWhenDoneOption` and `DeferredStopButtonOption` where
+  appropriate. A deferred stop should be checked at a safe boundary, with its
+  `ResetOnExit` guard so the button state is reset even if the run throws.
+
+### Controller Commands and Feedback
+
+- Send input through the controller context and existing `pbf_*` / `ssf_*` helpers.
+  Prefer explicit durations such as `160ms` or `10s` so the units are clear.
+  Commands are queued: use `context.wait_for_all_requests()` before making a decision that depends on those commands having finished.
+- For programs with feedback, use detectors and `wait_until()` / `run_until()` to recognize
+  game states and drive transitions. Handle both detected states and the no-detection
+  result. Keep delays needed for animation or movement, and explain unusual timings or
+  game-specific assumptions.
+- Give waits and recovery attempts a timeout or retry limit, and report failure when it
+  is reached. Use cancellable waits such as `context.wait_for()`; CPU-only loops that do
+  not otherwise reach a cancellation point must check `throw_if_cancelled()`. Follow
+  [AGENTS.md](AGENTS.md) for thread pools and synchronization.
+
+### Errors and Recovery
+
+- Use the project's exceptions for failures. For an unexpected game state, use
+  `OperationFailedException` or `OperationFailedExceptionWithScreenshot` as appropriate,
+  with a message describing the action and what failed. Preserve screenshots or other
+  diagnostic context when useful.
+- Recover from `OperationFailedException` only where there is a concrete recovery action,
+  such as returning to a known screen and retrying. Bound repeated recovery attempts and
+  propagate the failure when recovery is exhausted. If a catch only records statistics or
+  diagnostics, rethrow afterward. Let cancellation and `ProgramFinishedException` propagate;
+  do not swallow them in a general retry loop.
+- Before sending a change, remove obsolete commented-out code and temporary debugging
+  output. Explain non-obvious game behavior and helper contracts in comments.
+
 ## License
 
 By contributing, you agree that your code is released under the MIT license, unless the

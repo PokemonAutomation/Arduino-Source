@@ -6,12 +6,12 @@
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 //#include "Tests/TestUtils.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonSV_WhiteButtonDetector.h"
 
 //#include <iostream>
@@ -178,7 +178,7 @@ std::vector<ImageFloatBox> WhiteButtonDetector::detect_all(const ImageViewRGB32&
 
 
 
-class Test_WhiteButtonDetector : public UnitTest{
+class Test_WhiteButtonDetector : public ImageUnitTest{
 public:
     Test_WhiteButtonDetector(
         const std::string& image,
@@ -186,21 +186,22 @@ public:
         const ImageFloatBox& box,
         bool expected
     )
-        : UnitTest("PokemonSV::WhiteButtonDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::WhiteButtonDetector - " + image, {image})
         , m_button(button)
         , m_box(box)
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         WhiteButtonDetector detector(COLOR_RED, m_button, m_box);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     WhiteButton m_button;
     ImageFloatBox m_box;
     bool m_expected;

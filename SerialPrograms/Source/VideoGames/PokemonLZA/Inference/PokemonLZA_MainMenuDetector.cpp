@@ -4,10 +4,10 @@
  *
  */
 
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonLZA_MainMenuDetector.h"
 
@@ -30,26 +30,27 @@ bool MainMenuDetector::detect(const ImageViewRGB32& screen){
     return m_right_arrow_button.detect(screen) && m_b_button.detect(screen);
 }
 
-class Test_MainMenuDetector : public UnitTest{
+class Test_MainMenuDetector : public ImageUnitTest{
 public:
     Test_MainMenuDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonPLZA::MainMenuDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonPLZA::MainMenuDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay overlay;
         MainMenuDetector detector(COLOR_RED, &overlay);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

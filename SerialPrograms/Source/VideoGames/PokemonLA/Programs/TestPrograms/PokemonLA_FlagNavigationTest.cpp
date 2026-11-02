@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonFramework/Globals.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonLA/Programs/PokemonLA_FlagNavigationAir.h"

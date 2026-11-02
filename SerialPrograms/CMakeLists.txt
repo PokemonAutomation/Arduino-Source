@@ -597,7 +597,7 @@ else() # macOS and Linux
         target_link_libraries(SerialProgramsLib PUBLIC ${LEPTONICA_LINK_LIBRARIES})
     endif()
 
-    pkg_search_module(DPP dpp=10.1.5)
+    pkg_search_module(DPP dpp=10.1.6)
     if (DPP_FOUND) # enable dpp integration
         message(STATUS "Compiling with DPP integration enabled")
         target_compile_definitions(SerialProgramsLib PUBLIC PA_DPP)
@@ -642,8 +642,9 @@ else() # macOS and Linux
 
     if(APPLE)
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
-        # on macOS, need this framework to query OS API to control display sleep and system sleep behavior
-        target_link_libraries(SerialProgramsLib PRIVATE "-framework IOKit -framework CoreFoundation")
+        # on macOS, need these frameworks to query OS APIs: IOKit to control display sleep and system
+        # sleep behavior, CoreAudio to read the formats audio devices natively run in
+        target_link_libraries(SerialProgramsLib PRIVATE "-framework IOKit -framework CoreFoundation -framework CoreAudio")
     else() # Linux
         # Assume GCC
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
@@ -859,6 +860,22 @@ if (WIN32)
         VERBATIM
     )
 endif() # end WIN32
+
+if (WIN32 OR DPP_FOUND)
+    # Deploy the CA bundle beside the executable for DPP certificate verification.
+    if (WIN32)
+        set(DPP_CERT_DIR "${WIN_DEPLOY_DIR}")
+    else()
+        set(DPP_CERT_DIR "$<TARGET_FILE_DIR:SerialPrograms>")
+    endif()
+    add_custom_command(
+        TARGET SerialPrograms POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "${REPO_ROOT_DIR}/3rdPartyBinaries/dpp-cacert.pem"
+            "${DPP_CERT_DIR}/dpp-cacert.pem"
+        VERBATIM
+    )
+endif()
 
 set_target_properties(SerialPrograms PROPERTIES QT_QML_IMPORT_DEPENDENCIES "QtMultimedia")
 

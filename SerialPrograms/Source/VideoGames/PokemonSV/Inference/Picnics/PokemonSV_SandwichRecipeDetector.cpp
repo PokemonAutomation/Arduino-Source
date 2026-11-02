@@ -8,12 +8,12 @@
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonSV_SandwichRecipeDetector.h"
 
@@ -160,18 +160,20 @@ bool SandwichRecipeSelectionWatcher::detect(const ImageViewRGB32& frame){
 
 
 
-class Test_SandwichRecipeDetector : public UnitTest{
+class Test_SandwichRecipeDetector : public ImageUnitTest{
 public:
     Test_SandwichRecipeDetector(
         const std::string& image,
         std::vector<std::string> words
     )
-        : UnitTest("PokemonSV::Test_SandwichRecipeDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::Test_SandwichRecipeDetector - " + image, {image})
         , m_words(std::move(words))
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         // seven words: the sandwich recipe IDs on the screen. Order:
         // --------------------------------------
         // recipe_IDs[0]  |   recipe_IDs[1]
@@ -198,7 +200,7 @@ public:
         SandwichRecipeNumberDetector detector(logger);
 
         size_t detected_IDs[6] = {0, 0, 0, 0, 0, 0};
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         detector.detect_recipes(image, detected_IDs);
 
         for (int i = 0; i < 6; i++){
@@ -227,7 +229,6 @@ public:
     };
 
 private:
-    std::string m_image;
     std::vector<std::string> m_words;
 };
 

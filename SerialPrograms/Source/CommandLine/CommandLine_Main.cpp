@@ -12,7 +12,6 @@
 #include "Common/Cpp/Logging/LastLogTracker.h"
 #include "Common/Cpp/Logging/FileLogger.h"
 #include "Common/Cpp/Logging/GlobalLogger.h"
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/Logging/Logger.h"
 // #include "CommonFramework/Logging/OutputRedirector.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"

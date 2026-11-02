@@ -8,11 +8,11 @@
 #include <cstdio>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Tests/ImageUnitTest.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_PokemonLeagueDetectors.h"
 
@@ -195,29 +195,31 @@ bool HallOfFameSavingDetector::detect(const ImageViewRGB32& screen){
 
 
 
-class Test_EliteFourRoomDetector : public UnitTest{
+class Test_EliteFourRoomDetector : public ImageUnitTest{
 public:
     Test_EliteFourRoomDetector(
         const std::string& image,
         EliteFourRoom room,
         bool expected
     )
-        : UnitTest(
-            std::string("PokemonFRLG::EliteFourRoomDetector(") + elite_four_room_name(room) + ") - " + image
+        : ImageUnitTest(
+            std::string("PokemonFRLG::EliteFourRoomDetector(") + elite_four_room_name(room) + ") - " + image,
+            {image}
         )
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
         , m_room(room)
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         EliteFourRoomDetector detector(COLOR_RED, m_room);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     EliteFourRoom m_room;
     bool m_expected;
 };
@@ -292,25 +294,26 @@ void add_tests_EliteFourRoomDetector(UnitTestDatabase& database){
 }
 
 
-class Test_HallOfFameSavingDetector : public UnitTest{
+class Test_HallOfFameSavingDetector : public ImageUnitTest{
 public:
     Test_HallOfFameSavingDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonFRLG::HallOfFameSavingDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonFRLG::HallOfFameSavingDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         HallOfFameSavingDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

@@ -35,6 +35,8 @@ public:
     //  per test distortion, on the images re-colored with `TestImageDistortionManager::transform()`.
     //  The test passes only if every run passes. Otherwise the message lists each distortion that
     //  failed with the message of that run, e.g. "[Win-MYPIN] Error: ...".
+    //  There are no distortion runs while generating golden files (`GENERATE_TEST_GOLDEN_FILES`), so the
+    //  golden files hold the results on the images as they are.
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override final;
 
     //  The test images, relative to `UNIT_TEST_RESOURCE_PATH()`, as given to the constructor.

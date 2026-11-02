@@ -7,7 +7,6 @@
 #include <iostream>
 #include <QHBoxLayout>
 #include <QLabel>
-#include <QCheckBox>
 #include "ButtonWidget.h"
 
 //using std::cout;

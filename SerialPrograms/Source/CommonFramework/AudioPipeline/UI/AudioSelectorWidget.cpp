@@ -4,7 +4,6 @@
  *
  */
 
-#include <QAudio>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QComboBox>
@@ -15,8 +14,11 @@
 #include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
-#include "CommonFramework/AudioPipeline/AudioSources/AudioSource_File.h"
-#include "CommonFramework/AudioPipeline/AudioSources/AudioSource_Device.h"
+
+#include "CommonFramework/AudioPipeline/Sources/AudioSource_Null.h"
+//#include "CommonFramework/AudioPipeline/Sources/AudioSource_File.h"
+#include "CommonFramework/AudioPipeline/Sources/AudioSource_Device.h"
+
 #include "AudioDisplayWidget.h"
 #include "AudioSelectorWidget.h"
 
@@ -112,21 +114,11 @@ AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
     connect(
         m_audio_input_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [this](int index){
-            if (index <= 0 || index >= (int)m_input_audios.size() + 2){
-                m_session.clear_audio_input();
-            }else if (index == 1){
-                std::string path = QFileDialog::getOpenFileName(this, "Open audio file", ".", "*.wav *.mp3").toStdString();
-                if (path.empty()){
-                    m_session.clear_audio_input();
-                }else{
-                    m_session.set_audio_input(std::make_unique<AudioSourceDescriptor_File>(
-                        std::move(path)
-                    ));
-                }
+            if (0 <= index && index < (int)m_input_sources.size()){
+                m_input_sources[index]->run_post_select();
+                m_session.set_audio_input(m_input_sources[index]);
             }else{
-                m_session.set_audio_input(std::make_unique<AudioSourceDescriptor_Device>(
-                    m_input_audios[index - 2]
-                ));
+                m_session.set_audio_input(std::make_unique<AudioSourceDescriptor_Null>());
             }
         }
     );
@@ -208,22 +200,6 @@ AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
 
 
 
-void AudioSelectorWidget::build_input_list(const std::shared_ptr<const AudioSourceDescriptor>& source){
-    m_input_audios = AudioDeviceInfo::all_input_devices();
-    m_audio_input_box->clear();
-    m_audio_input_box->addItem("(none)");
-    m_audio_input_box->addItem("Play Audio File");
-    bool is_device = source && source->type == AudioSourceType::Device;
-    size_t index = source && source->type == AudioSourceType::File ? 1 : 0;
-    for (size_t c = 0; c < m_input_audios.size(); c++){
-        const AudioDeviceInfo& audio = m_input_audios[c];
-        m_audio_input_box->addItem(QString::fromStdString(audio.display_name()));
-        if (is_device && static_cast<const AudioSourceDescriptor_Device*>(source.get())->device_info() == audio){
-            index = c + 2;
-        }
-    }
-    m_audio_input_box->setCurrentIndex((int)index);
-}
 void AudioSelectorWidget::build_output_list(const AudioDeviceInfo& device){
     m_output_audios = AudioDeviceInfo::all_output_devices();
     m_audio_output_box->clear();
@@ -269,30 +245,39 @@ void AudioSelectorWidget::refresh_formats(
     m_audio_format_box->setCurrentIndex(index);
 }
 void AudioSelectorWidget::refresh_input_device(const std::shared_ptr<const AudioSourceDescriptor>& source){
-    if (m_input_audios.empty()){
-        build_input_list(source);
-        return;
+    std::shared_ptr<AudioSourceDescriptor> current_descriptor = m_session.input_source();
+
+    std::vector<std::shared_ptr<AudioSourceDescriptor>> sources;
+
+    //  Add all the static options.
+    {
+        AudioOption option;
+        m_session.save(option);
+        sources.emplace_back(option.get_input_from_cache(AudioSourceType::None));
+        sources.emplace_back(option.get_input_from_cache(AudioSourceType::File));
     }
 
-    if (source == nullptr || source->type == AudioSourceType::None){
-        m_audio_input_box->setCurrentIndex(0);
-        return;
+    //  Now add all the devices.
+    for (AudioDeviceInfo& info : AudioDeviceInfo::all_input_devices()){
+        sources.emplace_back(std::make_unique<AudioSourceDescriptor_Device>(std::move(info)));
     }
 
-    if (source->type == AudioSourceType::File){
-        m_audio_input_box->setCurrentIndex(1);
-        return;
-    }
+    m_input_sources = std::move(sources);
+    m_audio_input_box->clear();
 
-    //  See if it's in our cached list.
-    for (size_t c = 0; c < m_input_audios.size(); c++){
-        if (static_cast<const AudioSourceDescriptor_Device*>(source.get())->device_info() == m_input_audios[c]){
-            m_audio_input_box->setCurrentIndex((int)c + 2);
-            return;
+    int index = -1;
+    for (int c = 0; c < (int)m_input_sources.size(); c++){
+        const AudioSourceDescriptor& descriptor = *m_input_sources[c];
+        m_audio_input_box->addItem(QString::fromStdString(descriptor.display_name()));
+        if (*current_descriptor == descriptor){
+            index = c;
         }
     }
-
-    build_input_list(source);
+    if (index >= 0){
+        m_audio_input_box->setCurrentIndex((int)index);
+    }else{
+        m_session.logger().log("Unable to find entry for this source.", COLOR_RED);
+    }
 }
 void AudioSelectorWidget::refresh_output_device(const AudioDeviceInfo& device){
     if (m_output_audios.empty()){

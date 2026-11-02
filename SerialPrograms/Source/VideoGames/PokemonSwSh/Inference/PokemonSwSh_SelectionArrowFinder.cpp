@@ -18,6 +18,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonSwSh_SelectionArrowFinder.h"
 
@@ -259,19 +260,21 @@ int RotomPhoneMenuArrowFinder::detect_index(const ImageViewRGB32& screen){
 
 
 
-class Test_SelectionArrowFinder : public UnitTest{
+class Test_SelectionArrowFinder : public ImageUnitTest{
 public:
     Test_SelectionArrowFinder(
         const std::string& image,
         size_t expected
     )
-        : UnitTest("PokemonSwSh::SelectionArrowFinder - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSwSh::SelectionArrowFinder - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        ImageRGB32 image(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
         std::vector<ImagePixelBox> boxes = find_selection_arrows(image, 10);
         for (const auto& box : boxes){
             std::cout << "Found box: " << box.min_x << " " << box.max_x << " " << box.min_y << " " << box.max_y << std::endl;
@@ -280,95 +283,98 @@ public:
     };
 
 private:
-    std::string m_image;
     size_t m_expected;
 };
-class Test_RetrieveEggArrowFinder : public UnitTest{
+class Test_RetrieveEggArrowFinder : public ImageUnitTest{
 public:
     Test_RetrieveEggArrowFinder(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonSwSh::RetrieveEggArrowFinder - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSwSh::RetrieveEggArrowFinder - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay overlay;
         RetrieveEggArrowFinder detector(overlay);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
-class Test_CheckNurseryArrowFinder : public UnitTest{
+class Test_CheckNurseryArrowFinder : public ImageUnitTest{
 public:
     Test_CheckNurseryArrowFinder(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonSwSh::CheckNurseryArrowFinder - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSwSh::CheckNurseryArrowFinder - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay overlay;
         CheckNurseryArrowFinder detector(overlay);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
-class Test_StoragePokemonMenuArrowFinder : public UnitTest{
+class Test_StoragePokemonMenuArrowFinder : public ImageUnitTest{
 public:
     Test_StoragePokemonMenuArrowFinder(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonSwSh::StoragePokemonMenuArrowFinder - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSwSh::StoragePokemonMenuArrowFinder - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay overlay;
         StoragePokemonMenuArrowFinder detector(overlay);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
-class Test_RotomPhoneMenuArrowFinder : public UnitTest{
+class Test_RotomPhoneMenuArrowFinder : public ImageUnitTest{
 public:
     Test_RotomPhoneMenuArrowFinder(
         const std::string& image,
         int index
     )
-        : UnitTest("PokemonSwSh::RotomPhoneMenuArrowFinder - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSwSh::RotomPhoneMenuArrowFinder - " + image, {image})
         , m_index(index)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay overlay;
         RotomPhoneMenuArrowFinder detector(overlay);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect_index(image) == m_index;
     };
 
 private:
-    std::string m_image;
     int m_index;
 };
 

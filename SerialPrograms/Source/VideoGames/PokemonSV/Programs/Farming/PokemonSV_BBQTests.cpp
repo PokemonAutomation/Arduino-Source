@@ -5,8 +5,8 @@
  */
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "Tests/ImageUnitTest.h"
 #include "VideoGames/PokemonSV/Inference/PokemonSV_BlueberryPointsReader.h"
 #include "VideoGames/PokemonSV/Options/PokemonSV_BBQuests.h"
 #include "PokemonSV_BlueberryQuests.h"
@@ -46,16 +46,18 @@ public:
     }
 };
 
-class Test_BlueberryPoints : public UnitTest{
+class Test_BlueberryPoints : public ImageUnitTest{
 public:
     Test_BlueberryPoints(const std::string& image, int expected, size_t width, size_t height)
-        : UnitTest("PokemonSV::BlueberryPoints - " + image + " - " + std::to_string(width))
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonSV::BlueberryPoints - " + image + " - " + std::to_string(width), {image})
         , m_expected(expected), m_width(width), m_height(height)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope&) const override{
-        ImageRGB32 reference(m_image);
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope&,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& reference = images[0];
         ImageRGB32 image = reference.scale_to(m_width, m_height);
         const int actual = read_BP_from_image(logger, image);
         if (actual != m_expected){
@@ -65,7 +67,6 @@ public:
     }
 
 private:
-    const std::string m_image;
     const int m_expected;
     const size_t m_width, m_height;
 };

@@ -5,13 +5,13 @@
  */
 
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageFilter.h"
+#include "Tests/ImageUnitTest.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_ShinySymbolDetector.h"
 
@@ -60,26 +60,27 @@ bool ShinySymbolDetector::read(Logger& logger, const ImageViewRGB32& frame){
     return false;
 }
 
-class Test_ShinySymbolDetector : public UnitTest{
+class Test_ShinySymbolDetector : public ImageUnitTest{
 public:
 
     Test_ShinySymbolDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonHome::ShinySymbolDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonHome::ShinySymbolDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         ShinySymbolDetector detector(COLOR_RED);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.read(logger, image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

@@ -9,6 +9,7 @@
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/TestRunners/TestImageDistortionManager.h"
 #include "CommonFramework/GlobalAutoPaths.h"
+#include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "ImageUnitTest.h"
 
@@ -71,6 +72,12 @@ UnitTestResult ImageUnitTest::run(Logger& logger, CancellableScope& scope) const
     UnitTestResult result = run_on_images(logger, scope, images);
     const TestImageDistortionManager* manager = test_image_distortion_manager();
     if (result.result != UnitTestResult::PASSED || manager == nullptr){
+        return result;
+    }
+
+    //  When generating golden files, a test writes its results on the images as the expected
+    //  results. The distortion runs would overwrite them with results on re-colored images.
+    if (STATIC_GLOBALS.GENERATE_TEST_GOLDEN_FILES){
         return result;
     }
 

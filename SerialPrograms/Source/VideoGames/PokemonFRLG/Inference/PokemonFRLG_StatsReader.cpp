@@ -1,4 +1,4 @@
-﻿/*  Stats Reader
+/*  Stats Reader
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -15,6 +15,7 @@
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Inference/Pokemon_NatureReader.h"
@@ -103,6 +104,13 @@ bool StatsReader::read_name(
 
     if (!result.results.empty()){
         stats.name = result.results.begin()->second.token;
+        if (stats.name != "nidoran-f" && stats.name != "nidoran-m"){
+            return true;
+        }
+        const std::string symbol_name = read_nidoran_symbol(preprocess_for_ocr(name_box, 3, 1), DARK_TEXT_FILTERS());
+        if (!symbol_name.empty() && (subset.empty() || subset.contains(symbol_name))){
+            stats.name = symbol_name;
+        }
         return true;
     }
     logger.log("Failed to read species name.", COLOR_RED);
@@ -430,27 +438,29 @@ UnitTestResult language_from_filename(const std::string& image_path, Language& l
 }
 
 
-class Test_StatsReaderPage1 : public UnitTest{
+class Test_StatsReaderPage1 : public ImageUnitTest{
 public:
     Test_StatsReaderPage1(const std::string& image)
-        : UnitTest("PokemonFRLG::StatsReader - page1 - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonFRLG::StatsReader - page1 - " + image, {image})
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         Language language = Language::None;
-        UnitTestResult parsed = language_from_filename(m_image, language);
+        UnitTestResult parsed = language_from_filename(image_paths()[0], language);
         if (parsed.result != UnitTestResult::PASSED){
             return parsed;
         }
 
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         StatsReader reader;
         PokemonFRLG_Stats stats;
         reader.read_page1(logger, language, image, stats);
 
         return check_against_golden_file(
-            m_image,
+            UNIT_TEST_RESOURCE_PATH() + image_paths()[0],
             {"name", "level", "gender", "nature"},
             {
                 text_slug(stats.name),
@@ -460,33 +470,32 @@ public:
             }
         );
     };
-
-private:
-    std::string m_image;
 };
 
 
-class Test_StatsReaderPage2 : public UnitTest{
+class Test_StatsReaderPage2 : public ImageUnitTest{
 public:
     Test_StatsReaderPage2(const std::string& image)
-        : UnitTest("PokemonFRLG::StatsReader - page2 - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonFRLG::StatsReader - page2 - " + image, {image})
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         Language language = Language::None;
-        UnitTestResult parsed = language_from_filename(m_image, language);
+        UnitTestResult parsed = language_from_filename(image_paths()[0], language);
         if (parsed.result != UnitTestResult::PASSED){
             return parsed;
         }
 
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         StatsReader reader;
         PokemonFRLG_Stats stats;
         reader.read_page2(logger, language, image, stats);
 
         return check_against_golden_file(
-            m_image,
+            UNIT_TEST_RESOURCE_PATH() + image_paths()[0],
             {"hp", "attack", "defense", "spatk", "spdef", "speed"},
             {
                 number_slug(stats.hp),
@@ -498,9 +507,6 @@ public:
             }
         );
     };
-
-private:
-    std::string m_image;
 };
 
 
@@ -518,6 +524,7 @@ void add_tests_StatsReader(UnitTestDatabase& database){
     database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/horsea_3_deu.png");
     database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/magikarp_1_spa.png");
     database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/moltres_1_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/nidoran_m_eng.png");
     database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/pidgey_1_ita.png");
     database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/venonat_4k_eng.png");
     database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/abra_1_deu.png");

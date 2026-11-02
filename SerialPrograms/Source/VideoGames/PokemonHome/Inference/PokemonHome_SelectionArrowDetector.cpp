@@ -6,9 +6,9 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonHome_SelectionArrowDetector.h"
 
@@ -105,21 +105,23 @@ bool SelectionArrowDetector::detect(const ImageViewRGB32& screen){
     return found;
 }
 
-class Test_SelectionArrowDetector : public UnitTest{
+class Test_SelectionArrowDetector : public ImageUnitTest{
 public:
 
     Test_SelectionArrowDetector(
         const std::string& image,
         std::optional<SelectionArrowType> expected
     )
-        : UnitTest("PokemonHome::SelectionArrowDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonHome::SelectionArrowDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay video_overlay;
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         SelectionArrowDetector right_detector(COLOR_BLACK, &video_overlay, SelectionArrowType::RIGHT, ImageFloatBox(0.463, 0.09, 0.04, 0.06));
         SelectionArrowDetector down_detector(COLOR_BLACK, &video_overlay, SelectionArrowType::DOWN, ImageFloatBox(0.463, 0.09, 0.04, 0.06));
 
@@ -153,7 +155,6 @@ public:
     };
 
 private:
-    std::string m_image;
     std::optional<SelectionArrowType> m_expected;
 };
 

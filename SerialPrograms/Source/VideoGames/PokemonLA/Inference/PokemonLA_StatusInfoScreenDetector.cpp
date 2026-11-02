@@ -6,11 +6,11 @@
 
 #include <iostream>
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLA_CommonColorCheck.h"
@@ -184,18 +184,20 @@ std::string test_pokemon_details(const PokemonDetails& details, const PokemonDet
 
 
 
-class Test_StatusInfoScreenDetector : public UnitTest{
+class Test_StatusInfoScreenDetector : public ImageUnitTest{
 public:
     Test_StatusInfoScreenDetector(
         const std::string& image,
         std::vector<std::string> keywords
     )
-        : UnitTest("PokemonLA::StatusInfoScreenDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonLA::StatusInfoScreenDetector - " + image, {image})
         , m_keywords(std::move(keywords))
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         // the last five keywords should be: <language> <pokemon name slug> <Shiny/NotShiny> <Alpha/NotAlpha> <Male/Female/Genderless>
         Language language = Language::None;
         PokemonDetails target;
@@ -206,7 +208,7 @@ public:
         }
 
         DummyVideoOverlay overlay;
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         const PokemonDetails details = read_status_info(logger, overlay, image, language);
 
         ret = test_pokemon_details(details, target);
@@ -217,7 +219,6 @@ public:
     };
 
 private:
-    std::string m_image;
     std::vector<std::string> m_keywords;
 };
 

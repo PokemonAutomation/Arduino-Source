@@ -4,7 +4,6 @@
  *
  */
 
-#include <QtGlobal>
 //#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Globals.h"

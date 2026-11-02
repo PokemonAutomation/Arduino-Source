@@ -6,13 +6,13 @@
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
-#include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "PokemonLZA_DialogDetector.h"
 
@@ -475,73 +475,76 @@ bool LightBlueDialogDetector::detect(const ImageViewRGB32& screen){
 
 
 
-class Test_BlueDialogDetector : public UnitTest{
+class Test_BlueDialogDetector : public ImageUnitTest{
 public:
     Test_BlueDialogDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonPLZA::BlueDialogDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonPLZA::BlueDialogDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay overlay;
         BlueDialogDetector detector(COLOR_RED, &overlay);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 
 
-class Test_FlatWhiteDialogDetector : public UnitTest{
+class Test_FlatWhiteDialogDetector : public ImageUnitTest{
 public:
     Test_FlatWhiteDialogDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonPLZA::FlatWhiteDialogDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonPLZA::FlatWhiteDialogDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay overlay;
         FlatWhiteDialogDetector detector(COLOR_RED, &overlay);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 
-class Test_TransparentBattleDialogDetector : public UnitTest{
+class Test_TransparentBattleDialogDetector : public ImageUnitTest{
 public:
     Test_TransparentBattleDialogDetector(
         const std::string& image,
         bool expected
     )
-        : UnitTest("PokemonPLZA::TransparentBattleDialogDetector - " + image)
-        , m_image(UNIT_TEST_RESOURCE_PATH() + image)
+        : ImageUnitTest("PokemonPLZA::TransparentBattleDialogDetector - " + image, {image})
         , m_expected(expected)
     {}
 
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
         DummyVideoOverlay overlay;
         TransparentBattleDialogDetector detector(COLOR_RED, &overlay);
-        ImageRGB32 image(m_image);
+        const ImageRGB32& image = images[0];
         return detector.detect(image) == m_expected;
     };
 
 private:
-    std::string m_image;
     bool m_expected;
 };
 

@@ -6,7 +6,6 @@
 
 #include <QStandardItemModel>
 #include <QVBoxLayout>
-#include <QLabel>
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/PersistentSettings.h"
