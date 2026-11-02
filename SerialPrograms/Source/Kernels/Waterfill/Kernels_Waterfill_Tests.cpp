@@ -66,7 +66,12 @@ public:
     )
         : ImageUnitTest("Kernels::Waterfill - " + implementation.name + " - " + image, {image})
         , m_implementation(implementation)
-    {}
+    {
+        //  The test keeps the loaded image and a guard-page copy of it alive at the
+        //  same time, plus a packed binary matrix (width x height / 8).
+        const uint64_t image_bytes = test_image_rgb32_bytes(image);
+        m_memory = image_bytes * 2 + image_bytes / 32;
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,

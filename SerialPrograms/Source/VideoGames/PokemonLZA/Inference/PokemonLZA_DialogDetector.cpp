@@ -508,7 +508,10 @@ public:
     )
         : ImageUnitTest("PokemonPLZA::FlatWhiteDialogDetector - " + image, {image})
         , m_expected(expected)
-    {}
+    {
+        //  chao_fossil_True.png is 2560 x 1600 (15.6 MB).
+        m_memory = test_image_rgb32_bytes(image);
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,

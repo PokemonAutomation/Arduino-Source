@@ -22,6 +22,26 @@
 namespace PokemonAutomation{
 
 
+//  The number of bytes the test image at `relative_path` (relative to
+//  `UNIT_TEST_RESOURCE_PATH()`, as in `ImageUnitTest`'s constructor) occupies in
+//  memory as an `ImageRGB32` (width x height x 4), read from the file's PNG or JPEG
+//  header without decoding the image data. Returns 0 if the file is missing or cannot
+//  be read. Used by tests to set `UnitTest::m_memory` from the size of the test image
+//  they load.
+uint64_t test_image_rgb32_bytes(const std::string& relative_path);
+
+
+//  Best-effort per-test memory estimates for the PaddleOCR (ONNX) pipeline, added to the
+//  test image size when setting `UnitTest::m_memory` on tests that run OCR. The ONNX
+//  sessions are loaded once per process and shared by all tests, but the estimates
+//  attribute the full cost to each test so the parallel test runner's memory budget
+//  stays safe. Single-line reads only use the recognition model; multi-line reads
+//  additionally load the ~84 MB detection model (PaddleOCRDetection/det.onnx) plus its
+//  activations.
+constexpr uint64_t PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE = 32ull * 1024 * 1024;
+constexpr uint64_t PADDLE_OCR_MULTILINE_MEMORY_ESTIMATE = 256ull * 1024 * 1024;
+
+
 class ImageUnitTest : public UnitTest{
 public:
     //  `name`: the test name, as for `UnitTest`.

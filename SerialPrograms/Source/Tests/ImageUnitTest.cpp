@@ -5,6 +5,9 @@
  */
 
 #include <opencv2/core.hpp>
+#include <cstring>
+#include <fstream>
+#include <iterator>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/TestRunners/TestImageDistortionManager.h"
@@ -14,6 +17,82 @@
 #include "ImageUnitTest.h"
 
 namespace PokemonAutomation{
+
+
+namespace{
+
+//  Big-endian 16/32-bit reads from a byte buffer.
+uint16_t be16(const uint8_t* p){
+    return (uint16_t)((uint16_t)p[0] << 8 | p[1]);
+}
+uint32_t be32(const uint8_t* p){
+    return (uint32_t)p[0] << 24 | (uint32_t)p[1] << 16 | (uint32_t)p[2] << 8 | p[3];
+}
+
+//  PNG: the 24-byte signature + IHDR header holds the dimensions at offsets 16 and 20.
+bool png_dimensions(const std::vector<uint8_t>& data, size_t& width, size_t& height){
+    static const uint8_t SIGNATURE[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
+    if (data.size() < 24 || std::memcmp(data.data(), SIGNATURE, 8) != 0){
+        return false;
+    }
+    width = be32(data.data() + 16);
+    height = be32(data.data() + 20);
+    return width != 0 && height != 0;
+}
+
+//  JPEG: scan the marker stream for a SOF0..SOF15 frame (0xC0..0xCF, excluding the
+//  DHT / JPG / DAC markers 0xC4, 0xC8 and 0xCC); its payload is height then width.
+bool jpeg_dimensions(const std::vector<uint8_t>& data, size_t& width, size_t& height){
+    if (data.size() < 4 || data[0] != 0xff || data[1] != 0xd8){
+        return false;
+    }
+    size_t i = 2;
+    while (i + 4 < data.size()){
+        if (data[i] != 0xff){
+            i++;
+            continue;
+        }
+        const uint8_t marker = data[i + 1];
+        if (marker == 0xff || (marker >= 0xd0 && marker <= 0xd7) || marker == 0x01 || marker == 0xd9){
+            i += 2;
+            continue;
+        }
+        const size_t length = be16(data.data() + i + 2);
+        if ((marker >= 0xc0 && marker <= 0xcf) && marker != 0xc4 && marker != 0xc8 && marker != 0xcc){
+            if (i + 9 > data.size()){
+                return false;
+            }
+            height = be16(data.data() + i + 5);
+            width = be16(data.data() + i + 7);
+            return width != 0 && height != 0;
+        }
+        i += 2 + length;
+    }
+    return false;
+}
+
+}
+
+
+uint64_t test_image_rgb32_bytes(const std::string& relative_path){
+    const std::string path = UNIT_TEST_RESOURCE_PATH() + relative_path;
+    std::ifstream file(path, std::ios::binary);
+    if (!file){
+        return 0;
+    }
+    std::vector<uint8_t> data((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    if (data.size() < 24){
+        return 0;
+    }
+    size_t width = 0, height = 0;
+    if (png_dimensions(data, width, height)){
+        return (uint64_t)width * (uint64_t)height * 4;
+    }
+    if (jpeg_dimensions(data, width, height)){
+        return (uint64_t)width * (uint64_t)height * 4;
+    }
+    return 0;
+}
 
 
 namespace{

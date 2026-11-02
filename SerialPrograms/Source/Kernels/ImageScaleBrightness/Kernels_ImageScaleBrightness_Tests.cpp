@@ -90,7 +90,11 @@ public:
     )
         : ImageUnitTest("Kernels::ImageScaleBrightness - " + implementation.name + " - " + image, {image})
         , m_implementation(implementation)
-    {}
+    {
+        //  The test keeps the loaded image and a full-size guard-page copy alive at
+        //  the same time.
+        m_memory = test_image_rgb32_bytes(image) * 2;
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,

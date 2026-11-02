@@ -467,7 +467,11 @@ public:
     )
         : ImageUnitTest("PokemonSV::TeraCardDetector - " + image, {image})
         , m_expected(expected)
-    {}
+    {
+        //  The PaddleOCR (ONNX) recognition session plus its working set, on top of the
+        //  test image.
+        m_memory = test_image_rgb32_bytes(image) + PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,

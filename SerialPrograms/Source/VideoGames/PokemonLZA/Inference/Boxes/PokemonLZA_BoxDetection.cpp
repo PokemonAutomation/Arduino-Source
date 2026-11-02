@@ -507,7 +507,11 @@ public:
     )
         : ImageUnitTest("PokemonPLZA::BoxCellInfoDetector - " + image, {image})
         , m_words(std::move(words))
-    {}
+    {
+        //  The "Bug" test images are 3840 x 2160 (31.6 MB), plus the PaddleOCR working set
+        //  for the dex-number read.
+        m_memory = test_image_rgb32_bytes(image) + PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,

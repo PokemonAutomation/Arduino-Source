@@ -228,7 +228,11 @@ public:
         , m_expected_dex(expected_dex)
         , m_expected_ot_id(expected_ot_id)
         , m_expected_level(expected_level)
-    {}
+    {
+        //  The PaddleOCR (ONNX) recognition session plus its working set, on top of the
+        //  test image.
+        m_memory = test_image_rgb32_bytes(image) + PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,
@@ -266,7 +270,11 @@ public:
         , m_expected_nature(expected_nature)
         , m_expected_ability(expected_ability)
         , m_language(language)
-    {}
+    {
+        //  The PaddleOCR (ONNX) recognition session plus its working set, on top of the
+        //  test image.
+        m_memory = test_image_rgb32_bytes(image) + PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,
@@ -300,7 +308,11 @@ public:
         : ImageUnitTest("PokemonHome::SummaryReader_OtName - " + image, {image})
         , m_expected_ot_name(expected_ot_name)
         , m_language(language)
-    {}
+    {
+        //  The PaddleOCR (ONNX) recognition session plus its working set, on top of the
+        //  test image.
+        m_memory = test_image_rgb32_bytes(image) + PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,
@@ -326,7 +338,11 @@ public:
     Test_SummaryReader_LanguageOfOrigin(const std::string& image, std::string expected)
         : ImageUnitTest("PokemonHome::SummaryReader_LanguageOfOrigin - " + image, {image})
         , m_expected(expected)
-    {}
+    {
+        //  The PaddleOCR (ONNX) recognition session plus its working set, on top of the
+        //  test image.
+        m_memory = test_image_rgb32_bytes(image) + PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,
