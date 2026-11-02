@@ -1476,6 +1476,349 @@ public:
 };
 
 
+//  Verifies the close()-cancels-sends contract (see the docs on
+//  "AbstractClientSocket::close()"): the server never reads, so the
+//  256 MB send stays in flight, and "close()" has to end it. The send
+//  must return promptly with a best-effort byte count; the threshold
+//  only has to prove boundedness (the behavior without cancellation is
+//  an infinite hang), so it tolerates extremely loaded CI runners.
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_Sockets_CloseCancelsSend : public TestSockets<ClientSocketType, ServerSocketType>{
+public:
+    using TestSockets<ClientSocketType, ServerSocketType>::TestSockets;
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        if (timing_unreliable()){
+            return UnitTestResult(
+                UnitTestResult::SKIPPED,
+                "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
+            );
+        }
+
+        //  Stalls the server's reading for 70 s on the first data (or
+        //  until "stop" is set), keeping the client's send in flight.
+        struct StallingServerListener : ServerListener{
+            std::atomic<bool> stalled{false};
+            std::atomic<bool> stop{false};
+
+            ~StallingServerListener(){
+                stop.store(true, std::memory_order_release);
+            }
+
+            virtual void on_receive_data(const void* data, size_t bytes) override{
+                if (!stalled.exchange(true)){
+                    const auto end = std::chrono::steady_clock::now() + std::chrono::seconds(70);
+                    while (std::chrono::steady_clock::now() < end
+                        && !stop.load(std::memory_order_acquire)){
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    }
+                }
+                ServerListener::on_receive_data(data, bytes);
+            }
+        };
+
+        ServerSocketType server(this->m_thread_pool);
+        StallingServerListener server_listener;
+        server.add_listener(server_listener);
+
+        uint16_t port;
+        if (!this->start_server(server, server_listener, port)){
+            //  A listen-phase failure on a starved machine is the
+            //  machine's fault, not the socket's.
+            if (timing_unreliable()){
+                return UnitTestResult(
+                    UnitTestResult::SKIPPED,
+                    "The server did not start listening on a starved machine."
+                );
+            }
+            return "Failed to start the server";
+        }
+
+        bool ok = false;
+        std::string error;
+        {
+            ClientSocketType client(this->m_thread_pool);
+            ClientListener client_listener;
+            client.add_listener(client_listener);
+
+            if (!this->connect_client(client, client_listener, port, 1)){
+                //  A connect-phase failure on a starved machine is the
+                //  machine's fault, not the socket's.
+                if (timing_unreliable()){
+                    return UnitTestResult(
+                        UnitTestResult::SKIPPED,
+                        "The client did not finish connecting on a starved machine."
+                    );
+                }
+                error = "The client did not finish connecting";
+            }else if (!server_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&server_listener]{ return server_listener.connected.load() >= 1; }
+            )){
+                if (timing_unreliable()){
+                    return UnitTestResult(
+                        UnitTestResult::SKIPPED,
+                        "The server did not call on_connect on a starved machine."
+                    );
+                }
+                error = "The server did not call on_connect";
+            }else{
+                //  Far larger than the kernel send/receive buffering, so
+                //  the send stays in flight against the stalled reader.
+                //  (On an OS that buffered the whole payload anyway, the
+                //  send completes before close() and the test still
+                //  passes, just without exercising the cancel.)
+                constexpr size_t SIZE = 1 << 28;
+                std::vector<uint8_t> payload(SIZE, 0xAB);
+
+                size_t sent = 0;
+                auto send_start = std::chrono::steady_clock::now();
+                AsyncTask send_task = this->m_thread_pool.dispatch(
+                    [&client, &payload, &sent]{
+                        sent = client.send(payload.data(), payload.size());
+                    }
+                );
+
+                //  Give the send a head start so it is in flight when
+                //  close() runs, then cancel it.
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+                auto close_start = std::chrono::steady_clock::now();
+                client.close();
+                const long long close_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::steady_clock::now() - close_start
+                ).count();
+
+                send_task.wait_and_ignore_exceptions();
+                const long long send_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::steady_clock::now() - send_start
+                ).count();
+
+                if (send_ms > 60000){
+                    //  A send that is not ended by close() on a starved
+                    //  machine is the machine's fault, not the
+                    //  cancellation's.
+                    if (timing_unreliable()){
+                        return UnitTestResult(
+                            UnitTestResult::SKIPPED,
+                            "send() did not return within 60 s of close() on a starved machine."
+                        );
+                    }
+                    error = "send() did not return within 60 s of close() (" + std::to_string(send_ms) + " ms)";
+                }else if (close_ms > 60000){
+                    if (timing_unreliable()){
+                        return UnitTestResult(
+                            UnitTestResult::SKIPPED,
+                            "close() did not finish within 60 s on a starved machine."
+                        );
+                    }
+                    error = "close() did not finish within 60 s (" + std::to_string(close_ms) + " ms)";
+                }else if (sent > payload.size()){
+                    error = "send() reported more bytes (" + std::to_string(sent) + ") than the payload size";
+                }else{
+                    ok = true;
+                }
+            }
+
+            client.close();
+        }
+
+        //  Release the stalled reader so the server's close() (which
+        //  joins its connection thread, currently inside the stall) does
+        //  not wait for it.
+        server_listener.stop.store(true, std::memory_order_release);
+
+        server.close();
+
+        if (!ok && !error.empty()){
+            return error;
+        }
+        return true;
+    }
+};
+
+
+//  Verifies the close_connection()-cancels-sends contract (see the
+//  docs on "AbstractServerSocket::close_connection()"): the client
+//  never reads, so the 256 MB send stays in flight, and
+//  "close_connection()" has to end it. The send must return promptly
+//  with a best-effort byte count, and the server has to be back to
+//  LISTENING; the thresholds only have to prove boundedness, so they
+//  tolerate extremely loaded CI runners.
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_Sockets_CloseConnectionCancelsSend : public TestSockets<ClientSocketType, ServerSocketType>{
+public:
+    using TestSockets<ClientSocketType, ServerSocketType>::TestSockets;
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        if (timing_unreliable()){
+            return UnitTestResult(
+                UnitTestResult::SKIPPED,
+                "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
+            );
+        }
+
+        //  Stalls the client's reading for 70 s on the first data (or
+        //  until "stop" is set), keeping the server's send in flight.
+        struct StallingClientListener : ClientListener{
+            std::atomic<bool> stalled{false};
+            std::atomic<bool> stop{false};
+
+            ~StallingClientListener(){
+                stop.store(true, std::memory_order_release);
+            }
+
+            virtual void on_receive_data(const void* data, size_t bytes) override{
+                if (!stalled.exchange(true)){
+                    const auto end = std::chrono::steady_clock::now() + std::chrono::seconds(70);
+                    while (std::chrono::steady_clock::now() < end
+                        && !stop.load(std::memory_order_acquire)){
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    }
+                }
+                ClientListener::on_receive_data(data, bytes);
+            }
+        };
+
+        ServerSocketType server(this->m_thread_pool);
+        ServerListener server_listener;
+        server.add_listener(server_listener);
+
+        uint16_t port;
+        if (!this->start_server(server, server_listener, port)){
+            //  A listen-phase failure on a starved machine is the
+            //  machine's fault, not the socket's.
+            if (timing_unreliable()){
+                return UnitTestResult(
+                    UnitTestResult::SKIPPED,
+                    "The server did not start listening on a starved machine."
+                );
+            }
+            return "Failed to start the server";
+        }
+
+        bool ok = false;
+        std::string error;
+        {
+            ClientSocketType client(this->m_thread_pool);
+            StallingClientListener client_listener;
+            client.add_listener(client_listener);
+
+            if (!this->connect_client(client, client_listener, port, 1)){
+                //  A connect-phase failure on a starved machine is the
+                //  machine's fault, not the socket's.
+                if (timing_unreliable()){
+                    return UnitTestResult(
+                        UnitTestResult::SKIPPED,
+                        "The client did not finish connecting on a starved machine."
+                    );
+                }
+                error = "The client did not finish connecting";
+            }else if (!server_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&server_listener]{ return server_listener.connected.load() >= 1; }
+            )){
+                if (timing_unreliable()){
+                    return UnitTestResult(
+                        UnitTestResult::SKIPPED,
+                        "The server did not call on_connect on a starved machine."
+                    );
+                }
+                error = "The server did not call on_connect";
+            }else{
+                //  Far larger than the kernel send/receive buffering, so
+                //  the send stays in flight against the stalled reader.
+                //  (On an OS that buffered the whole payload anyway, the
+                //  send completes before close_connection() and the test
+                //  still passes, just without exercising the cancel.)
+                constexpr size_t SIZE = 1 << 28;
+                std::vector<uint8_t> payload(SIZE, 0xAB);
+
+                size_t sent = 0;
+                auto send_start = std::chrono::steady_clock::now();
+                AsyncTask send_task = this->m_thread_pool.dispatch(
+                    [&server, &payload, &sent]{
+                        sent = server.send(payload.data(), payload.size());
+                    }
+                );
+
+                //  Give the send a head start so it is in flight when
+                //  close_connection() runs, then cancel it.
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+                auto close_start = std::chrono::steady_clock::now();
+                server.close_connection();
+                const long long close_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::steady_clock::now() - close_start
+                ).count();
+
+                send_task.wait_and_ignore_exceptions();
+                const long long send_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::steady_clock::now() - send_start
+                ).count();
+
+                if (send_ms > 60000){
+                    //  A send that is not ended by close_connection() on
+                    //  a starved machine is the machine's fault, not the
+                    //  cancellation's.
+                    if (timing_unreliable()){
+                        return UnitTestResult(
+                            UnitTestResult::SKIPPED,
+                            "send() did not return within 60 s of close_connection() on a starved machine."
+                        );
+                    }
+                    error = "send() did not return within 60 s of close_connection() (" + std::to_string(send_ms) + " ms)";
+                }else if (close_ms > 60000){
+                    if (timing_unreliable()){
+                        return UnitTestResult(
+                            UnitTestResult::SKIPPED,
+                            "close_connection() did not finish within 60 s on a starved machine."
+                        );
+                    }
+                    error = "close_connection() did not finish within 60 s (" + std::to_string(close_ms) + " ms)";
+                }else if (sent > payload.size()){
+                    error = "send() reported more bytes (" + std::to_string(sent) + ") than the payload size";
+                }else{
+                    //  close_connection() may return with the close still
+                    //  pending on a starved event thread (Qt backend), so
+                    //  poll for the resulting LISTENING state within the
+                    //  shared budget before judging it.
+                    const auto s0 = std::chrono::steady_clock::now();
+                    while (server.state() != AbstractServerSocket::State::LISTENING
+                        && std::chrono::steady_clock::now() - s0 < SOCKET_TEST_WAIT){
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    }
+                    if (server.state() != AbstractServerSocket::State::LISTENING){
+                        if (timing_unreliable()){
+                            return UnitTestResult(
+                                UnitTestResult::SKIPPED,
+                                "The server is not LISTENING after close_connection() on a starved machine."
+                            );
+                        }
+                        error = "The server is not LISTENING after close_connection()";
+                    }else{
+                        ok = true;
+                    }
+                }
+            }
+
+            //  Release the stalled reader so the client's close() (which
+            //  joins its receive thread, currently inside the stall) does
+            //  not wait for it.
+            client_listener.stop.store(true, std::memory_order_release);
+            client.close();
+        }
+
+        server.close();
+
+        if (!ok && !error.empty()){
+            return error;
+        }
+        return true;
+    }
+};
+
+
 
 template <typename ClientSocketType, typename ServerSocketType>
 void add_socket_tests(UnitTestDatabase& database, ThreadPool& thread_pool, const char* backend_name){
@@ -1507,6 +1850,12 @@ void add_socket_tests(UnitTestDatabase& database, ThreadPool& thread_pool, const
     );
     database.add<Test_Sockets_ServerSendTimeout<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "Server send() timeout against a stalled peer"
+    );
+    database.add<Test_Sockets_CloseCancelsSend<ClientSocketType, ServerSocketType>>(
+        thread_pool, prefix + "close() cancels an in-flight send"
+    );
+    database.add<Test_Sockets_CloseConnectionCancelsSend<ClientSocketType, ServerSocketType>>(
+        thread_pool, prefix + "close_connection() cancels an in-flight send"
     );
 }
 

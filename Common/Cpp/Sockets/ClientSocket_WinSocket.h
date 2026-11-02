@@ -37,6 +37,10 @@ public:
     //  State::NOT_RUNNING so "connect()" can be called again. This is safe to
     //  call multiple times.
     //
+    //  It cancels an in-flight "send()": the send loop re-checks the state
+    //  every iteration, and "close()" notifies it, so the send returns within
+    //  a millisecond with the bytes written so far.
+    //
     //  This blocks until the receive thread has exited, so it must not be
     //  called from within a listener callback (which runs on that thread).
     virtual void close() noexcept override;

@@ -61,14 +61,29 @@ public:
         return m_state.load(std::memory_order_relaxed);
     }
 
+    //  Stops the connection and returns the socket to State::NOT_RUNNING
+    //  so "connect()" can be called again. This is safe to call multiple
+    //  times.
+    //
+    //  It cancels any in-flight operations: no further
+    //  "Listener::on_receive_data" callbacks are started (one already
+    //  running is allowed to finish), and an in-flight "send()" returns
+    //  promptly with the number of bytes actually written so far (best
+    //  effort). A "send()" that is already racing "close()" may still
+    //  complete.
+    //
+    //  This blocks until the receive thread has exited, so it must not be
+    //  called from within a listener callback.
     virtual void close() noexcept = 0;
     virtual void connect(const std::string& address, uint16_t port) = 0;
 
     //  Sends data on the active connection. This blocks until every byte
-    //  has been written, the connection is lost, or "timeout" elapses.
-    //  "std::chrono::milliseconds::max()" (the default) waits indefinitely.
-    //  Returns the number of bytes actually written, which may be less
-    //  than "bytes" if the deadline elapsed or the connection was lost.
+    //  has been written, the connection is lost, "close()" is called, or
+    //  "timeout" elapses. "std::chrono::milliseconds::max()" (the default)
+    //  waits indefinitely. Returns the number of bytes actually written,
+    //  which may be less than "bytes" if the deadline elapsed, the
+    //  connection was lost, or "close()" cancelled the send. If there is
+    //  no active connection, returns 0.
     virtual size_t send(
         const void* data,
         size_t bytes,
