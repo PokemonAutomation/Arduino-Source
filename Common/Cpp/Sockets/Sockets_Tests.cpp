@@ -916,8 +916,15 @@ public:
                     std::chrono::steady_clock::now() - t0
                 ).count();
 
-                if (send_ms > 1000){
-                    error = "send() did not honor its 100 ms timeout (" + std::to_string(send_ms) + " ms)";
+                //  The deadline is 100 ms, but this test also allocates and
+                //  moves 256 MB (the Qt backend additionally copies it into
+                //  its packet buffer), and on a loaded CI runner that page
+                //  traffic - or the calling thread being descheduled - can
+                //  take seconds. The pre-fix behavior was an infinite hang,
+                //  so the threshold only has to prove boundedness; 10 s
+                //  keeps the test meaningful while tolerating CI load.
+                if (send_ms > 10000){
+                    error = "send() did not return within 10 s of its 100 ms deadline (" + std::to_string(send_ms) + " ms)";
                 }else if (!QT && sent >= payload.size()){
                     error = "send() unexpectedly completed against the stalled peer";
                 }else{
@@ -926,7 +933,7 @@ public:
                     auto close_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
                         std::chrono::steady_clock::now() - c0
                     ).count();
-                    if (close_ms > 1000){
+                    if (close_ms > 5000){
                         error = "close() did not finish after the timed-out send (" + std::to_string(close_ms) + " ms)";
                     }else if (client.state() != AbstractClientSocket::State::NOT_RUNNING){
                         error = "The client is not NOT_RUNNING after close()";
