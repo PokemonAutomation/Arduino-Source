@@ -47,11 +47,12 @@ std::unique_ptr<EditableTableRow> DeviceAliasRow::clone() const{
 
 DeviceDropdownAliases::DeviceDropdownAliases()
     : EditableTableOption_t<DeviceAliasRow>(
+        "<b>Device Aliases:</b><br>"
         "Choose names for cameras and audio devices. "
         "Connected devices are added when Global Settings opens.<br>"
         "An empty alias uses the original name.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        false,
+        true,
         10
     )
 {}
@@ -107,13 +108,7 @@ void DeviceDropdownAliases::add_connected_devices(){
 }
 
 DeviceAliasOptions::DeviceAliasOptions()
-    : GroupOption(
-        "Device Aliases:",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        EnableMode::ALWAYS_ENABLED,
-        false,
-        false
-    )
+    : BatchOption(LockMode::UNLOCK_WHILE_RUNNING, false)
 {
     PA_ADD_OPTION(m_aliases);
 }

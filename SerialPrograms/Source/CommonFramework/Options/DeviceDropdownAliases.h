@@ -11,7 +11,7 @@
 #include <string>
 #include "Common/Cpp/Options/EditableTableOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/GroupOption.h"
+#include "Common/Cpp/Options/BatchOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 
 namespace PokemonAutomation{
@@ -44,7 +44,7 @@ private:
     void add_device(DeviceAliasType category, const std::string& id, const std::string& name);
 };
 
-class DeviceAliasOptions : public GroupOption{
+class DeviceAliasOptions : public BatchOption{
 public:
     DeviceAliasOptions();
 
