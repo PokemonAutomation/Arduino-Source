@@ -11,6 +11,7 @@
 #include <chrono>
 #include <thread>
 #include <iostream>
+#include <algorithm>
 #include <winsock2.h>
 #include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "ServerSocket_WinSocket.h"
@@ -191,7 +192,12 @@ size_t ServerSocket_WinSocket::send(const void* data, size_t bytes, std::chrono:
             return sent;
         }
 
-        int current_sent = ::send(socket, ptr, (int)bytes, 0);
+        //  "::send" takes an "int" length, so chunk the send the same
+        //  way the WinSocket client does; sending a payload larger than
+        //  2 GiB in one call would wrap the length negative.
+        constexpr size_t BLOCK_SIZE = (size_t)1 << 30;
+        const int current = (int)std::min<size_t>(bytes, BLOCK_SIZE);
+        int current_sent = ::send(socket, ptr, current, 0);
         if (current_sent != SOCKET_ERROR){
             sent += (size_t)current_sent;
             ptr += current_sent;
