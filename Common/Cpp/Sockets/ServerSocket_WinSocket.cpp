@@ -157,7 +157,7 @@ void ServerSocket_WinSocket::close() noexcept{
     }
 }
 
-size_t ServerSocket_WinSocket::send(const void* data, size_t bytes){
+size_t ServerSocket_WinSocket::send(const void* data, size_t bytes, std::chrono::milliseconds timeout){
     SOCKET socket;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -171,12 +171,24 @@ size_t ServerSocket_WinSocket::send(const void* data, size_t bytes){
     const char* ptr = (const char*)data;
     size_t sent = 0;
 
+    //  "time_point::max()" (the infinite default) is never reached; using
+    //  it also avoids overflowing "now() + timeout".
+    const std::chrono::steady_clock::time_point deadline =
+        (timeout == std::chrono::milliseconds::max())
+            ? std::chrono::steady_clock::time_point::max()
+            : std::chrono::steady_clock::now() + timeout;
+
     while (bytes > 0){
         {
             std::lock_guard<Mutex> lg(m_lock);
             if (m_state.load(std::memory_order_relaxed) != State::CONNECTED){
                 return sent;
             }
+        }
+        if (std::chrono::steady_clock::now() >= deadline){
+            //  The deadline elapsed with bytes still unwritten; the
+            //  connection is still fine, so just report the partial count.
+            return sent;
         }
 
         int current_sent = ::send(socket, ptr, (int)bytes, 0);

@@ -9,6 +9,7 @@
 
 #include <string>
 #include <atomic>
+#include <chrono>
 #include <winsock2.h>
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
@@ -35,7 +36,11 @@ public:
     virtual void close_connection() override;
     virtual void close() noexcept override;
 
-    virtual size_t send(const void* data, size_t bytes) override;
+    virtual size_t send(
+        const void* data,
+        size_t bytes,
+        std::chrono::milliseconds timeout = std::chrono::milliseconds::max()
+    ) override;
 
 
 private:

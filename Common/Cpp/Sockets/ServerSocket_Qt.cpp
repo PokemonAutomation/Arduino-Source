@@ -141,7 +141,7 @@ void ServerSocket_Qt::close() noexcept{
     m_close_requested = false;
 }
 
-size_t ServerSocket_Qt::send(const void* data, size_t bytes){
+size_t ServerSocket_Qt::send(const void* data, size_t bytes, std::chrono::milliseconds timeout){
     QTcpSocket* socket;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -155,19 +155,31 @@ size_t ServerSocket_Qt::send(const void* data, size_t bytes){
 
     QSharedPointer<SendData> send_data = QSharedPointer<SendData>::create();
     send_data->packet.assign((const char*)data, bytes);
+    //  "time_point::max()" (the infinite default) is never reached; using
+    //  it also avoids overflowing "now() + timeout".
+    send_data->deadline =
+        (timeout == std::chrono::milliseconds::max())
+            ? std::chrono::steady_clock::time_point::max()
+            : std::chrono::steady_clock::now() + timeout;
 
     emit internal_send(send_data);
 
     //  Wait for the server's event thread to finish writing the packet.
-    //  The timeout covers the case where "close()" destroys the server
-    //  before the queued call ever runs, in which case it will never
-    //  complete on its own; the shared ownership keeps the packet alive
-    //  until the queued call runs (or is discarded with the server).
+    //  The write loop itself stops at "deadline", so this bound only
+    //  covers the queued call's start-up delay. The infinite default
+    //  keeps a bounded 5 s safety: if "close()" destroys the server
+    //  before the queued call ever runs, it will never complete on its
+    //  own; the shared ownership keeps the packet alive until the queued
+    //  call runs (or is discarded with the server).
+    const std::chrono::milliseconds wait_time =
+        (timeout == std::chrono::milliseconds::max())
+            ? std::chrono::milliseconds(5000)
+            : timeout + std::chrono::milliseconds(1000);
     {
         std::unique_lock<Mutex> lg(send_data->lock);
         send_data->cv.wait_for(
             lg,
-            std::chrono::seconds(5),
+            wait_time,
             [&send_data]{ return send_data->done; }
         );
     }
@@ -323,7 +335,13 @@ void ServerSocket_Qt::on_send(QSharedPointer<SendData> send_data){
     if (sock != nullptr){
         const char* ptr = send_data->packet.data();
         size_t remaining = send_data->packet.size();
-        while (remaining > 0 && sock->state() == QAbstractSocket::ConnectedState){
+        //  The deadline keeps a client that never reads from pinning this
+        //  event thread forever (which would also block "close()").
+        while (
+            remaining > 0
+            && sock->state() == QAbstractSocket::ConnectedState
+            && std::chrono::steady_clock::now() < send_data->deadline
+        ){
             qint64 current_sent = sock->write(ptr, remaining);
             if (current_sent <= 0){
                 //  The kernel's send buffer is full. Wait for some of it
