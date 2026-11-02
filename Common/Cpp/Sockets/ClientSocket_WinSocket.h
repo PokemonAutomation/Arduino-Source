@@ -8,6 +8,7 @@
 #define PokemonAutomation_ClientSocket_WinSocket_H
 
 #include <atomic>
+#include <chrono>
 #include <mutex>
 #include <winsock2.h>
 #include "Common/Cpp/Concurrency/Mutex.h"
@@ -42,7 +43,11 @@ public:
 
     virtual void connect(const std::string& address, uint16_t port) override;
 
-    virtual size_t send(const void* data, size_t bytes) override;
+    virtual size_t send(
+        const void* data,
+        size_t bytes,
+        std::chrono::milliseconds timeout = std::chrono::milliseconds::max()
+    ) override;
 
 
 private:

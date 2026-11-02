@@ -20,6 +20,7 @@
 #include <random>
 #include <string>
 #include <thread>
+#include <type_traits>
 #include <vector>
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
@@ -843,6 +844,166 @@ private:
 };
 
 
+//  The peer accepts the connection but stalls reading: a send() with a
+//  deadline must stop at the deadline with a partial count, and
+//  close() must still be able to finish afterwards (on the Qt backend
+//  the in-flight write stops at the deadline, releasing the socket's
+//  event thread, which is what close() has to run on).
+//
+//  The stall lasts 12 s - longer than the 10 s send threshold below - so
+//  the peer is still stalled for the whole duration of every send in the
+//  retry loop. It is interruptible ("stop"), so shutting the peer down
+//  does not wait for it.
+//
+//  An OS with unusually large autotuned socket buffers (observed on
+//  Windows CI, where the kernel buffered the entire 256 MB payload
+//  against a non-reading peer) lets the first send "complete" by parking
+//  the data in the kernel. Those buffers are now full, so a follow-up
+//  send to the same stalled peer cannot complete and must stop at the
+//  deadline with a partial count; the loop retries until that happens
+//  (up to 4 times, i.e. unless the OS can buffer over 1 GiB).
+//
+//  Note: QTcpSocket::write() accepts the whole payload into Qt's internal
+//  buffer and reports it as written, so kernel backpressure never reaches
+//  the Qt write loop and the send legitimately "completes" there; a
+//  retry cannot exercise the deadline on that backend. On that backend
+//  only the timing and close() behavior are asserted.
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_Sockets_ClientSendTimeout : public TestSockets<ClientSocketType, ServerSocketType>{
+public:
+    using TestSockets<ClientSocketType, ServerSocketType>::TestSockets;
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        constexpr bool QT = std::is_same_v<ClientSocketType, ClientSocket_Qt>;
+
+        //  Stalls the server's reading for 12 s on the first data (or
+        //  until "stop" is set), keeping the client's send buffer full
+        //  for the duration of the send test.
+        struct StallingServerListener : ServerListener{
+            std::atomic<bool> stalled{false};
+            std::atomic<bool> stop{false};
+
+            virtual void on_receive_data(const void* data, size_t bytes) override{
+                if (!stalled.exchange(true)){
+                    const auto end = std::chrono::steady_clock::now() + std::chrono::seconds(12);
+                    while (std::chrono::steady_clock::now() < end
+                        && !stop.load(std::memory_order_acquire)){
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    }
+                }
+                ServerListener::on_receive_data(data, bytes);
+            }
+        };
+
+        ServerSocketType server(this->m_thread_pool);
+        StallingServerListener server_listener;
+        server.add_listener(server_listener);
+
+        uint16_t port;
+        if (!this->start_server(server, server_listener, port)){
+            return "Failed to start the server";
+        }
+
+        bool ok = false;
+        std::string error;
+        {
+            ClientSocketType client(this->m_thread_pool);
+            ClientListener client_listener;
+            client.add_listener(client_listener);
+
+            if (!this->connect_client(client, client_listener, port, 1)){
+                error = "The client did not finish connecting";
+            }else if (!server_listener.waiter.wait_for(
+                std::chrono::seconds(5),
+                [&server_listener]{ return server_listener.connected.load() >= 1; }
+            )){
+                error = "The server did not call on_connect";
+            }else{
+                //  Far larger than the kernel send/receive buffering that
+                //  the send loop can rely on being absent, so the send
+                //  must stop on the stalled reader (see the comment on
+                //  the class for the large-buffer OS case).
+                constexpr size_t SIZE = 1 << 28;
+                std::vector<uint8_t> payload(SIZE, 0xAB);
+
+                //  The deadline is 100 ms, but this test also allocates
+                //  and moves 256 MB (the Qt backend additionally copies it
+                //  into its packet buffer), and on a loaded CI runner that
+                //  page traffic - or the calling thread being descheduled
+                //  - can take seconds. The pre-fix behavior was an infinite
+                //  hang, so the threshold only has to prove boundedness;
+                //  10 s keeps the test meaningful while tolerating CI
+                //  load.
+                int completed = 0;
+                while (true){
+                    auto t0 = std::chrono::steady_clock::now();
+                    size_t sent = client.send(
+                        payload.data(),
+                        payload.size(),
+                        std::chrono::milliseconds(100)
+                    );
+                    auto send_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::steady_clock::now() - t0
+                    ).count();
+
+                    if (send_ms > 10000){
+                        error = "send() did not return within 10 s of its 100 ms deadline (" + std::to_string(send_ms) + " ms)";
+                        break;
+                    }else if (sent < payload.size()){
+                        //  The deadline engaged with bytes left unwritten.
+                        break;
+                    }else if (QT){
+                        //  Qt's "completion" is its userspace buffer, not
+                        //  kernel delivery; a retry cannot exercise the
+                        //  deadline on that backend.
+                        break;
+                    }
+
+                    //  The whole payload was written, so the kernel's
+                    //  socket buffers absorbed it (unusually large
+                    //  autotuned buffers). They are now full, so the
+                    //  next send to the same stalled peer cannot
+                    //  complete.
+                    if (++completed >= 4){
+                        error = "All 4 sends of 256 MB completed: the OS buffered over 1 GiB against the stalled peer, so the deadline cannot be verified";
+                        break;
+                    }
+                }
+
+                if (error.empty()){
+                    auto c0 = std::chrono::steady_clock::now();
+                    client.close();
+                    auto close_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::steady_clock::now() - c0
+                    ).count();
+                    if (close_ms > 5000){
+                        error = "close() did not finish after the timed-out send (" + std::to_string(close_ms) + " ms)";
+                    }else if (client.state() != AbstractClientSocket::State::NOT_RUNNING){
+                        error = "The client is not NOT_RUNNING after close()";
+                    }else{
+                        ok = true;
+                    }
+                }
+            }
+            client.close();
+        }
+
+        //  Release the stalled reader so the server's close() (which
+        //  joins its connection thread, currently inside the stall) does
+        //  not wait for it.
+        server_listener.stop.store(true, std::memory_order_release);
+
+        server.close();
+
+        if (!ok && !error.empty()){
+            return error;
+        }
+        return true;
+    }
+};
+
+
+
 template <typename ClientSocketType, typename ServerSocketType>
 void add_socket_tests(UnitTestDatabase& database, ThreadPool& thread_pool, const char* backend_name){
     const std::string prefix = "Sockets (" + std::string(backend_name) + ") - ";
@@ -867,6 +1028,9 @@ void add_socket_tests(UnitTestDatabase& database, ThreadPool& thread_pool, const
     );
     database.add<Test_Sockets_PortInUse<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "Port in use"
+    );
+    database.add<Test_Sockets_ClientSendTimeout<ClientSocketType, ServerSocketType>>(
+        thread_pool, prefix + "Client send() timeout against a stalled peer"
     );
 }
 
