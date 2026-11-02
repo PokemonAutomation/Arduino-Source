@@ -27,6 +27,7 @@
 #include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "Pokemon/AutoStory/Pokemon_AutoStorySelect.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "VideoGames/PokemonSV/PokemonSV_Settings.h"
 #include "VideoGames/PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
@@ -150,51 +151,24 @@ const std::vector<std::unique_ptr<AutoStory_Segment>>& ALL_AUTO_STORY_SEGMENT_LI
 }
 
 
-StringSelectDatabase make_all_segments_database(){
-    StringSelectDatabase ret;
-    int index_num = 0;
-    for (const auto& segment : ALL_AUTO_STORY_SEGMENT_LIST()){
-        ret.add_entry(StringSelectEntry(std::to_string(index_num), segment->name()));
-        index_num++;
-    }
-    return ret;
-}
 const StringSelectDatabase& ALL_SEGMENTS_SELECT_DATABASE(){
-    static StringSelectDatabase database = make_all_segments_database();
+    static StringSelectDatabase database = make_story_select_database(
+        ALL_AUTO_STORY_SEGMENT_LIST(), 0, ALL_AUTO_STORY_SEGMENT_LIST().size()
+    );
     return database;
-}
-
-StringSelectDatabase make_tutorial_segments_database(){
-    StringSelectDatabase ret;
-    const StringSelectDatabase& all_segments = ALL_SEGMENTS_SELECT_DATABASE();
-    size_t start = 0;
-    size_t end = INDEX_OF_LAST_TUTORIAL_SEGMENT + 1;
-    for (size_t i = start; i < end; i++){
-        const auto& segment = all_segments[i];
-        ret.add_entry(segment);
-    }
-    return ret;
 }
 
 const StringSelectDatabase& TUTORIAL_SEGMENTS_SELECT_DATABASE(){
-    static StringSelectDatabase database = make_tutorial_segments_database();
+    static StringSelectDatabase database = make_story_select_database(
+        ALL_AUTO_STORY_SEGMENT_LIST(), 0, INDEX_OF_LAST_TUTORIAL_SEGMENT + 1
+    );
     return database;
 }
 
-StringSelectDatabase make_mainstory_segments_database(){
-    StringSelectDatabase ret;
-    const StringSelectDatabase& all_segments = ALL_SEGMENTS_SELECT_DATABASE();
-    size_t start = INDEX_OF_LAST_TUTORIAL_SEGMENT + 1;
-    size_t end = all_segments.case_list().size();
-    for (size_t i = start; i < end; i++){
-        const auto& segment = all_segments[i];
-        ret.add_entry(segment);
-    }
-    return ret;
-}
-
 const StringSelectDatabase& MAINSTORY_SEGMENTS_SELECT_DATABASE(){
-    static StringSelectDatabase database = make_mainstory_segments_database();
+    static StringSelectDatabase database = make_story_select_database(
+        ALL_AUTO_STORY_SEGMENT_LIST(), INDEX_OF_LAST_TUTORIAL_SEGMENT + 1, ALL_AUTO_STORY_SEGMENT_LIST().size()
+    );
     return database;
 }
 
@@ -324,51 +298,24 @@ const std::vector<std::unique_ptr<AutoStory_Checkpoint>>& ALL_AUTO_STORY_CHECKPO
     return checkpoint_list;
 }
 
-StringSelectDatabase make_all_checkpoints_database(){
-    StringSelectDatabase ret;
-    int index_num = 0;
-    for (const auto& segment : ALL_AUTO_STORY_CHECKPOINT_LIST()){
-        ret.add_entry(StringSelectEntry(std::to_string(index_num), segment->name()));
-        index_num++;
-    }
-    return ret;
-}
 const StringSelectDatabase& ALL_CHECKPOINTS_SELECT_DATABASE(){
-    static StringSelectDatabase database = make_all_checkpoints_database();
+    static StringSelectDatabase database = make_story_select_database(
+        ALL_AUTO_STORY_CHECKPOINT_LIST(), 0, ALL_AUTO_STORY_CHECKPOINT_LIST().size()
+    );
     return database;
-}
-
-StringSelectDatabase make_tutorial_checkpoints_database(){
-    StringSelectDatabase ret;
-    const StringSelectDatabase& all_checkpoints = ALL_CHECKPOINTS_SELECT_DATABASE();
-    size_t start = 0;
-    size_t end = INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1;
-    for (size_t i = start; i < end; i++){
-        const auto& segment = all_checkpoints[i];
-        ret.add_entry(segment);
-    }
-    return ret;
 }
 
 const StringSelectDatabase& TUTORIAL_CHECKPOINTS_SELECT_DATABASE(){
-    static StringSelectDatabase database = make_tutorial_checkpoints_database();
+    static StringSelectDatabase database = make_story_select_database(
+        ALL_AUTO_STORY_CHECKPOINT_LIST(), 0, INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1
+    );
     return database;
 }
 
-StringSelectDatabase make_mainstory_checkpoints_database(){
-    StringSelectDatabase ret;
-    const StringSelectDatabase& all_checkpoints = ALL_CHECKPOINTS_SELECT_DATABASE();
-    size_t start = INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1;
-    size_t end = all_checkpoints.case_list().size();
-    for (size_t i = start; i < end; i++){
-        const auto& segment = all_checkpoints[i];
-        ret.add_entry(segment);
-    }
-    return ret;
-}
-
 const StringSelectDatabase& MAINSTORY_CHECKPOINTS_SELECT_DATABASE(){
-    static StringSelectDatabase database = make_mainstory_checkpoints_database();
+    static StringSelectDatabase database = make_story_select_database(
+        ALL_AUTO_STORY_CHECKPOINT_LIST(), INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1, ALL_AUTO_STORY_CHECKPOINT_LIST().size()
+    );
     return database;
 }
 
@@ -1101,71 +1048,49 @@ std::string AutoStory::end_segment_description(){
 }
 
 size_t AutoStory::get_start_segment_index(){
-    size_t start = 0;
-
-    if (STORY_SECTION == StorySection::TUTORIAL){
-        start = STARTPOINT_TUTORIAL.index();
-    }else if (STORY_SECTION == StorySection::MAIN_STORY){
-        start = (INDEX_OF_LAST_TUTORIAL_SEGMENT + 1) + STARTPOINT_MAINSTORY.index();
-    }
-    
-    return start;
+    const bool main_story = STORY_SECTION == StorySection::MAIN_STORY;
+    return story_index(
+        main_story,
+        main_story ? STARTPOINT_MAINSTORY.index() : STARTPOINT_TUTORIAL.index(),
+        INDEX_OF_LAST_TUTORIAL_SEGMENT + 1
+    );
 }
 
 size_t AutoStory::get_end_segment_index(){
-    size_t end = 0;
-
-    if (STORY_SECTION == StorySection::TUTORIAL){
-        end = ENDPOINT_TUTORIAL.index();
-    }else if (STORY_SECTION == StorySection::MAIN_STORY){
-        end = (INDEX_OF_LAST_TUTORIAL_SEGMENT + 1) + ENDPOINT_MAINSTORY.index();     
-    }
-    
-    return end;
+    const bool main_story = STORY_SECTION == StorySection::MAIN_STORY;
+    return story_index(
+        main_story,
+        main_story ? ENDPOINT_MAINSTORY.index() : ENDPOINT_TUTORIAL.index(),
+        INDEX_OF_LAST_TUTORIAL_SEGMENT + 1
+    );
 }
 
 std::string AutoStory::start_checkpoint_description(){
-    size_t checkpoint_index = 0;
-    if (STORY_SECTION == StorySection::TUTORIAL){
-        checkpoint_index = START_CHECKPOINT_TUTORIAL.index();
-    }else if (STORY_SECTION == StorySection::MAIN_STORY){
-        checkpoint_index = START_CHECKPOINT_MAINSTORY.index() + (INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1);
-    }
+    const size_t checkpoint_index = get_start_checkpoint_index();
     return "    Start: " + ALL_AUTO_STORY_CHECKPOINT_LIST()[checkpoint_index]->start_text();
 }
 
 std::string AutoStory::end_checkpoint_description(){
-    size_t checkpoint_index = 0;
-    if (STORY_SECTION == StorySection::TUTORIAL){
-        checkpoint_index = END_CHECKPOINT_TUTORIAL.index();
-    }else if (STORY_SECTION == StorySection::MAIN_STORY){
-        checkpoint_index = END_CHECKPOINT_MAINSTORY.index() + (INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1);
-    }    
+    const size_t checkpoint_index = get_end_checkpoint_index();
     return "    End: " + ALL_AUTO_STORY_CHECKPOINT_LIST()[checkpoint_index]->end_text();
 }
 
 size_t AutoStory::get_start_checkpoint_index(){
-    size_t start = 0;
-
-    if (STORY_SECTION == StorySection::TUTORIAL){
-        start = START_CHECKPOINT_TUTORIAL.index();
-    }else if (STORY_SECTION == StorySection::MAIN_STORY){
-        start = (INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1) + START_CHECKPOINT_MAINSTORY.index();
-    }
-    
-    return start;
+    const bool main_story = STORY_SECTION == StorySection::MAIN_STORY;
+    return story_index(
+        main_story,
+        main_story ? START_CHECKPOINT_MAINSTORY.index() : START_CHECKPOINT_TUTORIAL.index(),
+        INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1
+    );
 }
 
 size_t AutoStory::get_end_checkpoint_index(){
-    size_t end = 0;
-
-    if (STORY_SECTION == StorySection::TUTORIAL){
-        end = END_CHECKPOINT_TUTORIAL.index();
-    }else if (STORY_SECTION == StorySection::MAIN_STORY){
-        end = (INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1) + END_CHECKPOINT_MAINSTORY.index();     
-    }
-    
-    return end;
+    const bool main_story = STORY_SECTION == StorySection::MAIN_STORY;
+    return story_index(
+        main_story,
+        main_story ? END_CHECKPOINT_MAINSTORY.index() : END_CHECKPOINT_TUTORIAL.index(),
+        INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1
+    );
 }
 
 
