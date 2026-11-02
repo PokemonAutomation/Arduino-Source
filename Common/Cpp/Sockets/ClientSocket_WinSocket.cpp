@@ -126,10 +126,10 @@ size_t ClientSocket_WinSocket::send(const void* data, size_t bytes, std::chrono:
         int current = (int)std::min<size_t>(bytes, BLOCK_SIZE);
         int current_sent = ::send(socket, ptr, current, 0);
         if (current_sent != SOCKET_ERROR){
+            //  A partial send is not an error: advance and keep looping
+            //  until everything is written or the deadline/state ends
+            //  the send, the same way the POSIX and Qt backends do.
             sent += current_sent;
-            if (current_sent != current){
-                return sent;
-            }
             ptr += current_sent;
             bytes -= current_sent;
             continue;
