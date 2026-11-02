@@ -39,6 +39,7 @@
 #include "Programs/TestPrograms/PokemonFRLG_ReadBattleLevelUp.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadTrainerId.h"
 #include "Programs/TestPrograms/PokemonFRLG_ReadEncounter.h"
+#include "Programs/TestPrograms/PokemonFRLG_ReadBoxInfo.h"
 #include "Programs/TestPrograms/PokemonFRLG_SafariOptimalActionTest.h"
 #include "Programs/TestPrograms/PokemonFRLG_TestPartyInference.h"
 
@@ -100,6 +101,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back(make_SingleSwitchProgram<ReadBattleLevelUp>());
         ret.emplace_back(make_SingleSwitchProgram<ReadTrainerId>());
         ret.emplace_back(make_SingleSwitchProgram<ReadEncounter>());
+        ret.emplace_back(make_SingleSwitchProgram<ReadBoxInfo>());
         ret.emplace_back(make_SingleSwitchProgram<SafariOptimalActionTest>());
         ret.emplace_back(make_SingleSwitchProgram<TestPartyInference>());
     }
