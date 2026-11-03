@@ -1211,6 +1211,238 @@ private:
 };
 
 
+//  Verifies the Qt server's close_connection()-cancels-sends guarantee
+//  under an event-thread stall: with the event thread blocked for 6 s
+//  in on_receive_data, a "send()" started on the calling thread is
+//  queued behind the stall, so "close_connection()" is the only thing
+//  that can end it. It must cancel the send so the send's caller is
+//  woken promptly with a best-effort byte count, instead of the
+//  send's own bound expiring.
+class Test_Sockets_Qt_CloseConnectionCancelsSend : public UnitTest{
+public:
+    Test_Sockets_Qt_CloseConnectionCancelsSend(ThreadPool& thread_pool, std::string name)
+        : UnitTest(std::move(name))
+        , m_thread_pool(thread_pool)
+    {
+        m_threads = 2;
+    }
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        if (timing_unreliable()){
+            return UnitTestResult(
+                UnitTestResult::SKIPPED,
+                "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
+            );
+        }
+
+        //  Blocks the server's event thread for 6 s on the first data,
+        //  and flags it when the block starts. Only the first burst
+        //  stalls: the Qt server delivers the rest of the trigger 4096
+        //  bytes at a time, and every other burst stalling the event
+        //  thread for 6 s would queue the close behind minutes of stalls.
+        struct StallingServerListener : AbstractServerSocket::Listener{
+            Waiter waiter;
+            std::atomic<bool> stall_started{false};
+
+            virtual void on_receive_data(const void*, size_t) override{
+                if (!stall_started.exchange(true, std::memory_order_acq_rel)){
+                    waiter.notify();
+                    std::this_thread::sleep_for(std::chrono::seconds(6));
+                }
+            }
+        };
+
+        ServerSocket_Qt server(m_thread_pool);
+        ServerListener server_listener;
+        server.add_listener(server_listener);
+        StallingServerListener stall_listener;
+        server.add_listener(stall_listener);
+
+        uint16_t port = 0;
+        {
+            std::mt19937 rng{std::random_device{}()};
+            for (int attempt = 0; attempt < 8; attempt++){
+                uint16_t candidate = (uint16_t)(40000 + rng() % 20000);
+                server.start("127.0.0.1", candidate);
+                if (server_listener.waiter.wait_for(
+                    SOCKET_TEST_WAIT,
+                    [&server_listener]{ return server_listener.listen_finished.load() > 0; }
+                ) && server_listener.last_listen_error.empty()){
+                    port = candidate;
+                    break;
+                }
+            }
+        }
+        if (port == 0){
+            if (timing_unreliable()){
+                return UnitTestResult(
+                    UnitTestResult::SKIPPED,
+                    "The server did not start listening on a starved machine."
+                );
+            }
+            return "Failed to start the server";
+        }
+
+        bool ok = false;
+        std::string error;
+        {
+            ClientSocket_Qt client(m_thread_pool);
+            ClientListener client_listener;
+            client.add_listener(client_listener);
+            client.connect("127.0.0.1", port);
+            if (!client_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&client_listener]{ return client_listener.connect_finished.load() >= 1; }
+            )){
+                if (timing_unreliable()){
+                    return UnitTestResult(
+                        UnitTestResult::SKIPPED,
+                        "The client did not finish connecting on a starved machine."
+                    );
+                }
+                error = "The client did not finish connecting";
+            }else if (!server_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&server_listener]{ return server_listener.connected.load() >= 1; }
+            )){
+                if (timing_unreliable()){
+                    return UnitTestResult(
+                        UnitTestResult::SKIPPED,
+                        "The server did not call on_connect on a starved machine."
+                    );
+                }
+                error = "The server did not call on_connect";
+            }else{
+                //  One burst in: the server's on_receive_data blocks its
+                //  event thread for 6 s.
+                constexpr size_t TRIGGER_SIZE = 1 << 18;
+                std::vector<uint8_t> trigger(TRIGGER_SIZE, 0xCD);
+                if (client.send(trigger.data(), trigger.size()) != TRIGGER_SIZE){
+                    error = "The client did not send the trigger";
+                }else if (!stall_listener.waiter.wait_for(
+                    SOCKET_TEST_WAIT,
+                    [&stall_listener]{ return stall_listener.stall_started.load(); }
+                )){
+                    error = "The server's event thread did not reach the stall";
+                }else{
+                    //  The event thread is now blocked for 6 s; anything
+                    //  queued to it waits behind the stall. This send
+                    //  (on the test thread, so it is queued well before
+                    //  the close below) will queue behind the stall, and
+                    //  the close_connection() from the worker thread is
+                    //  the only thing that can end it.
+                    constexpr size_t SIZE = 1 << 20;
+                    std::vector<uint8_t> payload(SIZE, 0xAB);
+
+                    auto close_start = std::chrono::steady_clock::time_point::max();
+                    long long close_ms = 0;
+                    AsyncTask close_task = m_thread_pool.dispatch(
+                        [&server, &close_start, &close_ms]{
+                            //  Give the send a head start so it is in
+                            //  flight when close_connection() runs.
+                            std::this_thread::sleep_for(std::chrono::milliseconds(300));
+                            auto t0 = std::chrono::steady_clock::now();
+                            close_start = t0;
+                            server.close_connection();
+                            close_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                                std::chrono::steady_clock::now() - t0
+                            ).count();
+                        }
+                    );
+
+                    size_t sent = server.send(payload.data(), payload.size());
+                    const auto send_end = std::chrono::steady_clock::now();
+
+                    close_task.wait_and_ignore_exceptions();
+
+                    //  The send must have been woken by the cancel: it
+                    //  returns within a few milliseconds of
+                    //  close_connection() starting, no matter when
+                    //  close_connection() itself got to run. (Without
+                    //  cancellation it would only wake when the 6 s
+                    //  stall ends and the queued write finally runs.)
+                    const long long cancel_lag = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        send_end - close_start
+                    ).count();
+
+                    if (sent == payload.size()){
+                        //  The event thread caught up before
+                        //  close_connection() and the send completed on
+                        //  its own: the cancellation was not exercised,
+                        //  so there is nothing to assert on the send's
+                        //  timing.
+                        if (close_ms > 60000){
+                            if (timing_unreliable()){
+                                return UnitTestResult(
+                                    UnitTestResult::SKIPPED,
+                                    "close_connection() did not finish within 60 s on a starved machine."
+                                );
+                            }
+                            error = "close_connection() did not finish within 60 s (" + std::to_string(close_ms) + " ms)";
+                        }else{
+                            ok = true;
+                        }
+                    }else if (cancel_lag < 0){
+                        //  The send returned before close_connection()
+                        //  even started: it was never in flight, so the
+                        //  test's premise did not hold.
+                        error = "The send returned (" + std::to_string(sent) + " bytes) before close_connection() even started";
+                    }else if (cancel_lag > 2000){
+                        if (timing_unreliable()){
+                            return UnitTestResult(
+                                UnitTestResult::SKIPPED,
+                                "send() was not woken promptly by close_connection() on a starved machine."
+                            );
+                        }
+                        error = "send() did not return promptly after close_connection() cancelled it (lag " + std::to_string(cancel_lag) + " ms)";
+                    }else if (close_ms > 60000){
+                        if (timing_unreliable()){
+                            return UnitTestResult(
+                                UnitTestResult::SKIPPED,
+                                "close_connection() did not finish within 60 s on a starved machine."
+                            );
+                        }
+                        error = "close_connection() did not finish within 60 s (" + std::to_string(close_ms) + " ms)";
+                    }else{
+                        //  close_connection() may return with the close
+                        //  still pending on the (stalled) event thread,
+                        //  so poll for the resulting LISTENING state
+                        //  within the shared budget before judging it.
+                        const auto s0 = std::chrono::steady_clock::now();
+                        while (server.state() != AbstractServerSocket::State::LISTENING
+                            && std::chrono::steady_clock::now() - s0 < SOCKET_TEST_WAIT){
+                            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                        }
+                        if (server.state() != AbstractServerSocket::State::LISTENING){
+                            if (timing_unreliable()){
+                                return UnitTestResult(
+                                    UnitTestResult::SKIPPED,
+                                    "The server is not LISTENING after close_connection() on a starved machine."
+                                );
+                            }
+                            error = "The server is not LISTENING after close_connection()";
+                        }else{
+                            ok = true;
+                        }
+                    }
+                }
+            }
+
+            client.close();
+        }
+
+        server.close();
+
+        if (!ok && !error.empty()){
+            return error;
+        }
+        return true;
+    }
+
+private:
+    ThreadPool& m_thread_pool;
+};
+
 //  The peer accepts the connection but stalls reading: a send() with a
 //  deadline must stop at the deadline with a partial count, and
 //  close() must still be able to finish afterwards (on the Qt backend
@@ -2100,6 +2332,11 @@ void add_tests_Sockets(UnitTestDatabase& database, ThreadPool& thread_pool){
     database.add<Test_Sockets_Qt_CloseCancelsSend>(
         thread_pool,
         "Sockets (Qt) - close() cancels a send queued behind an event-thread stall"
+    );
+
+    database.add<Test_Sockets_Qt_CloseConnectionCancelsSend>(
+        thread_pool,
+        "Sockets (Qt) - close_connection() cancels a send queued behind an event-thread stall"
     );
 
 #ifndef _WIN32
