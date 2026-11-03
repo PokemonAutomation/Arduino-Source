@@ -176,6 +176,11 @@ void register_thread(){
 
 #if defined(_WIN32)
 
+//  Registry of thread ids created by the program (see register_thread()).
+//  On Windows this is the source of the dump's thread list.
+static Mutex g_registry_lock_windows;
+static std::vector<DWORD> g_registry_windows;
+
 namespace{
 
 constexpr int kMaxFrames = 48;
@@ -188,19 +193,6 @@ DWORD native_machine_type(){
     #else
         return IMAGE_FILE_MACHINE_I386;
     #endif
-}
-
-//  StackWalk64 callback: no frame skipping is needed; just continue.
-DWORD stack_walk_callback(
-    PSTACKFRAME64,
-    DWORD,
-    DWORD64,
-    PSYMBOL_INFO,
-    PIMAGEHLP_LINE64,
-    PDWORD,
-    PDWORD
-){
-    return STACKWALK_CONTINUE;
 }
 
 void dump_all_thread_stacks_windows(){
@@ -279,10 +271,10 @@ void dump_all_thread_stacks_windows(){
                     machine,
                     h_process,
                     h_thread,
-                    &ctx,
                     &sf,
+                    &ctx,
                     nullptr,
-                    stack_walk_callback,
+                    nullptr,
                     SymGetModuleBase64,
                     nullptr
                 )
@@ -348,11 +340,6 @@ void dump_all_thread_stacks_windows(){
 }
 
 }  // namespace
-
-//  Registry of thread ids created by the program (see register_thread()).
-//  On Windows this is the source of the dump's thread list.
-static Mutex g_registry_lock_windows;
-static std::vector<DWORD> g_registry_windows;
 
 void register_thread_windows(){
     std::lock_guard<Mutex> lg(g_registry_lock_windows);
