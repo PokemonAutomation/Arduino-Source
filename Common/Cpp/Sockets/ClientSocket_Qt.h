@@ -9,7 +9,6 @@
 
 #include <chrono>
 #include <string>
-#include <atomic>
 #include <vector>
 #include <QObject>
 #include <QSharedPointer>
