@@ -10,6 +10,7 @@
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Concurrency/Qt6.9ThreadBugWorkaround.h"
 #include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/TestRunners/HangWatchdog.h"
 
 //using std::cout;
 //using std::endl;
@@ -64,6 +65,8 @@ struct Thread::Data : public QThread{
 
     virtual void run() override{
 //        cout << "starting: " << this << endl;
+        //  Register this thread for the hang watchdog's stack dump.
+        HangWatchdog::register_thread();
         m_function();
 //        m_finished.store(true, std::memory_order_acquire);
 //        cout << "exiting: " << this << endl;

@@ -48,6 +48,13 @@ public:
     ~FileLogger();
     void stop() noexcept;
 
+    //  Diagnostics: # of log entries currently queued for writing, or
+    //  (size_t)-1 if the lock could not be taken in time.
+    size_t pending_count() const;
+    size_t max_queue_size() const{
+        return m_config.max_queue_size;
+    }
+
     // Logger interface implementation
     virtual void log(const std::string& msg, Color color = Color()) override;
     virtual void log(std::string&& msg, Color color = Color()) override;
