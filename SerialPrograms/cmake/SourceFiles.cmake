@@ -178,6 +178,8 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../Common/Cpp/Strings/StringTools.h
     ../Common/Cpp/Strings/Unicode.cpp
     ../Common/Cpp/Strings/Unicode.h
+    ../Common/Cpp/TestRunners/HangWatchdog.cpp
+    ../Common/Cpp/TestRunners/HangWatchdog.h
     ../Common/Cpp/Time.cpp
     ../Common/Cpp/Time.h
     ../Common/Cpp/UiWrapper.h

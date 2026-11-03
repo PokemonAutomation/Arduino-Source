@@ -9,6 +9,7 @@
 #include <thread>
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Concurrency/Thread.h"
+#include "Common/Cpp/TestRunners/HangWatchdog.h"
 
 namespace PokemonAutomation{
 
@@ -46,7 +47,11 @@ Thread::Thread() = default;
 // - Uses CONSTRUCT_TOKEN to construct Pimpl<Data> with Data constructor
 // - Thread starts running immediately (same as std::thread behavior)
 Thread::Thread(std::function<void()>&& function)
-    : m_data(CONSTRUCT_TOKEN, std::move(function))
+    : m_data(CONSTRUCT_TOKEN, [function = std::move(function)](){
+        //  Register the new thread for the hang watchdog's stack dump.
+        HangWatchdog::register_thread();
+        function();
+    })
 {}
 
 void Thread::join(){

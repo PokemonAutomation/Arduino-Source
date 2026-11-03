@@ -34,6 +34,15 @@ public:
     virtual size_t max_threads() const = 0;
     virtual WallDuration cpu_time() const = 0;
 
+    //  Diagnostics: how many tasks are queued up waiting for a thread, and
+    //  how many threads are currently executing a task.
+    virtual size_t queued_tasks() const{
+        return 0;
+    }
+    virtual size_t busy_threads() const{
+        return 0;
+    }
+
 public:
     //  As of this writing, tasks dispatched earlier are not allowed to block
     //  on tasks that are dispatched later as it may cause a deadlock.

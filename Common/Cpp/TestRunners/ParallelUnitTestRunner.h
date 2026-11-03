@@ -15,6 +15,7 @@
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
+#include "Common/Cpp/Time.h"
 #include "UnitTest.h"
 
 namespace PokemonAutomation{
@@ -77,6 +78,11 @@ public:
     virtual bool cancel(std::exception_ptr reason) noexcept override;
 
 
+    //  A short, human-readable snapshot of the runner's state, for
+    //  diagnostics (e.g., the hang watchdog's dump). Never logs.
+    std::string diagnostics_state();
+
+
 private:
     void dispatch_test(const std::string& name);
 
@@ -102,6 +108,7 @@ private:
     struct DispatchedEntry{
         std::shared_ptr<const UnitTest> test;
         AsyncTask task;
+        WallClock dispatched_at;
     };
 
     std::map<std::string, DispatchedEntry> m_completed;
