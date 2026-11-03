@@ -14,6 +14,7 @@
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_OcrPreprocessing.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonFRLG_BoxCellOccupiedDetector.h"
 #include "PokemonFRLG_BoxCellReader.h"
 
@@ -132,7 +133,11 @@ public:
         : UnitTest("PokemonFRLG::BoxCellReader_Name - " + image)
         , m_image(UNIT_TEST_RESOURCE_PATH() + image)
         , m_expected(expected)
-    {}
+    {
+        //  The test image, plus the PaddleOCR (ONNX) recognition session and its
+        //  working set.
+        m_memory = MAX_TEST_IMAGE_RGB32_BYTES + PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         ImageRGB32 image(m_image);
@@ -154,7 +159,11 @@ public:
         : UnitTest("PokemonFRLG::BoxCellReader_Level - " + image)
         , m_image(UNIT_TEST_RESOURCE_PATH() + image)
         , m_expected(expected)
-    {}
+    {
+        //  The test image, plus the PaddleOCR (ONNX) recognition session and its
+        //  working set.
+        m_memory = MAX_TEST_IMAGE_RGB32_BYTES + PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         ImageRGB32 image(m_image);

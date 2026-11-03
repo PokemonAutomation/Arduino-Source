@@ -135,7 +135,10 @@ public:
     Test_HyperspaceCalorieDetector(const std::string& image, int expected_calorie)
         : ImageUnitTest("PokemonPLZA::HyperspaceCalorieDetector - " + image, {image})
         , m_expected_calorie(expected_calorie)
-    {}
+    {
+        //  Plus the PaddleOCR (ONNX) recognition session and its working set.
+        m_memory += PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,

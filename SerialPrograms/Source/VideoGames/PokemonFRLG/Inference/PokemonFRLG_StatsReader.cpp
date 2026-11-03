@@ -442,7 +442,10 @@ class Test_StatsReaderPage1 : public ImageUnitTest{
 public:
     Test_StatsReaderPage1(const std::string& image)
         : ImageUnitTest("PokemonFRLG::StatsReader - page1 - " + image, {image})
-    {}
+    {
+        //  Plus the PaddleOCR (ONNX) recognition session and its working set.
+        m_memory += PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,
@@ -477,7 +480,10 @@ class Test_StatsReaderPage2 : public ImageUnitTest{
 public:
     Test_StatsReaderPage2(const std::string& image)
         : ImageUnitTest("PokemonFRLG::StatsReader - page2 - " + image, {image})
-    {}
+    {
+        //  Plus the PaddleOCR (ONNX) recognition session and its working set.
+        m_memory += PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,

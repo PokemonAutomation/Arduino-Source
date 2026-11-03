@@ -386,7 +386,10 @@ public:
     Test_BinaryMatrix(const std::string& type_name, BinaryMatrixType type, const std::string& image)
         : ImageUnitTest("Kernels::BinaryMatrix - " + type_name + " - " + image, {image})
         , m_type(type)
-    {}
+    {
+        //  Plus a guard-page copy of the image and a handful of packed binary matrices.
+        m_memory += MAX_TEST_IMAGE_RGB32_BYTES + MAX_TEST_IMAGE_RGB32_BYTES / 16;
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,

@@ -168,7 +168,10 @@ public:
     )
         : ImageUnitTest("PokemonSV::Test_SandwichRecipeDetector - " + image, {image})
         , m_words(std::move(words))
-    {}
+    {
+        //  Plus the PaddleOCR (ONNX) recognition session and its working set.
+        m_memory += PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,

@@ -59,7 +59,12 @@ ImageRGB32 apply_color_transform(const ImageViewRGB32& image, const ColorTransfo
 ImageUnitTest::ImageUnitTest(std::string name, std::vector<std::string> image_paths)
     : UnitTest(std::move(name))
     , m_image_paths(std::move(image_paths))
-{}
+{
+    //  The upper bound on the in-memory size of the test images this test loads.
+    //  Tests that keep extra full-size copies of the images, or load more images,
+    //  add to this in their constructor.
+    m_memory = MAX_TEST_IMAGE_RGB32_BYTES * image_paths.size();
+}
 
 
 UnitTestResult ImageUnitTest::run(Logger& logger, CancellableScope& scope) const{

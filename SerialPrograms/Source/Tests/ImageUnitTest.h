@@ -22,6 +22,27 @@
 namespace PokemonAutomation{
 
 
+//  Upper bound on the in-memory size of a test image as an `ImageRGB32`
+//  (width x height x 4): 3840 x 2160 ("4K"), the largest size in the
+//  CommandLineTests repository. `ImageUnitTest` declares this many bytes in
+//  `UnitTest::m_memory` for the image it loads; tests that keep extra full-size
+//  copies of the image, or load more images, add to it in their constructor.
+//  A test that loads an image larger than 4K must set `m_memory` to the actual
+//  size instead of using this bound.
+constexpr uint64_t MAX_TEST_IMAGE_RGB32_BYTES = 3840ull * 2160ull * 4;
+
+
+//  Best-effort per-test memory estimates for the PaddleOCR (ONNX) pipeline, added to the
+//  test image size when setting `UnitTest::m_memory` on tests that run OCR. The ONNX
+//  sessions are loaded once per process and shared by all tests, but the estimates
+//  attribute the full cost to each test so the parallel test runner's memory budget
+//  stays safe. Single-line reads only use the recognition model; multi-line reads
+//  additionally load the ~84 MB detection model (PaddleOCRDetection/det.onnx) plus its
+//  activations.
+constexpr uint64_t PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE = 32ull * 1024 * 1024;
+constexpr uint64_t PADDLE_OCR_MULTILINE_MEMORY_ESTIMATE = 256ull * 1024 * 1024;
+
+
 class ImageUnitTest : public UnitTest{
 public:
     //  `name`: the test name, as for `UnitTest`.

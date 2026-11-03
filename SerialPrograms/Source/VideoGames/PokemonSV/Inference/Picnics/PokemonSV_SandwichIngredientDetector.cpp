@@ -421,7 +421,10 @@ public:
     Test_SandwichIngredientsDetector(const std::string& image, std::vector<std::string> words)
         : ImageUnitTest("PokemonSV::SandwichIngredientsDetector - " + image, {image})
         , m_words(std::move(words))
-    {}
+    {
+        //  Plus the PaddleOCR (ONNX) recognition session and its working set.
+        m_memory += PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,
@@ -472,7 +475,10 @@ class Test_SandwichIngredientReader : public ImageUnitTest{
 public:
     Test_SandwichIngredientReader(const std::string& image)
         : ImageUnitTest("PokemonSV::SandwichIngredientReader - " + image, {image})
-    {}
+    {
+        //  Plus the PaddleOCR (ONNX) recognition session and its working set.
+        m_memory += PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,

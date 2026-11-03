@@ -87,7 +87,11 @@ Test::Test(
     , m_error1(error1)
     , m_errorW0(errorW0)
     , m_errorW1(errorW1)
-{}
+    {
+        //  The test allocates A and T, plus W and TW for the weighted variants:
+        //  2 or 4 matrices of width x height floats each (up to 16 MB).
+        m_memory = (uint64_t)width * (uint64_t)height * 4 * (use_weights ? 4 : 2);
+    }
 
 UnitTestResult Test::run(Logger& logger, CancellableScope& scope) const{
     scope.throw_if_cancelled();

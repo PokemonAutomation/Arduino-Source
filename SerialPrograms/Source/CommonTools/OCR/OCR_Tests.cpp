@@ -45,7 +45,10 @@ public:
         : ImageUnitTest("OCR::RawOCR - " + image, {image})
         , m_language(language)
         , m_expected(expected)
-    {}
+    {
+        //  Plus the PaddleOCR (ONNX) recognition session and its working set.
+        m_memory += PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,
@@ -77,7 +80,10 @@ public:
         , m_rgb32_min(rgb32_min)
         , m_rgb32_max(rgb32_max)
         , m_text_inside_range(text_inside_range)
-    {}
+    {
+        //  Plus the PaddleOCR (ONNX) recognition session and its working set.
+        m_memory += PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,
@@ -150,7 +156,12 @@ public:
         , m_box(box)
         , m_language(language)
         , m_expected_lines(std::move(expected_lines))
-    {}
+    {
+        //  Plus the PaddleOCR (ONNX) recognition and detection sessions and their
+        //  working sets: multi-line OCR loads the detection model on top of the
+        //  recognition model.
+        m_memory += PADDLE_OCR_MULTILINE_MEMORY_ESTIMATE;
+    }
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,
