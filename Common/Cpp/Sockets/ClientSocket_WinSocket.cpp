@@ -213,24 +213,33 @@ void ClientSocket_WinSocket::thread_loop_internal(const std::string& address, ui
     m_listeners.run_method(&Listener::on_thread_start);
 
     {
-        std::unique_lock<Mutex> lg(m_lock);
-
         sockaddr_in server;
         server.sin_family = AF_INET;
         server.sin_port = htons(port);
         server.sin_addr.s_addr = inet_addr(address.c_str());
 
         //  Connect
-        SOCKET socket = m_socket.load(std::memory_order_acquire);
+        SOCKET socket;
+        {
+            std::lock_guard<Mutex> lg(m_lock);
+            socket = m_socket.load(std::memory_order_acquire);
+        }
         if (socket == INVALID_SOCKET){
             return;
         }
 
         bool in_progress = false;
         while (true){
-            State state = m_state.load(std::memory_order_relaxed);
-            if (state == State::DESTRUCTING){
-                return;
+            //  The lock must not be held across the connect wait: a
+            //  connect to a host that drops SYNs can take the kernel
+            //  tens of seconds to fail, and "close()" needs the lock to
+            //  set DESTRUCTING. Hold it only for the state check (the
+            //  same way the server's accept loop does it).
+            {
+                std::lock_guard<Mutex> lg(m_lock);
+                if (m_state.load(std::memory_order_relaxed) == State::DESTRUCTING){
+                    return;
+                }
             }
 
             if (!in_progress){
@@ -242,6 +251,7 @@ void ClientSocket_WinSocket::thread_loop_internal(const std::string& address, ui
                 int error = WSAGetLastError();
 //                    cout << "error = " << error << endl;
                 if (error != WSAEWOULDBLOCK && error != WSAEINPROGRESS){
+                    std::unique_lock<Mutex> lg(m_lock);
                     if (error == WSAETIMEDOUT){
                         connection_lost_locked(lg, "Connection timed out.", false);
                     }else{
@@ -267,6 +277,7 @@ void ClientSocket_WinSocket::thread_loop_internal(const std::string& address, ui
             if (ret == SOCKET_ERROR){
                 int error = WSAGetLastError();
                 if (error != WSAEINTR){
+                    std::unique_lock<Mutex> lg(m_lock);
                     connection_lost_locked(lg, "select() failed: WSA Error Code: " + std::to_string(error), false);
                     return;
                 }
@@ -284,6 +295,7 @@ void ClientSocket_WinSocket::thread_loop_internal(const std::string& address, ui
             if (so_error == 0){
                 break;
             }
+            std::unique_lock<Mutex> lg(m_lock);
             if (so_error == WSAETIMEDOUT){
                 connection_lost_locked(lg, "Connection timed out.", false);
             }else if (so_error == WSAECONNREFUSED){
@@ -294,7 +306,15 @@ void ClientSocket_WinSocket::thread_loop_internal(const std::string& address, ui
             return;
         }
 
-        m_state.store(State::CONNECTED, std::memory_order_relaxed);
+        {
+            std::lock_guard<Mutex> lg(m_lock);
+            //  "close()" may have set DESTRUCTING while the connect was
+            //  in progress. Keep that state so the receive loop exits
+            //  immediately instead of marking the socket CONNECTED.
+            if (m_state.load(std::memory_order_relaxed) != State::DESTRUCTING){
+                m_state.store(State::CONNECTED, std::memory_order_relaxed);
+            }
+        }
     }
 
     m_listeners.run_method(&Listener::on_connect_finished, "");
