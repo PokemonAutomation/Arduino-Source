@@ -208,10 +208,7 @@ public:
         )
         , m_room(room)
         , m_expected(expected)
-    {
-        //  The test images are up to 3840 x 2160 (31.6 MB in RGB32).
-        m_memory = test_image_rgb32_bytes(image);
-    }
+    {}
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,
@@ -305,10 +302,7 @@ public:
     )
         : ImageUnitTest("PokemonFRLG::HallOfFameSavingDetector - " + image, {image})
         , m_expected(expected)
-    {
-        //  The test images are up to 3840 x 2160 (31.6 MB in RGB32).
-        m_memory = test_image_rgb32_bytes(image);
-    }
+    {}
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,

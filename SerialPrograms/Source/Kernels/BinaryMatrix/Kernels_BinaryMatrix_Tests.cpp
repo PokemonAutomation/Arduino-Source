@@ -387,10 +387,8 @@ public:
         : ImageUnitTest("Kernels::BinaryMatrix - " + type_name + " - " + image, {image})
         , m_type(type)
     {
-        //  The test keeps the loaded image and a guard-page copy of it alive at the
-        //  same time, plus a handful of packed binary matrices.
-        const uint64_t image_bytes = test_image_rgb32_bytes(image);
-        m_memory = image_bytes * 2 + image_bytes / 16;
+        //  Plus a guard-page copy of the image and a handful of packed binary matrices.
+        m_memory += MAX_TEST_IMAGE_RGB32_BYTES + MAX_TEST_IMAGE_RGB32_BYTES / 16;
     }
 
     virtual UnitTestResult run_on_images(

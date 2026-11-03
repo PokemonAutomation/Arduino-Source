@@ -60,8 +60,8 @@ public:
     Test_FlavorPowerScreenDetector(const std::string& image)
         : ImageUnitTest("PokemonPLZA::FlavorPowerScreenDetector - " + image, {image})
     {
-        //  jojoaman_01_chiTra.jpg is 2560 x 1440 (14.1 MB), plus the PaddleOCR working set.
-        m_memory = test_image_rgb32_bytes(image) + PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+        //  Plus the PaddleOCR (ONNX) recognition session and its working set.
+        m_memory += PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
     }
 
     virtual UnitTestResult run_on_images(

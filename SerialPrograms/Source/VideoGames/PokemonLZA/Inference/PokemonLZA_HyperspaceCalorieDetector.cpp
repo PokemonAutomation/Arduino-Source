@@ -136,9 +136,8 @@ public:
         : ImageUnitTest("PokemonPLZA::HyperspaceCalorieDetector - " + image, {image})
         , m_expected_calorie(expected_calorie)
     {
-        //  The PaddleOCR (ONNX) recognition session plus its working set, on top of the
-        //  test image.
-        m_memory = test_image_rgb32_bytes(image) + PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+        //  Plus the PaddleOCR (ONNX) recognition session and its working set.
+        m_memory += PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
     }
 
     virtual UnitTestResult run_on_images(

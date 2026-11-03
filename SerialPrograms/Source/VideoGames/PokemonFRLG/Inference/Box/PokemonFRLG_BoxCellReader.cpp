@@ -134,9 +134,9 @@ public:
         , m_image(UNIT_TEST_RESOURCE_PATH() + image)
         , m_expected(expected)
     {
-        //  The PaddleOCR (ONNX) recognition session plus its working set, on top of the
-        //  test image.
-        m_memory = test_image_rgb32_bytes(image) + PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+        //  The test image, plus the PaddleOCR (ONNX) recognition session and its
+        //  working set.
+        m_memory = MAX_TEST_IMAGE_RGB32_BYTES + PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
     }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
@@ -160,9 +160,9 @@ public:
         , m_image(UNIT_TEST_RESOURCE_PATH() + image)
         , m_expected(expected)
     {
-        //  The PaddleOCR (ONNX) recognition session plus its working set, on top of the
-        //  test image.
-        m_memory = test_image_rgb32_bytes(image) + PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+        //  The test image, plus the PaddleOCR (ONNX) recognition session and its
+        //  working set.
+        m_memory = MAX_TEST_IMAGE_RGB32_BYTES + PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
     }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{

@@ -1013,11 +1013,7 @@ public:
         const std::string& image
     )
         : ImageUnitTest("PokemonLA::MMOSpriteMatcher - " + image, {image, revealed_image_path(image)})
-    {
-        //  Two full-size (1920 x 1080) images are alive at the same time: the region with the
-        //  question marks and the revealed-sprites version of it.
-        m_memory = test_image_rgb32_bytes(image) * 2;
-    }
+    {}
 
     //  The test image with the MMO sprites revealed: the same file name with a leading "_", e.g.
     //  ".../Mirelands/_MMO_Region_Mirelands_07.png" for ".../Mirelands/MMO_Region_Mirelands_07.png".

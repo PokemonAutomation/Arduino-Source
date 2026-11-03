@@ -252,9 +252,8 @@ public:
         : ImageUnitTest("Kernels::ImageFilterRGB32Range - " + implementation.name + " - " + image, {image})
         , m_implementation(implementation)
     {
-        //  The test keeps the loaded image, a guard-page input copy and a full-size
-        //  output copy alive at the same time.
-        m_memory = test_image_rgb32_bytes(image) * 3;
+        //  Plus a guard-page input copy and a full-size output copy.
+        m_memory += MAX_TEST_IMAGE_RGB32_BYTES * 2;
     }
 
     virtual UnitTestResult run_on_images(
@@ -408,9 +407,8 @@ public:
         : ImageUnitTest("Kernels::ImageFilterByMask - " + implementation.name + " - " + image, {image})
         , m_implementation(implementation)
     {
-        //  The test keeps the loaded image, a guard-page input copy and a full-size
-        //  filtered copy alive at the same time.
-        m_memory = test_image_rgb32_bytes(image) * 3;
+        //  Plus a guard-page input copy and a full-size filtered copy.
+        m_memory += MAX_TEST_IMAGE_RGB32_BYTES * 2;
     }
 
     virtual UnitTestResult run_on_images(

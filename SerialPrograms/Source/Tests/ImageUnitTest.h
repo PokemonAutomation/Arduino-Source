@@ -22,13 +22,14 @@
 namespace PokemonAutomation{
 
 
-//  The number of bytes the test image at `relative_path` (relative to
-//  `UNIT_TEST_RESOURCE_PATH()`, as in `ImageUnitTest`'s constructor) occupies in
-//  memory as an `ImageRGB32` (width x height x 4), read from the file's PNG or JPEG
-//  header without decoding the image data. Returns 0 if the file is missing or cannot
-//  be read. Used by tests to set `UnitTest::m_memory` from the size of the test image
-//  they load.
-uint64_t test_image_rgb32_bytes(const std::string& relative_path);
+//  Upper bound on the in-memory size of a test image as an `ImageRGB32`
+//  (width x height x 4): 3840 x 2160 ("4K"), the largest size in the
+//  CommandLineTests repository. `ImageUnitTest` declares this many bytes in
+//  `UnitTest::m_memory` for the image it loads; tests that keep extra full-size
+//  copies of the image, or load more images, add to it in their constructor.
+//  A test that loads an image larger than 4K must set `m_memory` to the actual
+//  size instead of using this bound.
+constexpr uint64_t MAX_TEST_IMAGE_RGB32_BYTES = 3840ull * 2160ull * 4;
 
 
 //  Best-effort per-test memory estimates for the PaddleOCR (ONNX) pipeline, added to the

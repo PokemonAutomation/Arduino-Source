@@ -443,8 +443,8 @@ public:
     Test_StatsReaderPage1(const std::string& image)
         : ImageUnitTest("PokemonFRLG::StatsReader - page1 - " + image, {image})
     {
-        //  The test image is up to 3840 x 2160 (31.6 MB), plus the PaddleOCR working set.
-        m_memory = test_image_rgb32_bytes(image) + PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+        //  Plus the PaddleOCR (ONNX) recognition session and its working set.
+        m_memory += PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
     }
 
     virtual UnitTestResult run_on_images(
@@ -481,8 +481,8 @@ public:
     Test_StatsReaderPage2(const std::string& image)
         : ImageUnitTest("PokemonFRLG::StatsReader - page2 - " + image, {image})
     {
-        //  The test image is up to 3840 x 2160 (31.6 MB), plus the PaddleOCR working set.
-        m_memory = test_image_rgb32_bytes(image) + PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+        //  Plus the PaddleOCR (ONNX) recognition session and its working set.
+        m_memory += PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
     }
 
     virtual UnitTestResult run_on_images(

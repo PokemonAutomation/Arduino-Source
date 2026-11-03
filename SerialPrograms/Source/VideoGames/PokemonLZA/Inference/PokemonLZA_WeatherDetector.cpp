@@ -370,10 +370,7 @@ public:
         : ImageUnitTest("PokemonPLZA::WeatherIconDetector - " + image + " [" + weather_name(expected_weather) + "]", {image})
         , m_expected_weather(expected_weather)
         , m_expected_result(expected_result)
-    {
-        //  clear_dark_map_True.png is 2392 x 1495 (13.6 MB).
-        m_memory = test_image_rgb32_bytes(image);
-    }
+    {}
 
     virtual UnitTestResult run_on_images(
         Logger& logger, CancellableScope& scope,

@@ -46,9 +46,8 @@ public:
         , m_language(language)
         , m_expected(expected)
     {
-        //  The PaddleOCR (ONNX) recognition session plus its working set, on top of the
-        //  test image.
-        m_memory = test_image_rgb32_bytes(image) + PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+        //  Plus the PaddleOCR (ONNX) recognition session and its working set.
+        m_memory += PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
     }
 
     virtual UnitTestResult run_on_images(
@@ -82,9 +81,8 @@ public:
         , m_rgb32_max(rgb32_max)
         , m_text_inside_range(text_inside_range)
     {
-        //  The PaddleOCR (ONNX) recognition session plus its working set, on top of the
-        //  test image.
-        m_memory = test_image_rgb32_bytes(image_path) + PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+        //  Plus the PaddleOCR (ONNX) recognition session and its working set.
+        m_memory += PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
     }
 
     virtual UnitTestResult run_on_images(
@@ -159,9 +157,10 @@ public:
         , m_language(language)
         , m_expected_lines(std::move(expected_lines))
     {
-        //  Multi-line OCR loads the PaddleOCR (ONNX) detection model in addition to the
-        //  recognition session, on top of the test image.
-        m_memory = test_image_rgb32_bytes(image) + PADDLE_OCR_MULTILINE_MEMORY_ESTIMATE;
+        //  Plus the PaddleOCR (ONNX) recognition and detection sessions and their
+        //  working sets: multi-line OCR loads the detection model on top of the
+        //  recognition model.
+        m_memory += PADDLE_OCR_MULTILINE_MEMORY_ESTIMATE;
     }
 
     virtual UnitTestResult run_on_images(
