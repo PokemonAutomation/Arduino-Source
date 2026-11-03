@@ -6,10 +6,9 @@
 
 #include <opencv2/core.hpp>
 #include <cstring>
-#include <fstream>
-#include <iterator>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CancellableScope.h"
+#include "Common/Cpp/Filesystem/FileIO.h"
 #include "Common/Cpp/TestRunners/TestImageDistortionManager.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/StaticGlobals.h"
@@ -30,40 +29,41 @@ uint32_t be32(const uint8_t* p){
 }
 
 //  PNG: the 24-byte signature + IHDR header holds the dimensions at offsets 16 and 20.
-bool png_dimensions(const std::vector<uint8_t>& data, size_t& width, size_t& height){
+bool png_dimensions(const std::string& data, size_t& width, size_t& height){
     static const uint8_t SIGNATURE[] = {0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a};
     if (data.size() < 24 || std::memcmp(data.data(), SIGNATURE, 8) != 0){
         return false;
     }
-    width = be32(data.data() + 16);
-    height = be32(data.data() + 20);
+    width = be32(reinterpret_cast<const uint8_t*>(data.data()) + 16);
+    height = be32(reinterpret_cast<const uint8_t*>(data.data()) + 20);
     return width != 0 && height != 0;
 }
 
 //  JPEG: scan the marker stream for a SOF0..SOF15 frame (0xC0..0xCF, excluding the
 //  DHT / JPG / DAC markers 0xC4, 0xC8 and 0xCC); its payload is height then width.
-bool jpeg_dimensions(const std::vector<uint8_t>& data, size_t& width, size_t& height){
-    if (data.size() < 4 || data[0] != 0xff || data[1] != 0xd8){
+bool jpeg_dimensions(const std::string& data, size_t& width, size_t& height){
+    if (data.size() < 4 || (uint8_t)data[0] != 0xff || (uint8_t)data[1] != 0xd8){
         return false;
     }
+    const uint8_t* bytes = reinterpret_cast<const uint8_t*>(data.data());
     size_t i = 2;
     while (i + 4 < data.size()){
-        if (data[i] != 0xff){
+        if (bytes[i] != 0xff){
             i++;
             continue;
         }
-        const uint8_t marker = data[i + 1];
+        const uint8_t marker = bytes[i + 1];
         if (marker == 0xff || (marker >= 0xd0 && marker <= 0xd7) || marker == 0x01 || marker == 0xd9){
             i += 2;
             continue;
         }
-        const size_t length = be16(data.data() + i + 2);
+        const size_t length = be16(bytes + i + 2);
         if ((marker >= 0xc0 && marker <= 0xcf) && marker != 0xc4 && marker != 0xc8 && marker != 0xcc){
             if (i + 9 > data.size()){
                 return false;
             }
-            height = be16(data.data() + i + 5);
-            width = be16(data.data() + i + 7);
+            height = be16(bytes + i + 5);
+            width = be16(bytes + i + 7);
             return width != 0 && height != 0;
         }
         i += 2 + length;
@@ -75,12 +75,10 @@ bool jpeg_dimensions(const std::vector<uint8_t>& data, size_t& width, size_t& he
 
 
 uint64_t test_image_rgb32_bytes(const std::string& relative_path){
-    const std::string path = UNIT_TEST_RESOURCE_PATH() + relative_path;
-    std::ifstream file(path, std::ios::binary);
-    if (!file){
+    std::string data;
+    if (!file_to_string(UNIT_TEST_RESOURCE_PATH() + relative_path, data)){
         return 0;
     }
-    std::vector<uint8_t> data((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
     if (data.size() < 24){
         return 0;
     }
