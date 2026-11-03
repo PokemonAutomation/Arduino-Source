@@ -254,10 +254,12 @@ void UnitTestRunner::program(ProgramEnvironment& env, CancellableScope& scope){
         m_env = nullptr;
     });
 
+    //  Uncapped pool: the runner caps the # of concurrently running tests itself, and
+    //  dispatch_now_blocking() would stall the dispatcher once a capped pool saturates.
     PokemonAutomation::UnitTestRunner runner(
         &scope,
         env.logger(),
-        GlobalThreadPools::computation_normal()
+        GlobalThreadPools::unlimited_normal()
     );
     runner.add_listener(*this);
 
@@ -372,9 +374,11 @@ bool CommandLineUnitTestRunner::run(bool augment_color_distortions){
         m_logger.log("Color distortion augmentation enabled. Image tests with labeled images also run with: " + labels);
     }
 
+    //  Uncapped pool: the runner caps the # of concurrently running tests itself, and
+    //  dispatch_now_blocking() would stall the dispatcher once a capped pool saturates.
     PokemonAutomation::UnitTestRunner runner(
         m_logger,
-        GlobalThreadPools::computation_normal()
+        GlobalThreadPools::unlimited_normal()
     );
     runner.add_listener(*this);
     for (const auto& test : UNIT_TESTS_ALL()){
