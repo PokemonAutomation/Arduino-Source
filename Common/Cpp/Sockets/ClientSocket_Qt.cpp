@@ -107,9 +107,27 @@ size_t ClientSocket_Qt::send(const void* data, size_t bytes, std::chrono::millis
             ? std::chrono::steady_clock::time_point::max()
             : std::chrono::steady_clock::now() + timeout;
 
+    //  Register the send atomically with respect to "close()"/"connect()":
+    //  both detach "m_socket" under this same lock before they cancel the
+    //  in-flight sends. The packet copy above can take a while for large
+    //  payloads, so without this re-check a send could register *after*
+    //  "close()" already cancelled an (empty) list and queued the socket's
+    //  destruction: its "internal_send" call would then be posted after the
+    //  destruction event, Qt would silently discard it, and the wait below
+    //  (unbounded for the infinite default timeout) would never end. With
+    //  the re-check, a send either registers before the cancel (and gets
+    //  cancelled, waking the wait below) or sees the detached socket and
+    //  returns without queueing anything.
+    bool registered;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        m_inflight_sends.push_back(send_data);
+        registered = (m_socket != nullptr);
+        if (registered){
+            m_inflight_sends.push_back(send_data);
+        }
+    }
+    if (!registered){
+        return 0;
     }
 
     emit internal_send(send_data);
@@ -120,13 +138,16 @@ size_t ClientSocket_Qt::send(const void* data, size_t bytes, std::chrono::millis
     //  write loop stops at the deadline, so anything beyond that is just
     //  the queued call waiting to start.
     //
-    //  The infinite default waits without a time bound: "done" is set by
-    //  either the event-thread write loop (which stops at the deadline,
-    //  on a socket error, or when Qt's userspace buffer accepts the
-    //  packet) or by "close()"/"connect()" cancelling the send before
-    //  the socket is destroyed, so the wait is always ended. The shared
-    //  ownership keeps the packet alive until the queued call runs
-    //  (or is discarded with the socket).
+    //  The infinite default waits without a time bound. The registration
+    //  above is atomic with the "close()"/"connect()" detach, so "done" is
+    //  set by either the event-thread write loop (which stops at the
+    //  deadline, on a socket error, or when Qt's userspace buffer accepts
+    //  the packet; it runs before the queued socket destruction, since the
+    //  event loop is FIFO) or by "close()"/"connect()" cancelling the
+    //  registered send - even when Qt discards the queued write loop with
+    //  the socket - so the wait always ends. The shared ownership keeps
+    //  the packet alive until the queued call runs (or is discarded with
+    //  the socket).
     {
         std::unique_lock<Mutex> lg(send_data->lock);
         if (timeout == std::chrono::milliseconds::max()){
