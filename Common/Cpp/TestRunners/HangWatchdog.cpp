@@ -23,7 +23,6 @@
 #if defined(_WIN32)
 
 #include <windows.h>
-#include <tlhelp32.h>
 #include <dbghelp.h>
 #pragma comment(lib, "dbghelp.lib")
 
@@ -95,11 +94,13 @@ static uintptr_t my_thread_id(){
 
 
 // ---------------------------------------------------------------------------
-//  Thread registry (POSIX) - declared here, defined in the stack-dump
-//  section below. register_thread() calls it on all POSIX platforms.
+//  Thread registry - declared here, defined in the stack-dump section
+//  below. register_thread() calls the platform one.
 // ---------------------------------------------------------------------------
 
-#if !defined(_WIN32)
+#if defined(_WIN32)
+void register_thread_windows();
+#else
 void register_thread_posix();
 #endif
 
@@ -149,10 +150,10 @@ WallDuration configured_timeout(WallDuration default_timeout){
 
 
 void register_thread(){
-    #if !defined(_WIN32)
-        register_thread_posix();
+    #if defined(_WIN32)
+        register_thread_windows();
     #else
-        (void)0;
+        register_thread_posix();
     #endif
 }
 
@@ -161,10 +162,16 @@ void register_thread(){
 // ---------------------------------------------------------------------------
 //  All-thread stack dump: Windows
 //
-//  Suspend every other thread in the process, walk its stack with
-//  dbghelp's StackWalk64, symbolize with SymFromAddr, resume it, move on.
-//  Frames come out as "symbol + module_offset (absolute_address)"; without
-//  PDBs the offset is still enough to locate the function in the binary.
+//  Suspend every registered thread, walk its stack with dbghelp's
+//  StackWalk64, symbolize with SymFromAddr, resume it, move on. Frames come
+//  out as "symbol + module_offset (absolute_address)"; without PDBs the
+//  offset is still enough to locate the function in the binary.
+//
+//  Threads are enumerated from the program's own registry
+//  (register_thread()) rather than with the toolhelp snapshot API: the
+//  THREADLIST32-based enumeration is not available in every SDK/MSVC
+//  configuration. Library-created threads (Qt, ONNX...) that the program
+//  never registered are not captured - noted at the end, as on macOS.
 // ---------------------------------------------------------------------------
 
 #if defined(_WIN32)
@@ -183,6 +190,19 @@ DWORD native_machine_type(){
     #endif
 }
 
+//  StackWalk64 callback: no frame skipping is needed; just continue.
+DWORD stack_walk_callback(
+    PSTACKFRAME64,
+    DWORD,
+    DWORD64,
+    PSYMBOL_INFO,
+    PIMAGEHLP_LINE64,
+    PDWORD,
+    PDWORD
+){
+    return STACKWALK_CONTINUE;
+}
+
 void dump_all_thread_stacks_windows(){
     HANDLE h_process = OpenProcess(
         PROCESS_QUERY_INFORMATION | PROCESS_VM_READ,
@@ -197,21 +217,10 @@ void dump_all_thread_stacks_windows(){
     SymInitialize(h_process, nullptr, TRUE);
 
     std::vector<DWORD> tids;
-    HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
-    if (snapshot == INVALID_HANDLE_VALUE){
-        SymCleanup(h_process);
-        CloseHandle(h_process);
-        raw_stderr_line("Stack dump: CreateToolhelp32Snapshot failed\n");
-        return;
+    {
+        std::lock_guard<Mutex> lg(g_registry_lock_windows);
+        tids = g_registry_windows;
     }
-    THREADLIST32 info;
-    info.dwSize = sizeof(info);
-    if (Thread32First(snapshot, &info)){
-        do{
-            tids.push_back(info.th32ThreadID);
-        }while (Thread32Next(snapshot, &info));
-    }
-    CloseHandle(snapshot);
 
     DWORD self_tid = GetCurrentThreadId();
     DWORD machine = native_machine_type();
@@ -239,7 +248,10 @@ void dump_all_thread_stacks_windows(){
         if (GetThreadContext(h_thread, &ctx)){
             STACKFRAME64 sf;
             std::memset(&sf, 0, sizeof(sf));
-            sf.Machine = machine;
+            #if defined(_M_ARM64) || defined(_M_ARM)
+                //  The "Machine" field only exists in the ARM STACKFRAME64.
+                sf.Machine = machine;
+            #endif
             #if defined(_M_X64) || defined(_M_ARM64)
                 sf.AddrPC.Offset = ctx.Rip;
                 sf.AddrFrame.Offset = ctx.Rbp;
@@ -270,7 +282,7 @@ void dump_all_thread_stacks_windows(){
                     &ctx,
                     &sf,
                     nullptr,
-                    SymFunction,
+                    stack_walk_callback,
                     SymGetModuleBase64,
                     nullptr
                 )
@@ -317,6 +329,18 @@ void dump_all_thread_stacks_windows(){
 
     if (captured == 0){
         raw_stderr_line("Stack dump: no threads captured\n");
+    }else{
+        char note[160];
+        int len = std::snprintf(
+            note,
+            sizeof(note),
+            "(note: %d of %d registered threads captured; library-created threads are not registered)\n",
+            captured,
+            (int)tids.size()
+        );
+        if (len > 0){
+            raw_stderr_write(note, (size_t)len);
+        }
     }
 
     SymCleanup(h_process);
@@ -324,6 +348,22 @@ void dump_all_thread_stacks_windows(){
 }
 
 }  // namespace
+
+//  Registry of thread ids created by the program (see register_thread()).
+//  On Windows this is the source of the dump's thread list.
+static Mutex g_registry_lock_windows;
+static std::vector<DWORD> g_registry_windows;
+
+void register_thread_windows(){
+    std::lock_guard<Mutex> lg(g_registry_lock_windows);
+    DWORD self = GetCurrentThreadId();
+    for (DWORD tid : g_registry_windows){
+        if (tid == self){
+            return;
+        }
+    }
+    g_registry_windows.push_back(self);
+}
 
 #else  // !defined(_WIN32)
 
