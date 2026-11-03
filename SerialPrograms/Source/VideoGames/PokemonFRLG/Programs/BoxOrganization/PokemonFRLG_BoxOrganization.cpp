@@ -435,6 +435,27 @@ void execute_box_sorting_plan(
             move_cursor_to(env, context, selection_detector, cursor, destination, BoxSelectionMode::Relocate);
             pbf_press_button(context, BUTTON_A, 80ms, 400ms);
             context.wait_for_all_requests();
+            env.log("Step " + std::to_string(step + 1) + "/" + std::to_string(chain.size()) + " complete.");
+            auto selection = selection_detector.detect(env.console.video().snapshot());
+            if (!selection){
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
+                    "Box Sorter: Unable to detect the selection hand after pressing A.", env.console
+                );
+            }
+            if (step == chain.size() - 1){
+                if (selection->closed){
+                    OperationFailedExceptionWithScreenshot::fire(
+                        ErrorReportMode::SEND_ERROR_REPORT,
+                        "Box Sorter: Unexpected closed hand at the end of the chain.", env.console
+                    );
+                }
+            } else if (!selection->closed){
+                OperationFailedExceptionWithScreenshot::fire(
+                    ErrorReportMode::SEND_ERROR_REPORT,
+                    "Box Sorter: Unexpected open hand before the end of the chain.", env.console
+                );
+            }
             if (step != 0){
                 stats.swaps++;
                 env.update_stats();
