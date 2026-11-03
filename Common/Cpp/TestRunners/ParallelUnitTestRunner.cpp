@@ -9,6 +9,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/MemoryUtilization/MemoryUtilization.h"
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
+#include "Common/Cpp/TestRunners/HangWatchdog.h"
 #include "ParallelUnitTestRunner.h"
 
 //#include <iostream>
@@ -180,6 +181,7 @@ void UnitTestRunner::dispatch_test(const std::string& name){
     const UnitTest& test = *iter_current->second.test;
     m_current_memory += test.memory();
     m_current_threads += test.threads();
+    node.dispatched_at = current_time();
 
     {
         ReverseLockGuard<Mutex> lg(m_lock);
@@ -229,6 +231,9 @@ void UnitTestRunner::dispatch_test(const std::string& name){
                 m_current_threads -= test.threads();
             }
             m_cv.notify_all();
+
+            //  A completed test is forward progress for the hang watchdog.
+            HangWatchdog::note_test_completed();
         });
     }
 
@@ -239,6 +244,28 @@ void UnitTestRunner::dispatch_test(const std::string& name){
 }
 
 
+std::string UnitTestRunner::diagnostics_state(){
+    using std::chrono::duration;
+    using std::chrono::duration_cast;
+
+    std::lock_guard<Mutex> lg(m_lock);
+
+    std::ostringstream os;
+    os << "Runner: pending=" << m_test_by_name.size()
+       << " running=" << m_currently_running.size()
+       << " completed=" << m_completed.size()
+       << " current_threads=" << m_current_threads << "/" << m_max_threads
+       << " current_memory=" << m_current_memory << "/" << m_max_memory << " bytes"
+       << " cancelled=" << (cancelled() ? "yes" : "no")
+       << "\n";
+
+    WallClock now = current_time();
+    for (const auto& kv : m_currently_running){
+        double seconds = duration_cast<duration<double>>(now - kv.second.dispatched_at).count();
+        os << "  Running for " << seconds << "s: " << kv.first << "\n";
+    }
+    return os.str();
+}
 
 
 }

@@ -4,11 +4,15 @@
  *
  */
 
+#include <chrono>
+#include <sstream>
+
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/MoveOnlyFunction_Tests.h"
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Sockets/Sockets_Tests.h"
+#include "Common/Cpp/TestRunners/HangWatchdog.h"
 #include "Common/Cpp/TestRunners/TestImageDistortionManager.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Common/Qt/QtThreadPool_Tests.h"
@@ -18,6 +22,7 @@
 #include "CommonFramework/AudioPipeline/SinkPipeline_Tests.h"
 #include "CommonFramework/AudioPipeline/IO/AudioFileLoader_Tests.h"
 #include "CommonFramework/AudioPipeline/Spectrum/FFTStreamer.h"
+#include "Common/Cpp/Logging/FileLogger.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
@@ -40,6 +45,10 @@
 #include "ComputerPrograms_UnitTestRunner.h"
 
 namespace PokemonAutomation{
+
+//  Defined in Main.cpp; no header declares it.
+FileLogger& global_file_logger();
+
 namespace ComputerPrograms{
 
 
@@ -384,6 +393,41 @@ bool CommandLineUnitTestRunner::run(bool augment_color_distortions){
     for (const auto& test : UNIT_TESTS_ALL()){
         runner.add_test(test.second);
     }
+
+    //  Hang watchdog: if no test COMPLETES for 60s, dump the runner, pool and
+    //  logger state plus the stack trace of every thread in the process,
+    //  straight to the stderr file descriptor, then terminate (exit 124).
+    //  This turns a hung CI runner - which would otherwise sit until the 8h
+    //  job timeout - into a failed job with a full diagnostic dump.
+    //  PA_HANG_WATCHDOG overrides the timeout in seconds (0 disables).
+    HangWatchdog::set_state_provider([&runner]{
+        std::ostringstream os;
+        os << runner.diagnostics_state();
+        auto pool_line = [](const char* label, ThreadPool& pool){
+            std::ostringstream line;
+            line << "Pool [" << label << "]: threads=" << pool.current_threads()
+                 << " max=" << pool.max_threads()
+                 << " queued=" << pool.queued_tasks()
+                 << " busy=" << pool.busy_threads();
+            return line.str();
+        };
+        os << pool_line("unlimited_normal", GlobalThreadPools::unlimited_normal()) << "\n";
+        os << pool_line("computation_normal", GlobalThreadPools::computation_normal()) << "\n";
+        size_t pending = global_file_logger().pending_count();
+        os << "FileLogger: pending=";
+        if (pending == (size_t)-1){
+            os << "(lock busy)";
+        }else{
+            os << pending;
+        }
+        os << " max_queue=" << global_file_logger().max_queue_size() << "\n";
+        return os.str();
+    });
+    HangWatchdog::start(std::chrono::seconds(60));
+    ScopeExit stop_watchdog_on_exit([]{
+        HangWatchdog::stop();
+    });
+
     runner.run();
 
     m_logger.log(
