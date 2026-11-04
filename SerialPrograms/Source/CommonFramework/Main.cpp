@@ -48,7 +48,9 @@
 using namespace PokemonAutomation;
 
 namespace PokemonAutomation{
-    bool USE_QT_UI = true;
+    bool use_qt_ui(){
+        return true;
+    }
 }
 
 Q_DECLARE_METATYPE(std::string)

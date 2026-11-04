@@ -124,14 +124,14 @@ bool SerialPABotBase2_Connection::open_serial_port(){
     //  Validate the serial port.
 #ifdef QT_CORE_LIB
     QSerialPortInfo info;
-    if(USE_QT_UI){
+    if (use_qt_ui()){
         info = SerialPortPoller::instance().get_port(m_device_name);
     }else{
         info = QSerialPortInfo(QString::fromStdString(m_device_name));
     }
 
 
-    if(USE_QT_UI){
+    if (use_qt_ui()){
         //  Port is invalid.
         if (info.isNull()){
             std::string text = "Serial port " + m_device_name + " is invalid or not loaded.";

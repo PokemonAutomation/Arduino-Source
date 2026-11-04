@@ -37,7 +37,9 @@ extern const std::string COMPILER_VERSION;
 
 extern const size_t LOG_HISTORY_LINES;
 
-extern bool USE_QT_UI;
+//  Whether this executable shows the Qt GUI. Each executable defines it next to its main().
+//  e.g. the serial port code only uses the GUI port list and message boxes when it is true.
+bool use_qt_ui();
 
 
 
