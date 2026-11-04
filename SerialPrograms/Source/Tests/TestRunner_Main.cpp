@@ -101,16 +101,16 @@ FileLogger& test_file_logger(){
 
 int run_tests(const TestRunnerArguments& arguments){
     std::vector<std::string> names = ComputerPrograms::unit_test_names(arguments.filters);
+    if (names.empty()){
+        std::cerr << "No test matches the filters." << std::endl;
+        return EXIT_BAD_ARGUMENTS;
+    }
     if (arguments.list){
         for (const std::string& name : names){
             std::cout << name << "\n";
         }
         std::cout << names.size() << " tests" << std::endl;
-        return names.empty() ? EXIT_BAD_ARGUMENTS : 0;
-    }
-    if (names.empty()){
-        std::cerr << "No test matches the filters." << std::endl;
-        return EXIT_BAD_ARGUMENTS;
+        return 0;
     }
 
     Logger& logger = global_logger_command_line();
