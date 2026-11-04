@@ -104,9 +104,9 @@ const UnitTestDatabase& UNIT_TESTS_ALL(){
 
 std::vector<std::string> unit_test_names(std::span<const std::string_view> filters){
     std::vector<std::string> ret;
-    for (const auto& test : UNIT_TESTS_ALL()){
-        if (matches_any(test.first, filters)){
-            ret.emplace_back(test.first);
+    for (const auto& [test_name, test] : UNIT_TESTS_ALL()){
+        if (matches_any(test_name, filters)){
+            ret.emplace_back(test_name);
         }
     }
     return ret;
@@ -409,9 +409,9 @@ size_t CommandLineUnitTestRunner::run(bool augment_color_distortions, std::span<
         GlobalThreadPools::unlimited_normal()
     );
     runner.add_listener(*this);
-    for (const auto& test : UNIT_TESTS_ALL()){
-        if (matches_any(test.first, filters)){
-            runner.add_test(test.second);
+    for (const auto& [test_name, test] : UNIT_TESTS_ALL()){
+        if (matches_any(test_name, filters)){
+            runner.add_test(test);
         }
     }
     runner.run();
