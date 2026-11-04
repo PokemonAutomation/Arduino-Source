@@ -2874,6 +2874,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Notifications.h
     Source/VideoGames/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.cpp
     Source/VideoGames/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h
+    Source/VideoGames/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State_Tests.cpp
+    Source/VideoGames/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State_Tests.h
     Source/VideoGames/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.cpp
     Source/VideoGames/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.h
     Source/VideoGames/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.cpp
