@@ -33,6 +33,7 @@ BoxSorter_Descriptor::BoxSorter_Descriptor()
         "Programs/PokemonFRLG/BoxSorter.html",
         "Sort boxes of " + STRING_POKEMON + ". Start in Move " + STRING_POKEMON +
         " with an empty hand in the first box to sort. Uses English species names.",
+        PanelQualityStanding::OFFICIAL_BETA,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
@@ -54,8 +55,8 @@ BoxSorter::BoxSorter()
         {SortingRuleType::DexNo, SortingRuleType::Level, SortingRuleType::Gender, SortingRuleType::Shiny}
     )
     , DRY_RUN(
-        "<b>Dry Run:</b><br>Scan boxes and write &lt;output_file&gt;.json and "
-        "&lt;output_file&gt;-sorted.json without moving any " + STRING_POKEMON + ".",
+        "<b>Dry Run:</b><br>Scan boxes and write frlg-box_order.json and "
+        "frlg-box_order-sorted.json without moving any " + STRING_POKEMON + ".",
         LockMode::LOCK_WHILE_RUNNING, false
     )
     , NOTIFICATIONS({&NOTIFICATION_PROGRAM_FINISH, &NOTIFICATION_ERROR_FATAL})
