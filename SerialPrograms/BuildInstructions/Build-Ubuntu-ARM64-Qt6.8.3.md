@@ -40,6 +40,12 @@ sudo apt install libavcodec-dev libavformat-dev libavutil-dev libswscale-dev \
 
 Note: `libopencv-dev` on 24.04 provides OpenCV 4.6, and `libtesseract-dev` provides Tesseract 5.3.4. Both are picked up via `pkg-config` (`opencv4`, `tesseract`) by `SerialPrograms/CMakeLists.txt` — no manual OpenCV build is required on Linux (unlike Windows/Mac, which use prebuilt binaries from the `Packages` repo).
 
+## Optional gamepad support
+
+Gamepad support is disabled by default. To enable it, first install SDL 3.2 or newer with its development headers and CMake package. On Ubuntu 26.04, use `sudo apt install libsdl3-dev`. If your Ubuntu version's repositories do not provide SDL 3.2 or newer, follow the [SDL installation instructions](https://wiki.libsdl.org/SDL3/Installation).
+
+Add `-DPA_GAMEPAD=ON` to your CMake configure command, or set `PA_GAMEPAD` to `ON` in Qt Creator's CMake build settings, then reconfigure and rebuild.
+
 ## 2. Build Qt 6.8.3 from source
 
 ```bash

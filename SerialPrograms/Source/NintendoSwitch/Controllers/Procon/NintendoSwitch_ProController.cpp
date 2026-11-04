@@ -7,6 +7,7 @@
 #include "Common/Cpp/Strings/StringTools.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "ControllerInput/ControllerInput.h"
+#include "ControllerInput/Gamepad/GamepadInput_State.h"
 #include "ControllerInput/Keyboard/KeyboardInput_State.h"
 #include "Controllers/RumbleListener.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -129,26 +130,30 @@ bool ProController::run_string_command(Milliseconds duration, const std::string&
 void ProController::run_controller_input(const ControllerInputState& state){
 //    cout << "run_controller_input()" << endl;
 
-    if (state.type() != ControllerInputType::HID_Keyboard){
+    if (state.type() != ControllerInputType::HID_Keyboard && state.type() != ControllerInputType::StandardGamepad){
         return;
     }
 
     ProControllerDeltas deltas;
 
-    const KeyboardInputState& lstate = static_cast<const KeyboardInputState&>(state);
-    const std::map<KeyboardKey, ProControllerDeltas>& map = m_data->m_keyboard_mapping;
-
-//    cout << "keys() = " << lstate.keys().size() << endl;
-
-    for (KeyboardKey key : lstate.keys()){
-        auto iter = map.find(key);
-        if (iter != map.end()){
-            deltas += iter->second;
-        }
-    }
-
     ProControllerState controller_state;
-    deltas.to_state(controller_state);
+    if (state.type() == ControllerInputType::StandardGamepad){
+        controller_state = static_cast<const GamepadInputState&>(state).controller_state;
+    }else{
+        const KeyboardInputState& lstate = static_cast<const KeyboardInputState&>(state);
+        const std::map<KeyboardKey, ProControllerDeltas>& map = m_data->m_keyboard_mapping;
+
+    //    cout << "keys() = " << lstate.keys().size() << endl;
+
+        for (KeyboardKey key : lstate.keys()){
+            auto iter = map.find(key);
+            if (iter != map.end()){
+                deltas += iter->second;
+            }
+        }
+
+        deltas.to_state(controller_state);
+    }
 
     WallClock timestamp;
     if (controller_state.is_neutral()){

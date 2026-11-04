@@ -208,7 +208,7 @@ jobs:
           cd Arduino-Source/SerialPrograms
           mkdir bin
           cd bin
-          cmake .. -DQT_MAJOR:STRING=6 ${{env.CMAKE_ADDITIONAL_FLAGS}}
+          cmake .. -DQT_MAJOR:STRING=6 -DPA_GAMEPAD=ON ${{env.CMAKE_ADDITIONAL_FLAGS}}
           # By default Ninja reads each compile's .d dependency file into its own database, then deletes it.
           # To keep them for the downstream clang-query cache (see .github/scripts/clang-query-cached.py), add
           # -d keepdepfile

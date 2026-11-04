@@ -13,6 +13,12 @@ sudo apt install libopencv-dev
 ```
 
 
+## Optional gamepad support
+
+Gamepad support is disabled by default. To enable it, first install SDL 3.2 or newer with its development headers and CMake package. On Ubuntu 26.04, use `sudo apt install libsdl3-dev`. If your Ubuntu version's repositories do not provide SDL 3.2 or newer, follow the [SDL installation instructions](https://wiki.libsdl.org/SDL3/Installation).
+
+Add `-DPA_GAMEPAD=ON` to your CMake configure command, or set `PA_GAMEPAD` to `ON` in Qt Creator's CMake build settings, then reconfigure and rebuild.
+
 ## Install Qt 6.8.2:
 
 1. Download the online installer from here: https://www.qt.io/download-qt-installer

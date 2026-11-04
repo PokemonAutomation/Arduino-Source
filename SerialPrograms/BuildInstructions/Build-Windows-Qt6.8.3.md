@@ -50,6 +50,10 @@ If you are unable or unwilling to use the online installer, the alternative is t
 
 \*This Qt6 standalone file is 3GB in size and is being hosted by our staff for our own developers. We don't want the entire world converging here and overrunning the server.
 
+## Optional gamepad support
+
+To enable gamepad input, set the `PA_GAMEPAD` CMake variable to `ON` in Qt Creator's project build settings, then reconfigure and rebuild. For command-line builds, add `-DPA_GAMEPAD=ON` to the configure command.
+
 ## Setup:
 
 1. Clone this repo.

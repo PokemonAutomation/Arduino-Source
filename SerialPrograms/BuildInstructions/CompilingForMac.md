@@ -150,6 +150,14 @@ OpenCV is a software package for various computer vision algorithms. We need it 
 brew install opencv
 ```
 
+### Install SDL 3 (optional gamepad support)
+
+Gamepad input is disabled by default. To enable it, install [SDL 3](https://formulae.brew.sh/formula/sdl3) (version 3.2 or newer) before configuring the program:
+
+```sh
+brew install sdl3
+```
+
 ### Install DPP (optional)
 DPP is a library for Discord integration. If you need discord webhooks for notification you need to install it.
 You can do this step after [Part 3: Download Codebase](#part-3-download-codebase).
@@ -270,6 +278,8 @@ Execute the command in Terminal:
 ```
 cmake ../SerialPrograms/ -G Ninja -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/6.10.2/macos
 ```
+For gamepad support, append `-DPA_GAMEPAD=ON` to the command above after installing SDL 3. Keep the Qt path and other options. Use `-DPA_GAMEPAD=OFF` to disable it again.
+
 This command uses CMake to configure our code to prepare for compilation. `-G Ninja` tells CMake to compile with Ninja, and `-DCMAKE_PREFIX_PATH` tells CMake where the Qt you installed is. If successful, it should print texts like
 ```
 ...

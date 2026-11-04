@@ -5,6 +5,9 @@
  */
 
 #include <vector>
+#ifdef PA_GAMEPAD
+#include "Gamepad/GlobalGamepadTracker.h"
+#endif
 #include "Keyboard/GlobalKeyboardHidTracker.h"
 #include "ControllerInput.h"
 
@@ -20,6 +23,9 @@ public:
         //
 
         m_input_sources.emplace_back(&global_keyboard_tracker());
+#ifdef PA_GAMEPAD
+        m_input_sources.emplace_back(&global_gamepad_tracker());
+#endif
 
     }
 
