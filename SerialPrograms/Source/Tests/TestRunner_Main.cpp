@@ -8,11 +8,10 @@
  *  So it can run while SerialPrograms is open on the same computer.
  *
  *  Usage:
- *      SerialProgramsTests [--filter <text>]... [--list] [--augment-color-distortions]
+ *      SerialProgramsTests [--filter <text>]... [--augment-color-distortions]
  *
  *  --filter <text>                 Select the tests whose names contain <text>. Repeat it to
  *                                  select the tests that match any of them. Default: all tests.
- *  --list                          Print the names of the selected tests instead of running them.
  *  --augment-color-distortions     Also run the image tests with color distortions.
  *
  *  Exit code: the number of failed tests (at most 254), or 255 for a bad argument or when no
@@ -57,7 +56,6 @@ constexpr size_t MAX_FAILURE_EXIT_CODE = 254;
 struct TestRunnerArguments{
     //  Views of argv, which outlives every use.
     std::vector<std::string_view> filters;
-    bool list = false;
     bool augment_color_distortions = false;
 };
 
@@ -68,13 +66,11 @@ std::optional<TestRunnerArguments> parse_arguments(int argc, char* argv[]){
         const std::string_view arg = argv[i];
         if (arg == "--filter" && i + 1 < argc){
             arguments.filters.emplace_back(argv[++i]);
-        }else if (arg == "--list"){
-            arguments.list = true;
         }else if (arg == "--augment-color-distortions"){
             arguments.augment_color_distortions = true;
         }else{
             std::cerr << "Unknown or incomplete argument: " << arg << "\n"
-                << "Usage: SerialProgramsTests [--filter <text>]... [--list] [--augment-color-distortions]"
+                << "Usage: SerialProgramsTests [--filter <text>]... [--augment-color-distortions]"
                 << std::endl;
             return std::nullopt;
         }
@@ -104,13 +100,6 @@ int run_tests(const TestRunnerArguments& arguments){
     if (names.empty()){
         std::cerr << "No test matches the filters." << std::endl;
         return EXIT_BAD_ARGUMENTS;
-    }
-    if (arguments.list){
-        for (const std::string& name : names){
-            std::cout << name << "\n";
-        }
-        std::cout << names.size() << " tests" << std::endl;
-        return 0;
     }
 
     Logger& logger = global_logger_command_line();

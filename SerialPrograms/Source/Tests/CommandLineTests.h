@@ -6,7 +6,7 @@
  *
  *  How to run:
  *  Run the SerialProgramsTests executable (Tests/TestRunner_Main.cpp): it runs only the tests,
- *  with no GUI, no settings and no device scans, and takes "--filter <text>" and "--list".
+ *  with no GUI, no settings and no device scans, and takes "--filter <text>".
  *  Or launch the program with the argument "--command-line-test-mode", or set
  *  "20-GlobalSettings": "COMMAND_LINE_TESTS": "RUN" to true in SerialPrograms-Settings.json.
  *
