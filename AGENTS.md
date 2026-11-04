@@ -126,6 +126,11 @@ migrate a file to the wrappers when you're already touching it and it's straight
     Windows/Linux; `~/Library/Application Support/SerialPrograms/DownloadedResources` on macOS).
   - Headless Linux: `QT_QPA_PLATFORM=offscreen` and
     `TESSDATA_PREFIX=<bin>/Resources/Tesseract`.
+- `SerialProgramsTests` (built by default next to `SerialPrograms`; `-DTEST_RUNNER_EXE=OFF`
+  turns it off) runs the same tests without the GUI, settings or device scans, so it can run
+  while SerialPrograms is open: `ninja SerialProgramsTests`, then
+  `SerialProgramsTests --filter <text>` (repeatable) or `--list`. Its exit code is the number
+  of failed tests. Same requirements as above.
 - Test framework: test classes derive `UnitTest` (`Common/Cpp/TestRunners/UnitTest.h`) and are
   collected via per-module `add_tests(UnitTestDatabase&)` — see
   `SerialPrograms/Source/Tests/CommandLineTests.h`.

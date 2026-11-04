@@ -63,6 +63,9 @@ find_package(Threads REQUIRED)
 # Define a toggle option (ON by default)
 option(COMMAND_LINE_EXE "Build the optional executable" ON)
 
+# Build SerialProgramsTests, which runs the unit tests without the GUI.
+option(TEST_RUNNER_EXE "Build the unit test executable, SerialProgramsTests" ON)
+
 # Build only the GUI-free core: CoreLib and SerialProgramsCommandLine. This needs
 # no Qt, OpenCV, ONNX Runtime, Tesseract, DPP or Discord SDK, so none of them are
 # searched for.
@@ -334,6 +337,10 @@ if(NOT EXISTS "${DEST_DIR}/Scripts")
         COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Copying scripts"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${SCRIPTS_DIR}" "${DEST_DIR}/Scripts"
     )
+endif()
+
+if(TEST_RUNNER_EXE)
+    include(Source/Tests/TestRunnerExecutable.cmake)
 endif()
 
 if (WIN32)
