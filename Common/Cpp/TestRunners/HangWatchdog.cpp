@@ -349,6 +349,27 @@ void dump_all_thread_stacks_windows(){
                     raw_stderr_write(line, (size_t)line_len);
                 }
 
+                //  The instruction pointer, attributed to a module:
+                {
+                    const ModuleRange* rip_module = nullptr;
+                    for (const ModuleRange& m : modules){
+                        if ((uintptr_t)ctx.Rip >= m.base && (rip_module == nullptr || m.base > rip_module->base)){
+                            rip_module = &m;
+                        }
+                    }
+                    char rip_line[320];
+                    int rip_len = std::snprintf(
+                        rip_line,
+                        sizeof(rip_line),
+                        "    rip  %s + 0x%016llx\n",
+                        rip_module != nullptr ? rip_module->name : "<no module>",
+                        (unsigned long long)(((uintptr_t)ctx.Rip - (rip_module != nullptr ? rip_module->base : 0)))
+                    );
+                    if (rip_len > 0){
+                        raw_stderr_write(rip_line, (size_t)rip_len);
+                    }
+                }
+
                 //  Fallback when the walk produced nothing (in CI the
                 //  build has no PDB, so StackWalk64 often cannot even
                 //  step out of the first kernel wait): scan the top of
@@ -360,7 +381,7 @@ void dump_all_thread_stacks_windows(){
                 //  already identifies where the thread is parked.
                 uintptr_t sp = (uintptr_t)ctx.Rsp;
                 int shown = 0;
-                for (int i = 0; i < 24 && shown < 10; i++){
+                for (int i = 0; i < 128 && shown < 20; i++){
                     UINT64 value;
                     SIZE_T got = 0;
                     if (!::ReadProcessMemory(h_process, (LPCVOID)sp, &value, sizeof(value), &got)
