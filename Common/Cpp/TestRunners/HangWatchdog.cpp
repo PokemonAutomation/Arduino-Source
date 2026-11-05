@@ -223,17 +223,20 @@ void dump_all_thread_stacks_windows(){
     {
         HMODULE handles[1024];
         DWORD needed = 0;
-        if (EnumProcessModulesEx(h_process, handles, sizeof(handles), &needed, FILTER_MODULES_64BIT)){
+        if (EnumProcessModules(h_process, handles, sizeof(handles), &needed)){
             for (DWORD i = 0; i * sizeof(HMODULE) < needed; i++){
-                MODULEINFO mi;
-                if (GetModuleInfo(h_process, handles[i], &mi)){
-                    ModuleRange r;
-                    r.base = (uintptr_t)mi.lpBaseOfDll;
-                    r.size = mi.SizeOfImage;
-                    r.name[0] = '\0';
-                    GetModuleBaseNameA(h_process, handles[i], r.name, sizeof(r.name));
-                    modules.push_back(r);
+                ModuleRange r;
+                r.base = (uintptr_t)handles[i];
+                r.size = 0;
+                r.name[0] = '\0';
+                GetModuleBaseNameA(h_process, handles[i], r.name, sizeof(r.name));
+                IMAGEHLP_MODULE64 mod;
+                std::memset(&mod, 0, sizeof(mod));
+                mod.SizeOfStruct = sizeof(mod);
+                if (SymGetModuleInfo64(h_process, (DWORD64)r.base, &mod)){
+                    r.size = mod.SizeOfImage;
                 }
+                modules.push_back(r);
             }
         }
     }
@@ -366,7 +369,7 @@ void dump_all_thread_stacks_windows(){
                 uintptr_t sp = (uintptr_t)ctx.Rsp;
                 int shown = 0;
                 for (int i = 0; i < 24 && shown < 10; i++){
-                    QWORD value;
+                    UINT64 value;
                     SIZE_T got = 0;
                     if (!::ReadProcessMemory(h_process, (LPCVOID)sp, &value, sizeof(value), &got)
                         || got != sizeof(value)){
