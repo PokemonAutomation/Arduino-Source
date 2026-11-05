@@ -18,3 +18,9 @@ add_dependencies(SerialProgramsCommandLine CoreLib)
 # Apply common GUI-free target properties (includes, compile flags, etc.)
 # This function is defined in cmake/CoreLib.cmake
 pa_apply_gui_free_target_properties(SerialProgramsCommandLine)
+
+# As for SerialPrograms: let HangWatchdog's dladdr()-based stack
+# symbolization name frames in this executable.
+if (UNIX AND NOT APPLE)
+    target_link_options(SerialProgramsCommandLine PRIVATE -rdynamic)
+endif()

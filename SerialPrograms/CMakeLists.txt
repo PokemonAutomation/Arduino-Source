@@ -283,6 +283,13 @@ endfunction()
 apply_common_target_properties(SerialProgramsLib)
 apply_common_target_properties(SerialPrograms)
 
+# Export the full symbol table into the dynamic symbol table on Linux,
+# so HangWatchdog's dladdr()-based stack symbolization can name frames in
+# the executable even in builds without debug info.
+if (UNIX AND NOT APPLE)
+    target_link_options(SerialPrograms PRIVATE -rdynamic)
+endif()
+
 if(MSVC)
     set_source_files_properties("../3rdParty-Core/miniz-3.1.1/miniz.c" PROPERTIES COMPILE_FLAGS "/W0")
 else()

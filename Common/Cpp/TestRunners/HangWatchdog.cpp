@@ -32,6 +32,8 @@
 #include <signal.h>
 #include <unistd.h>
 #include <execinfo.h>
+#include <dlfcn.h>
+#include <cxxabi.h>
 
 #if defined(__linux__)
 #include <dirent.h>
@@ -274,9 +276,9 @@ void dump_all_thread_stacks_windows(){
                     &sf,
                     &ctx,
                     nullptr,
+                    SymGetModuleBase64,    #  GetModuleBase
                     nullptr,
-                    SymGetModuleBase64,
-                    nullptr
+                    nullptr                 #  KnContext
                 )
             ){
                 if (sf.AddrPC.Offset == 0){
@@ -310,7 +312,19 @@ void dump_all_thread_stacks_windows(){
                 depth++;
             }
             if (depth == 0){
-                raw_stderr_line("    (no frames captured)\n");
+                //  Diagnostics: report why the walk produced nothing.
+                DWORD last_error = ::GetLastError();
+                char line[256];
+                int line_len = std::snprintf(
+                    line,
+                    sizeof(line),
+                    "    (no frames captured; StackWalk64 error %lu, Rip 0x%016llX)\n",
+                    (unsigned long)last_error,
+                    (unsigned long long)ctx.Rip
+                );
+                if (line_len > 0){
+                    raw_stderr_write(line, (size_t)line_len);
+                }
             }
             captured++;
         }
@@ -427,6 +441,67 @@ static void hang_signal_handler(int){
     g_in_handler = false;
 }
 
+//  Scheduling policy/priority of a thread in the process, via
+//  pidfd_open() + sched_getattr(). Declared by hand (the sandbox
+//  toolchain ships a reduced glibc header set without <sys/sched.h>;
+//  the symbols are in glibc >= 2.30/2.34, which every CI image has).
+#if defined(__linux__)
+struct sched_attr_min{
+    uint32_t size;
+    uint32_t sched_policy;
+    uint64_t sched_flags;
+    int32_t sched_nice;
+    int32_t sched_priority;
+    uint64_t sched_runtime;
+    uint64_t sched_deadline;
+    uint64_t sched_period;
+};
+//  Syscall numbers (stable across kernel and glibc versions; the sandbox
+//  ships a reduced glibc without sched_getattr, so call the kernel
+//  directly).
+#if defined(__aarch64__)
+    static const long sys_pidfd_open_nr = 434;
+    static const long sys_sched_getattr_nr = 416;
+#elif defined(__x86_64__)
+    static const long sys_pidfd_open_nr = 434;
+    static const long sys_sched_getattr_nr = 310;
+#else
+    static const long sys_pidfd_open_nr = -1;
+    static const long sys_sched_getattr_nr = -1;
+#endif
+void thread_sched_info(uintptr_t tid, char* buf, size_t n){
+    if (sys_sched_getattr_nr < 0){
+        std::snprintf(buf, n, "sched=?");
+        return;
+    }
+    int pidfd = (int)syscall(sys_pidfd_open_nr, (long)tid, 0L);
+    if (pidfd < 0){
+        std::snprintf(buf, n, "sched=?");
+        return;
+    }
+    struct sched_attr_min attr;
+    std::memset(&attr, 0, sizeof(attr));
+    attr.size = sizeof(attr);
+    int ret = (int)syscall(sys_sched_getattr_nr, (long)pidfd, (long)&attr, (long)sizeof(attr), 0L);
+    ::close(pidfd);
+    if (ret != 0){
+        std::snprintf(buf, n, "sched=?");
+        return;
+    }
+    const char* policy = "OTHER";
+    if (attr.sched_policy == 2){
+        policy = "RR";
+    }else if (attr.sched_policy == 1){
+        policy = "FIFO";
+    }
+    std::snprintf(buf, n, "sched=%s prio=%d nice=%d", policy, (int)attr.sched_priority, (int)attr.sched_nice);
+}
+#else
+void thread_sched_info(uintptr_t, char* buf, size_t n){
+    std::snprintf(buf, n, "");
+}
+#endif
+
 std::vector<uintptr_t> enumerate_thread_ids(){
     std::vector<uintptr_t> ret;
     #if defined(__linux__)
@@ -521,18 +596,63 @@ void dump_all_thread_stacks_posix(){
         if (!s.done.load(std::memory_order_acquire)){
             continue;
         }
-        char header[80];
+        #if defined(__linux__)
+            char sched[160] = "";
+            thread_sched_info(s.tid, sched, sizeof(sched));
+        #else
+            const char* sched = "";
+        #endif
+        char header[320];
         int len = std::snprintf(
             header,
             sizeof(header),
-            "\n===== Thread 0x%lx =====\n",
-            (unsigned long)s.tid
+            "\n===== Thread 0x%lx (%s) =====\n",
+            (unsigned long)s.tid,
+            sched
         );
         if (len > 0){
             raw_stderr_write(header, (size_t)len);
         }
-        //  Writes one symbolized frame per line, straight to fd 2.
-        backtrace_symbols_fd(s.frames, s.n, 2);
+        //  Resolve each frame with dladdr(): the CI binaries keep
+        //  their symbol tables (the build only drops -g/PDBs), so
+        //  this names the function even without debug info.
+        for (int f = 0; f < s.n; f++){
+            Dl_info info;
+            const char* sym = "??";
+            char* demangled = nullptr;
+            const char* module = "??";
+            uintptr_t offset = 0;
+            if (::dladdr(s.frames[f], &info)){
+                if (info.dli_sname != nullptr){
+                    sym = info.dli_sname;
+                    demangled = abi::__cxa_demangle(sym, nullptr, nullptr, nullptr);
+                    if (demangled != nullptr){
+                        sym = demangled;
+                    }
+                }
+                if (info.dli_fname != nullptr){
+                    module = info.dli_fname;
+                }
+                if (info.dli_saddr != nullptr){
+                    offset = (uintptr_t)s.frames[f] - (uintptr_t)info.dli_saddr;
+                }
+            }
+            char line[700];
+            int line_len = std::snprintf(
+                line,
+                sizeof(line),
+                "    #%02d  %s (+0x%lx)  [%s] @ 0x%lx\n",
+                f,
+                sym,
+                (unsigned long)offset,
+                module,
+                (unsigned long)(uintptr_t)s.frames[f]
+            );
+            if (line_len > 0){
+                raw_stderr_write(line, (size_t)line_len);
+            }
+            ::free(demangled);
+        }
     }
 
     if (n < expected){
