@@ -8,6 +8,7 @@
 #define PokemonAutomation_ServerSocket_POSIX_H
 
 #include <string>
+#include <vector>
 #include <atomic>
 #include <chrono>
 #include "Common/Cpp/Concurrency/AsyncTask.h"
@@ -52,8 +53,14 @@ public:
 
 private:
 
-    void accept_thread_loop(std::string address, uint16_t port);
+    void accept_thread_loop(std::string address, uint16_t port, uint64_t generation);
     void connection_thread_loop();
+
+    //  "on_listen_finished" callback, but only for a task that still owns
+    //  the server. A task whose generation is stale (a newer start() ran
+    //  while it was still starting up) must stay silent, or its result
+    //  would corrupt the attempt that replaced it.
+    void report_listen_finished(uint64_t generation, const std::string& error);
 
 
 private:
@@ -63,17 +70,28 @@ private:
     bool m_starting = false;
     int m_closing = 0;
 
-    //  Protects m_accept_thread and m_client_thread. Kept separate from
-    //  m_lock: assigning to a task slot destroys the previous task's
-    //  AsyncTask, and its destructor waits for that task to finish - which
-    //  requires m_lock, so the two locks must never be held at once.
+    //  Increments on every start(). The accept task captures its own
+    //  generation so that a task left behind by a timed-out attempt can
+    //  tell it was replaced when it finally gets scheduled.
+    uint64_t m_generation = 0;
+
+    //  Protects m_accept_threads and m_client_thread. Kept separate from
+    //  m_lock because the task's lifetime interacts with it: joining a
+    //  task waits for it to exit, and exiting requires m_lock. Holding
+    //  m_lock while a task slot is destroyed would deadlock, so slot
+    //  operations happen under m_task_lock with m_lock released.
     Mutex m_task_lock;
 
     int m_listen = -1;
     int m_client = -1;
     bool m_close_requested = false;
 
-    AsyncTask m_accept_thread;
+    //  One task per start() call. start() must never destroy the previous
+    //  task's AsyncTask here: its destructor blocks until the task has
+    //  finished, and a task from an earlier attempt may still be running
+    //  (the caller's wait timed out while the pool was starved). close()
+    //  joins the whole list.
+    std::vector<AsyncTask> m_accept_threads;
     AsyncTask m_client_thread;
 };
 
