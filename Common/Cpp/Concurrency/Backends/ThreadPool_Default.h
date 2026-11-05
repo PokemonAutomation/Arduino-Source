@@ -47,6 +47,15 @@ public:
     }
     virtual WallDuration cpu_time() const override;
 
+    virtual size_t queued_tasks() const override{
+        std::lock_guard<Mutex> lg(m_lock);
+        return m_queue.size();
+    }
+    virtual size_t busy_threads() const override{
+        std::lock_guard<Mutex> lg(m_lock);
+        return m_busy_count;
+    }
+
 
 public:
     [[nodiscard]] virtual AsyncTask dispatch(std::function<void()>&& func) override;

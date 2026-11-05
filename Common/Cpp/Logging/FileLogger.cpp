@@ -4,7 +4,9 @@
  *
  */
 
+#include <chrono>
 #include <iostream>
+#include <thread>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Filesystem/FilePath.h"
 #include "Common/Cpp/Filesystem/Filesystem.h"
@@ -37,6 +39,23 @@ FileLogger::FileLogger(ThreadPool& thread_pool, FileLoggerConfig config)
 FileLogger::~FileLogger(){
     stop();
 }
+size_t FileLogger::pending_count() const{
+    //  std::mutex has no try_lock_for, so poll try_lock() for up to ~500ms.
+    //  The flusher only ever holds the lock briefly (file I/O happens outside
+    //  of it), so this essentially never times out; the timeout is there so the
+    //  diagnostic itself can never deadlock behind a stuck flusher.
+    std::unique_lock<Mutex> lg(m_lock, std::defer_lock);
+    for (int i = 0; i < 50; i++){
+        if (lg.try_lock()){
+            return m_queue.size();
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    return (size_t)-1;
+}
+
+
+
 void FileLogger::stop() noexcept{
     if (!m_thread){
         return;
