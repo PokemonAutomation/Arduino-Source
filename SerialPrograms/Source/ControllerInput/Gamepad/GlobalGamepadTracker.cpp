@@ -35,7 +35,10 @@ void GamepadTracker::start(){
     // Qt owns the window/event loop. SDL only owns joystick input.
     SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
     if (!SDL_InitSubSystem(SDL_INIT_GAMEPAD)){
-        global_logger_tagged().log(std::string("Gamepad initialization failed: ") + SDL_GetError());
+        global_logger_tagged().log(
+            std::string("Gamepad initialization failed: ") + SDL_GetError(),
+            COLOR_RED
+        );
         return;
     }
     m_initialized = true;
@@ -110,7 +113,8 @@ void GamepadTracker::thread_loop(){
         }
         std::unique_lock<Mutex> lock(m_sleep_lock);
         if (!m_stopping.load(std::memory_order_acquire)){
-            m_cv.wait_for(lock, std::chrono::milliseconds(8));
+            auto wake = pad ? now + std::chrono::milliseconds(8) : discover;
+            m_cv.wait_until(lock, wake);
         }
     }
     if (pad){

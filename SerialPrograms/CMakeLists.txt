@@ -874,6 +874,9 @@ if (WIN32)
 
     # Copy 3rd party DLLs if missing/different
     file(GLOB THIRD_PARTY_DLLS "${REPO_ROOT_DIR}/3rdPartyBinaries/*.dll")
+    if (NOT PA_GAMEPAD)
+        list(REMOVE_ITEM THIRD_PARTY_DLLS "${REPO_ROOT_DIR}/3rdPartyBinaries/SDL3.dll")
+    endif()
     foreach(DLL IN LISTS THIRD_PARTY_DLLS)
         get_filename_component(DLL_NAME "${DLL}" NAME)
         add_custom_command(
