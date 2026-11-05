@@ -275,10 +275,10 @@ void dump_all_thread_stacks_windows(){
                     h_thread,
                     &sf,
                     &ctx,
-                    nullptr,
-                    SymGetModuleBase64,    #  GetModuleBase
-                    nullptr,
-                    nullptr                 #  KnContext
+                    nullptr,              //  ReadProcessMemory
+                    nullptr,              //  GetFunctionTable
+                    SymGetModuleBase64,   //  GetModuleBase
+                    nullptr                 //  TranslateAddress
                 )
             ){
                 if (sf.AddrPC.Offset == 0){
