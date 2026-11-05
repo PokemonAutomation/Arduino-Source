@@ -26,6 +26,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #set(CMAKE_VERBOSE_MAKEFILE ON)
 
+# Compile through ccache when it is installed. See cmake/Ccache.cmake for the options.
+include(cmake/Ccache.cmake)
+
 # Set these three on globally so all intermediate Qt targets can get processed automatically
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
