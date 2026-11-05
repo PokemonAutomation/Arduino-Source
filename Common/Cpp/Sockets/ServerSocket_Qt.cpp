@@ -57,8 +57,8 @@ void ServerSocket_Qt::start(const std::string& address, uint16_t port){
         m_listeners.run_method(&Listener::on_listen_finished, "Failed to start the listener.");
         throw;
     }
-    bool listening;
-    bool destructing;
+    bool listening = false;
+    bool destructing = false;
     {
         std::lock_guard<Mutex> lg(m_lock);
         m_starting = false;
