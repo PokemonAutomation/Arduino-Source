@@ -23,6 +23,7 @@
 #if defined(_WIN32)
 
 #include <windows.h>
+#include <psapi.h>
 #include <dbghelp.h>
 #pragma comment(lib, "dbghelp.lib")
 
@@ -210,6 +211,33 @@ void dump_all_thread_stacks_windows(){
     SymSetOptions(SymGetOptions() | SYMOPT_UNDNAME);
     SymInitialize(h_process, nullptr, TRUE);
 
+    //  Loaded module ranges: used by the stack-peek fallback below
+    //  to name the module of candidate return addresses when
+    //  StackWalk64 cannot produce frames (no PDB in CI).
+    struct ModuleRange{
+        uintptr_t base;
+        size_t size;
+        char name[64];
+    };
+    std::vector<ModuleRange> modules;
+    {
+        HMODULE handles[1024];
+        DWORD needed = 0;
+        if (EnumProcessModulesEx(h_process, handles, sizeof(handles), &needed, FILTER_MODULES_64BIT)){
+            for (DWORD i = 0; i * sizeof(HMODULE) < needed; i++){
+                MODULEINFO mi;
+                if (GetModuleInfo(h_process, handles[i], &mi)){
+                    ModuleRange r;
+                    r.base = (uintptr_t)mi.lpBaseOfDll;
+                    r.size = mi.SizeOfImage;
+                    r.name[0] = '\0';
+                    GetModuleBaseNameA(h_process, handles[i], r.name, sizeof(r.name));
+                    modules.push_back(r);
+                }
+            }
+        }
+    }
+
     std::vector<DWORD> tids;
     {
         std::lock_guard<Mutex> lg(g_registry_lock_windows);
@@ -324,6 +352,60 @@ void dump_all_thread_stacks_windows(){
                 );
                 if (line_len > 0){
                     raw_stderr_write(line, (size_t)line_len);
+                }
+
+                //  Fallback when the walk produced nothing (in CI the
+                //  build has no PDB, so StackWalk64 often cannot even
+                //  step out of the first kernel wait): scan the top of
+                //  the suspended thread's stack and report, for each
+                //  candidate value that points into executable memory,
+                //  which loaded module it is in. No function names are
+                //  possible without symbols, but the module pattern
+                //  (e.g. SerialPrograms.exe / Qt6Network.dll / ntdll.dll)
+                //  already identifies where the thread is parked.
+                uintptr_t sp = (uintptr_t)ctx.Rsp;
+                int shown = 0;
+                for (int i = 0; i < 24 && shown < 10; i++){
+                    QWORD value;
+                    SIZE_T got = 0;
+                    if (!::ReadProcessMemory(h_process, (LPCVOID)sp, &value, sizeof(value), &got)
+                        || got != sizeof(value)){
+                        break;
+                    }
+                    sp += sizeof(value);
+                    if (value == 0){
+                        continue;
+                    }
+                    MEMORY_BASIC_INFORMATION mbi;
+                    if (::VirtualQueryEx(h_process, (LPCVOID)value, &mbi, sizeof(mbi)) != sizeof(mbi)){
+                        continue;
+                    }
+                    if (mbi.State != MEM_COMMIT){
+                        continue;
+                    }
+                    const DWORD protect = mbi.Protect & 0xFF;
+                    if ((protect & (PAGE_EXECUTE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE)) == 0){
+                        continue;
+                    }
+                    for (const ModuleRange& m : modules){
+                        if (value >= m.base && value < m.base + (uintptr_t)m.size){
+                            char peek[320];
+                            int peek_len = std::snprintf(
+                                peek,
+                                sizeof(peek),
+                                "    stack[%02d]  %s + 0x%016llx  (0x%016llx)\n",
+                                shown,
+                                m.name,
+                                (unsigned long long)(value - m.base),
+                                (unsigned long long)value
+                            );
+                            if (peek_len > 0){
+                                raw_stderr_write(peek, (size_t)peek_len);
+                            }
+                            shown++;
+                            break;
+                        }
+                    }
                 }
             }
             captured++;
