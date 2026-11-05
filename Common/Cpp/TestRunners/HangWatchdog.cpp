@@ -216,7 +216,6 @@ void dump_all_thread_stacks_windows(){
     //  StackWalk64 cannot produce frames (no PDB in CI).
     struct ModuleRange{
         uintptr_t base;
-        size_t size;
         char name[64];
     };
     std::vector<ModuleRange> modules;
@@ -227,15 +226,8 @@ void dump_all_thread_stacks_windows(){
             for (DWORD i = 0; i * sizeof(HMODULE) < needed; i++){
                 ModuleRange r;
                 r.base = (uintptr_t)handles[i];
-                r.size = 0;
                 r.name[0] = '\0';
                 GetModuleBaseNameA(h_process, handles[i], r.name, sizeof(r.name));
-                IMAGEHLP_MODULE64 mod;
-                std::memset(&mod, 0, sizeof(mod));
-                mod.SizeOfStruct = sizeof(mod);
-                if (SymGetModuleInfo64(h_process, (DWORD64)r.base, &mod)){
-                    r.size = mod.SizeOfImage;
-                }
                 modules.push_back(r);
             }
         }
@@ -390,23 +382,28 @@ void dump_all_thread_stacks_windows(){
                     if ((protect & (PAGE_EXECUTE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE)) == 0){
                         continue;
                     }
+                    const ModuleRange* match = nullptr;
                     for (const ModuleRange& m : modules){
-                        if (value >= m.base && value < m.base + (uintptr_t)m.size){
+                        if (value >= m.base && (match == nullptr || m.base > match->base)){
+                            match = &m;
+                        }
+                    }
+                    if (match != nullptr){
+                        {
                             char peek[320];
                             int peek_len = std::snprintf(
                                 peek,
                                 sizeof(peek),
                                 "    stack[%02d]  %s + 0x%016llx  (0x%016llx)\n",
                                 shown,
-                                m.name,
-                                (unsigned long long)(value - m.base),
+                                match->name,
+                                (unsigned long long)(value - match->base),
                                 (unsigned long long)value
                             );
                             if (peek_len > 0){
                                 raw_stderr_write(peek, (size_t)peek_len);
                             }
                             shown++;
-                            break;
                         }
                     }
                 }
