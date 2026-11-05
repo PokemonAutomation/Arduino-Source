@@ -130,16 +130,30 @@ bool ProController::run_string_command(Milliseconds duration, const std::string&
 void ProController::run_controller_input(const ControllerInputState& state){
 //    cout << "run_controller_input()" << endl;
 
-    if (state.type() != ControllerInputType::HID_Keyboard && state.type() != ControllerInputType::StandardGamepad){
-        return;
+    const auto execute_state = [this](const ProControllerState& controller_state){
+        WallClock timestamp;
+        if (controller_state.is_neutral()){
+            timestamp = current_time();
+            cancel_all_commands();
+        }else{
+            replace_on_next_command();
+
+            timestamp = current_time();
+            controller_state.execute(nullptr, false, *this, 2000ms);
+        }
+
+        on_command_input(timestamp, controller_state);
+    };
+
+    switch (state.type()){
+    case ControllerInputType::StandardGamepad:{
+        const ProControllerState& controller_state = static_cast<const GamepadInputState&>(state).controller_state;
+        execute_state(controller_state);
+        break;
     }
-
-    ProControllerDeltas deltas;
-
-    ProControllerState controller_state;
-    if (state.type() == ControllerInputType::StandardGamepad){
-        controller_state = static_cast<const GamepadInputState&>(state).controller_state;
-    }else{
+    case ControllerInputType::HID_Keyboard:{
+        ProControllerState controller_state;
+        ProControllerDeltas deltas;
         const KeyboardInputState& lstate = static_cast<const KeyboardInputState&>(state);
         const std::map<KeyboardKey, ProControllerDeltas>& map = m_data->m_keyboard_mapping;
 
@@ -153,20 +167,12 @@ void ProController::run_controller_input(const ControllerInputState& state){
         }
 
         deltas.to_state(controller_state);
+        execute_state(controller_state);
+        break;
     }
-
-    WallClock timestamp;
-    if (controller_state.is_neutral()){
-        timestamp = current_time();
-        cancel_all_commands();
-    }else{
-        replace_on_next_command();
-
-        timestamp = current_time();
-        controller_state.execute(nullptr, false, *this, 2000ms);
+    default:
+        return;
     }
-
-    on_command_input(timestamp, controller_state);
 }
 
 
