@@ -68,9 +68,6 @@ std::string make_missing_living_dex_report(
 
 std::vector<LivingDexEntry> load_living_dex_template(const std::string& path);
 
-
-enum class BoxSelectionMode;
-
 struct BoxOrganizationScan{
     std::vector<std::optional<Pokemon::CollectedPokemonInfo>> boxes_data;
     Pokemon::BoxCursor cursor;
