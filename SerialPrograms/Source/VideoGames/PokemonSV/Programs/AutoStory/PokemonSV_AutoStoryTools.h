@@ -148,13 +148,13 @@ bool confirm_marker_present(
 );
 
 // align player orientation based on the alignment mode
-// The direction is specified by (x, y):
-// x = 0 : left
-// x = 128 : neutral
-// x = 255 : right
-// y = 0 : up
-// y = 128 : neutral
-// y = 255 : down
+// The direction is specified by (x, y) with floating point values in [-1, +1]:
+// x = -1 : left
+// x = 0 : neutral
+// x = +1 : right
+// y = -1 : down
+// y = 0 : neutral
+// y = +1 : up
 // - REALIGN_NEW_MARKER: place down a map marker, which will align the player towards the marker
 // location of the marker is set with move_x, move_y, move_duration
 // - REALIGN_OLD_MARKER: assuming a marker is already set, open and close the map, 
@@ -403,7 +403,7 @@ void checkpoint_reattempt_loop_tutorial(
 );
 
 
-// walk forward forward_ticks. repeat this for num_rounds.
+// walk forward for forward_duration. repeat this for num_rounds.
 // if detect battle, kill the Pokemon. then continue. If we run into a battle, this round is considered to be done and will not be repeated.
 // NOTE: mashing A and Let's go aren't compatible. you end up talking to your Let's go pokemon if you mash A.
 void move_player_forward(
@@ -420,7 +420,7 @@ void move_player_forward(
 );
 
 // move forward until detected object is a certain width and height on screen (min_size)
-// walk forward forward_ticks each time
+// walk forward for forward_duration each time
 // if caught in battle, run recovery_action
 // throw exception if forward_move_count is above 50.
 // throw exception if never detected yolo object
@@ -437,7 +437,7 @@ void move_forward_until_yolo_object_above_min_size(
     Milliseconds delay_after_lets_go = Milliseconds(840)
 );
 
-// walk forward forward_ticks each time
+// walk forward for forward_duration each time
 // walk until we find the target object.
 // if caught in battle, run recovery_action
 // throw exception if exceed max_rounds.
@@ -455,7 +455,7 @@ void move_player_until_yolo_object_detected(
     Milliseconds delay_after_lets_go = Milliseconds(840)
 );
 
-// walk forward forward_ticks each time
+// walk forward for forward_duration each time
 // walk until we no longer see the target object. and haven't seen `it times_not_seen_threshold` times.
 // if caught in battle, run recovery_action
 // throw exception if exceed max_rounds.
