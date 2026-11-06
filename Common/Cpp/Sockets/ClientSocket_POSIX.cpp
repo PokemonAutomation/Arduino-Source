@@ -50,6 +50,23 @@ void ClientSocket_POSIX::close() noexcept{
         m_cv.notify_all();
     }
 }
+void ClientSocket_POSIX::abort() noexcept{
+    //  Non-blocking teardown, safe to call from the receive thread. "close()"
+    //  waits for the receive thread to exit and so must not run from a
+    //  listener callback; this instead just flips the state and releases the
+    //  socket. The receive thread's next iteration sees DESTRUCTING (or the
+    //  missing socket) and exits on its own. The socket is left DESTRUCTING;
+    //  a later close() returns it to NOT_RUNNING.
+    {
+        std::lock_guard<Mutex> lg(m_lock);
+        if (m_state.load(std::memory_order_relaxed) == State::NOT_RUNNING && !m_thread){
+            return;
+        }
+        m_state.store(State::DESTRUCTING, std::memory_order_release);
+        close_socket_locked();
+    }
+    m_cv.notify_all();
+}
 
 void ClientSocket_POSIX::connect(const std::string& address, uint16_t port){
     std::string error;

@@ -88,6 +88,33 @@ struct ClientListener : AbstractClientSocket::Listener{
 };
 
 
+//  A client listener that tears the connection down from within its own
+//  on_receive_data() callback via abort() - the exact scenario sys-botbase
+//  hits when it detects an oversized line. close() would deadlock here (it
+//  waits for this very receive thread to exit); abort() must return promptly.
+struct AbortingClientListener : AbstractClientSocket::Listener{
+    Waiter waiter;
+    std::atomic<int> connect_finished{0};
+    std::string last_connect_error;
+    std::atomic<int> aborted_in_callback{0};
+    //  Set to the owning client after construction; on_receive_data only
+    //  fires once connected and receiving, so it is valid by then.
+    AbstractClientSocket* client = nullptr;
+
+    virtual void on_connect_finished(const std::string& error_message) override{
+        connect_finished++;
+        last_connect_error = error_message;
+        waiter.notify();
+    }
+
+    virtual void on_receive_data(const void*, size_t) override{
+        client->abort();
+        aborted_in_callback++;
+        waiter.notify();
+    }
+};
+
+
 struct ServerListener : AbstractServerSocket::Listener{
     Waiter waiter;
     std::atomic<int> listen_finished{0};
@@ -2285,6 +2312,86 @@ public:
 
 
 
+//  Verifies that a ClientSocket can be torn down from within its own
+//  on_receive_data() callback via abort() (the sys-botbase oversized-line
+//  scenario). close() would deadlock there - it waits for this receive
+//  thread to exit - so the abort must return promptly and leave the socket
+//  no longer CONNECTED.
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_Sockets_AbortFromReceiveCallback : public TestSockets<ClientSocketType, ServerSocketType>{
+public:
+    using TestSockets<ClientSocketType, ServerSocketType>::TestSockets;
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        if (timing_unreliable()){
+            return UnitTestResult(
+                UnitTestResult::SKIPPED,
+                "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
+            );
+        }
+        ServerSocketType server(this->m_thread_pool);
+        ServerListener server_listener;
+        server.add_listener(server_listener);
+
+        uint16_t port;
+        if (!this->start_server(server, server_listener, port)){
+            if (timing_unreliable()){
+                return UnitTestResult(
+                    UnitTestResult::SKIPPED,
+                    "The server did not start listening on a starved machine."
+                );
+            }
+            return "Failed to start the server";
+        }
+
+        bool ok = false;
+        std::string error;
+        {
+            ClientSocketType client(this->m_thread_pool);
+            AbortingClientListener client_listener;
+            client_listener.client = &client;
+            client.add_listener(client_listener);
+
+            client.connect("127.0.0.1", port);
+            if (!client_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&client_listener]{ return client_listener.connect_finished.load() >= 1; }
+            )){
+                error = "The client did not finish connecting";
+            }else if (!client_listener.last_connect_error.empty()){
+                error = "The client failed to connect: " + client_listener.last_connect_error;
+            }else if (!server_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&server_listener]{ return server_listener.connected.load() >= 1; }
+            )){
+                error = "The server did not call on_connect";
+            }else if (server.send("ping", 4) != 4){
+                error = "The server did not send the trigger packet";
+            }else if (!client_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&client_listener]{ return client_listener.aborted_in_callback.load() >= 1; }
+            )){
+                error = "abort() did not return from the on_receive_data() callback (it blocked, like close() would)";
+            }else if (client.state() == AbstractClientSocket::State::CONNECTED){
+                error = "After abort() the client is still CONNECTED";
+            }else{
+                //  Now that abort() has stopped the receive thread, close() must
+                //  complete without hanging.
+                client.close();
+                ok = true;
+            }
+        }
+
+        server.close();
+
+        if (!ok && !error.empty()){
+            return error;
+        }
+        return true;
+    }
+};
+
+
 template <typename ClientSocketType, typename ServerSocketType>
 void add_socket_tests(UnitTestDatabase& database, ThreadPool& thread_pool, const char* backend_name){
     const std::string prefix = "Sockets (" + std::string(backend_name) + ") - ";
@@ -2321,6 +2428,9 @@ void add_socket_tests(UnitTestDatabase& database, ThreadPool& thread_pool, const
     );
     database.add<Test_Sockets_CloseConnectionCancelsSend<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "close_connection() cancels an in-flight send"
+    );
+    database.add<Test_Sockets_AbortFromReceiveCallback<ClientSocketType, ServerSocketType>>(
+        thread_pool, prefix + "abort() from the receive callback"
     );
 }
 

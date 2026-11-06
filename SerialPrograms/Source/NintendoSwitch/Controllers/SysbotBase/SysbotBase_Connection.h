@@ -8,6 +8,7 @@
 #define PokemonAutomation_Controllers_SysbotBase_Connection_H
 
 #include <deque>
+#include <vector>
 #include <QUrl>
 #include <QHostAddress>
 #include <QTcpSocket>
@@ -56,6 +57,25 @@ public:
     //
     static bool parse_ping_response(const std::string& str, uint64_t& seqnum);
 
+    //
+    //  Accumulates the next "bytes" of "data" into the current receive line
+    //  "line", emitting each complete line (terminated by '\n') into
+    //  "messages" and clearing "line" for the next. '\r' bytes are ignored.
+    //  A single line is capped at "max_line_bytes": if it would grow past
+    //  that before its '\n', "overflow" is set, "line" is cleared, and no
+    //  further bytes are consumed. Returns the number of bytes consumed from
+    //  "data". This is what stops a peer that streams bytes without a '\n'
+    //  from growing the receive buffer without bound.
+    //
+    static size_t accumulate_receive_line(
+        std::deque<char>& line,
+        std::vector<std::string>& messages,
+        const char* data,
+        size_t bytes,
+        size_t max_line_bytes,
+        bool& overflow
+    );
+
 private:
     void thread_loop();
 
@@ -64,6 +84,7 @@ private:
     virtual void on_disconnect(const std::string& error_message) override;
 
     void process_message(const std::string& message, WallClock timestamp);
+    void on_receive_overflow();
     void set_mode(const std::string& sbb_version);
 
 private:
@@ -92,6 +113,11 @@ private:
 //  Registers unit tests for parse_ping_response().
 //
 void add_tests_SysbotBasePing(UnitTestDatabase& database);
+
+//
+//  Registers unit tests for accumulate_receive_line().
+//
+void add_tests_SysbotBaseReceiveLine(UnitTestDatabase& database);
 
 
 

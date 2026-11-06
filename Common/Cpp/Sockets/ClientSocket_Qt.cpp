@@ -49,6 +49,31 @@ void ClientSocket_Qt::close() noexcept{
     std::lock_guard<Mutex> lg(m_lock);
     m_state.store(State::NOT_RUNNING, std::memory_order_release);
 }
+void ClientSocket_Qt::abort() noexcept{
+    QTcpSocket* socket;
+    {
+        std::lock_guard<Mutex> lg(m_lock);
+        if (m_socket == nullptr){
+            return;
+        }
+        m_state.store(State::DESTRUCTING, std::memory_order_release);
+        m_success_pending = false;
+        socket = m_socket;
+        m_socket = nullptr;
+    }
+    cancel_inflight_sends();
+
+    //  Destroy the socket without blocking, so this is safe to call from a
+    //  listener callback (which runs on the QTcpSocket's event thread).
+    //  remove_object() waits for that event thread to delete the socket, so it
+    //  is dispatched to a worker thread instead of run here. The socket is
+    //  left in State::DESTRUCTING.
+    try{
+        GlobalThreadPools::qt_worker_threadpool().dispatch([socket]{
+            GlobalThreadPools::qt_event_threadpool().remove_object(socket);
+        });
+    }catch (...){}
+}
 void ClientSocket_Qt::connect(const std::string& address, uint16_t port){
     QTcpSocket* old_socket;
     {

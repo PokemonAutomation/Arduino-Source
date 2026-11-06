@@ -72,6 +72,8 @@ public:
     //  socket that is running them.
     virtual void close() noexcept override;
 
+    virtual void abort() noexcept override;
+
     virtual void connect(const std::string& address, uint16_t port) override;
 
     virtual size_t send(
