@@ -61,6 +61,7 @@ public:
     virtual const std::string& boss_ball(
         size_t console_index, const std::string& boss_slug
     ) const = 0;
+    //  boss_slug is empty when the adventure ended without catching the boss.
     virtual CaughtScreenAction end_adventure_action(
         size_t console_index, const std::string& boss_slug,
         const PathStats& path_stats,
