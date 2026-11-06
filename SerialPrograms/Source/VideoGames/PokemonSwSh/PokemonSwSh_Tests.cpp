@@ -12,6 +12,7 @@
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_MainMenuDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
+#include "VideoGames/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State_Tests.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh_Tests.h"
 
@@ -30,6 +31,7 @@ void add_tests(UnitTestDatabase& database){
     NintendoSwitch::PokemonSwSh::add_tests_YCommDetector(database);
     NintendoSwitch::PokemonSwSh::add_tests_SelectionArrowFinder(database);
     NintendoSwitch::PokemonSwSh::MaxLairInternal::add_tests_MaxLairBattleMenuDetector(database);
+    NintendoSwitch::PokemonSwSh::MaxLairInternal::add_tests_MaxLairBossState(database);
 }
 
 

@@ -106,23 +106,14 @@ bool read_battle_menu(
             }
             state.opponent = {state.boss};
         }
-
-        opponent = state.opponent.empty()
-            ? ""
-            : *state.opponent.begin();
     }
     context.wait_for_all_requests();
 
 
-    if (state.wins != 3 && is_boss(opponent)){
+    if (!state.accept_opponent()){
         stream.log("Boss found before 3 wins. Something is seriously out-of-sync.", COLOR_RED);
         dump_image(stream.logger(), MODULE_NAME, "BossBeforeEnd", snapshot);
         return false;
-    }
-
-    //  Infer the boss if we don't know it.
-    if (state.boss.empty() && state.wins == 3){
-        state.boss = opponent;
     }
 
     //  Read misc.
