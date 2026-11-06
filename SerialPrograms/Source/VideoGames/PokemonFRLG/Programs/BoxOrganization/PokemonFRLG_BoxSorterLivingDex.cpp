@@ -12,8 +12,8 @@
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonFRLG_BoxOrganization.h"
-#include "PokemonFRLG_BoxSorterLivingDex.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
+#include "PokemonFRLG_BoxSorterLivingDex.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -28,6 +28,7 @@ BoxSorterLivingDex_Descriptor::BoxSorterLivingDex_Descriptor()
         "Programs/PokemonFRLG/BoxSorterLivingDex.html",
         "Arrange boxes of " + STRING_POKEMON + " into living dex order. Start in Move " + STRING_POKEMON +
         " with an empty hand in the first box to organize. Uses English species names.",
+        PanelQualityStanding::OFFICIAL_BETA,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
