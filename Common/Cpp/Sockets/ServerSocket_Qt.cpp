@@ -23,7 +23,16 @@ void ServerSocket_Qt::start(const std::string& address, uint16_t port){
             (m_state.load(std::memory_order_relaxed) == State::NOT_RUNNING)
             && m_server == nullptr
             && !m_starting;
-        m_starting = true;
+        //  Only claim the "starting" flag when we actually start: a
+        //  rejected call (server already running or already started) must
+        //  not leave "m_starting" true - "close()" waits on
+        //  "!m_starting", so a stale flag would deadlock the destructor.
+        //  (This happens when a test's start-retry loop calls start() on
+        //  a server whose first listen failed: "m_server" is set even on
+        //  a failed listen, so the retry is rejected here.)
+        if (starting){
+            m_starting = true;
+        }
     }
     if (!starting){
         return;
@@ -48,12 +57,15 @@ void ServerSocket_Qt::start(const std::string& address, uint16_t port){
         m_listeners.run_method(&Listener::on_listen_finished, "Failed to start the listener.");
         throw;
     }
-    bool listening;
+    bool listening = false;
+    bool destructing = false;
     {
         std::lock_guard<Mutex> lg(m_lock);
         m_starting = false;
+        destructing =
+            (m_state.load(std::memory_order_relaxed) == State::DESTRUCTING);
         m_server = server;
-        if (m_state.load(std::memory_order_relaxed) == State::DESTRUCTING){
+        if (destructing){
             //  "close()" is already in progress: it will destroy the
             //  server we just created. Leave the state for it.
         }else{
@@ -64,6 +76,19 @@ void ServerSocket_Qt::start(const std::string& address, uint16_t port){
             );
         }
         m_cv.notify_all();
+    }
+
+    if (!destructing && !listening){
+        //  The listen failed. Destroy the server now, leaving the object
+        //  exactly as it was before this start() (no "m_server", state
+        //  NOT_RUNNING), so the caller's start-retry loop can immediately
+        //  try another port. The other backends behave the same: a failed
+        //  listen leaves no listener behind. If "close()" raced us, it has
+        //  already claimed "m_server", and the pool's lookup makes the
+        //  second destruction a no-op.
+        GlobalThreadPools::qt_event_threadpool().remove_object(server);
+        std::lock_guard<Mutex> lg(m_lock);
+        m_server = nullptr;
     }
 
     m_listeners.run_method(&Listener::on_listen_finished, m_listen_error);

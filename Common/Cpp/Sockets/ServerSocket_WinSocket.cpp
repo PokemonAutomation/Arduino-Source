@@ -41,30 +41,38 @@ void ServerSocket_WinSocket::start(const std::string& address, uint16_t port){
     //  run).
     ensure_wsa_started();
 
+    uint64_t generation = 0;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        if (m_state.load(std::memory_order_relaxed) != State::NOT_RUNNING
-            || m_starting){
+        if (m_starting ||
+            m_state.load(std::memory_order_relaxed) != State::NOT_RUNNING
+        ){
             return;
         }
         m_starting = true;
+        m_generation++;
+        generation = m_generation;
     }
 
     //  Use the plain dispatch() rather than dispatch_now_blocking():
     //  start() may be called from a thread that is itself running on
     //  this pool, and blocking here until a pool thread is free could
-    //  deadlock a capped pool. The returned AsyncTask still lets
-    //  close() join the listener thread.
+    //  deadlock a capped pool.
     try{
         AsyncTask task = m_thread_pool.dispatch([=, this]{
-            accept_thread_loop(address, port);
+            accept_thread_loop(address, port, generation);
         });
         {
-            //  m_task_lock, not m_lock: close() only reads the slot
-            //  after it has waited for m_starting to clear, so this
-            //  assignment is the only writer besides close().
+            //  Append, never replace: replacing the slot would destroy
+            //  the previous task's AsyncTask, and its destructor blocks
+            //  until that task has finished. A task from an earlier
+            //  start() may still be running when this start() runs (the
+            //  caller's wait timed out while the pool was starved). It
+            //  notices its stale generation when it gets scheduled and
+            //  exits without listening, so it only has to outlive this
+            //  call; close() joins the whole list.
             std::lock_guard<Mutex> lg(m_task_lock);
-            m_accept_thread = std::move(task);
+            m_accept_threads.push_back(std::move(task));
         }
     }catch (...){
         {
@@ -72,7 +80,10 @@ void ServerSocket_WinSocket::start(const std::string& address, uint16_t port){
             m_starting = false;
             m_cv.notify_all();
         }
-        m_listeners.run_method(&Listener::on_listen_finished, "Failed to start the listener thread.");
+        m_listeners.run_method(
+            &Listener::on_listen_finished,
+            "Failed to start the listener thread."
+        );
         throw;
     }
 
@@ -130,7 +141,7 @@ void ServerSocket_WinSocket::close() noexcept{
         return;
     }
 
-    AsyncTask accept_thread;
+    std::vector<AsyncTask> accept_threads;
     AsyncTask client_thread;
     {
         //  m_task_lock, not m_lock: moving the tasks out destroys the
@@ -138,15 +149,16 @@ void ServerSocket_WinSocket::close() noexcept{
         //  tasks to finish - which they can only do if they can acquire
         //  m_lock.
         std::lock_guard<Mutex> lg(m_task_lock);
-        accept_thread = std::move(m_accept_thread);
-        m_accept_thread = AsyncTask();
+        accept_threads.swap(m_accept_threads);
         client_thread = std::move(m_client_thread);
         m_client_thread = AsyncTask();
     }
 
     //  The threads notice the new state within a few milliseconds and
     //  close their own sockets.
-    accept_thread.wait_and_ignore_exceptions();
+    for (auto& task : accept_threads){
+        task.wait_and_ignore_exceptions();
+    }
     client_thread.wait_and_ignore_exceptions();
 
     {
@@ -162,8 +174,9 @@ size_t ServerSocket_WinSocket::send(const void* data, size_t bytes, std::chrono:
     SOCKET socket;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        socket =
-            (m_state.load(std::memory_order_relaxed) == State::CONNECTED) ? m_client : INVALID_SOCKET;
+        socket = m_state.load(std::memory_order_relaxed) == State::CONNECTED
+            ? m_client
+            : INVALID_SOCKET;
     }
     if (socket == INVALID_SOCKET){
         return 0;
@@ -219,11 +232,22 @@ size_t ServerSocket_WinSocket::send(const void* data, size_t bytes, std::chrono:
     return sent;
 }
 
-void ServerSocket_WinSocket::accept_thread_loop(std::string address, uint16_t port){
+void ServerSocket_WinSocket::report_listen_finished(uint64_t generation, const std::string& error){
+    bool current;
+    {
+        std::lock_guard<Mutex> lg(m_lock);
+        current = (m_generation == generation);
+    }
+    if (current){
+        m_listeners.run_method(&Listener::on_listen_finished, error);
+    }
+}
+
+void ServerSocket_WinSocket::accept_thread_loop(std::string address, uint16_t port, uint64_t generation){
     SOCKET listen_socket = ::socket(AF_INET, SOCK_STREAM, 0);
     if (listen_socket == INVALID_SOCKET){
-        m_listeners.run_method(
-            &Listener::on_listen_finished,
+        report_listen_finished(
+            generation,
             "socket() failed: WSA Error Code: " + std::to_string(WSAGetLastError())
         );
         return;
@@ -244,8 +268,8 @@ void ServerSocket_WinSocket::accept_thread_loop(std::string address, uint16_t po
     if (bind(listen_socket, (struct sockaddr*)&server, sizeof(server)) == SOCKET_ERROR){
         int error = WSAGetLastError();
         ::closesocket(listen_socket);
-        m_listeners.run_method(
-            &Listener::on_listen_finished,
+        report_listen_finished(
+            generation,
             "bind() failed: WSA Error Code: " + std::to_string(error)
         );
         return;
@@ -254,19 +278,23 @@ void ServerSocket_WinSocket::accept_thread_loop(std::string address, uint16_t po
     if (::listen(listen_socket, 16) == SOCKET_ERROR){
         int error = WSAGetLastError();
         ::closesocket(listen_socket);
-        m_listeners.run_method(
-            &Listener::on_listen_finished,
+        report_listen_finished(
+            generation,
             "listen() failed: WSA Error Code: " + std::to_string(error)
         );
         return;
     }
 
     std::string start_error;
+    bool superseded = false;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        if (m_state.load(std::memory_order_relaxed) == State::DESTRUCTING){
-            //  close() won the race.
-            start_error = "The server was closed before it could start listening.";
+        superseded = m_generation != generation;
+        if (superseded ||
+            m_state.load(std::memory_order_relaxed) == State::DESTRUCTING
+        ){
+            //  A newer start() or close() won the race.
+            start_error = "The server was replaced or closed before it could start listening.";
         }else{
             m_listen = listen_socket;
             listen_socket = INVALID_SOCKET;
@@ -275,6 +303,14 @@ void ServerSocket_WinSocket::accept_thread_loop(std::string address, uint16_t po
     }
     if (listen_socket != INVALID_SOCKET){
         ::closesocket(listen_socket);
+    }
+
+    if (superseded){
+        //  The attempt that started this task gave up on it while it was
+        //  still starting up (its wait timed out). A newer attempt owns
+        //  the listeners now; reporting this result would only confuse
+        //  that attempt, so exit without touching them.
+        return;
     }
 
     m_listeners.run_method(&Listener::on_listen_finished, start_error);
@@ -290,7 +326,10 @@ void ServerSocket_WinSocket::accept_thread_loop(std::string address, uint16_t po
         {
             std::lock_guard<Mutex> lg(m_lock);
             State state = m_state.load(std::memory_order_relaxed);
-            if (state == State::DESTRUCTING || state == State::NOT_RUNNING){
+            if (state == State::DESTRUCTING ||
+                state == State::NOT_RUNNING ||
+                m_generation != generation
+            ){
                 break;
             }
             listen = m_listen;

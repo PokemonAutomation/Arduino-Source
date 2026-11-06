@@ -169,16 +169,26 @@ public:
 
 protected:
     bool start_server(ServerSocketType& server, ServerListener& listener, uint16_t& port) const{
+        //  "listen_finished" is never reset between attempts, so each
+        //  attempt records where the counter stands and waits for it to
+        //  advance. Waiting on "> 0" instead would return immediately on a
+        //  later attempt - with the previous attempt's stale result - and
+        //  the loop could hand back a port the server is not actually
+        //  listening on (the previous attempt's start() was rejected
+        //  because the server was already running on the other port).
         for (int attempt = 0; attempt < 8; attempt++){
             uint16_t candidate;
             {
                 std::lock_guard<Mutex> lg(m_rng_lock);
                 candidate = (uint16_t)(40000 + m_rng() % 20000);
             }
+            const int finished_before = listener.listen_finished.load();
             server.start("127.0.0.1", candidate);
             if (!listener.waiter.wait_for(
                 SOCKET_TEST_WAIT,
-                [&listener]{ return listener.listen_finished.load() > 0; }
+                [finished_before, &listener]{
+                    return listener.listen_finished.load() > finished_before;
+                }
             )){
                 continue;
             }
