@@ -277,14 +277,14 @@ void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& c
             }
         );
 
-        // confirm we can see cave-archway-2
+        // confirm we can see cave-archway-2. move left
         move_player_until_yolo_object_detected(env, context, yolo_detector, "cave-archway-2", 
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
             },
             5,
             800ms,
-            0, 128
+            -1, 0
         );
 
 
@@ -430,14 +430,14 @@ void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& c
             }
         );
 
-        // confirm we can see station-crystal-4
+        // confirm we can see station-crystal-4. move left
         move_player_until_yolo_object_detected(env, context, yolo_detector, "station-crystal-4", 
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
             },
             5,
             800ms,
-            0, 128
+            -1, 0
         );
 
         // align to station-crystal-4.  
