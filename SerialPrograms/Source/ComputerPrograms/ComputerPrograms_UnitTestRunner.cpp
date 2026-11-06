@@ -28,6 +28,7 @@
 #include "NintendoSwitch/Inference/NintendoSwitch_FailedToConnectDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "NintendoSwitch/Programs/Typewriter/NintendoSwitch_Typewriter_Tests.h"
+#include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_Connection.h"
 
 #include "VideoGames/PokemonHome/PokemonHome_Tests.h"
 #include "VideoGames/PokemonSwSh/PokemonSwSh_Tests.h"
@@ -55,6 +56,7 @@ UnitTestDatabase make_UNIT_TESTS_ALL(){
     add_tests_BlackBorderDetector(ret);
     add_tests_ListenerSet(ret);
     add_tests_MoveOnlyFunction(ret);
+    SysbotBase::add_tests_SysbotBasePing(ret);
     add_tests_AudioInfo(ret);
     add_tests_ChannelMixerMatrix(ret);
     add_tests_FFTStreamer(ret);

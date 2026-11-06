@@ -19,6 +19,9 @@
 #include "Controllers/ControllerConnection.h"
 
 namespace PokemonAutomation{
+
+class UnitTestDatabase;
+
 namespace SysbotBase{
 
 
@@ -43,6 +46,15 @@ public:
     ~TcpSysbotBase_Connection();
 
     void write_data(const std::string& data);
+
+    //
+    //  Parses the sequence number that follows a "ping" token in "str",
+    //  setting "seqnum" and returning true only if a complete, in-range
+    //  unsigned integer is present. The scan is bounded to "str", so a
+    //  message that ends right after "ping" (or has no valid number after
+    //  it) returns false instead of reading out of bounds.
+    //
+    static bool parse_ping_response(const std::string& str, uint64_t& seqnum);
 
 private:
     void thread_loop();
@@ -75,6 +87,11 @@ private:
 
     ListenerSet<Listener> m_listeners;
 };
+
+//
+//  Registers unit tests for parse_ping_response().
+//
+void add_tests_SysbotBasePing(UnitTestDatabase& database);
 
 
 
