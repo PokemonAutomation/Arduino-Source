@@ -44,12 +44,13 @@ void ServerSocket_WinSocket::start(const std::string& address, uint16_t port){
     uint64_t generation = 0;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        if (m_state.load(std::memory_order_relaxed) != State::NOT_RUNNING
-            || m_starting){
+        if (m_starting ||
+            m_state.load(std::memory_order_relaxed) != State::NOT_RUNNING
+        ){
             return;
         }
         m_starting = true;
-        ++m_generation;
+        m_generation++;
         generation = m_generation;
     }
 
@@ -79,7 +80,10 @@ void ServerSocket_WinSocket::start(const std::string& address, uint16_t port){
             m_starting = false;
             m_cv.notify_all();
         }
-        m_listeners.run_method(&Listener::on_listen_finished, "Failed to start the listener thread.");
+        m_listeners.run_method(
+            &Listener::on_listen_finished,
+            "Failed to start the listener thread."
+        );
         throw;
     }
 
@@ -170,8 +174,9 @@ size_t ServerSocket_WinSocket::send(const void* data, size_t bytes, std::chrono:
     SOCKET socket;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        socket =
-            (m_state.load(std::memory_order_relaxed) == State::CONNECTED) ? m_client : INVALID_SOCKET;
+        socket = m_state.load(std::memory_order_relaxed) == State::CONNECTED
+            ? m_client
+            : INVALID_SOCKET;
     }
     if (socket == INVALID_SOCKET){
         return 0;
@@ -241,7 +246,8 @@ void ServerSocket_WinSocket::report_listen_finished(uint64_t generation, const s
 void ServerSocket_WinSocket::accept_thread_loop(std::string address, uint16_t port, uint64_t generation){
     SOCKET listen_socket = ::socket(AF_INET, SOCK_STREAM, 0);
     if (listen_socket == INVALID_SOCKET){
-        report_listen_finished(generation,
+        report_listen_finished(
+            generation,
             "socket() failed: WSA Error Code: " + std::to_string(WSAGetLastError())
         );
         return;
@@ -262,7 +268,8 @@ void ServerSocket_WinSocket::accept_thread_loop(std::string address, uint16_t po
     if (bind(listen_socket, (struct sockaddr*)&server, sizeof(server)) == SOCKET_ERROR){
         int error = WSAGetLastError();
         ::closesocket(listen_socket);
-        report_listen_finished(generation,
+        report_listen_finished(
+            generation,
             "bind() failed: WSA Error Code: " + std::to_string(error)
         );
         return;
@@ -271,7 +278,8 @@ void ServerSocket_WinSocket::accept_thread_loop(std::string address, uint16_t po
     if (::listen(listen_socket, 16) == SOCKET_ERROR){
         int error = WSAGetLastError();
         ::closesocket(listen_socket);
-        report_listen_finished(generation,
+        report_listen_finished(
+            generation,
             "listen() failed: WSA Error Code: " + std::to_string(error)
         );
         return;
@@ -281,9 +289,10 @@ void ServerSocket_WinSocket::accept_thread_loop(std::string address, uint16_t po
     bool superseded = false;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        superseded = (m_generation != generation);
-        if (superseded
-            || m_state.load(std::memory_order_relaxed) == State::DESTRUCTING){
+        superseded = m_generation != generation;
+        if (superseded ||
+            m_state.load(std::memory_order_relaxed) == State::DESTRUCTING
+        ){
             //  A newer start() or close() won the race.
             start_error = "The server was replaced or closed before it could start listening.";
         }else{
@@ -317,8 +326,10 @@ void ServerSocket_WinSocket::accept_thread_loop(std::string address, uint16_t po
         {
             std::lock_guard<Mutex> lg(m_lock);
             State state = m_state.load(std::memory_order_relaxed);
-            if (state == State::DESTRUCTING || state == State::NOT_RUNNING
-                || m_generation != generation){
+            if (state == State::DESTRUCTING ||
+                state == State::NOT_RUNNING ||
+                m_generation != generation
+            ){
                 break;
             }
             listen = m_listen;

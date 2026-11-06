@@ -33,12 +33,13 @@ void ServerSocket_POSIX::start(const std::string& address, uint16_t port){
     uint64_t generation = 0;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        if (m_state.load(std::memory_order_relaxed) != State::NOT_RUNNING
-            || m_starting){
+        if (m_starting ||
+            m_state.load(std::memory_order_relaxed) != State::NOT_RUNNING
+        ){
             return;
         }
         m_starting = true;
-        ++m_generation;
+        m_generation++;
         generation = m_generation;
     }
 
@@ -68,7 +69,10 @@ void ServerSocket_POSIX::start(const std::string& address, uint16_t port){
             m_starting = false;
             m_cv.notify_all();
         }
-        m_listeners.run_method(&Listener::on_listen_finished, "Failed to start the listener thread.");
+        m_listeners.run_method(
+            &Listener::on_listen_finished,
+            "Failed to start the listener thread."
+        );
         throw;
     }
 
@@ -159,8 +163,9 @@ size_t ServerSocket_POSIX::send(const void* data, size_t bytes, std::chrono::mil
     int socket;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        socket =
-            (m_state.load(std::memory_order_relaxed) == State::CONNECTED) ? m_client : -1;
+        socket = m_state.load(std::memory_order_relaxed) == State::CONNECTED
+            ? m_client
+            : -1;
     }
     if (socket == -1){
         return 0;
@@ -250,7 +255,8 @@ void ServerSocket_POSIX::accept_thread_loop(std::string address, uint16_t port, 
     if (bind(listen_socket, (struct sockaddr*)&server, sizeof(server)) == -1){
         int error = errno;
         ::close(listen_socket);
-        report_listen_finished(generation,
+        report_listen_finished(
+            generation,
             "Failed to bind the socket: " + std::string(strerror(error))
         );
         return;
@@ -259,7 +265,8 @@ void ServerSocket_POSIX::accept_thread_loop(std::string address, uint16_t port, 
     if (::listen(listen_socket, 16) == -1){
         int error = errno;
         ::close(listen_socket);
-        report_listen_finished(generation,
+        report_listen_finished(
+            generation,
             "Failed to listen on the socket: " + std::string(strerror(error))
         );
         return;
@@ -270,8 +277,9 @@ void ServerSocket_POSIX::accept_thread_loop(std::string address, uint16_t port, 
     {
         std::lock_guard<Mutex> lg(m_lock);
         superseded = (m_generation != generation);
-        if (superseded
-            || m_state.load(std::memory_order_relaxed) == State::DESTRUCTING){
+        if (superseded ||
+            m_state.load(std::memory_order_relaxed) == State::DESTRUCTING
+        ){
             //  A newer start() or close() won the race.
             start_error = "The server was replaced or closed before it could start listening.";
         }else{
@@ -305,8 +313,10 @@ void ServerSocket_POSIX::accept_thread_loop(std::string address, uint16_t port, 
         {
             std::lock_guard<Mutex> lg(m_lock);
             State state = m_state.load(std::memory_order_relaxed);
-            if (state == State::DESTRUCTING || state == State::NOT_RUNNING
-                || m_generation != generation){
+            if (state == State::DESTRUCTING ||
+                state == State::NOT_RUNNING ||
+                m_generation != generation
+            ){
                 break;
             }
             listen = m_listen;
