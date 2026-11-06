@@ -13,6 +13,7 @@
 
 #include <charconv>
 #include <cstdint>
+#include <vector>
 
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
@@ -181,36 +182,16 @@ void TcpSysbotBase_Connection::on_disconnect(const std::string& error_message){
         set_status_line1("Disconnected: " + error_message, COLOR_RED);
     }catch (...){}
 }
-void TcpSysbotBase_Connection::on_receive_data(const void* data, size_t bytes){
-//    cout << "on_receive_data(): " << std::string((const char*)data, bytes - 2) << endl;
-
-    WallClock now = current_time();
-
-    try{
-        std::vector<std::string> messages;
-        bool overflow = false;
-        accumulate_receive_line(
-            m_receive_buffer,
-            messages,
-            (const char*)data,
-            bytes,
-            SBB_MAX_RECEIVE_LINE_BYTES,
-            overflow
-        );
-        if (overflow){
-            //  A peer streamed a line longer than the maximum without a
-            //  terminating '\n'. Drop the partial line and abort the
-            //  connection; the buffer can no longer grow.
-            m_receive_buffer.clear();
-            on_receive_overflow();
-            return;
-        }
-        for (const auto& message : messages){
-            process_message(message, now);
-        }
-    }catch (...){}
-}
-size_t TcpSysbotBase_Connection::accumulate_receive_line(
+namespace{
+//  Accumulates the next "bytes" of "data" into the current receive line
+//  "line", emitting each complete line (terminated by '\n') into
+//  "messages" and clearing "line" for the next. '\r' bytes are ignored.
+//  A single line is capped at "max_line_bytes": if it would grow past that
+//  before its '\n', "overflow" is set, "line" is cleared, and no further
+//  bytes are consumed. Returns the number of bytes consumed from "data".
+//  File-local: this is what stops a peer that streams bytes without a '\n'
+//  from growing the receive buffer without bound.
+size_t accumulate_receive_line(
     std::deque<char>& line,
     std::vector<std::string>& messages,
     const char* data,
@@ -241,6 +222,36 @@ size_t TcpSysbotBase_Connection::accumulate_receive_line(
         consumed++;
     }
     return consumed;
+}
+}
+void TcpSysbotBase_Connection::on_receive_data(const void* data, size_t bytes){
+//    cout << "on_receive_data(): " << std::string((const char*)data, bytes - 2) << endl;
+
+    WallClock now = current_time();
+
+    try{
+        std::vector<std::string> messages;
+        bool overflow = false;
+        accumulate_receive_line(
+            m_receive_buffer,
+            messages,
+            (const char*)data,
+            bytes,
+            SBB_MAX_RECEIVE_LINE_BYTES,
+            overflow
+        );
+        if (overflow){
+            //  A peer streamed a line longer than the maximum without a
+            //  terminating '\n'. Drop the partial line and abort the
+            //  connection; the buffer can no longer grow.
+            m_receive_buffer.clear();
+            on_receive_overflow();
+            return;
+        }
+        for (const auto& message : messages){
+            process_message(message, now);
+        }
+    }catch (...){}
 }
 void TcpSysbotBase_Connection::on_receive_overflow(){
     m_logger.log(
@@ -464,7 +475,7 @@ UnitTestResult ReceiveLineBoundTest::run(Logger&, CancellableScope&) const{
     std::deque<char> buffer;
     std::vector<std::string> messages;
     bool overflow = false;
-    TcpSysbotBase_Connection::accumulate_receive_line(
+    accumulate_receive_line(
         buffer,
         messages,
         m_input.data(),
