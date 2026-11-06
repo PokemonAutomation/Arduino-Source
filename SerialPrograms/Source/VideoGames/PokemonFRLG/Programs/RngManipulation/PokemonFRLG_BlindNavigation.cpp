@@ -42,12 +42,12 @@ static const uint64_t FISHING_FIXED_DURATION        = 4200;     // 4000ms + 200m
 static const uint64_t FISHING_MAX_RNG_WAIT          = 1000;     // 50ms * 20. The random wait before casting comes out of the variable wait
 
 // The part of the in-game delay (ms) that is spent walking to each Safari Zone target.
-static const uint64_t SAFARI_CENTER_WALK_DURATION   = 22170;
-static const uint64_t SAFARI_EAST_WALK_DURATION     = 37660;
-static const uint64_t SAFARI_NORTH_WALK_DURATION    = 38910;
-static const uint64_t SAFARI_WEST_WALK_DURATION     = 52930;
-static const uint64_t SAFARI_SURF_WALK_DURATION     = 31800;
-static const uint64_t SAFARI_FISH_WALK_DURATION     = 25300;
+static const uint64_t SAFARI_CENTER_WALK_DURATION   = 2170;
+static const uint64_t SAFARI_EAST_WALK_DURATION     = 17660;
+static const uint64_t SAFARI_NORTH_WALK_DURATION    = 18910;
+static const uint64_t SAFARI_WEST_WALK_DURATION     = 32930;
+static const uint64_t SAFARI_SURF_WALK_DURATION     = 11800;
+static const uint64_t SAFARI_FISH_WALK_DURATION     = 5300;
 
 // The minimum delay (ms) before the final button press to avoid button press drops
 static const uint64_t MIN_PRESS_GAP = 300;
@@ -71,6 +71,14 @@ static uint64_t lapras_fixed_duration(Language language){
     uint64_t duration = 7200; // 4000ms + 3000ms + 200ms
     if (language == Language::French){
         duration -= 1500;
+    }
+    return duration;
+}
+
+static uint64_t safari_zone_entrance_duration(Language language){
+    uint64_t duration = 20000;
+    if (language == Language::Japanese){
+        duration += 1500;
     }
     return duration;
 }
@@ -399,7 +407,7 @@ void use_registered_fishing_rod(ProControllerContext& context, uint64_t ingame_d
     context.wait_for_all_requests();
 }
 
-void enter_safarizone(ProControllerContext& context){
+void enter_safarizone(ProControllerContext& context, Language language){
     // walk up to initiate dialogue
     pbf_move_left_joystick(context, {0, +1}, 600ms, 400ms);
     // Advance through the dialogue (waiting a little longer when Safari Balls are recieved)
@@ -408,43 +416,47 @@ void enter_safarizone(ProControllerContext& context){
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    if (language == Language::Japanese){
+        pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
+    }
     pbf_press_button(context, BUTTON_A, 200ms, 3300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
-    // this last press is needed for German, but shouldn't throw off things off for other languages
+    // this last press is needed for German and Japanese, but is performed for all languages
+    // in case it's necessary for languages that haven't been tested directly by a developer
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     // finish dialogue and automatically enter the Safari Zone
     pbf_press_button(context, BUTTON_A, 200ms, 4800ms);
-    // total duration: 20000ms
+    // total duration: 20000ms (+1500ms for Japanese)
 }
 
-void walk_to_safarizonefish(ProControllerContext& context){
-    enter_safarizone(context); // 20000ms
+void walk_to_safarizonefish(ProControllerContext& context, Language language){
+    enter_safarizone(context, language); // 20000ms (+1500ms for Japanese)
     // walk from the entrance to the pond in the central area
     pbf_move_left_joystick(context, {0, +1}, 2200ms, 300ms);
     pbf_move_left_joystick(context, {+1, 0}, 1600ms, 300ms);
     pbf_move_left_joystick(context, {0, +1}, 600ms, 300ms);
-    // total duration: 25300ms
+    // total duration: 25300ms (+1500ms for Japanese)
 }
 
-void walk_to_safarizonesurf(ProControllerContext& context){
-    walk_to_safarizonefish(context); // 25300ms
+void walk_to_safarizonesurf(ProControllerContext& context, Language language){
+    walk_to_safarizonefish(context, language); // 25300ms (+1500ms for Japanese)
     // start surfing
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1300ms);
     pbf_press_button(context, BUTTON_A, 200ms, 3300ms);
-    // total duration: 31800ms
+    // total duration: 31800ms (+1500ms for Japanese)
 }
 
-void walk_to_safarizonecenter(ProControllerContext& context){
-    enter_safarizone(context); // 20000ms
+void walk_to_safarizonecenter(ProControllerContext& context, Language language){
+    enter_safarizone(context, language); // 20000ms (+1500ms for Japanese)
     // walk from the entrance to the nearest grass
     pbf_move_left_joystick(context, {0, +1}, 460ms, 300ms);
     pbf_move_left_joystick(context, {-1, 0}, 1110ms, 300ms);
-    // total duration: 22170ms
+    // total duration: 22170ms (+1500ms for Japanese)
 }
 
-void walk_to_safarizoneeast(ProControllerContext& context){
-    enter_safarizone(context); // 20000ms
+void walk_to_safarizoneeast(ProControllerContext& context, Language language){
+    enter_safarizone(context, language); // 20000ms (+1500ms for Japanese)
     // walk from the entrance to the east area
     pbf_move_left_joystick(context, {0, +1}, 160ms, 300ms);
     pbf_move_left_joystick(context, {+1, 0}, 4400ms, 300ms);
@@ -453,20 +465,20 @@ void walk_to_safarizoneeast(ProControllerContext& context){
     pbf_move_left_joystick(context, {+1, 0}, 3600ms, 300ms);
     pbf_move_left_joystick(context, {0, -1}, 700ms, 300ms);
     pbf_move_left_joystick(context, {+1, 0}, 3450ms, 300ms);
-    // total duration: 37660ms
+    // total duration: 37660ms (+1500ms for Japanese)
 }
 
-void walk_to_safarizonenorth(ProControllerContext& context){
-    walk_to_safarizonesurf(context); // 31800ms
+void walk_to_safarizonenorth(ProControllerContext& context, Language language){
+    walk_to_safarizonesurf(context, language); // 31800ms (+1500ms for Japanese)
     // from the pond to the grass in the north area
     pbf_move_left_joystick(context, {0, +1}, 2810ms, 300ms);
     pbf_move_left_joystick(context, {-1, 0}, 1530ms, 300ms);
     pbf_move_left_joystick(context, {0, +1}, 1870ms, 300ms);
-    // total duration: 38910ms
+    // total duration: 38910ms (+1500ms for Japanese)
 }
 
-void walk_to_safarizonewest(ProControllerContext& context){
-    walk_to_safarizonesurf(context); // 31800ms
+void walk_to_safarizonewest(ProControllerContext& context, Language language){
+    walk_to_safarizonesurf(context, language); // 31800ms (+1500ms for Japanese)
     // surf past the hedge and exit the pond
     pbf_move_left_joystick(context, {-1, 0}, 500ms, 300ms);
     pbf_move_left_joystick(context, {0, -1}, 260ms, 500ms);
@@ -481,7 +493,7 @@ void walk_to_safarizonewest(ProControllerContext& context){
     pbf_move_left_joystick(context, {0, -1}, 770ms, 300ms);
     pbf_move_left_joystick(context, {-1, 0}, 2400ms, 300ms);
     pbf_move_left_joystick(context, {0, -1}, 600ms, 300ms);
-    // total duration: 52930ms
+    // total duration: 52930ms (+1500ms for Japanese)
 }
 
 void activate_roamer(ProControllerContext& context, Language language, uint64_t ingame_delay){
@@ -582,17 +594,17 @@ IngameSequence get_ingame_sequence(PokemonFRLG_RngTarget target, Language langua
     case PokemonFRLG_RngTarget::fishing:
         return {"Fishing", FISHING_FIXED_DURATION + FISHING_MAX_RNG_WAIT, MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
     case PokemonFRLG_RngTarget::safarizonecenter:
-        return {"Safari Zone Center", SAFARI_CENTER_WALK_DURATION + SAFARI_SWEET_SCENT_FIXED_DURATION, MIN_PRESS_GAP, SWEET_SCENT_ADVANCES_OFFSET};
+        return {"Safari Zone Center", safari_zone_entrance_duration(language) + SAFARI_CENTER_WALK_DURATION + SAFARI_SWEET_SCENT_FIXED_DURATION, MIN_PRESS_GAP, SWEET_SCENT_ADVANCES_OFFSET};
     case PokemonFRLG_RngTarget::safarizoneeast:
-        return {"Safari Zone East", SAFARI_EAST_WALK_DURATION + SAFARI_SWEET_SCENT_FIXED_DURATION, MIN_PRESS_GAP, SWEET_SCENT_ADVANCES_OFFSET};
+        return {"Safari Zone East", safari_zone_entrance_duration(language) + SAFARI_EAST_WALK_DURATION + SAFARI_SWEET_SCENT_FIXED_DURATION, MIN_PRESS_GAP, SWEET_SCENT_ADVANCES_OFFSET};
     case PokemonFRLG_RngTarget::safarizonenorth:
-        return {"Safari Zone North", SAFARI_NORTH_WALK_DURATION + SAFARI_SWEET_SCENT_FIXED_DURATION, MIN_PRESS_GAP, SWEET_SCENT_ADVANCES_OFFSET};
+        return {"Safari Zone North", safari_zone_entrance_duration(language) + SAFARI_NORTH_WALK_DURATION + SAFARI_SWEET_SCENT_FIXED_DURATION, MIN_PRESS_GAP, SWEET_SCENT_ADVANCES_OFFSET};
     case PokemonFRLG_RngTarget::safarizonewest:
-        return {"Safari Zone West", SAFARI_WEST_WALK_DURATION + SAFARI_SWEET_SCENT_FIXED_DURATION, MIN_PRESS_GAP, SWEET_SCENT_ADVANCES_OFFSET};
+        return {"Safari Zone West", safari_zone_entrance_duration(language) + SAFARI_WEST_WALK_DURATION + SAFARI_SWEET_SCENT_FIXED_DURATION, MIN_PRESS_GAP, SWEET_SCENT_ADVANCES_OFFSET};
     case PokemonFRLG_RngTarget::safarizonesurf:
-        return {"Safari Zone Surfing", SAFARI_SURF_WALK_DURATION + SAFARI_SWEET_SCENT_FIXED_DURATION, MIN_PRESS_GAP, SWEET_SCENT_ADVANCES_OFFSET};
+        return {"Safari Zone Surfing", safari_zone_entrance_duration(language) + SAFARI_SURF_WALK_DURATION + SAFARI_SWEET_SCENT_FIXED_DURATION, MIN_PRESS_GAP, SWEET_SCENT_ADVANCES_OFFSET};
     case PokemonFRLG_RngTarget::safarizonefish:
-        return {"Safari Zone Fishing", SAFARI_FISH_WALK_DURATION + FISHING_FIXED_DURATION + FISHING_MAX_RNG_WAIT, MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
+        return {"Safari Zone Fishing", safari_zone_entrance_duration(language) + SAFARI_FISH_WALK_DURATION + FISHING_FIXED_DURATION + FISHING_MAX_RNG_WAIT, MIN_PRESS_GAP, DEFAULT_ADVANCES_OFFSET};
     case PokemonFRLG_RngTarget::raikou:
     case PokemonFRLG_RngTarget::entei:
     case PokemonFRLG_RngTarget::suicune:
@@ -766,33 +778,33 @@ void perform_blind_sequence(
         use_registered_fishing_rod(context, timings.ingame_delay);
         return;
     case PokemonFRLG_RngTarget::safarizonecenter:
-        modified_ingame_delay = timings.ingame_delay - SAFARI_CENTER_WALK_DURATION;
-        walk_to_safarizonecenter(context);
+        modified_ingame_delay = timings.ingame_delay - safari_zone_entrance_duration(language) - SAFARI_CENTER_WALK_DURATION;
+        walk_to_safarizonecenter(context, language);
         use_sweet_scent(context, modified_ingame_delay, true);
         return;
     case PokemonFRLG_RngTarget::safarizoneeast:
-        modified_ingame_delay = timings.ingame_delay - SAFARI_EAST_WALK_DURATION;
-        walk_to_safarizoneeast(context);
+        modified_ingame_delay = timings.ingame_delay - safari_zone_entrance_duration(language) - SAFARI_EAST_WALK_DURATION;
+        walk_to_safarizoneeast(context, language);
         use_sweet_scent(context, modified_ingame_delay, true);
         return;
     case PokemonFRLG_RngTarget::safarizonenorth:
-        modified_ingame_delay = timings.ingame_delay - SAFARI_NORTH_WALK_DURATION;
-        walk_to_safarizonenorth(context);
+        modified_ingame_delay = timings.ingame_delay - safari_zone_entrance_duration(language) - SAFARI_NORTH_WALK_DURATION;
+        walk_to_safarizonenorth(context, language);
         use_sweet_scent(context, modified_ingame_delay, true);
         return;
     case PokemonFRLG_RngTarget::safarizonewest:
-        modified_ingame_delay = timings.ingame_delay - SAFARI_WEST_WALK_DURATION;
-        walk_to_safarizonewest(context);
+        modified_ingame_delay = timings.ingame_delay - safari_zone_entrance_duration(language) - SAFARI_WEST_WALK_DURATION;
+        walk_to_safarizonewest(context, language);
         use_sweet_scent(context, modified_ingame_delay, true);
         return;
     case PokemonFRLG_RngTarget::safarizonesurf:
-        modified_ingame_delay = timings.ingame_delay - SAFARI_SURF_WALK_DURATION;
-        walk_to_safarizonesurf(context);
+        modified_ingame_delay = timings.ingame_delay - safari_zone_entrance_duration(language) - SAFARI_SURF_WALK_DURATION;
+        walk_to_safarizonesurf(context, language);
         use_sweet_scent(context, modified_ingame_delay, true);
         return;
     case PokemonFRLG_RngTarget::safarizonefish:
-        modified_ingame_delay = timings.ingame_delay - SAFARI_FISH_WALK_DURATION;
-        walk_to_safarizonefish(context);
+        modified_ingame_delay = timings.ingame_delay - safari_zone_entrance_duration(language) - SAFARI_FISH_WALK_DURATION;
+        walk_to_safarizonefish(context, language);
         use_registered_fishing_rod(context, modified_ingame_delay);
         return;
     case PokemonFRLG_RngTarget::raikou:
