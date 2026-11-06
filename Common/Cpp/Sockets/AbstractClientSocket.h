@@ -61,32 +61,21 @@ public:
         return m_state.load(std::memory_order_relaxed);
     }
 
-    //  Stops the connection and returns the socket to State::NOT_RUNNING
-    //  so "connect()" can be called again. This is safe to call multiple
-    //  times.
-    //
-    //  It cancels any in-flight operations: no further
-    //  "Listener::on_receive_data" callbacks are started (one already
-    //  running is allowed to finish), and an in-flight "send()" returns
-    //  promptly with the number of bytes actually written so far (best
-    //  effort). A "send()" that is already racing "close()" may still
-    //  complete.
-    //
-    //  This blocks until the receive thread has exited, so it must not be
-    //  called from within a listener callback.
+    //  Requests immediate teardown of the active connection, without waiting
+    //  for the receive thread to exit. This is safe to call from within a
+    //  listener callback (which runs on that thread; the blocking teardown
+    //  there would deadlock). It marks the socket DESTRUCTING and releases
+    //  the underlying socket; the receive thread observes this on its next
+    //  iteration and exits. It cancels any in-flight "send()": its caller
+    //  returns promptly with the number of bytes actually written so far
+    //  (best effort). No "on_disconnect" callback is fired. The socket is
+    //  left in State::DESTRUCTING; the socket's destructor completes the
+    //  teardown (joins the thread and returns it to NOT_RUNNING), so the
+    //  socket cannot be "connect()"ed again - destroy it and use a new one.
+    //  Calling "close()" when there is no active connection is a no-op. It
+    //  is safe to call multiple times.
     virtual void close() noexcept = 0;
 
-    //  Requests immediate teardown of the active connection. Unlike
-    //  "close()", this does NOT wait for the receive thread to exit, so it is
-    //  safe to call from within a listener callback (which runs on that
-    //  thread; calling "close()" there would deadlock). It marks the socket
-    //  DESTRUCTING and releases the underlying socket; the receive thread
-    //  observes this on its next iteration and exits. The socket is left in
-    //  State::DESTRUCTING; a later "close()" completes the teardown (returns
-    //  it to NOT_RUNNING). As with "close()", no "on_disconnect" callback is
-    //  fired. Calling "abort()" when there is no active connection is a
-    //  no-op. It is safe to call multiple times.
-    virtual void abort() noexcept = 0;
     virtual void connect(const std::string& address, uint16_t port) = 0;
 
     //  Sends data on the active connection. This blocks until every byte

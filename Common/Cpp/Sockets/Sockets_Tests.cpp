@@ -89,14 +89,15 @@ struct ClientListener : AbstractClientSocket::Listener{
 
 
 //  A client listener that tears the connection down from within its own
-//  on_receive_data() callback via abort() - the exact scenario sys-botbase
-//  hits when it detects an oversized line. close() would deadlock here (it
-//  waits for this very receive thread to exit); abort() must return promptly.
-struct AbortingClientListener : AbstractClientSocket::Listener{
+//  on_receive_data() callback via close() - the exact scenario sys-botbase
+//  hits when it detects an oversized line. close() must return promptly here
+//  (it does not wait for this very receive thread to exit; the blocking
+//  close_and_wait() would deadlock).
+struct ClosingClientListener : AbstractClientSocket::Listener{
     Waiter waiter;
     std::atomic<int> connect_finished{0};
     std::string last_connect_error;
-    std::atomic<int> aborted_in_callback{0};
+    std::atomic<int> closed_in_callback{0};
     //  Set to the owning client after construction; on_receive_data only
     //  fires once connected and receiving, so it is valid by then.
     AbstractClientSocket* client = nullptr;
@@ -108,8 +109,8 @@ struct AbortingClientListener : AbstractClientSocket::Listener{
     }
 
     virtual void on_receive_data(const void*, size_t) override{
-        client->abort();
-        aborted_in_callback++;
+        client->close();
+        closed_in_callback++;
         waiter.notify();
     }
 };
@@ -1654,7 +1655,7 @@ public:
                 if (error.empty()){
                     //  A zero-length send round-trips a queued call through
                     //  the socket's event thread (on the Qt backend, the
-                    //  thread that close() has to wait on). The infinite
+                    //  thread that close_and_wait() has to wait on). The infinite
                     //  default is the canary: it returns in ~0 ms on a
                     //  healthy event thread, and for the full 5 s internal
                     //  safety wait if that thread is starved. (A finite
@@ -1667,6 +1668,11 @@ public:
                         std::chrono::steady_clock::now() - z0
                     ).count();
 
+                    //  close() is non-blocking: it requests the teardown and
+                    //  leaves the socket DESTRUCTING. The blocking
+                    //  close_and_wait() runs when "client" is destroyed at the
+                    //  end of this scope, so it must not hang. Verify close()
+                    //  returned promptly and marked the socket DESTRUCTING.
                     auto c0 = std::chrono::steady_clock::now();
                     client.close();
                     auto close_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -1679,9 +1685,9 @@ public:
                                 "close() took " + std::to_string(close_ms) + " ms on a starved machine."
                             );
                         }
-                        error = "close() did not finish after the timed-out send (" + std::to_string(close_ms) + " ms)";
-                    }else if (client.state() != AbstractClientSocket::State::NOT_RUNNING){
-                        error = "The client is not NOT_RUNNING after close()";
+                        error = "close() did not return promptly (" + std::to_string(close_ms) + " ms)";
+                    }else if (client.state() != AbstractClientSocket::State::DESTRUCTING){
+                        error = "The client is not DESTRUCTING after close()";
                     }else{
                         ok = true;
                     }
@@ -2313,12 +2319,12 @@ public:
 
 
 //  Verifies that a ClientSocket can be torn down from within its own
-//  on_receive_data() callback via abort() (the sys-botbase oversized-line
-//  scenario). close() would deadlock there - it waits for this receive
-//  thread to exit - so the abort must return promptly and leave the socket
-//  no longer CONNECTED.
+//  on_receive_data() callback via close() (the sys-botbase oversized-line
+//  scenario). close_and_wait() would deadlock there - it waits for this
+//  receive thread to exit - so close() must return promptly and leave the
+//  socket no longer CONNECTED.
 template <typename ClientSocketType, typename ServerSocketType>
-class Test_Sockets_AbortFromReceiveCallback : public TestSockets<ClientSocketType, ServerSocketType>{
+class Test_Sockets_CloseFromReceiveCallback : public TestSockets<ClientSocketType, ServerSocketType>{
 public:
     using TestSockets<ClientSocketType, ServerSocketType>::TestSockets;
 
@@ -2348,7 +2354,7 @@ public:
         std::string error;
         {
             ClientSocketType client(this->m_thread_pool);
-            AbortingClientListener client_listener;
+            ClosingClientListener client_listener;
             client_listener.client = &client;
             client.add_listener(client_listener);
 
@@ -2369,15 +2375,15 @@ public:
                 error = "The server did not send the trigger packet";
             }else if (!client_listener.waiter.wait_for(
                 SOCKET_TEST_WAIT,
-                [&client_listener]{ return client_listener.aborted_in_callback.load() >= 1; }
+                [&client_listener]{ return client_listener.closed_in_callback.load() >= 1; }
             )){
-                error = "abort() did not return from the on_receive_data() callback (it blocked, like close() would)";
+                error = "close() did not return from the on_receive_data() callback (it would have blocked, like close_and_wait() would)";
             }else if (client.state() == AbstractClientSocket::State::CONNECTED){
-                error = "After abort() the client is still CONNECTED";
+                error = "After close() the client is still CONNECTED";
             }else{
-                //  Now that abort() has stopped the receive thread, close() must
-                //  complete without hanging.
-                client.close();
+                //  close() (called in the callback) only requested the
+                //  teardown. The blocking close_and_wait() runs when "client"
+                //  is destroyed at the end of this scope - it must not hang.
                 ok = true;
             }
         }
@@ -2429,8 +2435,8 @@ void add_socket_tests(UnitTestDatabase& database, ThreadPool& thread_pool, const
     database.add<Test_Sockets_CloseConnectionCancelsSend<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "close_connection() cancels an in-flight send"
     );
-    database.add<Test_Sockets_AbortFromReceiveCallback<ClientSocketType, ServerSocketType>>(
-        thread_pool, prefix + "abort() from the receive callback"
+    database.add<Test_Sockets_CloseFromReceiveCallback<ClientSocketType, ServerSocketType>>(
+        thread_pool, prefix + "close() from the receive callback"
     );
 }
 

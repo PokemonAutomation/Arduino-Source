@@ -18,7 +18,7 @@
 namespace PokemonAutomation{
 
 
-void ClientSocket_WinSocket::close() noexcept{
+void ClientSocket_WinSocket::close_and_wait() noexcept{
     AsyncTask thread;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -40,13 +40,14 @@ void ClientSocket_WinSocket::close() noexcept{
         m_cv.notify_all();
     }
 }
-void ClientSocket_WinSocket::abort() noexcept{
-    //  Non-blocking teardown, safe to call from the receive thread. "close()"
-    //  waits for the receive thread to exit and so must not run from a
-    //  listener callback; this instead just flips the state and releases the
-    //  socket. The receive thread's next iteration sees DESTRUCTING (or the
-    //  missing socket) and exits on its own. The socket is left DESTRUCTING;
-    //  a later close() returns it to NOT_RUNNING.
+void ClientSocket_WinSocket::close() noexcept{
+    //  Non-blocking teardown, safe to call from the receive thread. The
+    //  blocking "close_and_wait()" waits for the receive thread to exit and so
+    //  must not run from a listener callback; this instead just flips the
+    //  state and releases the socket. The receive thread's next iteration sees
+    //  DESTRUCTING (or the missing socket) and exits on its own. The socket is
+    //  left DESTRUCTING; the destructor's close_and_wait() returns it to
+    //  NOT_RUNNING.
     {
         std::lock_guard<Mutex> lg(m_lock);
         if (m_state.load(std::memory_order_relaxed) == State::NOT_RUNNING && !m_thread){
@@ -58,6 +59,13 @@ void ClientSocket_WinSocket::abort() noexcept{
     m_cv.notify_all();
 }
 void ClientSocket_WinSocket::connect(const std::string& address, uint16_t port){
+    //  Complete any in-progress connection or a requested-but-unfinished
+    //  close() before starting a new one. close() is non-blocking (it leaves
+    //  the socket DESTRUCTING), so reconnecting on the same socket joins the
+    //  old receive thread here to get back to NOT_RUNNING. No-op if the socket
+    //  is already NOT_RUNNING.
+    close_and_wait();
+
     std::string error;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -99,7 +107,7 @@ void ClientSocket_WinSocket::connect(const std::string& address, uint16_t port){
     //  connect() may be called from a thread that is itself running on
     //  this pool, and blocking here until a pool thread is free could
     //  deadlock a capped pool. The returned AsyncTask still lets
-    //  close() join the receive thread.
+    //  close_and_wait() join the receive thread.
     try{
         m_thread = m_thread_pool.dispatch([=, this]{
             thread_loop(address, port);

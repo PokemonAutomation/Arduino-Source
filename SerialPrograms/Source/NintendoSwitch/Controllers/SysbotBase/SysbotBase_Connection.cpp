@@ -260,11 +260,12 @@ void TcpSysbotBase_Connection::on_receive_overflow(){
         COLOR_RED
     );
     set_status_line1("Disconnected: sys-botbase sent an oversized line.", COLOR_RED);
-    //  Safe to call from this receive-thread callback: unlike close(), it does
-    //  not wait for the receive thread to exit (which would deadlock). The
-    //  heartbeat thread_loop, if running, observes the DESTRUCTING state and
-    //  stops on its next iteration.
-    m_socket.abort();
+    //  Safe to call from this receive-thread callback: close() requests the
+    //  teardown without waiting for the receive thread to exit (the blocking
+    //  close_and_wait() would deadlock here). The heartbeat thread_loop, if
+    //  running, observes the DESTRUCTING state and stops on its next
+    //  iteration.
+    m_socket.close();
 }
 void TcpSysbotBase_Connection::process_message(const std::string& message, WallClock timestamp){
     if (LOG_EVERYTHING()){

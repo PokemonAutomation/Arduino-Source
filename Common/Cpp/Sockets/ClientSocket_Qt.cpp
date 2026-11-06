@@ -9,6 +9,7 @@
 #include <QSharedPointer>
 #include <QTimer>
 #include <QTcpSocket>
+#include <QMetaObject>
 #include "Common/Qt/QtThreadPool.h"
 #include "Common/Qt/GlobalThreadPoolsQt.h"
 #include "ClientSocket_Qt.h"
@@ -21,7 +22,7 @@ namespace PokemonAutomation{
 
 
 
-void ClientSocket_Qt::close() noexcept{
+void ClientSocket_Qt::close_and_wait() noexcept{
     QTcpSocket* socket;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -49,7 +50,7 @@ void ClientSocket_Qt::close() noexcept{
     std::lock_guard<Mutex> lg(m_lock);
     m_state.store(State::NOT_RUNNING, std::memory_order_release);
 }
-void ClientSocket_Qt::abort() noexcept{
+void ClientSocket_Qt::close() noexcept{
     QTcpSocket* socket;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -61,17 +62,31 @@ void ClientSocket_Qt::abort() noexcept{
         socket = m_socket;
     }
 
-    //  Immediately break the connection. QTcpSocket::abort() is safe to call
-    //  from the socket's event thread (where a listener callback runs): it
-    //  disconnects without waiting, so this never blocks. The resulting
-    //  "disconnected"/"errorOccurred" signals reach connection_failed(), see
-    //  State::DESTRUCTING, and are no-ops. The socket is left in
-    //  State::DESTRUCTING; a later close() removes it and returns it to
-    //  NOT_RUNNING.
+    //  Immediately break the connection. QTcpSocket::abort() must run on the
+    //  socket's event thread, but "close()" may be called from any thread
+    //  (including a listener callback, which runs on that event thread), so
+    //  post the abort to the socket's event thread instead of calling it here
+    //  - a cross-thread call would trip Qt's QSocketNotifier thread check.
+    //  This stays non-blocking: close() returns immediately, and the socket is
+    //  aborted as soon as the event thread reaches the queued call. The
+    //  resulting "disconnected"/"errorOccurred" signals see State::DESTRUCTING
+    //  and are no-ops. The destructor's close_and_wait() destroys the socket
+    //  and returns it to NOT_RUNNING.
     cancel_inflight_sends();
-    socket->abort();
+    QMetaObject::invokeMethod(
+        socket,
+        [socket]{ socket->abort(); },
+        Qt::QueuedConnection
+    );
 }
 void ClientSocket_Qt::connect(const std::string& address, uint16_t port){
+    //  Complete any in-progress connection or a requested-but-unfinished
+    //  close() before starting a new one. close() is non-blocking (it leaves
+    //  the socket DESTRUCTING), so reconnecting on the same socket destroys the
+    //  old QTcpSocket here (on its event thread) to get back to NOT_RUNNING.
+    //  No-op if the socket is already NOT_RUNNING.
+    close_and_wait();
+
     QTcpSocket* old_socket;
     {
         std::lock_guard<Mutex> lg(m_lock);
