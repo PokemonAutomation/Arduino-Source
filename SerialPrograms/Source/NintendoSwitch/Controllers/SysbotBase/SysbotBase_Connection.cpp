@@ -11,6 +11,12 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "SysbotBase_Connection.h"
 
+#include <charconv>
+#include <cstdint>
+
+#include "Common/Cpp/TestRunners/UnitTest.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+
 //#include <iostream>
 //using std::cout;
 //using std::endl;
@@ -233,19 +239,8 @@ void TcpSysbotBase_Connection::process_message(const std::string& message, WallC
         }
     }
 
-    size_t pos = str.find("ping");
-    if (pos != std::string::npos){
-        const char* ptr = &str[pos + 4];
-        while (true){
-            char ch = ptr[0];
-            if (ch < 32 || ch == ' ' || ch == '\t'){
-                ptr++;
-                continue;
-            }
-            break;
-        }
-        size_t ping_seqnum = atoll(ptr);
-
+    uint64_t ping_seqnum = 0;
+    if (parse_ping_response(str, ping_seqnum)){
         std::lock_guard<Mutex> lg(m_lock);
         m_last_ping_receive = timestamp;
         auto iter = m_active_pings.find(ping_seqnum);
@@ -268,6 +263,33 @@ void TcpSysbotBase_Connection::process_message(const std::string& message, WallC
     }
 
 }
+
+
+bool TcpSysbotBase_Connection::parse_ping_response(const std::string& str, uint64_t& seqnum){
+    size_t pos = str.find("ping");
+    if (pos == std::string::npos){
+        return false;
+    }
+
+    //  The sequence number, if any, follows the "ping" token. A message may
+    //  end right after "ping", so the scan must stop at the string's end:
+    //  letting it run past the terminating NUL would read out of bounds, and
+    //  the number parse that follows would then read arbitrary memory.
+    size_t cursor = pos + 4;
+    while (cursor < str.size() && str[cursor] <= 32){
+        cursor++;
+    }
+    if (cursor >= str.size()){
+        //  Nothing after "ping" to parse.
+        return false;
+    }
+
+    //  Parse the bounded numeric token. Only a complete, in-range unsigned
+    //  integer counts; an overflow or a non-numeric token cannot be one of
+    //  our sequence numbers, so it is rejected.
+    auto parsed = std::from_chars(str.data() + cursor, str.data() + str.size(), seqnum);
+    return parsed.ec == std::errc();
+}
 void TcpSysbotBase_Connection::set_mode(const std::string& sbb_version){
     if (sbb_version.rfind("2.", 0) == 0){
         set_status_line1("sbb2 is no longer supported. Please upgrade to sbb3.", COLOR_RED);
@@ -287,6 +309,63 @@ void TcpSysbotBase_Connection::set_mode(const std::string& sbb_version){
         [this]{ thread_loop(); }
     );
     declare_ready();
+}
+
+
+namespace{
+class PingParseTest : public UnitTest{
+public:
+    PingParseTest(const std::string& name, const std::string& message, bool expected_found, uint64_t expected_seqnum);
+
+    virtual UnitTestResult run(Logger&, CancellableScope&) const override;
+
+private:
+    std::string m_message;
+    bool m_expected_found;
+    uint64_t m_expected_seqnum;
+};
+}
+
+
+PingParseTest::PingParseTest(
+    const std::string& name,
+    const std::string& message,
+    bool expected_found,
+    uint64_t expected_seqnum
+)
+    : UnitTest("NintendoSwitch::SysbotBase - " + name)
+    , m_message(message)
+    , m_expected_found(expected_found)
+    , m_expected_seqnum(expected_seqnum)
+{}
+
+UnitTestResult PingParseTest::run(Logger&, CancellableScope&) const{
+    uint64_t seqnum = 0;
+    bool found = TcpSysbotBase_Connection::parse_ping_response(m_message, seqnum);
+    if (found != m_expected_found){
+        return "parse_ping_response(\"" + m_message + "\") returned " + (found ? "true" : "false")
+            + ", expected " + (m_expected_found ? "true" : "false") + ".";
+    }
+    if (found && seqnum != m_expected_seqnum){
+        return "parse_ping_response(\"" + m_message + "\") returned seqnum " + std::to_string(seqnum)
+            + ", expected " + std::to_string(m_expected_seqnum) + ".";
+    }
+    return true;
+}
+
+
+
+void add_tests_SysbotBasePing(UnitTestDatabase& database){
+    database.add<PingParseTest>("PingParse(valid)", "ping 42", true, 42);
+    database.add<PingParseTest>("PingParse(zero)", "ping 0", true, 0);
+    database.add<PingParseTest>("PingParse(offset ping)", "prefix ping 7", true, 7);
+    database.add<PingParseTest>("PingParse(uint64 max)", "ping 18446744073709551615", true, UINT64_MAX);
+    database.add<PingParseTest>("PingParse(ends in ping)", std::string(128, 'A') + "ping", false, 0);
+    database.add<PingParseTest>("PingParse(bare ping)", "ping", false, 0);
+    database.add<PingParseTest>("PingParse(trailing whitespace)", "ping   ", false, 0);
+    database.add<PingParseTest>("PingParse(overflow)", "ping 18446744073709551616", false, 0);
+    database.add<PingParseTest>("PingParse(non-numeric)", "ping abc", false, 0);
+    database.add<PingParseTest>("PingParse(negative)", "ping -5", false, 0);
 }
 
 
