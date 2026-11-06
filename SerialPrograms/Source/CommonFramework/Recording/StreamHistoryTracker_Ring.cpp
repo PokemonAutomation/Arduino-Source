@@ -120,9 +120,13 @@ CodecParametersPtr copy_codec_parameters(const AVCodecParameters* source){
 }
 
 
-//  ffmpeg logs to stderr at AV_LOG_INFO by default, and probing the encoder
-//  candidates is noisy. The level is process-wide, so it is set once, when
-//  the first tracker is built, rather than reset by every tracker.
+//  set the log level to AV_LOG_ERROR, so only errors are logged.
+//  By default, ffmpeg logs to stderr at AV_LOG_INFO, where all progress
+//  is logged, in addition to errors.
+//
+//  The log level is process-wide, so it is set once, when
+//  the first tracker is built, rather than reset by every tracker. Therefore,
+//  we use a run once idiom, with the function-local static.
 void quiet_ffmpeg_logging_once(){
     static const bool done = []{
         av_log_set_level(AV_LOG_ERROR);
@@ -286,12 +290,12 @@ void abandon_video_encoder(Logger& logger, const char* name, AVCodecContext*& ct
 
 //  Threads:
 //  - The encoder thread (worker_loop()) owns the video encoder and its state:
-//    m_vctx, m_sws and the m_sws_* fields, m_video_width, m_video_height,
+//    m_video_context, m_sws and the m_sws_* fields, m_video_width, m_video_height,
 //    m_video_start, m_last_keyframe_us, m_last_pts_us,
 //    m_logged_unsupported_format and m_video_encoder_index. Nothing else
 //    touches them.
 //  - The audio thread (push_samples()) owns the AAC encoder, the sample
-//    accumulator and the audio clock: m_actx, m_audio_layout, m_have_audio,
+//    accumulator and the audio clock: m_audio_context, m_audio_layout, m_have_audio,
 //    m_audio_acc, m_audio_samples_total, m_audio_anchored,
 //    m_audio_anchor_sample and m_audio_anchor_time.
 //  - The video thread (on_frame()) throttles frames and queues them.
@@ -309,7 +313,7 @@ void abandon_video_encoder(Logger& logger, const char* name, AVCodecContext*& ct
 struct StreamHistoryTracker_Ring::Data{
     Logger& m_logger;
     mutable SpinLock m_lock;    //  See "Threads" above.
-    std::chrono::seconds m_window;
+    std::chrono::seconds m_window; // the duration in the past that we record
     bool m_has_video;
 
     //  Audio configuration. The working stream is attached at a fixed
@@ -332,13 +336,13 @@ struct StreamHistoryTracker_Ring::Data{
 
     //  Video encoder (initialized on the worker thread at the first frame).
     bool m_video_enabled;
-    bool m_logged_unsupported_format = false;
-    AVCodecContext* m_vctx = nullptr;
-    SwsContext* m_sws = nullptr;
-    int m_sws_in_format = AV_PIX_FMT_NONE;
-    int m_sws_width = 0;
-    int m_sws_height = 0;
-    int m_sws_out_format = AV_PIX_FMT_NONE;
+    bool m_logged_unsupported_format = false; // If a frame can’t be converted to RGB888, the error is logged the first time only
+    AVCodecContext* m_video_context = nullptr; // ffmpeg video encoder context
+    SwsContext* m_sws = nullptr; // libswscale context: converts and scales the captured frame into the encoder’s pixel format and output size.
+    int m_sws_in_format = AV_PIX_FMT_NONE; // source pixel format
+    int m_sws_width = 0; // source pixel width
+    int m_sws_height = 0; // source pixel height
+    int m_sws_out_format = AV_PIX_FMT_NONE; // encoder’s pixel format (m_video_context->pix_fmt) at build time
     int m_video_width = 0;
     int m_video_height = 0;
     int64_t m_last_keyframe_us = -VIDEO_KEYFRAME_INTERVAL_US;
@@ -357,7 +361,7 @@ struct StreamHistoryTracker_Ring::Data{
     //  Codec parameter snapshots for muxing, owned by Data, guarded by
     //  `m_lock`. ffmpeg is not thread-safe on a live AVCodecContext, and
     //  mux_to_file() runs on the caller's thread while the video worker and
-    //  the audio pipeline thread keep encoding into m_vctx/m_actx, so the muxer
+    //  the audio pipeline thread keep encoding into m_video_context/m_audio_context, so the muxer
     //  must never read those contexts directly (a torn read of, e.g., the
     //  lazily-populated hardware-encoder extradata crashes the mp4 muxer).
     //  Each snapshot is refreshed on its encoder's own thread when the first
@@ -368,7 +372,7 @@ struct StreamHistoryTracker_Ring::Data{
     AVCodecParameters* m_audio_params = nullptr;
 
     //  Audio encoder (used by push_samples).
-    AVCodecContext* m_actx = nullptr;
+    AVCodecContext* m_audio_context = nullptr;  // audio encoder context
     AVChannelLayout m_audio_layout = {};
     int64_t m_audio_samples_total = 0;    //  Samples (per channel) sent to the encoder.
     //  The audio sample clock: sample m_audio_anchor_sample was captured at
@@ -424,8 +428,8 @@ struct StreamHistoryTracker_Ring::Data{
         if (m_sws != nullptr) sws_freeContext(m_sws);
         if (m_video_params != nullptr) avcodec_parameters_free(&m_video_params);
         if (m_audio_params != nullptr) avcodec_parameters_free(&m_audio_params);
-        if (m_vctx != nullptr) avcodec_free_context(&m_vctx);
-        if (m_actx != nullptr) avcodec_free_context(&m_actx);
+        if (m_video_context != nullptr) avcodec_free_context(&m_video_context);
+        if (m_audio_context != nullptr) avcodec_free_context(&m_audio_context);
     }
 
 
@@ -441,45 +445,45 @@ struct StreamHistoryTracker_Ring::Data{
         }
 
         // allocate an AAC encoder context
-        m_actx = avcodec_alloc_context3(codec);
-        if (m_actx == nullptr){
+        m_audio_context = avcodec_alloc_context3(codec);
+        if (m_audio_context == nullptr){
             m_logger.log("Stream history: Failed to allocate AAC encoder. Disabling audio.", COLOR_RED);
             m_have_audio = false;
             return;
         }
-        m_actx->sample_rate = AUDIO_OUTPUT_RATE;
-        m_actx->time_base = av_make_q(1, AUDIO_OUTPUT_RATE);
-        m_actx->bit_rate = 96000;
-        m_actx->frame_size = AUDIO_FRAME_SAMPLES;
+        m_audio_context->sample_rate = AUDIO_OUTPUT_RATE;
+        m_audio_context->time_base = av_make_q(1, AUDIO_OUTPUT_RATE);
+        m_audio_context->bit_rate = 96000;
+        m_audio_context->frame_size = AUDIO_FRAME_SAMPLES;
         //  The AAC encoder requires the sample format to be set explicitly;
         //  avcodec_open2() fails with EINVAL ("Invalid audio sample format")
         //  if it is left at AV_SAMPLE_FMT_NONE. The encoder works in planar
         //  float; push_samples() accumulates the planar working stream
         //  packed/interleaved, and the encode loop de-interleaves it into
         //  the frame's planes.
-        m_actx->sample_fmt = AV_SAMPLE_FMT_FLTP;
+        m_audio_context->sample_fmt = AV_SAMPLE_FMT_FLTP;
         //  The AAC stream configuration (AudioSpecificConfig) must land in the
         //  container header: with this flag the encoder emits raw AAC frames +
         //  extradata, which is what both the MP4 and MKV muxers need. Without
         //  it the packets would be ADTS and mux_to_file() would fail to set up
         //  the audio stream.
-        m_actx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
+        m_audio_context->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
         // init AAC channel layout
-        if (!init_channel_layout(m_actx->ch_layout, (int)m_audio_channels)){
+        if (!init_channel_layout(m_audio_context->ch_layout, (int)m_audio_channels)){
             m_logger.log(
                 "Stream history: Failed to initialize the AAC channel layout ("
                 + std::to_string((int)m_audio_channels) + " channels). Disabling audio.",
                 COLOR_RED
             );
-            avcodec_free_context(&m_actx);
-            m_actx = nullptr;
+            avcodec_free_context(&m_audio_context);
+            m_audio_context = nullptr;
             m_have_audio = false;
             return;
         }
 
         // open the AAC encoder
-        int open_err = avcodec_open2(m_actx, codec, nullptr);
+        int open_err = avcodec_open2(m_audio_context, codec, nullptr);
         if (open_err < 0){
             m_logger.log(
                 "Stream history: Failed to open AAC encoder: "
@@ -487,8 +491,8 @@ struct StreamHistoryTracker_Ring::Data{
                 + ". Disabling audio.",
                 COLOR_RED
             );
-            avcodec_free_context(&m_actx);
-            m_actx = nullptr;
+            avcodec_free_context(&m_audio_context);
+            m_audio_context = nullptr;
             m_have_audio = false;
             return;
         }
@@ -497,13 +501,13 @@ struct StreamHistoryTracker_Ring::Data{
         init_channel_layout(m_audio_layout, (int)m_audio_channels);
         m_logger.log(
             "Stream history: audio = AAC " + std::to_string(m_audio_channels) + "ch @ 48 kHz ("
-            + std::to_string(m_actx->bit_rate / 1000) + " kbps)."
+            + std::to_string(m_audio_context->bit_rate / 1000) + " kbps)."
         );
     }
 
 
     //  Tries the encoder candidates from m_video_encoder_index (skipping
-    //  poisoned ones) and opens the first that works: sets m_vctx, resets
+    //  poisoned ones) and opens the first that works: sets m_video_context, resets
     //  the per-encoder state, and frees the old parameter snapshot. If none
     //  work, video is disabled (m_video_enabled).
     void init_video_encoder(int input_width, int input_height){
@@ -511,7 +515,7 @@ struct StreamHistoryTracker_Ring::Data{
         //  Candidates before m_video_encoder_index already failed. Once past
         //  the last one (e.g. the last candidate opened but then failed at
         //  runtime), there is nothing left to try: disable video so the
-        //  caller never proceeds with a null m_vctx.
+        //  caller never proceeds with a null m_video_context.
         if (m_video_encoder_index >= CANDIDATE_COUNT){
             m_logger.log("Stream history: No usable video encoder left. Disabling video.", COLOR_RED);
             WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
@@ -621,7 +625,7 @@ struct StreamHistoryTracker_Ring::Data{
             ctx->pix_fmt = preferred;
             int err = avcodec_open2(ctx, codec, nullptr);
             if (err == 0){
-                m_vctx = ctx;
+                m_video_context = ctx;
                 m_video_encoder_index = i + 1;
                 size_t dropped_packets;
                 {
@@ -688,7 +692,7 @@ struct StreamHistoryTracker_Ring::Data{
             m_logger.log("Stream history: Failed to allocate video packet.", COLOR_RED);
             return 0;
         }
-        int err = avcodec_receive_packet(m_vctx, packet);
+        int err = avcodec_receive_packet(m_video_context, packet);
         if (err == AVERROR(EAGAIN) || err == AVERROR_EOF){
             av_packet_free(&packet);
             return 0;
@@ -719,14 +723,14 @@ struct StreamHistoryTracker_Ring::Data{
             //  populate their extradata lazily, sometimes only after the first
             //  encoded packet. mux_to_file() must not read the live context.
             if (m_video_params == nullptr
-                || m_video_params->extradata_size != m_vctx->extradata_size
+                || m_video_params->extradata_size != m_video_context->extradata_size
             ){
                 if (m_video_params == nullptr){
                     m_video_params = avcodec_parameters_alloc();
                 }
                 if (m_video_params != nullptr){
-                    avcodec_parameters_from_context(m_video_params, m_vctx);
-                    m_video_time_base = m_vctx->time_base;
+                    avcodec_parameters_from_context(m_video_params, m_video_context);
+                    m_video_time_base = m_video_context->time_base;
                 }
             }
             m_video.push_back(std::move(ring_packet));
@@ -790,7 +794,7 @@ struct StreamHistoryTracker_Ring::Data{
             + "); falling back to the next candidate.",
             COLOR_YELLOW
         );
-        abandon_video_encoder(m_logger, failed, m_vctx);
+        abandon_video_encoder(m_logger, failed, m_video_context);
         init_video_encoder(input_width, input_height);
     }
 
@@ -855,7 +859,7 @@ struct StreamHistoryTracker_Ring::Data{
         //  (one line per failing stretch, not one per tracker).
         m_logged_unsupported_format = false;
 
-        if (m_vctx == nullptr){
+        if (m_video_context == nullptr){
             init_video_encoder(qframe.width(), qframe.height());
             if (!m_video_enabled){
                 unmap_if_needed();
@@ -866,14 +870,14 @@ struct StreamHistoryTracker_Ring::Data{
         //  (Re)build the scaler if the input changed, or if the encoder's
         //  preferred pixel format changed (e.g. after an encoder fallback).
         if (src_format != m_sws_in_format || src_width != m_sws_width || src_height != m_sws_height
-            || m_vctx->pix_fmt != m_sws_out_format){
+            || m_video_context->pix_fmt != m_sws_out_format){
             if (m_sws != nullptr){
                 sws_freeContext(m_sws);
                 m_sws = nullptr;
             }
             m_sws = sws_getContext(
                 src_width, src_height, (AVPixelFormat)src_format,
-                m_video_width, m_video_height, m_vctx->pix_fmt,
+                m_video_width, m_video_height, m_video_context->pix_fmt,
                 SWS_BILINEAR, nullptr, nullptr, nullptr
             );
             if (m_sws == nullptr){
@@ -891,7 +895,7 @@ struct StreamHistoryTracker_Ring::Data{
             m_sws_in_format = src_format;
             m_sws_width = src_width;
             m_sws_height = src_height;
-            m_sws_out_format = m_vctx->pix_fmt;
+            m_sws_out_format = m_video_context->pix_fmt;
         }
 
         AVFrame* frame = av_frame_alloc();
@@ -899,7 +903,7 @@ struct StreamHistoryTracker_Ring::Data{
             unmap_if_needed();
             return;
         }
-        frame->format = m_vctx->pix_fmt;
+        frame->format = m_video_context->pix_fmt;
         frame->width = m_video_width;
         frame->height = m_video_height;
         if (av_frame_get_buffer(frame, 0) < 0){
@@ -951,7 +955,7 @@ struct StreamHistoryTracker_Ring::Data{
         //  so a send can fail with EAGAIN while output packets are pending:
         //  drain one packet and retry instead of giving up.
         while (true){
-            int err = avcodec_send_frame(m_vctx, frame);
+            int err = avcodec_send_frame(m_video_context, frame);
             if (err == AVERROR(EAGAIN)){
                 int drained = drain_one_video_packet();
                 if (drained < 0){
@@ -1206,7 +1210,7 @@ struct StreamHistoryTracker_Ring::Data{
                 m_audio_acc.erase(m_audio_acc.begin(), erase_end);
             }
 
-            int err = avcodec_send_frame(m_actx, frame);
+            int err = avcodec_send_frame(m_audio_context, frame);
             av_frame_free(&frame);
             if (err < 0){
                 m_logger.log("Stream history: Audio encode failed: " + ffmpeg_error(err), COLOR_RED);
@@ -1218,7 +1222,7 @@ struct StreamHistoryTracker_Ring::Data{
                 if (packet == nullptr){
                     return;
                 }
-                err = avcodec_receive_packet(m_actx, packet);
+                err = avcodec_receive_packet(m_audio_context, packet);
                 if (err == AVERROR(EAGAIN)){
                     av_packet_free(&packet);
                     break;
@@ -1253,13 +1257,13 @@ struct StreamHistoryTracker_Ring::Data{
                     //  encoder's) thread; see the video counterpart in
                     //  drain_one_video_packet().
                     if (m_audio_params == nullptr
-                        || m_audio_params->extradata_size != m_actx->extradata_size
+                        || m_audio_params->extradata_size != m_audio_context->extradata_size
                     ){
                         if (m_audio_params == nullptr){
                             m_audio_params = avcodec_parameters_alloc();
                         }
                         if (m_audio_params != nullptr){
-                            avcodec_parameters_from_context(m_audio_params, m_actx);
+                            avcodec_parameters_from_context(m_audio_params, m_audio_context);
                         }
                     }
                     m_audio.push_back(std::move(ring_packet));
@@ -1290,7 +1294,7 @@ struct StreamHistoryTracker_Ring::Data{
     ) const{
         //  Parameter names use the p_ prefix: the ring deques and start
         //  indices have the same names as Data members (C4458 under /W4).
-        //  No live m_vctx/m_actx checks here: the codec state for muxing comes
+        //  No live m_video_context/m_audio_context checks here: the codec state for muxing comes
         //  from the m_video_params/m_audio_params snapshots (captured on the
         //  encoder threads; ffmpeg is not thread-safe on a live context).
         bool have_video = (p_video_start < p_video.size());
