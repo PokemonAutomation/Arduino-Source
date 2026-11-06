@@ -59,20 +59,17 @@ void ClientSocket_Qt::abort() noexcept{
         m_state.store(State::DESTRUCTING, std::memory_order_release);
         m_success_pending = false;
         socket = m_socket;
-        m_socket = nullptr;
     }
-    cancel_inflight_sends();
 
-    //  Destroy the socket without blocking, so this is safe to call from a
-    //  listener callback (which runs on the QTcpSocket's event thread).
-    //  remove_object() waits for that event thread to delete the socket, so it
-    //  is dispatched to a worker thread instead of run here. The socket is
-    //  left in State::DESTRUCTING.
-    try{
-        GlobalThreadPools::qt_worker_threadpool().dispatch([socket]{
-            GlobalThreadPools::qt_event_threadpool().remove_object(socket);
-        });
-    }catch (...){}
+    //  Immediately break the connection. QTcpSocket::abort() is safe to call
+    //  from the socket's event thread (where a listener callback runs): it
+    //  disconnects without waiting, so this never blocks. The resulting
+    //  "disconnected"/"errorOccurred" signals reach connection_failed(), see
+    //  State::DESTRUCTING, and are no-ops. The socket is left in
+    //  State::DESTRUCTING; a later close() removes it and returns it to
+    //  NOT_RUNNING.
+    cancel_inflight_sends();
+    socket->abort();
 }
 void ClientSocket_Qt::connect(const std::string& address, uint16_t port){
     QTcpSocket* old_socket;
