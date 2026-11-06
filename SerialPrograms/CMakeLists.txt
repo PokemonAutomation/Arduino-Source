@@ -74,6 +74,9 @@ option(PA_CORE_ONLY "Build only the GUI-free core (basic microcontroller functio
 # listing, so every file would be recompiled on every run.
 option(PA_ASSEMBLY_LISTINGS "Write an assembly listing of every source file to Assembly/ (MSVC and clang-cl only)" ON)
 
+# Enable gamepad integration by giving -DPA_GAMEPAD=ON command line to cmake
+option(PA_GAMEPAD "Enable physical gamepad input" OFF)
+
 if(PA_CORE_ONLY)
     message(STATUS "PA_CORE_ONLY: building only the GUI-free core")
     set(CMAKE_AUTOMOC OFF)
@@ -224,6 +227,12 @@ target_link_libraries(
     $<LINK_LIBRARY:WHOLE_ARCHIVE,SerialProgramsLib>
 )
 
+if (PA_GAMEPAD)
+    message(STATUS "Compiling with gamepad (via SDL) integration enabled")
+    target_compile_definitions(SerialProgramsLib PRIVATE PA_GAMEPAD)
+    target_compile_definitions(SerialPrograms PRIVATE PA_GAMEPAD)
+endif()
+
 # Add source code exclusive to the internal repo and add C++ macro of official release
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/Internal0.cpp")
     message(STATUS "Building internal SerialPrograms")
@@ -337,6 +346,14 @@ if(NOT EXISTS "${DEST_DIR}/Scripts")
 endif()
 
 if (WIN32)
+    if (PA_GAMEPAD)
+        add_library(SDL3_lib IMPORTED UNKNOWN)
+        set_target_properties(SDL3_lib PROPERTIES
+            IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/SDL3.lib
+        )
+        target_link_libraries(SerialProgramsLib PRIVATE SDL3_lib)
+    endif()
+
     add_library(OpenCV_lib IMPORTED UNKNOWN)
     target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/opencv-4.12.0/)
     set_target_properties(OpenCV_lib PROPERTIES
@@ -433,6 +450,18 @@ if (WIN32)
 #    target_compile_options(SerialProgramsLib PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512GF)
 else() # macOS and Linux
     find_package(PkgConfig REQUIRED)  # required to execute `pkg_search_module()` below
+    if (PA_GAMEPAD)
+        # Resolve Homebrew's config symlinks so SDL uses its own include directory,
+        # not the shared include root that also exposes incompatible Qt headers.
+        set(PA_SAVED_FIND_PACKAGE_RESOLVE_SYMLINKS "${CMAKE_FIND_PACKAGE_RESOLVE_SYMLINKS}")
+        set(CMAKE_FIND_PACKAGE_RESOLVE_SYMLINKS TRUE)
+        find_package(SDL3 3.2 REQUIRED CONFIG)
+        set(CMAKE_FIND_PACKAGE_RESOLVE_SYMLINKS "${PA_SAVED_FIND_PACKAGE_RESOLVE_SYMLINKS}")
+        get_target_property(SDL3_INCLUDE_DIRS SDL3::Headers INTERFACE_INCLUDE_DIRECTORIES)
+        # BEFORE to prefer the packaged SDL headers over the bundled Windows headers.
+        target_include_directories(SerialProgramsLib SYSTEM BEFORE PRIVATE ${SDL3_INCLUDE_DIRS})
+        target_link_libraries(SerialProgramsLib PRIVATE SDL3::SDL3)
+    endif()
     if (APPLE)
         # prepare onnxruntime if needed
         set(ONNXRUNTIME_VERSION "1.23.2")
@@ -845,6 +874,9 @@ if (WIN32)
 
     # Copy 3rd party DLLs if missing/different
     file(GLOB THIRD_PARTY_DLLS "${REPO_ROOT_DIR}/3rdPartyBinaries/*.dll")
+    if (NOT PA_GAMEPAD)
+        list(REMOVE_ITEM THIRD_PARTY_DLLS "${REPO_ROOT_DIR}/3rdPartyBinaries/SDL3.dll")
+    endif()
     foreach(DLL IN LISTS THIRD_PARTY_DLLS)
         get_filename_component(DLL_NAME "${DLL}" NAME)
         add_custom_command(
