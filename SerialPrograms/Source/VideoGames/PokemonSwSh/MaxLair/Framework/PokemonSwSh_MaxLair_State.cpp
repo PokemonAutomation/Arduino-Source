@@ -24,22 +24,31 @@ bool is_boss_battle(const GlobalState& state){
 
 } // namespace
 
+bool GlobalState::in_boss_battle_with_known_boss() const{
+    return is_boss_battle(*this) && is_boss(boss);
+}
+
 bool GlobalState::accept_opponent(){
-    const std::string opponent_slug = opponent.empty() ? "" : *opponent.begin();
-    //  A boss before the end means something is out-of-sync.
-    if (!is_boss_battle(*this) && is_boss(opponent_slug)){
+    if (opponent.size() != 1){
         return false;
     }
-    //  Infer the boss if we don't know it.
-    if (is_boss_battle(*this) && boss.empty()){
+    const std::string& opponent_slug = *opponent.begin();
+    //  Reject the OCR read if the opponent species doesn't match the current stage:
+    //  a legendary boss read during battles 1-3, or a non-boss rental read in battle 4.
+    if (is_boss(opponent_slug) != is_boss_battle(*this)){
+        return false;
+    }
+    if (is_boss_battle(*this) && !in_boss_battle_with_known_boss()){
         boss = opponent_slug;
     }
     return true;
 }
 
 std::string GlobalState::boss_if_caught() const{
-    //  The identified boss is reported whether or not it was caught.
-    return boss;
+    //  A failed adventure (e.g. wins == 3, only lost to the boss) can still have
+    //  an identified boss, but no boss catch: catching the boss requires winning
+    //  the fourth battle (wins == 4).
+    return wins == 4 && is_boss(boss) ? boss : "";
 }
 
 std::string PlayerState::dump() const{
