@@ -11,7 +11,6 @@
 
 #include "PokemonFRLG_Settings.h"
 #include "Programs/BoxOrganization/PokemonFRLG_BoxSorter.h"
-
 #include "Programs/BoxOrganization/PokemonFRLG_BoxSorterLivingDex.h"
 #include "Programs/Farming/PokemonFRLG_EliteFourFarmer.h"
 #include "Programs/Farming/PokemonFRLG_HeldItemFarmer-SafariZone.h"
