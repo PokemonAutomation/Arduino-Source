@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_PokemonBDSP_MenuDetector_H
 #define PokemonAutomation_PokemonBDSP_MenuDetector_H
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
-#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -50,7 +50,7 @@ public:
 //  The screenshot tests in CommandLineTests/PokemonBDSP/MenuDetector/.
 void add_tests_MenuDetector(UnitTestDatabase& database);
 
-}
-}
-}
+} // namespace PokemonBDSP
+} // namespace NintendoSwitch
+} // namespace PokemonAutomation
 #endif

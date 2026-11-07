@@ -85,7 +85,7 @@ private:
 //  The screenshot tests in CommandLineTests/PokemonBDSP/DialogDetector/.
 void add_tests_DialogDetector(UnitTestDatabase& database);
 
-}
-}
-}
+} // namespace PokemonBDSP
+} // namespace NintendoSwitch
+} // namespace PokemonAutomation
 #endif
