@@ -27,7 +27,7 @@ public:
 
 private:
     Color m_color;
-//    ImageFloatBox m_bottom;
+    ImageFloatBox m_bottom_white;
     ImageFloatBox m_left_white;
     ImageFloatBox m_left;
     ImageFloatBox m_right_white;

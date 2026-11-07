@@ -21,13 +21,16 @@ namespace PokemonBDSP{
 class ExperienceGainDetector : public StaticScreenDetector{
 public:
     ~ExperienceGainDetector();
-    ExperienceGainDetector(Color color = COLOR_RED);
+    // Level-100 parties can show the experience panel without any dialog.
+    // Opt in only while already handling a battle. Other callers require dialog.
+    ExperienceGainDetector(Color color = COLOR_RED, bool allow_no_dialog = false);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     Color m_color;
+    bool m_allow_no_dialog;
     ShortDialogDetector m_dialog;
     ImageFloatBox m_middle_column;
     ImageFloatBox m_left_column;
@@ -38,7 +41,7 @@ private:
 // The experience screen still shows even if all party pokemon are max leveled and have max EVs.
 class ExperienceGainWatcher : public ExperienceGainDetector, public VisualInferenceCallback{
 public:
-    ExperienceGainWatcher(Color color = COLOR_RED);
+    ExperienceGainWatcher(Color color = COLOR_RED, bool allow_no_dialog = false);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     // Return true when the screen that the party pokemon are about to gain experience is found.
