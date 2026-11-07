@@ -94,9 +94,16 @@ brew install cmake
 
 ### Install Ninja
 
-Ninja is a build tool that CMake can use to find out quickly what files need rebuilding. Install it using Homebrew by running in Terminal
+Ninja is a build tool that CMake can use to find out quickly what files need rebuilding by file modification time. Install it using Homebrew by running in Terminal
 ```
 brew install ninja
+```
+
+### Install ccache
+
+ccache is another build tool that saves build time. It uses a cache to skip building a source code file if that file's content has been compiled before. Install it using Homebrew by running in Terminal
+```
+brew install ccache
 ```
 
 ### Install Qt6
@@ -268,10 +275,12 @@ This makes a new folder called "build_mac" in "Arduino-Source" and moves the Ter
 
 Execute the command in Terminal:
 ```
-cmake ../SerialPrograms/ -G Ninja -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/6.10.2/macos
+cmake ../SerialPrograms/ -G Ninja -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_PREFIX_PATH=$HOME/Qt/6.10.2/macos -DPA_USE_CCACHE=ON
 ```
-This command uses CMake to configure our code to prepare for compilation. `-G Ninja` tells CMake to compile with Ninja, and `-DCMAKE_PREFIX_PATH` tells CMake where the Qt you installed is. If successful, it should print texts like
+This command uses CMake to configure our code to prepare for compilation. `-G Ninja` tells CMake to compile with Ninja, `-DCMAKE_PREFIX_PATH` tells CMake where the Qt you installed is, and `-DPA_USE_CCACHE=ON` tells CMake to compile with ccache. If successful, it should print texts like
 ```
+...
+-- Using ccache: /opt/homebrew/bin/ccache cache_dir=/Users/<YOUR_MAC_USERNAME>/Library/Caches/ccache/PA-Arduino-Source base_dir=<YOUR_PATH_TO_ARDUINO-SOURCE_FOLDER>
 ...
 -- Configuring done
 -- Generating done
@@ -286,6 +295,7 @@ cmake --build . -j 10
 ```
 to compile and build the program in "build_mac" folder.
 It will take a while to build depending on your computer's speed.
+Later builds should be faster thanks to Ninja and ccache.
 
 Each line starts with a counter like `[25/1613]`. If successful, the counter reaches the total, and the last lines in Terminal look like
 ```
@@ -351,11 +361,26 @@ rm -rf build_mac
 to delete the old "build_mac" folder. Then follow [Part 4: Compile the Program](#part-4-compile-the-program) again,
 with the new Qt version in the `-DCMAKE_PREFIX_PATH` part of the CMake command.
 
+## Part 7: Tuning ccache (optional)
 
+The default ccache settings work for most people. This part is for developers who build often or keep several copies of the code (a.k.a worktrees) in the filesystem. 
+
+To check cache statistics on the codebase (how many cache hits and misses so far and storage space uses), run in Terminal
+```
+ccache --dir $(ccache --get-config cache_dir)/PA-Arduino-Source -s
+```
+
+By default ccache has a max cache size of 5 GB. When the storage is full, ccache deletes the files it used least recently.
+If you often switch between many branches and worktrees of the codebase, you can increase its size to say 20 GB by
+```
+ccache --dir $(ccache --get-config cache_dir)/PA-Arduino-Source --set-config max_size=20G
+```
+
+For more info on how we set up ccache when configuring the program, see `SerialPrograms/cmake/Ccache.cmake`.
 
 <hr>
 
-Guide Written by: jw098
+Guide Written by: Gin, jw098
 
 **Discord Server:** 
 
