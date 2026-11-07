@@ -1885,6 +1885,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonHome/Programs/PokemonHome_BoxSorter.h
     Source/VideoGames/PokemonHome/Programs/PokemonHome_BoxSorterLivingDex.cpp
     Source/VideoGames/PokemonHome/Programs/PokemonHome_BoxSorterLivingDex.h
+    Source/VideoGames/PokemonHome/Programs/PokemonHome_BoxSorterLivingDex_Tests.cpp
+    Source/VideoGames/PokemonHome/Programs/PokemonHome_BoxSorterLivingDex_Tests.h
     Source/VideoGames/PokemonHome/Programs/PokemonHome_GenerateNameOCR.cpp
     Source/VideoGames/PokemonHome/Programs/PokemonHome_GenerateNameOCR.h
     Source/VideoGames/PokemonHome/Programs/PokemonHome_PageSwap.cpp

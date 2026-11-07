@@ -6,6 +6,7 @@
 
 #include <array>
 #include <cmath>
+#include <limits>
 #include <optional>
 #include <sstream>
 #include <vector>
@@ -71,6 +72,7 @@ std::unique_ptr<StatsTracker> BoxSorterLivingDex_Descriptor::make_stats() const{
 }
 
 BoxSorterLivingDex::~BoxSorterLivingDex(){
+    LIVING_DEX_STYLE.remove_listener(*this);
     OT_NAME_LANGUAGE.remove_listener(*this);
 };
 
@@ -107,9 +109,17 @@ BoxSorterLivingDex::BoxSorterLivingDex()
             {LivingDexStyle::POKEPC_SORTED_SPECIES, "pokepc_sorted_species", "PokePC Sorted by Species"},
             {LivingDexStyle::POKEPC_SORTED_SPECIES_MINIMAL, "pokepc_sorted_species_minimal", "PokePC Sorted by Species (Minimal)"},
             {LivingDexStyle::POKEPC_SPECIES_FIRST, "pokepc_species_first", "PokePC Species First"},
+            {LivingDexStyle::CUSTOM, "custom", "Custom"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         LivingDexStyle::SORTED_BY_FORMS
+    )
+    , CUSTOM_DEX_FILE(
+        "<b>Custom Living Dex File:</b><br>Select a JSON template in the same format as the files in Resources/PokemonHome/DexTemplates.",
+        LockMode::LOCK_WHILE_RUNNING,
+        "",
+        "JSON Files (*.json)",
+        "Select a living dex JSON file..."
     )
     , SHINY_DEX(
         "<b>Shiny Dex:</b><br>Enable or disable shiny dex mode.",
@@ -171,6 +181,7 @@ BoxSorterLivingDex::BoxSorterLivingDex()
     PA_ADD_OPTION(REJECT_BOX_START);
     PA_ADD_OPTION(REJECT_BOX_END);
     PA_ADD_OPTION(LIVING_DEX_STYLE);
+    PA_ADD_OPTION(CUSTOM_DEX_FILE);
     PA_ADD_OPTION(SHINY_DEX);
     PA_ADD_OPTION(OT_NAME_LANGUAGE);
     PA_ADD_OPTION(OT_NAME);
@@ -182,14 +193,84 @@ BoxSorterLivingDex::BoxSorterLivingDex()
 
     BoxSorterLivingDex::on_config_value_changed(this);
 
+    LIVING_DEX_STYLE.add_listener(*this);
     OT_NAME_LANGUAGE.add_listener(*this);
 }
 
 void BoxSorterLivingDex::on_config_value_changed(void* object){
+    CUSTOM_DEX_FILE.set_visibility(
+        LIVING_DEX_STYLE == LivingDexStyle::CUSTOM ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN
+    );
     if (OT_NAME_LANGUAGE == Language::None){
         OT_NAME.set_visibility(ConfigOptionState::HIDDEN);
     }else{
         OT_NAME.set_visibility(ConfigOptionState::ENABLED);
+    }
+}
+
+void validate_living_dex_template(const JsonValue& json, const std::string& path){
+    const JsonArray* entries = json.to_array();
+    if (entries == nullptr){
+        throw ParseException(path + ": Expected a JSON array of living dex entries. Check the JSON syntax and outer square brackets.");
+    }
+    if (entries->empty()){
+        throw ParseException(path + ": The living dex template must contain at least one entry.");
+    }
+    if (entries->size() > MAX_HOME_BOXES * 30){
+        throw ParseException(path + ": The living dex template exceeds HOME's capacity of " + std::to_string(MAX_HOME_BOXES * 30) + " slots.");
+    }
+
+    for (size_t i = 0; i < entries->size(); i++){
+        const std::string location = path + " (entry " + std::to_string(i + 1) + ")";
+        const JsonObject& obj = (*entries)[i].to_object_throw(location);
+        auto field = [&](const char* key, JsonType expected_type) -> const JsonValue&{
+            const JsonValue& value = obj.get_value_throw(key, location);
+            if (value.type() != expected_type){
+                throw JsonParseException(location, key, expected_type, value.type());
+            }
+            return value;
+        };
+        const std::string& species = field("species_slug", JsonType::STRING).to_string_throw();
+        const std::string& form = field("form_slug", JsonType::STRING).to_string_throw();
+        const std::string& slug = field("slug", JsonType::STRING).to_string_throw();
+        const int64_t nat_id = field("natID", JsonType::INTEGER).to_integer_throw();
+        const std::string& primary = field("primaryType", JsonType::STRING).to_string_throw();
+        const bool gender_difference = field("has_gender_difference", JsonType::BOOLEAN).to_boolean_throw();
+        if (nat_id < 0 || nat_id > std::numeric_limits<uint16_t>::max()){
+            throw ParseException(location + ": 'natID' must be an integer from 1 to 65535, or 0 for an empty slot.");
+        }
+
+        PokemonType secondary_type = PokemonType::NONE;
+        const JsonValue* secondary = obj.get_value("secondaryType");
+        if (secondary != nullptr && !secondary->is_null()){
+            const std::string& type = field("secondaryType", JsonType::STRING).to_string_throw();
+            secondary_type = POKEMON_TYPE_SLUGS().get_enum(type, PokemonType::NONE);
+            if (secondary_type == PokemonType::NONE && type != "none"){
+                throw ParseException(location + ": Unknown 'secondaryType': '" + type + "'. Use a lowercase Pokemon type, or null/\"none\" for no secondary type.");
+            }
+        }
+
+        // Bundled templates reserve empty slots with this placeholder entry.
+        if (nat_id == 0){
+            if (species != "empty" || !form.empty() || !slug.empty() || !primary.empty()
+                || secondary_type != PokemonType::NONE || gender_difference
+            ){
+                throw ParseException(location + ": An empty slot (natID 0) requires species_slug \"empty\", empty form_slug/slug/primaryType, no secondary type, and has_gender_difference false.");
+            }
+            continue;
+        }
+
+        for (const char* key : {"species_slug", "form_slug", "slug"}){
+            if (obj.get_string_throw(key, location).find_first_not_of(" \t\r\n") == std::string::npos){
+                throw ParseException(location + ": '" + key + "' must not be blank. Use \"none\" for a Pokemon with no special form.");
+            }
+        }
+        if (POKEMON_TYPE_SLUGS().get_enum(primary, PokemonType::NONE) == PokemonType::NONE){
+            throw ParseException(location + ": Unknown 'primaryType': '" + primary + "'. Use a lowercase Pokemon type such as \"normal\" or \"grass\".");
+        }
+        if (gender_difference && !slug.ends_with("-male") && !slug.ends_with("-female")){
+            throw ParseException(location + ": When 'has_gender_difference' is true, 'slug' must end with \"-male\" or \"-female\".");
+        }
     }
 }
 
@@ -388,13 +469,27 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
         case LivingDexStyle::POKEPC_SPECIES_FIRST:
             path = RESOURCE_PATH() + "PokemonHome/DexTemplates/pokepc_species_first.json";
             break;
+        case LivingDexStyle::CUSTOM:
+            path = CUSTOM_DEX_FILE;
+            if (path.find_first_not_of(" \t\r\n") == std::string::npos){
+                throw UserSetupError(env.logger(), "Select a Custom Living Dex File before starting the program.");
+            }
+            break;
         default:
             throw InternalProgramError(
                 &env.logger(), PA_CURRENT_FUNCTION, "Invalid living dex style"
             );
     }
     
-    JsonValue json = load_json_file(path);
+    JsonValue json;
+    try{
+        json = load_json_file(path);
+        validate_living_dex_template(json, path);
+    }catch (const FileException& e){
+        throw UserSetupError(env.logger(), "Unable to read the living dex template. Check that the selected file exists and is readable.\n" + e.message());
+    }catch (const ParseException& e){
+        throw UserSetupError(env.logger(), "Invalid living dex template:\n" + e.message());
+    }
     const JsonArray& slugs = json.to_array_throw(path);
 
     std::vector<LivingDexEntry> living_dex_order;
@@ -430,8 +525,6 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
     // vector that will store data for each slot
     std::vector<std::optional<CollectedPokemonInfo>> living_dex_boxes_data;
 
-    exit_menus(env, context, VIDEO_DELAY.get());
-
     BoxCursor dest_cursor;
     BoxCursor nav_cursor((LIVING_DEX_START_BOX - 1), 0, 0);
 
@@ -458,6 +551,8 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
             "ERROR: Living dex boxes overlap with reject boxes, please adjust box settings."
         );
     }
+
+    exit_menus(env, context, VIDEO_DELAY.get());
 
     nav_cursor = populate_box_data(env, context, sort_preferences, living_dex_boxes_data, living_dex_box_count, nav_cursor, OT_NAME_LANGUAGE);
 
