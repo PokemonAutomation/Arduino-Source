@@ -91,7 +91,7 @@ class SwitchProController:
         self._closed = False
         self.port = port
         if not self._backend.wait_for_ready(int(timeout_s * 1000)):
-            raise RuntimeError(f"Controller on {port} is not ready: {self._backend.current_status()}")
+            raise RuntimeError(f"Controller is not ready (port: {port or 'not specified'}): {self._backend.current_status()}")    
 
     # ---- status -------------------------------------------------------------
 
