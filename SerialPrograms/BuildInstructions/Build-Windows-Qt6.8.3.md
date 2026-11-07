@@ -50,6 +50,10 @@ If you are unable or unwilling to use the online installer, the alternative is t
 
 \*This Qt6 standalone file is 3GB in size and is being hosted by our staff for our own developers. We don't want the entire world converging here and overrunning the server.
 
+## Optional SDL support
+
+SDL support is disabled by default. Enable it with `-DPA_SDL=ON` when configuring CMake.
+
 ## Setup:
 
 1. Clone this repo.
