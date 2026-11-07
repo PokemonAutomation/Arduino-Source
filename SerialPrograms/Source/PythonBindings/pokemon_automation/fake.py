@@ -6,7 +6,7 @@ exercised in unit tests. It needs no compiled module.
 
 C++ reference: the interface it mirrors is the binding of
 `NintendoSwitch::PybindSwitchProController`
-(SerialPrograms/Source/Integrations/PybindSwitchProController.h) in
+(SerialPrograms/Source/Integrations/PybindSwitchController.h) in
 SerialPrograms/Source/PythonBindings/PythonBindings_Module.cpp; method names
 and arguments match that C++ class, so the fake is also a check that the
 Python API stays in step with the C++ interface.

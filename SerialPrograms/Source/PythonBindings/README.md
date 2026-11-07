@@ -3,7 +3,7 @@
 A basic Python interface for the microcontroller, built with [pybind11](https://github.com/pybind/pybind11).
 It lets Python act as a Nintendo Switch controller through a PABotBase2 serial
 device, using the `NintendoSwitch::PybindSwitchProController` class from CoreLib
-(`Source/Integrations/PybindSwitchProController.h`).
+(`Source/Integrations/PybindSwitchController.h`).
 
 ## Layout
 

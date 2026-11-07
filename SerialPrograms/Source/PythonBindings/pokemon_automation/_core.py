@@ -8,7 +8,7 @@ it from somewhere else.
 C++ reference: `_pa_core` is built from
 SerialPrograms/Source/PythonBindings/PythonBindings_Module.cpp and wraps
 `NintendoSwitch::PybindSwitchProController`
-(SerialPrograms/Source/Integrations/PybindSwitchProController.h/.cpp), which
+(SerialPrograms/Source/Integrations/PybindSwitchController.h/.cpp), which
 lives in CoreLib.
 
 Importing is deferred until first use, so the pure-Python parts of the package

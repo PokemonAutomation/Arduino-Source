@@ -1,7 +1,7 @@
 #  SwitchProController on top of a FakeController (no hardware, no compiled module).
 #  The command names match the backend (`_pa_core.Controller`), which mirrors the
 #  C++ interface of `NintendoSwitch::PybindSwitchProController`
-#  (SerialPrograms/Source/Integrations/PybindSwitchProController.h), bound by
+#  (SerialPrograms/Source/Integrations/PybindSwitchController.h), bound by
 #  SerialPrograms/Source/PythonBindings/PythonBindings_Module.cpp.
 import threading
 import time

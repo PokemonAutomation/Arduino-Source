@@ -39,7 +39,7 @@ class ControllerBackend(Protocol):
 
     C++ reference: `_pa_core.Controller` is a pybind defined in PythonBindings_Module.cpp
     It, in turn, is a 1:1 binding of `NintendoSwitch::PybindSwitchProController`
-    (SerialPrograms/Source/Integrations/PybindSwitchProController.h), which wraps the
+    (SerialPrograms/Source/Integrations/PybindSwitchController.h), which wraps the
     device-side command queue of `AbstractController`
     (SerialPrograms/Source/Controllers/Controller.h).
     """
@@ -136,7 +136,7 @@ class SwitchProController:
         C++: `AbstractController::issue_buttons()`
         (SerialPrograms/Source/Controllers/Controller.h), via
         `PybindSwitchProController::push_button()`
-        (SerialPrograms/Source/Integrations/PybindSwitchProController.h).
+        (SerialPrograms/Source/Integrations/PybindSwitchController.h).
         """
         _check_nonnegative(hold_ms=hold_ms, release_ms=release_ms)
         self._require_open()
@@ -164,7 +164,7 @@ class SwitchProController:
         C++: `AbstractController::issue_dpad()`
         (SerialPrograms/Source/Controllers/Controller.h), via
         `PybindSwitchProController::push_dpad()`
-        (SerialPrograms/Source/Integrations/PybindSwitchProController.h).
+        (SerialPrograms/Source/Integrations/PybindSwitchController.h).
         """
         _check_nonnegative(hold_ms=hold_ms, release_ms=release_ms)
         self._require_open()
@@ -274,7 +274,7 @@ class SwitchProController:
         (emergency stop).
 
         C++: `PybindSwitchProController::cancel_all_and_wait(timeout_ms)`
-        (SerialPrograms/Source/Integrations/PybindSwitchProController.h) ->
+        (SerialPrograms/Source/Integrations/PybindSwitchController.h) ->
         `AbstractController::cancel_all_and_wait()` (SerialPrograms/Source/Controllers/Controller.h).
         """
         self._require_open()

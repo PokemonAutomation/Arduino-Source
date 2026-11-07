@@ -5,7 +5,7 @@ Layers (each built on the one below):
 - `_pa_core` (C++, pybind11): acts as a Switch controller through a PABotBase2
   serial device, built only from this codebase's CoreLib (the module is
   SerialPrograms/Source/PythonBindings/PythonBindings_Module.cpp, wrapping
-  SerialPrograms/Source/Integrations/PybindSwitchProController.h). Build it
+  SerialPrograms/Source/Integrations/PybindSwitchController.h). Build it
   from SerialPrograms with `-DPA_PYTHON_BINDINGS=ON` (see the README next to
   this package).
 - `SwitchProController`: the Python API on top of it, with button names instead of
