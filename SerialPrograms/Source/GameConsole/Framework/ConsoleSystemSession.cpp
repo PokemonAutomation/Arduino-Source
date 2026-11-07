@@ -174,24 +174,24 @@ std::string ConsoleSystemSession::update_status(){
         }
     }
     if (!ok){
-        m_status_text = "Keyboard: " + html_color_text("&#x2b24;", COLOR_RED);
+        m_status_text = "Controller input: " + html_color_text("&#x2b24;", COLOR_RED);
         return m_status_text;
     }
 
     //  Controllers are locked. (program is probably running)
     if (!m_lock_controllers_reason.empty() && !allow_commands_while_locked()){
-        m_status_text = "Keyboard: " + html_color_text("&#x2b24;", COLOR_PURPLE);
+        m_status_text = "Controller input: " + html_color_text("&#x2b24;", COLOR_PURPLE);
         return m_status_text;
     }
 
     //  Not focused.
     if (!m_focused){
-        m_status_text = "Keyboard: " + html_color_text("&#x2b24;", COLOR_ORANGE);
+        m_status_text = "Controller input: " + html_color_text("&#x2b24;", COLOR_ORANGE);
         return m_status_text;
     }
 
     //  Ready.
-    m_status_text = "Keyboard: " + html_color_text("&#x2b24;", COLOR_DARKGREEN);
+    m_status_text = "Controller input: " + html_color_text("&#x2b24;", COLOR_DARKGREEN);
     return m_status_text;
 }
 void ConsoleSystemSession::on_focus_in(){
@@ -241,11 +241,11 @@ void ConsoleSystemSession::on_focus_out(){
 void ConsoleSystemSession::run_controller_input(ControllerInputState& state){
     std::lock_guard<Mutex> lg(m_lock);
     if (!m_focused){
-        m_logger.log("Keyboard Command Suppressed: Not in focus.", COLOR_RED);
+        m_logger.log("Controller Input Suppressed: Not in focus.", COLOR_RED);
         return;
     }
     if (!m_lock_controllers_reason.empty() && !allow_commands_while_locked()){
-        m_logger.log("Keyboard Command Suppressed: " + m_lock_controllers_reason, COLOR_RED);
+        m_logger.log("Controller Input Suppressed: " + m_lock_controllers_reason, COLOR_RED);
         return;
     }
 
@@ -255,7 +255,7 @@ void ConsoleSystemSession::run_controller_input(ControllerInputState& state){
             controller.run_controller_input(state);
         });
         if (!error.empty()){
-            controller.session.logger().log("Keyboard Command Failed: " + error, COLOR_RED);
+            controller.session.logger().log("Controller Input Failed: " + error, COLOR_RED);
         }
     }
 }

@@ -7,6 +7,7 @@
 #include "Common/Cpp/Strings/StringTools.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "ControllerInput/ControllerInput.h"
+#include "ControllerInput/Gamepad/GamepadInput_State.h"
 #include "ControllerInput/Keyboard/KeyboardInput_State.h"
 #include "Controllers/RumbleListener.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -115,39 +116,68 @@ bool JoyconController::run_string_command(Milliseconds duration, const std::stri
 
 void JoyconController::run_controller_input(const ControllerInputState& state){
 
-    if (state.type() != ControllerInputType::HID_Keyboard){
+    const auto execute_state = [this](const JoyconState& controller_state){
+        WallClock timestamp;
+        if (controller_state.is_neutral()){
+            timestamp = current_time();
+            cancel_all_commands();
+        }else{
+            replace_on_next_command();
+
+            timestamp = current_time();
+            controller_state.execute(nullptr, false, *this, 2000ms);
+        }
+
+        on_command_input(timestamp, controller_state);
+    };
+
+    switch (state.type()){
+    case ControllerInputType::StandardGamepad:{
+        JoyconState controller_state;
+        const ProControllerState& pro = static_cast<const GamepadInputState&>(state).controller_state;
+        controller_state.buttons = pro.buttons;
+        if (controller_class() == ControllerClass::NintendoSwitch_LeftJoycon){
+            static constexpr Button dpad_buttons[] = {
+                BUTTON_UP,
+                BUTTON_UP | BUTTON_RIGHT,
+                BUTTON_RIGHT,
+                BUTTON_DOWN | BUTTON_RIGHT,
+                BUTTON_DOWN,
+                BUTTON_DOWN | BUTTON_LEFT,
+                BUTTON_LEFT,
+                BUTTON_UP | BUTTON_LEFT,
+                BUTTON_NONE,
+            };
+            controller_state.buttons |= dpad_buttons[pro.dpad];
+            controller_state.joystick = pro.left_joystick;
+        }else{
+            controller_state.joystick = pro.right_joystick;
+        }
+        execute_state(controller_state);
+        break;
+    }
+    case ControllerInputType::HID_Keyboard:{
+        JoyconState controller_state;
+        JoyconDeltas deltas;
+        const KeyboardInputState& lstate = static_cast<const KeyboardInputState&>(state);
+        const std::map<KeyboardKey, JoyconDeltas>& map = m_data->m_keyboard_mapping;
+
+    //    cout << "keys() = " << lstate.keys().size() << endl;
+
+        for (KeyboardKey key : lstate.keys()){
+            auto iter = map.find(key);
+            if (iter != map.end()){
+                deltas += iter->second;
+            }
+        }
+
+        deltas.to_state(controller_state);
+        execute_state(controller_state);
+        break;
+    }
+    default:
         return;
     }
-
-    JoyconDeltas deltas;
-
-    const KeyboardInputState& lstate = static_cast<const KeyboardInputState&>(state);
-    const std::map<KeyboardKey, JoyconDeltas>& map = m_data->m_keyboard_mapping;
-
-//    cout << "keys() = " << lstate.keys().size() << endl;
-
-    for (KeyboardKey key : lstate.keys()){
-        auto iter = map.find(key);
-        if (iter != map.end()){
-            deltas += iter->second;
-        }
-    }
-
-    JoyconState controller_state;
-    deltas.to_state(controller_state);
-
-    WallClock timestamp;
-    if (controller_state.is_neutral()){
-        timestamp = current_time();
-        cancel_all_commands();
-    }else{
-        replace_on_next_command();
-
-        timestamp = current_time();
-        controller_state.execute(nullptr, false, *this, 2000ms);
-    }
-
-    on_command_input(timestamp, controller_state);
 }
 
 

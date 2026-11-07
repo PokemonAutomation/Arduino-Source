@@ -257,6 +257,12 @@ target_link_libraries(
     $<LINK_LIBRARY:WHOLE_ARCHIVE,SerialProgramsLib>
 )
 
+if (PA_SDL)
+    message(STATUS "Compiling with gamepad (via SDL) integration enabled")
+    target_compile_definitions(SerialProgramsLib PRIVATE PA_SDL)
+    target_compile_definitions(SerialPrograms PRIVATE PA_SDL)
+endif()
+
 # Add source code exclusive to the internal repo and add C++ macro of official release
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/Internal0.cpp")
     message(STATUS "Building internal SerialPrograms")
