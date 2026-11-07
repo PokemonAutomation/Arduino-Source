@@ -25,7 +25,7 @@ void ServerSocket_Qt::start(const std::string& address, uint16_t port){
             && !m_starting;
         //  Only claim the "starting" flag when we actually start: a
         //  rejected call (server already running or already started) must
-        //  not leave "m_starting" true - "close()" waits on
+        //  not leave "m_starting" true - "close_and_wait()" waits on
         //  "!m_starting", so a stale flag would deadlock the destructor.
         //  (This happens when a test's start-retry loop calls start() on
         //  a server whose first listen failed: "m_server" is set even on
@@ -66,7 +66,7 @@ void ServerSocket_Qt::start(const std::string& address, uint16_t port){
             (m_state.load(std::memory_order_relaxed) == State::DESTRUCTING);
         m_server = server;
         if (destructing){
-            //  "close()" is already in progress: it will destroy the
+            //  "close_and_wait()" is already in progress: it will destroy the
             //  server we just created. Leave the state for it.
         }else{
             listening = m_listen_error.empty();
@@ -83,7 +83,7 @@ void ServerSocket_Qt::start(const std::string& address, uint16_t port){
         //  exactly as it was before this start() (no "m_server", state
         //  NOT_RUNNING), so the caller's start-retry loop can immediately
         //  try another port. The other backends behave the same: a failed
-        //  listen leaves no listener behind. If "close()" raced us, it has
+        //  listen leaves no listener behind. If "close_and_wait()" raced us, it has
         //  already claimed "m_server", and the pool's lookup makes the
         //  second destruction a no-op.
         GlobalThreadPools::qt_event_threadpool().remove_object(server);
@@ -130,7 +130,7 @@ void ServerSocket_Qt::close_connection(){
         );
     }
 }
-void ServerSocket_Qt::close() noexcept{
+void ServerSocket_Qt::close_and_wait() noexcept{
     QTcpServer* server;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -195,12 +195,13 @@ size_t ServerSocket_Qt::send(const void* data, size_t bytes, std::chrono::millis
             ? std::chrono::steady_clock::time_point::max()
             : std::chrono::steady_clock::now() + timeout;
 
-    //  Register the send atomically with respect to "close()"/
-    //  "close_connection()": "close()" sets the state to DESTRUCTING and
-    //  detaches the socket under this same lock before it cancels the
-    //  in-flight sends. The packet copy above can take a while for large
-    //  payloads, so without this re-check a send could register *after*
-    //  "close()" already cancelled the (empty) list and queued the
+    //  Register the send atomically with respect to
+    //  "close_and_wait()"/"close_connection()": "close_and_wait()" sets the
+    //  state to DESTRUCTING and detaches the socket under this same lock
+    //  before it cancels the in-flight sends. The packet copy above can
+    //  take a while for large payloads, so without this re-check a send
+    //  could register *after*
+    //  "close_and_wait()" already cancelled the (empty) list and queued the
     //  server's destruction: its "internal_send" call would then be
     //  posted after the destruction event, Qt would silently discard it,
     //  and the wait below (unbounded for the infinite default timeout)
@@ -224,17 +225,17 @@ size_t ServerSocket_Qt::send(const void* data, size_t bytes, std::chrono::millis
     emit internal_send(send_data);
 
     //  Wait for the server's event thread to finish writing the packet,
-    //  or for "close()"/"close_connection()" to cancel the send. A
+    //  or for "close_and_wait()"/"close_connection()" to cancel the send. A
     //  finite "timeout" waits for the deadline plus 1 s of queueing
     //  margin: the write loop stops at the deadline, so anything beyond
     //  that is just the queued call waiting to start.
     //
     //  The infinite default waits without a time bound. The registration
-    //  above is atomic with the "close()"/"close_connection()" detach, so
+    //  above is atomic with the "close_and_wait()"/"close_connection()" detach, so
     //  "done" is set by either the event-thread write loop (which stops
     //  at the deadline, on a socket error, or when Qt's userspace buffer
     //  accepts the packet; it runs before the queued server destruction,
-    //  since the event loop is FIFO) or by "close()"/"close_connection()"
+    //  since the event loop is FIFO) or by "close_and_wait()"/"close_connection()"
     //  cancelling the registered send - even when Qt discards the queued
     //  write loop with the server - so the wait always ends. The shared
     //  ownership keeps the packet alive until the queued call runs (or
@@ -289,8 +290,8 @@ void ServerSocket_Qt::on_new_connection(){
         if (sock == nullptr){
             break;
         }
-        //  The connection socket lives with the server, so "close()"
-        //  destroys it on the event thread.
+        //  The connection socket lives with the server, so
+        //  "close_and_wait()" destroys it on the event thread.
         sock->setParent(server);
 
         bool accepted;
@@ -393,7 +394,7 @@ void ServerSocket_Qt::on_close_connection(QSharedPointer<CloseCompletion> comple
             m_close_requested = true;
             if (m_state.load(std::memory_order_relaxed) != State::DESTRUCTING){
                 //  The server keeps running, so it goes back to
-                //  LISTENING. The destructor's close() may have set
+                //  LISTENING. The destructor's close_and_wait() may have set
                 //  DESTRUCTING: leave the state for it.
                 m_state.store(State::LISTENING, std::memory_order_release);
             }
@@ -424,7 +425,7 @@ void ServerSocket_Qt::on_send(QSharedPointer<SendData> send_data){
     {
         std::lock_guard<Mutex> lg(send_data->lock);
         if (send_data->cancelled){
-            //  "close()"/"close_connection()" already cancelled this
+            //  "close_and_wait()"/"close_connection()" already cancelled this
             //  send and woken its caller; finish without writing.
             return;
         }
@@ -435,7 +436,8 @@ void ServerSocket_Qt::on_send(QSharedPointer<SendData> send_data){
         const char* ptr = send_data->packet.data();
         size_t remaining = send_data->packet.size();
         //  The deadline keeps a client that never reads from pinning this
-        //  event thread forever (which would also block "close()").
+        //  event thread forever (which would also block
+        //  "close_and_wait()").
         while (
             remaining > 0
             && sock->state() == QAbstractSocket::ConnectedState
@@ -470,7 +472,7 @@ void ServerSocket_Qt::on_send(QSharedPointer<SendData> send_data){
 
     {
         std::lock_guard<Mutex> lg(m_lock);
-        //  "close()"/"close_connection()" may already have claimed this
+        //  "close_and_wait()"/"close_connection()" may already have claimed this
         //  send; only remove it if it still owns its slot.
         m_inflight_sends.erase(
             std::remove(

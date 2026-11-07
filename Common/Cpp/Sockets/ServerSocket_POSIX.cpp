@@ -59,7 +59,7 @@ void ServerSocket_POSIX::start(const std::string& address, uint16_t port){
             //  caller's wait timed out while the pool was starved). It
             //  notices its stale generation when it gets scheduled and
             //  exits without listening, so it only has to outlive this
-            //  call; close() joins the whole list.
+            //  call; close_and_wait() joins the whole list.
             std::lock_guard<Mutex> lg(m_task_lock);
             m_accept_threads.push_back(std::move(task));
         }
@@ -101,7 +101,7 @@ void ServerSocket_POSIX::close_connection(){
     }
 }
 
-void ServerSocket_POSIX::close() noexcept{
+void ServerSocket_POSIX::close_and_wait() noexcept{
     {
         std::unique_lock<Mutex> lg(m_lock);
         //  Wait for an in-progress start() to publish the listener task
@@ -121,7 +121,7 @@ void ServerSocket_POSIX::close() noexcept{
     }
     if (!drain){
         //  Either nothing was running (m_closing == 0), or another
-        //  close() is already draining the threads (m_closing > 1).
+        //  close_and_wait() is already draining the threads (m_closing > 1).
         //  In the second case, wait for it to finish.
         std::unique_lock<Mutex> lg(m_lock);
         m_cv.wait(lg, [&]{
@@ -280,7 +280,7 @@ void ServerSocket_POSIX::accept_thread_loop(std::string address, uint16_t port, 
         if (superseded ||
             m_state.load(std::memory_order_relaxed) == State::DESTRUCTING
         ){
-            //  A newer start() or close() won the race.
+            //  A newer start() or close_and_wait() won the race.
             start_error = "The server was replaced or closed before it could start listening.";
         }else{
             m_listen = listen_socket;

@@ -31,7 +31,7 @@ class ServerSocket_Qt final : public QObject, public AbstractServerSocket{
     Q_OBJECT
 
     //  Carries shared ownership (the signals pass it by value) so that a call still
-    //  queued when the caller times out, or when "close()" destroys the server and
+    //  queued when the caller times out, or when "close_and_wait()" destroys the server and
     //  Qt discards the pending call, keeps the payload alive exactly as long as the
     //  event itself: the handler's copy outlives a timed-out caller, and a
     //  discarded event leaves the caller's copy as the last reference.
@@ -39,18 +39,19 @@ class ServerSocket_Qt final : public QObject, public AbstractServerSocket{
         std::string packet;
         //  The event-thread write loop stops at this deadline, so a send
         //  that can never complete (a client that never reads) cannot pin
-        //  the server's event thread forever and block "close()". "max()"
-        //  means no deadline (the infinite default).
+        //  the server's event thread forever and block
+        //  "close_and_wait()". "max()" means no deadline (the infinite
+        //  default).
         std::chrono::steady_clock::time_point deadline = std::chrono::steady_clock::time_point::max();
         //  The running byte count: the write loop updates it as it goes,
-        //  so "close()"/"close_connection()" cancelling the send mid-write
-        //  can report the bytes written so far (best effort).
+        //  so "close_and_wait()"/"close_connection()" cancelling the send
+        //  mid-write can report the bytes written so far (best effort).
         size_t bytes_sent = 0;
-        //  Set by "close()"/"close_connection()" when they cancel the
+        //  Set by "close_and_wait()"/"close_connection()" when they cancel the
         //  send; the queued write loop then finishes without writing.
         bool cancelled = false;
         //  Set when the event-thread write loop finishes or when
-        //  "close()"/"close_connection()" cancel the send.
+        //  "close_and_wait()"/"close_connection()" cancel the send.
         bool done = false;
 
         Mutex lock;
@@ -69,7 +70,7 @@ public:
     ServerSocket_Qt(ThreadPool&){}
 
     virtual ~ServerSocket_Qt(){
-        close();
+        close_and_wait();
     }
 
     //  Binds to "address" and listens on "port" on the Qt event thread. This
@@ -101,7 +102,8 @@ private:
     //  The active connection ended, or was aborted by "close_connection()".
     //  Only the first of the (errorOccurred, disconnected) signals for a
     //  given connection fires a callback, and "on_disconnect" is not fired
-    //  for a connection closed by "close_connection()" or "close()".
+    //  for a connection closed by "close_connection()" or
+    //  "close_and_wait()".
     //  Runs on the QTcpServer's event thread.
     void connection_lost(QTcpSocket* sock, const std::string& error_message);
 
@@ -126,7 +128,7 @@ private:
     //  until the QTcpServer has been destroyed, so any in-flight listener
     //  callback is finished by the time it returns; it is private and
     //  only called by the destructor.
-    void close() noexcept;
+    void close_and_wait() noexcept;
 
     std::unique_ptr<QTcpServer> make_server(const std::string& address, uint16_t port);
 
@@ -141,7 +143,8 @@ private:
     bool m_starting = false;
 
     //  The "send()" calls that are queued on the event thread but not
-    //  finished yet, so that "close()"/"close_connection()" can cancel
+    //  finished yet, so that "close_and_wait()"/"close_connection()" can
+    //  cancel
     //  them (and wake their callers) before the socket is destroyed. The
     //  write loops remove their entry when they finish. Protected by
     //  m_lock.
