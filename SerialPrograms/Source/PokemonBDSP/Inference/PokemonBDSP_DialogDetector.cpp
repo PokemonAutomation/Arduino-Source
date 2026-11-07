@@ -4,8 +4,13 @@
  *
  */
 
+#include <array>
+#include <format>
+#include <string_view>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonBDSP_DialogDetector.h"
 
 //#include <iostream>
@@ -23,6 +28,7 @@ ShortDialogDetector::ShortDialogDetector(Color color)
     , m_left_white(0.21, 0.835, 0.008, 0.12)
     , m_left(0.18, 0.835, 0.02, 0.12)
     , m_right_white(0.785, 0.835, 0.008, 0.12)
+    , m_right_white_low(0.785, 0.915, 0.008, 0.04)
     , m_right(0.822, 0.835, 0.02, 0.12)
 {}
 void ShortDialogDetector::make_overlays(VideoOverlaySet& items) const{
@@ -30,6 +36,7 @@ void ShortDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_left_white);
     items.add(m_color, m_left);
     items.add(m_color, m_right_white);
+    items.add(m_color, m_right_white_low);
     items.add(m_color, m_right);
 }
 bool ShortDialogDetector::detect(const ImageViewRGB32& screen){
@@ -40,7 +47,9 @@ bool ShortDialogDetector::detect(const ImageViewRGB32& screen){
     }
     ImageStats right_white = image_stats(extract_box_reference(screen, m_right_white));
 //    cout << right_white.average << right_white.stddev << endl;
-    if (!is_white(right_white)){
+    //  A long first line runs into m_right_white (Rowan's "Now, go on, and
+    //  leap into the world of Pokemon!"). Check below that line as well.
+    if (!is_white(right_white) && !is_white(image_stats(extract_box_reference(screen, m_right_white_low)))){
         return false;
     }
 //    ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
@@ -125,6 +134,63 @@ bool ShortDialogPromptDetector::process_frame(const ImageViewRGB32& screen, Wall
 
 
 
+
+
+namespace{
+
+//  The captured screen supplied to the short-dialog detector.
+struct DialogInput{
+    std::string_view image;
+};
+//  Whether a short dialog should be visible in that screen.
+struct DialogExpectation{
+    bool detected = false;
+};
+//  One image and its independently specified expected result.
+struct DialogCase{
+    DialogInput input;
+    DialogExpectation expectation;
+};
+
+//  Runs the detector on the original image and the image-test color distortions.
+class Test_ShortDialogDetector : public ImageUnitTest{
+public:
+    explicit Test_ShortDialogDetector(const DialogCase& test)
+        : ImageUnitTest(std::format("PokemonBDSP::ShortDialogDetector - {}", test.input.image), {std::string(test.input.image)})
+        , m_expectation(test.expectation)
+    {}
+
+    virtual UnitTestResult run_on_images(
+        Logger&, CancellableScope&,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const bool detected = ShortDialogDetector().detect(images[0]);
+        if (detected != m_expectation.detected){
+            return std::format("Expected short dialog detected={}, read {}.", m_expectation.detected, detected);
+        }
+        return true;
+    }
+
+private:
+    DialogExpectation m_expectation;
+};
+
+} // namespace
+
+void add_tests_DialogDetector(UnitTestDatabase& database){
+    static constexpr std::array<DialogCase, 6> CASES{{
+        {.input = {.image = "PokemonBDSP/DialogDetector/IntroRowanNameTab_True.png"}, .expectation = {.detected = true}},
+        {.input = {.image = "PokemonBDSP/DialogDetector/IntroRowanNoArrow_True.png"}, .expectation = {.detected = true}},
+        {.input = {.image = "PokemonBDSP/DialogDetector/IntroRowanShortLine_True.png"}, .expectation = {.detected = true}},
+        {.input = {.image = "PokemonBDSP/DialogDetector/JubilifeUnknownNameTab_True.png"}, .expectation = {.detected = true}},
+        {.input = {.image = "PokemonBDSP/DialogDetector/FloaromaOldManOneLine_True.png"}, .expectation = {.detected = true}},
+        {.input = {.image = "PokemonBDSP/DialogDetector/FloaromaCloudShadows_False.png"}, .expectation = {.detected = false}},
+    }};
+    for (const DialogCase& test : CASES){
+        database.add<Test_ShortDialogDetector>(test);
+    }
 }
-}
-}
+
+} // namespace PokemonBDSP
+} // namespace NintendoSwitch
+} // namespace PokemonAutomation

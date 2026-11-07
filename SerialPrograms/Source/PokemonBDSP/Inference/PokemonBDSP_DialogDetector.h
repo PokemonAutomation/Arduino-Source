@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_BattleDialogDetector_H
 #define PokemonAutomation_PokemonBDSP_BattleDialogDetector_H
 
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
 #include "PokemonBDSP_SelectionArrow.h"
@@ -31,6 +32,7 @@ private:
     ImageFloatBox m_left_white;
     ImageFloatBox m_left;
     ImageFloatBox m_right_white;
+    ImageFloatBox m_right_white_low;
     ImageFloatBox m_right;
 };
 class ShortDialogWatcher : public DetectorToFinder<ShortDialogDetector>{
@@ -79,7 +81,11 @@ private:
 
 
 
-}
-}
-}
+
+//  The screenshot tests in CommandLineTests/PokemonBDSP/DialogDetector/.
+void add_tests_DialogDetector(UnitTestDatabase& database);
+
+} // namespace PokemonBDSP
+} // namespace NintendoSwitch
+} // namespace PokemonAutomation
 #endif
