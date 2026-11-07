@@ -28,6 +28,7 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
+#include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Dialog.h"
 
 #include "Detect/PokemonBDSP_AutoStory_MenuCursorDetector.h"
 
@@ -46,6 +47,13 @@ enum class StarterChoice {
     PIPLUP,
 };
 
+enum class CoronetApproachPhase {
+    NOT_STARTED,
+    BEFORE_CYCLING_ROAD,
+    ON_CYCLING_ROAD,
+    INSIDE_CORONET,
+};
+
 struct AutoStoryStats : public StatsTracker {
     AutoStoryStats()
         : m_checkpoint(m_stats["Checkpoint"])
@@ -59,9 +67,14 @@ struct AutoStoryStats : public StatsTracker {
     std::atomic<uint64_t>& m_segment;
     std::atomic<uint64_t>& m_reset;
     bool m_first_run = true;
+    // Transient run state: count confirmed HOME reloads independently of retry attempts.
+    size_t game_reset_generation = 0;
+    size_t coronet_attempt_reset_generation = 0;
+    CoronetApproachPhase coronet_approach_phase = CoronetApproachPhase::NOT_STARTED;
+    bool coronet_toggle_bike_gear = false;
     // Main-story slots: contact, non-contact, spread, high-PP backup.
     StarterChoice starter_choice = StarterChoice::CHIMCHAR;
-    std::array<size_t, 4> move_pp_capacity{15, 15, 10, 30};
+    std::array<size_t, 4> move_pp_capacity{15, 15, 10, 15};
     std::array<size_t, 4> move_pp_remaining = move_pp_capacity;
 };
 
@@ -107,9 +120,16 @@ enum class Trainer {
 //  Returns the trainers.json battle-ID string for a Trainer value.
 const char* trainer_slug(Trainer t);
 
+// Retained for the legacy adaptive battle helpers, which have no route callers.
+// Active route scripts use StarterChoice and their configured move slots instead.
 struct OutsideHelpConfig {
-    OutsideHelpPokemon pokemon;
-    TorterraMove attacks[4];
+    OutsideHelpPokemon pokemon = OutsideHelpPokemon::TORTERRA;
+    TorterraMove attacks[4]{
+        TorterraMove::EARTHQUAKE,
+        TorterraMove::ROCK_SLIDE,
+        TorterraMove::WOOD_HAMMER,
+        TorterraMove::CRUNCH,
+    };
 };
 
 enum class CheckpointSaveMode {
@@ -132,6 +152,7 @@ struct AutoStoryOptions {
     OutsideHelpConfig outside_help;
     CheckpointSaveMode checkpoint_save_mode = CheckpointSaveMode::REAL;
     CheckpointRetryScope checkpoint_retry_scope = CheckpointRetryScope::CHECKPOINT;
+    bool catch_box_legendary = false;
 };
 
 
@@ -169,7 +190,7 @@ public:
 // ---------------------------------------------------------------------------
 
 //  Save the game from the overworld with retries. Returns true if the save was
-//  verified via overworld detection, false if the blind fallback was used.
+//  verified via overworld detection, false if all feedback-based save attempts failed.
 bool save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 // Fake save game to be replaced with save_game when program runs smoothly
@@ -239,14 +260,6 @@ void repeat_dpad(ProControllerContext& context,
     size_t times,
     bool include_last_dir = true);
 
-//  Wait (without pressing any buttons) until a short dialogue box appears.
-//  Logs `label + " dialogue detected."` when found (omit label to skip logging).
-//  Throws OperationFailedException if no dialogue appears within `timeout`.
-void wait_for_dialogue(VideoStream& stream,
-    ProControllerContext& context,
-    const std::string& label = "",
-    Milliseconds timeout = std::chrono::seconds(60));
-
 //  Mash `button` (default B) until the game returns to the free-roaming overworld
 //  (no dialogue, menu, or battle UI visible).
 //  Throws OperationFailedException if the overworld is not reached within `timeout`.
@@ -279,12 +292,18 @@ void fight_trainer_using_moves(VideoStream& stream,
 // Use the selected starter's slot-role priorities and retain PP across battles.
 // Slots 1/2/3/4 are contact/non-contact/spread/backup. Exhausted slots are
 // skipped only within this battle's allowed priorities. One confirmed selection
-// reserves one PP; this budget does not replace actual-PP OCR or model Pressure.
+// reserves one PP, or two for a confirmed Spiritomb in the Champion plan.
+// This budget does not replace actual-PP OCR. Item turns do not reserve PP.
+// Plans that identify opponents/items require the configured Game Language.
+// control_second_pokemon handles the player's own partner with move 1 and a
+// separate retained cursor, without charging its choices to the lead's PP.
 void fight_trainer_using_moves(VideoStream& stream,
     ProControllerContext& context,
     AutoStoryStats& stats,
     const std::string& label,
-    bool post_battle_dialogue_cleanup);
+    bool post_battle_dialogue_cleanup,
+    bool control_second_pokemon = false,
+    Language language = Language::None);
 
 // A full Bag screenshot with the desired item highlighted. Paths are relative
 // to RESOURCE_PATH(); quantities and selection borders are excluded.
@@ -312,14 +331,22 @@ struct BagItemRowMatch {
 // TMs, Treasures, Key Items. Zero means the selected tab is uncertain.
 int bag_pocket_position(const ImageViewRGB32& frame);
 // Count normal, unobscured pocket icons; NEW badges prevent a tab match.
-size_t bag_clear_tab_count(const ImageViewRGB32& frame);
-// Open bag, pause 1s on the initial selection in each pocket, then scan
-// with 80ms Down taps / 1s rest until all 8 tabs match,
-// then restore the top of the item list and close the bag.
-// Returns false after four bounded pocket passes.
-bool clear_new_item_flags(VideoStream& stream, ProControllerContext& context, int num_icons = 8);
+size_t bag_clear_tab_count(const ImageViewRGB32& frame, int pocket = 0);
+// Open the bag and skip empty or already-clear pockets. Each duration budgets
+// 80ms Down taps with 1s dwell per row, in the pocket order documented above.
+// Stop a pocket early when its NEW badge clears. Verify all eight tabs before
+// restoring the top of the list and closing. Return false after four passes.
+bool clear_new_item_flags(VideoStream& stream, ProControllerContext& context, int num_icons = 8,
+    const std::array<std::chrono::milliseconds, 8>& scroll_durations = {
+        std::chrono::seconds(13), std::chrono::seconds(13),
+        std::chrono::seconds(13), std::chrono::seconds(13),
+        std::chrono::seconds(13), std::chrono::seconds(13),
+        std::chrono::seconds(13), std::chrono::seconds(13)});
 bool bag_list_is_empty(const ImageViewRGB32& frame);
 int bag_cursor_position(const ImageViewRGB32& frame);
+// Shared geometry and navigation for an already-open Bag, including in battle.
+ImageFloatBox bag_list_name_box(size_t row);
+bool bag_navigate_to_pocket(VideoStream& stream, ProControllerContext& context, int target);
 std::array<BagItemRowMatch, 7>
 match_bag_item_rows(const ImageViewRGB32& frame, const ImageViewRGB32& reference, const BagItemTemplate& item);
 
@@ -385,11 +412,13 @@ void use_HM(VideoStream& stream, ProControllerContext& context, const std::strin
 
 //  Walk to the nurse, heal the party, and exit the Pokemon Center.
 //  `label` names the center for log messages (e.g. "Veilstone").
-//  Returns false if the exit black screen was not detected.
+//  Set exit_center=false to remain at the nurse (for the League rival route).
+//  Returns false if the requested exit black screen was not detected.
 bool heal_pokemon(VideoStream& stream,
     ProControllerContext& context,
     const std::string& label,
-    AutoStoryStats* stats = nullptr);
+    AutoStoryStats* stats = nullptr,
+    bool exit_center = true);
 
 enum class FlyPoint {
     CanalavCity,
@@ -419,6 +448,11 @@ std::string fly_point_name(FlyPoint place);
 // correctness, and mashes A until a black screen is detected
 bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place);
 
+// Manual test: start outdoors with Fly and all 16 named destinations unlocked.
+// Visits each in marked-map order, skipping Route 221; ends at League Upper.
+// Stops on the first failed fly_to call. Does not save or retry automatically.
+bool test_fly_locations(VideoStream& stream, ProControllerContext& context);
+
 // Opens the X-menu from the overworld, navigates the cursor to `target`, and presses A.
 // num_icons: 5 (early-game layout) or 8 (late-game layout).
 void open_menu(VideoStream& stream, ProControllerContext& context, MenuCursorPosition target, int num_icons);
@@ -428,43 +462,6 @@ void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context
 enum class GearLevel {
     Fast,
 };
-
-
-// ---------------------------------------------------------------------------
-//  Mart buying
-// ---------------------------------------------------------------------------
-
-enum class ShopItem {
-    FullRestore,
-    MaxPotion,
-    HyperPotion,
-    SuperPotion,
-    Potion,
-    Antidote,
-    ParalyzHeal,
-    Awakening,
-    Repel,
-    SuperRepel,
-    MaxRepel,
-    EscapeRope,
-};
-
-// Pass as the `quantity` field to buy the maximum available amount.
-static constexpr int BUY_MAX = -1;
-
-struct ItemToBuy {
-    ShopItem item;
-    int quantity; // positive count to buy, or BUY_MAX
-};
-
-// Walk up to a vendor (already talking to them), navigate through the Buy menu,
-// and purchase each item in `items` in order. The function presses DPAD_DOWN
-// until the matching item name is found via OCR, so items may appear in any
-// list order. Returns true on success.
-bool buy_items(VideoStream& stream,
-    ProControllerContext& context,
-    const std::vector<ItemToBuy>& items,
-    Language language = Language::English);
 
 
 // Mount the bicycle (press +) and confirm it is in the requested gear.

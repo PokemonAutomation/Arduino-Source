@@ -19,7 +19,7 @@ namespace PokemonBDSP{
 
 ShortDialogDetector::ShortDialogDetector(Color color)
     : m_color(color)
-//    , m_bottom(0.50, 0.91, 0.29, 0.05)
+    , m_bottom_white(0.55, 0.94, 0.15, 0.003)
     // Preserve the established inner-margin samples. detect() checks an
     // alternate blank margin when a long Gardenia reward line overlaps one.
     , m_left_white(0.221, 0.86, 0.002, 0.025)
@@ -28,7 +28,7 @@ ShortDialogDetector::ShortDialogDetector(Color color)
     , m_right(0.822, 0.835, 0.02, 0.12)
 {}
 void ShortDialogDetector::make_overlays(VideoOverlaySet& items) const{
-//    items.add(m_color, m_bottom);
+    items.add(m_color, m_bottom_white);
     items.add(m_color, m_left_white);
     items.add(m_color, m_left);
     items.add(m_color, m_right_white);
@@ -56,10 +56,15 @@ bool ShortDialogDetector::detect(const ImageViewRGB32& screen){
             if (!is_white(right_white)) return false;
         }
     }
-//    ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
-//    if (!is_white(bottom)){
-//        return false;
-//    }
+    // Symmetric floor tiles can match both side samples without a dialog.
+    // Require a blank lower margin too; short-dialog layouts use two heights.
+    ImageStats bottom_white = image_stats(extract_box_reference(screen, m_bottom_white));
+    if (!is_white(bottom_white)){
+        bottom_white = image_stats(extract_box_reference(screen, ImageFloatBox{0.55, 0.965, 0.15, 0.003}));
+        if (!is_white(bottom_white)){
+            return false;
+        }
+    }
     ImageStats left = image_stats(extract_box_reference(screen, m_left));
 //    cout << left.stddev << endl;
     if (left.stddev.sum() < 30){

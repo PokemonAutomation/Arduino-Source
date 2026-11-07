@@ -6,6 +6,8 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
+#include <cstdlib>
 #include <map>
 #include <set>
 #include <string>
@@ -18,6 +20,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 
@@ -31,6 +34,8 @@
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_EndBattleDetector.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_ShopItemNameReader.h"
 #include "PokemonBDSP/Programs/AutoStory/Data/PokemonBDSP_AutoStory_BDSPData.h"
 #include "PokemonBDSP/Programs/AutoStory/Detect/PokemonBDSP_AutoStory_OverworldDetector.h"
@@ -116,9 +121,9 @@ static const ImageFloatBox PP_BOX[4] = {
     {0.75, 0.730, 0.10, 0.060},
 };
 
-static int ocr_pp_slot(Logger& logger, const ImageViewRGB32& frame, const ImageFloatBox& box){
+static int ocr_pp_slot(Logger& logger, Language language, const ImageViewRGB32& frame, const ImageFloatBox& box){
     ImageViewRGB32 region = extract_box_reference(frame, box);
-    std::string text = OCR::ocr_read(Language::English, region, OCR::PageSegMode::SINGLE_LINE);
+    std::string text = OCR::ocr_read(language, region, OCR::PageSegMode::SINGLE_LINE);
     text.erase(0, text.find_first_not_of(" \t\r\n"));
     if (!text.empty()){
         text.erase(text.find_last_not_of(" \t\r\n") + 1);
@@ -139,11 +144,11 @@ static int ocr_pp_slot(Logger& logger, const ImageViewRGB32& frame, const ImageF
     }
 }
 
-static std::array<int, 4> read_all_pp(Logger& logger, VideoStream& stream){
+static std::array<int, 4> read_all_pp(Logger& logger, VideoStream& stream, Language language){
     VideoSnapshot frame = stream.video().snapshot();
     std::array<int, 4> result;
     for (int i = 0; i < 4; i++){
-        result[i] = ocr_pp_slot(logger, frame, PP_BOX[i]);
+        result[i] = ocr_pp_slot(logger, language, frame, PP_BOX[i]);
     }
     return result;
 }
@@ -278,7 +283,7 @@ void handle_battle_with_outside_help(const ProgramInfo& /*info*/,
 
         // OCR current PP
         {
-            auto ocr_pp = read_all_pp(logger, stream);
+            auto ocr_pp = read_all_pp(logger, stream, options.language);
             for (int i = 0; i < 4; i++){
                 if (ocr_pp[i] >= 0){
                     pp_remaining[i] = ocr_pp[i];
@@ -409,23 +414,24 @@ void handle_battle_with_outside_help(const ProgramInfo& /*info*/,
 //  Internal helpers for handle_expert_battle
 // ---------------------------------------------------------------------------
 
-//  ⚠️ Estimated player-side HP bar region — calibrate against a real capture.
-static const ImageFloatBox PLAYER_HP_BAR{0.057, 0.652, 0.168, 0.008};
+// Singles command-screen HP bar, excluding the HP label and border.
+static const ImageFloatBox PLAYER_HP_BAR{0.046, 0.883, 0.200, 0.012};
 
 //  ⚠️ Estimated player-side status badge region — calibrate against a real capture.
 static const ImageFloatBox PLAYER_STATUS_BOX{0.140, 0.710, 0.080, 0.018};
 
-//  ⚠️ Estimated battle-bag item name region (highlighted row) — calibrate.
-static const ImageFloatBox BATTLE_BAG_ITEM_NAME_BOX{0.470, 0.150, 0.350, 0.050};
-
 //  Returns the fraction [0.0, 1.0] of the player's HP bar that is filled.
 //  Scans each pixel column; a column with high colour saturation counts as "HP present".
-static double read_player_hp_ratio(const ImageViewRGB32& frame){
+double read_player_hp_ratio(const ImageViewRGB32& frame){
+    BattleMenuDetector commands(BattleType::TRAINER, COLOR_RED);
+    if (!commands.detect(frame) || !is_white(extract_box_reference(frame, ImageFloatBox{0.12, 0.910, 0.12, 0.025}))){
+        return -1;
+    }
     ImageViewRGB32 strip = extract_box_reference(frame, PLAYER_HP_BAR);
     int total = (int)strip.width();
     int mid_row = (int)(strip.height() / 2);
     if (total <= 0){
-        return 1.0;
+        return -1;
     }
 
     int colored_cols = 0;
@@ -448,83 +454,203 @@ static bool detect_player_status(const ImageViewRGB32& frame){
     return !is_white(extract_box_reference(frame, PLAYER_STATUS_BOX));
 }
 
-//  Cycle through battle-bag pockets with BUTTON_R until the highlighted item
-//  matches "full-restore", then use it on the first pokemon.
-//  Called while the battle-bag is already open (navigate to Bag from battle menu first).
-static void use_full_restore_in_open_bag(VideoStream& stream, ProControllerContext& context, Language language){
-    Logger& logger = stream.logger();
-    static constexpr size_t MAX_POCKETS = 9;
-    static constexpr size_t MAX_SCROLL = 25;
-
-    // Cycle pockets until we see Full Restore in the highlighted row
-    bool pocket_found = false;
-    for (size_t tab = 0; tab < MAX_POCKETS; tab++){
-        context.wait_for(500ms);
-        VideoSnapshot frame = stream.video().snapshot();
-        ImageViewRGB32 region = extract_box_reference(frame, BATTLE_BAG_ITEM_NAME_BOX);
-        OCR::StringMatchResult result = ShopItemNameReader::instance().read_substring(logger, language, region);
-        for (const auto& [score, match] : result.results){
-            if (match.token == "full-restore" && score <= ShopItemNameReader::MAX_LOG10P){
-                pocket_found = true;
-                break;
-            }
-        }
-        if (pocket_found){
+// Starts in an open Bag. Select a named item using the existing pocket/cursor
+// detectors; do not assume that it is the first item in the pocket.
+static void use_item_in_open_bag(VideoStream& stream,
+    ProControllerContext& context,
+    Language language,
+    const std::string& item_slug,
+    int pocket,
+    bool select_first_pokemon,
+    bool outside_battle = false){
+    if (!bag_navigate_to_pocket(stream, context, pocket)){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Battle item: requested pocket was not confirmed.", stream);
+    }
+    size_t confirmed = 0;
+    size_t unknown_cursor = 0;
+    bool found = false;
+    for (size_t scan = 0; scan < 128; scan++){
+        context.wait_for_all_requests();
+        const auto frame = stream.video().snapshot();
+        if (!frame || bag_list_is_empty(frame)){
             break;
         }
-        pbf_press_button(context, BUTTON_R, 10ms, 400ms);
-    }
-
-    if (!pocket_found){
-        logger.log("Full Restore pocket not found — scanning list", COLOR_YELLOW);
-    }
-
-    // Scroll down within the pocket until the highlighted row is Full Restore
-    for (size_t i = 0; i < MAX_SCROLL; i++){
-        context.wait_for(400ms);
-        VideoSnapshot frame = stream.video().snapshot();
-        ImageViewRGB32 region = extract_box_reference(frame, BATTLE_BAG_ITEM_NAME_BOX);
-        OCR::StringMatchResult result = ShopItemNameReader::instance().read_substring(logger, language, region);
-        bool found = false;
-        for (const auto& [score, match] : result.results){
-            if (match.token == "full-restore" && score <= ShopItemNameReader::MAX_LOG10P){
+        const int cursor = bag_cursor_position(frame);
+        if (cursor == 0){
+            if (++unknown_cursor >= 5){
+                break;
+            }
+            pbf_wait(context, 150ms);
+            continue;
+        }
+        unknown_cursor = 0;
+        const auto result = ShopItemNameReader::instance().read_substring(
+            stream.logger(), language, extract_box_reference(frame, bag_list_name_box(cursor)));
+        const bool matches = !result.results.empty() &&
+            result.results.begin()->first <= ShopItemNameReader::MAX_LOG10P &&
+            result.results.begin()->second.token == item_slug;
+        if (matches){
+            if (++confirmed >= 3){
                 found = true;
                 break;
             }
+            pbf_wait(context, 150ms);
+        }else{
+            confirmed = 0;
+            // Also search above a remembered cursor in a non-wrapping list.
+            pbf_press_dpad(context, scan < 64 ? DPAD_DOWN : DPAD_UP, 80ms, 300ms);
         }
-        if (found){
-            pbf_press_button(context, BUTTON_A, 10ms, 600ms); // select item
-            pbf_press_button(context, BUTTON_A, 10ms, 600ms); // "Use"
-            pbf_press_button(context, BUTTON_A, 10ms, 800ms); // confirm on first pokemon
-            context.wait_for(500ms);
-            logger.log("Full Restore used", COLOR_WHITE);
-            pbf_mash_button(context, BUTTON_B, 1500ms);
-            return;
-        }
-        pbf_press_dpad(context, DPAD_DOWN, 10ms, 200ms);
+    }
+    if (!found){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Battle item: could not confirm " + item_slug + "; no item used.", stream);
     }
 
-    logger.log("Full Restore not found in bag — skipping", COLOR_YELLOW);
-    pbf_mash_button(context, BUTTON_B, 1500ms);
+    pbf_press_button(context, BUTTON_A, 80ms, 300ms);
+    context.wait_for_all_requests();
+    SelectionArrowFinder use_item(stream.overlay(), {0.70, 0.10, 0.28, 0.65}, COLOR_GREEN);
+    if (wait_until(stream, context, 3s, {{use_item}}) != 0){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Battle item: Use menu not confirmed for " + item_slug + ".", stream);
+    }
+    pbf_press_button(context, BUTTON_A, 80ms, 300ms);
+    if (select_first_pokemon){
+        pbf_press_button(context, BUTTON_A, 80ms, 800ms);
+    }
+    if (outside_battle){
+        pbf_mash_button(context, BUTTON_B, 2000ms);
+        context.wait_for_all_requests();
+        return;
+    }
+    // X items act on the active Pokemon without a party-target selection.
+    // Require the Bag to close into battle narration; never send another A
+    // on a returned command menu and accidentally select a move.
+    BattleDialogDetector narration;
+    size_t stable = 0;
+    for (size_t check = 0; check < 50; check++){
+        context.wait_for_all_requests();
+        const auto frame = stream.video().snapshot();
+        if (frame && bag_pocket_position(frame) == 0 && narration.detect(frame)){
+            if (++stable >= 3){
+                stream.log("[Battle item] Submitted " + item_slug + "; awaiting the opponent's turn.");
+                return;
+            }
+        }else{
+            stable = 0;
+        }
+        pbf_wait(context, 100ms);
+    }
+    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+        "Battle item: " + item_slug + " did not leave the Bag for battle narration.", stream);
 }
 
-//  From the battle menu (Fight/Pokemon/Bag/Run), navigate to Bag and open it.
-//  In BDSP the battle menu is a 2×2 grid: Fight(top-left) Bag(top-right)
-//  Pokemon(bottom-left) Run(bottom-right). Cursor starts at Fight.
-static void open_battle_bag(ProControllerContext& context){
-    pbf_press_dpad(context, DPAD_RIGHT, 10ms, 200ms);
-    pbf_press_button(context, BUTTON_A, 10ms, 800ms);
-    context.wait_for(500ms);
+// BDSP's battle commands are vertical. Confirm the highlighted command before
+// opening Bag rather than relying on a remembered cursor position.
+static void open_battle_bag(VideoStream& stream, ProControllerContext& context){
+    BattleMenuDetector commands(BattleType::TRAINER, COLOR_RED);
+    size_t stable = 0;
+    for (size_t check = 0; check < 30 && stable < 3; check++){
+        context.wait_for_all_requests();
+        const auto frame = stream.video().snapshot();
+        const auto selected = frame ? commands.selected_option(frame) : BattleMenuOption::UNKNOWN;
+        if (selected == BattleMenuOption::BAG){
+            stable++;
+            pbf_wait(context, 100ms);
+        }else{
+            stable = 0;
+            if (selected == BattleMenuOption::UNKNOWN){
+                pbf_wait(context, 150ms);
+            }else{
+                pbf_press_dpad(context,
+                    selected == BattleMenuOption::RUN ? DPAD_UP : DPAD_DOWN, 80ms, 300ms);
+            }
+        }
+    }
+    if (stable < 3){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Battle item: Bag command not confirmed.", stream);
+    }
+    pbf_press_button(context, BUTTON_A, 80ms, 800ms);
+    context.wait_for_all_requests();
 }
 
-//  Use a Full Restore on the first party pokemon from the battle menu.
-//  Returns immediately after item use; the caller is responsible for resuming the turn.
-static void use_full_restore_in_battle(VideoStream& stream, ProControllerContext& context, Language language){
-    open_battle_bag(context);
-    use_full_restore_in_open_bag(stream, context, language);
-    // Mash B to ensure we're back at the battle menu
-    context.wait_for(300ms);
+void use_item_in_battle(VideoStream& stream,
+    ProControllerContext& context,
+    Language language,
+    const std::string& item_slug,
+    bool after_battle){
+    if (after_battle){
+        if (item_slug != "full-restore" || language == Language::None){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Post-battle healing requires Full Restore and a selected language.", stream);
+        }
+        for (size_t pass = 0; pass < 2; pass++){
+            open_menu(stream, context, MenuCursorPosition::BAG, 5);
+            pbf_wait(context, 750ms);
+            double hp = -1;
+            size_t stable = 0;
+            for (size_t check = 0; check < 20 && stable < 3; check++){
+                context.wait_for_all_requests();
+                const auto frame = stream.video().snapshot();
+                double observed = -1;
+                if (frame && bag_pocket_position(frame) != 0){
+                    const std::string text = OCR::tesseract_ocr_read(language,
+                        to_blackwhite_rgb32_range(
+                            extract_box_reference(frame, ImageFloatBox{0.108, 0.180, 0.150, 0.040}),
+                            true, 0xffc0c0c0, 0xffffffff));
+                    std::string digits;
+                    for (char c : text){
+                        if ((c >= '0' && c <= '9') || c == '/'){
+                            digits += c;
+                        }
+                    }
+                    const auto slash = digits.find('/');
+                    if (slash != std::string::npos && slash > 0 && slash + 1 < digits.size() && digits.size() <= 9){
+                        const int current = std::atoi(digits.substr(0, slash).c_str());
+                        const int maximum = std::atoi(digits.substr(slash + 1).c_str());
+                        if (maximum > 0 && maximum <= 999 && current > 0 && current <= maximum){
+                            observed = (double)current / maximum;
+                        }
+                    }
+                }
+                stable = observed > 0 && observed == hp ? stable + 1 : 0;
+                hp = observed;
+                pbf_wait(context, 150ms);
+            }
+            if (stable < 3 || (pass == 1 && hp != 1.0)){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Post-battle healing: exact current/maximum HP could not be confirmed full.", stream);
+            }
+            if (hp == 1.0){
+                stream.log("[League healing] Starter at full HP; no Full Restore needed.");
+                pbf_mash_button(context, BUTTON_B, 2000ms);
+                context.wait_for_all_requests();
+                OverworldWatcher overworld;
+                if (wait_until(stream, context, 10s, {{overworld}}) != 0){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "League healing: overworld return not confirmed.", stream);
+                }
+                return;
+            }
+            stream.log("[League healing] Starter below full HP; using Full Restore.");
+            use_item_in_open_bag(stream, context, language, "full-restore", 1, true, true);
+            OverworldWatcher overworld;
+            if (wait_until(stream, context, 10s, {{overworld}}) != 0){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "League Full Restore: overworld return not confirmed.", stream);
+            }
+        }
+    }
+    if (item_slug != "x-attack" && item_slug != "full-restore"){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Battle item: unsupported item " + item_slug + ".", stream);
+    }
+    open_battle_bag(stream, context);
+    use_item_in_open_bag(stream, context, language, item_slug,
+        item_slug == "x-attack" ? 3 : 1, item_slug == "full-restore");
 }
+
 
 //  OCR the opponent name box and restrict matches to `candidates`.
 //  Returns the best matching slug in candidates, or the best unrestricted match
@@ -827,7 +953,16 @@ void handle_expert_battle(const ProgramInfo& /*info*/,
                 logger.log("Full Restore needed (HP=" + std::to_string((int)(hp * 100)) +
                     "%, status=" + (has_status ? "yes" : "no") + ")",
                     COLOR_WHITE);
-                use_full_restore_in_battle(stream, context, options.language);
+                use_item_in_battle(stream, context, options.language, "full-restore");
+                BattleMenuWatcher commands(BattleType::TRAINER, COLOR_RED);
+                if (run_until<ProControllerContext>(stream, context,
+                    [](ProControllerContext& ctx){
+                        pbf_mash_button(ctx, BUTTON_B, 120000ms);
+                    }, {{commands}}) != 0){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "Full Restore: battle commands did not return.", stream);
+                }
+                continue;
             }
         }
 
@@ -836,7 +971,7 @@ void handle_expert_battle(const ProgramInfo& /*info*/,
         context.wait_for_all_requests();
         context.wait_for(300ms);
         {
-            auto ocr_pp = read_all_pp(logger, stream);
+            auto ocr_pp = read_all_pp(logger, stream, options.language);
             for (int i = 0; i < 4; i++){
                 if (ocr_pp[i] >= 0){
                     pp_remaining[i] = ocr_pp[i];

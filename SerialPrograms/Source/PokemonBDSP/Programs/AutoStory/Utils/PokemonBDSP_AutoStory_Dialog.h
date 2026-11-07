@@ -12,8 +12,11 @@
 #ifndef PokemonAutomation_PokemonBDSP_AutoStory_Dialog_H
 #define PokemonAutomation_PokemonBDSP_AutoStory_Dialog_H
 
+#include <chrono>
 #include <cstdint>
+#include <string>
 
+#include "Common/Cpp/Time.h"
 #include "CommonFramework/Tools/VideoStream.h"
 
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
@@ -35,8 +38,12 @@ enum class ClearDialogMode {
     //  Stop when a YES/NO prompt (ShortDialogPromptDetector) is detected.
     STOP_PROMPT,
 
-    //  Run for exactly `timeout_sec` seconds regardless of screen state.
+    //  Continue clearing until `timeout_sec` expires, even if dialog closes.
     STOP_TIMEOUT,
+
+    //  Stop after a quiet period without dialog, an instruction card, or a fade.
+    //  Already-clear screens are accepted; this preserves existing route calls.
+    STOP_QUIET,
 };
 
 
@@ -44,15 +51,40 @@ enum class ClearDialogMode {
 //  Dialog clearing
 // ---------------------------------------------------------------------------
 
-//  Mash A through NPC dialog until `mode` stop condition is met.
-//  Uses ShortDialogWatcher as the primary "still in dialog" signal.
-//  Throws OperationFailedException if no dialog is ever detected, or if
-//  the stop condition is not met within `timeout_sec` seconds.
-void clear_dialog(VideoStream& stream, ProControllerContext& context, ClearDialogMode mode, uint16_t timeout_sec = 60);
+//  Advance visible dialog with `button` until the selected stop condition.
+//  STOP_OVERWORLD requires seeing dialog or an instruction card first, then a
+//  continuous quiet overworld. STOP_PROMPT preserves the detected Yes/No choice.
+//  STOP_TIMEOUT does not require any dialog to appear. Other modes throw if
+//  their stop condition is not reached before `timeout_sec`; missing video fails.
+void clear_dialog(VideoStream& stream,
+    ProControllerContext& context,
+    ClearDialogMode mode,
+    uint16_t timeout_sec = 60,
+    Button button = BUTTON_A,
+    Milliseconds quiet_period = Milliseconds(3000),
+    const char* instruction_card = nullptr);
 
-//  Block until a short dialog box appears, then return.
-//  Throws OperationFailedException if no dialog appears within `timeout_sec`.
+// The button-based overload uses STOP_QUIET with a 120-second limit.
+// Advance dialogue until the requested quiet period contains no dialogue,
+// instruction card, or black screen. Used for story, item, and battle text.
+void clear_dialog(VideoStream& stream,
+    ProControllerContext& context,
+    Button button = BUTTON_B,
+    Milliseconds quiet_period = Milliseconds(3000),
+    const char* instruction_card = nullptr);
+
+// Wait without sending controller input until a short dialog box is confirmed.
+// The timeout starts after pending controller requests finish. A missing dialog
+// throws after one timeout window. The seconds-based API defaults to 30 seconds.
 void wait_for_dialog(VideoStream& stream, ProControllerContext& context, uint16_t timeout_sec = 30);
+
+// Labeled story-route calls retain their existing 60-second default and accept
+// millisecond timeouts. An empty label suppresses the success message.
+void wait_for_dialog(VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& label,
+    Milliseconds timeout = std::chrono::seconds(60));
+
 
 
 }

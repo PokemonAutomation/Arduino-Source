@@ -28,7 +28,7 @@ const double STRIPE_BOTTOM = 0.598;
 
 static ImageFloatBox menu_stripe(size_t index, bool skip_new_banner){
     double top = skip_new_banner ? STRIPE_TOP_BELOW_BANNER : STRIPE_TOP;
-    return ImageFloatBox(0.160 + 0.166 * (double)index, top, 0.015, STRIPE_BOTTOM - top);
+    return ImageFloatBox(0.166 + 0.166 * (double)index, top, 0.015, STRIPE_BOTTOM - top);
 }
 
 MenuDetector::MenuDetector(Color color, bool skip_new_banner)

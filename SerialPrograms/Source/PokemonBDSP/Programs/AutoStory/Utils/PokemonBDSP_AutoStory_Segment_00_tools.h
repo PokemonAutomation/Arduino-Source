@@ -8,6 +8,7 @@
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Programs/AutoStory/StorySegments/PokemonBDSP_AutoStory_Segment_00.h"
 
+#include "PokemonBDSP_AutoStory_Dialog.h"
 #include "PokemonBDSP_OverworldMatchers.h"
 
 namespace PokemonAutomation {
@@ -27,12 +28,6 @@ public:
 // Time / setup helpers
 // ---------------------------------------------------------------------------
 
-// Shared visual alignment and dialogue cleanup used by story routes.
-void clear_post_battle_dialogue(VideoStream& stream,
-    ProControllerContext& context,
-    Button button = BUTTON_B,
-    Milliseconds quiet_period = Milliseconds(3000),
-    const char* instruction_card = nullptr);
 void align_to_overworld_landmarks(VideoStream& stream,
     ProControllerContext& context,
     OverworldMatchResult (*matcher)(const ImageRGB32&),

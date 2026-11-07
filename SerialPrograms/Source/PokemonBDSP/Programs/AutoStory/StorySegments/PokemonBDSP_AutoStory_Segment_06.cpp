@@ -5,7 +5,8 @@
  *
  */
 
-#include "CommonFramework/Exceptions/FatalProgramException.h"
+#include <vector>
+
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Globals.h"
@@ -412,14 +413,208 @@ static bool go_to_canalave_gym(VideoStream& stream, ProControllerContext& contex
         stream.log("go_to_canalave_gym: entered gym", COLOR_GREEN);
     };
     context.wait_for_all_requests();
-    pbf_wait(context, 2000ms);
+    // Let the entrance scene finish after the watched black-screen transition.
+    pbf_wait(context, 5000ms);
     context.wait_for_all_requests();
-    // The old 06.11 repeated Gym entry; it did not solve the puzzle.
-    // Stop here until the actual puzzle and Byron route are available.
-    throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
-        "Canalave Gym entrance reached. The puzzle and Byron battle are not implemented; "
-        "Segment 06 is incomplete and Segment 07 must not start.",
-        stream);
+    return true;
+}
+
+// Start: inside Canalave Gym at the entrance, after the entry transition.
+// End: at Byron with battle/reward dialogue finished.
+// The checkpoint calls the recorded return to the inside entrance next.
+static void canalave_gym_puzzle_and_byron(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryStats& stats){
+    VideoStream& stream = env.console;
+    struct Move {
+        DpadPosition dir;
+        int count;
+        Milliseconds delay;
+    };
+
+    DpadState dpad;
+    dpad.last_dir = DPAD_UP; // The Gym entry approach ends facing north.
+
+    // Add a facing press on direction changes and synchronize known NPC turns after battles.
+    // Retain pauses of at least one second after their recorded platform/approach press.
+    const std::vector<Move> sequence1 = {
+        {DPAD_UP, 9, 0ms},
+        {DPAD_LEFT, 7, 0ms},
+        {DPAD_LEFT, 1, 1230ms},
+        {DPAD_UP, 2, 0ms},
+        {DPAD_UP, 1, 2011ms},
+    };
+
+    const std::vector<Move> sequence2 = {
+        {DPAD_RIGHT, 1, 3644ms},
+        {DPAD_UP, 1, 1611ms},
+        {DPAD_UP, 1, 1339ms},
+        {DPAD_RIGHT, 1, 2289ms},
+        {DPAD_RIGHT, 7, 0ms},
+        {DPAD_DOWN, 3, 0ms},
+        {DPAD_RIGHT, 2, 0ms},
+        {DPAD_RIGHT, 1, 2826ms},
+        {DPAD_UP, 3, 0ms},
+        {DPAD_UP, 1, 1989ms},
+        {DPAD_RIGHT, 3, 0ms},
+        {DPAD_DOWN, 6, 0ms},
+        // Center the southbound approach on the lift instead of one tile east.
+        {DPAD_RIGHT, 4, 0ms},
+        {DPAD_DOWN, 2, 0ms},
+        {DPAD_DOWN, 1, 2189ms},
+        {DPAD_UP, 9, 0ms},
+        {DPAD_LEFT, 1, 2182ms},
+        {DPAD_RIGHT, 5, 0ms},
+        {DPAD_DOWN, 8, 0ms},
+        {DPAD_DOWN, 1, 1883ms},
+        {DPAD_DOWN, 4, 0ms},
+        {DPAD_LEFT, 1, 0ms},
+        {DPAD_LEFT, 1, 1192ms},
+    };
+
+    const std::vector<Move> sequence3 = {
+        {DPAD_LEFT, 6, 0ms},
+        {DPAD_UP, 3, 0ms},
+        {DPAD_UP, 1, 2106ms},
+        {DPAD_LEFT, 2, 0ms},
+        {DPAD_LEFT, 1, 1822ms},
+        {DPAD_LEFT, 3, 0ms},
+        {DPAD_UP, 2, 0ms},
+        {DPAD_LEFT, 9, 0ms},
+        {DPAD_DOWN, 6, 0ms},
+        {DPAD_RIGHT, 3, 0ms},
+        {DPAD_RIGHT, 1, 2346ms},
+        {DPAD_LEFT, 3, 0ms},
+        {DPAD_UP, 3, 0ms},
+        {DPAD_UP, 1, 1593ms},
+        {DPAD_UP, 6, 0ms},
+        {DPAD_RIGHT, 2, 0ms},
+        {DPAD_UP, 8, 0ms},
+        // The third eastward step triggers the Worker before the horizontal lift.
+        {DPAD_RIGHT, 3, 0ms},
+    };
+
+    const std::vector<Move> sequence4 = {
+        // Resume the nine recorded eastward steps after the Worker's battle.
+        // Preserve the platform pauses instead of sending these inputs into dialogue.
+        {DPAD_RIGHT, 3, 1696ms},
+        {DPAD_RIGHT, 3, 0ms},
+        {DPAD_RIGHT, 1, 1806ms},
+        {DPAD_RIGHT, 1, 0ms},
+        {DPAD_RIGHT, 1, 1855ms},
+    };
+
+    const std::vector<Move> sequence5 = {
+        // David interrupts before this eastward step. Resume toward the stairs after battle.
+        {DPAD_RIGHT, 1, 0ms},
+        {DPAD_DOWN, 11, 0ms},
+        {DPAD_DOWN, 1, 1825ms},
+        {DPAD_DOWN, 2, 0ms},
+        {DPAD_RIGHT, 3, 0ms},
+        {DPAD_UP, 2, 0ms},
+        {DPAD_UP, 1, 1773ms},
+        {DPAD_UP, 5, 0ms},
+        {DPAD_UP, 1, 2187ms},
+        {DPAD_UP, 3, 0ms},
+        // Reach Breanna's east-facing sight line after the descending lift.
+        {DPAD_UP, 2, 1434ms},
+    };
+
+    const std::vector<Move> sequence6 = {
+        {DPAD_UP, 1, 0ms},
+        {DPAD_LEFT, 8, 0ms},
+        {DPAD_DOWN, 5, 0ms},
+        {DPAD_RIGHT, 1, 0ms},
+        {DPAD_RIGHT, 1, 1965ms},
+        {DPAD_LEFT, 8, 0ms},
+        {DPAD_LEFT, 1, 5406ms},
+        {DPAD_UP, 5, 0ms},
+        {DPAD_UP, 1, 1071ms},
+    };
+
+    const std::vector<Move>* sequences[] = {
+        &sequence1,
+        &sequence2,
+        &sequence3,
+        &sequence4,
+        &sequence5,
+        &sequence6,
+    };
+
+    for (size_t stage = 0; stage < 6; stage++){
+        const bool gym_leader = stage == 5;
+        const std::string label =
+            gym_leader ? "Byron" : "Canalave Gym trainer " + std::to_string(stage + 1);
+        stream.log("[Canalave Gym puzzle] Approaching " + label + ".");
+        for (const auto& move : *sequences[stage]){
+            repeat_dpad(context, dpad, move.dir, 80ms, 300ms, move.count, true);
+            if (move.delay > 0ms){
+                pbf_wait(context, move.delay);
+                context.wait_for_all_requests();
+            }
+        }
+        context.wait_for_all_requests();
+        if (stage == 2 || stage == 3 || stage == 4){
+            wait_for_dialog(stream, context, label, 10000ms);
+        }
+        pbf_press_button(context, BUTTON_A, 150ms, 300ms);
+        fight_trainer_using_moves(stream, context, stats, label, gym_leader);
+        clear_dialog(stream, context, BUTTON_B, gym_leader ? 6000ms : 3000ms);
+        if (stage == 1 || stage == 2 || stage == 3){
+            // Cesar, the Worker, and David turn the player north after their approaches.
+            // Synchronize facing before resuming the recorded west/east movement.
+            dpad.last_dir = DPAD_UP;
+        }else if (stage == 4){
+            // Breanna approaches from the west and turns the player toward her.
+            dpad.last_dir = DPAD_LEFT;
+        }
+    }
+    context.wait_for_all_requests();
+    stream.log("[Canalave Gym puzzle] Byron defeated; reward dialogue cleared.", COLOR_GREEN);
+}
+
+// Start: beside Byron after his reward dialogue, facing north.
+// End: inside Canalave Gym at the entrance, facing east; 07.01 owns the doorway exit.
+static void return_to_canalave_gym_entrance(VideoStream& stream, ProControllerContext& context){
+    struct Move {
+        DpadPosition dir;
+        int count;
+        Milliseconds delay;
+    };
+
+    stream.log("[Canalave Gym return] Returning from Byron to the inside entrance.");
+    // Preserve the opening input and settling pause from the recorded route.
+    pbf_move_right_joystick(context, {0, 1}, 146ms, 0ms);
+    pbf_wait(context, 3617ms);
+    context.wait_for_all_requests();
+
+    DpadState dpad;
+    dpad.last_dir = DPAD_UP;
+    const std::vector<Move> sequence = {
+        {DPAD_UP, 1, 0ms},
+        {DPAD_RIGHT, 3, 2655ms},
+        {DPAD_RIGHT, 2, 0ms},
+        {DPAD_DOWN, 3, 2787ms},
+        {DPAD_DOWN, 2, 0ms},
+        {DPAD_LEFT, 3, 2632ms},
+        {DPAD_LEFT, 2, 0ms},
+        {DPAD_UP, 2, 1189ms},
+        {DPAD_UP, 1, 2467ms},
+        {DPAD_UP, 2, 0ms},
+        {DPAD_RIGHT, 5, 6081ms},
+        {DPAD_DOWN, 19, 0ms},
+        {DPAD_RIGHT, 9, 0ms},
+    };
+
+    for (const auto& move : sequence){
+        repeat_dpad(context, dpad, move.dir, 80ms, 300ms, move.count, true);
+        if (move.delay > 0ms){
+            pbf_wait(context, move.delay);
+            context.wait_for_all_requests();
+        }
+    }
+    context.wait_for_all_requests();
+    stream.log("[Canalave Gym return] Recorded return to the inside entrance finished.", COLOR_GREEN);
 }
 
 // ---------------------------------------------------------------------------
@@ -435,7 +630,7 @@ std::string AutoStory_Segment_06::start_text() const {
 }
 
 std::string AutoStory_Segment_06::end_text() const {
-    return "Target: Sixth Gym Badge acquired (Canalave City). The Canalave Gym puzzle and Byron battle are not implemented yet.";
+    return "Sixth badge acquired; back inside Canalave Gym at the entrance, with reward dialogue finished.";
 }
 
 void AutoStory_Segment_06::run_segment(SingleSwitchProgramEnvironment& env,
@@ -605,7 +800,7 @@ void checkpoint_0603(SingleSwitchProgramEnvironment& env,
 }
 
 std::string AutoStory_Checkpoint_0604::name() const {
-    return "06.04 - Canalave Gym (puzzle pending)";
+    return "06.04 - Canalave Gym and Byron";
 }
 
 std::string AutoStory_Checkpoint_0604::start_text() const {
@@ -613,7 +808,7 @@ std::string AutoStory_Checkpoint_0604::start_text() const {
 }
 
 std::string AutoStory_Checkpoint_0604::end_text() const {
-    return "Current implementation stops inside Canalave Gym at the entrance. Puzzle, Byron battle, and reward dialogue are pending.";
+    return "Inside Canalave Gym at the entrance, facing east, with Byron defeated and reward dialogue finished.";
 }
 
 void AutoStory_Checkpoint_0604::run_checkpoint(SingleSwitchProgramEnvironment& env,
@@ -638,6 +833,8 @@ void checkpoint_0604(SingleSwitchProgramEnvironment& env,
                     "06.04: Canalave Gym entry did not complete.",
                     env.console);
             }
+            canalave_gym_puzzle_and_byron(env, context, stats);
+            return_to_canalave_gym_entrance(env.console, context);
         },
         true);
 }

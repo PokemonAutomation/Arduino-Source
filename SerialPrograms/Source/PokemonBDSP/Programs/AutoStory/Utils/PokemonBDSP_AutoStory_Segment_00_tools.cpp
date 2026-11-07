@@ -10,6 +10,8 @@
 #include <cctype>
 #include <chrono>
 #include <cmath>
+#include <map>
+#include <memory>
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
@@ -21,7 +23,6 @@
 
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "CommonTools/VisualDetectors/ImageMatchDetector.h"
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -30,6 +31,7 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleOpponentNameReader.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_EndBattleDetector.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
@@ -44,6 +46,7 @@
 
 #include "PokemonBDSP_Autostory_Segment_01_tools.h"
 
+#include "PokemonBDSP_AutoStory_Battle.h"
 #include "PokemonBDSP_AutoStory_Segment_00_tools.h"
 
 using namespace std::chrono_literals;
@@ -650,8 +653,9 @@ static void select_battle_move_slot(VideoStream& stream,
     size_t target,
     const std::string& label,
     bool confirm_default_target = false,
-    size_t current_move = 1){
-    BattleMenuDetector commands(battle_type);
+    size_t current_move = 1,
+    bool control_second_pokemon = false){
+    BattleMenuDetector commands(battle_type, COLOR_RED, control_second_pokemon);
     VideoOverlaySet overlays(stream.overlay());
     commands.make_overlays(overlays);
     overlays.add(COLOR_GREEN, {0.90, 0.48, 0.075, 0.505});
@@ -1055,6 +1059,17 @@ static void confirm_battle_overworld(VideoStream& stream, ProControllerContext& 
     context.wait_for_all_requests();
 }
 
+// Setup is tied to a confirmed species, not the number of defeated opponents.
+// The per-battle progress counter lives in fight_using_move_list so a checkpoint
+// retry starts the setup again. Item turns do not advance the move script.
+struct BattleSetupPlan {
+    Language language = Language::None;
+    std::string opponent;
+    size_t x_attacks = 0;
+    size_t max_full_restores = 0;
+    std::map<std::string, size_t> moves;
+};
+
 static void fight_using_move_list(VideoStream& stream,
     ProControllerContext& context,
     BattleType battle_type,
@@ -1062,7 +1077,12 @@ static void fight_using_move_list(VideoStream& stream,
     const std::string& label,
     bool confirm_default_target,
     bool post_battle_dialogue_cleanup,
-    std::array<size_t, 4>* remaining_pp = nullptr){
+    std::array<size_t, 4>* remaining_pp = nullptr,
+    bool ordered_moves = false,
+    bool control_second_pokemon = false,
+    bool advance_on_experience = false,
+    size_t expected_opponents = 0,
+    const BattleSetupPlan* setup = nullptr){
     if (move_slots.empty() || std::any_of(move_slots.begin(), move_slots.end(), [](size_t slot){
             return slot < 1 || slot > 4;
         })){
@@ -1070,10 +1090,17 @@ static void fight_using_move_list(VideoStream& stream,
             label + ": Supply a nonempty move list containing only positions 1 through 4.",
             stream);
     }
+    if (setup && (setup->language == Language::None || control_second_pokemon)){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            label + ": Item setup requires a selected Game Language and a singles battle.", stream);
+    }
+    size_t setup_items_used = 0;
+    size_t full_restores_used = 0;
+    double hp_before_restore = -1;
     size_t move_index = 0;
     // The first Fight menu starts at move 1. Later turns retain
     // this Pokemon's previous selection; a new battle resets it.
-    size_t current_move = 1;
+    std::array<size_t, 2> current_move{1, 1};
     stream.log("[AutoStory] Starting " + label + " battle...", COLOR_BLUE);
 
     // Scripted battles wait on the menu detector below, so no
@@ -1084,27 +1111,48 @@ static void fight_using_move_list(VideoStream& stream,
     }
 
     bool battle_menu_seen = false;
-    EndBattleWatcher end_battle;
+    bool awaiting_experience = false;
+    size_t opponents_defeated = 0;
+    const bool watch_experience = advance_on_experience || expected_opponents != 0;
+    auto end_battle = std::make_unique<EndBattleWatcher>();
+
+    const auto advance_dialogue = [&stream, battle_type, control_second_pokemon](ProControllerContext& ctx){
+        if (!control_second_pokemon){
+            // Clear narration with B while watching for commands.
+            pbf_mash_button(ctx, BUTTON_B, 120000ms);
+            return;
+        }
+        BattleMenuDetector commands(battle_type, COLOR_RED, control_second_pokemon);
+        for (size_t poll = 0; poll < 1200; poll++){
+            ctx.wait_for_all_requests();
+            const auto frame = stream.video().snapshot();
+            // B on the partner's command screen cancels the lead's
+            // queued move. Observe commands without sending B.
+            if (!frame || commands.detect(frame)){
+                pbf_wait(ctx, 100ms);
+            }else{
+                pbf_mash_button(ctx, BUTTON_B, 100ms);
+            }
+        }
+    };
 
     while (true){
 
         context.wait_for_all_requests();
 
-        BattleMenuWatcher battle_menu(battle_type);
+        BattleMenuWatcher battle_menu(battle_type, COLOR_RED, control_second_pokemon);
+        ExperienceGainWatcher experience(COLOR_RED, true);
         // Reuse the farming handlers' move-learning prompt recovery.
         SelectionArrowFinder learn_move(stream.overlay(), {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
 
         int ret = run_until<ProControllerContext>(stream,
             context,
-            [](ProControllerContext& context){
-                // Clear narration with B while watching for commands.
-                // A here can open Fight before selection begins.
-                pbf_mash_button(context, BUTTON_B, 120000ms);
-            },
+            advance_dialogue,
             {
                 {battle_menu},
-                battle_menu_seen ? PeriodicInferenceCallback{end_battle} : PeriodicInferenceCallback{},
+                battle_menu_seen ? PeriodicInferenceCallback{*end_battle} : PeriodicInferenceCallback{},
                 confirm_default_target ? PeriodicInferenceCallback{learn_move} : PeriodicInferenceCallback{},
+                watch_experience && awaiting_experience ? PeriodicInferenceCallback{experience} : PeriodicInferenceCallback{},
             });
 
         switch (ret){
@@ -1114,11 +1162,119 @@ static void fight_using_move_list(VideoStream& stream,
             // -------------------------------------------------
         case 0: {
             battle_menu_seen = true;
-            size_t selected_move = move_slots[move_index];
-            if (remaining_pp){
+            size_t player = 1;
+            if (control_second_pokemon){
+                BattleMenuDetector commands(battle_type, COLOR_RED, true);
+                size_t stable = 0;
+                player = 0;
+                for (size_t check = 0; check < 20 && stable < 3; check++){
+                    context.wait_for_all_requests();
+                    const auto frame = stream.video().snapshot();
+                    const size_t observed = frame ? commands.active_player(frame) : 0;
+                    if (observed != 0 && observed == player){
+                        stable++;
+                    }else{
+                        player = observed;
+                        stable = observed != 0 ? 1 : 0;
+                    }
+                    if (stable < 3){
+                        pbf_wait(context, 100ms);
+                    }
+                }
+                if (stable < 3){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        label + ": Could not identify which player Pokemon needs a command.",
+                        stream);
+                }
+            }
+            std::string opponent;
+            size_t pp_cost = 1;
+            if (setup){
+                size_t stable = 0;
+                for (size_t check = 0; check < 20 && stable < 3; check++){
+                    context.wait_for_all_requests();
+                    const auto frame = stream.video().snapshot();
+                    const auto names = frame ? read_battle_opponent_names(
+                        stream.logger(), setup->language, frame, BDSPBattleType::SINGLES) : std::vector<std::string>{};
+                    const std::string observed = names.size() == 1 ? names.front() : "";
+                    if (!observed.empty() && setup->moves.count(observed) != 0){
+                        stable = observed == opponent ? stable + 1 : 1;
+                        opponent = observed;
+                    }else{
+                        stable = 0;
+                        opponent.clear();
+                    }
+                    if (stable < 3){
+                        pbf_wait(context, 150ms);
+                    }
+                }
+                if (stable < 3){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        label + ": Opponent not confirmed; no setup item or attack selected.", stream);
+                }
+                stream.log("[" + label + "] Confirmed opponent: " + opponent + ".");
+                if (setup->max_full_restores != 0){
+                    double hp = -1;
+                    size_t stable_hp = 0;
+                    for (size_t check = 0; check < 20 && stable_hp < 3; check++){
+                        context.wait_for_all_requests();
+                        const auto frame = stream.video().snapshot();
+                        const double observed = frame ? read_player_hp_ratio(frame) : -1;
+                        stable_hp = observed > 0 && std::abs(observed - hp) < 0.02 ? stable_hp + 1 : 0;
+                        hp = observed;
+                        if (stable_hp < 3){
+                            pbf_wait(context, 100ms);
+                        }
+                    }
+                    if (stable_hp < 3){
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                            label + ": HP not confirmed; no item or attack selected.", stream);
+                    }
+                    if (hp_before_restore >= 0 && hp <= hp_before_restore + 0.05){
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                            label + ": Full Restore did not improve HP after the opponent's turn.", stream);
+                    }
+                    hp_before_restore = -1;
+                    // Leave a margin for another setup hit. This is a recovery
+                    // threshold, not a guarantee against critical hits or debuffs.
+                    if (hp < 0.60){
+                        if (full_restores_used >= setup->max_full_restores){
+                            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                                label + ": In-battle Full Restore budget exhausted.", stream);
+                        }
+                        stream.log("[" + label + "] HP " + std::to_string((int)(hp * 100)) +
+                            "%; using Full Restore before the next action.");
+                        use_item_in_battle(stream, context, setup->language, "full-restore");
+                        full_restores_used++;
+                        hp_before_restore = hp;
+                        awaiting_experience = false;
+                        break;
+                    }
+                }
+                if (opponent == setup->opponent && setup_items_used < setup->x_attacks){
+                    stream.log("[" + label + "] X Attack " + std::to_string(setup_items_used + 1) +
+                        "/" + std::to_string(setup->x_attacks) + " against " + opponent + ".");
+                    use_item_in_battle(stream, context, setup->language, "x-attack");
+                    setup_items_used++;
+                    awaiting_experience = false;
+                    // An item consumes a battle turn, not a move or a PP.
+                    break;
+                }
+                if (setup_items_used != 0 && setup_items_used < setup->x_attacks){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        label + ": Required setup opponent is no longer present; setup incomplete.", stream);
+                }
+                // Pressure applies to attacks into Spiritomb, never item turns.
+                pp_cost = opponent == "spiritomb" ? 2 : 1;
+            }
+
+            auto* player_pp = player == 1 ? remaining_pp : nullptr;
+            size_t selected_move = setup ? setup->moves.at(opponent) : player == 2 ? 1 : move_slots[move_index];
+            stream.log("[" + label + "] Selecting for player Pokemon " + std::to_string(player) + ".");
+            if (player_pp && !ordered_moves && !setup){
                 selected_move = 0;
                 for (size_t slot : move_slots){
-                    if ((*remaining_pp)[slot - 1] > 0){
+                    if ((*player_pp)[slot - 1] > 0){
                         selected_move = slot;
                         break;
                     }
@@ -1130,9 +1286,14 @@ static void fight_using_move_list(VideoStream& stream,
                 }
             }
 
+            if (player_pp && (ordered_moves || setup) && (*player_pp)[selected_move - 1] < pp_cost){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    label + ": Scripted move PP budget exhausted; heal before continuing.",
+                    stream);
+            }
             stream.log("[AutoStory] Battle menu detected.", COLOR_BLUE);
 
-            if (remaining_pp){
+            if (player_pp && !ordered_moves && !setup){
                 stream.log("[" + label + "] Using available move slot " + std::to_string(selected_move) +
                     " from this battle's priority list.");
             }else{
@@ -1145,11 +1306,11 @@ static void fight_using_move_list(VideoStream& stream,
                 selected_move,
                 label,
                 confirm_default_target,
-                current_move);
-            // A disabled move leaves the Fight list open and consumes no PP.
-            // The single-slot policy has no legal alternative: retry the checkpoint
-            // rather than repeatedly charging an input the game rejected.
-            if (remaining_pp && move_slots.size() == 1){
+                current_move[player - 1],
+                control_second_pokemon);
+            // A rejected move leaves the Fight list open and consumes no PP.
+            // Do not charge the software budget for that rejected selection.
+            if (player_pp){
                 context.wait_for_all_requests();
                 const auto frame = stream.video().snapshot();
                 if (frame && detect_battle_move_menu(frame).move_count){
@@ -1158,15 +1319,19 @@ static void fight_using_move_list(VideoStream& stream,
                         stream);
                 }
             }
-            current_move = selected_move;
-            if (remaining_pp){
-                --(*remaining_pp)[selected_move - 1];
+            current_move[player - 1] = selected_move;
+            if (player_pp){
+                (*player_pp)[selected_move - 1] -= pp_cost;
                 stream.log("[Move PP] Slot " + std::to_string(selected_move) + ": " +
-                    std::to_string((*remaining_pp)[selected_move - 1]) + " remaining in the current budget.");
+                    std::to_string((*player_pp)[selected_move - 1]) + " remaining in the current budget.");
             }
-            // Advance once per move selection; retain the final entry.
-            if (!remaining_pp && move_index + 1 < move_slots.size()){
-                move_index++;
+            if (player == 1){
+                awaiting_experience = watch_experience;
+                // Turn scripts advance after a selection. Opponent scripts wait
+                // for the experience screen, repeating the move on surviving foes.
+                if (!advance_on_experience && (!remaining_pp || ordered_moves) && move_index + 1 < move_slots.size()){
+                    move_index++;
+                }
             }
 
             break;
@@ -1176,6 +1341,39 @@ static void fight_using_move_list(VideoStream& stream,
             // End battle detected.
             // -------------------------------------------------
         case 1: {
+            if (control_second_pokemon){
+                // A partner fainting is not a defeat or a completed battle.
+                // Confirm commands have not returned before accepting the fade.
+                BattleMenuWatcher ongoing(battle_type, COLOR_RED, true);
+                OverworldWatcher outside;
+                const int finished = run_until<ProControllerContext>(stream,
+                    context,
+                    advance_dialogue,
+                    {{ongoing}, {outside}});
+                if (finished == 0){
+                    stream.log("[" + label + "] Battle continues after the transition.");
+                    end_battle = std::make_unique<EndBattleWatcher>();
+                    continue;
+                }
+                if (finished != 1){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        label + ": Could not confirm the battle continued or returned to the overworld.",
+                        stream);
+                }
+            }
+            // A blackout also produces an exit fade. Do not let a failed League
+            // battle advance the checkpoint and save over its recovery position.
+            if (expected_opponents != 0 && opponents_defeated != expected_opponents){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    label + ": Battle exited after " + std::to_string(opponents_defeated) +
+                    " of " + std::to_string(expected_opponents) +
+                    " confirmed opponent defeats; victory not confirmed.",
+                    stream);
+            }
+            if (setup && setup_items_used != setup->x_attacks){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    label + ": Battle ended without completing the required item setup.", stream);
+            }
             stream.log("[AutoStory] " + label + " battle complete.", COLOR_GREEN);
 
             // EndBattleWatcher has confirmed the completed exit transition.
@@ -1208,6 +1406,18 @@ static void fight_using_move_list(VideoStream& stream,
             pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
             break;
 
+        case 3:
+            // Disarm until another move is selected so a persistent experience
+            // screen cannot consume multiple entries in the opponent list.
+            awaiting_experience = false;
+            opponents_defeated++;
+            if (advance_on_experience && move_index + 1 < move_slots.size()){
+                move_index++;
+            }
+            stream.log("[" + label + "] Confirmed opponent defeats: " + std::to_string(opponents_defeated) +
+                "; move list position " + std::to_string(move_index + 1) + ".");
+            break;
+
         default:
             stream.log("[AutoStory] " + label + " battle timeout.", COLOR_RED);
 
@@ -1225,58 +1435,6 @@ static void fight_using_move_slot(VideoStream& stream,
     size_t move_slot,
     const std::string& label){
     fight_using_move_list(stream, context, battle_type, {move_slot}, label, false, true);
-}
-
-void clear_post_battle_dialogue(VideoStream& stream,
-    ProControllerContext& context,
-    Button button,
-    Milliseconds quiet_period,
-    const char* instruction_card){
-    context.wait_for_all_requests();
-    std::unique_ptr<ImageMatchDetector> card;
-    if (instruction_card){
-        card = std::make_unique<ImageMatchDetector>(std::make_shared<ImageRGB32>(RESOURCE_PATH() + instruction_card),
-            ImageFloatBox{.04, .32, .92, .34},
-            30.0);
-    }
-    ShortDialogDetector dialogue(COLOR_YELLOW);
-    BlackScreenDetector black;
-    VideoOverlaySet overlays(stream.overlay());
-    dialogue.make_overlays(overlays);
-    black.make_overlays(overlays);
-    const auto deadline = std::chrono::steady_clock::now() + 120s;
-    auto absent_since = std::chrono::steady_clock::now();
-    while (std::chrono::steady_clock::now() < deadline){
-        const auto frame = stream.video().snapshot();
-        if (!frame){
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Post-battle dialogue: No video frame.",
-                stream);
-        }
-        const auto now = std::chrono::steady_clock::now();
-        const bool dialogue_visible = dialogue.detect(*frame.frame);
-        const bool card_visible = card && card->detect(*frame.frame);
-        if (dialogue_visible || card_visible || black.detect(*frame.frame)){
-            absent_since = now;
-        }else if (now - absent_since >= quiet_period){
-            stream.log(
-                "[Post-battle dialogue] " + std::to_string(quiet_period.count()) + "ms without dialogue confirmed.");
-            return;
-        }
-        // A can interact again once dialogue disappears. Only confirm
-        // visible prompts; B retains the existing post-battle behavior.
-        if (card_visible){
-            pbf_press_button(context, BUTTON_B, 80ms, 100ms);
-        }else if (button == BUTTON_A && !dialogue_visible){
-            pbf_wait(context, 100ms);
-        }else{
-            pbf_mash_button(context, button, 100ms);
-        }
-        context.wait_for_all_requests();
-    }
-    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-        "Post-battle dialogue: Three clear seconds not confirmed.",
-        stream);
 }
 
 void align_to_overworld_landmarks(VideoStream& stream,
@@ -1622,19 +1780,25 @@ void fight_trainer_using_moves(VideoStream& stream,
     ProControllerContext& context,
     AutoStoryStats& stats,
     const std::string& label,
-    bool post_battle_dialogue_cleanup){
+    bool post_battle_dialogue_cleanup,
+    bool control_second_pokemon,
+    Language language){
     // Preserve the list-based selection/target/exit handling. These priorities
     // refer to the wiki's standardized slot roles, not move-name OCR.
     std::vector<size_t> priorities{1, 2, 4, 3};
+    bool ordered_moves = false;
+    bool advance_on_experience = false;
     const bool grass_gym = label == "Gardenia" || label == "Lass Caroline" ||
         label == "Aroma Lady Jenna" || label == "Aroma Lady Angela" ||
         label == "Beauty Lindsay" || label == "Aroma Lady Teighler";
     const bool rock_battle = label == "Roark" || label.find("Hiker") != std::string::npos ||
         label.find("hiker_") != std::string::npos;
     const bool water_battle = label == "Crasher Wake" || label.find("Pastoria Gym trainer") != std::string::npos ||
+        label == "Canalave Gym trainer 5" ||
         label.find("tuber_") != std::string::npos || label.find("swimmer_") != std::string::npos;
     const bool flying_battle = label.find("Bird") != std::string::npos ||
-        label.find("birdkeeper_") != std::string::npos || label.find("Cycling Road") != std::string::npos;
+        label.find("birdkeeper_") != std::string::npos || label.find("Cycling Road") != std::string::npos ||
+        label == "coronet_ascent_landing_grunt";
     const bool fighting_battle = label.find("Black Belt") != std::string::npos ||
         label.find("blackbelt_") != std::string::npos;
 
@@ -1649,11 +1813,38 @@ void fight_trainer_using_moves(VideoStream& stream,
         }
         break;
     case StarterChoice::CHIMCHAR:
-        if (label == "Fantina" || label.find("psychic_") != std::string::npos ||
+        // Recorded single-trainer parties have a fixed send-out order.
+        // Preserve noncontact PP for the summit without spending it on normal foes.
+        if (label == "coronet_ascent_grunt_3"){
+            priorities = {1, 2};
+            ordered_moves = true;
+        }else if (label == "coronet_ascent_grunt_4"){
+            priorities = {2, 1};
+            ordered_moves = true;
+        }else if (label == "coronet_ascent_grunt_6"){
+            priorities = {2, 2, 1};
+            ordered_moves = true;
+        }else if (label.find("coronet_ascent_grunt_") == 0 || label == "coronet_ascent_landing_grunt" ||
+            label == "spear_pillar_cyrus"){
+            // Bronzor and the flying/bug parties must not receive a Ground or
+            // Fighting fallback when the noncontact slot's PP is exhausted.
+            priorities = {2};
+        }else if (label == "spear_pillar_mars_jupiter"){
+            priorities = { 1, 2, 1, 1, 2, 2, 2, 4};
+            ordered_moves = true;
+        }else if (label == "spear_pillar_grunts"){
+            priorities = {3, 2, 1, 4};
+        }else if (label == "Fantina" || label.find("psychic_") != std::string::npos ||
             label.find("Psychics ") != std::string::npos){
             // Psychic/Ghost parties rule out Fighting slots; Levitate users also
             // rule out Earthquake. Do not spend a different slot on exhaustion.
             priorities = {2};
+        }else if (label == "pokemon_league_rival"){
+            // Staraptor, Snorlax, Empoleon, Roserade, Rapidash, Heracross.
+            // Quick Claw + Charm can make Empoleon take multiple hits.
+            priorities = {1, 4, 3, 2, 3, 2};
+            ordered_moves = true;
+            advance_on_experience = true;
         }else if (grass_gym || fighting_battle || label == "Maylene" ||
             label == "Route 215 Ruin Maniac Calvin" ||
             label == "Bug Catchers Donald and Phillip" || label == "victory_road_ace_sydney"){
@@ -1668,7 +1859,8 @@ void fight_trainer_using_moves(VideoStream& stream,
         if (grass_gym || flying_battle || label.find("dragontamer_") != std::string::npos ||
             label == "victory_road_ace_sydney"){
             priorities = {2, 1, 4, 3};
-        }else if (rock_battle || label == "Maylene" || label == "Fantina" ||
+        }else if (rock_battle || label == "Maylene" || label == "Fantina" || label == "Byron" ||
+            (label.find("Canalave Gym trainer") != std::string::npos && !water_battle) ||
             label.find(" and ") != std::string::npos ||
             label == "veilstone_galactic_grunts_1" || label == "Route 215 Ruin Maniac Calvin"){
             priorities = {3, 2, 1, 4};
@@ -1677,6 +1869,116 @@ void fight_trainer_using_moves(VideoStream& stream,
         }
         break;
     }
+    if (label == "elite_four_aaron"){
+        switch (stats.starter_choice){
+        case StarterChoice::CHIMCHAR:
+            priorities = {2};
+            break;
+        case StarterChoice::TURTWIG:
+            priorities = {1};
+            break;
+        case StarterChoice::PIPLUP:
+            priorities = {1};
+            break;
+        }
+    }else if (label == "elite_four_bertha"){
+        switch (stats.starter_choice){
+        case StarterChoice::CHIMCHAR:
+            // Recorded order: Quagsire, Whiscash, Golem, Sudowoodo, Hippowdon.
+            // Repeat against survivors and healing; switch slots only after a KO.
+            priorities = {4, 4, 4, 4, 2};
+            ordered_moves = true;
+            advance_on_experience = true;
+            break;
+        case StarterChoice::TURTWIG:
+            priorities = {2, 4};
+            break;
+        case StarterChoice::PIPLUP:
+            // The lead's ability rules out the spread slot. Keep a usable
+            // list regardless of the order of the remaining opponents.
+            priorities = {1, 2};
+            break;
+        }
+    }else if (label == "elite_four_flint"){
+        switch (stats.starter_choice){
+        case StarterChoice::CHIMCHAR:
+            // First-test order observed in the recording:
+            // Rapidash, Lopunny, Steelix, Drifblim, Infernape.
+            // Repeat on surviving opponents; advance only after experience.
+            priorities = {3, 4, 2, 1, 3};
+            ordered_moves = true;
+            advance_on_experience = true;
+            break;
+        case StarterChoice::TURTWIG:
+            priorities = {1};
+            break;
+        case StarterChoice::PIPLUP:
+            priorities = {3};
+            break;
+        }
+    }else if (label == "elite_four_lucian"){
+        switch (stats.starter_choice){
+        case StarterChoice::CHIMCHAR:
+            priorities = {2};
+            break;
+        case StarterChoice::TURTWIG:
+            priorities = {1};
+            break;
+        case StarterChoice::PIPLUP:
+            priorities = {3, 1};
+            break;
+        }
+    }
+    if (label == "route_217_ace_dalton" || label == "route_217_ace_olivia" ||
+        label == "galactic_hq_grunt_2"){
+        // These fights use the noncontact slot. Do not fall back to a contact
+        // move when its PP budget is exhausted.
+        priorities = {2};
+    }
+    if (label.find("Sunyshore Gym ") == 0 || label == "Volkner"){
+        // Spend the spread slot's remaining budget, then the noncontact slot.
+        // Avoid contact-status abilities without inventing PP after each fight.
+        priorities = {3, 2};
+    }
+    BattleSetupPlan setup;
+    setup.language = language;
+    if (stats.starter_choice == StarterChoice::CHIMCHAR){
+        if (label == "elite_four_aaron"){
+            setup.moves = {
+                {"dustox", 2},
+                {"beautifly", 1},
+                {"vespiquen", 1},
+                {"heracross", 2},
+                {"drapion", 2},
+            };
+        }else if (label == "elite_four_bertha"){
+            // One item turn replaces the unboosted extra hit on the lead.
+            // Waiting for a later foe loses that benefit and takes another hit.
+            setup.opponent = "quagsire";
+            setup.x_attacks = 1;
+            setup.moves = {
+                {"quagsire", 4},
+                {"whiscash", 4},
+                {"golem", 4},
+                {"sudowoodo", 4},
+                {"hippowdon", 2},
+            };
+        }else if (label == "champion_cynthia"){
+            // Planned for the still-pending Champion route. Set up before
+            // the Water/Ground threats; do not assume a later send-out order.
+            setup.opponent = "spiritomb";
+            setup.x_attacks = 2;
+            setup.max_full_restores = 4;
+            setup.moves = {
+                {"spiritomb", 1},
+                {"roserade", 2},
+                {"gastrodon", 3},
+                {"lucario", 4},
+                {"milotic", 1},
+                {"garchomp", 3},
+            };
+        }
+    }
     fight_using_move_list(stream,
         context,
         BattleType::TRAINER,
@@ -1684,7 +1986,14 @@ void fight_trainer_using_moves(VideoStream& stream,
         label,
         true,
         post_battle_dialogue_cleanup,
-        &stats.move_pp_remaining);
+        &stats.move_pp_remaining,
+        ordered_moves,
+        control_second_pokemon,
+        advance_on_experience,
+        label == "elite_four_aaron" || label == "elite_four_bertha" ||
+            label == "elite_four_flint" || label == "elite_four_lucian" ? 5 :
+            label == "champion_cynthia" ? 6 : 0,
+        !setup.moves.empty() ? &setup : nullptr);
 }
 
 void fight_trainer_using_move_slot(VideoStream& stream,

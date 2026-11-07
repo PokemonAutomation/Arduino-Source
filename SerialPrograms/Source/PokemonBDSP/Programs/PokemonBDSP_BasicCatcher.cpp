@@ -4,6 +4,7 @@
  *
  */
 
+#include <vector>
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -219,16 +220,21 @@ CatchResults basic_catcher(
         SelectionArrowFinder learn_move(stream.overlay(), {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         //  Look for the pokemon caught screen.
         ReceivePokemonDetector caught_detector;
+        std::vector<PeriodicInferenceCallback> callbacks{
+            end_battle,
+            learn_move,
+        };
+        // Capture is a single event. Later fades can resemble another receive
+        // screen; keep clearing dialogue without re-arming that notification.
+        if (results.result != CatchResult::POKEMON_CAUGHT){
+            callbacks.emplace_back(caught_detector);
+        }
         int ret = run_until<ProControllerContext>(
             stream, context,
             [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 120000ms);
             },
-            {
-                end_battle,
-                caught_detector,
-                learn_move,
-            }
+            callbacks
         );
         switch (ret){
         case 0:
@@ -242,19 +248,12 @@ CatchResults basic_catcher(
             pbf_wait(context, 1000ms);
             context.wait_for_all_requests();
             return results;
-        case 1:
-            if (results.result == CatchResult::POKEMON_CAUGHT){
-                OperationFailedExceptionWithScreenshot::fire(
-                    ErrorReportMode::SEND_ERROR_REPORT,
-                    "BasicCatcher: Found receive pokemon screen two times.",
-                    stream
-                );
-            }
+        case 2:
             stream.log("BasicCatcher: The wild " + STRING_POKEMON + " was caught by " + pokeball_str, COLOR_BLUE);
             pbf_wait(context, 400ms);
             results.result = CatchResult::POKEMON_CAUGHT;
             break; //  Continue the loop.
-        case 2:
+        case 1:
             stream.log("BasicCatcher: Detected move learn! Don't learn the new move.", COLOR_BLUE);
             num_learned_moves++;
             if (num_learned_moves == 100){
