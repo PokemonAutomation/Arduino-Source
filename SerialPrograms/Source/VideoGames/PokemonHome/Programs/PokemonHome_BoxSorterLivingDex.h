@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonHome_BoxSorterLivingDex_H
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/PathOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
@@ -22,6 +23,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonHome{
 using namespace Pokemon;
+
+// Throws ParseException with the file and entry location if the template is invalid.
+void validate_living_dex_template(const JsonValue& json, const std::string& path);
 
 class BoxSorterLivingDex_Descriptor : public SingleSwitchProgramDescriptor{
 public:
@@ -66,6 +70,7 @@ private:
         POKEPC_SORTED_SPECIES,
         POKEPC_SORTED_SPECIES_MINIMAL,
         POKEPC_SPECIES_FIRST,
+        CUSTOM,
     };
 
     // Checks if the given pokemon is viable for the living dex entry. 
@@ -95,6 +100,7 @@ private:
 
     // Living dex style.
     EnumDropdownOption<LivingDexStyle> LIVING_DEX_STYLE;
+    PathOption CUSTOM_DEX_FILE;
 
     // Dex filters
     BooleanCheckBoxOption SHINY_DEX;
