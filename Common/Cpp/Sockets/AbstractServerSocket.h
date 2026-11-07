@@ -85,26 +85,28 @@ public:
     //  State::LISTENING on success or State::NOT_RUNNING on failure.
     virtual void start(const std::string& address, uint16_t port) = 0;
 
-    //  Closes the active connection, if any, and keeps listening. Unlike
-    //  "close()", this does not wait for the worker threads, so it is safe
-    //  to call from within a listener callback. "Listener::on_disconnect"
-    //  is not called for the connection closed this way.
+    //  Closes the active connection, if any, and keeps listening. It does
+    //  not wait for the worker threads, so it is safe to call from within
+    //  a listener callback. "Listener::on_disconnect" is not called for
+    //  the connection closed this way.
     //
     //  It cancels any in-flight "send()" the same way "close()" does: the
     //  send returns promptly with the number of bytes actually written so
     //  far (best effort).
     virtual void close_connection() = 0;
 
-    //  Stops the server: it stops accepting new connections, closes the
-    //  active connection, and returns the socket to State::NOT_RUNNING so
-    //  "start()" can be called again. This is safe to call multiple times.
-    //
-    //  It cancels any in-flight "send()": the send returns promptly with
-    //  the number of bytes actually written so far (best effort).
-    //
-    //  This blocks until the worker threads have exited, so it must not be
-    //  called from within a listener callback (which runs on one of those
-    //  threads).
+    //  Requests immediate teardown of the server, without waiting for the
+    //  worker threads to exit. This is safe to call from within a listener
+    //  callback (which runs on one of those threads; a blocking teardown
+    //  there would deadlock). It marks the server DESTRUCTING (no new
+    //  connections are accepted), closes the active connection, and
+    //  cancels any in-flight "send()": its caller returns promptly with
+    //  the number of bytes actually written so far (best effort). No
+    //  "on_disconnect" callback is fired. The server is left in
+    //  State::DESTRUCTING; its destructor completes the teardown (joins
+    //  the threads and returns it to NOT_RUNNING), and so does a later
+    //  "start()" on the same server, so it can be reused or destroyed. It
+    //  is safe to call multiple times.
     virtual void close() noexcept = 0;
 
     //  Sends data to the active connection. This blocks until every byte
