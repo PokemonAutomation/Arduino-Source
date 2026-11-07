@@ -11,6 +11,7 @@
 
 #include "PokemonFRLG_Settings.h"
 #include "Programs/BoxOrganization/PokemonFRLG_BoxSorter.h"
+#include "Programs/BoxOrganization/PokemonFRLG_BoxSorterLivingDex.h"
 #include "Programs/Farming/PokemonFRLG_EliteFourFarmer.h"
 #include "Programs/Farming/PokemonFRLG_HeldItemFarmer-SafariZone.h"
 #include "Programs/Farming/PokemonFRLG_ItemDuplication.h"
@@ -92,6 +93,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     if (IS_BETA_VERSION || STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back("---- Untested/Beta/WIP ----");
         ret.emplace_back(make_SingleSwitchProgram<BoxSorter>());
+        ret.emplace_back(make_SingleSwitchProgram<BoxSorterLivingDex>());
     }
 
     if (STATIC_GLOBALS.DEVELOPER_MODE){
