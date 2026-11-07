@@ -76,10 +76,10 @@ public:
     //  returns promptly with the number of bytes actually written so far
     //  (best effort). No "on_disconnect" callback is fired. The socket is
     //  left in State::DESTRUCTING; the socket's destructor completes the
-    //  teardown (joins the thread and returns it to NOT_RUNNING), so the
-    //  socket cannot be "connect()"ed again - destroy it and use a new one.
-    //  Calling "close()" when there is no active connection is a no-op. It
-    //  is safe to call multiple times.
+    //  teardown (joins the thread and returns it to NOT_RUNNING). A later
+    //  "connect()" on the same socket completes that teardown first, so
+    //  the socket can be reused. Calling "close()" when there is no
+    //  active connection is a no-op. It is safe to call multiple times.
     virtual void close() noexcept = 0;
 
     virtual void connect(const std::string& address, uint16_t port) = 0;
