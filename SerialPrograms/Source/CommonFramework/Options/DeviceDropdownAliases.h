@@ -17,6 +17,7 @@
 namespace PokemonAutomation{
 
 enum class DeviceAliasType{
+    SERIAL,
     VIDEO,
     AUDIO,
 };

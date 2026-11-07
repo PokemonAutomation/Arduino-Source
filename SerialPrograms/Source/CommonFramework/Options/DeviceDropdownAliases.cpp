@@ -8,6 +8,9 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/Backends/AudioDeviceInfo.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
+#ifdef QT_SERIALPORT_LIB
+#include "Controllers/SerialPort/SerialPortPollerQt.h"
+#endif
 #include "DeviceDropdownAliases.h"
 
 namespace PokemonAutomation{
@@ -15,6 +18,7 @@ namespace{
 
 const EnumDropdownDatabase<DeviceAliasType>& categories(){
     static const EnumDropdownDatabase<DeviceAliasType> database{
+        {DeviceAliasType::SERIAL, "Serial", "Serial"},
         {DeviceAliasType::VIDEO, "Video", "Video"},
         {DeviceAliasType::AUDIO, "Audio", "Audio"},
     };
@@ -48,7 +52,7 @@ std::unique_ptr<EditableTableRow> DeviceAliasRow::clone() const{
 DeviceDropdownAliases::DeviceDropdownAliases()
     : EditableTableOption_t<DeviceAliasRow>(
         "<b>Device Aliases:</b><br>"
-        "Choose names for cameras and audio devices. "
+        "Choose names for serial, cameras and audio devices."
         "Connected devices are added when Global Settings opens.<br>"
         "An empty alias uses the original name.",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -96,6 +100,11 @@ void DeviceDropdownAliases::add_device(DeviceAliasType category, const std::stri
 }
 
 void DeviceDropdownAliases::add_connected_devices(){
+#ifdef QT_SERIALPORT_LIB
+    for (const QSerialPortInfo& info : SerialPortPoller::instance().ports()){
+        add_device(DeviceAliasType::SERIAL, info.portName().toStdString(), info.description().toStdString());
+    }
+#endif
     for (const CameraInfo& info : get_all_cameras()){
         add_device(DeviceAliasType::VIDEO, info.device_name(), get_camera_name(info));
     }

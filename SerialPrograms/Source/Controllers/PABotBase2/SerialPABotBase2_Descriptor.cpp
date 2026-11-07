@@ -7,6 +7,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Controllers/ControllerTypeStrings.h"
 #ifdef QT_CORE_LIB
+#include "CommonFramework/Options/DeviceDropdownAliases.h"
 #include "Controllers/SerialPort/SerialPortPollerQt.h"
 #endif
 
@@ -43,6 +44,11 @@ std::string SerialPABotBase2_Descriptor::display_name() const{
     if (m_name.empty()){
         return "(none)";
     }
+#ifdef QT_CORE_LIB
+    if (auto alias = device_dropdown_name(DeviceAliasType::SERIAL, m_name)){
+        return *alias;
+    }
+#endif
     return m_name;
 }
 JsonValue SerialPABotBase2_Descriptor::to_json() const{
