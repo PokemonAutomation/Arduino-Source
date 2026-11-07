@@ -16,7 +16,7 @@ Example:
         sw.push_button("L+R", hold_ms=200)               # press L and R together
         sw.push_dpad("up")                               # d-pad up
         sw.push_left_joystick((0.0, 1.0), hold_ms=1500)  # walk forward
-        sw.controller_state("B", "up", left_joystick=(0.0, 1.0), duration_ms=2000)  # run forward
+        sw.controller_state("B", "up", left_joystick=(0.0, 1.0), duration_ms=2000)  # left stick up, hold B, hold Dpad up
         sw.wait_for_all_requests()
 """
 
@@ -130,7 +130,7 @@ class SwitchProController:
         `controller_state()`.
         
         This function does not allow for overlapping button presses. For that, use controller_state().
-        However, the pybind backend does expose `delay_ms`. If this is set to less than `hold_ms`, one may
+        However, the raw `_pa_core` backend does expose `delay_ms`. If this is set to less than `hold_ms`, one may
         also overlap button presses, similar to the functions in NintendoSwitch_Commands_Superscalar.h
 
         C++: `AbstractController::issue_buttons()`
