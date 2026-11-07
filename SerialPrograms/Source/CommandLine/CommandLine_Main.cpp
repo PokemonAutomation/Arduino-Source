@@ -23,11 +23,6 @@ using namespace PokemonAutomation::NintendoSwitch;
 
 namespace PokemonAutomation{
 
-bool use_qt_ui(){
-    return false;
-}
-
-
 FileLogger& global_file_logger(){
     static FileLogger logger(
         GlobalThreadPools::unlimited_normal(),
