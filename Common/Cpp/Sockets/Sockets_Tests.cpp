@@ -161,23 +161,6 @@ struct ServerListener : AbstractServerSocket::Listener{
 };
 
 
-//  A server listener that tears the server down from within its own
-//  on_receive_data() callback via close() - the server-side counterpart of
-//  ClosingClientListener. close() must return promptly here: on POSIX and
-//  Windows the callback runs on the connection thread that the blocking
-//  close_and_wait() would join, and on Qt it runs on the event thread that
-//  close_and_wait() would block.
-struct ClosingServerListener : ServerListener{
-    std::atomic<int> closed_in_callback{0};
-
-    virtual void on_receive_data(const void*, size_t) override{
-        server->close();
-        closed_in_callback++;
-        waiter.notify();
-    }
-};
-
-
 //  The parallel test runner can starve threads for long stretches on
 //  loaded CI machines, where wall-clock assertions then fail tests that
 //  would pass on a healthy machine. A small fixed workload (a 32 MB
@@ -345,8 +328,6 @@ public:
             error = "The server did not call on_disconnect";
         }
 
-        server.close();
-
         if (!ok && !error.empty()){
             return error;
         }
@@ -423,8 +404,6 @@ public:
 
             client.close();
         }
-
-        server.close();
 
         if (!ok && !error.empty()){
             return error;
@@ -506,8 +485,6 @@ public:
 
             client.close();
         }
-
-        server.close();
 
         if (!ok && !error.empty()){
             return error;
@@ -607,8 +584,6 @@ public:
             }
             client.close();
         }
-
-        server.close();
 
         if (!ok && !error.empty()){
             return error;
@@ -744,8 +719,6 @@ public:
             client.close();
         }
 
-        server.close();
-
         if (!ok && !error.empty()){
             return error;
         }
@@ -841,8 +814,6 @@ public:
             client_b.close();
         }
 
-        server.close();
-
         if (!ok && !error.empty()){
             return error;
         }
@@ -891,17 +862,12 @@ public:
             SOCKET_TEST_WAIT,
             [&second_listener]{ return second_listener.listen_finished.load() > 0; }
         )){
-            server.close();
             return "The second server did not report its start";
         }
         if (second_listener.last_listen_error.empty()){
-            server.close();
-            second_server.close();
             return "The second server succeeded on a port that is already in use";
         }
         if (second_server.state() != AbstractServerSocket::State::NOT_RUNNING){
-            server.close();
-            second_server.close();
             return "The second server is not NOT_RUNNING after a failed start";
         }
 
@@ -927,9 +893,6 @@ public:
 
             client.close();
         }
-
-        server.close();
-        second_server.close();
 
         if (!ok){
             return "The original server stopped working";
@@ -1043,8 +1006,6 @@ public:
 
             client.close();
         }
-
-        server.close();
 
         if (!ok && !error.empty()){
             return error;
@@ -1252,8 +1213,6 @@ public:
 
             client.close();
         }
-
-        server.close();
 
         if (!ok && !error.empty()){
             return error;
@@ -1486,8 +1445,6 @@ public:
             client.close();
         }
 
-        server.close();
-
         if (!ok && !error.empty()){
             return error;
         }
@@ -1717,8 +1674,6 @@ public:
         //  joins its connection thread, currently inside the stall) does
         //  not wait for it.
         server_listener.stop.store(true, std::memory_order_release);
-
-        server.close();
 
         if (!ok && !error.empty()){
             return error;
@@ -1967,8 +1922,6 @@ public:
             client.close();
         }
 
-        server.close();
-
         if (!ok && !error.empty()){
             return error;
         }
@@ -2135,8 +2088,6 @@ public:
         //  joins its connection thread, currently inside the stall) does
         //  not wait for it.
         server_listener.stop.store(true, std::memory_order_release);
-
-        server.close();
 
         if (!ok && !error.empty()){
             return error;
@@ -2324,8 +2275,6 @@ public:
             client.close();
         }
 
-        server.close();
-
         if (!ok && !error.empty()){
             return error;
         }
@@ -2405,107 +2354,6 @@ public:
             }
         }
 
-        server.close();
-
-        if (!ok && !error.empty()){
-            return error;
-        }
-        return true;
-    }
-};
-
-
-//  Verifies that a ServerSocket can be torn down from within its own
-//  on_receive_data() callback via close() (the server-side counterpart of
-//  Test_Sockets_CloseFromReceiveCallback). close_and_wait() would deadlock
-//  there - it joins the thread that is running this callback (or, on Qt,
-//  blocks the event thread that runs it) - so close() must return promptly
-//  and leave the server no longer LISTENING or CONNECTED. The blocking
-//  close_and_wait() then runs twice: as the start() prelude when the test
-//  re-listens on the same object, and in the destructor.
-template <typename ClientSocketType, typename ServerSocketType>
-class Test_Sockets_ServerCloseFromReceiveCallback : public TestSockets<ClientSocketType, ServerSocketType>{
-public:
-    using TestSockets<ClientSocketType, ServerSocketType>::TestSockets;
-
-    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        if (timing_unreliable()){
-            return UnitTestResult(
-                UnitTestResult::SKIPPED,
-                "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
-            );
-        }
-        ClosingServerListener server_listener;
-        ServerSocketType server(this->m_thread_pool);
-        server.add_listener(server_listener);
-        server_listener.server = &server;
-
-        uint16_t port;
-        if (!this->start_server(server, server_listener, port)){
-            if (timing_unreliable()){
-                return UnitTestResult(
-                    UnitTestResult::SKIPPED,
-                    "The server did not start listening on a starved machine."
-                );
-            }
-            return "Failed to start the server";
-        }
-
-        bool ok = false;
-        std::string error;
-        {
-            ClientListener client_listener;
-            ClientSocketType client(this->m_thread_pool);
-            client.add_listener(client_listener);
-
-            client.connect("127.0.0.1", port);
-            if (!client_listener.waiter.wait_for(
-                SOCKET_TEST_WAIT,
-                [&client_listener]{ return client_listener.connect_finished.load() >= 1; }
-            )){
-                error = "The client did not finish connecting";
-            }else if (!client_listener.last_connect_error.empty()){
-                error = "The client failed to connect: " + client_listener.last_connect_error;
-            }else if (!server_listener.waiter.wait_for(
-                SOCKET_TEST_WAIT,
-                [&server_listener]{ return server_listener.connected.load() >= 1; }
-            )){
-                error = "The server did not call on_connect";
-            }else if (client.send("ping", 4) != 4){
-                error = "The client did not send the trigger packet";
-            }else if (!server_listener.waiter.wait_for(
-                SOCKET_TEST_WAIT,
-                [&server_listener]{ return server_listener.closed_in_callback.load() >= 1; }
-            )){
-                error = "close() did not return from the on_receive_data() callback (it would have blocked, like close_and_wait() would)";
-            }else if (server.state() == AbstractServerSocket::State::CONNECTED
-                || server.state() == AbstractServerSocket::State::LISTENING
-            ){
-                error = "After close() the server is still connected or listening";
-            }else{
-                //  close() (called in the callback) only requested the
-                //  teardown. The blocking close_and_wait() runs when
-                //  start() is called again below and when "server" is
-                //  destroyed - neither may hang.
-                ok = true;
-            }
-        }
-
-        //  Re-listen on the same server: start() must complete the
-        //  close() requested in the callback (its close_and_wait()
-        //  prelude) and bind again.
-        if (ok && !this->start_server(server, server_listener, port)){
-            if (timing_unreliable()){
-                return UnitTestResult(
-                    UnitTestResult::SKIPPED,
-                    "The server did not re-start listening on a starved machine."
-                );
-            }
-            error = "The server did not re-start listening after close()";
-        }
-
-        server.close();
-
         if (!ok && !error.empty()){
             return error;
         }
@@ -2553,9 +2401,6 @@ void add_socket_tests(UnitTestDatabase& database, ThreadPool& thread_pool, const
     );
     database.add<Test_Sockets_CloseFromReceiveCallback<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "close() from the receive callback"
-    );
-    database.add<Test_Sockets_ServerCloseFromReceiveCallback<ClientSocketType, ServerSocketType>>(
-        thread_pool, prefix + "server close() from the receive callback"
     );
 }
 

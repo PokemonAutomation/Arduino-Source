@@ -34,14 +34,6 @@ void ServerSocket_WinSocket::ensure_wsa_started(){
 }
 
 void ServerSocket_WinSocket::start(const std::string& address, uint16_t port){
-    //  Complete a requested-but-unfinished close() before starting a new
-    //  listener: close() is non-blocking (it leaves the server DESTRUCTING
-    //  with the threads still exiting), so re-listening on the same server
-    //  joins them here. No-op if the server is already NOT_RUNNING.
-    //  start() is always user-initiated, never a callback, so blocking is
-    //  safe.
-    close_and_wait();
-
     //  Winsock has to be started before any of its functions can be
     //  used. Call it here, on the calling thread, so it is done before
     //  any socket is created (a client created right after "start()"
@@ -78,7 +70,7 @@ void ServerSocket_WinSocket::start(const std::string& address, uint16_t port){
             //  caller's wait timed out while the pool was starved). It
             //  notices its stale generation when it gets scheduled and
             //  exits without listening, so it only has to outlive this
-            //  call; close_and_wait() joins the whole list.
+            //  call; close() joins the whole list.
             std::lock_guard<Mutex> lg(m_task_lock);
             m_accept_threads.push_back(std::move(task));
         }
@@ -121,25 +113,6 @@ void ServerSocket_WinSocket::close_connection(){
 }
 
 void ServerSocket_WinSocket::close() noexcept{
-    //  Non-blocking teardown, safe to call from within a listener callback
-    //  (which runs on one of the threads this would otherwise have to
-    //  join). The accept loop and the connection loop observe
-    //  State::DESTRUCTING on their next iteration (a few milliseconds) and
-    //  exit on their own, closing their sockets; the server is left in
-    //  State::DESTRUCTING. The blocking "close_and_wait()" - driven by the
-    //  destructor and by a later "start()" on the same object - joins the
-    //  threads and returns it to NOT_RUNNING.
-    {
-        std::lock_guard<Mutex> lg(m_lock);
-        if (m_state.load(std::memory_order_relaxed) != State::NOT_RUNNING){
-            m_close_requested = true;
-            m_state.store(State::DESTRUCTING, std::memory_order_release);
-        }
-    }
-    m_cv.notify_all();
-}
-
-void ServerSocket_WinSocket::close_and_wait() noexcept{
     {
         std::unique_lock<Mutex> lg(m_lock);
         //  Wait for an in-progress start() to publish the listener task
@@ -159,7 +132,7 @@ void ServerSocket_WinSocket::close_and_wait() noexcept{
     }
     if (!drain){
         //  Either nothing was running (m_closing == 0), or another
-        //  close_and_wait() is already draining the threads (m_closing > 1).
+        //  close() is already draining the threads (m_closing > 1).
         //  In the second case, wait for it to finish.
         std::unique_lock<Mutex> lg(m_lock);
         m_cv.wait(lg, [&]{

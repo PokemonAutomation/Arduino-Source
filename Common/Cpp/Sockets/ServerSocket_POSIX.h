@@ -27,7 +27,7 @@ public:
     ServerSocket_POSIX(ThreadPool& thread_pool);
 
     virtual ~ServerSocket_POSIX(){
-        close_and_wait();
+        close();
     }
 
     virtual void start(const std::string& address, uint16_t port) override;
@@ -39,16 +39,6 @@ public:
     //  within a listener callback.
     virtual void close_connection() override;
 
-    //  Requests immediate teardown of the server, without waiting for the
-    //  worker threads to exit. It marks the server DESTRUCTING and closes
-    //  the active connection; the accept and connection threads observe
-    //  the new state on their next iteration and exit on their own, closing
-    //  their sockets. It cancels any in-flight "send()" the same way
-    //  "close_connection()" does. Safe to call from within a listener
-    //  callback. The blocking "close_and_wait()" (the destructor, and the
-    //  "start()" prelude) joins the threads and returns NOT_RUNNING.
-    virtual void close() noexcept override;
-
     virtual size_t send(
         const void* data,
         size_t bytes,
@@ -58,11 +48,11 @@ public:
 
 private:
 
-    //  The blocking teardown: waits for an in-progress start() to publish
-    //  its task, then joins the accept and connection threads and returns
-    //  the server to NOT_RUNNING. Driven by the destructor and by start()
-    //  (which re-listens on the same object after a close()).
-    void close_and_wait() noexcept;
+    //  Stops the server: it stops accepting new connections, closes the
+    //  active connection, and returns the server to State::NOT_RUNNING so
+    //  the object is fully torn down. It blocks until the worker threads
+    //  have exited, so it is private and only called by the destructor.
+    void close() noexcept;
 
     void accept_thread_loop(std::string address, uint16_t port, uint64_t generation);
     void connection_thread_loop();
@@ -100,8 +90,8 @@ private:
     //  One task per start() call. start() must never destroy the previous
     //  task's AsyncTask here: its destructor blocks until the task has
     //  finished, and a task from an earlier attempt may still be running
-    //  (the caller's wait timed out while the pool was starved).
-    //  close_and_wait() joins the whole list.
+    //  (the caller's wait timed out while the pool was starved). close()
+    //  joins the whole list.
     std::vector<AsyncTask> m_accept_threads;
     AsyncTask m_client_thread;
 };
