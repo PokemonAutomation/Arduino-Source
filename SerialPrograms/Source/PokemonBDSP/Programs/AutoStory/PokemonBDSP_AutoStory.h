@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "CommonTools/Options/StringSelectOption.h"
 
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -48,6 +49,9 @@ private:
     void update_ui_state();
 
 private:
+    OCR::LanguageOCROption LANGUAGE;
+    StaticTextOption SETUP_NOTE;
+
     // DIAGNOSTIC ONLY: Remove before pushing to production.
     BooleanCheckBoxOption DIAGNOSTIC_FAKE_CHECKPOINT_SAVE;
     EnumDropdownOption<StorySection> STORY_SECTION;
@@ -73,11 +77,6 @@ private:
     BooleanCheckBoxOption STARTER_SHINY;
     BooleanCheckBoxOption CATCH_LEGENDARY;
     EnumDropdownOption<HelpMode> HELP_MODE;
-    EnumDropdownOption<OutsideHelpPokemon> OUTSIDE_HELP_POKEMON;
-    EnumDropdownOption<TorterraMove> OUTSIDE_HELP_ATTACK_1;
-    EnumDropdownOption<TorterraMove> OUTSIDE_HELP_ATTACK_2;
-    EnumDropdownOption<TorterraMove> OUTSIDE_HELP_ATTACK_3;
-    EnumDropdownOption<TorterraMove> OUTSIDE_HELP_ATTACK_4;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

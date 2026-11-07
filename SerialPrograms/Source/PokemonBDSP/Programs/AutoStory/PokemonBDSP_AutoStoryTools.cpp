@@ -14,6 +14,7 @@
 
 #include "Common/Cpp/Filesystem/Filesystem.h"
 
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/GlobalAutoPaths.h"
@@ -39,7 +40,6 @@
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_ShopDetectors.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_TransitionWatchers.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
@@ -173,13 +173,7 @@ bool save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& contex
         }
     }
 
-    // Blind fallback: reuse the non-feedback save_game(context) from GameNavigation
-    // rather than duplicating the button sequence manually.
-    env.console.log("All save retries failed. Using blind fallback.", COLOR_ORANGE);
-    pbf_mash_button(context, BUTTON_B, 1000ms);
-    save_game(context); // PokemonBDSP_GameNavigation.h - non-feedback overload
-    pbf_mash_button(context, BUTTON_B, 2000ms);
-    context.wait_for_all_requests();
+    env.console.log("All checkpoint save attempts failed; route movement will not continue.", COLOR_RED);
 
     return false;
 }
@@ -194,15 +188,18 @@ void checkpoint_save(SingleSwitchProgramEnvironment& env,
     env.console.log(
         fake ? "[Checkpoint save] DIAGNOSTIC FAKE mode: save is not verified." : "[Checkpoint save] REAL mode.");
     bool success = fake ? fake_save_game(env, context) : save_game(env, context);
+    if (!success){
+        throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
+            "Checkpoint save could not be verified. Stopped before route movement; the previous save was not reloaded.",
+            env.console);
+    }
 
     stats.m_checkpoint++;
     env.update_stats();
 
     send_program_status_notification(env,
         notif_status_update,
-        fake          ? "Diagnostic fake checkpoint save (not verified)."
-        : success ? "Saved at checkpoint (verified)."
-        : "Saved at checkpoint (blind fallback).");
+        fake ? "Diagnostic fake checkpoint save (not verified)." : "Saved at checkpoint (verified).");
 }
 
 
@@ -261,6 +258,7 @@ void checkpoint_reattempt_loop(SingleSwitchProgramEnvironment& env,
                 }
                 // Only a real game reload restores the corresponding PP balance.
                 stats.move_pp_remaining = pp_at_checkpoint;
+                stats.game_reset_generation++;
             }else{
                 env.console.log("Reloading from backup save before retry...", COLOR_ORANGE);
                 reload_backup_save(env, context);
@@ -276,46 +274,6 @@ void repeat(std::initializer_list<std::function<void()>> actions, size_t times){
             action();
         }
     }
-}
-
-
-void wait_for_dialogue(VideoStream& stream,
-    ProControllerContext& context,
-    const std::string& label,
-    Milliseconds timeout){
-    auto log_detected = [&] {
-        if (!label.empty()){
-            stream.log(label + " dialogue detected.");
-        }
-    };
-
-    ShortDialogWatcher watcher_cyan(COLOR_CYAN);
-    int ret = run_until<ProControllerContext>(stream,
-        context,
-        [timeout](ProControllerContext& context){
-            context.wait_for(timeout);
-        },
-        {{watcher_cyan}});
-    if (ret == 0){
-        log_detected();
-        return;
-    }
-
-    ShortDialogWatcher watcher_red(COLOR_RED);
-    ret = run_until<ProControllerContext>(stream,
-        context,
-        [timeout](ProControllerContext& context){
-            context.wait_for(timeout);
-        },
-        {{watcher_red}});
-    if (ret == 0){
-        log_detected();
-        return;
-    }
-
-    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-        (label.empty() ? "wait_for_dialogue" : label) + ": dialogue not detected within timeout.",
-        stream);
 }
 
 
@@ -351,281 +309,11 @@ void repeat_dpad(ProControllerContext& context,
     }
 }
 
-static const char* shop_item_name(ShopItem item){
-    switch (item){
-    case ShopItem::FullRestore:
-        return "Full restore";
-    case ShopItem::MaxPotion:
-        return "Max potion";
-    case ShopItem::HyperPotion:
-        return "Hyper potion";
-    case ShopItem::SuperPotion:
-        return "Super potion";
-    case ShopItem::Potion:
-        return "Potion";
-    case ShopItem::Antidote:
-        return "Antidote";
-    case ShopItem::ParalyzHeal:
-        return "Paralyz heal";
-    case ShopItem::Awakening:
-        return "Awakening";
-    case ShopItem::Repel:
-        return "Repel";
-    case ShopItem::SuperRepel:
-        return "Super repel";
-    case ShopItem::MaxRepel:
-        return "Max repel";
-    case ShopItem::EscapeRope:
-        return "Escape rope";
-    default:
-        return "Unknown";
-    }
-}
-
-// Returns the OCR slug used as the dictionary key in ShopItemNameOCR.json.
-static const char* shop_item_slug(ShopItem item){
-    switch (item){
-    case ShopItem::FullRestore:
-        return "full-restore";
-    case ShopItem::MaxPotion:
-        return "max-potion";
-    case ShopItem::HyperPotion:
-        return "hyper-potion";
-    case ShopItem::SuperPotion:
-        return "super-potion";
-    case ShopItem::Potion:
-        return "potion";
-    case ShopItem::Antidote:
-        return "antidote";
-    case ShopItem::ParalyzHeal:
-        return "paralyze-heal";
-    case ShopItem::Awakening:
-        return "awakening";
-    case ShopItem::Repel:
-        return "repel";
-    case ShopItem::SuperRepel:
-        return "super-repel";
-    case ShopItem::MaxRepel:
-        return "max-repel";
-    case ShopItem::EscapeRope:
-        return "escape-rope";
-    default:
-        return "unknown";
-    }
-}
-
-// {MaxRepel, 2, 4}, {FullRestore, 0, 3} → "4 Max repel, 3 Full restore"
-static std::string make_buy_label(const std::vector<ItemToBuy>& items){
-    std::string label;
-    for (size_t i = 0; i < items.size(); i++){
-        if (i > 0){
-            label += ", ";
-        }
-        if (items[i].quantity == BUY_MAX){
-            label += "max ";
-        }else{
-            label += std::to_string(items[i].quantity) + " ";
-        }
-        label += shop_item_name(items[i].item);
-    }
-    return label;
-}
-
-bool buy_items(VideoStream& stream,
-    ProControllerContext& context,
-    const std::vector<ItemToBuy>& items,
-    Language language){
-    if (items.empty()){
-        return true;
-    }
-
-    const std::string label = make_buy_label(items);
-    context.wait_for_all_requests();
-    pbf_wait(context, 500ms);
-    pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
-    pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
-    context.wait_for_all_requests();
-
-
-    // ── Coordinate constants ─────────────────────────────────────────────────
-
-    // Area where the selection arrow appears at the vendor greeting menu (Buy/Sell/Leave).
-    static const ImageFloatBox VENDOR_ARROW_BOX{0.630000, 0.550000, 0.070000, 0.120000};
-
-    // Area where the selection arrow appears at the YES/NO confirmation dialog.
-    static const ImageFloatBox CONFIRM_ARROW_BOX{0.700000, 0.620000, 0.070000, 0.120000};
-
-    // Full area containing all item rows in the shop list.
-    // The hover detector scans this region to dynamically locate the red outline.
-    static const ImageFloatBox ITEM_SCAN_AREA{0.417000, 0.100000, 0.540000, 0.625000};
-
-    static constexpr size_t MAX_OUTER = 50;
-    static constexpr size_t MAX_ITEM_SEARCH = 50; // max iterations per item before giving up
-
-    // ── Outer state machine ──────────────────────────────────────────────────
-    for (size_t outer = 0; outer < MAX_OUTER; outer++){
-        SelectionArrowFinder arrow_vendor(stream.overlay(), VENDOR_ARROW_BOX, COLOR_GREEN);
-        ShopBuyingWindowWatcher buying_window;
-        ShortDialogWatcher dialog(COLOR_RED);
-
-        // case 0: no detectors fired — press A in a for-loop (5 presses) while watching.
-        stream.log("Starting to loop over items");
-        int state = run_until<ProControllerContext>(stream,
-            context,
-            [](ProControllerContext& ctx){
-                for (int i = 0; i < 5; i++){
-                    pbf_press_button(ctx, BUTTON_A, 80ms, 1000ms);
-                }
-            },
-            {{arrow_vendor}, {buying_window}, {dialog}});
-
-        context.wait_for_all_requests();
-        pbf_wait(context, 500ms);
-
-        switch (state){
-
-        case 0: // case 1: SelectionArrow at vendor menu → press A to choose "Buy"
-            stream.log("Found the selection arrow, pressing A to enter the buying window...", COLOR_GREEN);
-            pbf_press_button(context, BUTTON_A, 80ms, 500ms);
-            break;
-
-        case 1: // case 2: buying window open → buy each requested item
-            stream.log("Found the buying window, searching for the right item...", COLOR_GREEN);
-            {
-                bool buying_failed = false;
-
-                for (const ItemToBuy& item : items){
-                    stream.log("Buying " + std::to_string(item.quantity) + "x " + shop_item_slug(item.item));
-                    if (buying_failed){
-                        break;
-                    }
-
-                    // Detector fires only when the red outline is found AND both
-                    // name and price OCR match the expected item slug.
-                    ShopItemHoverDetector hover(stream.logger(),
-                        ITEM_SCAN_AREA,
-                        shop_item_slug(item.item),
-                        language,
-                        COLOR_CYAN);
-                    ShopQuantityWindowWatcher qty_window;
-                    SelectionArrowFinder confirm_arrow(stream.overlay(), CONFIRM_ARROW_BOX, COLOR_GREEN);
-
-                    bool item_bought = false;
-                    bool hover_confirmed = false;
-                    for (size_t inner = 0; inner < MAX_ITEM_SEARCH && !item_bought; inner++){
-                        context.wait_for_all_requests();
-
-                        int sub = run_until<ProControllerContext>(stream,
-                            context,
-                            [](ProControllerContext& ctx){
-                                ctx.wait_for(1000ms);
-                            },
-                            {{confirm_arrow}, {qty_window}, {hover}});
-
-                        context.wait_for_all_requests();
-
-                        stream.log("buy_items: sub=" + std::to_string(sub), COLOR_WHITE);
-
-                        switch (sub){
-
-                        case 0: // YES/NO confirmation arrow → confirm purchase
-                            stream.log("Found the confirmation to buy arrow, pressing A to buy", COLOR_GREEN);
-                            {
-                                context.wait_for_all_requests();
-                                ShopBuyingWindowWatcher back_in_shop;
-                                run_until<ProControllerContext>(stream,
-                                    context,
-                                    [](ProControllerContext& ctx){
-                                        for (int i = 0; i < 10; i++){
-                                            pbf_press_button(ctx, BUTTON_A, 80ms, 800ms);
-                                        }
-                                    },
-                                    {{back_in_shop}});
-                                item_bought = true;
-                                break;
-                            }
-
-                        case 1: // quantity window
-                            if (!hover_confirmed){
-                                // Quantity window appeared before we confirmed the right item —
-                                // an earlier A press accidentally opened the wrong item's selector.
-                                // Press B to go back to the list and continue searching.
-                                stream.log("Unexpected quantity window (wrong item), pressing B...", COLOR_YELLOW);
-                                pbf_press_button(context, BUTTON_B, 80ms, 800ms);
-                                break;
-                            }
-                            stream.log("Found the quantity window", COLOR_GREEN);
-                            if (item.quantity == BUY_MAX){
-                                stream.log("Buying max quantity");
-                                pbf_press_dpad(context, DPAD_DOWN, 80ms, 300ms);
-                            }else{
-                                stream.log("Buying " + std::to_string(item.quantity) + " of the item");
-                                for (int q = 1; q < item.quantity; q++){
-                                    pbf_press_dpad(context, DPAD_UP, 80ms, 300ms);
-                                }
-                            }
-                            pbf_press_button(context, BUTTON_A, 80ms, 300ms);
-                            pbf_wait(context, 1000ms);
-                            break;
-
-                        case 2: // correct item highlighted → press A to open quantity selector
-                            stream.log("Found the right item, pressing A to buy a certain quantity...", COLOR_GREEN);
-                            hover_confirmed = true;
-                            pbf_press_button(context, BUTTON_A, 80ms, 300ms);
-                            pbf_wait(context, 1000ms);
-                            break;
-
-                        default: // outline not found or wrong item → advance to next row
-                            stream.log("Not on the right item, moving...", COLOR_GREEN);
-                            pbf_press_dpad(context, DPAD_DOWN, 80ms, 300ms);
-                            pbf_wait(context, 300ms);
-                            break;
-                        }
-                    }
-
-                    if (!item_bought){
-                        stream.log(label + ": buy_items: could not locate " + shop_item_name(item.item) +
-                            " in shop list.",
-                            COLOR_RED);
-                        buying_failed = true;
-                    }
-                }
-
-                if (!buying_failed){
-                    stream.log("All items bought, exiting shop...", COLOR_GREEN);
-                    pbf_mash_button(context, BUTTON_B, 5000ms);
-                    return true;
-                }
-                break;
-            }
-
-        case 2: // case 3: unexpected ShortDialog → press B until back in buying window
-        {
-            ShopBuyingWindowWatcher back_in_shop;
-            run_until<ProControllerContext>(stream,
-                context,
-                [](ProControllerContext& ctx){
-                    pbf_mash_button(ctx, BUTTON_B, 5000ms);
-                },
-                {{back_in_shop}});
-            break;
-        }
-
-        default: // outer default: unrecognised state → press B to recover
-            pbf_press_button(context, BUTTON_B, 80ms, 3000ms);
-            break;
-        }
-    }
-
-    stream.log(label + ": buy_items: failed to complete after max iterations.", COLOR_RED);
-    return false;
-}
-
-
 bool heal_pokemon(VideoStream& stream,
     ProControllerContext& context,
     const std::string& label,
-    AutoStoryStats* stats){
+    AutoStoryStats* stats,
+    bool exit_center){
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
 
@@ -635,10 +323,17 @@ bool heal_pokemon(VideoStream& stream,
     pbf_mash_button(context, BUTTON_A, 5000ms);
     context.wait_for_all_requests();
     pbf_wait(context, 3000ms);
-    wait_for_dialogue(stream, context, label + " - Pokemon healing");
+    wait_for_dialog(stream, context, label + " - Pokemon healing");
     mash_until_dialogue_ends(stream, context, BUTTON_B);
     context.wait_for_all_requests();
     pbf_wait(context, 1000ms);
+
+    if (!exit_center){
+        if (stats){
+            stats->move_pp_remaining = stats->move_pp_capacity;
+        }
+        return true;
+    }
 
     // Exiting the Pokemon Center
     BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
@@ -768,6 +463,7 @@ bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place){
         pbf_move_left_joystick(context, {+1, -1}, 4000ms, 500ms);
         break;
     case FlyPoint::SnowpointCity:
+    case FlyPoint::FloaromaTown:
         pbf_move_left_joystick(context, {-1, +1}, 4000ms, 500ms);
         break;
     case FlyPoint::TwinleafTown:
@@ -799,6 +495,8 @@ bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place){
 
     switch (place){
     case FlyPoint::CanalavCity:
+        city_icon_box = {0.380000, 0.673000, 0.012000, 0.054000};
+        repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 6, false);
         break;
     case FlyPoint::CelesticTown:
         city_icon_box = {0.660000, 0.470000, 0.012000, 0.020000};
@@ -806,8 +504,14 @@ bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place){
         repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 13, false);
         break;
     case FlyPoint::EternaCity:
+        city_icon_box = {0.566000, 0.482000, 0.012000, 0.048000};
+        repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 13, false);
+        repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 10, false);
         break;
     case FlyPoint::FloaromaTown:
+        city_icon_box = {0.475000, 0.573000, 0.012000, 0.054000};
+        repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 16, false);
+        repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 5, false);
         break;
     case FlyPoint::HearthomeCity:
         city_icon_box = {0.660000, 0.637000, 0.029000, 0.052000};
@@ -825,14 +529,29 @@ bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place){
         repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 5, false);
         break;
     case FlyPoint::PastoriaCity:
+        city_icon_box = {0.773000, 0.806000, 0.029000, 0.052000};
+        repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 2, false);
+        repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 10, false);
         break;
     case FlyPoint::PokemonLeagueLower:
+        // Estimated from the marked map; verify without the player/flag overlay.
+        city_icon_box = {0.924000, 0.509000, 0.012000, 0.025000};
+        repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 12, false);
+        repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 3, false);
         break;
     case FlyPoint::PokemonLeagueUpper:
+        // Estimated from the marked map; verify without the player/flag overlay.
+        city_icon_box = {0.924000, 0.477000, 0.012000, 0.025000};
+        repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 13, false);
+        repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 3, false);
         break;
     case FlyPoint::Route221:
+        city_icon_box = {0.507000, 0.914000, 0.044000, 0.010000};
         break;
     case FlyPoint::SandgemTown:
+        city_icon_box = {0.475000, 0.838000, 0.012000, 0.022000};
+        repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 5, false);
+        repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 2, false);
         break;
     case FlyPoint::SolaceonTown:
         city_icon_box = {0.735000, 0.603000, 0.030000, 0.022000};
@@ -845,6 +564,9 @@ bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place){
         repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 1, false);
         break;
     case FlyPoint::SunyshoreCity:
+        city_icon_box = {0.924000, 0.705000, 0.029000, 0.052000};
+        repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 5, false);
+        repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 2, false);
         break;
     case FlyPoint::TwinleafTown:
         city_icon_box = {0.415000, 0.870000, 0.013000, 0.022000};
@@ -906,6 +628,43 @@ bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place){
         }
     }
     return false;
+}
+
+bool test_fly_locations(VideoStream& stream, ProControllerContext& context){
+    // Follow the marked map order, excluding Route 221 and CurrentCity.
+    const FlyPoint destinations[] = {
+        FlyPoint::CanalavCity,
+        FlyPoint::TwinleafTown,
+        FlyPoint::SandgemTown,
+        FlyPoint::JubilifeCity,
+        FlyPoint::FloaromaTown,
+        FlyPoint::OreburghCity,
+        FlyPoint::EternaCity,
+        FlyPoint::SnowpointCity,
+        FlyPoint::HearthomeCity,
+        FlyPoint::CelesticTown,
+        FlyPoint::SolaceonTown,
+        FlyPoint::PastoriaCity,
+        FlyPoint::VeilstoneCity,
+        FlyPoint::SunyshoreCity,
+        FlyPoint::PokemonLeagueLower,
+        FlyPoint::PokemonLeagueUpper,
+    };
+    for (FlyPoint place : destinations){
+        const std::string name = fly_point_name(place);
+        stream.log("Fly test: starting " + name + ".");
+        if (!fly_to(stream, context, place)){
+            stream.log("Fly test: failed at " + name + ".", COLOR_RED);
+            return false;
+        }
+        // fly_to returns at the flight fade, before the landing animation.
+        // Let the animation finish before opening the map for the next flight.
+        pbf_wait(context, 10000ms);
+        context.wait_for_all_requests();
+        stream.log("Fly test: finished " + name + ".");
+    }
+    stream.log("Fly test: completed all 16 destinations.", COLOR_GREEN);
+    return true;
 }
 
 // ---------------------------------------------------------------------------
@@ -1350,7 +1109,7 @@ static ImageFloatBox bag_list_icon_box(size_t row){
     return ImageFloatBox(0.449, 0.212 + (row - 1) * 0.075, 0.033, 0.050);
 }
 
-static ImageFloatBox bag_list_name_box(size_t row){
+ImageFloatBox bag_list_name_box(size_t row){
     // Previous height included the faint lower selection border in rows 2/6.
     // return ImageFloatBox(0.492, 0.213 + (row - 1) * 0.075, 0.335, 0.052);
     return ImageFloatBox(0.492, 0.213 + (row - 1) * 0.075, 0.335, 0.050);
@@ -1377,7 +1136,7 @@ static double bag_row_patch_score(const ImageRGB32& reference, const ImageViewRG
 //     return dark < names.width() * names.height() * 0.001;
 // }
 
-size_t bag_clear_tab_count(const ImageViewRGB32& frame){
+size_t bag_clear_tab_count(const ImageViewRGB32& frame, int pocket){
     if (!frame || bag_pocket_position(frame) == 0){
         return 0;
     }
@@ -1402,6 +1161,9 @@ size_t bag_clear_tab_count(const ImageViewRGB32& frame){
     }();
     size_t clear = 0;
     for (size_t tab = 0; tab < 8; tab++){
+        if (pocket != 0 && static_cast<int>(tab + 1) != pocket){
+            continue;
+        }
         const double x = .570 + tab * .0421;
         // A selected tab has a thin red outline. The NEW marker fills the
         // interior of this upper-left patch, which the outline leaves white.
@@ -1429,7 +1191,8 @@ size_t bag_clear_tab_count(const ImageViewRGB32& frame){
     return clear;
 }
 
-bool clear_new_item_flags(VideoStream& stream, ProControllerContext& context, int num_icons){
+bool clear_new_item_flags(VideoStream& stream, ProControllerContext& context, int num_icons,
+    const std::array<std::chrono::milliseconds, 8>& scroll_durations){
     stream.log("[Bag NEW flags] Opening bag to verify all eight tabs.");
     open_menu(stream, context, MenuCursorPosition::BAG, num_icons);
     pbf_wait(context, 1000ms);
@@ -1454,11 +1217,31 @@ bool clear_new_item_flags(VideoStream& stream, ProControllerContext& context, in
         if (pocket){
             pbf_press_dpad(context, DPAD_RIGHT, 80ms, 300ms);
         }
-        // Let the initial selection and each subsequent item clear its NEW
-        // flag. Short taps avoid skipping rows through held-button repeat.
+        // Let the tab settle and its initial selection clear before inspecting it.
         pbf_wait(context, 1000ms);
-        for (size_t tap = 0; tap < 12; tap++){
-            pbf_press_dpad(context, DPAD_DOWN, 80ms, 1000ms);
+        context.wait_for_all_requests();
+        auto frame = stream.video().snapshot();
+        const int selected = frame ? bag_pocket_position(*frame.frame) : 0;
+        if (selected == 0){
+            stream.log("[Bag NEW flags] Selected tab uncertain; stopping.", COLOR_ORANGE);
+            break;
+        }
+        if (bag_list_is_empty(*frame.frame) || bag_clear_tab_count(*frame.frame, selected) == 1){
+            stream.log("[Bag NEW flags] Skip empty or already-clear tab " + std::to_string(selected) + ".");
+        }else{
+            // The caller budgets each pocket independently. Retain the dwell on
+            // each row: a long held Down can skip NEW flags without clearing them.
+            const auto budget = scroll_durations[selected - 1];
+            stream.log("[Bag NEW flags] Tab " + std::to_string(selected) +
+                ": scroll budget " + std::to_string(budget.count()) + "ms.");
+            for (auto elapsed = 0ms; elapsed + 1080ms <= budget; elapsed += 1080ms){
+                pbf_press_dpad(context, DPAD_DOWN, 80ms, 1000ms);
+                context.wait_for_all_requests();
+                frame = stream.video().snapshot();
+                if (frame && bag_clear_tab_count(*frame.frame, selected) == 1){
+                    break;
+                }
+            }
         }
         cleared = all_clear();
     }
@@ -1600,7 +1383,7 @@ BagPocketMovePlan plan_bag_pocket_move(int current, int target){
         : BagPocketMovePlan{BagPocketAction::LEFT, static_cast<size_t>(left)};
 }
 
-static bool bag_navigate_to_pocket(VideoStream& stream, ProControllerContext& context, int target){
+bool bag_navigate_to_pocket(VideoStream& stream, ProControllerContext& context, int target){
     int current = bag_confirm_pocket(stream, context);
     for (size_t attempt = 0; attempt < 3; attempt++){
         const auto plan = plan_bag_pocket_move(current, target);

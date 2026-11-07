@@ -169,7 +169,7 @@ pastoria_city_drama(VideoStream& stream, ProControllerContext& context, AutoStor
         }
         if (ret == 0){
             stream.log("pastoria_city_drama_talk_to_grunt_1: talking to grunt!");
-            clear_post_battle_dialogue(stream, context, BUTTON_B, 4000ms);
+            clear_dialog(stream, context, BUTTON_B, 4000ms);
         };
     }
 
@@ -340,7 +340,7 @@ go_through_route_213_chasing(VideoStream& stream, ProControllerContext& context,
     }
     if (ret == 0){
         stream.log("[Route 213 grunt] Unexpected choice prompt; stopping the approach.", COLOR_RED);
-        clear_post_battle_dialogue(stream, context, BUTTON_B, 4000ms);
+        clear_dialog(stream, context, BUTTON_B, 4000ms);
         return false;
     }
 
@@ -349,11 +349,11 @@ go_through_route_213_chasing(VideoStream& stream, ProControllerContext& context,
     BlackScreenWatcher npc_nameplate(COLOR_BLUE, {0.21, 0.765, 0.01, 0.02});
     if (wait_until(stream, context, 1000ms, {{npc_nameplate}}) != 0){
         stream.log("[Route 213 grunt] NPC nameplate not detected; refusing this dialogue.", COLOR_RED);
-        clear_post_battle_dialogue(stream, context, BUTTON_B, 4000ms);
+        clear_dialog(stream, context, BUTTON_B, 4000ms);
         return false;
     }
     stream.log("[Route 213 grunt] NPC dialogue detected at the grunt approach.");
-    clear_post_battle_dialogue(stream, context, BUTTON_B, 4000ms);
+    clear_dialog(stream, context, BUTTON_B, 4000ms);
 
     context.wait_for_all_requests();
     pbf_wait(context, 3000ms);
@@ -497,7 +497,7 @@ go_through_route_214(VideoStream& stream, ProControllerContext& context, AutoSto
     }
     if (ret == 0){
         stream.log("go_through_route_214_talk_to_grunt: talking to grunt!");
-        clear_post_battle_dialogue(stream, context, BUTTON_B, 4000ms);
+        clear_dialog(stream, context, BUTTON_B, 4000ms);
     };
 
     context.wait_for_all_requests();
@@ -559,7 +559,7 @@ go_through_route_214(VideoStream& stream, ProControllerContext& context, AutoSto
     }
     if (ret == 0){
         stream.log("go_through_route_214_talk_to_cynthia: talking to Cynthia!");
-        clear_post_battle_dialogue(stream, context, BUTTON_A, 6000ms);
+        clear_dialog(stream, context, BUTTON_A, 6000ms);
     };
 
     context.wait_for_all_requests();
@@ -724,8 +724,8 @@ go_to_the_psyduck_route_210(VideoStream& stream, ProControllerContext& context, 
         // Its dialogue-free gap does not mean Cynthia's follow-up is finished.
         mash_until_dialogue_ends(stream, context, BUTTON_A, 60s);
         stream.log("[Route 210] Waiting for Cynthia after the Psyducks leave.");
-        wait_for_dialogue(stream, context, "Route 210 - Cynthia after Psyducks", 30s);
-        clear_post_battle_dialogue(stream, context, BUTTON_A, 6000ms);
+        wait_for_dialog(stream, context, "Route 210 - Cynthia after Psyducks", 30s);
+        clear_dialog(stream, context, BUTTON_A, 6000ms);
         stream.log("[Route 210] Cynthia follow-up cleared; resuming movement and Repel setup.");
     }
 
@@ -994,7 +994,7 @@ celestic_town_drama(VideoStream& stream, ProControllerContext& context, AutoStor
         }
         if (ret == 0){
             stream.log("celestic_town_talk_to_cynthias_grandma: talking to Cynthia's grandma!");
-            clear_post_battle_dialogue(stream, context, BUTTON_B, 6000ms);
+            clear_dialog(stream, context, BUTTON_B, 6000ms);
         };
     }
 
@@ -1035,7 +1035,7 @@ celestic_town_drama(VideoStream& stream, ProControllerContext& context, AutoStor
             }
             stream.log("celestic_town_talk_to_the_grunt: starting the battle.");
             fight_trainer_using_moves(stream, context, stats, "celestic_town_galactic_grunt", true);
-            clear_post_battle_dialogue(stream, context, BUTTON_B, 4000ms);
+            clear_dialog(stream, context, BUTTON_B, 4000ms);
         };
     }
 
@@ -1090,7 +1090,7 @@ static bool discover_the_paintings(VideoStream& stream, ProControllerContext& co
         }
         if (ret == 0){
             stream.log("discover_the_paintings_talk_to_cynthias_grandma: talking to the grandma!");
-            clear_post_battle_dialogue(stream, context, BUTTON_B, 6000ms);
+            clear_dialog(stream, context, BUTTON_B, 6000ms);
         };
     }
     context.wait_for_all_requests();
@@ -1126,8 +1126,8 @@ static bool talk_to_cyrus_and_fly_hearthome(VideoStream& stream, ProControllerCo
     pbf_press_button(context, BUTTON_L, 80ms, 300ms);
     pbf_press_button(context, BUTTON_L, 80ms, 300ms);
     context.wait_for_all_requests();
-    wait_for_dialogue(stream, context, "Cyrus", 10000ms);
-    clear_post_battle_dialogue(stream, context, BUTTON_B, 6000ms);
+    wait_for_dialog(stream, context, "Cyrus", 10000ms);
+    clear_dialog(stream, context, BUTTON_B, 6000ms);
 
     stream.log("[After Celestic cave] Flying to Hearthome after Cyrus's conversation.");
     if (!fly_to(stream, context, FlyPoint::HearthomeCity)){
@@ -1263,7 +1263,7 @@ static void hearthome_gym_puzzle_and_cynthia(SingleSwitchProgramEnvironment& env
     context.wait_for_all_requests();
     pbf_press_button(context, BUTTON_A, 150ms, 300ms);
     fight_trainer_using_moves(stream, context, stats, "Fantina", true);
-    clear_post_battle_dialogue(stream, context, BUTTON_B, 6000ms);
+    clear_dialog(stream, context, BUTTON_B, 6000ms);
 
     const Move sequence2[] = {
         {DPAD_DOWN, 6, 0ms},
@@ -1358,8 +1358,8 @@ static void hearthome_gym_puzzle_and_cynthia(SingleSwitchProgramEnvironment& env
             stream);
     }
     context.wait_for_all_requests();
-    wait_for_dialogue(stream, context, "Cynthia after Hearthome Gym", 30000ms);
-    clear_post_battle_dialogue(stream, context, BUTTON_B, 6000ms);
+    wait_for_dialog(stream, context, "Cynthia after Hearthome Gym", 30000ms);
+    clear_dialog(stream, context, BUTTON_B, 6000ms);
     context.wait_for_all_requests();
     stream.log(
         "[Hearthome Gym puzzle] Fantina defeated; outside the Gym with Cynthia's dialogue finished.",

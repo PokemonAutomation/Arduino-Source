@@ -16,6 +16,8 @@ namespace PokemonBDSP {
 
 
 // Reused at safe walking points to synchronize Repel expiration and renewal.
+// A renewal requires the dialogue choice cursor, not just a dialogue box.
+// Unknown dialogue or a battle fails closed.
 enum class RepelRenewalChoice {
     YES,
     NO

@@ -219,7 +219,7 @@ void jubilife_to_oreburgh_gate(SingleSwitchProgramEnvironment& env,
     pbf_wait(context, 482ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 3810ms, 0ms);
 
-    wait_for_dialogue(stream, context, "Phase 1 (Barry 1 fight dialog)");
+    wait_for_dialog(stream, context, "Phase 1 (Barry 1 fight dialog)");
     pbf_mash_button(context, BUTTON_B, 5000ms);
     fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
     pbf_mash_button(context, BUTTON_B, 5000ms);
@@ -227,7 +227,7 @@ void jubilife_to_oreburgh_gate(SingleSwitchProgramEnvironment& env,
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 2761ms, 0ms);
     pbf_wait(context, 1647ms);
     walk_through_grass(stream, context, 1, 0, 5, "right through grass");
-    wait_for_dialogue(stream, context, "Dallas fight dialog)");
+    wait_for_dialog(stream, context, "Dallas fight dialog)");
     pbf_mash_button(context, BUTTON_B, 5000ms);
     fight_trainer_using_moves(stream, context, stats, "Route trainer", false); //fighting Dallas
     context.wait_for_all_requests();
@@ -252,7 +252,7 @@ void jubilife_to_oreburgh_gate(SingleSwitchProgramEnvironment& env,
 void oreburgh_gate_nav(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     pbf_wait(context, 2000ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 879ms, 0ms);
-    wait_for_dialogue(stream, context, "HM Rock Smash Dialog");
+    wait_for_dialog(stream, context, "HM Rock Smash Dialog");
     pbf_mash_button(context, BUTTON_B, 15000ms);
     walk_through_grass(stream, context, 1, 0, 10, "right through gate");
     //Similar to sebastian, an edge case exists where we run into too many
@@ -1445,7 +1445,7 @@ static bool mine_talk_to_roark(VideoStream& stream, ProControllerContext& contex
 
     // The opening cutscene precedes the first dialogue box.
     // Do not mash B or measure dialogue absence during that cutscene.
-    wait_for_dialogue(stream, context, "[Mine Roark] First box", 30s);
+    wait_for_dialog(stream, context, "[Mine Roark] First box", 30s);
 
     ShortDialogDetector dialogue(COLOR_YELLOW);
     const auto deadline = std::chrono::steady_clock::now() + 60s;
@@ -1633,13 +1633,13 @@ void gym_Puzzle_01(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
 
     //Button presses to initiate the Gym battle.
     pbf_press_button(context, BUTTON_A, 180ms, 0ms);
-    wait_for_dialogue(stream, context, "Phase 3 (Roark fight dialog)");
+    wait_for_dialog(stream, context, "Phase 3 (Roark fight dialog)");
     pbf_mash_button(context, BUTTON_B, 5000ms);
     //Barry 1 battle logic can be used here since the moves don't matter this early.
     fight_trainer_using_moves(stream, context, stats, "Roark", false);
 
     context.wait_for_all_requests();
-    wait_for_dialogue(stream, context, "Phase 4 (Roark post battle dialog)");
+    wait_for_dialog(stream, context, "Phase 4 (Roark post battle dialog)");
     ShortDialogDetector post_battle_dialogue(COLOR_YELLOW);
     const auto dialogue_deadline = std::chrono::steady_clock::now() + 180s;
     auto dialogue_absent_since = std::chrono::steady_clock::now();

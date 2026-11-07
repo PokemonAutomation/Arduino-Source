@@ -20,9 +20,10 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-BattleMenuDetector::BattleMenuDetector(BattleType battle_type, Color color)
+BattleMenuDetector::BattleMenuDetector(BattleType battle_type, Color color, bool control_second_pokemon)
     : m_color(color)
     , m_battle_type(battle_type)
+    , m_control_second_pokemon(control_second_pokemon)
     , m_left0_status    (0.140, 0.922, 0.100, 0.010)
     , m_left1_status    (0.140, 0.910, 0.100, 0.010)
     , m_right_status    (0.405, 0.925, 0.100, 0.010)
@@ -68,7 +69,12 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
     {
         bool left = is_white(extract_box_reference(screen, m_opponent_left));
         bool right = is_white(extract_box_reference(screen, m_opponent_right));
-        if (!left && !right){
+        // Own-party doubles raise the panels while choosing the first move.
+        // Keep this additional layout restricted to the opt-in double handler.
+        const bool own_partner_opponent = m_control_second_pokemon &&
+            is_white(extract_box_reference(screen, ImageFloatBox{0.505, 0.905, 0.010, 0.005})) &&
+            is_white(extract_box_reference(screen, ImageFloatBox{0.700, 0.070, 0.004, 0.010}));
+        if (!left && !right && !own_partner_opponent){
 //            cout << "opp left or right" << endl;
             return false;
         }
@@ -77,7 +83,9 @@ bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
         bool left0 = is_white(extract_box_reference(screen, m_left0_status));
         bool left1 = is_white(extract_box_reference(screen, m_left1_status));
         bool right = is_white(extract_box_reference(screen, m_right_status));
-        if (!left0 && !left1 && !right){
+        const bool own_partner = m_control_second_pokemon &&
+            is_white(extract_box_reference(screen, ImageFloatBox{0.505, 0.905, 0.010, 0.005}));
+        if (!left0 && !left1 && !right && !own_partner){
             return false;
         }
     }
@@ -207,6 +215,24 @@ BattleMenuOption BattleMenuDetector::selected_option(const ImageViewRGB32& scree
     return static_cast<BattleMenuOption>(selected);
 }
 
+size_t BattleMenuDetector::active_player(const ImageViewRGB32& screen){
+    if (!screen || !detect(screen)){
+        return 0;
+    }
+    // The command owner's status panel is raised. The other panel's lower
+    // white strip stays visible; names, HP values and menu language are unused.
+    const bool partner_present = is_white(extract_box_reference(screen, ImageFloatBox{0.505, 0.905, 0.010, 0.005}));
+    if (!partner_present){
+        return 1;
+    }
+    const bool lead_lower = is_white(extract_box_reference(screen, ImageFloatBox{0.140, 0.930, 0.040, 0.006}));
+    const bool partner_lower = is_white(extract_box_reference(screen, ImageFloatBox{0.330, 0.930, 0.040, 0.006}));
+    if (lead_lower == partner_lower){
+        return 0;
+    }
+    return lead_lower ? 2 : 1;
+}
+
 BattleMoveMenuState detect_battle_move_menu(const ImageViewRGB32& screen){
     BattleMoveMenuState result;
     if (!screen) return result;
@@ -276,8 +302,8 @@ BattleMoveMenuState detect_battle_move_menu(const ImageViewRGB32& screen){
     return result;
 }
 
-BattleMenuWatcher::BattleMenuWatcher(BattleType battle_type, Color color)
-    : BattleMenuDetector(battle_type, color)
+BattleMenuWatcher::BattleMenuWatcher(BattleType battle_type, Color color, bool control_second_pokemon)
+    : BattleMenuDetector(battle_type, color, control_second_pokemon)
     , VisualInferenceCallback("BattleMenuWatcher")
 {}
 void BattleMenuWatcher::make_overlays(VideoOverlaySet& items) const{

@@ -29,6 +29,7 @@
 #include "PokemonBDSP/Inference/PokemonBDSP_TransitionWatchers.h"
 #include "PokemonBDSP/Programs/AutoStory/Detect/PokemonBDSP_AutoStory_OverworldDetector.h"
 #include "PokemonBDSP/Programs/AutoStory/PokemonBDSP_AutoStoryTools.h"
+#include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Shopping.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Segment_00_tools.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_Autostory_Segment_01_tools.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_OverworldMatchers.h"
@@ -579,7 +580,7 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context, A
             "Galactic HQ: Front bush interaction did not produce dialogue.",
             stream);
     }
-    clear_post_battle_dialogue(stream, context, BUTTON_A, 6000ms);
+    clear_dialog(stream, context, BUTTON_A, 6000ms);
     context.wait_for_all_requests();
     // Cut succeeds, but the Center exit can leave us one tile west of
     // the HQ doorway. Do not replay the interior route against its wall.
@@ -701,7 +702,7 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context, A
     }
     fight("Commander Jupiter", true);
     // Jupiter's departure and the rescued family have chained dialogue.
-    clear_post_battle_dialogue(stream, context, BUTTON_A, 6000ms);
+    clear_dialog(stream, context, BUTTON_A, 6000ms);
     stream.log("[Galactic HQ] Rescue dialogue cleared; following recorded exit.", COLOR_GREEN);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 691ms, 0ms);
     pbf_wait(context, 575ms);
@@ -827,7 +828,7 @@ static void segment03_enter_cycle_shop(VideoStream& stream, ProControllerContext
 void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     // Continue from 03.01 outside HQ, directly in front of the Cut bush.
     use_HM(stream, context, "Galactic HQ exit Cut");
-    clear_post_battle_dialogue(stream, context, BUTTON_A, 6000ms);
+    clear_dialog(stream, context, BUTTON_A, 6000ms);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1413ms, 0ms);
     pbf_wait(context, 182ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 712ms, 0ms);
@@ -1465,9 +1466,9 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context, A
             "Hearthome Contest Hall: Fantina dialogue did not start.",
             stream);
     }
-    clear_post_battle_dialogue(stream, context, BUTTON_B);
+    clear_dialog(stream, context, BUTTON_B);
     pbf_wait(context, 2000ms);
-    clear_post_battle_dialogue(stream, context, BUTTON_B);
+    clear_dialog(stream, context, BUTTON_B);
     // Keep Hall entry separate from Fantina's outdoor conversation.
     segment03_cycling_move(stream, context, stats, 0, 1, 1179ms, 4268ms, "Hearthome Contest Hall entrance", true);
     pbf_press_button(context, BUTTON_A, 181ms, 219ms);
@@ -1844,7 +1845,7 @@ void lost_tower(VideoStream& stream, ProControllerContext& context, AutoStorySta
             if (pending_repel_dialogue.detect(*frame.frame)){
                 stream.log("[Lost Tower Repel] Pending renewal before down press " + std::to_string(i + 1) +
                     "; clearing before movement.");
-                clear_post_battle_dialogue(stream, context, BUTTON_A);
+                clear_dialog(stream, context, BUTTON_A);
                 repel_renewed = true;
             }
 
@@ -1863,7 +1864,7 @@ void lost_tower(VideoStream& stream, ProControllerContext& context, AutoStorySta
             if (expiry == 0){
                 stream.log("[Lost Tower Repel] Renewal after down press " + std::to_string(i + 1) + "/" +
                     std::to_string(move.count) + "; clearing before the remaining steps.");
-                clear_post_battle_dialogue(stream, context, BUTTON_A);
+                clear_dialog(stream, context, BUTTON_A);
                 repel_renewed = true;
             }
             context.wait_for_all_requests();
@@ -1874,7 +1875,7 @@ void lost_tower(VideoStream& stream, ProControllerContext& context, AutoStorySta
         ShortDialogWatcher late_repel_dialogue(COLOR_YELLOW);
         if (wait_until(stream, context, 3s, {{late_repel_dialogue}}) == 0){
             stream.log("[Lost Tower Repel] Late renewal dialogue detected; accepting renewal.");
-            clear_post_battle_dialogue(stream, context, BUTTON_A);
+            clear_dialog(stream, context, BUTTON_A);
         }else{
             stream.log("[Lost Tower Repel] No renewal dialogue at the recorded stop; continuing.");
         }
@@ -1940,7 +1941,7 @@ void lost_tower(VideoStream& stream, ProControllerContext& context, AutoStorySta
         stream.log("[Lost Tower biker] Dialogue detected after " + std::to_string(biker_up_completed) +
             " up presses; handling the trainer battle.");
         fight_trainer_using_moves(stream, context, stats, "Lost Tower biker", false);
-        clear_post_battle_dialogue(stream, context, BUTTON_B);
+        clear_dialog(stream, context, BUTTON_B);
 
         // The trainer conversation turns the player toward the biker.
         // Restore north if its facing press was already used before the battle.
@@ -2040,8 +2041,8 @@ void lost_tower(VideoStream& stream, ProControllerContext& context, AutoStorySta
     context.wait_for_all_requests();
     pbf_press_button(context, BUTTON_A, 80ms, 100ms);
     context.wait_for_all_requests();
-    wait_for_dialogue(stream, context, "Lost Tower reward: First box", 30s);
-    clear_post_battle_dialogue(stream, context, BUTTON_B, 4000ms);
+    wait_for_dialog(stream, context, "Lost Tower reward: First box", 30s);
+    clear_dialog(stream, context, BUTTON_B, 4000ms);
     stream.log("[Lost Tower reward] Dialogue absent for four seconds; opening the Bag.");
     if (!use_escape_rope(stream, context, 8)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
@@ -2499,7 +2500,7 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
             "Veilstone Dawn: Dialogue did not start from the west stair approach.",
             stream);
     }
-    clear_post_battle_dialogue(stream, context, BUTTON_B, 4000ms);
+    clear_dialog(stream, context, BUTTON_B, 4000ms);
 
     // The new recording already enters the Gym. Cancel at its first fade.
     context.wait_for_all_requests();
@@ -2736,7 +2737,7 @@ static void gym_Puzzle_03(VideoStream& stream, ProControllerContext& context, Au
     // Clear badge and reward dialogue before handing off inside the Gym.
     // Match Gardenia's quiet period so gaps between rewards do not end cleanup.
     stream.log("[Veilstone Gym puzzle] Shared battle cleanup returned; clearing remaining Maylene rewards with B.");
-    clear_post_battle_dialogue(stream, context, BUTTON_B, 6000ms);
+    clear_dialog(stream, context, BUTTON_B, 6000ms);
     stream.log("[Veilstone Gym puzzle] Maylene post-battle dialogue cleared; remaining here for Segment 04.");
 }
 

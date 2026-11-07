@@ -4,17 +4,16 @@
  *
  */
 
-#include <map>
 #include <string>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/OCR/OCR_NumberReader.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonBDSP_ShopItemNameReader.h"
-#include "PokemonBDSP_ShopItemPriceReader.h"
 #include "PokemonBDSP_ShopDetectors.h"
 
 namespace PokemonAutomation{
@@ -98,49 +97,10 @@ static constexpr double RED_MIN_ASPECT = 4.0;
 // Minimum consecutive frames that must confirm before the detector fires.
 static constexpr size_t HOVER_MIN_CONSECUTIVE = 3;
 
-// OCR region X offsets (as fractions of outline row width).
-// Tune NAME_X_OFFSET if the first character of the item name is being cut off.
-// Name:  [ 5%, 70%]  →  x_offset=0.05, width_fraction=0.65
-// Price: [70%, 100%] →  x_offset=0.70, width_fraction=0.30
-static constexpr double NAME_X_OFFSET   = 0.08;
-static constexpr double NAME_X_WIDTH    = 0.65;
-static constexpr double PRICE_X_OFFSET  = 0.70;
-static constexpr double PRICE_X_WIDTH   = 0.30;
-// Fixed OCR box height in normalized screen coordinates. The waterfill detects
-// only the thin red border lines, so outline_box.height is just the border
-// thickness. This constant covers the full item row height instead.
-static constexpr double OCR_ROW_HEIGHT  = 0.06;
-
-// Maps item slug → expected price slug.
-static const std::map<std::string, std::string> ITEM_PRICE_TABLE{
-    {"poke-ball",     "200"},
-    {"great-ball",    "600"},
-    {"ultra-ball",    "1200"},
-    {"heal-ball",     "300"},
-    {"net-ball",      "1000"},
-    {"nest-ball",     "1000"},
-    {"dusk-ball",     "1000"},
-    {"quick-ball",    "1000"},
-    {"timer-ball",    "1000"},
-    {"repeat-ball",   "1000"},
-    {"luxury-ball",   "1000"},
-    {"potion",        "300"},
-    {"super-potion",  "700"},
-    {"hyper-potion",  "1200"},
-    {"max-potion",    "2500"},
-    {"full-restore",  "3000"},
-    {"revive",        "1500"},
-    {"antidote",      "100"},
-    {"paralyze-heal", "200"},
-    {"awakening",     "250"},
-    {"burn-heal",     "250"},
-    {"ice-heal",      "250"},
-    {"full-heal",     "600"},
-    {"escape-rope",   "550"},
-    {"repel",         "350"},
-    {"super-repel",   "500"},
-    {"max-repel",     "700"},
-};
+// Item-name OCR region, relative to the selected row.
+static constexpr double NAME_X_OFFSET = 0.08;
+static constexpr double NAME_X_WIDTH = 0.65;
+static constexpr double OCR_ROW_HEIGHT = 0.06;
 
 ShopItemHoverDetector::ShopItemHoverDetector(
     Logger& logger,
@@ -155,7 +115,6 @@ ShopItemHoverDetector::ShopItemHoverDetector(
     , m_language(language)
     , m_scan_area(scan_area)
     , m_item_slug(item_slug)
-    , m_price_slug(ITEM_PRICE_TABLE.at(item_slug))
 {}
 
 bool ShopItemHoverDetector::find_outline(const ImageViewRGB32& screen, ImageFloatBox& out_box) const{
@@ -190,35 +149,23 @@ bool ShopItemHoverDetector::match_ocr(const ImageViewRGB32& screen, const ImageF
         NAME_X_WIDTH * outline_box.width,
         OCR_ROW_HEIGHT
     };
-    m_last_price_box = ImageFloatBox{
-        outline_box.x + PRICE_X_OFFSET * outline_box.width,
-        outline_box.y,
-        PRICE_X_WIDTH * outline_box.width,
-        OCR_ROW_HEIGHT
-    };
-    const ImageFloatBox& name_box  = m_last_name_box;
-    const ImageFloatBox& price_box = m_last_price_box;
+    const ImageFloatBox& name_box = m_last_name_box;
 
     const ShopItemNameReader& name_reader = ShopItemNameReader::instance();
     OCR::StringMatchResult name_result = name_reader.read_substring(
         m_logger, m_language, extract_box_reference(screen, name_box)
     );
     name_result.clear_beyond_log10p(ShopItemNameReader::MAX_LOG10P);
-    if (name_result.results.empty()) return false;
-    if (name_result.results.begin()->second.token != m_item_slug) return false;
-
-    const ShopItemPriceReader& price_reader = ShopItemPriceReader::instance();
-    OCR::StringMatchResult price_result = price_reader.read_substring(
-        m_logger, m_language, extract_box_reference(screen, price_box)
-    );
-    price_result.clear_beyond_log10p(ShopItemPriceReader::MAX_LOG10P);
-    if (price_result.results.empty()) return false;
-    if (price_result.results.begin()->second.token != m_price_slug) return false;
+    if (name_result.results.empty()){
+        return false;
+    }
+    if (name_result.results.begin()->second.token != m_item_slug){
+        return false;
+    }
 
     if (!m_ocr_logged){
         m_ocr_logged = true;
         name_result.log(m_logger, ShopItemNameReader::MAX_LOG10P, "want: " + m_item_slug);
-        price_result.log(m_logger, ShopItemPriceReader::MAX_LOG10P, "want: " + m_price_slug);
     }
     return true;
 }
@@ -228,17 +175,25 @@ bool ShopItemHoverDetector::detect(const ImageViewRGB32& screen){
     if (!find_outline(screen, outline_box)){
         m_detected_box   = ImageFloatBox{0, 0, 0, 0};
         m_last_name_box  = ImageFloatBox{0, 0, 0, 0};
-        m_last_price_box = ImageFloatBox{0, 0, 0, 0};
         m_ocr_logged     = false;
         return false;
     }
     if (!match_ocr(screen, outline_box)){
         m_last_name_box  = ImageFloatBox{0, 0, 0, 0};
-        m_last_price_box = ImageFloatBox{0, 0, 0, 0};
         return false;
     }
     m_detected_box = outline_box;
     return true;
+}
+
+int ShopItemHoverDetector::read_stock(const ImageViewRGB32& screen){
+    if (!detect(screen)){
+        return -1;
+    }
+    // Bag count at the lower right of the item-description panel; exclude the x.
+    const ImageFloatBox stock_box{0.935, 0.855, 0.050, 0.065};
+    const int stock = OCR::read_number(m_logger, extract_box_reference(screen, stock_box));
+    return stock >= 0 && stock <= 999 ? stock : -1;
 }
 
 void ShopItemHoverDetector::make_overlays(VideoOverlaySet& items) const{
@@ -248,9 +203,6 @@ void ShopItemHoverDetector::make_overlays(VideoOverlaySet& items) const{
     }
     if (m_last_name_box.width > 0){
         items.add(COLOR_BLUE, m_last_name_box);
-    }
-    if (m_last_price_box.width > 0){
-        items.add(COLOR_GREEN, m_last_price_box);
     }
 }
 

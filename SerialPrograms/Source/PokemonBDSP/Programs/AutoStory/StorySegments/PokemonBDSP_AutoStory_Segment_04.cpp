@@ -110,7 +110,7 @@ static bool go_to_veilstone_pokemon_center(VideoStream& stream, ProControllerCon
     DpadState dpad;
     stream.log("Walking towards the pokemon center");
     pbf_wait(context, 4000ms);
-    wait_for_dialogue(stream, context, "Dawn");
+    wait_for_dialog(stream, context, "Dawn");
     mash_until_dialogue_ends(stream, context, BUTTON_B);
     context.wait_for_all_requests();
     pbf_wait(context, 4000ms);
@@ -862,7 +862,7 @@ static void pastoria_gym_puzzle_and_wake(SingleSwitchProgramEnvironment& env,
             pbf_wait(context, 500ms);
             context.wait_for_all_requests();
             // Let any automatic exit dialogue finish before 05.01 saves or opens the map.
-            clear_post_battle_dialogue(stream, context, BUTTON_B, 4000ms);
+            clear_dialog(stream, context, BUTTON_B, 4000ms);
             break;
         }
         for (const auto& move : sequences[stage]){
@@ -881,7 +881,7 @@ static void pastoria_gym_puzzle_and_wake(SingleSwitchProgramEnvironment& env,
             gym_leader ? "Crasher Wake" : "Pastoria Gym trainer " + std::to_string(stage + 1);
         pbf_press_button(context, BUTTON_A, 150ms, 300ms);
         fight_trainer_using_moves(stream, context, stats, label, gym_leader);
-        clear_post_battle_dialogue(stream, context, BUTTON_B, gym_leader ? 6000ms : 3000ms);
+        clear_dialog(stream, context, BUTTON_B, gym_leader ? 6000ms : 3000ms);
     }
     stream.log("[Pastoria Gym puzzle] Reward dialogue cleared; outside the Gym doorway, ready for 05.01.",
         COLOR_GREEN);

@@ -16,6 +16,8 @@
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 
+#include "Pokemon/Inference/Pokemon_NameReader.h"
+
 #include "StorySegments/PokemonBDSP_AutoStory_Segment_00.h"
 #include "StorySegments/PokemonBDSP_AutoStory_Segment_01.h"
 #include "StorySegments/PokemonBDSP_AutoStory_Segment_02.h"
@@ -143,6 +145,10 @@ static std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_checkpoint_list()
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0907>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0908>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0909>());
+    // Manual flight regression test: visits all 16 destinations except Route 221
+    // to check map navigation and icon boxes. All destinations live-verified.
+    // Re-enable this registration only when testing flight changes.
+    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0910>());
 
 
     //checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_021>());
@@ -267,8 +273,6 @@ std::unique_ptr<StatsTracker> BDSPAutoStory_Descriptor::make_stats() const {
 // ---------------------------------------------------------------------------
 
 BDSPAutoStory::~BDSPAutoStory(){
-    OUTSIDE_HELP_POKEMON.remove_listener(*this);
-    HELP_MODE.remove_listener(*this);
     STORY_SECTION.remove_listener(*this);
     START_SEGMENT_MAINSTORY.remove_listener(*this);
     END_SEGMENT_MAINSTORY.remove_listener(*this);
@@ -288,6 +292,13 @@ BDSPAutoStory::~BDSPAutoStory(){
 
 BDSPAutoStory::BDSPAutoStory()
     : SingleSwitchProgramInstance()
+    , LANGUAGE("<b>Game Language:</b>",
+        Pokemon::PokemonNameReader::instance().languages(),
+        LockMode::LOCK_WHILE_RUNNING,
+        true)
+    , SETUP_NOTE(
+        "NOTE: Select the correct Start Point and place your character in its exact starting position and facing direction. "
+        "Read the Start description before starting the program.")
     // DIAGNOSTIC ONLY: Remove before pushing to production.
     , DIAGNOSTIC_FAKE_CHECKPOINT_SAVE(
         "<b>Diagnostic only: Fake checkpoint saves</b><br>"
@@ -301,11 +312,11 @@ BDSPAutoStory::BDSPAutoStory()
         {{StorySection::TUTORIAL, "tutorial", "Tutorial"}, {StorySection::MAIN_STORY, "main-story", "Main Story"}},
         LockMode::LOCK_WHILE_RUNNING,
         StorySection::TUTORIAL)
-    , MAINSTORY_NOTE("",
+    , MAINSTORY_NOTE(
         "Return your maxed starter from Pokemon HOME before starting Main Story. "
         "Use the required moveset and the starting position shown below.")
     , ENABLE_ADVANCED_MODE("<b>Advanced mode:</b><br>"
-        "Use checkpoints instead of segments.",
+        "Select the start/end checkpoints instead of segments. i.e. finer control over start/end points.",
         LockMode::UNLOCK_WHILE_RUNNING,
         false)
     , START_CHECKPOINT_TUTORIAL("<b>Start Checkpoint:</b>",
@@ -323,15 +334,15 @@ BDSPAutoStory::BDSPAutoStory()
     , START_DESCRIPTION_CHECKPOINT("<b>Start:</b><br>", "")
     , END_DESCRIPTION_CHECKPOINT("<b>End:</b><br>", "")
 
-    , START_CHECKPOINT_MAINSTORY("<b>Start Checkpoint (Main):</b>",
+    , START_CHECKPOINT_MAINSTORY("<b>Start Checkpoint:</b>",
         section_database(true, false),
         LockMode::LOCK_WHILE_RUNNING,
         "6")
 
-    , END_CHECKPOINT_MAINSTORY("<b>End Checkpoint (Main):</b>",
+    , END_CHECKPOINT_MAINSTORY("<b>End Checkpoint:</b>",
         section_database(true, false),
         LockMode::UNLOCK_WHILE_RUNNING,
-        section_database(true, false)[ALL_CHECKPOINTS().size() - TUTORIAL_CHECKPOINT_COUNT - 1].slug)
+        "09.09")
 
     , START_SEGMENT("<b>Start Segment:</b>", section_database(false, true), LockMode::LOCK_WHILE_RUNNING, "0")
 
@@ -347,9 +358,9 @@ BDSPAutoStory::BDSPAutoStory()
         std::to_string(ALL_SEGMENTS().size() - 1))
     , STARTERCHOICE("<b>Starter Pokemon:</b>",
         {
-            {StarterChoice::TURTWIG, "turtwig", "Turtwig"},
-            {StarterChoice::CHIMCHAR, "chimchar", "Chimchar"},
-            {StarterChoice::PIPLUP, "piplup", "Piplup"},
+            {StarterChoice::TURTWIG, "turtwig", "Turtwig (Grass)"},
+            {StarterChoice::CHIMCHAR, "chimchar", "Chimchar (Fire)"},
+            {StarterChoice::PIPLUP, "piplup", "Piplup (Water)"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         StarterChoice::CHIMCHAR)
@@ -364,94 +375,7 @@ BDSPAutoStory::BDSPAutoStory()
             {HelpMode::OUTSIDE_HELP, "outside_help", "Outside Help"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        HelpMode::NO_OUTSIDE_HELP)
-
-    , OUTSIDE_HELP_POKEMON("<b>Pokemon:</b>",
-        {
-            {OutsideHelpPokemon::TORTERRA, "torterra", "Torterra"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        OutsideHelpPokemon::TORTERRA)
-
-    , OUTSIDE_HELP_ATTACK_1("<b>Attack 1:</b>",
-        {
-            {TorterraMove::EARTHQUAKE, "earthquake", "Earthquake"},
-            {TorterraMove::WOOD_HAMMER, "wood_hammer", "Wood Hammer"},
-            {TorterraMove::RAZOR_LEAF, "razor_leaf", "Razor Leaf"},
-            {TorterraMove::CRUNCH, "crunch", "Crunch"},
-            {TorterraMove::GIGA_DRAIN, "giga_drain", "Giga Drain"},
-            {TorterraMove::IRON_TAIL, "iron_tail", "Iron Tail"},
-            {TorterraMove::ROCK_TOMB, "rock_tomb", "Rock Tomb"},
-            {TorterraMove::FACADE, "facade", "Facade"},
-            {TorterraMove::STONE_EDGE, "stone_edge", "Stone Edge"},
-            {TorterraMove::ROCK_SLIDE, "rock_slide", "Rock Slide"},
-            {TorterraMove::BULLDOZE, "bulldoze", "Bulldoze"},
-            {TorterraMove::STRENGTH, "strength", "Strength"},
-            {TorterraMove::ROCK_SMASH, "rock_smash", "Rock Smash"},
-            {TorterraMove::ROCK_CLIMB, "rock_climb", "Rock Climb"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        TorterraMove::EARTHQUAKE)
-
-    , OUTSIDE_HELP_ATTACK_2("<b>Attack 2:</b>",
-        {
-            {TorterraMove::EARTHQUAKE, "earthquake", "Earthquake"},
-            {TorterraMove::WOOD_HAMMER, "wood_hammer", "Wood Hammer"},
-            {TorterraMove::RAZOR_LEAF, "razor_leaf", "Razor Leaf"},
-            {TorterraMove::CRUNCH, "crunch", "Crunch"},
-            {TorterraMove::GIGA_DRAIN, "giga_drain", "Giga Drain"},
-            {TorterraMove::IRON_TAIL, "iron_tail", "Iron Tail"},
-            {TorterraMove::ROCK_TOMB, "rock_tomb", "Rock Tomb"},
-            {TorterraMove::FACADE, "facade", "Facade"},
-            {TorterraMove::STONE_EDGE, "stone_edge", "Stone Edge"},
-            {TorterraMove::ROCK_SLIDE, "rock_slide", "Rock Slide"},
-            {TorterraMove::BULLDOZE, "bulldoze", "Bulldoze"},
-            {TorterraMove::STRENGTH, "strength", "Strength"},
-            {TorterraMove::ROCK_SMASH, "rock_smash", "Rock Smash"},
-            {TorterraMove::ROCK_CLIMB, "rock_climb", "Rock Climb"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        TorterraMove::ROCK_SLIDE)
-
-    , OUTSIDE_HELP_ATTACK_3("<b>Attack 3:</b>",
-        {
-            {TorterraMove::EARTHQUAKE, "earthquake", "Earthquake"},
-            {TorterraMove::WOOD_HAMMER, "wood_hammer", "Wood Hammer"},
-            {TorterraMove::RAZOR_LEAF, "razor_leaf", "Razor Leaf"},
-            {TorterraMove::CRUNCH, "crunch", "Crunch"},
-            {TorterraMove::GIGA_DRAIN, "giga_drain", "Giga Drain"},
-            {TorterraMove::IRON_TAIL, "iron_tail", "Iron Tail"},
-            {TorterraMove::ROCK_TOMB, "rock_tomb", "Rock Tomb"},
-            {TorterraMove::FACADE, "facade", "Facade"},
-            {TorterraMove::STONE_EDGE, "stone_edge", "Stone Edge"},
-            {TorterraMove::ROCK_SLIDE, "rock_slide", "Rock Slide"},
-            {TorterraMove::BULLDOZE, "bulldoze", "Bulldoze"},
-            {TorterraMove::STRENGTH, "strength", "Strength"},
-            {TorterraMove::ROCK_SMASH, "rock_smash", "Rock Smash"},
-            {TorterraMove::ROCK_CLIMB, "rock_climb", "Rock Climb"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        TorterraMove::WOOD_HAMMER)
-
-    , OUTSIDE_HELP_ATTACK_4("<b>Attack 4:</b>",
-        {
-            {TorterraMove::EARTHQUAKE, "earthquake", "Earthquake"},
-            {TorterraMove::WOOD_HAMMER, "wood_hammer", "Wood Hammer"},
-            {TorterraMove::RAZOR_LEAF, "razor_leaf", "Razor Leaf"},
-            {TorterraMove::CRUNCH, "crunch", "Crunch"},
-            {TorterraMove::GIGA_DRAIN, "giga_drain", "Giga Drain"},
-            {TorterraMove::IRON_TAIL, "iron_tail", "Iron Tail"},
-            {TorterraMove::ROCK_TOMB, "rock_tomb", "Rock Tomb"},
-            {TorterraMove::FACADE, "facade", "Facade"},
-            {TorterraMove::STONE_EDGE, "stone_edge", "Stone Edge"},
-            {TorterraMove::ROCK_SLIDE, "rock_slide", "Rock Slide"},
-            {TorterraMove::BULLDOZE, "bulldoze", "Bulldoze"},
-            {TorterraMove::STRENGTH, "strength", "Strength"},
-            {TorterraMove::ROCK_SMASH, "rock_smash", "Rock Smash"},
-            {TorterraMove::ROCK_CLIMB, "rock_climb", "Rock Climb"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        TorterraMove::CRUNCH)
+        HelpMode::OUTSIDE_HELP)
 
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(30))
     , NOTIFICATIONS({
@@ -466,46 +390,35 @@ BDSPAutoStory::BDSPAutoStory()
     //  Options
     // -----------------------------------------------------------------------
 
-    PA_ADD_OPTION(DIAGNOSTIC_FAKE_CHECKPOINT_SAVE);
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(SETUP_NOTE);
     PA_ADD_OPTION(STORY_SECTION);
-    PA_ADD_OPTION(MAINSTORY_NOTE);
-    PA_ADD_OPTION(ENABLE_ADVANCED_MODE);
 
-    // Segment UI
+    // Segment start/end controls, followed by the finer checkpoint controls.
     PA_ADD_OPTION(START_SEGMENT);
+    PA_ADD_OPTION(MAINSTORY_NOTE);
     PA_ADD_OPTION(START_SEGMENT_MAINSTORY);
     PA_ADD_OPTION(START_DESCRIPTION_SEGMENT);
-
     PA_ADD_OPTION(END_SEGMENT);
     PA_ADD_OPTION(END_SEGMENT_MAINSTORY);
     PA_ADD_OPTION(END_DESCRIPTION_SEGMENT);
 
-    // Checkpoint UI
     PA_ADD_OPTION(START_CHECKPOINT_TUTORIAL);
     PA_ADD_OPTION(START_CHECKPOINT_MAINSTORY);
     PA_ADD_OPTION(START_DESCRIPTION_CHECKPOINT);
-
     PA_ADD_OPTION(END_CHECKPOINT_TUTORIAL);
     PA_ADD_OPTION(END_CHECKPOINT_MAINSTORY);
     PA_ADD_OPTION(END_DESCRIPTION_CHECKPOINT);
 
-
     PA_ADD_OPTION(STARTERCHOICE);
     PA_ADD_OPTION(STARTER_SHINY);
     PA_ADD_OPTION(CATCH_LEGENDARY);
-
     PA_ADD_OPTION(HELP_MODE);
-    PA_ADD_OPTION(OUTSIDE_HELP_POKEMON);
 
-    PA_ADD_OPTION(OUTSIDE_HELP_ATTACK_1);
-    PA_ADD_OPTION(OUTSIDE_HELP_ATTACK_2);
-    PA_ADD_OPTION(OUTSIDE_HELP_ATTACK_3);
-    PA_ADD_OPTION(OUTSIDE_HELP_ATTACK_4);
-
+    PA_ADD_OPTION(ENABLE_ADVANCED_MODE);
+    PA_ADD_OPTION(DIAGNOSTIC_FAKE_CHECKPOINT_SAVE);
     PA_ADD_OPTION(NOTIFICATIONS);
 
-    HELP_MODE.add_listener(*this);
-    OUTSIDE_HELP_POKEMON.add_listener(*this);
     START_CHECKPOINT_TUTORIAL.add_listener(*this);
     END_CHECKPOINT_TUTORIAL.add_listener(*this);
     ENABLE_ADVANCED_MODE.add_listener(*this);
@@ -606,14 +519,6 @@ void BDSPAutoStory::update_ui_state(){
     visible(END_DESCRIPTION_CHECKPOINT, advanced);
     visible(MAINSTORY_NOTE, !tutorial);
 
-    bool show_help = ((HelpMode)HELP_MODE == HelpMode::OUTSIDE_HELP);
-
-    OUTSIDE_HELP_POKEMON.set_visibility(show_help ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
-
-    OUTSIDE_HELP_ATTACK_1.set_visibility(show_help ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
-    OUTSIDE_HELP_ATTACK_2.set_visibility(show_help ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
-    OUTSIDE_HELP_ATTACK_3.set_visibility(show_help ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
-    OUTSIDE_HELP_ATTACK_4.set_visibility(show_help ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 }
 void BDSPAutoStory::on_config_value_changed(void*){
     const bool tutorial = STORY_SECTION == StorySection::TUTORIAL;
@@ -663,18 +568,14 @@ void BDSPAutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     }
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
-    AutoStoryOptions options{Language::English,
+    AutoStoryOptions options{static_cast<Language>(LANGUAGE),
         STARTERCHOICE,
         NOTIFICATION_STATUS_UPDATE,
         (HelpMode)HELP_MODE,
-        OutsideHelpConfig{(OutsideHelpPokemon)OUTSIDE_HELP_POKEMON,
-            {
-                (TorterraMove)OUTSIDE_HELP_ATTACK_1,
-                (TorterraMove)OUTSIDE_HELP_ATTACK_2,
-                (TorterraMove)OUTSIDE_HELP_ATTACK_3,
-                (TorterraMove)OUTSIDE_HELP_ATTACK_4,
-            }},
+        OutsideHelpConfig{},
         DIAGNOSTIC_FAKE_CHECKPOINT_SAVE ? CheckpointSaveMode::FAKE : CheckpointSaveMode::REAL};
+
+    options.catch_box_legendary = CATCH_LEGENDARY;
 
     stats.starter_choice = options.starter_choice;
     switch (options.starter_choice){
@@ -682,7 +583,7 @@ void BDSPAutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         stats.move_pp_capacity = {15, 15, 10, 25};
         break;
     case StarterChoice::CHIMCHAR:
-        stats.move_pp_capacity = {15, 15, 10, 30};
+        stats.move_pp_capacity = {15, 15, 10, 15};
         break;
     case StarterChoice::PIPLUP:
         stats.move_pp_capacity = {20, 10, 15, 35};
@@ -691,6 +592,10 @@ void BDSPAutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     // A direct main-story start requires full HP/PP, as described in the wiki.
     // After startup, only confirmed healing or a successful save reload refills it.
     stats.move_pp_remaining = stats.move_pp_capacity;
+    stats.game_reset_generation = 0;
+    stats.coronet_attempt_reset_generation = 0;
+    stats.coronet_approach_phase = CoronetApproachPhase::NOT_STARTED;
+    stats.coronet_toggle_bike_gear = false;
 
     const bool fake_saves = options.checkpoint_save_mode == CheckpointSaveMode::FAKE;
     if (fake_saves){

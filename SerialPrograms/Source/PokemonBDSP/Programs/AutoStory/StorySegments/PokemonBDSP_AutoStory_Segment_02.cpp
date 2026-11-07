@@ -25,11 +25,14 @@
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_TransitionWatchers.h"
 #include "PokemonBDSP/Programs/AutoStory/Detect/PokemonBDSP_AutoStory_OverworldDetector.h"
 #include "PokemonBDSP/Programs/AutoStory/PokemonBDSP_AutoStoryTools.h"
+#include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Shopping.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Segment_00_tools.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_Autostory_Segment_01_tools.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_OverworldMatchers.h"
@@ -149,6 +152,8 @@ void force_repel_expiry(VideoStream& stream,
         " until expiry; renewal response=" + (choice == RepelRenewalChoice::YES ? "Yes." : "No."));
     const Button response = choice == RepelRenewalChoice::YES ? BUTTON_A : BUTTON_B;
     ShortDialogWatcher expired(COLOR_CYAN);
+    StartBattleDetector starting(stream.overlay());
+    BattleMenuWatcher battle(BattleType::TRAINER);
     // 108 fresh Max Repels, two calibration runs: mean 41.244682s,
     // sample SD 3.668059s. Round mean + SD up to the next millisecond.
     // Match the calibration's 500ms movement / 100ms rest pulses.
@@ -174,8 +179,8 @@ void force_repel_expiry(VideoStream& stream,
                 pbf_wait(ctx, remaining);
             }
         },
-        {{expired}});
-    if (result != 0){
+        {{expired}, {starting}, {battle}});
+    if (result < 0){
         if (require_expiry){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 "Repel renewal: Required expiry prompt not observed within calibrated limit.",
@@ -184,15 +189,43 @@ void force_repel_expiry(VideoStream& stream,
         stream.log(
             "[Repel expiry] Calibrated 44.913s limit reached without an expiry prompt; checking clear overworld before continuing.",
             COLOR_ORANGE);
+    }else if (result != 0){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Repel renewal: Unexpected battle; renewal choice not confirmed.",
+            stream);
+    }else{
+        // The expiry text must be advanced before the Yes/No menu appears.
+        // Check first so an already-visible choice is not answered prematurely.
+        // Allow the appearing cursor to accumulate its five required detections
+        // before another press can dismiss the choice. Stop on a battle.
+        ShortDialogPromptDetector renewal(stream.overlay(), {0.60, 0.55, 0.30, 0.25}, COLOR_CYAN);
+        int renewal_state = wait_until(stream, context, 3s, {{renewal}, {starting}, {battle}});
+        for (size_t advance = 0; renewal_state < 0 && advance < 3; advance++){
+            stream.log("[Repel expiry] Advancing initial text before renewal choice (" +
+                std::to_string(advance + 1) + "/3).");
+            pbf_press_button(context, BUTTON_A, 80ms, 100ms);
+            context.wait_for_all_requests();
+            renewal_state = wait_until(stream, context, 3s, {{renewal}, {starting}, {battle}});
+        }
+        if (renewal_state != 0){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Repel renewal: Unexpected dialogue; renewal choice not confirmed.",
+                stream);
+        }
+        stream.log("[Repel expiry] Renewal choice confirmed.");
     }
     // Renewal has a gap before the final used-Repel message. A single
     // overworld frame is insufficient: require three continuous clear seconds.
     context.wait_for_all_requests();
     ShortDialogDetector dialogue(COLOR_YELLOW);
+    BattleDialogDetector battle_dialogue(COLOR_RED);
+    BattleMenuDetector battle_menu(BattleType::TRAINER, COLOR_RED);
     BlackScreenDetector black;
     OverworldDetector overworld;
     VideoOverlaySet overlays(stream.overlay());
     dialogue.make_overlays(overlays);
+    battle_dialogue.make_overlays(overlays);
+    battle_menu.make_overlays(overlays);
     black.make_overlays(overlays);
     overworld.make_overlays(overlays);
     const auto deadline = std::chrono::steady_clock::now() + 30s;
@@ -206,6 +239,11 @@ void force_repel_expiry(VideoStream& stream,
                 stream);
         }
         const auto now = std::chrono::steady_clock::now();
+        if (battle_dialogue.detect(*frame.frame) || battle_menu.detect(*frame.frame)){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Repel renewal: Battle detected during cleanup; renewal not confirmed.",
+                stream);
+        }
         if (dialogue.detect(*frame.frame)){
             quiet = false;
             pbf_mash_button(context, response, 100ms);
@@ -877,7 +915,7 @@ static void enter_ravaged_path_from_route204(SingleSwitchProgramEnvironment& env
         stream.log("[Ravaged Path approach] Lass Samantha triggered; completing battle before continuing.");
         wait_for_trainer_battle_menu(stream, context);
         fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
-        clear_post_battle_dialogue(stream, context);
+        clear_dialog(stream, context);
     };
     Route204ArrivalTracker arrival;
     size_t position_confirmations = 0;
@@ -1159,7 +1197,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1467ms, 0ms);
     pbf_wait(context, 2816ms);
     // Barry conversation
-    wait_for_dialogue(stream, context, "Barry conversation");
+    wait_for_dialog(stream, context, "Barry conversation");
     context.wait_for_all_requests();
 
     ShortDialogDetector dialogue(COLOR_YELLOW);
@@ -1257,9 +1295,9 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     approach_galactic_dialogue(stream, context);
     wait_for_trainer_battle_menu(stream, context);
     fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
-    clear_post_battle_dialogue(stream, context);
+    clear_dialog(stream, context);
     pbf_wait(context, 2000ms);
-    clear_post_battle_dialogue(stream, context);
+    clear_dialog(stream, context);
     // Rowan and the Poketch president leave the player north of the
     // reference. Bring the plaza landmarks back into view first.
     stream.log("[Galactic return] Dialogue cleared; short downward return before reacquiring the plaza.");
@@ -1297,7 +1335,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     }
     wait_for_trainer_battle_menu(stream, context);
     fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
-    clear_post_battle_dialogue(stream, context);
+    clear_dialog(stream, context);
     // Resume encounter protection after the Center and the following battle.
     if (!activate_repel(stream, context, 6)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
@@ -1323,7 +1361,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     // it must never fall through into overworld movement mid-battle.
     wait_for_trainer_battle_menu(stream, context);
     fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
-    clear_post_battle_dialogue(stream, context);
+    clear_dialog(stream, context);
     // Keep the recently activated Repel through Ravaged Path.
     // Reacquire west of the sign after Tyler before moving north;
     // do not spend its remaining steps on an early expiry search.
@@ -1335,7 +1373,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
         }
         wait_for_trainer_battle_menu(stream, context);
         fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
-        clear_post_battle_dialogue(stream, context);
+        clear_dialog(stream, context);
     }
     if (!northbound_aligned){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
@@ -1357,14 +1395,14 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
         stream.log("[Segment 02 battle] " + label);
         wait_for_trainer_battle_menu(stream, context);
         fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
-        clear_post_battle_dialogue(stream, context);
+        clear_dialog(stream, context);
     };
     // Break the blocking rock using the existing HM confirmation helper.
     move(0, 1, 1100ms, 900ms);
     move(1, 0, 600ms);
     use_HM(stream, context, "Rock Smash in Ravaged Path");
     context.wait_for_all_requests();
-    clear_post_battle_dialogue(stream, context);
+    clear_dialog(stream, context);
     // Failed frames stop against the remaining center rocks. Pass
     // above their collision row before the eastward exit approach.
     move(0, 1, 200ms);
@@ -1397,7 +1435,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     stream.log("[Segment 02 battle] Aroma Lady Teighler: move slot 2.");
     wait_for_trainer_battle_menu(stream, context);
     fight_trainer_using_moves(stream, context, stats, "Aroma Lady Teighler", false);
-    clear_post_battle_dialogue(stream, context);
+    clear_dialog(stream, context);
 
     // Omit the Awakening. The grass north of Teighler can trigger
     // the Bug Catcher: finish that battle before any Center locator.
@@ -1536,14 +1574,14 @@ static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& s
         stream.log("[Segment 02 battle] " + label);
         wait_for_trainer_battle_menu(stream, context);
         fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
-        clear_post_battle_dialogue(stream, context);
+        clear_dialog(stream, context);
     };
     auto talk = [&](const std::string& label, Button response = BUTTON_B){
         stream.log("[Segment 02 dialogue] " + label);
         pbf_press_button(context, BUTTON_A, 150ms, 500ms);
         context.wait_for_all_requests();
-        wait_for_dialogue(stream, context, label, 5000ms);
-        clear_post_battle_dialogue(stream, context, response);
+        wait_for_dialog(stream, context, label, 5000ms);
+        clear_dialog(stream, context, response);
     };
 
     // The house exit fixes the start pose. Use the median of the
@@ -1643,7 +1681,7 @@ static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& s
     // One additional recorded nudge centers the subsequent northward entry.
     move(1, 0, 40ms);
     transition(0, 1, 1000ms, "Valley Windworks entrance");
-    clear_post_battle_dialogue(stream, context); // Entrance warning from the grunt.
+    clear_dialog(stream, context); // Entrance warning from the grunt.
     move(-1, 0, 2000ms);                         // Combined 1210ms + 817ms, separated by only 5ms.
     bool fought_grunt = watch_route204_trainer_event(
         stream,
@@ -1730,7 +1768,7 @@ static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& s
         if (!fought_grunt){
             battle("Valley Windworks interior Galactic grunt (upper crossing)");
         }else{
-            clear_post_battle_dialogue(stream, context);
+            clear_dialog(stream, context);
         }
         // The event cancelled travel at an unknown point. Reacquire
         // the west wall and upper row, then cross from that known pose.
@@ -1751,7 +1789,7 @@ static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& s
     move(1, 0, 750ms, 500ms);
     pbf_press_button(context, BUTTON_A, 150ms, 500ms);
     battle("Commander Mars");
-    clear_post_battle_dialogue(stream, context); // Father/daughter reunion after Mars leaves.
+    clear_dialog(stream, context); // Father/daughter reunion after Mars leaves.
     stream.log("[Segment 02] Mars defeated; post-battle dialogue cleared.", COLOR_GREEN);
 }
 static void align_to_route205_marker(VideoStream& stream, ProControllerContext& context, bool forest){
@@ -1917,7 +1955,7 @@ void mars_to_eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& str
         stream.log("[Route 205 battle] " + label);
         wait_for_trainer_battle_menu(stream, context);
         fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
-        clear_post_battle_dialogue(stream, context);
+        clear_dialog(stream, context);
     };
     auto patrol_battle = [&](const std::string& label,
         const std::function<OverworldMatchResult(const ImageRGB32&)>& match,
@@ -2072,12 +2110,12 @@ void eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
     pbf_wait(context, 1588ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 531ms, 0ms);
     pbf_wait(context, 3398ms);
-    wait_for_dialogue(stream, context, "Cheryl introduction");
+    wait_for_dialog(stream, context, "Cheryl introduction");
     // Reuse the Galactic plaza cutscene cleanup, including a second
     // pass after the animation gap before route movement resumes.
-    clear_post_battle_dialogue(stream, context);
+    clear_dialog(stream, context);
     pbf_wait(context, 2000ms);
-    clear_post_battle_dialogue(stream, context);
+    clear_dialog(stream, context);
     auto encounter = [&](const std::string& label, const std::function<void(ProControllerContext&)>& approach){
         if (!watch_route204_trainer_event(stream, context, approach, label)){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
@@ -2141,15 +2179,15 @@ void eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1613ms, 0ms);
     pbf_wait(context, 538ms);
     // Clear the recorded expiry prompt before Cheryl's farewell.
-    clear_post_battle_dialogue(stream, context, BUTTON_A);
+    clear_dialog(stream, context, BUTTON_A);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 928ms, 0ms);
     pbf_wait(context, 1487ms);
-    wait_for_dialogue(stream, context, "Cheryl farewell");
+    wait_for_dialog(stream, context, "Cheryl farewell");
     // Reuse the Galactic plaza cutscene cleanup, including a second
     // pass after the animation gap before route movement resumes.
-    clear_post_battle_dialogue(stream, context);
+    clear_dialog(stream, context);
     pbf_wait(context, 2000ms);
-    clear_post_battle_dialogue(stream, context);
+    clear_dialog(stream, context);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1238ms, 0ms);
     pbf_wait(context, 2157ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 510ms, 0ms);
@@ -2238,10 +2276,10 @@ void eterna_forest_exit_to_gym(SingleSwitchProgramEnvironment& env,
         true);
     pbf_move_left_joystick(context, {0, 1}, 80ms, 200ms);
     pbf_press_button(context, BUTTON_A, 80ms, 200ms);
-    wait_for_dialogue(stream, context, "Underground Man introduction");
+    wait_for_dialog(stream, context, "Underground Man introduction");
     // Recorded forced walk: 4.7s between house and street dialogue.
     // Keep watching for that gap plus a 500ms hardware buffer.
-    clear_post_battle_dialogue(stream,
+    clear_dialog(stream,
         context,
         BUTTON_A,
         5200ms,
@@ -2277,8 +2315,8 @@ void eterna_forest_exit_to_gym(SingleSwitchProgramEnvironment& env,
     // Keep the Y / Go up / Yes inputs above, then watch the
     // Underground Man's reward dialogue through the surface return.
     context.wait_for_all_requests();
-    wait_for_dialogue(stream, context, "Underground Man return");
-    clear_post_battle_dialogue(stream, context, BUTTON_A, 3500ms);
+    wait_for_dialog(stream, context, "Underground Man return");
+    clear_dialog(stream, context, BUTTON_A, 3500ms);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 584ms, 0ms);
     pbf_wait(context, 85ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1448ms, 0ms);
@@ -2290,13 +2328,13 @@ void eterna_forest_exit_to_gym(SingleSwitchProgramEnvironment& env,
     // Reuse the plaza/Cheryl cutscene cleanup rather than a
     // recorded number of A presses during Cynthia's camera changes.
     context.wait_for_all_requests();
-    wait_for_dialogue(stream, context, "Cynthia introduction");
-    clear_post_battle_dialogue(stream, context, BUTTON_A, 3500ms);
+    wait_for_dialog(stream, context, "Cynthia introduction");
+    clear_dialog(stream, context, BUTTON_A, 3500ms);
     // Let Cynthia's departure/camera finish before any route input,
     // then watch once more for delayed dialogue on slower hardware.
     pbf_wait(context, 2000ms);
     context.wait_for_all_requests();
-    clear_post_battle_dialogue(stream, context, BUTTON_A, 1500ms);
+    clear_dialog(stream, context, BUTTON_A, 1500ms);
     pbf_wait(context, 500ms);
     stream.log("[Cynthia exit] Departure settled; moving west and south to reacquire the Center.");
     pbf_move_left_joystick(context, {-1, 0}, 1200ms, 100ms);
@@ -2520,8 +2558,8 @@ static void gym_Puzzle_02(SingleSwitchProgramEnvironment& env, VideoStream& stre
     // introduction finishes before the doorway movement starts.
     pbf_press_button(context, BUTTON_A, 150ms, 300ms);
     context.wait_for_all_requests();
-    wait_for_dialogue(stream, context, "Gardenia introduction");
-    clear_post_battle_dialogue(stream, context, BUTTON_A, 3500ms);
+    wait_for_dialog(stream, context, "Gardenia introduction");
+    clear_dialog(stream, context, BUTTON_A, 3500ms);
     stream.log("[Eterna Gym puzzle] Gardenia introduction dialogue cleared.");
     // Door transition and gym camera introduction take about 7.5s
     // in 2026-10-18 20-01-01; include 500ms for hardware variation.
@@ -2603,7 +2641,7 @@ static void gym_Puzzle_02(SingleSwitchProgramEnvironment& env, VideoStream& stre
     // Continue the existing B watcher through remaining rewards;
     // its clear confirmation spans the observed ~5s badge gap.
     stream.log("[Eterna Gym puzzle] Shared battle cleanup returned; clearing remaining Gardenia rewards with B.");
-    clear_post_battle_dialogue(stream, context, BUTTON_B, 6000ms);
+    clear_dialog(stream, context, BUTTON_B, 6000ms);
     stream.log("[Eterna Gym puzzle] Gardenia post-battle dialogue cleared; starting exit path.");
 
     for (const auto& move : sequence6){
