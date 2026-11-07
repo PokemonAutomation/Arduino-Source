@@ -284,7 +284,7 @@ class SwitchProController:
 
     def close(self) -> None:
         """Stop the device (cancelling queued commands and waiting briefly for the
-        neutral state) and drop the connection.
+        neutral state).
 
         The closed flag is set under the command lock before the cancel starts, so
         commands that start while the cancel is in flight are rejected instead of

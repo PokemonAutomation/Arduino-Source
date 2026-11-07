@@ -86,7 +86,7 @@ python -m pokemon_automation.switch_connection_test
 python -m pokemon_automation.switch_connection_test /dev/ttyACM0
 ```
 
-If `port` is omitted, every port from `list_serial_ports()` is tried in turn. 
+If `port` is omitted, every port from `list_serial_ports()` is tried in turn. WARNING: In Windows, without pyserial, the script will try every port from COM1 to COM63, which can take several minutes. Consider installing pyserial with `pip install pyserial`.
 
 `port` examples: "/dev/cu.usbserial-0001" on macOS, "/dev/ttyACM0" on Linux, or "COM3" on Windows.
 
