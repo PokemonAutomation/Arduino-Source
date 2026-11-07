@@ -97,7 +97,8 @@ void walk_through_grass(VideoStream& stream,
     const std::string& direction_name,
     BattleType battle_type = BattleType::STANDARD,
     Milliseconds movement_duration = Milliseconds(200),
-    OverworldMatchResult (*destination)(const ImageRGB32&) = nullptr);
+    OverworldMatchResult (*destination)(const ImageRGB32&) = nullptr,
+    bool fight_encounters = false);
 
 bool detect_black_screen_after_movement(VideoStream& stream, ProControllerContext& context, Milliseconds timeout);
 

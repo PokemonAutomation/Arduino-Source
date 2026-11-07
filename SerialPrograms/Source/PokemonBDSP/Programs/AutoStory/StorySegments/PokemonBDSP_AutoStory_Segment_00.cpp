@@ -27,6 +27,7 @@
 #include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Pokemon_Strings.h"
 
+#include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 #include "PokemonBDSP/Programs/AutoStory/PokemonBDSP_AutoStoryTools.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Segment_00_tools.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_OverworldMatchers.h"
@@ -51,14 +52,19 @@ static void recorded_move_until_transition(VideoStream& stream,
     double x,
     double y,
     Milliseconds duration,
-    const std::string& label){
+    const std::string& label,
+    bool advance_dialogue = false){
     context.wait_for_all_requests();
     stream.log("[Tutorial transition] " + label + ": approaching fade.");
     BlackScreenWatcher black;
     int ret = run_until<ProControllerContext>(stream,
         context,
-        [x, y, duration](ProControllerContext& ctx){
-            pbf_move_left_joystick(ctx, {x, y}, duration, 0ms);
+        [x, y, duration, advance_dialogue](ProControllerContext& ctx){
+            if (advance_dialogue){
+                pbf_mash_button(ctx, BUTTON_B, duration);
+            }else{
+                pbf_move_left_joystick(ctx, {x, y}, duration, 0ms);
+            }
             // Keep observing a delayed fade after the recorded hold.
             pbf_wait(ctx, 5000ms);
         },
@@ -267,11 +273,9 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     // Align left after entry before the next upward stair approach.
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 400ms, 0ms);
     pbf_move_left_joystick(context, {-1.000000, 0.000000}, 1600ms, 0ms);
+    // The north hold reaches the stair corner. Turn east directly;
+    // the recorded left/up repetitions only push into the same walls.
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 2722ms, 0ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1600ms, 0ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 501ms, 0ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 652ms, 0ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 1817ms, 0ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 975ms, 0ms);
     pbf_wait(context, 1422ms);
 
@@ -407,18 +411,65 @@ tutorial_part_2_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 745ms, 0ms);
     DateTime t{2026, 1, 1, 0, 0, 50};
     set_time_fast(env, context, t);
-    walk_through_grass(stream, context, 1, 0, 20, "right through grass to path", BattleType::STARTER);
-    walk_through_grass(stream, context, 0, 1, 18, "up through grass 2", BattleType::STARTER);
+    walk_through_grass(stream, context, 1, 0, 12, "right through grass to path", BattleType::STARTER);
+    // Keep the shortened approach, then line up with the second column
+    // of the northern grass patch before walking up to the Potion clerk.
+    DpadState dpad;
+    dpad.last_dir = DPAD_RIGHT;
+    // The stopped run reached the column left of the clerk; add one tile.
+    pbf_move_left_joystick(context, { 1.000000, 0.000000 }, 7300ms, 0ms);
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 13);
+    walk_through_grass(stream, context, 0, 1, 10, "Route 201 Potion clerk approach", BattleType::STARTER);
+    pbf_press_button(context, BUTTON_A, 80ms, 300ms);
+    wait_for_dialog(stream, context, "Route 201 Potion gift");
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B);
+
+    // Step around the clerk, then regain the northern tree boundary
+    // before the existing eastward crossing and lab approach.
+    dpad.last_dir = DPAD_UP;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 1);
+    walk_through_grass(stream, context, 0, 1, 2, "Route 201 north tree alignment", BattleType::STARTER);
     walk_through_grass(stream, context, 1, 0, 10, "right through grass 2", BattleType::STARTER);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 730ms, 0ms);
     pbf_wait(context, 941ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1950ms, 0ms);
     wait_for_dialog(stream, context, "Phase 11 (dawn conversation)");
-    pbf_mash_button(context, BUTTON_B, 50000ms);
-    wait_for_dialog(stream, context, "Phase 12 (Nickname reject)");
-    pbf_mash_button(context, BUTTON_B, 40000ms);
-    wait_for_dialog(stream, context, "Phase 13 (Pokedex accept)");
-    pbf_mash_button(context, BUTTON_A, 40000ms);
+    clear_dialog(stream, context, ClearDialogMode::STOP_PROMPT, 120, BUTTON_B);
+    stream.log("[Rowan] Nickname choice: selecting No.");
+    SelectionArrowFinder nickname_no(stream.overlay(), {0.707, 0.713, 0.040, 0.065}, COLOR_CYAN);
+    const auto nickname_frame = stream.video().snapshot();
+    if (!nickname_frame){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Rowan nickname: No video frame.", stream);
+    }
+    if (!nickname_no.detect(*nickname_frame.frame)){
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 300ms);
+    }
+    if (wait_until(stream, context, 3s, {{nickname_no}}) != 0){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Rowan nickname: No selection not confirmed.", stream);
+    }
+    pbf_press_button(context, BUTTON_A, 80ms, 500ms);
+    context.wait_for_all_requests();
+
+    clear_dialog(stream, context, ClearDialogMode::STOP_PROMPT, 120, BUTTON_B);
+    stream.log("[Rowan] Pokedex choice: selecting Yes.");
+    SelectionArrowFinder pokedex_yes(stream.overlay(), {0.707, 0.650, 0.040, 0.065}, COLOR_CYAN);
+    const auto pokedex_frame = stream.video().snapshot();
+    if (!pokedex_frame){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Rowan Pokedex: No video frame.", stream);
+    }
+    if (!pokedex_yes.detect(*pokedex_frame.frame)){
+        pbf_press_dpad(context, DPAD_UP, 80ms, 300ms);
+    }
+    if (wait_until(stream, context, 3s, {{pokedex_yes}}) != 0){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Rowan Pokedex: Yes selection not confirmed.", stream);
+    }
+    pbf_press_button(context, BUTTON_A, 80ms, 500ms);
+    context.wait_for_all_requests();
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 120, BUTTON_B);
 
 
     // pokedex received
@@ -437,6 +488,7 @@ tutorial_part_2_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
 // Collects poketech and stands in front of the PC to end the tutorial section
 // and send the starter to pokemon HOME.
 // ---------------------------------------------------------------------------
+
 
 static void
 tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
@@ -480,46 +532,58 @@ tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
 
     context.wait_for_all_requests();
     pbf_wait(context, 1500ms);
-    pbf_press_dpad(context, DPAD_LEFT, 150ms, 0ms);
-    pbf_wait(context, 1143ms);
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 875ms, 0ms);
-    pbf_wait(context, 1169ms);
-    pbf_press_button(context, BUTTON_A, 180ms, 0ms);
-    pbf_wait(context, 946ms);
-    pbf_press_button(context, BUTTON_A, 180ms, 0ms);
-    pbf_wait(context, 9092ms);
-    pbf_press_button(context, BUTTON_A, 180ms, 0ms);
-    pbf_wait(context, 740ms);
-    pbf_press_button(context, BUTTON_A, 180ms, 0ms);
-    pbf_wait(context, 2998ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 240ms, 0ms);
-    pbf_wait(context, 893ms);
+    // Shift one tile left from the rug to align with the exit.
+    // Finish the doorway transition before starting the Route 201 return.
+    DpadState dpad;
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 1);
+    // Mom stops the first departure after the parcel with a final reminder.
+    // Finish that conversation before requiring the doorway fade.
+    pbf_move_left_joystick(context, {0, -1}, 875ms, 300ms);
+    wait_for_dialog(stream, context, "Mom departure reminder", 10s);
+    // The outfit scene automatically exits the house. Observe that fade
+    // while advancing the reminder, then finish Mom's outdoor goodbye.
+    recorded_move_until_transition(stream, context, 0, -1, 30000ms, "Player house exit after parcel", true);
+    wait_for_dialog(stream, context, "Mom outdoor goodbye", 20s);
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B);
+    // Clear the doorway column before heading north toward Route 201.
+    pbf_move_left_joystick(context, {-1, 0}, 240ms, 300ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 5300ms, 0ms);
-    pbf_wait(context, 282ms);
+    pbf_wait(context, 500ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 260ms, 0ms);
     context.wait_for_all_requests();
-    pbf_wait(context, 1500ms);
+    pbf_wait(context, 500ms);
 
     DateTime t{2026, 1, 1, 0, 0, 50};
     set_time_fast(env, context, t);
-    walk_through_grass(stream, context, 1, 0, 20, "right through grass to path", BattleType::STARTER);
-    walk_through_grass(stream, context, 0, 1, 18, "up through grass 2", BattleType::STARTER);
-    walk_through_grass(stream, context, 1, 0, 10, "right through grass 2", BattleType::STARTER);
+    // Before Dawn gives Poke Balls, wild commands have no ball shortcut.
+    // Reuse the starter-layout detector for these training encounters.
+    walk_through_grass(stream, context, 1, 0, 12, "right through grass to path",
+        BattleType::STARTER, 200ms, nullptr, true);
+    pbf_move_left_joystick(context, { 1.000000, 0.000000 }, 7300ms, 0ms);
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 7);
+    walk_through_grass(stream, context, 0, 1, 10, "up through grass 2",
+        BattleType::STARTER, 200ms, nullptr, true);
+    walk_through_grass(stream, context, 1, 0, 5, "right through grass 2",
+        BattleType::STARTER, 200ms, nullptr, true);
     context.wait_for_all_requests();
-    pbf_wait(context, 1500ms);
+    pbf_wait(context, 500ms);
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 5);
 
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 560ms, 0ms);
-    pbf_wait(context, 1500ms);
+    pbf_wait(context, 500ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 5000ms, 0ms);
-    pbf_wait(context, 1500ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1000ms, 0ms);
-    pbf_wait(context, 1500ms);
+    pbf_wait(context, 500ms);
+    dpad.last_dir = DPAD_LEFT;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 6);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 1855ms, 0ms);
-    pbf_wait(context, 1500ms);
+    pbf_wait(context, 500ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 430ms, 0ms);
-    pbf_wait(context, 1500ms);
+    pbf_wait(context, 500ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 850ms, 0ms);
-    pbf_wait(context, 1500ms);
+    pbf_wait(context, 500ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1120ms, 0ms);
 
     wait_for_dialog(stream, context, "Phase 16 (catch tutorial)");
@@ -614,7 +678,7 @@ static void align_to_tutorial_landmarks(VideoStream& stream,
         stream);
 }
 
-static void align_to_sandgem_junction(VideoStream& stream, ProControllerContext& context){
+[[maybe_unused]] static void align_to_sandgem_junction(VideoStream& stream, ProControllerContext& context){
     align_to_tutorial_landmarks(stream, context, match_sandgem_junction, "Sandgem junction");
 }
 
@@ -623,83 +687,12 @@ static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironmen
     VideoStream& stream,
     ProControllerContext& context){
     pbf_wait(context, 1500ms);
-    //--------------------------------------------------------
-    // To get potions
-    // -------------------------------------------------------
-    walk_through_grass(stream,
-        context,
-        1,
-        0,
-        10,
-        "Route 202 grass exit",
-        BattleType::STANDARD,
-        200ms,
-        match_route202_grass_exit);
-    // Recording: the exit reference was reached after two 200ms steps.
-    // Eight further steps (1600ms) reached the eastern tree boundary.
-    // Continue outside grass to preserve the next down movement's start.
-    stream.log("[Tutorial] Route 202 grass exit confirmed; continuing right to the tree boundary.");
-    pbf_move_left_joystick(context, {1.0, 0.0}, 1600ms, 0ms);
-    pbf_wait(context, 700ms);
-    context.wait_for_all_requests();
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1421ms, 0ms);
-    pbf_wait(context, 52ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1013ms, 0ms);
-    pbf_wait(context, 142ms);
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1112ms, 0ms);
-    pbf_wait(context, 45ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 3206ms, 0ms);
-    pbf_wait(context, 912ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 856ms, 0ms);
-    context.wait_for_all_requests();
-    pbf_wait(context, 1500ms);
-    walk_through_grass(stream, context, -1, 0, 18, "left through grass 3");
-    pbf_press_button(context, BUTTON_A, 180ms, 0ms);
-
-    wait_for_dialog(stream, context, "Phase 17 (accept potions)");
-
-    pbf_mash_button(context, BUTTON_B, 10000ms);
-    context.wait_for_all_requests();
-    // Catching the second Pokemon can damage the starter. Verify healing
-    // once Potions are available, before continuing toward Tristan.
-    stream.log("[Tutorial] Checking starter HP after the first Potion pickup.");
+    // Potions were collected before Rowan. Stay in the Route 202 catch
+    // grass for healing and training instead of returning to Route 201.
+    stream.log("[Tutorial] Checking starter HP after catching the second Pokemon.");
     use_potion_first_pokemon(stream, context);
     context.wait_for_all_requests();
-    // Complete one training encounter before Tristan. The helper waits
-    // through XP/automatic move learning and heals after the fight.
     battle_1_pokemon(stream, context);
-
-    // Stop on the verified Route 201 reference instead of overshooting
-    // with ten fixed steps. The limit also allows small final corrections.
-    walk_through_grass(stream,
-        context,
-        1,
-        0,
-        20,
-        "Route 201 Potion exit",
-        BattleType::STANDARD,
-        200ms,
-        match_route201_potion_exit);
-    context.wait_for_all_requests();
-    pbf_wait(context, 1500ms);
-
-    // ---------------------------------------------------------
-    // Navigate back to catch tutorial grass
-    // ---------------------------------------------------------
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 560ms, 0ms);
-    pbf_wait(context, 1500ms);
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 5000ms, 0ms);
-    pbf_wait(context, 1500ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1000ms, 0ms);
-    pbf_wait(context, 1500ms);
-    align_to_sandgem_junction(stream, context);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 1855ms, 0ms);
-    pbf_wait(context, 1500ms);
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 430ms, 0ms);
-    pbf_wait(context, 1500ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 850ms, 0ms);
-    pbf_wait(context, 1500ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1120ms, 0ms);
 
     // Continue on to jubilife
     walk_through_grass(stream, context, -1, 0, 18, "left through grass 3");
@@ -957,10 +950,13 @@ static void
 tutorial_part_4_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 2580ms, 0ms);
     pbf_wait(context, 504ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 830ms, 0ms);
-    pbf_wait(context, 617ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 800ms, 0ms);
-    pbf_wait(context, 509ms);
+    // Face west, then cross six tiles to the school doorway.
+    // repeat_dpad adds the facing-change press before the six steps.
+    DpadState dpad;
+    dpad.last_dir = DPAD_UP;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 6);
+    // Confirm entry before approaching Barry.
+    recorded_move_until_transition(stream, context, 0, 1, 2000ms, "Jubilife Trainers School entry");
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 2000ms, 0ms);
     pbf_wait(context, 598ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 200ms, 0ms);
@@ -1267,7 +1263,7 @@ std::string AutoStory_Checkpoint_0003::start_text() const {
     return AutoStory_Checkpoint_0002().end_text();
 }
 std::string AutoStory_Checkpoint_0003::end_text() const {
-    return "Standing in front of The professor after recieving the Pokedex";
+    return "Standing in front of the professor after receiving the Pokedex, with the Route 201 Potions collected.";
 }
 void AutoStory_Checkpoint_0003::run_checkpoint(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -1299,7 +1295,7 @@ std::string AutoStory_Checkpoint_0004::start_text() const {
     return AutoStory_Checkpoint_0003().end_text();
 }
 std::string AutoStory_Checkpoint_0004::end_text() const {
-    return "On Route 202 after catching the second Pokemon, with the catch sequence finished.";
+    return "On Route 202 after catching the second Pokemon, with the catch sequence finished and the Route 201 Potions in the Bag.";
 }
 void AutoStory_Checkpoint_0004::run_checkpoint(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
