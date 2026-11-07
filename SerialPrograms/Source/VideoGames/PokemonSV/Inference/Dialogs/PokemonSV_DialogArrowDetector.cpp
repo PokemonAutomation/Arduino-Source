@@ -127,6 +127,7 @@ std::vector<ImageFloatBox> DialogArrowDetector::detect_all(const ImageViewRGB32&
 std::pair<double, double> DialogArrowDetector::locate_dialog_arrow(const ImageViewRGB32& screen) const{
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {combine_rgb(200, 200, 200), combine_rgb(255, 255, 255)},
+        {combine_rgb(220, 220, 220), combine_rgb(255, 255, 255)},
 
     };
 
