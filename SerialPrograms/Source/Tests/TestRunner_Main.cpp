@@ -40,7 +40,6 @@
 #include "Common/Qt/GlobalThreadPoolsQt.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalServices.h"
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/OCR/OCR_Routines.h"
@@ -162,11 +161,6 @@ int test_runner_main(int& argc, char* argv[]){
 }
 
 } // namespace
-
-
-bool use_qt_ui(){
-    return false;
-}
 
 
 } // namespace PokemonAutomation
