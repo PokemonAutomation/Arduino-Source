@@ -25,6 +25,12 @@ public:
     };
 
     struct Listener{
+        //  A listener must outlive the socket that calls it. Callbacks can
+        //  still be delivered after a non-blocking "close()" returns - the
+        //  socket's threads only stop when the socket itself is destroyed -
+        //  so a listener must not be destroyed before the socket that added
+        //  it. Declare the listener before the socket, so that it is
+        //  destroyed after the socket.
         //  Called at the start of the receiver thread. This can be used to set
         //  the thread priority of the thread.
         virtual void on_thread_start(){}
