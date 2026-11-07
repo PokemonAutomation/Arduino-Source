@@ -57,7 +57,7 @@ public:
 
         //  Called when the active connection is lost (the client closed
         //  the connection or a socket error occurred). It is not called
-        //  by "close()" or "close_connection()".
+        //  by "close_and_wait()" or "close_connection()".
         virtual void on_disconnect(const std::string& error_message){}
     };
 
@@ -96,8 +96,8 @@ public:
     virtual void close_connection() = 0;
 
     //  Sends data to the active connection. This blocks until every byte
-    //  has been written, the connection is lost, "close()"/
-    //  "close_connection()" is called, or "timeout" elapses.
+    //  has been written, the connection is lost,
+    //  "close_and_wait()"/"close_connection()" is called, or "timeout" elapses.
     //  "std::chrono::milliseconds::max()" (the default) waits indefinitely.
     //  Returns the number of bytes actually written, which may be less
     //  than "bytes" if the deadline elapsed, the connection was lost, or
