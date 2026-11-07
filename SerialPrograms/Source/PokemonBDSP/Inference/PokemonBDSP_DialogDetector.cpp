@@ -24,7 +24,7 @@ namespace PokemonBDSP{
 
 ShortDialogDetector::ShortDialogDetector(Color color)
     : m_color(color)
-//    , m_bottom(0.50, 0.91, 0.29, 0.05)
+    , m_bottom_white(0.55, 0.94, 0.15, 0.003)
     , m_left_white(0.221, 0.860, 0.002, 0.025)
     , m_left(0.18, 0.835, 0.02, 0.12)
     , m_right_white(0.798, 0.860, 0.002, 0.025)
@@ -32,7 +32,7 @@ ShortDialogDetector::ShortDialogDetector(Color color)
     , m_right(0.822, 0.835, 0.02, 0.12)
 {}
 void ShortDialogDetector::make_overlays(VideoOverlaySet& items) const{
-//    items.add(m_color, m_bottom);
+    items.add(m_color, m_bottom_white);
     items.add(m_color, m_left_white);
     items.add(m_color, m_left);
     items.add(m_color, m_right_white);
@@ -63,10 +63,17 @@ bool ShortDialogDetector::detect(const ImageViewRGB32& screen){
             }
         }
     }
-//    ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
-//    if (!is_white(bottom)){
-//        return false;
-//    }
+    // Reject floor tiles that resemble a dialogue box by checking the lower margin.
+    // Short-dialog layouts may place this margin at either of two heights.
+    ImageStats bottom_white = image_stats(extract_box_reference(screen, m_bottom_white));
+    if (!is_white(bottom_white)){
+        bottom_white = image_stats(extract_box_reference(
+            screen, ImageFloatBox(0.55, 0.965, 0.15, 0.003)
+        ));
+        if (!is_white(bottom_white)){
+            return false;
+        }
+    }
     ImageStats left = image_stats(extract_box_reference(screen, m_left));
 //    cout << left.stddev << endl;
     if (left.stddev.sum() < 30){

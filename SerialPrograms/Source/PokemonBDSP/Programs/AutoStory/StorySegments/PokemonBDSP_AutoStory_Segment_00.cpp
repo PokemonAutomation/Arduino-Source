@@ -198,7 +198,7 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1112ms, 0ms);
     pbf_wait(context, 4967ms);
 
-    wait_for_dialogue(stream, context, "Phase 1 (Mom)");
+    wait_for_dialog(stream, context, "Phase 1 (Mom)");
 
     pbf_mash_button(context, BUTTON_A, 5000ms);
     pbf_wait(context, 300ms);
@@ -208,7 +208,7 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1215ms, 0ms);
     pbf_wait(context, 1419ms);
 
-    wait_for_dialogue(stream, context, "Phase 2 (Mom Warning)");
+    wait_for_dialog(stream, context, "Phase 2 (Mom Warning)");
 
     pbf_mash_button(context, BUTTON_A, 2500ms);
     pbf_wait(context, 300ms);
@@ -226,10 +226,10 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_wait(context, 4000ms);
     context.wait_for_all_requests();
 
-    wait_for_dialogue(stream, context, "Phase 3 (Barry 1st)");
+    wait_for_dialog(stream, context, "Phase 3 (Barry 1st)");
     pbf_mash_button(context, BUTTON_A, 6000ms);
     pbf_wait(context, 800ms);
-    wait_for_dialogue(stream, context, "Phase 3 (Barry 1st)");
+    wait_for_dialog(stream, context, "Phase 3 (Barry 1st)");
     pbf_mash_button(context, BUTTON_A, 6000ms);
     pbf_wait(context, 800ms);
 
@@ -275,7 +275,7 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 975ms, 0ms);
     pbf_wait(context, 1422ms);
 
-    wait_for_dialogue(stream, context, "Phase 8 (Barry 2nd dialog)");
+    wait_for_dialog(stream, context, "Phase 8 (Barry 2nd dialog)");
     pbf_mash_button(context, BUTTON_A, 10000ms);
 
     pbf_wait(context, 856ms);
@@ -299,7 +299,7 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 5861ms, 0ms);
     pbf_wait(context, 134ms);
 
-    wait_for_dialogue(stream, context, "Phase 9 (Barry Route 201)");
+    wait_for_dialog(stream, context, "Phase 9 (Barry Route 201)");
 
     pbf_mash_button(context, BUTTON_B, 6000ms);
     pbf_wait(context, 800ms);
@@ -337,7 +337,7 @@ static void starter_nav(VideoStream& stream, ProControllerContext& context){
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 300ms, 0ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 300ms, 0ms);
 
-    wait_for_dialogue(stream, context, "Phase 10 (Barry before the starter selection)");
+    wait_for_dialog(stream, context, "Phase 10 (Barry before the starter selection)");
 
     pbf_mash_button(context, BUTTON_A, 1000ms);
 
@@ -394,7 +394,7 @@ tutorial_part_2_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_wait(context, 3963ms);
     context.wait_for_all_requests();
 
-    wait_for_dialogue(stream, context, "Phase 10 (Professor dialog to mom)");
+    wait_for_dialog(stream, context, "Phase 10 (Professor dialog to mom)");
     pbf_mash_button(context, BUTTON_B, 40000ms);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 820ms, 0ms);
     pbf_wait(context, 4000ms);
@@ -413,11 +413,11 @@ tutorial_part_2_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 730ms, 0ms);
     pbf_wait(context, 941ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1950ms, 0ms);
-    wait_for_dialogue(stream, context, "Phase 11 (dawn conversation)");
+    wait_for_dialog(stream, context, "Phase 11 (dawn conversation)");
     pbf_mash_button(context, BUTTON_B, 50000ms);
-    wait_for_dialogue(stream, context, "Phase 12 (Nickname reject)");
+    wait_for_dialog(stream, context, "Phase 12 (Nickname reject)");
     pbf_mash_button(context, BUTTON_B, 40000ms);
-    wait_for_dialogue(stream, context, "Phase 13 (Pokedex accept)");
+    wait_for_dialog(stream, context, "Phase 13 (Pokedex accept)");
     pbf_mash_button(context, BUTTON_A, 40000ms);
 
 
@@ -445,7 +445,7 @@ tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     recorded_move_until_transition(stream, context, 0.0, -1.0, 2010ms, "Rowan lab exit");
     context.wait_for_all_requests();
 
-    wait_for_dialogue(stream, context, "Phase 14 (dawn tour)");
+    wait_for_dialog(stream, context, "Phase 14 (dawn tour)");
 
     pbf_mash_button(context, BUTTON_B, 25000ms);
 
@@ -474,7 +474,7 @@ tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_press_dpad(context, DPAD_RIGHT, 130ms, 0ms);
     pbf_press_button(context, BUTTON_A, 180ms, 0ms);
 
-    wait_for_dialogue(stream, context, "Phase 15 (Mom conversation to accept parcel)");
+    wait_for_dialog(stream, context, "Phase 15 (Mom conversation to accept parcel)");
 
     pbf_mash_button(context, BUTTON_B, 40000ms);
 
@@ -522,7 +522,7 @@ tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_wait(context, 1500ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1120ms, 0ms);
 
-    wait_for_dialogue(stream, context, "Phase 16 (catch tutorial)");
+    wait_for_dialog(stream, context, "Phase 16 (catch tutorial)");
 
     pbf_mash_button(context, BUTTON_B, 70000ms);
     context.wait_for_all_requests();
@@ -656,7 +656,7 @@ static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironmen
     walk_through_grass(stream, context, -1, 0, 18, "left through grass 3");
     pbf_press_button(context, BUTTON_A, 180ms, 0ms);
 
-    wait_for_dialogue(stream, context, "Phase 17 (accept potions)");
+    wait_for_dialog(stream, context, "Phase 17 (accept potions)");
 
     pbf_mash_button(context, BUTTON_B, 10000ms);
     context.wait_for_all_requests();
@@ -705,7 +705,7 @@ static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironmen
     walk_through_grass(stream, context, -1, 0, 18, "left through grass 3");
     walk_through_grass(stream, context, 0, 1, 18, "up through grass 3");
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1000ms, 0ms);
-    wait_for_dialogue(stream, context, "Phase 18 (tristan encounter dialog)");
+    wait_for_dialog(stream, context, "Phase 18 (tristan encounter dialog)");
 
     pbf_mash_button(context, BUTTON_B, 5000ms);
     fight_tristan(stream, context);
@@ -722,7 +722,7 @@ static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironmen
     pbf_wait(context, 1672ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1344ms, 0ms);
 
-    wait_for_dialogue(stream, context, "Phase 19 (natalie encounter dialog)");
+    wait_for_dialog(stream, context, "Phase 19 (natalie encounter dialog)");
 
     pbf_mash_button(context, BUTTON_B, 5000ms);
 
@@ -737,7 +737,7 @@ static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironmen
     pbf_wait(context, 1261ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 815ms, 0ms);
 
-    wait_for_dialogue(stream, context, "Phase 20 (logan encounter dialog)");
+    wait_for_dialog(stream, context, "Phase 20 (logan encounter dialog)");
 
     pbf_mash_button(context, BUTTON_B, 5000ms);
     fight_Natalie(stream, context);
@@ -747,7 +747,7 @@ static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironmen
     walk_through_grass(stream, context, -1, 0, 8, "left through grass");
 
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 2469ms, 0ms);
-    wait_for_dialogue(stream, context, "Phase 21 (dawn Jubilife dialog)");
+    wait_for_dialog(stream, context, "Phase 21 (dawn Jubilife dialog)");
 
     pbf_mash_button(context, BUTTON_B, 5000ms);
 }
@@ -866,7 +866,7 @@ static void align_and_talk_to_poketch_man(VideoStream& stream, ProControllerCont
                 context.wait_for_all_requests();
                 pbf_press_button(context, BUTTON_A, 80ms, 500ms);
                 context.wait_for_all_requests();
-                wait_for_dialogue(stream, context, "Phase 27 (poketech challenge completed dialog)", 10s);
+                wait_for_dialog(stream, context, "Phase 27 (poketech challenge completed dialog)", 10s);
                 return;
             }
             pbf_wait(context, 300ms);
@@ -968,7 +968,7 @@ tutorial_part_4_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_press_button(context, BUTTON_A, 150ms, 0ms);
     pbf_wait(context, 795ms);
 
-    wait_for_dialogue(stream, context, "Phase 22 (barry town map dialog)");
+    wait_for_dialog(stream, context, "Phase 22 (barry town map dialog)");
 
     pbf_mash_button(context, BUTTON_B, 15000ms);
     context.wait_for_all_requests();
@@ -981,7 +981,7 @@ tutorial_part_4_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 1018ms, 0ms);
     pbf_wait(context, 3811ms);
 
-    wait_for_dialogue(stream, context, "Phase 23 (poketech challenge dialog)");
+    wait_for_dialog(stream, context, "Phase 23 (poketech challenge dialog)");
 
     pbf_mash_button(context, BUTTON_B, 5000ms);
     context.wait_for_all_requests();

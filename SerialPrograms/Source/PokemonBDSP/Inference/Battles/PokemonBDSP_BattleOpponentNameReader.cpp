@@ -18,12 +18,12 @@ namespace PokemonBDSP{
 using namespace Pokemon;
 
 
-//  ⚠  These regions are estimated from BDSP's typical battle layout.
-//     Calibrate against a real capture if OCR reads are consistently wrong.
+// The doubles regions remain estimates; they are not used by the singles setup plans.
 //
 //  In BDSP singles, the one opponent's info box is in the top-right quadrant.
 //  In BDSP doubles, two boxes sit side-by-side in the top half of the screen.
-static const ImageFloatBox BOX_SINGLES_OPP   (0.505, 0.010, 0.420, 0.085);
+// Singles name strip excludes the HP bar and level on native game frames.
+static const ImageFloatBox BOX_SINGLES_OPP   (0.740, 0.065, 0.160, 0.040);
 static const ImageFloatBox BOX_DOUBLES_LEFT  (0.505, 0.010, 0.200, 0.085);
 static const ImageFloatBox BOX_DOUBLES_RIGHT (0.710, 0.010, 0.260, 0.085);
 
