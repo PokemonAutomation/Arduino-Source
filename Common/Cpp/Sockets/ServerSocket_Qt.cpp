@@ -16,14 +16,6 @@
 namespace PokemonAutomation{
 
 void ServerSocket_Qt::start(const std::string& address, uint16_t port){
-    //  Complete a requested-but-unfinished close() before starting a new
-    //  listener: close() is non-blocking (it leaves the server DESTRUCTING
-    //  with the QTcpServer still alive), so re-listening on the same server
-    //  destroys the old one here. No-op if the server is already
-    //  NOT_RUNNING. start() is always user-initiated, never a callback, so
-    //  blocking is safe.
-    close_and_wait();
-
     bool starting;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -33,7 +25,7 @@ void ServerSocket_Qt::start(const std::string& address, uint16_t port){
             && !m_starting;
         //  Only claim the "starting" flag when we actually start: a
         //  rejected call (server already running or already started) must
-        //  not leave "m_starting" true - "close_and_wait()" waits on
+        //  not leave "m_starting" true - "close()" waits on
         //  "!m_starting", so a stale flag would deadlock the destructor.
         //  (This happens when a test's start-retry loop calls start() on
         //  a server whose first listen failed: "m_server" is set even on
@@ -74,8 +66,7 @@ void ServerSocket_Qt::start(const std::string& address, uint16_t port){
             (m_state.load(std::memory_order_relaxed) == State::DESTRUCTING);
         m_server = server;
         if (destructing){
-            //  "close_and_wait()" is already in progress (from the
-            //  destructor or a concurrent start()): it will destroy the
+            //  "close()" is already in progress: it will destroy the
             //  server we just created. Leave the state for it.
         }else{
             listening = m_listen_error.empty();
@@ -92,9 +83,9 @@ void ServerSocket_Qt::start(const std::string& address, uint16_t port){
         //  exactly as it was before this start() (no "m_server", state
         //  NOT_RUNNING), so the caller's start-retry loop can immediately
         //  try another port. The other backends behave the same: a failed
-        //  listen leaves no listener behind. If "close_and_wait()" raced
-        //  us, it has already claimed "m_server", and the pool's lookup
-        //  makes the second destruction a no-op.
+        //  listen leaves no listener behind. If "close()" raced us, it has
+        //  already claimed "m_server", and the pool's lookup makes the
+        //  second destruction a no-op.
         GlobalThreadPools::qt_event_threadpool().remove_object(server);
         std::lock_guard<Mutex> lg(m_lock);
         m_server = nullptr;
@@ -140,41 +131,6 @@ void ServerSocket_Qt::close_connection(){
     }
 }
 void ServerSocket_Qt::close() noexcept{
-    //  Non-blocking teardown, safe to call from within a listener callback
-    //  (which runs on the event thread; the blocking teardown there would
-    //  deadlock). It marks the server DESTRUCTING (on_new_connection()
-    //  stops accepting, and connection_lost() no longer reports), cancels
-    //  the in-flight "send()" calls so their callers return promptly, and
-    //  aborts the active connection on the event thread the same way
-    //  "close_connection()" does - queued when called from another
-    //  thread, so it runs as soon as the event loop next turns. It does
-    //  not wait for any of that. The QTcpServer itself (the connection
-    //  socket is its child) is destroyed by the blocking
-    //  "close_and_wait()" - the destructor, and the "start()" prelude -
-    //  which also returns the state to NOT_RUNNING.
-    {
-        std::lock_guard<Mutex> lg(m_lock);
-        if (m_server == nullptr && !m_starting){
-            //  Never started, or already closed.
-            return;
-        }
-        m_close_requested = true;
-        m_state.store(State::DESTRUCTING, std::memory_order_release);
-    }
-
-    //  Cancel the in-flight "send()" calls so their callers return
-    //  promptly with the best-effort byte count.
-    cancel_inflight_sends();
-
-    //  Abort the active connection, same event as "close_connection()".
-    //  Deliberately no wait: close() must never block. If we are not on
-    //  the event thread, the abort runs when the event loop next turns
-    //  (or is discarded with the server, which is harmless: it only ever
-    //  touches state under m_lock).
-    emit internal_close_connection(QSharedPointer<CloseCompletion>::create());
-}
-
-void ServerSocket_Qt::close_and_wait() noexcept{
     QTcpServer* server;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -333,8 +289,8 @@ void ServerSocket_Qt::on_new_connection(){
         if (sock == nullptr){
             break;
         }
-        //  The connection socket lives with the server, so
-        //  "close_and_wait()" destroys it on the event thread.
+        //  The connection socket lives with the server, so "close()"
+        //  destroys it on the event thread.
         sock->setParent(server);
 
         bool accepted;
@@ -436,9 +392,9 @@ void ServerSocket_Qt::on_close_connection(QSharedPointer<CloseCompletion> comple
         if (m_socket != nullptr){
             m_close_requested = true;
             if (m_state.load(std::memory_order_relaxed) != State::DESTRUCTING){
-                //  A plain close_connection(): the server keeps running,
-                //  so it goes back to LISTENING. A close() in progress
-                //  already set DESTRUCTING: leave the state for it.
+                //  The server keeps running, so it goes back to
+                //  LISTENING. The destructor's close() may have set
+                //  DESTRUCTING: leave the state for it.
                 m_state.store(State::LISTENING, std::memory_order_release);
             }
             sock = m_socket;
@@ -479,8 +435,7 @@ void ServerSocket_Qt::on_send(QSharedPointer<SendData> send_data){
         const char* ptr = send_data->packet.data();
         size_t remaining = send_data->packet.size();
         //  The deadline keeps a client that never reads from pinning this
-        //  event thread forever (which would also block
-        //  "close_and_wait()").
+        //  event thread forever (which would also block "close()").
         while (
             remaining > 0
             && sock->state() == QAbstractSocket::ConnectedState
