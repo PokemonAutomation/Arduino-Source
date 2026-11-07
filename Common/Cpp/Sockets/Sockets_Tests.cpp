@@ -88,6 +88,34 @@ struct ClientListener : AbstractClientSocket::Listener{
 };
 
 
+//  A client listener that tears the connection down from within its own
+//  on_receive_data() callback via close() - the exact scenario sys-botbase
+//  hits when it detects an oversized line. close() must return promptly here
+//  (it does not wait for this very receive thread to exit; the blocking
+//  close_and_wait() would deadlock).
+struct ClosingClientListener : AbstractClientSocket::Listener{
+    Waiter waiter;
+    std::atomic<int> connect_finished{0};
+    std::string last_connect_error;
+    std::atomic<int> closed_in_callback{0};
+    //  Set to the owning client after construction; on_receive_data only
+    //  fires once connected and receiving, so it is valid by then.
+    AbstractClientSocket* client = nullptr;
+
+    virtual void on_connect_finished(const std::string& error_message) override{
+        connect_finished++;
+        last_connect_error = error_message;
+        waiter.notify();
+    }
+
+    virtual void on_receive_data(const void*, size_t) override{
+        client->close();
+        closed_in_callback++;
+        waiter.notify();
+    }
+};
+
+
 struct ServerListener : AbstractServerSocket::Listener{
     Waiter waiter;
     std::atomic<int> listen_finished{0};
@@ -238,8 +266,8 @@ public:
                 "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
             );
         }
-        ServerSocketType server(this->m_thread_pool);
         ServerListener server_listener;
+        ServerSocketType server(this->m_thread_pool);
         server_listener.server = &server;
         server.add_listener(server_listener);
 
@@ -259,8 +287,8 @@ public:
         bool ok = false;
         std::string error;
         {
-            ClientSocketType client(this->m_thread_pool);
             ClientListener client_listener;
+            ClientSocketType client(this->m_thread_pool);
             client.add_listener(client_listener);
 
             if (!this->connect_client(client, client_listener, port, 1)){
@@ -324,8 +352,8 @@ public:
                 "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
             );
         }
-        ServerSocketType server(this->m_thread_pool);
         ServerListener server_listener;
+        ServerSocketType server(this->m_thread_pool);
         server_listener.server = &server;
         server.add_listener(server_listener);
 
@@ -345,8 +373,8 @@ public:
         bool ok = false;
         std::string error;
         {
-            ClientSocketType client(this->m_thread_pool);
             ClientListener client_listener;
+            ClientSocketType client(this->m_thread_pool);
             client.add_listener(client_listener);
 
             if (!this->connect_client(client, client_listener, port, 1)){
@@ -409,8 +437,8 @@ public:
             payload[i] = (uint8_t)(i % 251);
         }
 
-        ServerSocketType server(this->m_thread_pool);
         ServerListener server_listener;
+        ServerSocketType server(this->m_thread_pool);
         server_listener.server = &server;
         server.add_listener(server_listener);
 
@@ -430,8 +458,8 @@ public:
         bool ok = false;
         std::string error;
         {
-            ClientSocketType client(this->m_thread_pool);
             ClientListener client_listener;
+            ClientSocketType client(this->m_thread_pool);
             client.add_listener(client_listener);
 
             if (!this->connect_client(client, client_listener, port, 1)){
@@ -488,8 +516,8 @@ public:
         }
         constexpr int CYCLES = 50;
 
-        ServerSocketType server(this->m_thread_pool);
         ServerListener server_listener;
+        ServerSocketType server(this->m_thread_pool);
         server_listener.server = &server;
         server.add_listener(server_listener);
 
@@ -510,8 +538,8 @@ public:
         std::string error;
         size_t expected_echo = 0;
         {
-            ClientSocketType client(this->m_thread_pool);
             ClientListener client_listener;
+            ClientSocketType client(this->m_thread_pool);
             client.add_listener(client_listener);
 
             for (int cycle = 0; cycle < CYCLES; cycle++){
@@ -592,8 +620,8 @@ public:
         constexpr size_t SIZE = 1 << 20;
         std::vector<uint8_t> payload(SIZE, 0xAB);
 
-        ServerSocketType server(this->m_thread_pool);
         ServerListener server_listener;
+        ServerSocketType server(this->m_thread_pool);
         server_listener.server = &server;
         server.add_listener(server_listener);
 
@@ -613,8 +641,8 @@ public:
         bool ok = false;
         std::string error;
         {
-            ClientSocketType client(this->m_thread_pool);
             ClientListener client_listener;
+            ClientSocketType client(this->m_thread_pool);
             client.add_listener(client_listener);
 
             if (!this->connect_client(client, client_listener, port, 1)){
@@ -723,8 +751,8 @@ public:
                 "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
             );
         }
-        ServerSocketType server(this->m_thread_pool);
         ServerListener server_listener;
+        ServerSocketType server(this->m_thread_pool);
         server_listener.server = &server;
         server.add_listener(server_listener);
 
@@ -744,12 +772,12 @@ public:
         bool ok = false;
         std::string error;
         {
-            ClientSocketType client_a(this->m_thread_pool);
             ClientListener client_a_listener;
+            ClientSocketType client_a(this->m_thread_pool);
             client_a.add_listener(client_a_listener);
 
-            ClientSocketType client_b(this->m_thread_pool);
             ClientListener client_b_listener;
+            ClientSocketType client_b(this->m_thread_pool);
             client_b.add_listener(client_b_listener);
 
             if (!this->connect_client(client_a, client_a_listener, port, 1)){
@@ -820,8 +848,8 @@ public:
                 "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
             );
         }
-        ServerSocketType server(this->m_thread_pool);
         ServerListener server_listener;
+        ServerSocketType server(this->m_thread_pool);
         server_listener.server = &server;
         server.add_listener(server_listener);
 
@@ -838,8 +866,8 @@ public:
             return "Failed to start the server";
         }
 
-        ServerSocketType second_server(this->m_thread_pool);
         ServerListener second_listener;
+        ServerSocketType second_server(this->m_thread_pool);
         second_server.add_listener(second_listener);
         second_server.start("127.0.0.1", port);
         if (!second_listener.waiter.wait_for(
@@ -863,8 +891,8 @@ public:
         //  The original server must still work.
         bool ok = false;
         {
-            ClientSocketType client(this->m_thread_pool);
             ClientListener client_listener;
+            ClientSocketType client(this->m_thread_pool);
             client.add_listener(client_listener);
 
             if (!this->connect_client(client, client_listener, port, 1)){
@@ -924,11 +952,11 @@ public:
             }
         };
 
-        ServerSocket_Qt server(m_thread_pool);
         ServerListener server_listener;
+        StallListener stall_listener;
+        ServerSocket_Qt server(m_thread_pool);
         server_listener.server = &server;
         server.add_listener(server_listener);
-        StallListener stall_listener;
         server.add_listener(stall_listener);
 
         uint16_t port = 0;
@@ -953,8 +981,8 @@ public:
         bool ok = false;
         std::string error;
         {
-            ClientSocket_Qt client(m_thread_pool);
             ClientListener client_listener;
+            ClientSocket_Qt client(m_thread_pool);
             client.add_listener(client_listener);
             client.connect("127.0.0.1", port);
             if (!client_listener.waiter.wait_for(
@@ -1048,8 +1076,8 @@ public:
             }
         };
 
-        ServerSocket_Qt server(m_thread_pool);
         ServerListener server_listener;
+        ServerSocket_Qt server(m_thread_pool);
         server_listener.server = &server;
         server.add_listener(server_listener);
 
@@ -1081,9 +1109,9 @@ public:
         bool ok = false;
         std::string error;
         {
-            ClientSocket_Qt client(m_thread_pool);
             ClientListener client_listener;
             StallingClientListener stall_listener;
+            ClientSocket_Qt client(m_thread_pool);
             client.add_listener(client_listener);
             client.add_listener(stall_listener);
             client.connect("127.0.0.1", port);
@@ -1262,10 +1290,10 @@ public:
             }
         };
 
-        ServerSocket_Qt server(m_thread_pool);
         ServerListener server_listener;
-        server.add_listener(server_listener);
         StallingServerListener stall_listener;
+        ServerSocket_Qt server(m_thread_pool);
+        server.add_listener(server_listener);
         server.add_listener(stall_listener);
 
         uint16_t port = 0;
@@ -1296,8 +1324,8 @@ public:
         bool ok = false;
         std::string error;
         {
-            ClientSocket_Qt client(m_thread_pool);
             ClientListener client_listener;
+            ClientSocket_Qt client(m_thread_pool);
             client.add_listener(client_listener);
             client.connect("127.0.0.1", port);
             if (!client_listener.waiter.wait_for(
@@ -1519,8 +1547,8 @@ public:
             }
         };
 
-        ServerSocketType server(this->m_thread_pool);
         StallingServerListener server_listener;
+        ServerSocketType server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -1539,8 +1567,8 @@ public:
         bool ok = false;
         std::string error;
         {
-            ClientSocketType client(this->m_thread_pool);
             ClientListener client_listener;
+            ClientSocketType client(this->m_thread_pool);
             client.add_listener(client_listener);
 
             if (!this->connect_client(client, client_listener, port, 1)){
@@ -1627,7 +1655,7 @@ public:
                 if (error.empty()){
                     //  A zero-length send round-trips a queued call through
                     //  the socket's event thread (on the Qt backend, the
-                    //  thread that close() has to wait on). The infinite
+                    //  thread that close_and_wait() has to wait on). The infinite
                     //  default is the canary: it returns in ~0 ms on a
                     //  healthy event thread, and for the full 5 s internal
                     //  safety wait if that thread is starved. (A finite
@@ -1640,6 +1668,11 @@ public:
                         std::chrono::steady_clock::now() - z0
                     ).count();
 
+                    //  close() is non-blocking: it requests the teardown and
+                    //  leaves the socket DESTRUCTING. The blocking
+                    //  close_and_wait() runs when "client" is destroyed at the
+                    //  end of this scope, so it must not hang. Verify close()
+                    //  returned promptly and marked the socket DESTRUCTING.
                     auto c0 = std::chrono::steady_clock::now();
                     client.close();
                     auto close_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -1652,9 +1685,9 @@ public:
                                 "close() took " + std::to_string(close_ms) + " ms on a starved machine."
                             );
                         }
-                        error = "close() did not finish after the timed-out send (" + std::to_string(close_ms) + " ms)";
-                    }else if (client.state() != AbstractClientSocket::State::NOT_RUNNING){
-                        error = "The client is not NOT_RUNNING after close()";
+                        error = "close() did not return promptly (" + std::to_string(close_ms) + " ms)";
+                    }else if (client.state() != AbstractClientSocket::State::DESTRUCTING){
+                        error = "The client is not DESTRUCTING after close()";
                     }else{
                         ok = true;
                     }
@@ -1746,8 +1779,8 @@ public:
             }
         };
 
-        ServerSocketType server(this->m_thread_pool);
         ServerListener server_listener;
+        ServerSocketType server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -1766,8 +1799,8 @@ public:
         bool ok = false;
         std::string error;
         {
-            ClientSocketType client(this->m_thread_pool);
             StallingClientListener client_listener;
+            ClientSocketType client(this->m_thread_pool);
             client.add_listener(client_listener);
 
             if (!this->connect_client(client, client_listener, port, 1)){
@@ -1975,8 +2008,8 @@ public:
             }
         };
 
-        ServerSocketType server(this->m_thread_pool);
         StallingServerListener server_listener;
+        ServerSocketType server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -1995,8 +2028,8 @@ public:
         bool ok = false;
         std::string error;
         {
-            ClientSocketType client(this->m_thread_pool);
             ClientListener client_listener;
+            ClientSocketType client(this->m_thread_pool);
             client.add_listener(client_listener);
 
             if (!this->connect_client(client, client_listener, port, 1)){
@@ -2145,8 +2178,8 @@ public:
             }
         };
 
-        ServerSocketType server(this->m_thread_pool);
         ServerListener server_listener;
+        ServerSocketType server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -2165,8 +2198,8 @@ public:
         bool ok = false;
         std::string error;
         {
-            ClientSocketType client(this->m_thread_pool);
             StallingClientListener client_listener;
+            ClientSocketType client(this->m_thread_pool);
             client.add_listener(client_listener);
 
             if (!this->connect_client(client, client_listener, port, 1)){
@@ -2285,6 +2318,86 @@ public:
 
 
 
+//  Verifies that a ClientSocket can be torn down from within its own
+//  on_receive_data() callback via close() (the sys-botbase oversized-line
+//  scenario). close_and_wait() would deadlock there - it waits for this
+//  receive thread to exit - so close() must return promptly and leave the
+//  socket no longer CONNECTED.
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_Sockets_CloseFromReceiveCallback : public TestSockets<ClientSocketType, ServerSocketType>{
+public:
+    using TestSockets<ClientSocketType, ServerSocketType>::TestSockets;
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        if (timing_unreliable()){
+            return UnitTestResult(
+                UnitTestResult::SKIPPED,
+                "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
+            );
+        }
+        ServerListener server_listener;
+        ServerSocketType server(this->m_thread_pool);
+        server.add_listener(server_listener);
+
+        uint16_t port;
+        if (!this->start_server(server, server_listener, port)){
+            if (timing_unreliable()){
+                return UnitTestResult(
+                    UnitTestResult::SKIPPED,
+                    "The server did not start listening on a starved machine."
+                );
+            }
+            return "Failed to start the server";
+        }
+
+        bool ok = false;
+        std::string error;
+        {
+            ClosingClientListener client_listener;
+            ClientSocketType client(this->m_thread_pool);
+            client_listener.client = &client;
+            client.add_listener(client_listener);
+
+            client.connect("127.0.0.1", port);
+            if (!client_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&client_listener]{ return client_listener.connect_finished.load() >= 1; }
+            )){
+                error = "The client did not finish connecting";
+            }else if (!client_listener.last_connect_error.empty()){
+                error = "The client failed to connect: " + client_listener.last_connect_error;
+            }else if (!server_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&server_listener]{ return server_listener.connected.load() >= 1; }
+            )){
+                error = "The server did not call on_connect";
+            }else if (server.send("ping", 4) != 4){
+                error = "The server did not send the trigger packet";
+            }else if (!client_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&client_listener]{ return client_listener.closed_in_callback.load() >= 1; }
+            )){
+                error = "close() did not return from the on_receive_data() callback (it would have blocked, like close_and_wait() would)";
+            }else if (client.state() == AbstractClientSocket::State::CONNECTED){
+                error = "After close() the client is still CONNECTED";
+            }else{
+                //  close() (called in the callback) only requested the
+                //  teardown. The blocking close_and_wait() runs when "client"
+                //  is destroyed at the end of this scope - it must not hang.
+                ok = true;
+            }
+        }
+
+        server.close();
+
+        if (!ok && !error.empty()){
+            return error;
+        }
+        return true;
+    }
+};
+
+
 template <typename ClientSocketType, typename ServerSocketType>
 void add_socket_tests(UnitTestDatabase& database, ThreadPool& thread_pool, const char* backend_name){
     const std::string prefix = "Sockets (" + std::string(backend_name) + ") - ";
@@ -2321,6 +2434,9 @@ void add_socket_tests(UnitTestDatabase& database, ThreadPool& thread_pool, const
     );
     database.add<Test_Sockets_CloseConnectionCancelsSend<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "close_connection() cancels an in-flight send"
+    );
+    database.add<Test_Sockets_CloseFromReceiveCallback<ClientSocketType, ServerSocketType>>(
+        thread_pool, prefix + "close() from the receive callback"
     );
 }
 

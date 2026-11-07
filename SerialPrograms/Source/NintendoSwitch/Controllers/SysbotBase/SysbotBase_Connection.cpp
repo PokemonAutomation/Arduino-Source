@@ -13,6 +13,7 @@
 
 #include <charconv>
 #include <cstdint>
+#include <vector>
 
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
@@ -26,6 +27,13 @@ namespace PokemonAutomation{
 namespace SysbotBase{
 
 using namespace std::chrono_literals;
+
+
+//  Maximum number of bytes in a single sys-botbase line (the bytes between
+//  two '\n's, '\r' excluded). A peer that streams bytes without a '\n' can
+//  otherwise grow the receive buffer without bound; a line longer than this
+//  is discarded and the connection is aborted.
+constexpr size_t SBB_MAX_RECEIVE_LINE_BYTES = 65536; // 64 KiB
 
 
 
@@ -174,35 +182,90 @@ void TcpSysbotBase_Connection::on_disconnect(const std::string& error_message){
         set_status_line1("Disconnected: " + error_message, COLOR_RED);
     }catch (...){}
 }
+namespace{
+//  Accumulates the next "bytes" of "data" into the current receive line
+//  "line", emitting each complete line (terminated by '\n') into
+//  "messages" and clearing "line" for the next. '\r' bytes are ignored.
+//  A single line is capped at "max_line_bytes": if it would grow past that
+//  before its '\n', "overflow" is set, "line" is cleared, and no further
+//  bytes are consumed. Returns the number of bytes consumed from "data".
+//  File-local: this is what stops a peer that streams bytes without a '\n'
+//  from growing the receive buffer without bound.
+size_t accumulate_receive_line(
+    std::deque<char>& line,
+    std::vector<std::string>& messages,
+    const char* data,
+    size_t bytes,
+    size_t max_line_bytes,
+    bool& overflow
+){
+    size_t consumed = 0;
+    for (size_t c = 0; c < bytes; c++){
+        char ch = data[c];
+        if (ch == '\r'){
+            consumed++;
+            continue;
+        }
+        if (ch != '\n'){
+            if (line.size() >= max_line_bytes){
+                line.clear();
+                overflow = true;
+                return consumed;
+            }
+            line.emplace_back(ch);
+            consumed++;
+            continue;
+        }
+        //  '\n': emit the completed line and start a new one.
+        messages.emplace_back(line.begin(), line.end());
+        line.clear();
+        consumed++;
+    }
+    return consumed;
+}
+}
 void TcpSysbotBase_Connection::on_receive_data(const void* data, size_t bytes){
 //    cout << "on_receive_data(): " << std::string((const char*)data, bytes - 2) << endl;
 
     WallClock now = current_time();
 
     try{
-        const char* ptr = (const char*)data;
-        for (size_t c = 0; c < bytes; c++){
-            char ch = ptr[c];
-            if (ch == '\r'){
-                continue;
-            }
-            if (ch != '\n'){
-                m_receive_buffer.emplace_back(ch);
-                continue;
-            }
-            process_message(
-                std::string(
-                    m_receive_buffer.begin(),
-                    m_receive_buffer.end()
-                ),
-                now
-            );
+        std::vector<std::string> messages;
+        bool overflow = false;
+        accumulate_receive_line(
+            m_receive_buffer,
+            messages,
+            (const char*)data,
+            bytes,
+            SBB_MAX_RECEIVE_LINE_BYTES,
+            overflow
+        );
+        if (overflow){
+            //  A peer streamed a line longer than the maximum without a
+            //  terminating '\n'. Drop the partial line and abort the
+            //  connection; the buffer can no longer grow.
             m_receive_buffer.clear();
+            on_receive_overflow();
+            return;
         }
-
-//        m_listeners.run_method(&Listener::on_receive_data, data, bytes);
-
+        for (const auto& message : messages){
+            process_message(message, now);
+        }
     }catch (...){}
+}
+void TcpSysbotBase_Connection::on_receive_overflow(){
+    m_logger.log(
+        "sys-botbase sent a line longer than " + std::to_string(SBB_MAX_RECEIVE_LINE_BYTES)
+        + " bytes with no newline; aborting the connection.",
+        COLOR_RED
+    );
+    set_status_line1("Disconnected: sys-botbase sent an oversized line.", COLOR_RED);
+    //  Safe to call from this receive-thread callback: close() requests the
+    //  teardown without waiting for the receive thread to exit (the blocking
+    //  close_and_wait() would deadlock here). The heartbeat thread_loop, if
+    //  running, observes the DESTRUCTING state and stops on its next
+    //  iteration.
+    m_socket.close();
 }
 void TcpSysbotBase_Connection::process_message(const std::string& message, WallClock timestamp){
     if (LOG_EVERYTHING()){
@@ -366,6 +429,88 @@ void add_tests_SysbotBasePing(UnitTestDatabase& database){
     database.add<PingParseTest>("PingParse(overflow)", "ping 18446744073709551616", false, 0);
     database.add<PingParseTest>("PingParse(non-numeric)", "ping abc", false, 0);
     database.add<PingParseTest>("PingParse(negative)", "ping -5", false, 0);
+}
+
+
+namespace{
+class ReceiveLineBoundTest : public UnitTest{
+public:
+    ReceiveLineBoundTest(
+        const std::string& name,
+        const std::string& input,
+        size_t max_line,
+        std::vector<std::string> expected_messages,
+        bool expected_overflow,
+        std::string expected_final_buffer
+    );
+
+    virtual UnitTestResult run(Logger&, CancellableScope&) const override;
+
+private:
+    std::string m_input;
+    size_t m_max_line;
+    std::vector<std::string> m_expected_messages;
+    bool m_expected_overflow;
+    std::string m_expected_final_buffer;
+};
+}
+
+
+ReceiveLineBoundTest::ReceiveLineBoundTest(
+    const std::string& name,
+    const std::string& input,
+    size_t max_line,
+    std::vector<std::string> expected_messages,
+    bool expected_overflow,
+    std::string expected_final_buffer
+)
+    : UnitTest("NintendoSwitch::SysbotBase - " + name)
+    , m_input(input)
+    , m_max_line(max_line)
+    , m_expected_messages(std::move(expected_messages))
+    , m_expected_overflow(expected_overflow)
+    , m_expected_final_buffer(std::move(expected_final_buffer))
+{}
+
+UnitTestResult ReceiveLineBoundTest::run(Logger&, CancellableScope&) const{
+    std::deque<char> buffer;
+    std::vector<std::string> messages;
+    bool overflow = false;
+    accumulate_receive_line(
+        buffer,
+        messages,
+        m_input.data(),
+        m_input.size(),
+        m_max_line,
+        overflow
+    );
+    if (overflow != m_expected_overflow){
+        return "overflow=" + std::string(overflow ? "true" : "false")
+            + ", expected " + std::string(m_expected_overflow ? "true" : "false") + ".";
+    }
+    if (messages != m_expected_messages){
+        return "emitted " + std::to_string(messages.size()) + " message(s), expected "
+            + std::to_string(m_expected_messages.size()) + ".";
+    }
+    std::string final_buffer(buffer.begin(), buffer.end());
+    if (final_buffer != m_expected_final_buffer){
+        return "final buffer size " + std::to_string(final_buffer.size())
+            + ", expected " + std::to_string(m_expected_final_buffer.size()) + ".";
+    }
+    return true;
+}
+
+
+
+void add_tests_SysbotBaseReceiveLine(UnitTestDatabase& database){
+    database.add<ReceiveLineBoundTest>("ReceiveLine(normal)", "hello\n", 16, std::vector<std::string>{"hello"}, false, "");
+    database.add<ReceiveLineBoundTest>("ReceiveLine(multiple)", "a\nb\nc\n", 16, std::vector<std::string>{"a", "b", "c"}, false, "");
+    database.add<ReceiveLineBoundTest>("ReceiveLine(partial)", "abc", 16, std::vector<std::string>{}, false, "abc");
+    database.add<ReceiveLineBoundTest>("ReceiveLine(oversized no newline)", std::string(40, 'A'), 16, std::vector<std::string>{}, true, "");
+    database.add<ReceiveLineBoundTest>("ReceiveLine(exactly max)", std::string(16, 'A') + "\n", 16, std::vector<std::string>{std::string(16, 'A')}, false, "");
+    database.add<ReceiveLineBoundTest>("ReceiveLine(max+1 no newline)", std::string(17, 'A'), 16, std::vector<std::string>{}, true, "");
+    database.add<ReceiveLineBoundTest>("ReceiveLine(CR ignored)", "a\rb\n", 16, std::vector<std::string>{"ab"}, false, "");
+    database.add<ReceiveLineBoundTest>("ReceiveLine(overflow before newline)", std::string(100, 'A') + "\n", 16, std::vector<std::string>{}, true, "");
 }
 
 

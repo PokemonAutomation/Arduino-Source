@@ -29,23 +29,23 @@ public:
         : m_thread_pool(thread_pool)
     {}
 
-    virtual ~ClientSocket_WinSocket(){
-        close();
+    ~ClientSocket_WinSocket() override{
+        close_and_wait();
     }
 
-    //  Stops the receive thread, closes the socket, and returns the socket to
-    //  State::NOT_RUNNING so "connect()" can be called again. This is safe to
-    //  call multiple times.
-    //
-    //  It cancels an in-flight "send()": the send loop re-checks the state
-    //  every iteration, and "close()" notifies it, so the send returns within
-    //  a millisecond with the bytes written so far.
-    //
-    //  This blocks until the receive thread has exited, so it must not be
-    //  called from within a listener callback (which runs on that thread).
-    virtual void close() noexcept override;
+    //  Requests immediate teardown of the active connection, without waiting
+    //  for the receive thread to exit. Safe to call from within a listener
+    //  callback (which runs on that thread). It marks the socket DESTRUCTING
+    //  and releases the underlying socket; the receive thread exits on its
+    //  next iteration. It cancels an in-flight "send()" (the send loop
+    //  re-checks the state and returns within a millisecond with the bytes
+    //  written so far). The socket is left in State::DESTRUCTING; the
+    //  destructor's close_and_wait() joins the thread and returns it to
+    //  NOT_RUNNING. No "on_disconnect" callback is fired. Safe to call
+    //  multiple times.
+    void close() noexcept override;
 
-    virtual void connect(const std::string& address, uint16_t port) override;
+    void connect(const std::string& address, uint16_t port) override;
 
     virtual size_t send(
         const void* data,
@@ -55,6 +55,13 @@ public:
 
 
 private:
+    //  Stops the receive thread, closes the socket, and returns the socket to
+    //  State::NOT_RUNNING. It blocks until the receive thread has exited, so
+    //  it must not be called from within a listener callback. The public
+    //  "close()" only requests the teardown; this actually joins the thread,
+    //  and is called by the destructor.
+    void close_and_wait() noexcept;
+
     //  Winsock has to be started before any of its functions can be used, and
     //  nothing else in the program calls WSAStartup, so call it exactly once
     //  before the first socket is created. We deliberately never call

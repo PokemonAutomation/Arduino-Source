@@ -64,6 +64,7 @@ private:
     virtual void on_disconnect(const std::string& error_message) override;
 
     void process_message(const std::string& message, WallClock timestamp);
+    void on_receive_overflow();
     void set_mode(const std::string& sbb_version);
 
 private:
@@ -92,6 +93,11 @@ private:
 //  Registers unit tests for parse_ping_response().
 //
 void add_tests_SysbotBasePing(UnitTestDatabase& database);
+
+//
+//  Registers unit tests for the receive-line length bound.
+//
+void add_tests_SysbotBaseReceiveLine(UnitTestDatabase& database);
 
 
 

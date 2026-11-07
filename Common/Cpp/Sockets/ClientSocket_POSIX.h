@@ -25,23 +25,23 @@ class ClientSocket_POSIX final : public AbstractClientSocket{
 public:
     ClientSocket_POSIX(ThreadPool& thread_pool);
 
-    virtual ~ClientSocket_POSIX(){
-        close();
+    ~ClientSocket_POSIX() override{
+        close_and_wait();
     }
 
-    //  Stops the receive thread, closes the socket, and returns the socket to
-    //  State::NOT_RUNNING so "connect()" can be called again. This is safe to
-    //  call multiple times.
-    //
-    //  It cancels an in-flight "send()": the send loop re-checks the state
-    //  every iteration, and "close()" notifies it, so the send returns within
-    //  a millisecond with the bytes written so far.
-    //
-    //  This blocks until the receive thread has exited, so it must not be
-    //  called from within a listener callback (which runs on that thread).
-    virtual void close() noexcept override;
+    //  Requests immediate teardown of the active connection, without waiting
+    //  for the receive thread to exit. Safe to call from within a listener
+    //  callback (which runs on that thread). It marks the socket DESTRUCTING
+    //  and releases the underlying socket; the receive thread exits on its
+    //  next iteration. It cancels an in-flight "send()" (the send loop
+    //  re-checks the state and returns within a millisecond with the bytes
+    //  written so far). The socket is left in State::DESTRUCTING; the
+    //  destructor's close_and_wait() joins the thread and returns it to
+    //  NOT_RUNNING. No "on_disconnect" callback is fired. Safe to call
+    //  multiple times.
+    void close() noexcept override;
 
-    virtual void connect(const std::string& address, uint16_t port) override;
+    void connect(const std::string& address, uint16_t port) override;
 
     virtual size_t send(
         const void* data,
@@ -51,6 +51,13 @@ public:
 
 
 private:
+    //  Stops the receive thread, closes the socket, and returns the socket to
+    //  State::NOT_RUNNING. It blocks until the receive thread has exited, so
+    //  it must not be called from within a listener callback. The public
+    //  "close()" only requests the teardown; this actually joins the thread,
+    //  and is called by the destructor.
+    void close_and_wait() noexcept;
+
     //  Closes the underlying socket, if any. Requires "m_lock" to be held.
     void close_socket_locked();
 

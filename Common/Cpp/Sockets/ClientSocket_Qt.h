@@ -31,8 +31,8 @@ class ClientSocket_Qt final : public QObject, public AbstractClientSocket{
         std::string packet;
         //  The event-thread write loop stops at this deadline, so a send
         //  that can never complete (a peer that never reads) cannot pin
-        //  the socket's event thread forever and block "close()". "max()"
-        //  means no deadline (the infinite default).
+        //  the socket's event thread forever and block "close_and_wait()".
+        //  "max()" means no deadline (the infinite default).
         std::chrono::steady_clock::time_point deadline = std::chrono::steady_clock::time_point::max();
         //  The running byte count: the write loop updates it as it goes,
         //  so "close()" cancelling the send mid-write can report the
@@ -53,26 +53,22 @@ class ClientSocket_Qt final : public QObject, public AbstractClientSocket{
 public:
     ClientSocket_Qt(ThreadPool&){}
 
-    virtual ~ClientSocket_Qt(){
-        close();
+    ~ClientSocket_Qt() override{
+        close_and_wait();
     }
 
-    //  Stops the connection, destroys the QTcpSocket, and returns the socket
-    //  to State::NOT_RUNNING so "connect()" can be called again. This blocks
-    //  until the QTcpSocket has been destroyed, so any in-flight listener
-    //  callback is finished by the time it returns. It is safe to call
-    //  multiple times.
-    //
-    //  It cancels the in-flight "send()" calls: their callers return
-    //  promptly with the number of bytes actually written so far (best
-    //  effort), instead of waiting for the event thread to finish them.
-    //
-    //  This must not be called from within a listener callback, since the
-    //  callbacks run on the QTcpSocket's event thread and this destroys the
-    //  socket that is running them.
-    virtual void close() noexcept override;
+    //  Requests immediate teardown of the active connection, without waiting
+    //  for the QTcpSocket's event thread to destroy it. Safe to call from
+    //  within a listener callback (which runs on that event thread). It marks
+    //  the socket DESTRUCTING and aborts the underlying QTcpSocket; the
+    //  resulting disconnect signals are no-ops. It cancels the in-flight
+    //  "send()" calls (their callers return promptly with the bytes written
+    //  so far). The socket is left in State::DESTRUCTING; the destructor's
+    //  close_and_wait() destroys the QTcpSocket and returns it to NOT_RUNNING.
+    //  No "on_disconnect" callback is fired. Safe to call multiple times.
+    void close() noexcept override;
 
-    virtual void connect(const std::string& address, uint16_t port) override;
+    void connect(const std::string& address, uint16_t port) override;
 
     virtual size_t send(
         const void* data,
@@ -87,6 +83,13 @@ signals:
 
 
 private:
+    //  Stops the connection, destroys the QTcpSocket on its event thread, and
+    //  returns the socket to State::NOT_RUNNING. It blocks until the
+    //  QTcpSocket has been destroyed, so it must not be called from within a
+    //  listener callback. The public "close()" only requests the teardown;
+    //  this actually destroys the socket, and is called by the destructor.
+    void close_and_wait() noexcept;
+
     //  The connection attempt or the connection itself ended in a failure.
     //  This fires the appropriate callback and returns the socket to
     //  State::NOT_RUNNING so "connect()" can be called again. If the
