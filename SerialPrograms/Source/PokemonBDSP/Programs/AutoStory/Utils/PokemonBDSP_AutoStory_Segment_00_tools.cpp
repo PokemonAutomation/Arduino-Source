@@ -2369,7 +2369,8 @@ void walk_through_grass(VideoStream& stream,
     const std::string& direction_name,
     BattleType battle_type,
     Milliseconds movement_duration,
-    OverworldMatchResult (*destination)(const ImageRGB32&)){
+    OverworldMatchResult (*destination)(const ImageRGB32&),
+    bool fight_encounters){
     size_t movements = 0, confirmations = 0;
     while (true){
         context.wait_for_all_requests();
@@ -2444,11 +2445,17 @@ void walk_through_grass(VideoStream& stream,
         if (ret >= 0){
             confirmations = 0;
             stream.log("[Grass] " + direction_name + " step " + std::to_string(movements) + "/" +
-                std::to_string(steps) + ": encounter trigger=" + std::to_string(ret) +
-                "; using shared confirmed-Run escape.");
-            escape_wild_battle(stream, context, battle_type);
-            context.wait_for_all_requests();
-            stream.log("[Grass] Escape confirmed; resuming " + direction_name + ".");
+                std::to_string(steps) + ": encounter trigger=" + std::to_string(ret));
+            if (fight_encounters){
+                fight_using_move_slot(stream, context, battle_type, 1, "Route training (move slot 1)");
+                use_potion_first_pokemon(stream, context);
+                context.wait_for_all_requests();
+                stream.log("[Grass] Training battle and healing complete; resuming " + direction_name + ".");
+            }else{
+                escape_wild_battle(stream, context, battle_type);
+                context.wait_for_all_requests();
+                stream.log("[Grass] Escape confirmed; resuming " + direction_name + ".");
+            }
         }
     }
 }

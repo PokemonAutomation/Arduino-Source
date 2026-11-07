@@ -120,6 +120,10 @@ void clear_dialog(VideoStream& stream,
             pbf_press_button(context, BUTTON_B, 80ms, 100ms);
         }else if (button == BUTTON_A && !dialogue_visible){
             pbf_wait(context, 100ms);
+        }else if (mode == ClearDialogMode::STOP_PROMPT){
+            // A mash can open and answer a choice between screenshots.
+            // Advance once, release, then inspect before sending another input.
+            pbf_press_button(context, button, 80ms, 700ms);
         }else{
             pbf_mash_button(context, button, 100ms);
         }
