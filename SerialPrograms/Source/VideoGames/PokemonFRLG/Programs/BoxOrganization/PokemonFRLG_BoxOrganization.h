@@ -42,6 +42,32 @@ BoxSortingPlan make_box_sorting_plan(
     const std::vector<std::optional<Pokemon::CollectedPokemonInfo>>& boxes_sorted
 );
 
+struct LivingDexEntry{
+    uint16_t nat_id;
+    std::string slug;
+    bool has_gender_difference;
+};
+
+bool is_viable_for_dex(
+    const LivingDexEntry& entry, const Pokemon::CollectedPokemonInfo& pokemon,
+    bool obey_gender_differences, bool shiny_dex = false
+);
+
+std::vector<std::optional<Pokemon::CollectedPokemonInfo>> make_living_dex_order(
+    Logger& logger,
+    const std::vector<std::optional<Pokemon::CollectedPokemonInfo>>& boxes_data,
+    const std::vector<LivingDexEntry>& living_dex_order,
+    bool obey_gender_differences, bool shiny_dex = false
+);
+
+// List empty template slots in National Dex order, with one number and English name per line.
+std::string make_missing_living_dex_report(
+    const std::vector<std::optional<Pokemon::CollectedPokemonInfo>>& boxes_sorted,
+    const std::vector<LivingDexEntry>& living_dex_order
+);
+
+std::vector<LivingDexEntry> load_living_dex_template(const std::string& path);
+
 struct BoxOrganizationScan{
     std::vector<std::optional<Pokemon::CollectedPokemonInfo>> boxes_data;
     Pokemon::BoxCursor cursor;

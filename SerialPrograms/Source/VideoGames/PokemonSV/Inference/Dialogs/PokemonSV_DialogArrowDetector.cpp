@@ -13,6 +13,7 @@
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
+#include "Tests/ImageUnitTest.h"
 #include "PokemonSV_DialogArrowDetector.h"
 
 //#include <iostream>
@@ -126,6 +127,7 @@ std::vector<ImageFloatBox> DialogArrowDetector::detect_all(const ImageViewRGB32&
 std::pair<double, double> DialogArrowDetector::locate_dialog_arrow(const ImageViewRGB32& screen) const{
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {combine_rgb(200, 200, 200), combine_rgb(255, 255, 255)},
+        {combine_rgb(220, 220, 220), combine_rgb(255, 255, 255)},
 
     };
 
@@ -229,8 +231,40 @@ bool DialogArrowWatcher::process_frame(const ImageViewRGB32& frame, WallClock ti
 
 
 
+//  Test that `locate_dialog_arrow` detects the dialog arrow on a screenshot.
+//  For now it only checks that the arrow is detected, not its location.
+class Test_DialogArrowDetector_LocateDialogArrow : public ImageUnitTest{
+public:
+    Test_DialogArrowDetector_LocateDialogArrow(const std::string& image, const ImageFloatBox& box)
+        : ImageUnitTest("PokemonSV::DialogArrowDetector - " + image, {image})
+        , m_box(box)
+    {}
+
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        DialogArrowDetector detector(COLOR_RED, m_box);
+        const ImageRGB32& image = images[0];
+        std::pair<double, double> location = detector.locate_dialog_arrow(image);
+        if (location.first < 0.0 || location.second < 0.0){
+            return "Dialog arrow not detected";
+        }
+        return true;
+    }
+
+private:
+    ImageFloatBox m_box;
+};
 
 
+
+void add_tests_DialogArrowDetector(UnitTestDatabase& database){
+    database.add<Test_DialogArrowDetector_LocateDialogArrow>(
+        "PokemonSV/DialogArrowDetector/ParadiseProtectionProtocol_BattleStart-20261106-130450.png",
+        ImageFloatBox(0.70, 0.70, 0.30, 0.30)
+    );
+}
 
 
 

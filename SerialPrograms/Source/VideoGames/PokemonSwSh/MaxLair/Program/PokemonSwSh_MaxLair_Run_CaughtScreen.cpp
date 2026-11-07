@@ -202,7 +202,7 @@ StateMachineAction run_caught_screen(
     }
 
 
-    const std::string& boss = state_tracker[console_index].boss;
+    const std::string boss = state_tracker[console_index].boss_if_caught();
     CaughtScreenAction action =
         decider.end_adventure_action(
             console_index, boss,

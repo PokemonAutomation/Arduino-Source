@@ -123,38 +123,32 @@ bool SerialPABotBase2_Connection::open_serial_port(){
 
     //  Validate the serial port.
 #ifdef QT_CORE_LIB
-    QSerialPortInfo info;
-    if (use_qt_ui()){
-        info = SerialPortPoller::instance().get_port(m_device_name);
-    }else{
-        info = QSerialPortInfo(QString::fromStdString(m_device_name));
+    //  This only compiles into the Qt-enabled SerialProgramsLib, which is only ever
+    //  linked into the GUI app, so the port poller and message boxes are always available.
+    QSerialPortInfo info = SerialPortPoller::instance().get_port(m_device_name);
+
+    //  Port is invalid.
+    if (info.isNull()){
+        std::string text = "Serial port " + m_device_name + " is invalid or not loaded.";
+        m_logger.log(text, COLOR_RED);
+        set_status_line0(text, COLOR_RED);
+        return false;
     }
 
-
-    if (use_qt_ui()){
-        //  Port is invalid.
-        if (info.isNull()){
-            std::string text = "Serial port " + m_device_name + " is invalid or not loaded.";
-            m_logger.log(text, COLOR_RED);
-            set_status_line0(text, COLOR_RED);
-            return false;
-        }
-
-        //  Prolific is banned
-        if (info.description().indexOf("Prolific") != -1){
-            QMessageBox box;
-            box.critical(
-                nullptr,
-                "Error",
-                "Cannot select Prolific controller.<br><br>"
-                "Prolific controllers do not work for Arduino and similar microcontrollers.<br>"
-                "You were warned of this in the setup instructions. Please buy a CP210x controller instead."
-            );
-            std::string text = "Cannot connect to Prolific controller.";
-            m_logger.log(text, COLOR_RED);
-            set_status_line0(text, COLOR_RED);
-            return false;
-        }
+    //  Prolific is banned
+    if (info.description().indexOf("Prolific") != -1){
+        QMessageBox box;
+        box.critical(
+            nullptr,
+            "Error",
+            "Cannot select Prolific controller.<br><br>"
+            "Prolific controllers do not work for Arduino and similar microcontrollers.<br>"
+            "You were warned of this in the setup instructions. Please buy a CP210x controller instead."
+        );
+        std::string text = "Cannot connect to Prolific controller.";
+        m_logger.log(text, COLOR_RED);
+        set_status_line0(text, COLOR_RED);
+        return false;
     }
 #endif
 

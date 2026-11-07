@@ -10,6 +10,7 @@
 #include <QAudioDecoder>
 #include <QAudioFormat>
 #include <QTimer>
+#include <QThread>
 #include <QEventLoop>
 #include "3rdParty/QtWavFile/WavFile.h"
 #include "Common/Qt/StringToolsQt.h"
@@ -106,9 +107,7 @@ bool AudioFileLoader::start(){
         connect(m_timer, &QTimer::timeout, this, &AudioFileLoader::send_decoded_buffer_on_timer);
     });
 
-    emit m_audio_decoder_worker->start();
-
-    return m_audio_decoder_worker->start_succeeded();
+    return m_audio_decoder_worker->start();
 }
 
 void AudioFileLoader::build_timer(){
@@ -144,39 +143,39 @@ std::tuple<const char*, size_t> AudioFileLoader::load_full_audio(){
         return convert_raw_wav_samples();
     }
 
-    // Use QAudioDecoder to decode compressed audio file:
-    m_audio_decoder_worker = static_cast<AudioDecoderWorker*>(
-        GlobalThreadPools::qt_event_threadpool().add_object([this]{
-            return std::make_unique<AudioDecoderWorker>(nullptr, m_filename, m_audio_format, m_raw_buffer);
-        })
-    );
-//    m_audio_decoder_worker = new AudioDecoderWorker(nullptr, m_filename, m_audio_format, m_raw_buffer);
-//    m_audio_decoder_worker->moveToThread(&m_audioDecoderThread);
+    //  Use QAudioDecoder to decode compressed audio file on the current thread.
+    bool errored = false;
+    {
+        AudioDecoderWorker worker(nullptr, m_filename, m_audio_format, m_raw_buffer);
 
-    connect(this, &AudioFileLoader::run_audio_decoder_async, m_audio_decoder_worker, &AudioDecoderWorker::start);
-//    connect(&m_audioDecoderThread, &QThread::finished, m_audio_decoder_worker, &QObject::deleteLater);
+        QEventLoop loop;
+        bool done = false;
+        connect(&worker, &AudioDecoderWorker::errored, &loop, [&done, &errored, &loop]{
+            done = true;
+            errored = true;
+            loop.quit();
+        });
+        connect(&worker, &AudioDecoderWorker::finished, &loop, [&done, &loop]{
+            done = true;
+            loop.quit();
+        });
 
-    QEventLoop loop;
-    connect(m_audio_decoder_worker, &AudioDecoderWorker::errored, &loop, &QEventLoop::quit);
-    connect(m_audio_decoder_worker, &AudioDecoderWorker::finished, &loop, &QEventLoop::quit);
+        //  The decoder can fail inside `start()`: Qt reports a missing file as
+        //  an error right away, we check `done` after `start()`.
+        worker.start();
+        if (!done){
+            loop.exec();
+        }
+    }
 
-    // m_audioDecoderThread takes care of m_audio_decoder_worker via finished -> deleteLater connection.
-    // So we don't hold the pointer m_audio_decoder_worker anymore.
-    m_audio_decoder_worker = nullptr;
-
-//    m_audioDecoderThread.start();
-    emit run_audio_decoder_async();
-
-    // Block the current thread until the m_audio_decoder_worker errored or finished.
-    loop.exec();
     if (m_raw_buffer.empty()){
         std::cout << "Error: audio decoder produced no audio data for " << m_filename
             << " (the decoder could not find usable audio in the file)." << std::endl;
     }
-    
-//    m_audioDecoderThread.quit();
-//    m_audioDecoderThread.wait();
-    GlobalThreadPools::qt_event_threadpool().remove_object(m_audio_decoder_worker);
+    else if (errored){
+        std::cout << "Error: error decoding audio file " << m_filename << "." << std::endl;
+        m_raw_buffer.clear();
+    }
     return std::make_tuple<const char*, size_t>(m_raw_buffer.data(), m_raw_buffer.size());
 }
 
@@ -354,8 +353,21 @@ void AudioDecoderWorker::internal_start(){
     m_audio_decoder->start();
     std::cout << "Start audio decoder." << std::endl;
 
-    m_start_succeeded = true;
+    //  Qt can report an error inside start() itself, e.g. for a missing file.
+    m_start_succeeded = m_audio_decoder->error() == QAudioDecoder::NoError;
     return;
+}
+
+bool AudioDecoderWorker::start(){
+    //  internal_start() must run on the worker's thread (queried via `this->thread()`)
+    if (QThread::currentThread() == thread()){
+        internal_start();
+    }else{
+        // Called from any another thread
+        // `QMetaObject::invokeMethod()` blocks until it has run there
+        QMetaObject::invokeMethod(this, &AudioDecoderWorker::internal_start, Qt::BlockingQueuedConnection);
+    }
+    return m_start_succeeded;
 }
 
 AudioDecoderWorker::~AudioDecoderWorker(){

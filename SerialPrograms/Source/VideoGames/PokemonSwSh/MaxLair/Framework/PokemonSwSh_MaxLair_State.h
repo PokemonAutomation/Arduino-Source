@@ -146,6 +146,10 @@ struct GlobalState{
 
     bool adventure_started = false;
 
+    //  The adventure's boss as known from the start: the den's boss sprite,
+    //  voted across consoles. Used all adventure long (path and move choice,
+    //  the boss ball, the fourth battle's check, Save Path) and kept after a
+    //  lost adventure.
     std::string boss;
 
     PathMap path;
@@ -167,6 +171,19 @@ struct GlobalState{
 
     size_t find_player_index(size_t console_id) const;
     void clear_battle_state();
+
+    //  Returns false when the opponent read doesn't fit this battle stage (a
+    //  boss before the fourth battle), so the caller retries the read. On an
+    //  accepted read at the fourth battle, records the boss if none is known.
+    bool accept_opponent();
+
+    //  The same boss, but only if the adventure caught it, else empty: for the
+    //  end-of-adventure decision (end_adventure_action()), which must not apply
+    //  the boss-caught rules after a loss. Decided from the battles won (the
+    //  boss is the fourth battle), not from how many Pokemon were caught, so it
+    //  stays right if non-boss catches are ever skipped.
+    //  For now this returns boss whatever the battles won.
+    std::string boss_if_caught() const;
 
     std::string dump() const;
 };

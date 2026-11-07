@@ -15,6 +15,7 @@
 #include "Inference/Tera/PokemonSV_TeraCardDetector.h"
 #include "Inference/Tera/PokemonSV_TeraSilhouetteReader.h"
 #include "Inference/Tera/PokemonSV_TeraTypeReader.h"
+#include "Inference/Dialogs/PokemonSV_DialogArrowDetector.h"
 #include "Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "Inference/Map/PokemonSV_FastTravelDetector.h"
 #include "Inference/Map/PokemonSV_MapMenuDetector.h"
@@ -36,6 +37,7 @@ void add_tests(UnitTestDatabase& database){
     add_tests_WhiteButtonDetector(database);
     add_tests_BoxInfoDetector(database);
     add_tests_BoxEggDetector(database);
+    add_tests_DialogArrowDetector(database);
     add_tests_DialogDetector(database);
     add_tests_ESPEmotionDetector(database);
     add_tests_FastTravelDetector(database);

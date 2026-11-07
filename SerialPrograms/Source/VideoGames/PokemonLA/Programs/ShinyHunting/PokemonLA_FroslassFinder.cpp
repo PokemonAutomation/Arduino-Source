@@ -66,7 +66,7 @@ std::unique_ptr<StatsTracker> FroslassFinder_Descriptor::make_stats() const{
 FroslassFinder::FroslassFinder()
     : DASH_DURATION0(
         "<b>Braviary dash duration:</b><br>"
-        "How many ticks for Braviary to dash to reach the hole.",
+        "Number of milliseconds for Braviary to dash to reach the hole.",
         LockMode::LOCK_WHILE_RUNNING,
         "7888"
     )
