@@ -1,0 +1,9 @@
+# Built extension module (copied in by CMake after building _pa_core)
+pokemon_automation/_pa_core*.so
+pokemon_automation/_pa_core*.pyd
+
+# Python
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/

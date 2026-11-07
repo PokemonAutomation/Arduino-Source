@@ -1,0 +1,50 @@
+name: C++ CI Python Bindings
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Builds the GUI-free core plus the _pa_core pybind11 module 
+# (Source/PythonBindings/README.md) and runs the package's pytest suite.
+# This needs no Qt, OpenCV, ONNX Runtime, Tesseract, DPP or Discord SDK.
+
+jobs:
+  build:
+    # if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-26.04
+
+    steps:
+      - name: Checkout Arduino-Source
+        uses: actions/checkout@v7
+        with:
+          path: 'Arduino-Source'
+          submodules: 'recursive'
+
+      # Step 1: Create a single environment for the entire job
+      - name: Set up Virtual Environment
+        run: |
+          python3 -m venv /tmp/pa-build-venv
+          /tmp/pa-build-venv/bin/pip install --upgrade pip
+          /tmp/pa-build-venv/bin/pip install pybind11 pytest
+
+      - name: Generate binaries
+        run: |
+          cd Arduino-Source/SerialPrograms
+          mkdir bin
+          cd bin
+          cmake .. -DPA_CORE_ONLY=ON -DPA_PYTHON_BINDINGS=ON -DPython_EXECUTABLE=/tmp/pa-build-venv/bin/python
+          cmake --build . --config RelWithDebInfo --parallel 10
+
+      - name: Run the Python tests
+        run: |
+          cd Arduino-Source/SerialPrograms/Source/PythonBindings
+          /tmp/pa-build-venv/bin/python -m pytest -q
+
+# Note: the venv avoids PEP 668 issues with system-pip on newer runners.
+# The runner's system Python needs dev headers (python3-dev is preinstalled on the images).
