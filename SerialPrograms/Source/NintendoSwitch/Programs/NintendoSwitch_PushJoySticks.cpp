@@ -26,12 +26,12 @@ PushJoySticks_Descriptor::PushJoySticks_Descriptor()
 {}
 
 
-//  x = 0 : left
-//  x = 128 : neutral
-//  x = 255 : right
-//  y = 0 : up
-//  y = 128 : neutral
-//  y = 255 : down
+//  x = -1 : left
+//  x = 0 : neutral
+//  x = +1 : right
+//  y = -1 : down
+//  y = 0 : neutral
+//  y = +1 : up
 
 PushJoySticks::PushJoySticks()
     : JOYCON_CLICK(

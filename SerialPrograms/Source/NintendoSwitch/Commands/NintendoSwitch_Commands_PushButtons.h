@@ -41,12 +41,12 @@ void pbf_press_dpad     (ProControllerContext& context, DpadPosition position, M
 //  x = -1 : left
 //  x = 0 : neutral
 //  x = +1 : right
-//  y = -1 : up
+//  y = -1 : down
 //  y = 0 : neutral
-//  y = +1 : down
+//  y = +1 : up
 //  Values outside of [-1, +1] are scaled back into the unit circle before being sent.
 //  Example: move the joystick fully left: (x, y) = (-1, 0)
-//           move the joystick upper-right: (x, y) = (+1, -1)
+//           move the joystick upper-right: (x, y) = (+1, +1)
 void pbf_move_left_joystick     (ProControllerContext& context, const JoystickPosition& position, Milliseconds hold, Milliseconds release);
 
 //  Move right joystick towards a 2D direction. Hold the direction for `hold`, then release it for `release`.
@@ -54,12 +54,12 @@ void pbf_move_left_joystick     (ProControllerContext& context, const JoystickPo
 //  x = -1 : left
 //  x = 0 : neutral
 //  x = +1 : right
-//  y = -1 : up
+//  y = -1 : down
 //  y = 0 : neutral
-//  y = +1 : down
+//  y = +1 : up
 //  Values outside of [-1, +1] are scaled back into the unit circle before being sent.
 //  Example: move the joystick fully left: (x, y) = (-1, 0)
-//           move the joystick upper-right: (x, y) = (+1, -1)
+//           move the joystick upper-right: (x, y) = (+1, +1)
 void pbf_move_right_joystick    (ProControllerContext& context, const JoystickPosition& position, Milliseconds hold, Milliseconds release);
 
 //  Mash a Switch controller button (excluding D-Pad) repeatedly for `duration`.
