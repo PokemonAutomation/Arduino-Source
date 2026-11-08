@@ -52,6 +52,6 @@ inline size_t story_index(bool main_story, size_t index_in_section, size_t first
 }
 
 
-}
-}
+} // namespace Pokemon
+} // namespace PokemonAutomation
 #endif
