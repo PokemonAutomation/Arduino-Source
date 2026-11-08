@@ -56,6 +56,9 @@ public:
         if (state.boss != expected.boss){
             return std::format("Expected boss '{}', got '{}'", expected.boss, state.boss);
         }
+        if (state.opponent != input.opponent){
+            return "Expected opponent candidates to be preserved.";
+        }
         state.wins = input.final_wins;
         const std::string caught = state.boss_if_caught();
         if (caught != expected.boss_if_caught){
@@ -69,6 +72,43 @@ private:
 };
 
 const BossStateTestCase CASES[] = {
+    {
+        .input = {.name = "form ambiguity is only valid during rental battles", .wins = 4, .opponent = {"lycanroc-midday", "lycanroc-midnight"}, .boss = "nihilego", .final_wins = 4},
+        .expectation = {.accepted = false, .boss = "nihilego", .boss_if_caught = "nihilego"},
+    },
+    {
+        .input = {.name = "Lycanroc forms at battle two", .wins = 1, .opponent = {"lycanroc-midday", "lycanroc-midnight"}, .boss = "nihilego", .final_wins = 1},
+        .expectation = {.accepted = true, .boss = "nihilego", .boss_if_caught = ""},
+    },
+    {
+        .input = {.name = "Basculin forms at battle three", .wins = 2, .opponent = {"basculin-blue-striped", "basculin-red-striped"}, .boss = "nihilego", .final_wins = 2},
+        .expectation = {.accepted = true, .boss = "nihilego", .boss_if_caught = ""},
+    },
+    {
+        .input = {.name = "rental forms cannot pass boss stage", .wins = 3, .opponent = {"lycanroc-midday", "lycanroc-midnight"}, .boss = "", .final_wins = 3},
+        .expectation = {.accepted = false, .boss = "", .boss_if_caught = ""},
+    },
+    {
+        .input = {.name = "different rentals are not form ambiguity", .wins = 1, .opponent = {"lycanroc-midday", "magmar"}, .boss = "nihilego", .final_wins = 1},
+        .expectation = {.accepted = false, .boss = "nihilego", .boss_if_caught = ""},
+    },
+    {
+        .input = {.name = "mixed boss and rental cannot pass rental stage", .wins = 1, .opponent = {"lycanroc-midday", "nihilego"}, .boss = "nihilego", .final_wins = 1},
+        .expectation = {.accepted = false, .boss = "nihilego", .boss_if_caught = ""},
+    },
+    {
+        .input = {.name = "unknown form slug cannot pass", .wins = 1, .opponent = {"lycanroc-midday", "lycanroc-unknown"}, .boss = "nihilego", .final_wins = 1},
+        .expectation = {.accepted = false, .boss = "nihilego", .boss_if_caught = ""},
+    },
+    {
+        .input = {.name = "empty rental read still rejects", .wins = 1, .opponent = {}, .boss = "nihilego", .final_wins = 1},
+        .expectation = {.accepted = false, .boss = "nihilego", .boss_if_caught = ""},
+    },
+    {
+        .input = {.name = "multiple boss candidates cannot infer a boss", .wins = 3, .opponent = {"kyurem", "nihilego"}, .boss = "", .final_wins = 3},
+        .expectation = {.accepted = false, .boss = "", .boss_if_caught = ""},
+    },
+
     {
         .input = {.name = "rental before three wins", .wins = 2, .opponent = {"mimikyu-disguised"}, .boss = "", .final_wins = 3},
         .expectation = {.accepted = true, .boss = "", .boss_if_caught = ""},

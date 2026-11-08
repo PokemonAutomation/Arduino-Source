@@ -175,10 +175,10 @@ struct GlobalState{
     //  True during the fourth (boss) battle when a boss has already been identified.
     bool in_boss_battle_with_known_boss() const;
 
-    //  Returns false when the opponent read doesn't fit this battle stage (not
-    //  exactly one opponent, or a boss before the fourth battle / a rental at
-    //  it), so the caller retries the read. On an accepted read at the fourth
-    //  battle, records the boss unless a boss is already known.
+    //  Accepts one opponent matching this stage. Before the fourth battle,
+    //  also accepts supported non-boss forms sharing one OCR species name,
+    //  preserving the candidate set. Boss-stage reads still need one boss;
+    //  records it unless a boss is already known. Otherwise retries the read.
     bool accept_opponent();
 
     //  The same boss, but only if the adventure caught it, else empty: for the

@@ -22,6 +22,29 @@ bool is_boss_battle(const GlobalState& state){
     return state.wins == 3;
 }
 
+//  Some supported rental forms share an OCR species name even after the
+//  summary read (Lycanroc and Basculin). Preserve that candidate set rather
+//  than treating it as a stage mismatch. Unrelated/unknown species are not
+//  interchangeable, and every candidate must have AI data and be a non-boss.
+bool compatible_rental_forms(const std::set<std::string>& candidates){
+    if (candidates.empty()){
+        return false;
+    }
+    const auto& slugs = maxlair_slugs();
+    const auto first = slugs.find(*candidates.begin());
+    if (first == slugs.end() || first->second.name_slug.empty()){
+        return false;
+    }
+    for (const std::string& slug : candidates){
+        const auto found = slugs.find(slug);
+        if (found == slugs.end() || found->second.name_slug != first->second.name_slug ||
+            is_boss(slug) || get_maxlair_mon_nothrow(slug) == nullptr){
+            return false;
+        }
+    }
+    return true;
+}
+
 } // namespace
 
 bool GlobalState::in_boss_battle_with_known_boss() const{
@@ -29,8 +52,11 @@ bool GlobalState::in_boss_battle_with_known_boss() const{
 }
 
 bool GlobalState::accept_opponent(){
-    if (opponent.size() != 1){
+    if (opponent.empty()){
         return false;
+    }
+    if (opponent.size() > 1){
+        return wins < 3 && compatible_rental_forms(opponent);
     }
     const std::string& opponent_slug = *opponent.begin();
     //  Reject the OCR read if the opponent species doesn't match the current stage:
