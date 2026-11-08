@@ -162,7 +162,7 @@ void start_game_from_home(
     enter_game(
         context,
         backup_save,
-        GameSettings::instance().ENTER_GAME_MASH0,
+        GameSettings::instance().ENTER_GAME_MASH1,
         GameSettings::instance().ENTER_GAME_WAIT0
     );
 }
