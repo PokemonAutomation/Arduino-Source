@@ -618,6 +618,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/ImageTools/ImageBoxes.h
     Source/CommonFramework/ImageTools/ImageDiff.cpp
     Source/CommonFramework/ImageTools/ImageDiff.h
+    Source/CommonFramework/ImageTools/ImageHistogram.cpp
+    Source/CommonFramework/ImageTools/ImageHistogram.h
     Source/CommonFramework/ImageTools/ImageStats.cpp
     Source/CommonFramework/ImageTools/ImageStats.h
     Source/CommonFramework/ImageTools/ImageStats_Tests.cpp
