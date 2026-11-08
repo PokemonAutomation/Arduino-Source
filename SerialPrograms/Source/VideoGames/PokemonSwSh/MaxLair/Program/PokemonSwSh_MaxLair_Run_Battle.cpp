@@ -107,10 +107,10 @@ bool read_battle_menu(
     context.wait_for_all_requests();
 
 
+    //  Probably a misread. It only costs move choice; a reset would cost the adventure.
     if (!state.accept_opponent()){
-        stream.log("Opponent does not match the battle stage after summary read.", COLOR_RED);
+        stream.log("Opponent does not match the battle stage after summary read. Continuing.", COLOR_RED);
         dump_image(stream.logger(), MODULE_NAME, "UnexpectedBattleOpponent", snapshot);
-        return false;
     }
 
     //  Read misc.

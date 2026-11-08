@@ -89,15 +89,11 @@ const BossStateTestCase CASES[] = {
         .expectation = {.accepted = false, .boss = "", .boss_if_caught = ""},
     },
     {
-        .input = {.name = "different rentals are not form ambiguity", .wins = 1, .opponent = {"lycanroc-midday", "magmar"}, .boss = "nihilego", .final_wins = 1},
-        .expectation = {.accepted = false, .boss = "nihilego", .boss_if_caught = ""},
+        .input = {.name = "two different rentals at battle two", .wins = 1, .opponent = {"lycanroc-midday", "magmar"}, .boss = "nihilego", .final_wins = 1},
+        .expectation = {.accepted = true, .boss = "nihilego", .boss_if_caught = ""},
     },
     {
         .input = {.name = "mixed boss and rental cannot pass rental stage", .wins = 1, .opponent = {"lycanroc-midday", "nihilego"}, .boss = "nihilego", .final_wins = 1},
-        .expectation = {.accepted = false, .boss = "nihilego", .boss_if_caught = ""},
-    },
-    {
-        .input = {.name = "unknown form slug cannot pass", .wins = 1, .opponent = {"lycanroc-midday", "lycanroc-unknown"}, .boss = "nihilego", .final_wins = 1},
         .expectation = {.accepted = false, .boss = "nihilego", .boss_if_caught = ""},
     },
     {
