@@ -16,16 +16,24 @@ namespace PokemonAutomation{
 namespace Pokemon{
 
 
-//  A dropdown database of the story segments or checkpoints [begin, end) of
+//  A dropdown database of the story segments or checkpoints [first, last) of
 //  `list`, labeled by their name() and slugged by their index in the whole
 //  list, so a slug picks the same entry whichever section it was chosen from.
+//  Bounds are whole-list indices. `last` is exclusive and clamped to list.size();
+//  first >= last or first >= list.size() yields an empty database.
 template <typename Entry>
 StringSelectDatabase make_story_select_database(
     const std::vector<std::unique_ptr<Entry>>& list,
-    size_t begin, size_t end
+    size_t first, size_t last
+);
+
+template <typename Entry>
+StringSelectDatabase make_story_select_database(
+    const std::vector<std::unique_ptr<Entry>>& list,
+    size_t first, size_t last
 ){
     StringSelectDatabase ret;
-    for (size_t i = begin; i < end && i < list.size(); i++){
+    for (size_t i = first; i < last && i < list.size(); i++){
         ret.add_entry(StringSelectEntry(std::to_string(i), list[i]->name()));
     }
     return ret;
