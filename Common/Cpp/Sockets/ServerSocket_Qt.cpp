@@ -321,6 +321,12 @@ void ServerSocket_Qt::on_new_connection(){
                 m_listeners.run_method(&Listener::on_connect_rejected);
             }
             sock->abort();
+            //  The socket is never used again: delete it, so a peer that
+            //  repeatedly connects (or keeps trying while another client
+            //  is connected) cannot accumulate one QTcpSocket per attempt
+            //  - they would otherwise stay children of the server until
+            //  the whole server is destroyed.
+            sock->deleteLater();
             continue;
         }
 
@@ -384,6 +390,13 @@ void ServerSocket_Qt::connection_lost(QTcpSocket* sock, const std::string& error
     if (report){
         m_listeners.run_method(&Listener::on_disconnect, error_message);
     }
+
+    //  The socket is no longer tracked (m_socket was nulled above, and the
+    //  first callback for a socket wins), so it can be released: schedule
+    //  its deletion on the event thread (this runs on it). A duplicate
+    //  signal for the same socket returned above and does not schedule a
+    //  second deletion; deleteLater() is idempotent either way.
+    sock->deleteLater();
 }
 
 void ServerSocket_Qt::on_close_connection(QSharedPointer<CloseCompletion> completion){
@@ -406,6 +419,12 @@ void ServerSocket_Qt::on_close_connection(QSharedPointer<CloseCompletion> comple
     }
     if (sock != nullptr){
         sock->abort();
+        //  The socket is no longer tracked (m_socket was nulled above):
+        //  schedule its deletion on the event thread. The
+        //  disconnected/errorOccurred signals that abort() may still emit
+        //  go through connection_lost(), which returns early because
+        //  m_socket is already null, so the socket is not scheduled twice.
+        sock->deleteLater();
     }
 
     {

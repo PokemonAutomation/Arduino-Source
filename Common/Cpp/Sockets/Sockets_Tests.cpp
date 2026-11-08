@@ -1455,6 +1455,298 @@ private:
     ThreadPool& m_thread_pool;
 };
 
+//  Exercises the Qt server's connection-churn paths: repeated
+//  connect/disconnect cycles, rejected connections while a client is
+//  connected, and close_connection() on the active connection.
+//  ServerSocket_Qt releases every QTcpSocket as soon as it stops being
+//  used (a rejected socket right after abort(), an accepted socket after
+//  its disconnect/error, and the active socket after
+//  close_connection()); before the fix, every connect/disconnect attempt
+//  left one QTcpSocket child of the server behind until the server itself
+//  was destroyed. This hammers those paths and verifies that the server
+//  keeps behaving correctly while its sockets are actually released.
+class Test_Sockets_Qt_ConnectionChurn : public UnitTest{
+public:
+    Test_Sockets_Qt_ConnectionChurn(ThreadPool& thread_pool, std::string name)
+        : UnitTest(std::move(name))
+        , m_thread_pool(thread_pool)
+    {
+        m_threads = 2;
+    }
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        if (timing_unreliable()){
+            return UnitTestResult(
+                UnitTestResult::SKIPPED,
+                "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
+            );
+        }
+
+        constexpr int CYCLES = 20;
+        constexpr int REJECTIONS = 10;
+
+        ServerListener server_listener;
+        ServerSocket_Qt server(m_thread_pool);
+        server.add_listener(server_listener);
+        server_listener.server = &server;  // Echo received data back.
+
+        uint16_t port = 0;
+        {
+            std::mt19937 rng{std::random_device{}()};
+            for (int attempt = 0; attempt < 8; attempt++){
+                uint16_t candidate = (uint16_t)(40000 + rng() % 20000);
+                server.start("127.0.0.1", candidate);
+                if (server_listener.waiter.wait_for(
+                    SOCKET_TEST_WAIT,
+                    [&server_listener]{ return server_listener.listen_finished.load() > 0; }
+                ) && server_listener.last_listen_error.empty()){
+                    port = candidate;
+                    break;
+                }
+            }
+        }
+        if (port == 0){
+            if (timing_unreliable()){
+                return UnitTestResult(
+                    UnitTestResult::SKIPPED,
+                    "The server did not start listening on a starved machine."
+                );
+            }
+            return "Failed to start the server";
+        }
+
+        std::string error;
+        {
+            ClientListener client_listener;
+            ClientSocket_Qt client(m_thread_pool);
+            client.add_listener(client_listener);
+
+            //  Phase 1: connect, echo, disconnect - repeated. Each cycle
+            //  exercises the accepted-socket release path.
+            for (int i = 0; i < CYCLES; i++){
+                client.connect("127.0.0.1", port);
+                if (!client_listener.waiter.wait_for(
+                    SOCKET_TEST_WAIT,
+                    [&client_listener, i]{ return client_listener.connect_finished.load() > i; }
+                ) || !client_listener.last_connect_error.empty()){
+                    if (timing_unreliable()){
+                        return UnitTestResult(
+                            UnitTestResult::SKIPPED,
+                            "A socket wait timed out on a starved machine."
+                        );
+                    }
+                    error = "The client did not connect on cycle " + std::to_string(i + 1);
+                    break;
+                }
+                if (!server_listener.waiter.wait_for(
+                    SOCKET_TEST_WAIT,
+                    [&server_listener, i]{ return server_listener.connected.load() > i; }
+                )){
+                    if (timing_unreliable()){
+                        return UnitTestResult(
+                            UnitTestResult::SKIPPED,
+                            "A socket wait timed out on a starved machine."
+                        );
+                    }
+                    error = "The server did not call on_connect on cycle " + std::to_string(i + 1);
+                    break;
+                }
+                if (client.send("ping", 4) != 4){
+                    error = "The client could not send on cycle " + std::to_string(i + 1);
+                    break;
+                }
+                if (!client_listener.waiter.wait_for(
+                    SOCKET_TEST_WAIT,
+                    [&client_listener, i]{
+                        return client_listener.received.size() >= 4 * (size_t)(i + 1);
+                    }
+                )){
+                    if (timing_unreliable()){
+                        return UnitTestResult(
+                            UnitTestResult::SKIPPED,
+                            "A socket wait timed out on a starved machine."
+                        );
+                    }
+                    error = "The server did not echo on cycle " + std::to_string(i + 1);
+                    break;
+                }
+                client.close();
+                if (!server_listener.waiter.wait_for(
+                    SOCKET_TEST_WAIT,
+                    [&server_listener, i]{ return server_listener.disconnected.load() > i; }
+                )){
+                    if (timing_unreliable()){
+                        return UnitTestResult(
+                            UnitTestResult::SKIPPED,
+                            "A socket wait timed out on a starved machine."
+                        );
+                    }
+                    error = "The server did not call on_disconnect on cycle " + std::to_string(i + 1);
+                    break;
+                }
+            }
+
+            //  Phase 2: while a client occupies the server, extra
+            //  connections are rejected; each rejection exercises the
+            //  rejected-socket release path.
+            if (error.empty()){
+                client.connect("127.0.0.1", port);
+                if (!client_listener.waiter.wait_for(
+                    SOCKET_TEST_WAIT,
+                    [&client_listener]{
+                        return client_listener.connect_finished.load() >= CYCLES + 1;
+                    }
+                ) || !client_listener.last_connect_error.empty()){
+                    error = "The client did not reconnect for the rejection phase";
+                }else if (!server_listener.waiter.wait_for(
+                    SOCKET_TEST_WAIT,
+                    [&server_listener]{ return server_listener.connected.load() == CYCLES + 1; }
+                )){
+                    error = "The server did not call on_connect for the rejection phase";
+                }else{
+                    for (int i = 0; i < REJECTIONS; i++){
+                        {
+                            ClientListener second_listener;
+                            ClientSocket_Qt second_client(m_thread_pool);
+                            second_client.add_listener(second_listener);
+                            second_client.connect("127.0.0.1", port);
+                            if (!server_listener.waiter.wait_for(
+                                SOCKET_TEST_WAIT,
+                                [&server_listener, i]{
+                                    return server_listener.rejected.load() > i;
+                                }
+                            )){
+                                if (timing_unreliable()){
+                                    return UnitTestResult(
+                                        UnitTestResult::SKIPPED,
+                                        "A socket wait timed out on a starved machine."
+                                    );
+                                }
+                                error = "The server did not reject connection " + std::to_string(i + 1);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                //  Release the occupying client.
+                client.close();
+                if (error.empty() && !server_listener.waiter.wait_for(
+                    SOCKET_TEST_WAIT,
+                    [&server_listener]{
+                        return server_listener.disconnected.load() == CYCLES + 1;
+                    }
+                )){
+                    error = "The server did not call on_disconnect after the rejection phase";
+                }
+            }
+
+            //  Phase 3: close_connection() releases the active
+            //  connection's socket, and the server must keep working
+            //  afterwards.
+            if (error.empty()){
+                client.connect("127.0.0.1", port);
+                if (!client_listener.waiter.wait_for(
+                    SOCKET_TEST_WAIT,
+                    [&client_listener]{
+                        return client_listener.connect_finished.load() >= CYCLES + 2;
+                    }
+                ) || !client_listener.last_connect_error.empty()){
+                    error = "The client did not reconnect for the close_connection phase";
+                }else if (!server_listener.waiter.wait_for(
+                    SOCKET_TEST_WAIT,
+                    [&server_listener]{ return server_listener.connected.load() == CYCLES + 2; }
+                )){
+                    error = "The server did not call on_connect for the close_connection phase";
+                }else{
+                    server.close_connection();
+
+                    //  close_connection() may return with the close still
+                    //  pending on the event thread, so poll for the
+                    //  resulting LISTENING state within the shared budget.
+                    const auto s0 = std::chrono::steady_clock::now();
+                    while (
+                        server.state() != AbstractServerSocket::State::LISTENING
+                        && std::chrono::steady_clock::now() - s0 < SOCKET_TEST_WAIT
+                    ){
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    }
+                    if (server.state() != AbstractServerSocket::State::LISTENING){
+                        error = "The server is not LISTENING after close_connection()";
+                    }
+                }
+
+                //  Reconnect and echo once more.
+                if (error.empty()){
+                    client.connect("127.0.0.1", port);
+                    if (!client_listener.waiter.wait_for(
+                        SOCKET_TEST_WAIT,
+                        [&client_listener]{
+                            return client_listener.connect_finished.load() >= CYCLES + 3;
+                        }
+                    ) || !client_listener.last_connect_error.empty()){
+                        error = "The client could not reconnect after close_connection()";
+                    }else if (!server_listener.waiter.wait_for(
+                        SOCKET_TEST_WAIT,
+                        [&server_listener]{ return server_listener.connected.load() == CYCLES + 3; }
+                    )){
+                        error = "The server did not call on_connect after close_connection()";
+                    }else if (client.send("pong", 4) != 4){
+                        error = "The client could not send after close_connection()";
+                    }else if (!client_listener.waiter.wait_for(
+                        SOCKET_TEST_WAIT,
+                        [&client_listener]{
+                            return client_listener.received.size() >= 4 * (size_t)(CYCLES + 1);
+                        }
+                    )){
+                        error = "The server did not echo after close_connection()";
+                    }
+                }
+
+                //  Release the final connection.
+                if (error.empty()){
+                    client.close();
+                    if (!server_listener.waiter.wait_for(
+                        SOCKET_TEST_WAIT,
+                        [&server_listener]{
+                            return server_listener.disconnected.load() == CYCLES + 2;
+                        }
+                    )){
+                        error = "The server did not call on_disconnect for the final connection";
+                    }
+                }
+            }
+
+            //  Final counter check: the CYCLES phase-1 connections, the
+            //  phase-2 occupant, and the two phase-3 connections; the
+            //  close_connection() itself is not reported as a disconnect.
+            if (error.empty()){
+                if (server_listener.connected.load() != CYCLES + 3){
+                    error = "Expected " + std::to_string(CYCLES + 3) + " on_connect callbacks, got "
+                        + std::to_string(server_listener.connected.load());
+                }else if (server_listener.disconnected.load() != CYCLES + 2){
+                    error = "Expected " + std::to_string(CYCLES + 2) + " on_disconnect callbacks, got "
+                        + std::to_string(server_listener.disconnected.load());
+                }else if (server_listener.rejected.load() != REJECTIONS){
+                    error = "Expected " + std::to_string(REJECTIONS) + " on_connect_rejected callbacks, got "
+                        + std::to_string(server_listener.rejected.load());
+                }else if (server_listener.bytes_received.load() != 4 * (CYCLES + 1)){
+                    error = "Expected " + std::to_string(4 * (CYCLES + 1)) + " received bytes, got "
+                        + std::to_string(server_listener.bytes_received.load());
+                }
+            }
+        }
+
+        if (!error.empty()){
+            return error;
+        }
+        return true;
+    }
+
+private:
+    ThreadPool& m_thread_pool;
+};
+
 //  The peer accepts the connection but stalls reading: a send() with a
 //  deadline must stop at the deadline with a partial count, and
 //  close() must still be able to finish afterwards (on the Qt backend
@@ -2427,6 +2719,11 @@ void add_tests_Sockets(UnitTestDatabase& database, ThreadPool& thread_pool){
     database.add<Test_Sockets_Qt_CloseConnectionCancelsSend>(
         thread_pool,
         "Sockets (Qt) - close_connection() cancels a send queued behind an event-thread stall"
+    );
+
+    database.add<Test_Sockets_Qt_ConnectionChurn>(
+        thread_pool,
+        "Sockets (Qt) - connection churn releases the QTcpSocket objects"
     );
 
 #ifndef _WIN32
