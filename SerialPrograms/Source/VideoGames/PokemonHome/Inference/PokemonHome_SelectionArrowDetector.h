@@ -8,59 +8,66 @@
 #define PokemonAutomation_PokemonHome_SelectionArrowDetector_H
 
 #include <optional>
+#include "Common/Cpp/Color.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonTools/VisualDetector.h"
+#include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonHome{
 
 
-enum class SelectionArrowType{
-    RIGHT,
-    DOWN,
+enum class BoxSelectionMode{
+    Normal,     // Red
+    Relocate,   // Blue
+    Multi,      // Green
 };
 
+enum class BoxSelectionLocation{
+    Grid,
+    BoxName,
+    BoxSpaces,
+    Newest30,
+};
 
-class SelectionArrowDetector : public StaticScreenDetector{
+struct BoxSelection{
+    BoxSelectionMode mode;
+    BoxSelectionLocation location;
+    // Zero-based coordinates in the 5-row, 6-column grid. Only valid for Grid.
+    size_t row = 0;
+    size_t column = 0;
+};
+
+class SelectionArrowDetector{
 public:
-    SelectionArrowDetector(
-        Color color,
-        VideoOverlay* overlay,
-        SelectionArrowType type,
-        const ImageFloatBox& box
-    );
+    SelectionArrowDetector(Color color = COLOR_RED) : m_color(color) {}
 
-    const ImageFloatBox& last_detected() const{ return m_last_detected; }
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-
-    virtual bool detect(const ImageViewRGB32& screen) override;
+    void make_overlays(VideoOverlaySet& items) const;
+    // Returns no value when no arrow matches a supported box selection position.
+    std::optional<BoxSelection> detect(const ImageViewRGB32& screen) const;
 
 private:
-    friend class SelectionArrowWatcher;
-
-    const Color m_color;
-    VideoOverlay* m_overlay;
-    const SelectionArrowType m_type;
-    const ImageFloatBox m_arrow_box;
-
-    ImageFloatBox m_last_detected;
-    std::optional<OverlayBoxScope> m_last_detected_box;
+    Color m_color;
 };
-class SelectionArrowWatcher : public DetectorToFinder<SelectionArrowDetector>{
+
+class SelectionArrowWatcher : public SelectionArrowDetector, public VisualInferenceCallback{
 public:
-    SelectionArrowWatcher(
-        Color color,
-        VideoOverlay* overlay,
-        SelectionArrowType type,
-        const ImageFloatBox& box,
-        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
-    )
-         : DetectorToFinder("SelectionArrowWatcher", hold_duration, color, overlay, type, box)
-    {}
+    SelectionArrowWatcher(Color color, BoxSelectionMode mode, BoxSelectionLocation location);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override{
+        SelectionArrowDetector::make_overlays(items);
+    }
+
+    using VisualInferenceCallback::process_frame;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+
+    // Contains the matching mode, location and grid coordinates after process_frame() succeeds.
+    const std::optional<BoxSelection>& last_detected() const{ return m_last_detected; }
+
+private:
+    BoxSelectionMode m_mode;
+    BoxSelectionLocation m_location;
+    std::optional<BoxSelection> m_last_detected;
 };
 
 void add_tests_SelectionArrowDetector(UnitTestDatabase& database);

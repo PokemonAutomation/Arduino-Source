@@ -84,11 +84,39 @@ TestDatabaseGenerator::TestDatabaseGenerator()
 
 namespace{
 
-[[nodiscard]] std::string optional_arrow_name(std::optional<SelectionArrowType> arrow){
+[[nodiscard]] std::string optional_arrow_name(const std::optional<BoxSelection>& arrow){
     if (!arrow){
-        return "none";
+        return "std::nullopt";
     }
-    return *arrow == SelectionArrowType::RIGHT ? "right" : "down";
+    std::string mode;
+    switch (arrow->mode){
+    case BoxSelectionMode::Normal:
+        mode = "Normal";
+        break;
+    case BoxSelectionMode::Relocate:
+        mode = "Relocate";
+        break;
+    case BoxSelectionMode::Multi:
+        mode = "Multi";
+        break;
+    }
+    std::string location;
+    switch (arrow->location){
+    case BoxSelectionLocation::Grid:
+        location = "Grid";
+        break;
+    case BoxSelectionLocation::BoxName:
+        location = "BoxName";
+        break;
+    case BoxSelectionLocation::BoxSpaces:
+        location = "BoxSpaces";
+        break;
+    case BoxSelectionLocation::Newest30:
+        location = "Newest30";
+        break;
+    }
+    return "BoxSelection{BoxSelectionMode::" + mode + ", BoxSelectionLocation::" + location
+        + ", " + std::to_string(arrow->row) + ", " + std::to_string(arrow->column) + "}";
 }
 
 [[nodiscard]] std::string to_uppercase(std::string value){
@@ -162,7 +190,6 @@ void TestDatabaseGenerator::program(
     for (const Filesystem::Path& path : screenshots){
         try{
             ImageRGB32 image(path.string());
-            ImageFloatBox arrow_box(0.021, 0.073, 0.47, 0.72);
             ImageFloatBox button_box(0.100, 0.956, 0.107, 0.041);
 
             SummaryReader summary_reader;
@@ -177,8 +204,7 @@ void TestDatabaseGenerator::program(
             ShinyDetector shiny_detector(COLOR_RED, &env.console.overlay());
             AlphaDetector alpha_detector(COLOR_RED, &env.console.overlay());
             GigantamaxDetector gigantamax_detector(COLOR_RED, &env.console.overlay());
-            SelectionArrowDetector right_arrow_detector(COLOR_RED, &env.console.overlay(), SelectionArrowType::RIGHT, arrow_box);
-            SelectionArrowDetector down_arrow_detector(COLOR_RED, &env.console.overlay(), SelectionArrowType::DOWN, arrow_box);
+            SelectionArrowDetector arrow_detector;
             ButtonDetector b_detector(COLOR_RED, ButtonType::ButtonB, button_box, &env.console.overlay());
             ButtonDetector plus_detector(COLOR_RED, ButtonType::ButtonPlus, button_box, &env.console.overlay());
             BallReader ball_reader(env.console);
@@ -189,8 +215,7 @@ void TestDatabaseGenerator::program(
             const bool shiny = shiny_detector.detect(image);
             const bool alpha = alpha_detector.detect(image);
             const bool gigantamax = gigantamax_detector.detect(image);
-            const bool right_arrow = right_arrow_detector.detect(image);
-            const bool down_arrow = down_arrow_detector.detect(image);
+            const auto arrow = arrow_detector.detect(image);
             const bool button_b = b_detector.detect(image);
             const bool button_plus = plus_detector.detect(image);
             const std::string ball = ball_reader.read_ball(image);
@@ -225,12 +250,6 @@ void TestDatabaseGenerator::program(
                     }
                 }
             }
-
-            std::optional<SelectionArrowType> arrow;
-            if (right_arrow)
-                arrow = SelectionArrowType::RIGHT;
-            else if (down_arrow)
-                arrow = SelectionArrowType::DOWN;
 
             const Filesystem::Path database_file = renamed_path.empty() ? path : Filesystem::Path(renamed_path);
             const std::string print_directory = (std::string)PRINT_DIRECTORY;
@@ -313,7 +332,7 @@ void TestDatabaseGenerator::program(
             entry.selection_arrow = std::format(
                 "database.add<Test_SelectionArrowDetector>({}, {});",
                 quote_string(database_path),
-                arrow ? "SelectionArrowType::" + to_uppercase(optional_arrow_name(arrow)) : "std::nullopt"
+                optional_arrow_name(arrow)
             );
 
             entry.button = std::format(
