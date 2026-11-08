@@ -202,7 +202,7 @@ private:
 
 void add_tests_SelectionArrowDetector(UnitTestDatabase& database){
     database.add<Test_SelectionArrowDetector>("PokemonHome/BoxView/BoxView-1.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 0, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/BoxView/image.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 0, 0});
+    database.add<Test_SelectionArrowDetector>("PokemonHome/BoxView/SelectionArrow_Normal_Grid_Row0_Column0_02.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 0, 0});
     database.add<Test_SelectionArrowDetector>("PokemonHome/BoxView/SelectionArrow_Normal_Grid_Row0_Column0_01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 0, 0});
     database.add<Test_SelectionArrowDetector>("PokemonHome/BoxView/SelectionArrow_Multi_BoxSpaces_01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::BoxSpaces, 0, 0});
     database.add<Test_SelectionArrowDetector>("PokemonHome/BoxView/SelectionArrow_Multi_BoxSpaces_02.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::BoxSpaces, 0, 0});
