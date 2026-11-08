@@ -236,8 +236,6 @@ void ClientSocket_POSIX::thread_loop(std::string address, uint16_t port){
     }
 }
 void ClientSocket_POSIX::thread_loop_internal(std::string address, uint16_t port){
-    m_listeners.run_method(&Listener::on_thread_start);
-
     {
         sockaddr_in server;
         std::memset(&server, 0, sizeof(server));
