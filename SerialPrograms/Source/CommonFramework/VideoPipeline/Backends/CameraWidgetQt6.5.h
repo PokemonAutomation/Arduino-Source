@@ -65,6 +65,9 @@ public:
         setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         setFocusPolicy(Qt::FocusPolicy::NoFocus);
+        //  Frames are drawn by QPainter::drawImage() scaled to the widget size.
+        //  Without this, the scaling is nearest-neighbor and edges shimmer.
+        setRenderHint(QPainter::SmoothPixmapTransform);
     }
 
     virtual void wheelEvent(QWheelEvent* e) override{
