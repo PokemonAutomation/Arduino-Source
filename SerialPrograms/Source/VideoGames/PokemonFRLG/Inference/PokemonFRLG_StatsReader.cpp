@@ -145,9 +145,10 @@ void StatsReader::read_gender(
     );
     const size_t num_red_pixels = image_stats(red_region).count;
 
+    //  Blue from 150, not higher: darker capture cards show the male symbol's blue at ~155.
     const ImageRGB32 blue_region = filter_rgb32_range(
         gender_box,
-        combine_rgb(0, 0, 180), combine_rgb(130, 130, 255), Color(0), replace_color_within_range
+        combine_rgb(0, 0, 150), combine_rgb(130, 130, 255), Color(0), replace_color_within_range
     );
     const size_t num_blue_pixels = image_stats(blue_region).count;
 
