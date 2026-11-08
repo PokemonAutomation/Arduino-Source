@@ -60,7 +60,7 @@ void enter_loading_game(
     openedgame_to_gamemenu(stream, context, GameSettings::instance().START_GAME_WAIT0);
 
     stream.log("enter_loading_game(): Game Loaded. Entering game...", COLOR_PURPLE);
-    enter_game(context, backup_save, GameSettings::instance().ENTER_GAME_MASH0, 0ms);
+    enter_game(context, backup_save, GameSettings::instance().ENTER_GAME_MASH1, 0ms);
     context.wait_for_all_requests();
 
     //  Wait to enter game.

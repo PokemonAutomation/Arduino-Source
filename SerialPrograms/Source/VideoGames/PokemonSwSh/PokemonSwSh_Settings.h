@@ -47,7 +47,7 @@ public:
 
     SectionDividerOption m_start_game_timings;
     MillisecondsOption START_GAME_WAIT0;
-    MillisecondsOption ENTER_GAME_MASH0;
+    MillisecondsOption ENTER_GAME_MASH1;
     MillisecondsOption ENTER_GAME_WAIT0;
 
     SectionDividerOption m_den_timings;

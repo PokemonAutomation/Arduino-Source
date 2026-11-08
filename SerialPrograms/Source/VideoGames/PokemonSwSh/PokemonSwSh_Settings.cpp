@@ -92,10 +92,10 @@ GameSettings::GameSettings()
         LockMode::LOCK_WHILE_RUNNING,
         "20000 ms"
     )
-    , ENTER_GAME_MASH0(
+    , ENTER_GAME_MASH1(
         "<b>Enter Game Mash:</b><br>Mash A for this long to enter the game.",
         LockMode::LOCK_WHILE_RUNNING,
-        "3000 ms"
+        "1000 ms"
     )
     , ENTER_GAME_WAIT0(
         "<b>Enter Game Wait:</b><br>Wait this long for the game to enter the overworld.",
@@ -241,7 +241,7 @@ GameSettings::GameSettings()
 
     PA_ADD_STATIC(m_start_game_timings);
     PA_ADD_OPTION(START_GAME_WAIT0);
-    PA_ADD_OPTION(ENTER_GAME_MASH0);
+    PA_ADD_OPTION(ENTER_GAME_MASH1);
     PA_ADD_OPTION(ENTER_GAME_WAIT0);
 
     PA_ADD_STATIC(m_den_timings);
