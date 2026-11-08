@@ -235,8 +235,6 @@ void ClientSocket_WinSocket::thread_loop(const std::string& address, uint16_t po
 
 
 void ClientSocket_WinSocket::thread_loop_internal(const std::string& address, uint16_t port){
-    m_listeners.run_method(&Listener::on_thread_start);
-
     {
         sockaddr_in server;
         server.sin_family = AF_INET;

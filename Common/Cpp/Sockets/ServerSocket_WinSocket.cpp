@@ -423,8 +423,6 @@ void ServerSocket_WinSocket::accept_thread_loop(std::string address, uint16_t po
 }
 
 void ServerSocket_WinSocket::connection_thread_loop(){
-    m_listeners.run_method(&Listener::on_thread_start);
-
     SOCKET socket;
     bool active;
     {

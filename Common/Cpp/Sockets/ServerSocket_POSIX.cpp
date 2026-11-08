@@ -403,8 +403,6 @@ void ServerSocket_POSIX::accept_thread_loop(std::string address, uint16_t port, 
 }
 
 void ServerSocket_POSIX::connection_thread_loop(){
-    m_listeners.run_method(&Listener::on_thread_start);
-
     int socket;
     bool active;
     {
