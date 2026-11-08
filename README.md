@@ -24,6 +24,7 @@ This is the source code for all the main Arduino programs.
 | [OpenCV](https://github.com/opencv/opencv) | Apache 2.0 |
 | [ONNX](https://github.com/microsoft/onnxruntime) | MIT |
 | [sdbus-c++](https://github.com/Kistler-Group/sdbus-cpp) | LGPLv2.1 |
+| [SDL](https://github.com/libsdl-org/SDL) | zlib |
 
 Vanilla GPL is disallowed, though LGPL is allowed. This is for the following reasons:
 1. A tiny portion of the project is not open-sourced. (mostly related to telemetry and internal research experiments)

@@ -101,6 +101,9 @@ option(PA_CORE_ONLY "Build only the GUI-free core (basic microcontroller functio
 # listing, so every file would be recompiled on every run.
 option(PA_ASSEMBLY_LISTINGS "Write an assembly listing of every source file to Assembly/ (MSVC and clang-cl only)" ON)
 
+# Enable SDL by giving -DPA_SDL=ON on the CMake command line
+option(PA_SDL "Enable SDL library" OFF)
+
 if(PA_CORE_ONLY)
     message(STATUS "PA_CORE_ONLY: building only the GUI-free core")
     set(CMAKE_AUTOMOC OFF)
@@ -360,6 +363,14 @@ if(NOT EXISTS "${DEST_DIR}/Scripts")
 endif()
 
 if (WIN32)
+    if (PA_SDL)
+        add_library(SDL3_lib IMPORTED UNKNOWN)
+        set_target_properties(SDL3_lib PROPERTIES
+            IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/SDL3.lib
+        )
+        target_link_libraries(SerialProgramsLib PRIVATE SDL3_lib)
+    endif()
+
     add_library(OpenCV_lib IMPORTED UNKNOWN)
     target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/opencv-4.12.0/)
     set_target_properties(OpenCV_lib PROPERTIES
@@ -456,6 +467,18 @@ if (WIN32)
 #    target_compile_options(SerialProgramsLib PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512GF)
 else() # macOS and Linux
     find_package(PkgConfig REQUIRED)  # required to execute `pkg_search_module()` below
+    if (PA_SDL)
+        # Resolve Homebrew's config symlinks so SDL uses its own include directory,
+        # not the shared include root that also exposes incompatible Qt headers.
+        set(PA_SAVED_FIND_PACKAGE_RESOLVE_SYMLINKS "${CMAKE_FIND_PACKAGE_RESOLVE_SYMLINKS}")
+        set(CMAKE_FIND_PACKAGE_RESOLVE_SYMLINKS TRUE)
+        find_package(SDL3 3.2 REQUIRED CONFIG)
+        set(CMAKE_FIND_PACKAGE_RESOLVE_SYMLINKS "${PA_SAVED_FIND_PACKAGE_RESOLVE_SYMLINKS}")
+        get_target_property(SDL3_INCLUDE_DIRS SDL3::Headers INTERFACE_INCLUDE_DIRECTORIES)
+        # BEFORE to prefer the packaged SDL headers over the bundled Windows headers.
+        target_include_directories(SerialProgramsLib SYSTEM BEFORE PRIVATE ${SDL3_INCLUDE_DIRS})
+        target_link_libraries(SerialProgramsLib PRIVATE SDL3::SDL3)
+    endif()
     if (APPLE)
         # prepare onnxruntime if needed
         set(ONNXRUNTIME_VERSION "1.23.2")
@@ -868,6 +891,9 @@ if (WIN32)
 
     # Copy 3rd party DLLs if missing/different
     file(GLOB THIRD_PARTY_DLLS "${REPO_ROOT_DIR}/3rdPartyBinaries/*.dll")
+    if (NOT PA_SDL)
+        list(REMOVE_ITEM THIRD_PARTY_DLLS "${REPO_ROOT_DIR}/3rdPartyBinaries/SDL3.dll")
+    endif()
     foreach(DLL IN LISTS THIRD_PARTY_DLLS)
         get_filename_component(DLL_NAME "${DLL}" NAME)
         add_custom_command(

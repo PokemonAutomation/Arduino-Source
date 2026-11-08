@@ -102,7 +102,7 @@ jobs:
         run: |
           cd Arduino-Source
           sudo apt update
-          sudo apt install ccache clang-tools libopencv-dev libsystemd-dev
+          sudo apt install ccache clang-tools libopencv-dev libsystemd-dev libsdl3-dev
 
           sudo apt install ./3rdPartyBinaries/libdpp-10.1.6-linux-x64.deb
 
@@ -112,7 +112,7 @@ jobs:
           cd Arduino-Source
           # libsodium, openssl@3, opus and pkgconf are libdpp's dependencies, installed here so
           # their versions can go into the libdpp cache key below.
-          brew install opencv@4 onnxruntime ccache libsodium openssl@3 opus pkgconf
+          brew install opencv@4 onnxruntime ccache libsodium openssl@3 opus pkgconf sdl3
 
           brew tap-new --no-git PA/libdpp
           brew trust PA/libdpp
@@ -208,7 +208,7 @@ jobs:
           cd Arduino-Source/SerialPrograms
           mkdir bin
           cd bin
-          cmake .. -DQT_MAJOR:STRING=6 ${{env.CMAKE_ADDITIONAL_FLAGS}}
+          cmake .. -DQT_MAJOR:STRING=6 -DPA_SDL=ON ${{env.CMAKE_ADDITIONAL_FLAGS}}
           # By default Ninja reads each compile's .d dependency file into its own database, then deletes it.
           # To keep them for the downstream clang-query cache (see .github/scripts/clang-query-cached.py), add
           # -d keepdepfile

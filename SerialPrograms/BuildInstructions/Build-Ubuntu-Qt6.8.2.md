@@ -13,6 +13,12 @@ sudo apt install libopencv-dev
 ```
 
 
+## Install SDL 3
+
+Install SDL 3.2 or newer with its development headers and CMake package. If available in your distribution, use `sudo apt install libsdl3-dev`; otherwise follow the [SDL installation instructions](https://wiki.libsdl.org/SDL3/Installation).
+
+SDL support is disabled by default. Enable it with `-DPA_SDL=ON` when configuring CMake.
+
 ## Install Qt 6.8.2:
 
 1. Download the online installer from here: https://www.qt.io/download-qt-installer

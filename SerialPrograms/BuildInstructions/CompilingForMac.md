@@ -157,6 +157,16 @@ OpenCV is a software package for various computer vision algorithms. We need it 
 brew install opencv
 ```
 
+### Install SDL 3
+
+Install SDL 3.2 or newer before configuring the program:
+
+```sh
+brew install sdl3
+```
+
+SDL support is disabled by default. Enable it with `-DPA_SDL=ON` when configuring CMake.
+
 ### Install DPP (optional)
 DPP is a library for Discord integration. If you need discord webhooks for notification you need to install it.
 You can do this step after [Part 3: Download Codebase](#part-3-download-codebase).

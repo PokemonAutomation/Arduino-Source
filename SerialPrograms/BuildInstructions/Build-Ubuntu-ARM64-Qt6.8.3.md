@@ -40,6 +40,12 @@ sudo apt install libavcodec-dev libavformat-dev libavutil-dev libswscale-dev \
 
 Note: `libopencv-dev` on 24.04 provides OpenCV 4.6, and `libtesseract-dev` provides Tesseract 5.3.4. Both are picked up via `pkg-config` (`opencv4`, `tesseract`) by `SerialPrograms/CMakeLists.txt` — no manual OpenCV build is required on Linux (unlike Windows/Mac, which use prebuilt binaries from the `Packages` repo).
 
+## Install SDL 3
+
+Install SDL 3.2 or newer with its development headers and CMake package. If available in your distribution, use `sudo apt install libsdl3-dev`; otherwise follow the [SDL installation instructions](https://wiki.libsdl.org/SDL3/Installation).
+
+SDL support is disabled by default. Enable it with `-DPA_SDL=ON` when configuring CMake.
+
 ## 2. Build Qt 6.8.3 from source
 
 ```bash
