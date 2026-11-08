@@ -89,8 +89,9 @@ bool AdvanceWhiteDialogDetector::detect(const ImageViewRGB32& screen){
     if (is_white(right_image)
         && is_white(top_image)
         && is_white(bottom_image)
-        && (stats.average.r > stats.average.b + 180)
-        && (stats.average.r > stats.average.g + 180)
+        //  The red arrow.
+        && (stats.average.r > stats.average.b + 160)
+        && (stats.average.r > stats.average.g + 160)
     ){
         return true;
     }
