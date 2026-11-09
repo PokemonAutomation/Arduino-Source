@@ -324,7 +324,9 @@ bool heal_pokemon(VideoStream& stream,
     context.wait_for_all_requests();
     pbf_wait(context, 3000ms);
     wait_for_dialog(stream, context, label + " - Pokemon healing");
-    mash_until_dialogue_ends(stream, context, BUTTON_B);
+    // Nurse dialogue can pause before the final message. Require a continuous
+    // quiet overworld before exiting or restoring the tracked PP budget.
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
     context.wait_for_all_requests();
     pbf_wait(context, 1000ms);
 

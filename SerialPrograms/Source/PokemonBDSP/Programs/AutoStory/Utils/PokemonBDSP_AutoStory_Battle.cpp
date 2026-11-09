@@ -17,6 +17,7 @@
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -588,41 +589,80 @@ void use_item_in_battle(VideoStream& stream,
         for (size_t pass = 0; pass < 2; pass++){
             open_menu(stream, context, MenuCursorPosition::BAG, 5);
             pbf_wait(context, 750ms);
-            double hp = -1;
+            int hp_current = -1;
+            int hp_maximum = -1;
             size_t stable = 0;
+            std::string last_reading;
             for (size_t check = 0; check < 20 && stable < 3; check++){
                 context.wait_for_all_requests();
                 const auto frame = stream.video().snapshot();
-                double observed = -1;
-                if (frame && bag_pocket_position(frame) != 0){
-                    const std::string text = OCR::tesseract_ocr_read(language,
-                        to_blackwhite_rgb32_range(
-                            extract_box_reference(frame, ImageFloatBox{0.108, 0.180, 0.150, 0.040}),
-                            true, 0xffc0c0c0, 0xffffffff));
-                    std::string digits;
-                    for (char c : text){
-                        if ((c >= '0' && c <= '9') || c == '/'){
-                            digits += c;
+                const int pocket = frame ? bag_pocket_position(frame) : 0;
+                int observed_current = -1;
+                int observed_maximum = -1;
+                bool conflicting = false;
+                std::string reading = "pocket=" + std::to_string(pocket);
+                if (pocket != 0){
+                    // The Bag HP numbers are white on blue. Use the existing
+                    // white-text filters to tolerate capture brightness changes.
+                    // Valid filters must agree on both numbers, not just their ratio.
+                    for (const auto& range : OCR::WHITE_TEXT_FILTERS()){
+                        const std::string text = OCR::tesseract_ocr_read(language,
+                            to_blackwhite_rgb32_range(
+                                extract_box_reference(frame, ImageFloatBox{0.108, 0.180, 0.150, 0.040}),
+                                true, range.mins, range.maxs), OCR::PageSegMode::SINGLE_WORD);
+                        std::string digits;
+                        for (char c : text){
+                            if (c != ' ' && c != '\n' && c != '\r' && c != '\t'){
+                                digits += c;
+                            }
                         }
-                    }
-                    const auto slash = digits.find('/');
-                    if (slash != std::string::npos && slash > 0 && slash + 1 < digits.size() && digits.size() <= 9){
+                        reading += " [" + digits.substr(0, 40) + "]";
+                        const auto slash = digits.find('/');
+                        if (slash == std::string::npos || slash == 0 || slash > 3 ||
+                            slash + 1 >= digits.size() || digits.size() - slash - 1 > 3 ||
+                            digits.find('/', slash + 1) != std::string::npos ||
+                            digits.find_first_not_of("0123456789/") != std::string::npos){
+                            continue;
+                        }
                         const int current = std::atoi(digits.substr(0, slash).c_str());
                         const int maximum = std::atoi(digits.substr(slash + 1).c_str());
-                        if (maximum > 0 && maximum <= 999 && current > 0 && current <= maximum){
-                            observed = (double)current / maximum;
+                        if (maximum > 0 && current > 0 && current <= maximum){
+                            conflicting |= observed_current > 0 &&
+                                (current != observed_current || maximum != observed_maximum);
+                            observed_current = current;
+                            observed_maximum = maximum;
                         }
                     }
                 }
-                stable = observed > 0 && observed == hp ? stable + 1 : 0;
-                hp = observed;
+                if (conflicting){
+                    observed_current = -1;
+                    observed_maximum = -1;
+                    reading += " conflicting HP reads";
+                }
+                if (reading != last_reading){
+                    stream.log("[League healing] HP check: " + reading);
+                    last_reading = reading;
+                }
+                stable = observed_current > 0 && observed_current == hp_current &&
+                    observed_maximum == hp_maximum ? stable + 1 : 0;
+                hp_current = observed_current;
+                hp_maximum = observed_maximum;
                 pbf_wait(context, 150ms);
             }
-            if (stable < 3 || (pass == 1 && hp != 1.0)){
+            if (stable < 3 || (pass == 1 && hp_current != hp_maximum)){
+                context.wait_for_all_requests();
+                const auto frame = stream.video().snapshot();
+                if (frame){
+                    dump_debug_image(stream.logger(), "PokemonBDSP/LeagueHealing",
+                        "hp-check-failed", frame);
+                }
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "Post-battle healing: exact current/maximum HP could not be confirmed full.", stream);
+                    stable < 3
+                        ? "Post-battle healing: exact HP read was not stable. " + last_reading
+                        : "Post-battle healing: Full Restore did not restore full HP (" +
+                            std::to_string(hp_current) + "/" + std::to_string(hp_maximum) + ").", stream);
             }
-            if (hp == 1.0){
+            if (hp_current == hp_maximum){
                 stream.log("[League healing] Starter at full HP; no Full Restore needed.");
                 pbf_mash_button(context, BUTTON_B, 2000ms);
                 context.wait_for_all_requests();

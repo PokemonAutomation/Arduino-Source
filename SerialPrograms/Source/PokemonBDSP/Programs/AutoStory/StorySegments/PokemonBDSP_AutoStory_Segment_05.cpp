@@ -1193,6 +1193,14 @@ static void hearthome_gym_puzzle_and_cynthia(SingleSwitchProgramEnvironment& env
     ProControllerContext& context,
     AutoStoryStats& stats){
     VideoStream& stream = env.console;
+    // The door fade ends before the entry camera tour. The 2026-11-08
+    // recording shows all eight initial up presses lost during that tour.
+    // Wait for the entrance view before starting the lift approach.
+    context.wait_for_all_requests();
+    stream.log("[Hearthome Gym puzzle] Waiting for the entry camera tour to finish.");
+    pbf_wait(context, 8000ms);
+    context.wait_for_all_requests();
+
     struct Move {
         DpadPosition dir;
         int count;
@@ -1375,11 +1383,11 @@ std::string AutoStory_Segment_05::name() const {
 }
 
 std::string AutoStory_Segment_05::start_text() const {
-    return "Start: Outside Pastoria Gym at the doorway, facing south, with fourth-badge rewards and dialogue finished.";
+    return AutoStory_Checkpoint_0501().start_text();
 }
 
 std::string AutoStory_Segment_05::end_text() const {
-    return "Outside Hearthome Gym at the post-Cynthia position, with her dialogue finished and the fifth badge acquired.";
+    return AutoStory_Checkpoint_0505().end_text();
 }
 
 void AutoStory_Segment_05::run_segment(SingleSwitchProgramEnvironment& env,

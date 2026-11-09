@@ -35,6 +35,7 @@
 #include "PokemonBDSP/Programs/AutoStory/PokemonBDSP_AutoStory.h"
 #include "PokemonBDSP/Programs/AutoStory/PokemonBDSP_AutoStoryTools.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Battle.h"
+#include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_OverworldMatchers.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Segment_00_tools.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_Autostory_Segment_01_tools.h"
 
@@ -2651,25 +2652,22 @@ static bool go_to_house_west_sunyshore(VideoStream& stream, ProControllerContext
     pbf_move_left_joystick(context, {0, -1}, 6200ms, 100ms); // 31+
     context.wait_for_all_requests();
 
-    force_repel_expiry(stream, context, RepelRenewalChoice::YES, false, true);
-
-    context.wait_for_all_requests();
-
-    pbf_move_left_joystick(context, {+1, 0}, 3000ms, 100ms); // 15+
-
-    dpad.last_dir = DPAD_LEFT;
-    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 9);
-    pbf_move_left_joystick(context, {0, -1}, 8400ms, 100ms); // 42+
+    // Keep the original Super Repel through the grass. Without the expiry
+    // wiggle here, the eastward reset is unnecessary. Preserve the recorded
+    // nine left presses: one facing change followed by eight walking steps.
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 8);
+    // The reviewed crossing leaves the grass about three seconds into this
+    // south leg. Stop at four seconds, in the clearing, and decline renewal.
+    // North/south expiry movement keeps the column for the remaining south hold.
+    pbf_move_left_joystick(context, {0, -1}, 4000ms, 100ms);
+    force_repel_expiry(stream, context, RepelRenewalChoice::NO, true, true);
+    pbf_move_left_joystick(context, {0, -1}, 4400ms, 100ms);
     dpad.last_dir = DPAD_DOWN;
     repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 4);
     repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 5);
-    // TODO(live verification): verify west/east clearance before the long east crossing and its eastern stop.
-    // Planned before the next leg exceeds the 22s Super Repel movement budget.
-    force_repel_expiry(stream, context, RepelRenewalChoice::YES, false, true);
-
+    // Repel is already inactive; continue through the cleared route to Sunyshore.
     pbf_move_left_joystick(context, {+1, 0}, 7400ms, 100ms); // 37+
-
-    force_repel_expiry(stream, context, RepelRenewalChoice::NO, false, true);
 
     context.wait_for_all_requests();
     pbf_move_left_joystick(context, {+1, 0}, 7400ms, 100ms); // 37+
@@ -2865,6 +2863,11 @@ talk_to_volkner_at_the_lighthouse(VideoStream& stream, ProControllerContext& con
     dpad.last_dir = DPAD_DOWN;
     repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 4);
     context.wait_for_all_requests();
+    // The return route clears the elevator building before visual correction.
+    // Align its door column; the indoor camera cannot establish the player's
+    // north/south distance reliably near the room edge. Watch entry below.
+    align_to_overworld_landmarks(stream, context, match_sunyshore_lighthouse_elevator,
+        "Sunyshore lighthouse elevator exit");
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
@@ -3323,11 +3326,11 @@ std::string AutoStory_Segment_08::name() const {
 }
 
 std::string AutoStory_Segment_08::start_text() const {
-    return "Start: Outside Snowpoint Gym at the doorway, facing south, with seventh-badge rewards and dialogue finished, Repel inactive.";
+    return AutoStory_Checkpoint_0801().start_text();
 }
 
 std::string AutoStory_Segment_08::end_text() const {
-    return "Outside Sunyshore Gym at the doorway, with eighth-badge rewards and dialogue finished.";
+    return AutoStory_Checkpoint_0809().end_text();
 }
 
 void AutoStory_Segment_08::run_segment(SingleSwitchProgramEnvironment& env,
@@ -3814,7 +3817,7 @@ std::string AutoStory_Checkpoint_0809::start_text() const {
 }
 
 std::string AutoStory_Checkpoint_0809::end_text() const {
-    return "Outside Sunyshore Gym at the doorway, with eighth-badge rewards and dialogue finished.";
+    return "Outside Sunyshore Gym at the doorway, facing south, with eighth-badge rewards and dialogue finished.";
 }
 
 void AutoStory_Checkpoint_0809::run_checkpoint(SingleSwitchProgramEnvironment& env,

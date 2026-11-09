@@ -14,6 +14,17 @@
 namespace PokemonAutomation {
 namespace NintendoSwitch {
 namespace PokemonBDSP {
+// Shared template matching defaults to grayscale (BGRA -> gray), then
+// TM_CCOEFF_NORMED correlation. It compares intensity structure, not exact
+// RGB pixel values. Normalized correlation tolerates uniform brightness
+// gain/offset when clipping and quantization do not change that structure.
+// LOCAL_CONTRAST additionally divides out slow illumination changes; its
+// references must be normalized on the full source frame before cropping.
+// BLUE_FRACTION is an opt-in color-ratio representation, not grayscale.
+// These choices reduce some lighting/capture differences, but do not prove
+// capture-card independence: unequal channel changes, clipping, gamma and
+// lost detail can still alter matches. Validate held-out captures and
+// negative cases; retain uniqueness and landmark-position agreement gates.
 enum class LandmarkFeatures {
     GRAYSCALE,
     LOCAL_CONTRAST,
@@ -2559,8 +2570,10 @@ OverworldMatchResult match_route204_floaroma_turn(const ImageRGB32& frame){
     // placing it above the player so the westward turn clears its post and
     // the flower-bed fence. Align horizontally with the sign before the
     // subsequent westward route, rather than staying in the eastern lane.
-    for (double scale_x : {1.0, 1.05, 1.10, 1.15, 1.20}){
-        for (double scale_y : {.90, 1.0, 1.10}){
+    // Include the slightly narrower/compressed northbound camera pose.
+    // It preserves the score and uniqueness gates during leftward acquisition.
+    for (double scale_x : {.95, 1.0, 1.05, 1.10, 1.15, 1.20}){
+        for (double scale_y : {.90, .95, 1.0, 1.10}){
             const double w = 140.0 / 1920 * scale_x, h = 57.0 / 1080 * scale_y;
             auto candidate = match_landmarks(frame,
                 {{"Northern Route 204 sign",
@@ -3645,8 +3658,130 @@ OverworldMatchResult match_route215_jogger_corner(const ImageRGB32& frame){
     }
     return best;
 }
+OverworldMatchResult match_oreburgh_gym_entrance(const ImageRGB32& frame){
+    // References cover the centered approach and the recorded west-pillar
+    // stops in sun, cloud shadow, evening and night lighting. The darker
+    // 02:00-03:59 sign uses a separate reference. All use the centered pose.
+    // Only the fixed sign symbol and doorway emblem vote, never the player
+    // or sign lettering. Each needs a unique match and agreeing position.
+    return match_lighting_pair(frame,
+        {{"Gym sign symbol",
+                "PokemonBDSP/Autostory/OreburghGym/SignSymbolAligned.png",
+                {228.0 / 960, 188.0 / 540, 72.0 / 960, 38.0 / 540},
+                {0.05, 0.1, 0.7, 0.65},
+                .93,
+                .15,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Gym doorway emblem",
+                "PokemonBDSP/Autostory/OreburghGym/DoorEmblemAligned.png",
+                {438.0 / 960, 138.0 / 540, 88.0 / 960, 46.0 / 540},
+                {0.2, 0.05, 0.55, 0.6},
+                .93,
+                .15,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Gym sign symbol",
+                "PokemonBDSP/Autostory/OreburghGym/SignSymbolLeftDay.png",
+                {228.0 / 960, 188.0 / 540, 72.0 / 960, 38.0 / 540},
+                {0.05, 0.1, 0.7, 0.65},
+                .93,
+                .15,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Gym doorway emblem",
+                "PokemonBDSP/Autostory/OreburghGym/DoorEmblemLeftDay.png",
+                {438.0 / 960, 138.0 / 540, 88.0 / 960, 46.0 / 540},
+                {0.2, 0.05, 0.55, 0.6},
+                .93,
+                .15,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Gym sign symbol",
+                "PokemonBDSP/Autostory/OreburghGym/SignSymbolLeftShadow.png",
+                {228.0 / 960, 188.0 / 540, 72.0 / 960, 38.0 / 540},
+                {0.05, 0.1, 0.7, 0.65},
+                .93,
+                .15,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Gym doorway emblem",
+                "PokemonBDSP/Autostory/OreburghGym/DoorEmblemLeftShadow.png",
+                {438.0 / 960, 138.0 / 540, 88.0 / 960, 46.0 / 540},
+                {0.2, 0.05, 0.55, 0.6},
+                .93,
+                .15,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Gym sign symbol",
+                "PokemonBDSP/Autostory/OreburghGym/SignSymbolLeftEvening.png",
+                {228.0 / 960, 188.0 / 540, 72.0 / 960, 38.0 / 540},
+                {0.05, 0.1, 0.7, 0.65},
+                .93,
+                .15,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Gym doorway emblem",
+                "PokemonBDSP/Autostory/OreburghGym/DoorEmblemLeftEvening.png",
+                {438.0 / 960, 138.0 / 540, 88.0 / 960, 46.0 / 540},
+                {0.2, 0.05, 0.55, 0.6},
+                .93,
+                .15,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Gym sign symbol",
+                "PokemonBDSP/Autostory/OreburghGym/SignSymbolEarlyMorning.png",
+                {228.0 / 960, 188.0 / 540, 72.0 / 960, 38.0 / 540},
+                {0.05, 0.1, 0.7, 0.65},
+                .93,
+                .15,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Gym sign symbol",
+                "PokemonBDSP/Autostory/OreburghGym/SignSymbolLeftNight.png",
+                {228.0 / 960, 188.0 / 540, 72.0 / 960, 38.0 / 540},
+                {0.05, 0.1, 0.7, 0.65},
+                .93,
+                .15,
+                LandmarkFeatures::LOCAL_CONTRAST},
+            {"Gym doorway emblem",
+                "PokemonBDSP/Autostory/OreburghGym/DoorEmblemLeftNight.png",
+                {438.0 / 960, 138.0 / 540, 88.0 / 960, 46.0 / 540},
+                {0.2, 0.05, 0.55, 0.6},
+                .93,
+                .15,
+                LandmarkFeatures::LOCAL_CONTRAST}},
+        "Gym sign symbol",
+        "Gym doorway emblem",
+        1.0 / 64);
+}
+OverworldMatchResult match_sunyshore_lighthouse_elevator(const ImageRGB32& frame){
+    // Grayscale structure matching: both fixed elevator features must agree.
+    // The room camera clamps vertically near the exit; only infer the door
+    // column. The caller must already be on the clear row south of the lift.
+    auto result = match_landmarks(frame,
+        {{"Elevator indicator",
+                "PokemonBDSP/Autostory/SunyshoreLighthouse/Indicator.png",
+                {846.0 / 1920, 570.0 / 1080, 220.0 / 1920, 66.0 / 1080},
+                {0, 180.0 / 540, 1, 280.0 / 540},
+                .90,
+                .10},
+            {"Elevator call buttons",
+                "PokemonBDSP/Autostory/SunyshoreLighthouse/ButtonPanel.png",
+                {1066.0 / 1920, 652.0 / 1080, 68.0 / 1920, 148.0 / 1080},
+                {0, 180.0 / 540, 1, 280.0 / 540},
+                .90,
+                .10}},
+        2,
+        7.0 / 960,
+        1,
+        true);
+    result.dy = 0;
+    result.at_target = result.located && std::abs(result.dx) <= 7.0 / 960;
+    return result;
+}
 const std::vector<OverworldMatcher>& overworld_matchers(){
     static const std::vector<OverworldMatcher> matchers = {
+        {"sunyshore-lighthouse-elevator", "Sunyshore lighthouse elevator exit (door column)", match_sunyshore_lighthouse_elevator},
+        {"oreburgh-gym", "Oreburgh Gym doorway (sign + emblem)", match_oreburgh_gym_entrance},
+        {"route204-floaroma-turn", "Route 204 north turn toward Floaroma", match_route204_floaroma_turn},
+        {"cycling-road-bridge-approach", "Cycling Road upper platform and right rail", match_cycling_road_bridge_approach},
+        {"route208-lower-stair-lane", "Route 208 lower stair lane", match_route208_lower_stair_lane},
+        {"galactic-hq-cut", "Galactic HQ front Cut bush approach", match_galactic_hq_cut},
+        {"galactic-hq-exterior", "Galactic HQ exterior after exit", match_galactic_hq_exterior},
+        {"eterna-center-departure", "Eterna Pokemon Center departure", match_eterna_center_departure},
+        {"eterna-cycle-shop-entrance", "Eterna bicycle shop entrance", match_eterna_cycle_shop_entrance},
         {"route204-north-approach", "Route 204 left of sign after Tyler", match_route204_north_approach},
         {"teighler-alcove-corner", "Teighler alcove bottom-left corner", match_teighler_alcove_corner},
         {"route204-north-stairs", "Route 204 north stairs junction", match_route204_north_stairs},

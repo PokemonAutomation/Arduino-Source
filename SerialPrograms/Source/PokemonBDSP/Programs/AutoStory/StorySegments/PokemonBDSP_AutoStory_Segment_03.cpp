@@ -759,7 +759,7 @@ static void eterna_mart_escape_ropes(VideoStream& stream, ProControllerContext& 
     segment03_doorway(stream, context, true, 896ms, "Eterna Mart entrance");
     // Standard Mart layout: walk north from the entrance to the clerk.
     pbf_move_left_joystick(context, {0, 1}, 885ms, 300ms);
-    if (!buy_items(stream, context, {{ShopItem::EscapeRope, 3}})){
+    if (!buy_items(stream, context, {{ShopItem::EscapeRope, 3}}, Language::English, DPAD_UP)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Eterna Mart: Could not buy 3 Escape Ropes.",
             stream);
@@ -2745,10 +2745,10 @@ std::string AutoStory_Segment_03::name() const {
     return "03: Second Badge to Third Badge";
 }
 std::string AutoStory_Segment_03::start_text() const {
-    return "Start: Second Gym Badge acquired (Eterna City).";
+    return AutoStory_Checkpoint_0301().start_text();
 }
 std::string AutoStory_Segment_03::end_text() const {
-    return "End: Inside Veilstone Gym in front of Maylene, facing north, after acquiring the third badge and clearing her reward dialogue.";
+    return AutoStory_Checkpoint_0307().end_text();
 }
 
 void AutoStory_Segment_03::run_segment(SingleSwitchProgramEnvironment& env,
@@ -2776,7 +2776,7 @@ std::string AutoStory_Checkpoint_0301::name() const {
     return "03.01 - Eterna Gym to Jupiter";
 }
 std::string AutoStory_Checkpoint_0301::start_text() const {
-    return "Outside Eterna Gym after defeating Gardenia and acquiring the Forest Badge.";
+    return "Outside Eterna Gym after defeating Gardenia and acquiring the Forest Badge, facing south with reward dialogue finished.";
 }
 std::string AutoStory_Checkpoint_0301::end_text() const {
     return "Outside Eterna Galactic HQ after defeating Jupiter and completing the rescue dialogue, facing south against the uncut front bush.";

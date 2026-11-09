@@ -1122,10 +1122,10 @@ std::string AutoStory_Segment_00::name() const {
     return "00: Intro to Poketch";
 }
 std::string AutoStory_Segment_00::start_text() const {
-    return "Start: Game launched, Standing in the player's room after tv stops playing";
+    return AutoStory_Checkpoint_0000().start_text();
 }
 std::string AutoStory_Segment_00::end_text() const {
-    return "End: Poketch received; standing at the Jubilife Pokemon Center PC, ready to deposit the starter for the HOME transfer.";
+    return AutoStory_Checkpoint_0006().end_text();
 }
 void AutoStory_Segment_00::run_segment(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -1156,7 +1156,7 @@ std::string AutoStory_Checkpoint_0000::name() const {
     return "00.00 - Verify Settings";
 }
 std::string AutoStory_Checkpoint_0000::start_text() const {
-    return "Standing in the initial bedroom before beginning the tutorial.";
+    return "Standing in the player's bedroom immediately after the opening TV scene, before moving, with menus and dialogue closed.";
 }
 std::string AutoStory_Checkpoint_0000::end_text() const {
     return "Required game settings verified and saved; ready for 00.01.";
@@ -1358,7 +1358,7 @@ std::string AutoStory_Checkpoint_0006::start_text() const {
     return AutoStory_Checkpoint_0005().end_text();
 }
 std::string AutoStory_Checkpoint_0006::end_text() const {
-    return "Standing at the Jubilife Pokemon Center PC with the Poketch received, ready to deposit the starter.";
+    return "Standing in front of the Jubilife Pokemon Center PC, facing north with menus closed, after receiving the Poketch. The tutorial stops here for team preparation.";
 }
 void AutoStory_Checkpoint_0006::run_checkpoint(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,

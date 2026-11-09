@@ -5,6 +5,7 @@
  */
 
 #include <algorithm>
+#include <cmath>
 #include <opencv2/imgproc.hpp>
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -261,6 +262,15 @@ BattleMoveMenuState detect_battle_move_menu(const ImageViewRGB32& screen){
     }
     if (panels.empty() || panels.size() > 4) return result;
     std::sort(panels.begin(), panels.end(), [](const cv::Rect& a, const cv::Rect& b){ return a.y < b.y; });
+    // Move lists are bottom-aligned, including one- and two-move lists.
+    // Wake's waterfall can look like a single white PP panel near the top
+    // of the search area during an attack. Require the final panel at the
+    // bottom of the menu before reporting any available moves.
+    const cv::Rect& last = panels.back();
+    const double menu_bottom = search.y + (double)(last.y + last.height) / screen.height();
+    if (std::abs(menu_bottom - 0.975) > 0.025){
+        return result;
+    }
     // Reject inconsistent/overlapping geometry rather than count noise as moves.
     for (size_t i = 1; i < panels.size(); i++) {
         if (panels[i].y <= panels[i - 1].y + panels[i - 1].height ||

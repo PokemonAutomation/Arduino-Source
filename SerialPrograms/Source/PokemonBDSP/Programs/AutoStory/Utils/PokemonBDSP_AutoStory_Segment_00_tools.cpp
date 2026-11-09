@@ -1361,8 +1361,8 @@ static void fight_using_move_list(VideoStream& stream,
                         stream);
                 }
             }
-            // A blackout also produces an exit fade. Do not let a failed League
-            // battle advance the checkpoint and save over its recovery position.
+            // A blackout also produces an exit fade. When an opponent count is
+            // supplied, require every defeat before continuing the route.
             if (expected_opponents != 0 && opponents_defeated != expected_opponents){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     label + ": Battle exited after " + std::to_string(opponents_defeated) +
@@ -1464,6 +1464,8 @@ void align_to_overworld_landmarks(VideoStream& stream,
     BattleMenuDetector battle(BattleType::TRAINER, COLOR_GREEN);
     size_t confirmations = 0, missing = 0;
     bool ace_bypass = false;
+    bool plaza_located = false;
+    const bool lighthouse_exit = matcher == match_sunyshore_lighthouse_elevator;
     const bool route215_renewal = matcher == match_route215_bridge_renewal || matcher == match_route215_ace_renewal ||
         matcher == match_route215_derek_stairs_renewal || matcher == match_route215_derek_stair_top_renewal;
     Milliseconds correction_movement = 0ms;
@@ -1514,6 +1516,7 @@ void align_to_overworld_landmarks(VideoStream& stream,
         }
         const auto result = matcher(*frame.frame);
         if (result.located){
+            plaza_located |= matcher == match_jubilife_plaza_approach;
             missing_rocks_since = std::chrono::steady_clock::time_point::max();
         }
         VideoOverlaySet overlays(stream.overlay());
@@ -1582,6 +1585,14 @@ void align_to_overworld_landmarks(VideoStream& stream,
                 coarse_horizontal = a.accepted && b.accepted && a.dx * b.dx > 0 && nearest > 1.0 / 64 &&
                     nearest > 2 * std::abs(a.dx - b.dx);
             }
+            // From the west, recover the Center doorway row before crossing
+            // its column. A perspective match may guide travel, not arrival.
+            // A strong emblem match can still be beside the west wall.
+            // Restore the clear doorway row before any eastward correction,
+            // regardless of whether the match is coarse or precise.
+            const bool floaroma_row_recovery = matcher == match_floaroma_center_entrance && result.dy > 1.0 / 36;
+            const bool floaroma_anchor_horizontal = matcher == match_floaroma_center_entrance && result.coarse &&
+                std::abs(result.dy) <= 1.0 / 36 && std::abs(result.dx) > 1.0 / 64;
             const bool plaza_anchor_horizontal = matcher == match_jubilife_plaza_approach && result.coarse &&
                 std::abs(result.dx) > 1.0 / 50 && std::abs(result.dy) <= 1.0 / 54;
             // A uniquely matched Eterna ball may correct the door
@@ -1613,8 +1624,8 @@ void align_to_overworld_landmarks(VideoStream& stream,
                 matcher == match_route208_stair_top && !result.coarse && std::abs(result.dx) <= 1.0 / 64;
             const bool horizontal = !ace_row_recovery && !ace_central_row &&
                 (ace_bypass ||
-                    (!contest_row_recovery && !gym_row_recovery && !jupiter_row_recovery &&
-                        (jupiter_anchor_horizontal || coarse_horizontal || plaza_anchor_horizontal ||
+                    (!floaroma_row_recovery && !contest_row_recovery && !gym_row_recovery && !jupiter_row_recovery &&
+                        (jupiter_anchor_horizontal || coarse_horizontal || plaza_anchor_horizontal || floaroma_anchor_horizontal ||
                             eterna_anchor_horizontal || gym_anchor_horizontal ||
                             (!result.coarse &&
                                 ((horizontal_first && !stair_fine_correction && std::abs(result.dx) > 1.0 / 128) ||
@@ -1650,10 +1661,10 @@ void align_to_overworld_landmarks(VideoStream& stream,
                     }
                 }
             }
-            if (route215_renewal){
+            if (route215_renewal || lighthouse_exit){
                 if (correction_movement + duration > 1500ms){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        label + ": Renewal alignment movement budget exhausted.",
+                        label + ": Alignment movement budget exhausted.",
                         stream);
                 }
                 correction_movement += duration;
@@ -1665,8 +1676,12 @@ void align_to_overworld_landmarks(VideoStream& stream,
             pbf_wait(context, 500ms);
         }else{
             confirmations = 0;
-            if (matcher == match_hearthome_center_entrance || matcher == match_hearthome_contest_fantina ||
-                matcher == match_veilstone_city_passage || matcher == match_veilstone_dawn_stairs || route215_renewal){
+            if (plaza_located || matcher == match_floaroma_center_entrance ||
+                matcher == match_hearthome_center_entrance || matcher == match_hearthome_contest_fantina ||
+                matcher == match_veilstone_city_passage || matcher == match_veilstone_dawn_stairs ||
+                route215_renewal || lighthouse_exit){
+                // Once the plaza is acquired, wait out passing cloud shadows
+                // instead of abandoning a near-target pose for a blind sweep.
                 // Do not sweep into a different doorway or around the Hall's
                 // side, or onto a Veilstone terrace, while required anchors are hidden.
                 if (++missing > 20){
@@ -1813,9 +1828,16 @@ void fight_trainer_using_moves(VideoStream& stream,
         }
         break;
     case StarterChoice::CHIMCHAR:
+        // Generic parties can contain Flying types or Levitate users. Reserve
+        // Earthquake for the specific matchups below instead of a blind fallback.
+        priorities = {1, 2, 4};
         // Recorded single-trainer parties have a fixed send-out order.
         // Preserve noncontact PP for the summit without spending it on normal foes.
-        if (label == "coronet_ascent_grunt_3"){
+        if (label == "coronet_ascent_landing_grunt" || label == "coronet_ascent_grunt_2"){
+            // Beautifly and the Dustox/Golbat party take Electric damage. Save
+            // four Flamethrower PP for the remaining ascent and summit script.
+            priorities = {1, 2};
+        }else if (label == "coronet_ascent_grunt_3"){
             priorities = {1, 2};
             ordered_moves = true;
         }else if (label == "coronet_ascent_grunt_4"){
@@ -1824,8 +1846,7 @@ void fight_trainer_using_moves(VideoStream& stream,
         }else if (label == "coronet_ascent_grunt_6"){
             priorities = {2, 2, 1};
             ordered_moves = true;
-        }else if (label.find("coronet_ascent_grunt_") == 0 || label == "coronet_ascent_landing_grunt" ||
-            label == "spear_pillar_cyrus"){
+        }else if (label.find("coronet_ascent_grunt_") == 0 || label == "spear_pillar_cyrus"){
             // Bronzor and the flying/bug parties must not receive a Ground or
             // Fighting fallback when the noncontact slot's PP is exhausted.
             priorities = {2};
@@ -1834,25 +1855,63 @@ void fight_trainer_using_moves(VideoStream& stream,
             ordered_moves = true;
         }else if (label == "spear_pillar_grunts"){
             priorities = {3, 2, 1, 4};
+        }else if (label == "Byron" ||
+            (label.find("Canalave Gym trainer ") == 0 && label != "Canalave Gym trainer 5")){
+            // Onix/Steelix block Electric; Byron's Bronzor also blocks Ground.
+            priorities = {2, 4};
+        }else if (label == "route_210_ace_ernest" || label == "route_217_blackbelt_luke"){
+            // Both mixed parties contain Onix. Ernest also has Flying Mothim.
+            priorities = {2, 4};
+        }else if (label == "Barry in Hearthome" || label == "pastoria_clint" || label == "canalave_clint"){
+            // The Chimchar-route rival has Flash Fire Ponyta and a Flying lead.
+            // Neither Fire nor Ground is a safe whole-party fallback.
+            priorities = {1, 4};
         }else if (label == "Fantina" || label.find("psychic_") != std::string::npos ||
             label.find("Psychics ") != std::string::npos){
             // Psychic/Ghost parties rule out Fighting slots; Levitate users also
             // rule out Earthquake. Do not spend a different slot on exhaustion.
             priorities = {2};
-        }else if (label == "pokemon_league_rival"){
-            // Staraptor, Snorlax, Empoleon, Roserade, Rapidash, Heracross.
-            // Quick Claw + Charm can make Empoleon take multiple hits.
-            priorities = {1, 4, 3, 2, 3, 2};
+        }else if (label == "Snowpoint Gym Ace Trainer Isaiah" || label == "route_222_sailor_luther" ||
+            label == "victory_road_dragontamer_andre"){
+            // These parties contain Ground types. Every fallback must damage
+            // Quagsire, Gastrodon or Gabite; Brick Break also covers Luther's other foes.
+            priorities = {4, 3, 2};
+        }else if (label == "victory_road_ace_sydney" || label == "victory_road_veteran_clayton"){
+            // Fire covers both mixed parties, including Torterra and Hippowdon.
+            // Do not fall back to Thunder Punch when Flamethrower runs out.
+            priorities = {2, 4};
+        }else if (label == "victory_road_veteran_edgar"){
+            // Tentacruel, Golem and Empoleon all take Ground damage.
+            // Reuse Earthquake if Sturdy leaves Golem alive.
+            priorities = {3, 4, 2};
+        }else if (label == "Snowpoint Gym Ace Trainer Brenna" || label == "Candice"){
+            // Fire covers Snover and the Ice team; it also hits Medicham.
+            priorities = {2, 4, 1};
+        }else if (label == "Crasher Wake"){
+            // Gyarados leads; Quagsire and Floatzel may follow in either order.
+            // After the first confirmed KO, use Brick Break against both.
+            // Thunder Punch cannot damage Quagsire because it is Ground-type.
+            priorities = {1, 4, 4};
             ordered_moves = true;
             advance_on_experience = true;
+        }else if (label == "pokemon_league_rival"){
+            // Species confirmation below avoids Flying and Flash Fire immunities
+            // if the rival changes its send-out order.
+            priorities = {1};
         }else if (grass_gym || fighting_battle || label == "Maylene" ||
             label == "Route 215 Ruin Maniac Calvin" ||
-            label == "Bug Catchers Donald and Phillip" || label == "victory_road_ace_sydney"){
+            label == "Bug Catchers Donald and Phillip"){
             priorities = {2, 1, 4};
         }else if (flying_battle){
             priorities = {1, 4, 2};
-        }else if (water_battle || rock_battle){
-            priorities = {1, 4, 3, 2};
+        }else if (rock_battle || label == "Camper Zackary" ||
+            label == "Mount Coronet approach encounter" || label.find("Hearthome west gate") == 0){
+            // Hiker Justin mixes Geodude with Levitate Bronzor. Keep every
+            // fallback usable against both rather than switching to Ground.
+            priorities = {4, 2};
+        }else if (water_battle){
+            // The routed swimmers and Pastoria trainers include Flying types.
+            priorities = {1, 4, 2};
         }
         break;
     case StarterChoice::PIPLUP:
@@ -1902,12 +1961,8 @@ void fight_trainer_using_moves(VideoStream& stream,
     }else if (label == "elite_four_flint"){
         switch (stats.starter_choice){
         case StarterChoice::CHIMCHAR:
-            // First-test order observed in the recording:
-            // Rapidash, Lopunny, Steelix, Drifblim, Infernape.
-            // Repeat on surviving opponents; advance only after experience.
-            priorities = {3, 4, 2, 1, 3};
-            ordered_moves = true;
-            advance_on_experience = true;
+            // The species-confirmed plan below selects the reviewed move.
+            priorities = {3};
             break;
         case StarterChoice::TURTWIG:
             priorities = {1};
@@ -1940,10 +1995,41 @@ void fight_trainer_using_moves(VideoStream& stream,
         // Avoid contact-status abilities without inventing PP after each fight.
         priorities = {3, 2};
     }
+    if (stats.starter_choice == StarterChoice::CHIMCHAR){
+        // These parties have no contact-status ability. Preserve the shared
+        // Earthquake/Flamethrower budget for the rest of Sunyshore Gym.
+        if (label == "Sunyshore Gym School Kid Forrest"){
+            priorities = {1, 2};
+        }else if (label == "Sunyshore Gym Guitarist Preston"){
+            priorities = {4, 2};
+        }
+    }
     BattleSetupPlan setup;
     setup.language = language;
     if (stats.starter_choice == StarterChoice::CHIMCHAR){
-        if (label == "elite_four_aaron"){
+        if (label == "pokemon_league_rival"){
+            setup.moves = {
+                {"staraptor", 1},
+                {"snorlax", 4},
+                {"empoleon", 3},
+                {"roserade", 2},
+                {"rapidash", 3},
+                {"heracross", 2},
+            };
+        }else if (label == "victory_road_veteran_clayton"){
+            // Confirm each opponent so Electric never targets Ground-type Hippowdon.
+            setup.moves = {
+                {"staraptor", 1},
+                {"hippowdon", 2},
+            };
+        }else if (label == "victory_road_dragontamer_clinton"){
+            // Gyarados can be sent between either Gible. Confirm the species
+            // before choosing Electric or Fighting instead of assuming an order.
+            setup.moves = {
+                {"gible", 4},
+                {"gyarados", 1},
+            };
+        }else if (label == "elite_four_aaron"){
             setup.moves = {
                 {"dustox", 2},
                 {"beautifly", 1},
@@ -1962,6 +2048,26 @@ void fight_trainer_using_moves(VideoStream& stream,
                 {"golem", 4},
                 {"sudowoodo", 4},
                 {"hippowdon", 2},
+            };
+        }else if (label == "elite_four_flint"){
+            // Keep the reviewed moves, but do not let a different send-out order
+            // put Thunder Punch into Steelix or Earthquake into Drifblim.
+            setup.moves = {
+                {"rapidash", 3},
+                {"lopunny", 4},
+                {"steelix", 2},
+                {"drifblim", 1},
+                {"infernape", 3},
+            };
+        }else if (label == "elite_four_lucian"){
+            // Physical hits remove the screen setters before Light Screen can
+            // exhaust the shared League Flamethrower budget. Bronzong levitates.
+            setup.moves = {
+                {"mr-mime", 3},
+                {"girafarig", 4},
+                {"medicham", 2},
+                {"alakazam", 1},
+                {"bronzong", 2},
             };
         }else if (label == "champion_cynthia"){
             // Planned for the still-pending Champion route. Set up before
@@ -1992,7 +2098,11 @@ void fight_trainer_using_moves(VideoStream& stream,
         advance_on_experience,
         label == "elite_four_aaron" || label == "elite_four_bertha" ||
             label == "elite_four_flint" || label == "elite_four_lucian" ? 5 :
-            label == "champion_cynthia" ? 6 : 0,
+            label == "champion_cynthia" || label == "pokemon_league_rival" ? 6 :
+            label == "route_222_sailor_luther" || label == "victory_road_veteran_edgar" ||
+                label == "victory_road_dragontamer_clinton" ? 3 :
+            label == "victory_road_ace_sydney" || label == "victory_road_veteran_clayton" ? 2 :
+            label == "victory_road_dragontamer_andre" ? 1 : 0,
         !setup.moves.empty() ? &setup : nullptr);
 }
 
