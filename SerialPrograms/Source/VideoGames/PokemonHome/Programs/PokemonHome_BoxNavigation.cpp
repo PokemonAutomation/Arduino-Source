@@ -19,17 +19,16 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon/Inference/Pokemon_TypeReader.h"
-#include "VideoGames/PokemonHome/Inference/PokemonHome_BallReader.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_AlphaDetector.h"
+#include "VideoGames/PokemonHome/Inference/PokemonHome_BallReader.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_BoxGenderDetector.h"
+#include "VideoGames/PokemonHome/Inference/PokemonHome_BoxViewDetector.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_GigantamaxDetector.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_OriginMarkReader.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_ShinyDetector.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_SummaryReader.h"
-#include "VideoGames/PokemonHome/Inference/PokemonHome_SummaryScreenDetector.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_TeraTypeReader.h"
 #include "PokemonHome_BoxNavigation.h"
-#include "VideoGames/PokemonHome/Inference/PokemonHome_BoxViewDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

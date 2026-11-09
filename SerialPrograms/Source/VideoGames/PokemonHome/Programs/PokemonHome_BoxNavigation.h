@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonHome_BoxNavigation_H
 
 #include <array>
-#include <cstddef>
 #include <optional>
 #include <vector>
 #include "Common/Cpp/Time.h"
