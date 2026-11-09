@@ -16,6 +16,7 @@
 #include "Pokemon/Pokemon_BoxCursor.h"
 #include "Pokemon/Pokemon_CollectedPokemonInfo.h"
 #include "Pokemon/Options/Pokemon_BoxSortingTable.h"
+#include "VideoGames/PokemonHome/Inference/PokemonHome_SelectionArrowDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -61,7 +62,10 @@ void print_boxes_data(
     SingleSwitchProgramEnvironment& env
 );
 
-void exit_menus(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::chrono::milliseconds video_delay);
+// Backout of any menus to the box view.
+void exit_menus(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+void switch_selection_mode(SingleSwitchProgramEnvironment& env, ProControllerContext& context, BoxSelectionMode desired_mode);
 
 }
 }

@@ -552,7 +552,8 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
         );
     }
 
-    exit_menus(env, context, VIDEO_DELAY.get());
+    exit_menus(env, context);
+    switch_selection_mode(env, context, BoxSelectionMode::Normal);
 
     nav_cursor = populate_box_data(env, context, sort_preferences, living_dex_boxes_data, living_dex_box_count, nav_cursor, OT_NAME_LANGUAGE);
 
