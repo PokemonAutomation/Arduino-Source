@@ -175,12 +175,10 @@ static void segment03_register_bike(VideoStream& stream, ProControllerContext& c
     stream.log("[Eterna Bike] Registration inputs sent; preserving the reward's mounted state.", COLOR_GREEN);
 }
 
-// Stop at the completed doorway transition, rather than spending the
-// remaining movement budget inside the next map.
-// Recorded Cycling Road movement may cross a gate before its budget ends.
-// Cancel at either fade color and resume only after that fade has cleared.
-// Recover the successful descent endpoint before spending eastward travel.
-// Correct height first, while still west of the honey-tree collision column.
+// Stop at a completed doorway transition so remaining outdoor movement cannot run inside the next
+// map. Cancel at either fade color and resume only after the fade clears. Recover the descent
+// endpoint before moving east. Correct height while still west of the honey-tree collision
+// column.
 static void segment03_align_lower_stair_lane(VideoStream& stream, ProControllerContext& context){
     size_t confirmations = 0, missing = 0;
     for (size_t observation = 0; observation < 40; observation++){
@@ -345,8 +343,8 @@ static bool segment03_align_cycle_start(VideoStream& stream, ProControllerContex
                 }
             }else{
                 confirmed = 0;
-                // Align against the rail first. The demonstrated target is
-                // on the stationary upper white platform, before gravity.
+                // Align against the rail on the stationary upper white platform, before the
+                // downhill section.
                 if (std::abs(match.dx) > .012){
                     x = match.dx > 0 ? 1 : -1;
                     hold = std::abs(match.dx) > .04 ? 320ms : 240ms;
@@ -487,9 +485,6 @@ static void segment03_doorway(VideoStream& stream,
 }
 
 void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
-    auto fight = [&](const std::string& label, bool post_battle_dialogue_cleanup = false){
-        fight_trainer_using_moves(stream, context, stats, label, post_battle_dialogue_cleanup);
-    };
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1060ms, 0ms);
     pbf_wait(context, 225ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 4232ms, 0ms);
@@ -582,8 +577,8 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context, A
     }
     clear_dialog(stream, context, BUTTON_A, 6000ms);
     context.wait_for_all_requests();
-    // Cut succeeds, but the Center exit can leave us one tile west of
-    // the HQ doorway. Do not replay the interior route against its wall.
+    // The Center exit can leave the player one tile west of the HQ doorway. Confirm entry before
+    // starting the interior route.
     BlackScreenWatcher hq_entering;
     const int hq_entry = run_until<ProControllerContext>(stream,
         context,
@@ -625,7 +620,7 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context, A
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 1246ms, 0ms);
     pbf_wait(context, 2989ms);
     pbf_press_button(context, BUTTON_A, 150ms, 250ms);
-    fight("Galactic HQ entrance grunts", false);
+    fight_trainer_using_moves(stream, context, stats, "Galactic HQ entrance grunts", false);
     // With one usable Pokemon these grunts battle consecutively. The next
     // intro can outlast the ordinary dialogue quiet period. Keep movement
     // stopped and reuse the battle handler only if its command menu appears.
@@ -639,7 +634,7 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context, A
         {{hq_next_grunt}});
     if (hq_next_battle == 0){
         stream.log("[Galactic HQ] Second entrance grunt detected before stair movement.");
-        fight("Galactic HQ second entrance grunt", false);
+        fight_trainer_using_moves(stream, context, stats, "Galactic HQ second entrance grunt", false);
     }
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 580ms, 0ms);
     pbf_wait(context, 220ms);
@@ -658,7 +653,7 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context, A
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 744ms, 0ms);
     pbf_wait(context, 2084ms);
     pbf_press_button(context, BUTTON_A, 150ms, 250ms);
-    fight("Galactic HQ upper-floor grunt", false);
+    fight_trainer_using_moves(stream, context, stats, "Galactic HQ upper-floor grunt", false);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 2119ms, 0ms);
     pbf_wait(context, 903ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 263ms, 0ms);
@@ -666,7 +661,7 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context, A
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 342ms, 0ms);
     pbf_wait(context, 1806ms);
     pbf_press_button(context, BUTTON_A, 150ms, 250ms);
-    fight("Galactic HQ Scientist", false);
+    fight_trainer_using_moves(stream, context, stats, "Galactic HQ Scientist", false);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 425ms, 0ms);
     pbf_wait(context, 161ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 723ms, 0ms);
@@ -700,7 +695,7 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context, A
             "Galactic HQ: Jupiter interaction did not reach the battle menu.",
             stream);
     }
-    fight("Commander Jupiter", true);
+    fight_trainer_using_moves(stream, context, stats, "Commander Jupiter", true);
     // Jupiter's departure and the rescued family have chained dialogue.
     clear_dialog(stream, context, BUTTON_A, 6000ms);
     stream.log("[Galactic HQ] Rescue dialogue cleared; following recorded exit.", COLOR_GREEN);
@@ -743,7 +738,6 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context, A
             stream);
     }
     segment03_finish_transition(stream, context, "Galactic HQ exit");
-    segment03_confirm_location(stream, context, match_galactic_hq_exterior, "Galactic HQ exterior");
     // Clamp against the uncut front bush; checkpoint 03.02 starts here.
     pbf_move_left_joystick(context, {0, -1}, 350ms, 500ms);
     context.wait_for_all_requests();
@@ -751,7 +745,6 @@ void eterna_gym_to_jupiter(VideoStream& stream, ProControllerContext& context, A
 }
 static void eterna_mart_escape_ropes(VideoStream& stream, ProControllerContext& context){
     stream.log("[Eterna Mart] Buying exactly 3 Escape Ropes after the Jupiter heal.");
-    // Recorded Center-exit to Mart-door path (eternamart1.txt).
     pbf_move_left_joystick(context, {0, -1}, 2713ms, 0ms);
     pbf_wait(context, 444ms);
     pbf_move_left_joystick(context, {1, 0}, 587ms, 0ms);
@@ -864,9 +857,8 @@ void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context, Auto
     pbf_wait(context, 403ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 642ms, 0ms);
     pbf_wait(context, 14ms);
-    // The recorded approach reaches the keeper even when the exact
-    // counter reference pose differs. Start talking before any reward wait.
-    // Cancel Up immediately on dialogue; all subsequent inputs are A only.
+    // The approach reaches the keeper even if the exact counter pose differs. Start talking
+    // before waiting for the reward. Cancel Up immediately on dialogue; use only A afterward.
     context.wait_for_all_requests();
     ShortDialogWatcher keeper_dialogue;
     if (run_until<ProControllerContext>(stream,
@@ -1011,17 +1003,17 @@ void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context, Auto
     }
     pbf_wait(context, 6000ms);
     stream.log("[Route 207 Dawn] Dialogue cleared; continuing to Camper Anthony.", COLOR_GREEN);
-    // restof206.txt begins after Dawn. Recorded battle/menu inputs are
-    // replaced by the encounter watchers and existing move-2 battle engine.
+    // Start after Dawn. Encounter watchers and the move-2 battle handler manage battles and
+    // menus.
     segment03_expected_encounter(stream, context, stats, "Route 207 Camper Anthony", [](ProControllerContext& ctx){
         pbf_move_left_joystick(ctx, {0, -1}, 1013ms, 1667ms);
         pbf_move_left_joystick(ctx, {1, 0}, 3309ms, 1011ms);
     });
-    // The recorded approach triggers Lauren next without further steering.
+    // The approach triggers Lauren without further steering.
     segment03_expected_encounter(stream, context, stats, "Route 207 Picnicker Lauren", [](ProControllerContext&){
     });
-    // Justin can be dodged. After the recorded approach, wait three seconds
-    // for an encounter; otherwise keep the remaining Coronet route.
+    // Justin can be dodged. After the approach, wait three seconds for an encounter; otherwise
+    // continue toward Coronet.
     segment03_expected_encounter(
         stream,
         context, stats,
@@ -1033,8 +1025,8 @@ void jupiter_to_coronet(VideoStream& stream, ProControllerContext& context, Auto
         },
         3000ms,
         false);
-    // Keep the recorded route after Justin; replace its final blind doorway
-    // excerpt with the same watched down/right search used at Oreburgh Gate.
+    // Continue after Justin, then use the watched down/right doorway search from Oreburgh Gate
+    // for the final entry.
     bool coronet_entered = segment03_cycling_move(stream, context, stats, 1, 0, 942ms, 443ms, "Mount Coronet approach");
     if (!coronet_entered){
         coronet_entered = segment03_cycling_move(stream, context, stats, 0, -1, 776ms, 119ms, "Mount Coronet approach");
@@ -1251,9 +1243,8 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context, A
     context.wait_for_all_requests();
     if (rock_acquisition_timed_out){
         stream.log("[Route 208 stair fallback] Using east 2000ms, southwest 1500ms, then south trial 1650ms.");
-        // Keep the recorded inputs explicit for review and calibration.
-        // Watch this whole recovery phase; cancel its remaining inputs if
-        // a transition or battle starts before the gate approach.
+        // Watch the entire recovery phase and cancel remaining inputs if a transition or battle
+        // starts before the gate approach.
         BlackScreenWatcher fallback_black;
         WhiteScreenWatcher fallback_white;
         BattleMenuWatcher fallback_battle(BattleType::TRAINER);
@@ -1266,7 +1257,7 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context, A
                 // Southwest: drag toward the stair column.
                 pbf_move_left_joystick(ctx, {-1, -1}, 1500ms, 0ms);
                 ctx.wait_for_all_requests();
-                // South: user-requested 1650ms trial; recovery may start farther down the stairs.
+                // Move south for 1650ms. Recovery may start farther down the stairs.
                 pbf_move_left_joystick(ctx, {0, -1}, 1650ms, 0ms);
                 pbf_wait(ctx, 643ms);
                 ctx.wait_for_all_requests();
@@ -1279,8 +1270,8 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context, A
                 stream);
         }
     }else{
-        // Pass just above the honey tree, between the southern trainer
-        // and Hannah to the north. Calibrate this 1825ms trial from video.
+        // Pass above the honey tree, between the southern trainer and Hannah. Validate the 1825ms
+        // descent endpoint.
         pbf_move_left_joystick(context, {0.000000, -1.000000}, 1825ms, 0ms);
         pbf_wait(context, 643ms);
     }
@@ -1319,8 +1310,7 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context, A
             "Hearthome Buneary approach: Unexpected extra transition.",
             stream);
     }
-    // Begin the scene deadline after the approach requests finish, not
-    // while the recorded movement and neutral waits remain queued.
+    // Start the scene deadline after approach requests and neutral waits finish.
     context.wait_for_all_requests();
     ShortDialogWatcher buneary_dialogue;
     if (wait_until(stream, context, 15s, {{buneary_dialogue}}) != 0){
@@ -1353,9 +1343,8 @@ void coronet_to_heartholme(VideoStream& stream, ProControllerContext& context, A
     pbf_move_left_joystick(context, {1, 0}, 500ms, 0ms);
     context.wait_for_all_requests();
     force_repel_expiry(stream, context, RepelRenewalChoice::NO, false, true);
-    // Use the same whole-approach watcher as the Eterna bicycle shop.
-    // A doorway reached during recorded travel or alignment cancels all
-    // remaining outdoor inputs; the room must then be confirmed visually.
+    // Use the whole-approach watcher from the Eterna bicycle shop. Entry during travel or
+    // alignment cancels remaining outdoor inputs; confirm the room visually afterward.
     bool center_entered = false;
     BlackScreenWatcher center_transition;
     const int center_entry = run_until<ProControllerContext>(stream,
@@ -1526,7 +1515,6 @@ void heartholme_to_lost_tower(VideoStream& stream, ProControllerContext& context
             "Hearthome Contest Hall checkpoint start: Overworld not ready.",
             stream);
     }
-    // butters' recorded Contest Hall-to-rival route.
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1294ms, 0ms);
     pbf_wait(context, 132ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 3255ms, 0ms);
@@ -1536,7 +1524,6 @@ void heartholme_to_lost_tower(VideoStream& stream, ProControllerContext& context
     pbf_wait(context, 456ms);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1065ms, 0ms);
     fight_trainer_using_moves(stream, context, stats, "Barry in Hearthome", true);
-    // butters' recorded rival-to-Lost Tower route.
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1088ms, 0ms);
     pbf_wait(context, 95ms);
     context.wait_for_all_requests();
@@ -1595,7 +1582,7 @@ void heartholme_to_lost_tower(VideoStream& stream, ProControllerContext& context
     stream.log("[Hearthome east gate] Entry and exit transitions finished.", COLOR_GREEN);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1128ms, 0ms);
     pbf_wait(context, 7266ms);
-    // Use the existing Bag helper instead of replaying recorded menu inputs.
+    // Use the Bag helper to handle menu navigation.
     if (!activate_repel(stream, context, 8, 0)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Route 209: Repel activation failed.",
@@ -1618,7 +1605,7 @@ void heartholme_to_lost_tower(VideoStream& stream, ProControllerContext& context
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 612ms, 0ms);
     pbf_wait(context, 1001ms);
     context.wait_for_all_requests();
-    // butters' marked road pose: sign frame and rock pair.
+    // Road alignment uses the sign frame and rock pair.
     align_to_overworld_landmarks(stream,
         context,
         match_route209_repel_point,
@@ -1751,9 +1738,9 @@ void lost_tower(VideoStream& stream, ProControllerContext& context, AutoStorySta
             stream);
     }
 
-    // butters' route, using the same counted D-pad steps as the Eterna Gym.
-    // Counts include one facing press whenever the commanded direction changes.
-    // Keep the same direction across a dialogue stop without another facing press.
+    // Use counted D-pad steps as in the Eterna Gym. Counts include one facing press whenever
+    // direction changes. Keep the same direction across a dialogue stop without another facing
+    // press.
     struct Move {
         DpadPosition dir;
         int count;
@@ -2064,7 +2051,7 @@ void lost_tower(VideoStream& stream, ProControllerContext& context, AutoStorySta
 }
 
 void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
-    // Recorded Tower-to-Gym path; shared helpers handle prompts and battles.
+    // Tower-to-Gym path; shared helpers handle prompts and battles.
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 336ms, 0ms);
     pbf_wait(context, 590ms);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 327ms, 0ms);
@@ -2101,9 +2088,8 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
     pbf_wait(context, 421ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 2327ms, 0ms);
     pbf_wait(context, 71ms);
-    // Expiry can interrupt this eastward leg or the following north turn.
-    // Renew on the clear strip, then repeat the recorded eastward alignment
-    // against the trees before taking the uninterrupted north leg.
+    // Expiry can interrupt the eastward leg or following north turn. Renew on the clear strip,
+    // then realign east against the trees before taking the uninterrupted north leg.
     force_repel_expiry(stream, context, RepelRenewalChoice::YES, false, true);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 2327ms, 0ms);
     pbf_wait(context, 71ms);
@@ -2205,9 +2191,9 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
                     "Route 215 jogger: Repeated unexpected encounter.",
                     stream);
             }
-            // The recorded failure is the jogger's trainer introduction.
-            // Complete it with the shared move-list handler, then measure
-            // the current lane again; the trainer may have approached us.
+            // The jogger can interrupt with a trainer introduction. Complete it with the
+            // move-list battle handler, then measure the lane again; the trainer may have
+            // approached the player.
             fight_trainer_using_moves(stream, context, stats, "Route 215 jogger", false);
             context.wait_for_all_requests();
             fresh_after = current_time();
@@ -2348,9 +2334,9 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
     // The corner-to-bridge leg stays below the regular Repel movement budget.
     force_repel_expiry(stream, context, RepelRenewalChoice::YES, false, true);
     pbf_wait(context, 1767ms);
-    // Expiry stays on the clear upper strip. The recorded east crossing
-    // takes 2392ms; 3000ms also covers an unfinished 500ms west expiry pulse.
-    // The eastern wall fixes the starting column for Derek's south approach.
+    // Handle expiry on the clear upper strip. The east crossing takes 2392ms; 3000ms also covers
+    // an unfinished 500ms west expiry pulse. The eastern wall fixes the starting column for
+    // Derek's south approach.
     pbf_move_left_joystick(context, {1.0, 0.0}, 3000ms, 0ms);
     pbf_wait(context, 43ms);
     context.wait_for_all_requests();
@@ -2360,9 +2346,9 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
     if (run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& ctx){
-                // The uninterrupted 1000ms approach ends one step into grass.
-                // Stop one recorded step earlier on Derek's sightline while
-                // the existing watchers wait for him to turn toward the player.
+                // The uninterrupted 1000ms approach ends one step into grass. Stop one step
+                // earlier on Derek's sightline while the watchers wait for him to turn toward the
+                // player.
                 pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 850ms, 0ms);
                 pbf_wait(ctx, 15000ms);
             },
@@ -2414,8 +2400,8 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
     // West/east follows the clear strip south of the grass before the Ace Trainers.
     force_repel_expiry(stream, context, RepelRenewalChoice::YES, false, true);
     pbf_wait(context, 1767ms);
-    // Resume from the road/fence pose shown at renewal in the recording.
-    // A fixed leftover west input compounds the variable expiry offset.
+    // Resume from the road/fence pose after renewal. A fixed leftover west input compounds the
+    // variable expiry offset.
     align_to_overworld_landmarks(stream,
         context,
         match_route215_ace_renewal,
@@ -2467,15 +2453,15 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
         false,
         true,
         true);
-    // Replay the successful street approach, then correct onto the western
-    // stair lane before climbing. Do not use the NPC pair as a wall stop.
+    // Follow the street approach, then align with the western stair lane before climbing. Do not
+    // use the NPC pair as a wall stop.
     pbf_move_left_joystick(context, {0.0, -1.0}, 1342ms, 0ms);
     pbf_move_left_joystick(context, {-1.0, 0.0}, 1404ms, 0ms);
     pbf_move_left_joystick(context, {0.0, -1.0}, 368ms, 0ms);
     pbf_move_left_joystick(context, {-1.0, -1.0}, 90ms, 0ms);
     pbf_move_left_joystick(context, {-1.0, 0.0}, 1458ms, 0ms);
-    // Expose the western stair base with the first 200ms of the recorded
-    // north leg; correct its lane before continuing the remaining ascent.
+    // Use the first 200ms of the north leg to expose the western stair base, then correct its
+    // lane before continuing the ascent.
     pbf_move_left_joystick(context, {0.0, 1.0}, 200ms, 0ms);
     context.wait_for_all_requests();
     align_to_overworld_landmarks(stream,
@@ -2502,7 +2488,7 @@ void lost_tower_to_veilstone_gym(VideoStream& stream, ProControllerContext& cont
     }
     clear_dialog(stream, context, BUTTON_B, 4000ms);
 
-    // The new recording already enters the Gym. Cancel at its first fade.
+    // Cancel movement at the first gym entry fade.
     context.wait_for_all_requests();
     BlackScreenWatcher gym_entry;
     if (run_until<ProControllerContext>(stream,
@@ -2800,7 +2786,6 @@ void Checkpoint_0301(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            // Recorded route with feedback battle handling.
             eterna_gym_to_jupiter(env.console, context, stats);
         },
 
@@ -2845,7 +2830,6 @@ void Checkpoint_0302(SingleSwitchProgramEnvironment& env,
             set_time_fast(env, context, locator_time, true);
             pbf_wait(context, 5000ms);
             context.wait_for_all_requests();
-            // Recorded route with feedback battle handling.
             jupiter_to_coronet(env.console, context, stats);
         },
 
@@ -2879,7 +2863,6 @@ void Checkpoint_0303(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            // Recorded route with feedback battle handling.
             coronet1(env.console, context);
         },
 
@@ -2913,7 +2896,6 @@ void Checkpoint_0304(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            // Recorded route with feedback battle handling.
             coronet_to_heartholme(env.console, context, stats);
         },
 
@@ -2957,7 +2939,6 @@ void Checkpoint_0305(SingleSwitchProgramEnvironment& env,
             set_time_fast(env, context, locator_time, true);
             pbf_wait(context, 5000ms);
             context.wait_for_all_requests();
-            // Recorded route with feedback battle handling.
             heartholme_to_lost_tower(env.console, context, stats);
             // Stop here. Checkpoint 03.06 saves outside and owns the Tower visit.
         },

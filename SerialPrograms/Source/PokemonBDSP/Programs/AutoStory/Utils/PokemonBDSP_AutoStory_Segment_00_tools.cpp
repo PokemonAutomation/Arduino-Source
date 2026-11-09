@@ -47,6 +47,7 @@
 #include "PokemonBDSP_Autostory_Segment_01_tools.h"
 
 #include "PokemonBDSP_AutoStory_Battle.h"
+#include "PokemonBDSP_AutoStory_Dialog.h"
 #include "PokemonBDSP_AutoStory_Segment_00_tools.h"
 
 using namespace std::chrono_literals;
@@ -104,7 +105,7 @@ void clown_dialog_helper(VideoStream& stream, ProControllerContext& context, Dpa
         }
 
         context.wait_for_all_requests();
-        pbf_press_dpad(context, direction, 80ms, 200ms);
+        pbf_press_dpad(context, direction, 80ms, 300ms);
         pbf_press_button(context, BUTTON_A, 80ms, 500ms);
 
         if (wait_until(stream, context, 1500ms, {{dialog}}) == 0){
@@ -113,19 +114,24 @@ void clown_dialog_helper(VideoStream& stream, ProControllerContext& context, Dpa
         }
     }
 
-    // -------------------------------------------------
-    // Phase 2: A mash for 2 seconds.
-    // -------------------------------------------------
-    stream.log("[AutoStory] Mashing A to advance dialog...", COLOR_BLUE);
-    pbf_mash_button(context, BUTTON_A, 4000ms);
+    // Stop at the quiz prompt and confirm Yes before collecting the coupon.
+    clear_dialog(stream, context, ClearDialogMode::STOP_PROMPT, 60, BUTTON_B);
+    SelectionArrowFinder yes_arrow(stream.overlay(), {0.707, 0.650, 0.040, 0.065}, COLOR_CYAN);
+    const auto choice_frame = stream.video().snapshot();
+    if (!choice_frame){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Clown quiz: No video frame.", stream);
+    }
+    if (!yes_arrow.detect(*choice_frame.frame)){
+        pbf_press_dpad(context, DPAD_UP, 80ms, 300ms);
+    }
+    if (wait_until(stream, context, 3s, {{yes_arrow}}) != 0){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Clown quiz: Yes selection not confirmed.", stream);
+    }
+    pbf_press_button(context, BUTTON_A, 80ms, 500ms);
     context.wait_for_all_requests();
-
-    // -------------------------------------------------
-    // Phase 3: Clear remaining dialog.
-    // -------------------------------------------------
-    pbf_mash_button(context, BUTTON_B, 4000ms);
-
-    context.wait_for_all_requests();
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B);
 
     stream.log("[AutoStory] Clown dialog helper complete.", COLOR_GREEN);
 }
@@ -357,8 +363,7 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
                     "Settings checkpoint: Unable to confirm expected row " + std::string(settings[row].label),
                     stream);
             }
-            // These are regular video-overlay boxes, so the existing
-            // overlay display control can show/hide every active ROI.
+            // The overlay display control shows or hides every active ROI.
             OverlayBoxScope row_overlay(stream.overlay(), COLOR_RED, {0.07, y - 0.04, 0.84, 0.08}, "");
             OverlayBoxScope label_overlay(stream.overlay(), COLOR_YELLOW, {0.08, y - 0.025, 0.24, 0.05}, "");
             OverlayBoxScope value_overlay(stream.overlay(), COLOR_GREEN, {0.33, y - 0.025, 0.54, 0.05}, "");
@@ -382,9 +387,8 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
             }
             stream.log(
                 "[Tutorial settings] " + std::string(settings[row].label) + " target match=" + std::to_string(score));
-            // The reference recording uses inactive pale-red text;
-            // the focused live row has a thicker dark-red glyph mask.
-            // Verified Fast scores 0.734 while Slow/Normal score 0.
+            // The inactive row uses pale-red text; the focused row uses a thicker dark-red glyph
+            // mask. Fast scores 0.734 while Slow/Normal score 0.
             if (score >= 0.65 && (row != 7 || autosave_off_highlight(frame, y))){
                 if (row == 7){
                     for (size_t confirmation = 0; confirmation < 3; confirmation++){
@@ -647,14 +651,15 @@ void set_time_fast(SingleSwitchProgramEnvironment& env,
 // ---------------------------------------------------------------------------
 // Natalie battle
 // ---------------------------------------------------------------------------
-static void select_battle_move_slot(VideoStream& stream,
+static size_t select_battle_move_slot(VideoStream& stream,
     ProControllerContext& context,
     BattleType battle_type,
     size_t target,
     const std::string& label,
     bool confirm_default_target = false,
     size_t current_move = 1,
-    bool control_second_pokemon = false){
+    bool control_second_pokemon = false,
+    bool prefer_third_move = false){
     BattleMenuDetector commands(battle_type, COLOR_RED, control_second_pokemon);
     VideoOverlaySet overlays(stream.overlay());
     commands.make_overlays(overlays);
@@ -730,7 +735,7 @@ static void select_battle_move_slot(VideoStream& stream,
         }
         pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
         pbf_press_button(context, BUTTON_A, 80ms, 3000ms);
-        return;
+        return target;
     }
     confirmed = 0;
     size_t previous_move_count = 0, stable_move_count = 0;
@@ -752,6 +757,11 @@ static void select_battle_move_slot(VideoStream& stream,
             stable_move_count = 1;
             confirmed = 0;
         }
+        // Tutorial training uses slot 3 only after three frames confirm it exists.
+        // Missing/uncertain move lists never cause an unconfirmed A press.
+        if (prefer_third_move && stable_move_count >= 3){
+            target = moves.move_count >= 3 ? 3 : 1;
+        }
         if (moves.move_count > 0 && moves.move_count < target && stable_move_count >= 3){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 label + ": Move slot " + std::to_string(target) + " is absent; no move confirmed.",
@@ -761,7 +771,7 @@ static void select_battle_move_slot(VideoStream& stream,
             if (++confirmed >= 3){
                 stream.log("[" + label + "] Move " + std::to_string(target) + " confirmed; using it.");
                 pbf_press_button(context, BUTTON_A, 80ms, 3000ms);
-                return;
+                return target;
             }
             pbf_wait(context, 100ms);
         }else{
@@ -840,7 +850,8 @@ void fight_Natalie(VideoStream& stream, ProControllerContext& context){
         case 1: {
             stream.log("[AutoStory] Natalie battle complete.", COLOR_GREEN);
 
-            pbf_mash_button(context, BUTTON_B, 5000ms);
+            // The exit watcher may return after the final text has already closed.
+            clear_dialog(stream, context, ClearDialogMode::STOP_QUIET, 60, BUTTON_B, 6000ms);
 
             return;
         }
@@ -1065,6 +1076,7 @@ static void confirm_battle_overworld(VideoStream& stream, ProControllerContext& 
 struct BattleSetupPlan {
     Language language = Language::None;
     std::string opponent;
+    size_t x_sp_defs = 0;
     size_t x_attacks = 0;
     size_t max_full_restores = 0;
     std::map<std::string, size_t> moves;
@@ -1082,7 +1094,9 @@ static void fight_using_move_list(VideoStream& stream,
     bool control_second_pokemon = false,
     bool advance_on_experience = false,
     size_t expected_opponents = 0,
-    const BattleSetupPlan* setup = nullptr){
+    const BattleSetupPlan* setup = nullptr,
+    bool prefer_third_move = false,
+    bool battle_menu_confirmed = false){
     if (move_slots.empty() || std::any_of(move_slots.begin(), move_slots.end(), [](size_t slot){
             return slot < 1 || slot > 4;
         })){
@@ -1094,7 +1108,8 @@ static void fight_using_move_list(VideoStream& stream,
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             label + ": Item setup requires a selected Game Language and a singles battle.", stream);
     }
-    size_t setup_items_used = 0;
+    size_t x_sp_defs_used = 0;
+    size_t x_attacks_used = 0;
     size_t full_restores_used = 0;
     double hp_before_restore = -1;
     size_t move_index = 0;
@@ -1106,7 +1121,7 @@ static void fight_using_move_list(VideoStream& stream,
     // Scripted battles wait on the menu detector below, so no
     // extra fixed delay is needed after a caller confirms it.
     // Preserve the existing early-game transition delay.
-    if (!confirm_default_target){
+    if (!confirm_default_target && !battle_menu_confirmed){
         pbf_wait(context, 5000ms);
     }
 
@@ -1230,9 +1245,12 @@ static void fight_using_move_list(VideoStream& stream,
                         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                             label + ": HP not confirmed; no item or attack selected.", stream);
                     }
-                    if (hp_before_restore >= 0 && hp <= hp_before_restore + 0.05){
-                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                            label + ": Full Restore did not improve HP after the opponent's turn.", stream);
+                    if (hp_before_restore >= 0){
+                        // The opponent attacks after the item. Its damage can erase
+                        // the healing gain, so net HP cannot verify whether it worked.
+                        stream.log("[" + label + "] HP after Full Restore and the opponent's turn: " +
+                            std::to_string((int)(hp * 100)) + "% (before item: " +
+                            std::to_string((int)(hp_before_restore * 100)) + "%).");
                     }
                     hp_before_restore = -1;
                     // Leave a margin for another setup hit. This is a recovery
@@ -1251,16 +1269,23 @@ static void fight_using_move_list(VideoStream& stream,
                         break;
                     }
                 }
-                if (opponent == setup->opponent && setup_items_used < setup->x_attacks){
-                    stream.log("[" + label + "] X Attack " + std::to_string(setup_items_used + 1) +
-                        "/" + std::to_string(setup->x_attacks) + " against " + opponent + ".");
-                    use_item_in_battle(stream, context, setup->language, "x-attack");
-                    setup_items_used++;
+                if (opponent == setup->opponent &&
+                    (x_sp_defs_used < setup->x_sp_defs || x_attacks_used < setup->x_attacks)){
+                    // Finish special-defense setup before spending turns on Attack.
+                    const bool special_defense = x_sp_defs_used < setup->x_sp_defs;
+                    size_t& used = special_defense ? x_sp_defs_used : x_attacks_used;
+                    const size_t target = special_defense ? setup->x_sp_defs : setup->x_attacks;
+                    stream.log("[" + label + "] " + (special_defense ? "X Sp. Def " : "X Attack ") +
+                        std::to_string(used + 1) + "/" + std::to_string(target) +
+                        " against " + opponent + ".");
+                    use_item_in_battle(stream, context, setup->language,
+                        special_defense ? "x-sp-def" : "x-attack");
+                    used++;
                     awaiting_experience = false;
                     // An item consumes a battle turn, not a move or a PP.
                     break;
                 }
-                if (setup_items_used != 0 && setup_items_used < setup->x_attacks){
+                if (x_sp_defs_used < setup->x_sp_defs || x_attacks_used < setup->x_attacks){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         label + ": Required setup opponent is no longer present; setup incomplete.", stream);
                 }
@@ -1300,14 +1325,15 @@ static void fight_using_move_list(VideoStream& stream,
                 stream.log("[" + label + "] Move list position " + std::to_string(move_index + 1) + ": use move " +
                     std::to_string(selected_move) + ".");
             }
-            select_battle_move_slot(stream,
+            selected_move = select_battle_move_slot(stream,
                 context,
                 battle_type,
                 selected_move,
                 label,
                 confirm_default_target,
                 current_move[player - 1],
-                control_second_pokemon);
+                control_second_pokemon,
+                prefer_third_move);
             // A rejected move leaves the Fight list open and consumes no PP.
             // Do not charge the software budget for that rejected selection.
             if (player_pp){
@@ -1370,7 +1396,7 @@ static void fight_using_move_list(VideoStream& stream,
                     " confirmed opponent defeats; victory not confirmed.",
                     stream);
             }
-            if (setup && setup_items_used != setup->x_attacks){
+            if (setup && (x_sp_defs_used != setup->x_sp_defs || x_attacks_used != setup->x_attacks)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     label + ": Battle ended without completing the required item setup.", stream);
             }
@@ -1433,8 +1459,14 @@ static void fight_using_move_slot(VideoStream& stream,
     ProControllerContext& context,
     BattleType battle_type,
     size_t move_slot,
-    const std::string& label){
-    fight_using_move_list(stream, context, battle_type, {move_slot}, label, false, true);
+    const std::string& label,
+    const AutoStoryOptions* training_options = nullptr,
+    bool battle_menu_confirmed = false){
+    // Tackle remains the simple neutral choice for Turtwig against the early
+    // bird/bug encounters. Chimchar/Piplup prefer their learned slot 3 attack.
+    const bool prefer_third = training_options && training_options->starter_choice != StarterChoice::TURTWIG;
+    fight_using_move_list(stream, context, battle_type, {move_slot}, label, false, true,
+        nullptr, false, false, false, 0, nullptr, prefer_third, battle_menu_confirmed);
 }
 
 void align_to_overworld_landmarks(VideoStream& stream,
@@ -1616,10 +1648,9 @@ void align_to_overworld_landmarks(VideoStream& stream,
                 result.coarse && std::abs(result.dx) > 1.0 / 128;
             // Stay south of the Contest Hall wall/sign before crossing to Fantina.
             const bool contest_row_recovery = matcher == match_hearthome_contest_fantina && result.dy > 1.0 / 54;
-            // Keep the stair approach horizontal-first until close to
-            // its column. Recorded fine poses otherwise spent repeated
-            // 16ms sideways turns while a larger vertical error waited.
-            // Fine correction changes axis priority, never arrival gates.
+            // Keep the stair approach horizontal-first until close to its column. During fine
+            // correction, prioritize a larger vertical error over repeated 16ms sideways turns.
+            // Axis priority does not change arrival requirements.
             const bool stair_fine_correction =
                 matcher == match_route208_stair_top && !result.coarse && std::abs(result.dx) <= 1.0 / 64;
             const bool horizontal = !ace_row_recovery && !ace_central_row &&
@@ -1689,9 +1720,8 @@ void align_to_overworld_landmarks(VideoStream& stream,
                         label + ": Scene anchors missing; stationary reacquisition exhausted.",
                         stream);
                 }
-                // Recorded expiry endpoints can be north of the passage.
-                // Acquire its buildings along the clear south-only strip;
-                // cap total search motion, then remain stationary.
+                // Expiry can leave the player north of the passage. Acquire its buildings along
+                // the clear south-only strip; cap total search motion, then remain stationary.
                 if (matcher == match_veilstone_city_passage && search_down_first && correction_movement < 1800ms){
                     pbf_move_left_joystick(context, {0.0, -1.0}, 100ms, 0ms);
                     correction_movement += 100ms;
@@ -1701,8 +1731,8 @@ void align_to_overworld_landmarks(VideoStream& stream,
                 continue;
             }
             if (matcher == match_galactic_hq_jupiter || matcher == match_route208_stair_top){
-                // Keep generic missing-anchor behavior unchanged. Route208's
-                // explicit caller can instead request its recorded recovery.
+                // Keep generic missing-anchor behavior unchanged. Route208's caller can request
+                // its route-specific recovery.
                 const bool stair_rocks = matcher == match_route208_stair_top;
                 if (stair_rocks && rock_acquisition_timed_out){
                     const auto now = std::chrono::steady_clock::now();
@@ -1831,8 +1861,8 @@ void fight_trainer_using_moves(VideoStream& stream,
         // Generic parties can contain Flying types or Levitate users. Reserve
         // Earthquake for the specific matchups below instead of a blind fallback.
         priorities = {1, 2, 4};
-        // Recorded single-trainer parties have a fixed send-out order.
-        // Preserve noncontact PP for the summit without spending it on normal foes.
+        // These single-trainer parties have a fixed send-out order. Preserve noncontact PP for
+        // the summit instead of spending it on normal foes.
         if (label == "coronet_ascent_landing_grunt" || label == "coronet_ascent_grunt_2"){
             // Beautifly and the Dustox/Golbat party take Electric damage. Save
             // four Flamethrower PP for the remaining ascent and summit script.
@@ -1943,8 +1973,8 @@ void fight_trainer_using_moves(VideoStream& stream,
     }else if (label == "elite_four_bertha"){
         switch (stats.starter_choice){
         case StarterChoice::CHIMCHAR:
-            // Recorded order: Quagsire, Whiscash, Golem, Sudowoodo, Hippowdon.
-            // Repeat against survivors and healing; switch slots only after a KO.
+            // Send-out order: Quagsire, Whiscash, Golem, Sudowoodo, Hippowdon. Repeat against
+            // survivors and healing; switch slots only after a KO.
             priorities = {4, 4, 4, 4, 2};
             ordered_moves = true;
             advance_on_experience = true;
@@ -1961,7 +1991,7 @@ void fight_trainer_using_moves(VideoStream& stream,
     }else if (label == "elite_four_flint"){
         switch (stats.starter_choice){
         case StarterChoice::CHIMCHAR:
-            // The species-confirmed plan below selects the reviewed move.
+            // The species-confirmed plan below selects the move.
             priorities = {3};
             break;
         case StarterChoice::TURTWIG:
@@ -2050,8 +2080,8 @@ void fight_trainer_using_moves(VideoStream& stream,
                 {"hippowdon", 2},
             };
         }else if (label == "elite_four_flint"){
-            // Keep the reviewed moves, but do not let a different send-out order
-            // put Thunder Punch into Steelix or Earthquake into Drifblim.
+            // Keep the configured moves, but do not let a different send-out order put Thunder
+            // Punch into Steelix or Earthquake into Drifblim.
             setup.moves = {
                 {"rapidash", 3},
                 {"lopunny", 4},
@@ -2070,9 +2100,10 @@ void fight_trainer_using_moves(VideoStream& stream,
                 {"bronzong", 2},
             };
         }else if (label == "champion_cynthia"){
-            // Planned for the still-pending Champion route. Set up before
-            // the Water/Ground threats; do not assume a later send-out order.
+            // Raise Special Defense against Spiritomb before setting up Attack.
+            // Later move choices follow confirmed species, not send-out order.
             setup.opponent = "spiritomb";
+            setup.x_sp_defs = 2;
             setup.x_attacks = 2;
             setup.max_full_restores = 4;
             setup.moves = {
@@ -2119,15 +2150,25 @@ void fight_tristan(VideoStream& stream, ProControllerContext& context){
     fight_trainer_using_move_slot(stream, context, 3, "Tristan (move slot 3)");
 }
 
-void battle_1_pokemon(VideoStream& stream, ProControllerContext& context){
-    stream.log("[Training] Finding one wild Pokemon using the catch encounter wiggle.", COLOR_BLUE);
-    encounter_one_wild_pokemon(stream, context);
-    // Use the same battle loop as Tristan with move slot 1.
-    fight_using_move_slot(stream, context, BattleType::STANDARD, 1, "Training (move slot 1)");
-    stream.log("[Training] Fight and level-up cleanup complete; verifying Potion healing.");
-    use_potion_first_pokemon(stream, context);
-    context.wait_for_all_requests();
-    stream.log("[Training] One wild battle completed; slot 1 healing verified.", COLOR_GREEN);
+void battle_1_pokemon(VideoStream& stream, ProControllerContext& context, const AutoStoryOptions& options){
+    // Level 7 retains the demonstrated pre-Tristan level; route encounters may
+    // already have supplied that experience. Never skip the full-HP check.
+    for (size_t battles = 0; battles <= 3; battles++){
+        uint8_t level = 0;
+        use_potion_first_pokemon(stream, context, &level);
+        if (level >= 7){
+            stream.log("[Training] Full HP and level " + std::to_string(level) +
+                " confirmed; ready for Route 202 trainers.", COLOR_GREEN);
+            return;
+        }
+        if (battles == 3){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Training: Level 7 not reached after three additional encounters.", stream);
+        }
+        stream.log("[Training] Level " + std::to_string(level) + "; finding one additional encounter.");
+        encounter_one_wild_pokemon(stream, context);
+        fight_using_move_slot(stream, context, BattleType::STANDARD, 1, "Tutorial training", &options, true);
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -2480,7 +2521,8 @@ void walk_through_grass(VideoStream& stream,
     BattleType battle_type,
     Milliseconds movement_duration,
     OverworldMatchResult (*destination)(const ImageRGB32&),
-    bool fight_encounters){
+    bool fight_encounters,
+    const AutoStoryOptions* training_options){
     size_t movements = 0, confirmations = 0;
     while (true){
         context.wait_for_all_requests();
@@ -2557,7 +2599,7 @@ void walk_through_grass(VideoStream& stream,
             stream.log("[Grass] " + direction_name + " step " + std::to_string(movements) + "/" +
                 std::to_string(steps) + ": encounter trigger=" + std::to_string(ret));
             if (fight_encounters){
-                fight_using_move_slot(stream, context, battle_type, 1, "Route training (move slot 1)");
+                fight_using_move_slot(stream, context, battle_type, 1, "Route training", training_options);
                 use_potion_first_pokemon(stream, context);
                 context.wait_for_all_requests();
                 stream.log("[Grass] Training battle and healing complete; resuming " + direction_name + ".");

@@ -155,9 +155,8 @@ void force_repel_expiry(VideoStream& stream,
     ShortDialogWatcher expired(COLOR_CYAN);
     StartBattleDetector starting(stream.overlay());
     BattleMenuWatcher battle(BattleType::TRAINER);
-    // 108 fresh Max Repels, two calibration runs: mean 41.244682s,
-    // sample SD 3.668059s. Round mean + SD up to the next millisecond.
-    // Match the calibration's 500ms movement / 100ms rest pulses.
+    // Repel expiry allowance is the mean 41.244682s plus sample SD 3.668059s, rounded up to the
+    // next millisecond. Use 500ms movement / 100ms rest pulses.
     const auto movement_deadline = std::chrono::steady_clock::now() + 44913ms;
     const int result = run_until<ProControllerContext>(stream,
         context,
@@ -411,8 +410,7 @@ static bool approach_route204_female_trainer(VideoStream& stream, ProControllerC
         context,
         [](ProControllerContext& ctx){
             pbf_move_left_joystick(ctx, {0.0, 1.0}, 8000ms, 0ms);
-            // Replaces the 2374ms settle plus the unbounded-looking
-            // generic dialogue wait with one explicit detection window.
+            // Use one bounded dialogue-detection window for the settling period.
             pbf_wait(ctx, 2500ms);
         },
         "Route 204 female trainer approach");
@@ -510,9 +508,8 @@ static void recover_teighler_trigger(VideoStream& stream, ProControllerContext& 
         stream,
         context,
         [](ProControllerContext& ctx){
-            // The old 500ms sweeps stopped beneath/west of Teighler.
-            // Cross the full bottom ledge in both directions, still
-            // limiting the total recovery motion to five seconds.
+            // Cross the full bottom ledge in both directions to reach Teighler. Limit total
+            // recovery motion to five seconds.
             for (size_t pair = 0; pair < 3; pair++){
                 const Milliseconds sweep = pair < 2 ? 1000ms : 500ms;
                 pbf_move_left_joystick(ctx, {-1, 0}, sweep, 0ms);
@@ -527,59 +524,6 @@ static void recover_teighler_trigger(VideoStream& stream, ProControllerContext& 
             "Teighler: No battle after five-second left/right ledge recovery.",
             stream);
     }
-}
-
-static void align_to_windworks_sign(VideoStream& stream, ProControllerContext& context){
-    context.wait_for_all_requests();
-    size_t confirmed = 0, missing = 0;
-    bool previously_located = false;
-    stream.log("[Windworks approach] Locate beside the sign before the blind wall/NPC approach.");
-    for (size_t attempt = 0; attempt < 80; attempt++){
-        const auto frame = stream.video().snapshot();
-        if (!frame){
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Windworks approach: No video frame.",
-                stream);
-        }
-        const auto result = match_windworks_sign_approach(*frame.frame);
-        if (result.at_target){
-            if (++confirmed >= 3){
-                return;
-            }
-            pbf_wait(context, 150ms);
-        }else{
-            confirmed = 0;
-            double x = 0, y = 1;
-            Milliseconds duration = 100ms;
-            if (result.located){
-                missing = 0;
-                previously_located = true;
-                // Correct large height errors first, including coming
-                // south from the wall, then clear the grass horizontally.
-                const bool vertical = result.dy > .08 || std::abs(result.dx) <= 1.0 / 50;
-                const double error = vertical ? std::abs(result.dy) : std::abs(result.dx);
-                x = vertical ? 0 : (result.dx < 0 ? -1 : 1);
-                y = vertical ? (result.dy > 0 ? -1 : 1) : 0;
-                duration = error < .08 ? 40ms : 100ms;
-                stream.log("[Windworks approach] Sign offset=(" + std::to_string(result.dx) + "," +
-                    std::to_string(result.dy) + ")");
-            }else if (previously_located && ++missing <= 12){
-                pbf_wait(context, 250ms);
-                context.wait_for_all_requests();
-                continue;
-            }else if (previously_located || ++missing > 12){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "Windworks approach: Sign unavailable during bounded northward acquisition.",
-                    stream);
-            }
-            pbf_move_left_joystick(context, {x, y}, duration, 0ms);
-            pbf_wait(context, 250ms);
-        }
-        context.wait_for_all_requests();
-    }
-    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-        "Windworks approach: Sign position did not converge.",
-        stream);
 }
 
 struct Route204ArrivalTracker {
@@ -637,21 +581,18 @@ struct Route204ArrivalTracker {
 static void align_to_route204_fence(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     context.wait_for_all_requests();
     stream.log("[Route 204 fence] Two steps south of Sara, six west into the pond fence, then four north.");
-    // The 2026-11-07 recording's 19 post-Sara endpoints share this row.
-    // Two down steps clear her relocated body before crossing west. Six
-    // west steps deliberately overtravel into the pond fence to fix the
-    // column; four north steps return to the road beside the grass.
-    // Counts use 80/300 D-pad steps, plus repeat_dpad's facing correction.
+    // Two down steps clear Sara before crossing west. Six west steps overtravel into the pond
+    // fence to fix the column; four north steps return to the road beside the grass. Counts use
+    // 80/300 D-pad steps, plus repeat_dpad's facing correction.
     DpadState dpad;
     dpad.last_dir = DPAD_LEFT; // Facing Sara after her eastward approach.
     repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 2);
     repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 6);
     context.wait_for_all_requests();
 
-    // This lane may bypass Tyler. Never seek him out or assume a battle.
-    // Watch one north step at a time so his approach cannot consume the
-    // remainder of a queued route. The recorded exclamation/approach takes
-    // about three seconds before dialogue becomes detectable.
+    // This lane may bypass Tyler. Never seek him out or assume a battle. Watch one north step at
+    // a time so his approach cannot consume the rest of the queued route. His exclamation and
+    // approach take about three seconds before dialogue becomes detectable.
     ShortDialogDetector dialogue(COLOR_YELLOW);
     BattleMenuDetector menu(BattleType::TRAINER, COLOR_GREEN);
     size_t north_steps = 0;
@@ -671,8 +612,8 @@ static void align_to_route204_fence(VideoStream& stream, ProControllerContext& c
                 },
                 "Route 204 fence northward step");
             context.wait_for_all_requests();
-            // A newly triggered trainer interrupts the settle after the
-            // entering step. Count that step; do not replay it after combat.
+            // A trainer can interrupt the settle after the entering step. Count that step; do not
+            // repeat it after combat.
             north_steps++;
         }
         if (interrupted){
@@ -714,12 +655,6 @@ static void enter_ravaged_path_from_route204(SingleSwitchProgramEnvironment& env
         const auto empty = image_stats(extract_box_reference(frame, map_void));
         return empty.average.r < 20 && empty.average.g < 20 && empty.average.b < 20 && empty.stddev.sum() < 30;
     };
-    auto handle_trainer = [&] {
-        stream.log("[Ravaged Path approach] Lass Samantha triggered; completing battle before continuing.");
-        wait_for_trainer_battle_menu(stream, context);
-        fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
-        clear_dialog(stream, context);
-    };
     Route204ArrivalTracker arrival;
     size_t position_confirmations = 0;
     auto missing_since = std::chrono::steady_clock::now();
@@ -744,7 +679,10 @@ static void enter_ravaged_path_from_route204(SingleSwitchProgramEnvironment& env
         ShortDialogDetector current_dialogue;
         BattleMenuDetector current_battle(BattleType::TRAINER);
         if (current_dialogue.detect(*before.frame) || current_battle.detect(*before.frame)){
-            handle_trainer();
+            stream.log("[Ravaged Path approach] Lass Samantha triggered; completing battle before continuing.");
+            wait_for_trainer_battle_menu(stream, context);
+            fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
+            clear_dialog(stream, context);
             arrival.reset();
             position_confirmations = 0;
             missing_since = std::chrono::steady_clock::now();
@@ -854,8 +792,8 @@ static void enter_ravaged_path_from_route204(SingleSwitchProgramEnvironment& env
             }else{
                 position_confirmations = 0;
                 if (now - missing_since > 10s){
-                    // The southern route now uses the pond fence. Do not
-                    // reintroduce sign-dependent recovery or blind searches.
+                    // Use the pond fence for the southern route. Avoid sign-dependent recovery
+                    // and blind searches.
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         "Ravaged Path locator: Entrance landmarks unavailable after the fence approach.",
                         stream);
@@ -880,7 +818,10 @@ static void enter_ravaged_path_from_route204(SingleSwitchProgramEnvironment& env
             {{entrance}, {dialogue}, {battle}});
         context.wait_for_all_requests();
         if (ret == 1 || ret == 2){
-            handle_trainer();
+            stream.log("[Ravaged Path approach] Lass Samantha triggered; completing battle before continuing.");
+            wait_for_trainer_battle_menu(stream, context);
+            fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
+            clear_dialog(stream, context);
             arrival.reset();
             position_confirmations = 0;
             missing_since = std::chrono::steady_clock::now();
@@ -919,7 +860,10 @@ static void enter_ravaged_path_from_route204(SingleSwitchProgramEnvironment& env
             context.wait_for_all_requests();
         }
         if (trainer_seen){
-            handle_trainer();
+            stream.log("[Ravaged Path approach] Lass Samantha triggered; completing battle before continuing.");
+            wait_for_trainer_battle_menu(stream, context);
+            fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
+            clear_dialog(stream, context);
         }
         arrival.reset();
         position_confirmations = 0;
@@ -1038,8 +982,8 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     pbf_wait(context, 300ms);
     pbf_move_left_joystick(context, {0.0, -1.0}, 1700ms, 0ms);
     pbf_wait(context, 500ms);
-    // Cross the lower stairs at the offset needed for the next north leg.
-    // Combine the old left/right correction and the two upward moves.
+    // Cross the lower stairs at the offset needed for the next north leg, combining horizontal
+    // correction and upward movement.
     pbf_move_left_joystick(context, {-1.0, 0.0}, 850ms, 0ms);
     pbf_wait(context, 150ms);
     pbf_move_left_joystick(context, {0.0, 1.0}, 1800ms, 0ms);
@@ -1064,9 +1008,8 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     set_time_fast(env, context, locator_time, true);
     pbf_wait(context, 5000ms);
     context.wait_for_all_requests();
-    // Stop east of the TV-station overshoot seen in the recording.
-    // Acquire/correct the street lane before moving north; the locator
-    // now supplies vertical travel instead of the blind 2579ms up move.
+    // Stop east of the TV station. Align with the street lane before moving north; the locator
+    // controls vertical travel.
     pbf_move_left_joystick(context, {-1.0, 0.0}, 3700ms, 0ms);
     pbf_wait(context, 850ms);
     align_to_overworld_landmarks(stream,
@@ -1107,9 +1050,8 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     pbf_wait(context, 1073ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 431ms, 0ms);
     pbf_wait(context, 3099ms);
-    // Stop outside: the old additional 1028ms up move sometimes
-    // entered the building before exterior alignment even started.
-    // Repel is inactive here; no expiry search is needed before the Center.
+    // Stop outside before aligning with the Center. Extra northward movement can enter the
+    // building prematurely. Repel is inactive, so no expiry search is needed.
     align_and_enter_jubilife_center(stream, context);
     if (!heal_pokemon(stream, context, "Jubilife", &stats)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
@@ -1142,31 +1084,27 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     enter_ravaged_path_from_route204(env, stream, context, stats);
     //cave navigation
 
-    // Ravaged Path -> Floaroma -> Valley Windworks -> Mars.
-    // First-pass route from ravagedpath.txt and the 2026-10-13
-    // 19-48-08 recording. Timings need live route validation.
-    auto move = [&](double x, double y, Milliseconds duration, Milliseconds settle = 250ms){
-        pbf_move_left_joystick(context, {x, y}, duration, 0ms);
-        pbf_wait(context, settle);
-        context.wait_for_all_requests();
-    };
-    auto battle = [&](const std::string& label){
-        stream.log("[Segment 02 battle] " + label);
-        wait_for_trainer_battle_menu(stream, context);
-        fight_trainer_using_moves(stream, context, stats, label, false);
-        clear_dialog(stream, context);
-    };
+    // Ravaged Path -> Floaroma -> Valley Windworks -> Mars. Route timings still need live
+    // validation.
     // Break the blocking rock using the existing HM confirmation helper.
-    move(0, 1, 1100ms, 900ms);
-    move(1, 0, 600ms);
+    pbf_move_left_joystick(context, {0, 1}, 1100ms, 0ms);
+    pbf_wait(context, 900ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {1, 0}, 600ms, 0ms);
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
     use_HM(stream, context, "Rock Smash in Ravaged Path");
     context.wait_for_all_requests();
     clear_dialog(stream, context);
     // Failed frames stop against the remaining center rocks. Pass
     // above their collision row before the eastward exit approach.
-    move(0, 1, 200ms);
+    pbf_move_left_joystick(context, {0, 1}, 200ms, 0ms);
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
     exit_ravaged_path_to_route204(stream, context);
-    move(0, -1, 350ms, 500ms);
+    pbf_move_left_joystick(context, {0, -1}, 350ms, 0ms);
+    pbf_wait(context, 500ms);
+    context.wait_for_all_requests();
 
     // Resolve the current Repel before searching for Teighler so
     // its expiry prompt cannot interrupt trainer acquisition.
@@ -1174,8 +1112,12 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     force_repel_expiry(stream, context, RepelRenewalChoice::YES);
 
     // Route 204 north: go around the cliff to Aroma Lady Teighler.
-    move(-1, 0, 1300ms);
-    move(0, 1, 1300ms, 650ms);
+    pbf_move_left_joystick(context, {-1, 0}, 1300ms, 0ms);
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {0, 1}, 1300ms, 0ms);
+    pbf_wait(context, 650ms);
+    context.wait_for_all_requests();
     // Timed approach: get onto the alcove's left edge, descend
     // to its bottom ledge, then cross right through her sightline.
     // Watch the entire approach so an early trigger stops movement.
@@ -1228,14 +1170,17 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
                         "Route 204 northbound: Too many trainer interruptions.",
                         stream);
                 }
-                battle("Route 204 north Bug Catcher");
+                stream.log("[Segment 02 battle] Route 204 north Bug Catcher");
+                wait_for_trainer_battle_menu(stream, context);
+                fight_trainer_using_moves(stream, context, stats, "Route 204 north Bug Catcher", false);
+                clear_dialog(stream, context);
                 // The west wall establishes the next turn after this
                 // battle; do not finish an obsolete northward timer.
                 if (stop_after_battle){
                     return;
                 }
-                // Replay only this possibly interrupted short step,
-                // never the complete pre-battle travel duration.
+                // Repeat only this possibly interrupted short step, never the complete pre-battle
+                // travel duration.
             }else{
                 remaining -= step;
             }
@@ -1244,14 +1189,12 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     northbound_move(1, 0, 2000ms); // Reach the right wall.
     northbound_move(0, 1, 450ms);  // Clear the corner above it.
     northbound_move(1, 0, 1200ms); // Move into the northbound lane.
-    // Restore the north/west turns from the successful manual
-    // recording. The former 3200ms up stopped at the Bug Catcher,
-    // well short of town, and omitted the flower-bed detour.
+    // Turn north, then west around the flower beds. A straight north hold stops at the Bug
+    // Catcher, short of town.
     northbound_move(0, 1, 2200ms, true);
-    // Cross west below the flower beds until the fence/tree wall fixes
-    // the column. The recorded route reaches this same northbound lane
-    // after its sign corrections; overtravel absorbs the horizontal offset.
-    // Keep trainer handling active if the Bug Catcher was not yet fought.
+    // Cross west below the flower beds until the fence/tree wall fixes the column. Overtravel
+    // absorbs the horizontal offset. Keep trainer handling active if the Bug Catcher was not yet
+    // fought.
     stream.log("[Route 204 north turn] Moving west into the flower-bed wall, then north toward Floaroma.");
     northbound_move(-1, 0, 4200ms);
     // The expected town transition follows this known Route 204 lane.
@@ -1317,11 +1260,6 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
 }
 
 static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
-    auto move = [&](double x, double y, Milliseconds duration, Milliseconds settle = 250ms){
-        pbf_move_left_joystick(context, {x, y}, duration, 0ms);
-        pbf_wait(context, settle);
-        context.wait_for_all_requests();
-    };
     auto transition = [&](double x, double y, Milliseconds duration, const std::string& label){
         context.wait_for_all_requests();
         stream.log("[Route transition] " + label);
@@ -1332,7 +1270,7 @@ static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& s
             [x, y, duration](ProControllerContext& ctx){
                 pbf_move_left_joystick(ctx, {x, y}, duration, 0ms);
                 pbf_wait(ctx, 1500ms);
-                // Bounded doorway correction if the recorded move stops short.
+                // Apply a bounded doorway correction if the approach stops short.
                 for (size_t pulse = 0; pulse < 10; pulse++){
                     pbf_move_left_joystick(ctx, {x, y}, 100ms, 100ms);
                 }
@@ -1371,71 +1309,100 @@ static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& s
             label + ": Transition did not finish.",
             stream);
     };
-    auto battle = [&](const std::string& label){
-        stream.log("[Segment 02 battle] " + label);
-        wait_for_trainer_battle_menu(stream, context);
-        fight_trainer_using_moves(stream, context, stats, label, false);
-        clear_dialog(stream, context);
-    };
-    auto talk = [&](const std::string& label, Button response = BUTTON_B){
-        stream.log("[Segment 02 dialogue] " + label);
-        pbf_press_button(context, BUTTON_A, 150ms, 500ms);
-        context.wait_for_all_requests();
-        wait_for_dialog(stream, context, label, 5000ms);
-        clear_dialog(stream, context, response);
-    };
 
     // Checkpoint 0201 already healed and exited this Center.
     pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
     // Clear the Center doorway to the west before turning north,
     // so we cannot walk back through the door. Repel is already off.
-    move(-1, 0, 1500ms);
+    pbf_move_left_joystick(context, {-1, 0}, 1500ms, 0ms);
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
 
     // Meet the girl on Route 205, then return for the Works Key.
-    move(0, 1, 1000ms);
+    pbf_move_left_joystick(context, {0, 1}, 1000ms, 0ms);
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
     // Include the westward clearance and the former 650 ms east leg.
-    move(1, 0, 6550ms, 900ms);
-    talk("Route 205 girl requesting help for her father");
-    move(-1, 0, 4500ms, 500ms);
-    // Repel is already inactive; omit the recorded renewal A presses.
-    move(-1, 0, 3000ms);
-    move(0, 1, 2300ms);
-    // The westward overtravel establishes the tree wall. The
-    // recording then stops west of the Meadow gap: move right
-    // into that opening instead of pushing farther left.
-    move(1, 0, 300ms);
+    pbf_move_left_joystick(context, {1, 0}, 6550ms, 0ms);
+    pbf_wait(context, 900ms);
+    context.wait_for_all_requests();
+    stream.log("[Segment 02 dialogue] Route 205 girl requesting help for her father");
+    pbf_press_button(context, BUTTON_A, 150ms, 500ms);
+    context.wait_for_all_requests();
+    wait_for_dialog(stream, context, "Route 205 girl requesting help for her father", 5000ms);
+    clear_dialog(stream, context, BUTTON_B);
+    pbf_move_left_joystick(context, {-1, 0}, 7500ms, 0ms);
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {0, 1}, 2300ms, 0ms);
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
+    // Overtravel west to establish the tree wall, then move right into the Meadow gap.
+    pbf_move_left_joystick(context, {1, 0}, 300ms, 0ms);
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
     transition(0, 1, 1000ms, "Floaroma Meadow entrance");
-    move(0, 1, 1100ms);
+    pbf_move_left_joystick(context, {0, 1}, 1100ms, 0ms);
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
     pbf_press_button(context, BUTTON_A, 150ms, 500ms);
     stream.log("[Segment 02 battle] Floaroma Meadow first Galactic grunt.");
     wait_for_trainer_battle_menu(stream, context);
     fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
     // The second grunt starts another battle automatically. Do not
     // wait for quiet overworld or send movement between the fights.
-    battle("Floaroma Meadow second Galactic grunt");
-    talk("Floaroma Meadow honey seller and Works Key");
+    stream.log("[Segment 02 battle] Floaroma Meadow second Galactic grunt");
+    wait_for_trainer_battle_menu(stream, context);
+    fight_trainer_using_moves(stream, context, stats, "Floaroma Meadow second Galactic grunt", false);
+    clear_dialog(stream, context);
     if (!clear_new_item_flags(stream, context, 6)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Floaroma Meadow: Bag NEW flags did not clear.",
             stream);
     }
     transition(0, -1, 1000ms, "Floaroma Meadow exit");
-    move(0, -1, 2600ms);
+    pbf_move_left_joystick(context, {0, -1}, 2600ms, 0ms);
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
 
-    // No Repel is needed on the town/road route to Valley Windworks.
-    move(1, 0, 4200ms);
-    move(0, -1, 200ms);
-    move(1, 0, 5500ms);
-    move(0, -1, 500ms);
-    move(1, 0, 1200ms);
-    align_to_windworks_sign(stream, context);
-    // From the sign-side pose, the building wall fixes north/south
-    // position and the grunt blocks the subsequent eastward travel.
-    move(0, 1, 2000ms);
-    move(1, 0, 1500ms);
+    for (size_t location_index = 0; location_index < 2; location_index++){
+        const char* location = location_index == 0 ? "Route 205" : "Valley Windworks";
+        TownBannerWatcher banner_cleared(COLOR_CYAN, TownBannerWatcher::FinderType::GONE, 300ms);
+        if (wait_until(stream, context, 7s, {{banner_cleared}}) != 0){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                std::string(location) + ": Previous location banner did not clear.", stream);
+        }
+        TownBannerWatcher banner(COLOR_CYAN);
+        const int entered = run_until<ProControllerContext>(stream, context,
+            [](ProControllerContext& ctx){
+                pbf_move_left_joystick(ctx, {1, 0}, 10000ms, 0ms);
+            },
+            {{banner}});
+        context.wait_for_all_requests();
+        if (entered != 0){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                std::string(location) + ": Location banner not detected during eastward approach.", stream);
+        }
+        stream.log(std::string("[Windworks approach] ") + location + " banner detected; eastward movement stopped.");
+        if (location_index == 0){
+            pbf_move_left_joystick(context, {0, -1}, 200ms, 250ms);
+            context.wait_for_all_requests();
+        }
+    }
+    pbf_move_left_joystick(context, {1.000000, -0.000000}, 4651ms, 0ms);
+    pbf_wait(context, 234ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 3432ms, 0ms);
+    pbf_wait(context, 1630ms);
+    DpadState dpad;
+    dpad.last_dir = DPAD_UP;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 1, false);
+    context.wait_for_all_requests();
     pbf_press_button(context, BUTTON_A, 150ms, 500ms);
-    battle("Valley Windworks door Galactic grunt");
+    stream.log("[Segment 02 battle] Valley Windworks door Galactic grunt");
+    wait_for_trainer_battle_menu(stream, context);
+    fight_trainer_using_moves(stream, context, stats, "Valley Windworks door Galactic grunt", false);
+    clear_dialog(stream, context);
 
     // Probe the door after the grunt retreats. Cancel all remaining
     // movement as soon as dialogue appears, preserving doorway alignment.
@@ -1461,118 +1428,71 @@ static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& s
     stream.log("[Windworks door] Dialogue detected; confirm Works Key for two seconds.");
     pbf_mash_button(context, BUTTON_A, 2000ms);
     context.wait_for_all_requests();
-    // Interaction reaches the door from west of its entrance lane.
-    // One additional recorded nudge centers the subsequent northward entry.
-    move(1, 0, 40ms);
+    // Interaction reaches the door from west of its entrance lane. One additional nudge centers
+    // the northward entry.
+    pbf_move_left_joystick(context, {1, 0}, 40ms, 0ms);
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
     transition(0, 1, 1000ms, "Valley Windworks entrance");
     clear_dialog(stream, context); // Entrance warning from the grunt.
-    move(-1, 0, 2000ms);                         // Combined 1210ms + 817ms, separated by only 5ms.
-    bool fought_grunt = watch_route204_trainer_event(
-        stream,
+    pbf_move_left_joystick(context, {-1, 0}, 2000ms, 0ms); // West wall, below the first grunt's sightline.
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
+    // Stop northward travel on the actual battle menu. The floor here can
+    // resemble a short dialogue box, so do not use the merged dialogue watcher.
+    BattleMenuWatcher grunt_menu(BattleType::TRAINER, COLOR_YELLOW);
+    const int grunt_event = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& ctx){
             pbf_move_left_joystick(ctx, {0, 1}, 1250ms, 0ms);
-            pbf_wait(ctx, 2500ms);
+            pbf_mash_button(ctx, BUTTON_A, 30000ms);
         },
-        "Valley Windworks interior grunt approach");
-    if (fought_grunt){
-        battle("Valley Windworks interior Galactic grunt");
-    }
-    auto grunt_position = [&](){
-        OverworldMatchResult position;
-        for (size_t attempt = 0; attempt < 12; attempt++){
-            context.wait_for_all_requests();
-            const auto frame = stream.video().snapshot();
-            if (frame){
-                position = match_windworks_interior_grunt(*frame.frame);
-            }
-            if (position.located){
-                return position;
-            }
-            pbf_wait(context, 250ms);
-        }
+        {{grunt_menu}});
+    context.wait_for_all_requests();
+    if (grunt_event != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "Windworks interior: Could not determine player position relative to the grunt.",
-            stream);
-        return position;
-    };
-    auto position = grunt_position();
-    if (!fought_grunt && position.dy <= .025){
-        stream.log("[Windworks interior] Below/level with grunt; recover north and interact.");
-        for (size_t attempt = 0; attempt < 20 && !fought_grunt; attempt++){
-            fought_grunt = watch_route204_trainer_event(
-                stream,
-                context,
-                [](ProControllerContext& ctx){
-                    pbf_move_left_joystick(ctx, {0, 1}, 100ms, 0ms);
-                    pbf_press_button(ctx, BUTTON_A, 150ms, 500ms);
-                },
-                "Windworks interior below-grunt recovery");
-        }
-        if (!fought_grunt){
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Windworks interior: North/A recovery did not trigger the grunt battle.",
-                stream);
-        }
-        battle("Valley Windworks interior Galactic grunt (below recovery)");
+            "Windworks interior: First grunt battle menu not confirmed.", stream);
     }
-    auto align_above_grunt = [&](){
-        // Re-establish the west wall after a below-grunt interaction,
-        // then climb past his row before crossing the partition gap.
-        move(-1, 0, 1000ms);
-        bool above = false;
-        for (size_t attempt = 0; attempt < 20; attempt++){
-            position = grunt_position();
-            if (position.dy > .025){
-                above = true;
-                break;
-            }
-            move(0, 1, 80ms);
-        }
-        if (!above){
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Windworks interior: Could not get above the defeated grunt.",
-                stream);
-        }
-    };
-    if (fought_grunt){
-        align_above_grunt();
-    }else{
-        stream.log("[Windworks interior] Above grunt; try the rightward crossing for his battle.");
-    }
-    const bool crossing_event = watch_route204_trainer_event(
-        stream,
-        context,
-        [](ProControllerContext& ctx){
-            pbf_move_left_joystick(ctx, {1, 0}, 750ms, 0ms);
-            pbf_wait(ctx, 2500ms);
-        },
-        "Windworks interior upper crossing");
-    if (crossing_event){
-        if (!fought_grunt){
-            battle("Valley Windworks interior Galactic grunt (upper crossing)");
-        }else{
-            clear_dialog(stream, context);
-        }
-        // The event cancelled travel at an unknown point. Reacquire
-        // the west wall and upper row, then cross from that known pose.
-        align_above_grunt();
-        move(1, 0, 750ms, 450ms);
-    }else if (!fought_grunt){
-        stream.log(
-            "[Windworks interior] Rightward crossing completed without a battle; grunt missed, continuing to Mars.");
-    }
+    stream.log("[Segment 02 battle] Valley Windworks interior Galactic grunt.");
+    fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
+    clear_dialog(stream, context);
 
-    // The upper crossing above replaces the old blind north/right
-    // pair. Retain the remaining turns between the machines.
-    move(0, -1, 300ms, 0ms);
-    move(1, 0, 900ms);
-    move(0, 1, 250ms);
-    move(1, 0, 550ms, 400ms);
-    move(0, 1, 200ms);
-    move(1, 0, 750ms, 500ms);
+    // The grunt stops beside us on his row. Reacquire the west wall,
+    // then step one tile north into the gap between the two partitions.
+    // Once this grunt is defeated, there is no dialogue to clear here.
+    pbf_move_left_joystick(context, {-1, 0}, 1000ms, 0ms);
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
+    dpad.last_dir = DPAD_LEFT;
+    repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 1);
+    pbf_move_left_joystick(context, {1, 0}, 750ms, 0ms);
+    pbf_wait(context, 450ms);
+    context.wait_for_all_requests();
+
+    // Continue between the machines to Mars; retain the remaining recorded turns.
+    pbf_move_left_joystick(context, {0, -1}, 300ms, 0ms);
+    pbf_wait(context, 0ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {1, 0}, 900ms, 0ms);
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {0, 1}, 250ms, 0ms);
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {1, 0}, 550ms, 0ms);
+    pbf_wait(context, 400ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {0, 1}, 200ms, 0ms);
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {1, 0}, 750ms, 0ms);
+    pbf_wait(context, 500ms);
+    context.wait_for_all_requests();
     pbf_press_button(context, BUTTON_A, 150ms, 500ms);
-    battle("Commander Mars");
+    stream.log("[Segment 02 battle] Commander Mars");
+    wait_for_trainer_battle_menu(stream, context);
+    fight_trainer_using_moves(stream, context, stats, "Commander Mars", false);
+    clear_dialog(stream, context);
     clear_dialog(stream, context); // Father/daughter reunion after Mars leaves.
     stream.log("[Segment 02] Mars defeated; post-battle dialogue cleared.", COLOR_GREEN);
 }
@@ -1730,17 +1650,6 @@ static void align_route205_patrol_position(VideoStream& stream,
 }
 
 void mars_to_eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
-    auto move = [&](double x, double y, Milliseconds duration, Milliseconds settle = 250ms){
-        pbf_move_left_joystick(context, {x, y}, duration, 0ms);
-        pbf_wait(context, settle);
-        context.wait_for_all_requests();
-    };
-    auto battle = [&](const std::string& label){
-        stream.log("[Route 205 battle] " + label);
-        wait_for_trainer_battle_menu(stream, context);
-        fight_trainer_using_moves(stream, context, stats, label, false);
-        clear_dialog(stream, context);
-    };
     auto patrol_battle = [&](const std::string& label,
         const std::function<OverworldMatchResult(const ImageRGB32&)>& match,
         const std::function<void(ProControllerContext&)>& approach){
@@ -1760,46 +1669,80 @@ void mars_to_eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& str
                 label + ": Trainer did not approach the confirmed patrol position.",
                 stream);
         }
-        battle(label);
+        stream.log("[Route 205 battle] " + label);
+        wait_for_trainer_battle_menu(stream, context);
+        fight_trainer_using_moves(stream, context, stats, label, false);
+        clear_dialog(stream, context);
         // Either trainer can interrupt the approach. After the fight,
         // continue the route without returning to a patrol waypoint
         // or replaying the canceled approach movement.
     };
 
-    // Recorded path around the Windworks machines from the exact
-    // reunion position at the end of 02.02. Keep directional turns.
-    move(-1, 0, 1335ms, 847ms);
-    move(0, 1, 880ms, 209ms);
-    move(-1, 0, 906ms, 471ms);
-    move(0, -1, 427ms, 728ms);
-    move(-1, 0, 1213ms, 936ms);
-    move(-1, 0, 991ms, 175ms);
-    move(0, -1, 1714ms, 456ms);
-    move(1, -1, 6809ms, 1862ms);
-    move(0, -1, 922ms, 554ms);
-    move(-1, 0, 813ms, 1370ms);
-    move(0, -1, 1862ms, 145ms);
-    move(-1, 0, 3478ms, 500ms);
+    // Start at the reunion position at the end of 02.02. Follow the path around the Windworks
+    // machines and preserve directional turns.
+    pbf_move_left_joystick(context, {-1, 0}, 1335ms, 0ms);
+    pbf_wait(context, 847ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {0, 1}, 880ms, 0ms);
+    pbf_wait(context, 209ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {-1, 0}, 906ms, 0ms);
+    pbf_wait(context, 471ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {0, -1}, 427ms, 0ms);
+    pbf_wait(context, 728ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {-1, 0}, 1213ms, 0ms);
+    pbf_wait(context, 936ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {-1, 0}, 991ms, 0ms);
+    pbf_wait(context, 175ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {0, -1}, 1714ms, 0ms);
+    pbf_wait(context, 456ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {1, -1}, 6809ms, 0ms);
+    pbf_wait(context, 1862ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {0, -1}, 922ms, 0ms);
+    pbf_wait(context, 554ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {-1, 0}, 813ms, 0ms);
+    pbf_wait(context, 1370ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {0, -1}, 1862ms, 0ms);
+    pbf_wait(context, 145ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {-1, 0}, 3478ms, 0ms);
+    pbf_wait(context, 500ms);
+    context.wait_for_all_requests();
     // Replace the manual left/right/up sign adjustments with the
     // supplied repeatable position south of the bridge.
     align_to_route205_marker(stream, context, false);
     // Stop on the north bank, before Jacob's sight line. The longer
     // hold reached his patrol and interrupted the westward crossing.
-    move(0, 1, 800ms, 500ms);
+    pbf_move_left_joystick(context, {0, 1}, 800ms, 0ms);
+    pbf_wait(context, 500ms);
+    context.wait_for_all_requests();
     if (!activate_repel(stream, context, 6)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Route 205: Could not activate Repel before the grass.",
             stream);
     }
 
-    // Cross beside the golden tree first, then travel through the
-    // grass west of Jacob. Clamp north against the plateau cliff
-    // before completing the westward approach to its south stairs.
-    // Keep the recorded total westward travel, split around the turn.
-    move(-1, 0, 600ms, 268ms);
+    // Cross beside the golden tree, then travel through the grass west of Jacob. Clamp north
+    // against the plateau cliff before approaching its south stairs from the east. Preserve total
+    // westward travel across the turn.
+    pbf_move_left_joystick(context, {-1, 0}, 600ms, 0ms);
+    pbf_wait(context, 268ms);
+    context.wait_for_all_requests();
     align_to_route205_bank_tree(stream, context);
-    move(0, 1, 2500ms, 250ms);
-    move(-1, 0, 2212ms, 268ms);
+    pbf_move_left_joystick(context, {0, 1}, 2500ms, 0ms);
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {-1, 0}, 2212ms, 0ms);
+    pbf_wait(context, 268ms);
+    context.wait_for_all_requests();
     // Route 204's missed-fight pattern: one continuous approach,
     // then stand still and decide before sending the next movement.
     ShortDialogDetector hiker_dialogue(COLOR_YELLOW);
@@ -1837,7 +1780,10 @@ void mars_to_eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& str
         hiker_started();
     stream.log("[Daniel dodge check] missed_trainer=" + std::to_string(!hiker_encounter));
     if (hiker_encounter){
-        battle("Hiker Daniel");
+        stream.log("[Route 205 battle] Hiker Daniel");
+        wait_for_trainer_battle_menu(stream, context);
+        fight_trainer_using_moves(stream, context, stats, "Hiker Daniel", false);
+        clear_dialog(stream, context);
         stream.log("[Route 205] Daniel defeated; moving north from his battle landing to Zackary.");
     }else{
         stream.log("[Route 205] Daniel dodged; continuing north up the stairs before turning right to Zackary.",
@@ -1855,41 +1801,56 @@ void mars_to_eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& str
         // corner before visual confirmation and stationary wait.
         pbf_move_left_joystick(ctx, {1, 0}, 900ms, 250ms);
     });
-    // Restore the west side for the recorded bridge/stair turns.
-    move(-1, 0, 1800ms, 250ms);
+    // Return to the west side for the bridge/stair turns.
+    pbf_move_left_joystick(context, {-1, 0}, 1800ms, 0ms);
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
     patrol_battle("Battle Girl Kelsey", match_route205_kelsey, [](ProControllerContext& ctx){
-        const auto step = [&](double x, double y, Milliseconds duration, Milliseconds settle){
-            pbf_move_left_joystick(ctx, {x, y}, duration, 0ms);
-            pbf_wait(ctx, settle);
-        };
-        step(0, 1, 638ms, 673ms);
-        step(1, 0, 476ms, 508ms);
-        step(0, 1, 717ms, 254ms);
-        step(-1, 0, 415ms, 430ms);
-        step(0, 1, 2517ms, 57ms);
-        step(1, 0, 410ms, 299ms);
-        step(0, 1, 1343ms, 500ms);
-        step(-1, 0, 294ms, 250ms);
+        pbf_move_left_joystick(ctx, {0, 1}, 638ms, 0ms);
+        pbf_wait(ctx, 673ms);
+        pbf_move_left_joystick(ctx, {1, 0}, 476ms, 0ms);
+        pbf_wait(ctx, 508ms);
+        pbf_move_left_joystick(ctx, {0, 1}, 717ms, 0ms);
+        pbf_wait(ctx, 254ms);
+        pbf_move_left_joystick(ctx, {-1, 0}, 415ms, 0ms);
+        pbf_wait(ctx, 430ms);
+        pbf_move_left_joystick(ctx, {0, 1}, 2517ms, 0ms);
+        pbf_wait(ctx, 57ms);
+        pbf_move_left_joystick(ctx, {1, 0}, 410ms, 0ms);
+        pbf_wait(ctx, 299ms);
+        pbf_move_left_joystick(ctx, {0, 1}, 1343ms, 0ms);
+        pbf_wait(ctx, 500ms);
+        pbf_move_left_joystick(ctx, {-1, 0}, 294ms, 0ms);
+        pbf_wait(ctx, 250ms);
     });
     stream.log("[Route 205] Kelsey defeated; taking the left/north/right/north forest approach.");
-    // Original recorded turns around the ledge and northern outcrop.
-    // This exit applies even if Kelsey interrupted an earlier step.
-    move(-1, 0, 415ms, 430ms);
-    // Renew in the cleared lane so expiry cannot interrupt the climb.
-    // Keep both recorded northward movement durations unchanged.
+    // Follow the turns around the ledge and northern outcrop. This exit applies even if Kelsey
+    // interrupted an earlier step.
+    pbf_move_left_joystick(context, {-1, 0}, 415ms, 0ms);
+    pbf_wait(context, 430ms);
+    context.wait_for_all_requests();
+    // Renew in the cleared lane so expiry cannot interrupt the climb. Preserve both northward
+    // movement durations.
     force_repel_expiry(stream, context, RepelRenewalChoice::YES, true);
-    move(0, 1, 2517ms, 57ms);
-    move(1, 0, 410ms, 299ms);
-    move(0, 1, 1343ms, 500ms);
+    pbf_move_left_joystick(context, {0, 1}, 2517ms, 0ms);
+    pbf_wait(context, 57ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {1, 0}, 410ms, 0ms);
+    pbf_wait(context, 299ms);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {0, 1}, 1343ms, 0ms);
+    pbf_wait(context, 500ms);
+    context.wait_for_all_requests();
     align_to_route205_marker(stream, context, true);
-    move(0, 1, 20ms);
+    pbf_move_left_joystick(context, {0, 1}, 20ms, 0ms);
+    pbf_wait(context, 250ms);
+    context.wait_for_all_requests();
     stream.log("[Route 205] Forest entrance sign confirmed; checkpoint complete.", COLOR_GREEN);
 }
-// Cheryl controls her own Pokemon. Select move slot 2 visually,
-// then A advances target selection and battle text, as in the recording.
+// Cheryl controls her own Pokemon. Select move slot 2 visually, then use A to advance target
+// selection and battle text.
 void eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     (void)env;
-    // Second recorded run, beginning at the northern Route 205 sign.
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 1466ms, 0ms);
     pbf_wait(context, 1588ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 531ms, 0ms);
@@ -1945,7 +1906,7 @@ void eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
     pbf_move_left_joystick(context, {1.000000, -1.000000}, 12ms, 0ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1358ms, 0ms);
     pbf_wait(context, 223ms);
-    // The recording renews here before walking into the last pair.
+    // Renew Repel before walking into the last pair.
     force_repel_expiry(stream, context, RepelRenewalChoice::YES, true);
     encounter("Bug Catchers Donald and Phillip", [&](ProControllerContext& context){
         pbf_move_left_joystick(context, {1.000000, -0.000000}, 2335ms, 0ms);
@@ -1962,7 +1923,7 @@ void eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
     pbf_wait(context, 109ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1613ms, 0ms);
     pbf_wait(context, 538ms);
-    // Clear the recorded expiry prompt before Cheryl's farewell.
+    // Clear the expiry prompt before Cheryl's farewell.
     clear_dialog(stream, context, BUTTON_A);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 928ms, 0ms);
     pbf_wait(context, 1487ms);
@@ -2050,7 +2011,7 @@ void eterna_forest_exit_to_gym(SingleSwitchProgramEnvironment& env,
             stream);
     }
     pbf_wait(context, 500ms);
-    // Retain the recorded northward approach from the fixed entrance.
+    // Approach north from the fixed entrance.
     pbf_move_left_joystick(context, {0, 1}, 290ms, 0ms);
     align_to_overworld_landmarks(stream,
         context,
@@ -2061,8 +2022,8 @@ void eterna_forest_exit_to_gym(SingleSwitchProgramEnvironment& env,
     pbf_move_left_joystick(context, {0, 1}, 80ms, 200ms);
     pbf_press_button(context, BUTTON_A, 80ms, 200ms);
     wait_for_dialog(stream, context, "Underground Man introduction");
-    // Recorded forced walk: 4.7s between house and street dialogue.
-    // Keep watching for that gap plus a 500ms hardware buffer.
+    // The forced walk between house and street dialogue takes 4.7s. Keep watching for that gap
+    // plus a 500ms hardware buffer.
     clear_dialog(stream,
         context,
         BUTTON_A,
@@ -2086,7 +2047,6 @@ void eterna_forest_exit_to_gym(SingleSwitchProgramEnvironment& env,
             stream);
     }
     stream.log("[Grand Underground] Tutorial dialogue complete; returning with Y.");
-    // User-requested full settling interval immediately before Y.
     pbf_wait(context, 2000ms);
     pbf_press_button(context, BUTTON_Y, 129ms, 0ms);
     pbf_wait(context, 2076ms);
@@ -2109,8 +2069,8 @@ void eterna_forest_exit_to_gym(SingleSwitchProgramEnvironment& env,
     pbf_wait(context, 145ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1257ms, 0ms);
     pbf_wait(context, 956ms);
-    // Reuse the plaza/Cheryl cutscene cleanup rather than a
-    // recorded number of A presses during Cynthia's camera changes.
+    // Use the plaza/Cheryl cutscene cleanup during Cynthia's camera changes instead of a fixed
+    // number of A presses.
     context.wait_for_all_requests();
     wait_for_dialog(stream, context, "Cynthia introduction");
     clear_dialog(stream, context, BUTTON_A, 3500ms);
@@ -2145,9 +2105,8 @@ void eterna_forest_exit_to_gym(SingleSwitchProgramEnvironment& env,
         nullptr,
         .03,
         .02);
-    // User's eternapctogym.txt with a shorter south leg; omit its final left127ms correction.
-    // Start acquiring north of the old fence collision, then let
-    // gym landmarks correct the final row and rightward approach.
+    // Start acquiring north of the fence collision, then use gym landmarks to correct the final
+    // row and eastward approach.
     pbf_move_left_joystick(context, {0, -1}, 4300ms, 0ms);
     pbf_wait(context, 642ms);
     pbf_move_left_joystick(context, {1, 0}, 1125ms, 0ms);
@@ -2345,8 +2304,8 @@ static void gym_Puzzle_02(SingleSwitchProgramEnvironment& env, VideoStream& stre
     wait_for_dialog(stream, context, "Gardenia introduction");
     clear_dialog(stream, context, BUTTON_A, 3500ms);
     stream.log("[Eterna Gym puzzle] Gardenia introduction dialogue cleared.");
-    // Door transition and gym camera introduction take about 7.5s
-    // in 2026-10-18 20-01-01; include 500ms for hardware variation.
+    // Allow 7.5 seconds for the door transition and gym camera introduction, plus 500ms for
+    // hardware variation.
     stream.log(
         "[Eterna Gym puzzle] Entering Gardenia's doorway; waiting 8000ms for transition/cutscene (includes 500ms buffer).");
     pbf_press_dpad(context, DPAD_UP, 80ms, 8000ms);
@@ -2419,11 +2378,9 @@ static void gym_Puzzle_02(SingleSwitchProgramEnvironment& env, VideoStream& stre
     wait_for_trainer_battle_menu(stream, context);
     fight_trainer_using_moves(stream, context, stats, "Gardenia", true);
 
-    // The shared battle handler already advances reward dialogue
-    // while confirming the overworld. Do not require the badge
-    // animation again after it may have finished or be underway.
-    // Continue the existing B watcher through remaining rewards;
-    // its clear confirmation spans the observed ~5s badge gap.
+    // The battle handler advances reward dialogue while confirming the overworld. The badge
+    // animation may already be finished or underway. Continue the B watcher through remaining
+    // rewards; its clear confirmation spans the approximately five-second badge gap.
     stream.log("[Eterna Gym puzzle] Shared battle cleanup returned; clearing remaining Gardenia rewards with B.");
     clear_dialog(stream, context, BUTTON_B, 6000ms);
     stream.log("[Eterna Gym puzzle] Gardenia post-battle dialogue cleared; starting exit path.");

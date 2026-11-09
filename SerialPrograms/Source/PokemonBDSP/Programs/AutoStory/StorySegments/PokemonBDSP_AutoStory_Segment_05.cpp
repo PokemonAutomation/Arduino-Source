@@ -134,7 +134,7 @@ static bool go_to_pastoria_pokemon_center(VideoStream& stream, ProControllerCont
     return true;
 }
 
-static bool exit_pastoria_pokemon_center(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
+static bool heal_at_pastoria_pokemon_center(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     return heal_pokemon(stream, context, "Pastoria", &stats);
 }
 
@@ -1193,9 +1193,8 @@ static void hearthome_gym_puzzle_and_cynthia(SingleSwitchProgramEnvironment& env
     ProControllerContext& context,
     AutoStoryStats& stats){
     VideoStream& stream = env.console;
-    // The door fade ends before the entry camera tour. The 2026-11-08
-    // recording shows all eight initial up presses lost during that tour.
-    // Wait for the entrance view before starting the lift approach.
+    // Wait for the entry camera tour to finish before sending the eight northward presses for the
+    // lift approach.
     context.wait_for_all_requests();
     stream.log("[Hearthome Gym puzzle] Waiting for the entry camera tour to finish.");
     pbf_wait(context, 8000ms);
@@ -1207,7 +1206,7 @@ static void hearthome_gym_puzzle_and_cynthia(SingleSwitchProgramEnvironment& env
         Milliseconds delay;
     };
 
-    // Trial: use the supplied counts without an extra facing press.
+    // These counts already include facing presses; do not add another.
     const Move sequence1[] = {
         {DPAD_UP, 7, 0ms},
         {DPAD_UP, 1, 5000ms},
@@ -1448,9 +1447,9 @@ void checkpoint_0501(SingleSwitchProgramEnvironment& env,
                 }
             }
             {
-                if (!exit_pastoria_pokemon_center(env.console, context, stats)){
+                if (!heal_at_pastoria_pokemon_center(env.console, context, stats)){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "exit_pastoria_pokemon_center: transition not detected.",
+                        "heal_at_pastoria_pokemon_center: transition not detected.",
                         env.console);
                 }
             }

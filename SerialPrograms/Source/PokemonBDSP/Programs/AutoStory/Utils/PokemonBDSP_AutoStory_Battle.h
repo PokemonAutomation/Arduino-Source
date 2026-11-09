@@ -45,8 +45,8 @@ void run_battle_press_A(const ProgramInfo& info, VideoStream& stream, ProControl
 double read_player_hp_ratio(const ImageViewRGB32& frame);
 
 // Starts at the singles trainer command menu. Confirms Bag, item name, Use,
-// and the return to battle narration. Supports X Attack on the active Pokemon
-// and Full Restore on the first party Pokemon. Throws on unconfirmed states;
+// and the return to battle narration. Supports X Attack and X Sp. Def on the
+// active Pokemon, and Full Restore on the first party Pokemon. Throws on unconfirmed states;
 // the caller must finish narration before selecting another battle action.
 // after_battle starts/ends in the overworld, checks exact Bag HP numbers,
 // and uses Full Restore only below full HP, verifying full HP afterward.

@@ -682,13 +682,13 @@ void use_item_in_battle(VideoStream& stream,
             }
         }
     }
-    if (item_slug != "x-attack" && item_slug != "full-restore"){
+    if (item_slug != "x-attack" && item_slug != "x-sp-def" && item_slug != "full-restore"){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Battle item: unsupported item " + item_slug + ".", stream);
     }
     open_battle_bag(stream, context);
     use_item_in_open_bag(stream, context, language, item_slug,
-        item_slug == "x-attack" ? 3 : 1, item_slug == "full-restore");
+        item_slug == "full-restore" ? 1 : 3, item_slug == "full-restore");
 }
 
 

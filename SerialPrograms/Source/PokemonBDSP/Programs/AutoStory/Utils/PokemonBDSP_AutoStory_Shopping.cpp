@@ -35,7 +35,10 @@ const std::vector<ItemToBuy> ASSISTED_LEAGUE_MEDICINE{
 const VeilstoneShoppingList ASSISTED_INFERNAPE_LEAGUE{
     {},
     {},
-    {{ShopItem::XAttack, 3, ShopQuantityMode::TARGET_STOCK}},
+    {
+        {ShopItem::XAttack, 3, ShopQuantityMode::TARGET_STOCK},
+        {ShopItem::XSpDef, 2, ShopQuantityMode::TARGET_STOCK},
+    },
     {},
     {},
 };
@@ -88,6 +91,8 @@ static const char* shop_item_name(ShopItem item){
         return "Escape rope";
     case ShopItem::XAttack:
         return "X Attack";
+    case ShopItem::XSpDef:
+        return "X Sp. Def";
     case ShopItem::XSpAtk:
         return "X Sp. Atk";
     case ShopItem::XSpeed:
@@ -126,6 +131,8 @@ static const char* shop_item_slug(ShopItem item){
         return "escape-rope";
     case ShopItem::XAttack:
         return "x-attack";
+    case ShopItem::XSpDef:
+        return "x-sp-def";
     case ShopItem::XSpAtk:
         return "x-sp-atk";
     case ShopItem::XSpeed:
@@ -453,7 +460,7 @@ bool shop_veilstone_department_store(VideoStream& stream,
         return false;
     }
     DpadState dpad;
-    // Recorded counts include facing presses. Do not add another turning press.
+    // Counts include facing presses. Do not add another turning press.
     const auto move = [&](DpadPosition dir, size_t count){
         repeat_dpad(context, dpad, dir, 80ms, 300ms, count, false);
     };
@@ -491,7 +498,7 @@ bool shop_veilstone_department_store(VideoStream& stream,
 
     // Let the Fly landing finish before the first facing/movement presses.
     pbf_wait(context, 1000ms);
-    // PCtoDept: recorded approach from the Fly landing outside the Center.
+    // Approach the department store from the Fly landing outside the Center.
     move(DPAD_LEFT, 4);
     move(DPAD_DOWN, 2);
     pbf_move_left_joystick(context, {-1, 0}, 2211ms, 300ms);
@@ -561,9 +568,8 @@ bool shop_veilstone_department_store(VideoStream& stream,
         return false;
     }
     stream.log("Veilstone shopping: 3F south aisle to the west counters.");
-    // Video 2026-11-06 07-21-11, 10:41-10:50: leave the elevator
-    // south to the wall, then west to the planter beside the lower counter.
-    // These holds include margin against the fixed stops, not an NPC.
+    // Leave the elevator south to the wall, then west to the planter beside the lower counter.
+    // These holds include margin against fixed stops, not an NPC.
     pbf_move_left_joystick(context, {0, -1}, 3000ms, 300ms);
     pbf_move_left_joystick(context, {-1, 0}, 2500ms, 300ms);
     // Four presses = face north + three tiles past the planter.

@@ -74,7 +74,7 @@ OverworldMatchResult match_veilstone_dawn_stairs(const ImageRGB32& frame);
 OverworldMatchResult match_hearthome_gym_entrance(const ImageRGB32& frame);
 OverworldMatchResult match_route208_stair_top(const ImageRGB32& frame);
 OverworldMatchResult match_route208_lower_stair_lane(const ImageRGB32& frame);
-// User-marked sign frame and rock pair at the Route 209 renewal point.
+// Sign frame and rock pair at the Route 209 renewal point.
 OverworldMatchResult match_route209_repel_point(const ImageRGB32& frame);
 // Lane 4 east corner; coarse bridge references only guide approach acquisition.
 OverworldMatchResult match_route215_jogger_corner(const ImageRGB32& frame);

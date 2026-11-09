@@ -669,25 +669,6 @@ bool test_fly_locations(VideoStream& stream, ProControllerContext& context){
     return true;
 }
 
-// ---------------------------------------------------------------------------
-// Arrow - Based Potion Usage Helper
-
-// This version assumes :
-//
-// you are already inside the Bag
-// Potion has already been selected
-// the game is currently waiting for you to choose a Pokemon
-//
-// Flow :
-// 1. Move LEFT once to Pokemon list
-// 2. Press A on first Pokemon
-// 3. Use SelectionArrow to detect arrow position
-// 4. Move DOWN until arrow reaches slot 3
-// 5. Mash A for 3 seconds
-// 6. Mash B for 10 seconds
-//
-// ---------------------------------------------------------------------------
-
 // Slot 1's colored HP bar in the Bag. Read fill position rather than OCR.
 static double potion_hp_fraction(const ImageViewRGB32& frame){
     if (bag_pocket_position(frame) == 0){
@@ -710,15 +691,16 @@ static double potion_hp_fraction(const ImageViewRGB32& frame){
     return bar.width() ? (double)filled / bar.width() : -1;
 }
 
-static double confirmed_potion_hp(VideoStream& stream, ProControllerContext& context){
+static double confirmed_potion_hp(VideoStream& stream, ProControllerContext& context, double minimum = -1){
     double previous = -1;
     size_t stable = 0;
-    for (size_t check = 0; check < 20; check++){
+    for (size_t check = 0; check < 40; check++){
         context.wait_for_all_requests();
         auto frame = stream.video().snapshot();
         double hp = frame ? potion_hp_fraction(frame) : -1;
-        if (hp >= 0 && previous >= 0 && std::abs(hp - previous) <= 0.015){
-            if (++stable >= 3){
+        if (hp >= 0 && hp > minimum && previous > minimum && std::abs(hp - previous) <= 0.015){
+            const size_t required = minimum >= 0 && hp < 0.98 ? 8 : 3;
+            if (++stable >= required){
                 return hp;
             }
         }else{
@@ -732,72 +714,112 @@ static double confirmed_potion_hp(VideoStream& stream, ProControllerContext& con
         stream);
 }
 
-void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context){
+void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context, uint8_t* level){
     OverlayBoxScope hp_overlay(stream.overlay(), COLOR_GREEN, {0.137, 0.160, 0.202, 0.016}, "");
     BagItemTemplate potion;
     potion.reference_path = "PokemonBDSP/Autostory/Bag_Potion.png";
     potion.label = "Potion";
     potion.reference_row = 1;
-    bool healed = false;
-    for (size_t dose = 0; dose < 3; dose++){
-        stream.log("[Potion] Finding Bag/Medicine/Potion; dose " + std::to_string(dose + 1) + "/3.");
-        if (!find_bag_item(stream, context, potion, 1, 5, 64, std::chrono::seconds(45))){
+    open_menu(stream, context, MenuCursorPosition::BAG, 5);
+    pbf_wait(context, 1000ms);
+    double hp = confirmed_potion_hp(stream, context);
+    for (size_t dose = 0; hp < 0.98 && dose < 3; dose++){
+        if (hp <= 0.005){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Potion: Could not verify Potion in the Medicine pocket.",
-                stream);
+                "Potion: Slot 1 appears fainted; a Potion cannot revive it.", stream);
         }
-        const double before = confirmed_potion_hp(stream, context);
-        stream.log("[Potion] Slot 1 HP bar before use=" + std::to_string(before * 100) + "%.");
-        if (before >= 0.98){
-            healed = true;
-            break;
-        }
-        if (before <= 0.005){
+        stream.log("[Potion] Finding Potion; dose " + std::to_string(dose + 1) + "/3.");
+        if (!find_bag_item(stream, context, potion, 1, 5, 64, 45s, true)){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Potion: Slot 1 appears fainted; a Potion cannot revive it.",
-                stream);
+                "Potion: Could not verify Potion in the Medicine pocket.", stream);
         }
         pbf_press_button(context, BUTTON_A, 80ms, 500ms);
         pbf_press_button(context, BUTTON_A, 80ms, 500ms);
         pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
-        pbf_mash_button(context, BUTTON_B, 2000ms);
-        context.wait_for_all_requests();
-        OverworldWatcher overworld;
-        if (wait_until(stream, context, std::chrono::seconds(10), {{overworld}}) != 0){
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Potion: Did not return to the overworld after use.",
-                stream);
+        // The party HP bar stays visible while the Potion is applied, even
+        // when it was the last Potion. Require an increase before accepting
+        // stable HP; an unchanged pre-animation bar is not a successful dose.
+        hp = confirmed_potion_hp(stream, context, hp + 0.005);
+        stream.log("[Potion] Slot 1 HP after use=" + std::to_string(hp * 100) + "%.");
+        if (hp < 0.98){
+            // Return from the target/result prompt to the item list for another dose.
+            bool item_list = false;
+            for (size_t press = 0; press < 5; press++){
+                context.wait_for_all_requests();
+                const auto frame = stream.video().snapshot();
+                if (frame && bag_pocket_position(frame) != 0 && bag_cursor_position(frame) != 0){
+                    item_list = true;
+                    break;
+                }
+                pbf_press_button(context, BUTTON_B, 80ms, 300ms);
+            }
+            if (!item_list){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Potion: Item list not confirmed for another dose.", stream);
+            }
         }
-        // Reopen Bag to verify the result, including when the last Potion was used.
-        open_menu(stream, context, MenuCursorPosition::BAG, 5);
-        pbf_wait(context, 750ms);
-        context.wait_for_all_requests();
-        const double after = confirmed_potion_hp(stream, context);
-        stream.log("[Potion] Slot 1 HP bar after use=" + std::to_string(after * 100) + "%.");
-        if (after <= before + 0.005){
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Potion: Slot 1 HP did not increase; refusing to continue movement.",
-                stream);
-        }
-        if (after >= 0.98){
-            healed = true;
-            break;
-        }
-        pbf_mash_button(context, BUTTON_B, 2000ms);
-        context.wait_for_all_requests();
     }
-    if (!healed){
+    if (hp < 0.98){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "Potion: Full HP not confirmed after three uses.",
-            stream);
+            "Potion: Full HP not confirmed after three uses.", stream);
+    }
+    if (level){
+        // Reuse the visible Bag level for tutorial readiness. Strict numeric
+        // reads must agree across filters and three frames before skipping training.
+        *level = 0;
+        int previous = -1;
+        size_t stable = 0;
+        for (size_t check = 0; check < 12; check++){
+            context.wait_for_all_requests();
+            const auto frame = stream.video().snapshot();
+            int observed = -1;
+            bool conflicting = false;
+            if (frame && bag_pocket_position(frame) != 0){
+                for (const auto& range : OCR::WHITE_TEXT_FILTERS()){
+                    const std::string text = OCR::tesseract_ocr_read(Language::English,
+                        to_blackwhite_rgb32_range(
+                            extract_box_reference(frame, ImageFloatBox{0.320, 0.180, 0.025, 0.040}),
+                            true, range.mins, range.maxs), OCR::PageSegMode::SINGLE_WORD);
+                    std::string digits;
+                    for (char c : text){
+                        if (!std::isspace(static_cast<unsigned char>(c))){
+                            digits += c;
+                        }
+                    }
+                    if (digits.empty() || digits.size() > 2 ||
+                        digits.find_first_not_of("0123456789") != std::string::npos){
+                        continue;
+                    }
+                    const int value = std::atoi(digits.c_str());
+                    // This optional check is used only before tutorial training.
+                    if (value >= 5 && value <= 20){
+                        conflicting |= observed >= 0 && observed != value;
+                        observed = value;
+                    }
+                }
+            }
+            if (conflicting){
+                observed = -1;
+            }
+            stable = observed >= 0 && observed == previous ? stable + 1 : 1;
+            previous = observed;
+            if (observed >= 0 && stable >= 3){
+                *level = static_cast<uint8_t>(observed);
+                break;
+            }
+            pbf_wait(context, 150ms);
+        }
+        if (*level == 0){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Tutorial training: Starter level could not be confirmed in the Bag.", stream);
+        }
     }
     pbf_mash_button(context, BUTTON_B, 2000ms);
     context.wait_for_all_requests();
     OverworldWatcher overworld;
-    if (wait_until(stream, context, std::chrono::seconds(10), {{overworld}}) != 0){
+    if (wait_until(stream, context, 10s, {{overworld}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "Potion: Final overworld return not confirmed.",
-            stream);
+            "Potion: Final overworld return not confirmed.", stream);
     }
     stream.log("[Potion] Slot 1 HP bar full and overworld confirmed.");
 }
@@ -857,7 +879,6 @@ void open_menu(VideoStream& stream, ProControllerContext& context, MenuCursorPos
             "CAPSULES",
             "MYSTERYGIFT",
         };
-        // Previous optional template directory: PokemonBDSP/AutoStory.
         std::string ref_dir = RESOURCE_PATH() + "PokemonBDSP/Autostory";
         for (int i = 0; i < MENU_CURSOR_NUM_ICONS; i++){
             std::string path = ref_dir + "/" + ICON_NAMES[i] + ".png";
@@ -866,7 +887,6 @@ void open_menu(VideoStream& stream, ProControllerContext& context, MenuCursorPos
             if (!Filesystem::is_regular_file(path)){
                 continue;
             }
-            // Previously constructed the image before checking its availability.
             ImageRGB32 img(path);
             if (img){
                 detector.set_icon_reference(static_cast<MenuCursorPosition>(i), std::move(img));
@@ -1421,7 +1441,8 @@ bool find_bag_item(VideoStream& stream,
     int target_pocket,
     int num_icons,
     size_t max_scrolls_per_pocket,
-    std::chrono::milliseconds search_timeout){
+    std::chrono::milliseconds search_timeout,
+    bool bag_already_open){
     if (target_pocket < 1 || target_pocket > 8 || item.reference_row < 1 || item.reference_row > 7){
         stream.log("[Bag search] Invalid template reference row.", COLOR_ORANGE);
         return false;
@@ -1436,8 +1457,10 @@ bool find_bag_item(VideoStream& stream,
     ImageMatchDetector bag(reference, ImageFloatBox(0.055, 0.012, 0.044, 0.045), 35.0, true);
     const auto deadline = std::chrono::steady_clock::now() + search_timeout;
 
-    open_menu(stream, context, MenuCursorPosition::BAG, num_icons);
-    pbf_wait(context, 1000ms);
+    if (!bag_already_open){
+        open_menu(stream, context, MenuCursorPosition::BAG, num_icons);
+        pbf_wait(context, 1000ms);
+    }
     context.wait_for_all_requests();
 
     if (!bag_navigate_to_pocket(stream, context, target_pocket)){

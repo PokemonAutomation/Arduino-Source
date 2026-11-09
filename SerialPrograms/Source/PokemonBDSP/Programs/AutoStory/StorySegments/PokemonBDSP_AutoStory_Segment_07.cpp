@@ -719,7 +719,7 @@ static bool continue_through_route_216(VideoStream& stream, ProControllerContext
     context.wait_for_all_requests();
     stream.log("continue_through_route_216: Repel renewed; Dalton alignment stop and return offset finished.");
 
-    // The return offset restores the original start of this recorded northward leg.
+    // The return offset restores the start of the northward leg.
     pbf_move_left_joystick(context, {0, +1}, 17000ms, 100ms); // 67++ (snow)
     dpad.last_dir = DPAD_UP;
     repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 800ms, 8); // Snow
@@ -942,7 +942,7 @@ static bool restock_super_repels_snowpoint(VideoStream& stream,
             context,
             [](ProControllerContext& context){
                 pbf_move_left_joystick(context, {0.000000, -1.000000}, 1101ms, 0ms);
-                // Observe the doorway fade after the recorded movement ends.
+                // Observe the doorway fade after movement ends.
                 pbf_wait(context, 5000ms);
             },
             {{exit}});
@@ -1107,9 +1107,8 @@ static bool walk_through_route_214(VideoStream& stream, ProControllerContext& co
     pbf_move_left_joystick(context, {0, -1}, 600ms, 100ms); // 3+
     repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 2, true);
 
-    // Keep the recorded southward stop against the trees at 41:00.
-    // Skip the expiry wiggle and shorten the following westward alignment
-    // from four seconds to three before continuing along the existing route.
+    // Stop south against the trees. Skip the expiry wiggle and align west for three seconds
+    // before continuing.
     pbf_move_left_joystick(context, {0, -1}, 6200ms, 100ms); // 31+
     pbf_move_left_joystick(context, {-1, 0}, 3000ms, 100ms);
 
@@ -1125,7 +1124,7 @@ static bool walk_through_route_214(VideoStream& stream, ProControllerContext& co
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                // Recorded entry completes in under three seconds, including the fade.
+                // Entry completes in under three seconds, including the fade.
                 pbf_move_left_joystick(context, {-1, 0}, 4000ms, 100ms);
             },
             {{black_screen}});
@@ -1153,8 +1152,8 @@ static bool go_through_lake_valor(VideoStream& stream,
     pbf_move_left_joystick(context, {-1, 0}, 2000ms, 100ms); // 10+
     context.wait_for_all_requests();
     force_repel_expiry(stream, context, RepelRenewalChoice::NO, false, true);
-    // The footage shows this west hold reaching the cliff beside the stairs.
-    // Reuse that stop after expiry to remove the horizontal wiggle offset.
+    // The west hold reaches the cliff beside the stairs. Use that stop after expiry to remove the
+    // horizontal wiggle offset.
     pbf_move_left_joystick(context, {-1, 0}, 2000ms, 100ms);
     dpad.last_dir = DPAD_LEFT;
     repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 2);
@@ -1176,7 +1175,7 @@ static bool go_through_lake_valor(VideoStream& stream,
 
     context.wait_for_all_requests();
     stream.log("Lake Valor: following the recorded route from the stair landing to Saturn.");
-    // Recorded taps include facing presses. Do not add another turn press.
+    // These taps include facing presses. Do not add another turn press.
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1627ms, 0ms);
     pbf_wait(context, 390ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 434ms, 0ms);
@@ -1227,8 +1226,8 @@ static bool go_through_lake_valor(VideoStream& stream,
         const int result = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& ctx){
-                // The recorded fight relied on the Grunt turning and walking
-                // over. Approach and interact instead of waiting at a distance.
+                // Approach the Grunt and interact instead of waiting at a distance for him to
+                // turn and walk over.
                 ssf_press_left_joystick(ctx, {-1, 0}, 0ms, 2000ms);
                 ssf_mash1_button(ctx, BUTTON_A, 30000ms);
             },
@@ -1241,10 +1240,9 @@ static bool go_through_lake_valor(VideoStream& stream,
     fight_trainer_using_moves(stream, context, stats, "lake_valor_grunt", true);
     context.wait_for_all_requests();
 
-    // A direct interaction and a sight-line encounter can end at different
-    // horizontal positions. Step below the Grunt before using the west cliff
-    // so the NPC cannot block the wall stop. Restore the recorded column five
-    // walking steps east; one south step here leaves seven of the recorded eight.
+    // Direct interaction and a sight-line encounter can end at different horizontal positions.
+    // Step below the Grunt before using the west cliff so the NPC cannot block the wall stop.
+    // Restore the column five walking steps east; the south step here leaves seven more.
     // TODO(live verification): verify this wall return and restored column.
     dpad.last_dir = DPAD_LEFT;
     repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 1);
@@ -1303,7 +1301,7 @@ static bool go_through_lake_valor(VideoStream& stream,
                 pbf_wait(ctx, 323ms);
                 pbf_press_dpad(ctx, DPAD_UP, 193ms, 0ms);
                 pbf_wait(ctx, 1741ms);
-                // Observe a delayed fade without extending the recorded movement.
+                // Observe a delayed fade without extending movement.
                 pbf_wait(ctx, 5000ms);
             },
             {{black}, {white}});
@@ -1378,8 +1376,8 @@ static bool go_through_lake_valor(VideoStream& stream,
             stream.log("Valor Cavern: Exit transition did not start.", COLOR_RED);
             return false;
         }
-        // The recording exits through a white fade. Stop movement at its onset
-        // so no remaining south hold carries past the exterior doorway spawn.
+        // Stop movement at the start of the white exit fade so the remaining south hold cannot
+        // carry past the exterior doorway spawn.
         BlackScreenWatcher black_gone(COLOR_RED,
             {0.1, 0.1, 0.8, 0.8}, 100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
         WhiteScreenWatcher white_gone(COLOR_RED,
@@ -1736,8 +1734,8 @@ static bool restock_and_heal_snowpoint(VideoStream& stream,
     if (!restock_super_repels_snowpoint(stream, context, 10, language)){
         return false;
     }
-    // The recorded Mart route ends outside the shop. Fly back to the known
-    // Center landing point before reusing its entry and healing sequence.
+    // The Mart route ends outside the shop. Fly back to the Center landing point before using its
+    // entry and healing sequence.
     if (!fly_to(stream, context, FlyPoint::SnowpointCity)){
         return false;
     }
@@ -1825,11 +1823,10 @@ static bool snowpoint_gym_puzzle_and_candice(VideoStream& stream,
 
     DpadState dpad;
     dpad.last_dir = DPAD_UP;
-    // Use explicit 80ms facing presses. When the recording also moved on a
-    // direction change, release before a separate 80ms movement press.
-    // These turns are already in the tables: repeat_dpad must not add another.
-    // Retain slide/stair settling time; trim recorded idle pauses only where
-    // the replay shows arrival. Omitted inputs retain time in the preceding pause.
+    // Use explicit 80ms facing presses. Release before a separate 80ms movement press when a
+    // direction change also needs movement. These turns are already in the tables: repeat_dpad
+    // must not add another. Preserve slide/stair settling time and the pause assigned to omitted
+    // inputs.
     const std::vector<Move> sequence1 = {
         {DPAD_UP, 1, 109ms, 424ms},
         {DPAD_UP, 1, 144ms, 554ms},
@@ -1932,8 +1929,8 @@ static bool snowpoint_gym_puzzle_and_candice(VideoStream& stream,
         {DPAD_RIGHT, 1, 80ms, 300ms},
         {DPAD_RIGHT, 1, 80ms, 2500ms},
         {DPAD_LEFT, 1, 80ms, 300ms},
-        // Finish the west slide before the south-facing input; one second
-        // swallowed that turn in the 2026-11-08 replay. Restore the verified wait.
+        // Wait for the west slide to finish before the south-facing input. One second is too
+        // short.
         {DPAD_LEFT, 1, 176ms, 2538ms},
         {DPAD_DOWN, 1, 80ms, 300ms},
         {DPAD_DOWN, 1, 80ms, 3390ms},
@@ -2027,8 +2024,7 @@ static bool snowpoint_gym_puzzle_and_candice(VideoStream& stream,
         clear_dialog(stream, context, BUTTON_B, gym_leader ? 6000ms : 3000ms);
     }
 
-    // The recorded right-stick input produced no route displacement. Return
-    // straight south through the cleared puzzle; stop input at the exit fade.
+    // Return straight south through the cleared puzzle and stop input at the exit fade.
     context.wait_for_all_requests();
     BlackScreenWatcher exit_black;
     const int exit_result = run_until<ProControllerContext>(stream,

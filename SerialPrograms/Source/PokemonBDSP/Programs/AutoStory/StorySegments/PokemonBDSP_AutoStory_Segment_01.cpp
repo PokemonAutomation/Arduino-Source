@@ -1638,8 +1638,8 @@ void oreburgh_mine_to_gym(SingleSwitchProgramEnvironment& env, VideoStream& stre
             pbf_wait(ctx, 5000ms);
             ctx.wait_for_all_requests();
 
-            // Eight recorded misses stopped at the left pillar. Slide northeast
-            // toward the door once; the watcher cancels input at the entry fade.
+            // If the approach stops at the left pillar, slide northeast toward the door once. The
+            // watcher cancels input at the entry fade.
             stream.log("[Mine to gym] Entry missed; trying a short northeast drag.");
             pbf_move_left_joystick(ctx, {1.0, 1.0}, 300ms, 300ms);
             // Diagonal input can leave either cardinal facing. Let repeat_dpad
@@ -1730,9 +1730,8 @@ void oreburgh_mine_to_gym(SingleSwitchProgramEnvironment& env, VideoStream& stre
 
 void gym_Puzzle_01(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
 
-    //Upon entering the Gym.
-    // The entry camera sequence lasts about 7.5 seconds in the reference
-    // video. Allow another 500ms before sending puzzle movement inputs.
+    // Allow 7.5 seconds for the gym entry camera sequence, plus a 500ms buffer, before sending
+    // puzzle inputs.
     context.wait_for_all_requests();
     env.log("[Gym puzzle] Waiting for the entry cutscene to finish.");
     pbf_wait(context, 8000ms);
