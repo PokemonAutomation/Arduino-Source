@@ -1562,6 +1562,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Inference/PokemonBDSP_MapDetector.h
     Source/PokemonBDSP/Inference/PokemonBDSP_MarkFinder.cpp
     Source/PokemonBDSP/Inference/PokemonBDSP_MarkFinder.h
+    Source/PokemonBDSP/Inference/PokemonBDSP_TownBannerDetector.cpp
+    Source/PokemonBDSP/Inference/PokemonBDSP_TownBannerDetector.h
     Source/PokemonBDSP/Inference/PokemonBDSP_TransitionWatchers.cpp
     Source/PokemonBDSP/Inference/PokemonBDSP_TransitionWatchers.h
     Source/PokemonBDSP/Inference/PokemonBDSP_MenuDetector.cpp

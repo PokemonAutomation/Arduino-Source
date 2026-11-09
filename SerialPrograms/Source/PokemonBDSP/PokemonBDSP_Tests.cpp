@@ -17,7 +17,10 @@
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Programs/AutoStory/PokemonBDSP_AutoStoryTools.h"
 #include "PokemonBDSP_Tests.h"
+#include "Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "Inference/PokemonBDSP_MenuDetector.h"
+#include "Inference/PokemonBDSP_TownBannerDetector.h"
+#include "Tests/ImageUnitTest.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -51,6 +54,61 @@ bool empty_bag_row(const ImageViewRGB32& image, size_t row){
 struct TestItemTemplate{
     BagItemTemplate item;
     std::shared_ptr<const ImageRGB32> reference;
+};
+
+class Test_BattleMoveMenu : public ImageUnitTest{
+public:
+    Test_BattleMoveMenu(const std::string& name, size_t expected)
+        : ImageUnitTest("PokemonBDSP::BattleMoveMenu/" + name,
+            {"PokemonBDSP/BattleMoveMenu/" + name})
+        , m_expected(expected)
+    {
+        m_memory += MAX_TEST_IMAGE_RGB32_BYTES;
+    }
+
+    UnitTestResult run_on_images(Logger&, CancellableScope&, const std::vector<ImageRGB32>& images) const override{
+        if (images.empty() || !images[0]){
+            return false;
+        }
+        for (size_t width : {size_t(1920), size_t(1280), size_t(960)}){
+            const ImageRGB32 scaled = images[0].scale_to(width, width * 9 / 16);
+            if (detect_battle_move_menu(scaled).move_count != m_expected){
+                return false;
+            }
+        }
+        return true;
+    }
+
+private:
+    size_t m_expected;
+};
+
+class Test_TownBanner : public ImageUnitTest{
+public:
+    Test_TownBanner(const std::string& name)
+        : ImageUnitTest("PokemonBDSP::TownBannerDetector/" + name,
+            {"PokemonBDSP/TownBannerDetector/" + name})
+        , m_expected(name.ends_with("_True.png"))
+    {
+        m_memory += MAX_TEST_IMAGE_RGB32_BYTES;
+    }
+
+    UnitTestResult run_on_images(Logger&, CancellableScope&, const std::vector<ImageRGB32>& images) const override{
+        if (images.empty() || !images[0]){
+            return false;
+        }
+        TownBannerDetector detector;
+        for (size_t width : {size_t(1920), size_t(1280), size_t(960)}){
+            const ImageRGB32 scaled = images[0].scale_to(width, width * 9 / 16);
+            if (detector.detect(scaled) != m_expected){
+                return false;
+            }
+        }
+        return true;
+    }
+
+private:
+    bool m_expected;
 };
 
 class Test_BagScreenshots : public UnitTest{
@@ -288,6 +346,34 @@ bool run_bag_screenshot_tests(Logger& logger, const std::string& folder){
 void add_tests(UnitTestDatabase& database){
     database.add<Test_BagScreenshots>();
     add_tests_MenuDetector(database);
+    database.add<Test_BattleMoveMenu>("Wake_MoveList_618-7.png", 4);
+    database.add<Test_BattleMoveMenu>("Wake_MoveList_619-1.png", 4);
+    database.add<Test_BattleMoveMenu>("Wake_MoveList_1064-9.png", 4);
+    database.add<Test_BattleMoveMenu>("Wake_Attack_620-0.png", 0);
+    database.add<Test_BattleMoveMenu>("Wake_Attack_623-1.png", 0);
+    database.add<Test_BattleMoveMenu>("Wake_Fainted_624-1.png", 0);
+    database.add<Test_BattleMoveMenu>("Wake_Attack_1069-2.png", 0);
+    database.add<Test_BattleMoveMenu>("Wake_Fainted_1069-5.png", 0);
+    for (const char* name : {
+        "Floaroma_RepelText_3791-0_True.png",
+        "Floaroma_RepelChoice_3791-3_True.png",
+        "Floaroma_Clear_3791-6_True.png",
+        "Floaroma_BannerEntering_3790-0_False.png",
+        "Floaroma_BannerLeaving_3792-0_False.png",
+        "Floaroma_NoBanner_3793-0_False.png",
+        "Battle_600-0_False.png",
+        "Route204_Sign_650-0_False.png",
+        "Oreburgh_Exterior_0-0_False.png",
+        "Jubilife_Plaza_1034-0_False.png",
+        "Floaroma_HouseApproach_678-0_False.png",
+        "Floaroma_FirstArrival_666-0_True.png",
+        "Floaroma_FirstArrivalNorth_667-0_True.png",
+        "Floaroma_BeforeBanner_665-0_False.png",
+        "Floaroma_AfterBanner_668-0_False.png",
+        "Floaroma_EnteringTown_3790-3_True.png",
+    }){
+        database.add<Test_TownBanner>(name);
+    }
 }
 
 }
