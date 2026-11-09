@@ -55,20 +55,6 @@ bool process_header_read(
     return false;
 }
 
-//  An empty summary read tells us less than an ambiguous header read
-//  (e.g. both Persian forms): keep the header's candidates.
-std::set<std::string> summary_or_header_read(
-    Logger& logger,
-    std::set<std::string> summary,
-    const std::set<std::string>& header
-){
-    if (summary.empty() && header.size() > 1){
-        logger.log("Summary read failed. Keeping the battle read: " + set_to_str(header), COLOR_ORANGE);
-        return header;
-    }
-    return summary;
-}
-
 
 bool read_battle_menu(
     ProgramEnvironment& env,
@@ -88,10 +74,13 @@ bool read_battle_menu(
     //  Read raid mon.
     std::set<std::string> mon = reader.read_opponent(stream.logger(), context, stream.video());
 
-    bool retry = !process_header_read(stream.logger(), state, mon);
+    bool retry = !process_header_read(stream.logger(), state, std::move(mon));
+    std::string opponent = state.opponent.empty()
+        ? ""
+        : *state.opponent.begin();
 
-    //  The fourth battle must be a boss; earlier battles must be rentals.
-    if (!state.accept_opponent()){
+    //  If we see a boss before the end. Something is wrong. Retry.
+    if (state.wins != 3 && is_boss(opponent)){
         retry = true;
     }
 
@@ -104,11 +93,11 @@ bool read_battle_menu(
         context.wait_for_all_requests();
 
         snapshot = stream.video().snapshot();
-        std::set<std::string> summary = reader.read_opponent_in_summary(stream.logger(), snapshot);
+        mon = reader.read_opponent_in_summary(stream.logger(), snapshot);
         pbf_mash_button(context, BUTTON_B, 3000ms);
-        state.opponent = summary_or_header_read(stream.logger(), std::move(summary), mon);
+        state.opponent = std::move(mon);
 
-        if (state.in_boss_battle_with_known_boss()){
+        if (state.wins == 3 && !state.boss.empty()){
             if (!state.opponent.empty() && *state.opponent.begin() != state.boss){
                 stream.log(
                     "Inconsistent Boss: Expected " + state.boss + ", Read: " + *state.opponent.begin(),
@@ -121,10 +110,10 @@ bool read_battle_menu(
     context.wait_for_all_requests();
 
 
-    //  Probably a misread. It only costs move choice; a reset would cost the adventure.
     if (!state.accept_opponent()){
-        stream.log("Opponent does not match the battle stage after summary read. Continuing.", COLOR_RED);
-        dump_image(stream.logger(), MODULE_NAME, "UnexpectedBattleOpponent", snapshot);
+        stream.log("Boss found before 3 wins. Something is seriously out-of-sync.", COLOR_RED);
+        dump_image(stream.logger(), MODULE_NAME, "BossBeforeEnd", snapshot);
+        return false;
     }
 
     //  Read misc.

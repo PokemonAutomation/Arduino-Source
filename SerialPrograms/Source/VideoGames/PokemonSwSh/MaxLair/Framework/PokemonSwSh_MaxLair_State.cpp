@@ -22,53 +22,26 @@ bool is_boss_battle(const GlobalState& state){
     return state.wins == 3;
 }
 
-//  Battles 1-3 are against rentals. After the fourth there is no battle.
-bool is_rental_battle(const GlobalState& state){
-    return state.wins < 3;
-}
-
-bool has_boss_candidate(const std::set<std::string>& candidates){
-    for (const std::string& slug : candidates){
-        if (is_boss(slug)){
-            return true;
-        }
-    }
-    return false;
-}
-
 } // namespace
 
-bool GlobalState::in_boss_battle_with_known_boss() const{
-    return is_boss_battle(*this) && is_boss(boss);
-}
-
 bool GlobalState::accept_opponent(){
-    if (opponent.empty()){
+    const std::string opponent_slug = opponent.empty() ? "" : *opponent.begin();
+    //  A boss before the end means something is out-of-sync.
+    if (!is_boss_battle(*this) && is_boss(opponent_slug)){
         return false;
     }
-    if (opponent.size() > 1){
-        //  Forms sharing one OCR species name (Lycanroc, Basculin) stay
-        //  ambiguous even after the summary read. That is fine for a rental
-        //  battle as long as no candidate is a boss. It cannot identify the boss.
-        return is_rental_battle(*this) && !has_boss_candidate(opponent);
-    }
-    const std::string& opponent_slug = *opponent.begin();
-    //  Reject the OCR read if the opponent species doesn't match the current stage:
-    //  a legendary boss read during battles 1-3, or a non-boss rental read in battle 4.
-    if (is_boss(opponent_slug) != is_boss_battle(*this)){
-        return false;
-    }
-    if (is_boss_battle(*this) && !in_boss_battle_with_known_boss()){
+    //  Infer the boss if we don't know it. Only a single boss species counts:
+    //  a rental read here is a misread (Kyurem read as Mimikyu, 2026-11-02)
+    //  and must not become the boss. A later turn's read can still record it.
+    if (is_boss_battle(*this) && boss.empty() && opponent.size() == 1 && is_boss(opponent_slug)){
         boss = opponent_slug;
     }
     return true;
 }
 
 std::string GlobalState::boss_if_caught() const{
-    //  A failed adventure (e.g. wins == 3, only lost to the boss) can still have
-    //  an identified boss, but no boss catch: catching the boss requires winning
-    //  the fourth battle (wins == 4).
-    return wins == 4 && is_boss(boss) ? boss : "";
+    //  The identified boss is reported whether or not it was caught.
+    return boss;
 }
 
 std::string PlayerState::dump() const{
