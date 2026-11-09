@@ -744,9 +744,8 @@ static void pastoria_gym_puzzle_and_wake(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryStats& stats){
     VideoStream& stream = env.console;
-    // The door fade ends before the opening camera tour. In the 2026-11-08
-    // run it consumed the initial northward presses on all three attempts.
-    // Let the view return to the entrance before spending puzzle movements.
+    // The entry camera tour continues after the door fade and can consume movement inputs. Wait
+    // for the entrance view before starting the puzzle.
     context.wait_for_all_requests();
     stream.log("[Pastoria Gym puzzle] Waiting for the entry camera tour to finish.");
     pbf_wait(context, 8000ms);
@@ -758,7 +757,7 @@ static void pastoria_gym_puzzle_and_wake(SingleSwitchProgramEnvironment& env,
         Milliseconds delay;
     };
 
-    // Trial: use the supplied counts without an extra facing press.
+    // These counts already include facing presses; do not add another.
     const std::vector<Move> sequences[] = {
         {
             // Trainer 1

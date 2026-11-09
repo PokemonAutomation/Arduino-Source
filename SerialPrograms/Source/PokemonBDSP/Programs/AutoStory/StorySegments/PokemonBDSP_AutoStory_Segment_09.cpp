@@ -42,11 +42,6 @@ namespace PokemonBDSP {
 //  Helpers
 // ---------------------------------------------------------------------------
 
-static bool handle_battle(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, const std::string& trainerid){
-    fight_trainer_using_moves(stream, context, stats, trainerid, true);
-    return true;
-}
-
 static bool heal_and_exit(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, const std::string& label){
     return heal_pokemon(stream, context, label, &stats);
 }
@@ -123,7 +118,7 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
         clear_dialog(stream, context, BUTTON_B, 6000ms);
     }
 
-    // Join the recorded Surf lane two walking tiles west of this approach.
+    // Join the Surf lane two walking tiles west of this approach.
     dpad.last_dir = DPAD_UP;
     repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 2);
     pbf_move_left_joystick(context, {0, +1}, 1034ms, 100ms);
@@ -172,7 +167,7 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
     // Go around the eastern side instead of triggering Colton and Paige.
     pbf_move_left_joystick(context, {0, +1}, 4500ms, 100ms);
     pbf_move_left_joystick(context, {+1, 0}, 3700ms, 100ms);
-    // Alternative route retained for reverting the eastern bypass.
+    // Alternative route around the eastern bypass.
     /*
     dpad.last_dir = DPAD_RIGHT;
     repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 3);
@@ -287,8 +282,8 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
     pbf_move_left_joystick(context, {0, +1}, 583ms, 100ms);
     */
 
-    // Recorded eastern bypass from the rock to the shallow-water landing.
-    // Keep the recorded holds and pauses while validating the new route.
+    // Follow the eastern bypass from the rock to the shallow-water landing. Preserve holds and
+    // pauses while validating the route.
     stream.log("Route 223: bypassing Ricardo, Wesley, and Crystal on the east.");
     pbf_move_left_joystick(context, {0, +1}, 400ms, 0ms);
     pbf_wait(context, 517ms);
@@ -355,8 +350,8 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
             }
             stream.log("Route 223: Crystal interrupted the northwest slide; using the fixed landing approach.");
             fight_trainer_using_moves(stream, context, stats, "route_223_swimmer_crystal", true);
-            // Replay the recorded wall slide after the encounter rather than
-            // estimating unused movement time. Verify this landing case live.
+            // Repeat the wall slide after an encounter rather than estimating unused movement
+            // time. Verify this landing case live.
             pbf_move_left_joystick(context, {-1, +1}, 6100ms, 0ms);
         }else{
             stream.log("Route 223: Northwest slide clear; continuing from the landing.");
@@ -557,7 +552,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "victory_road_ace_mariah");
+                fight_trainer_using_moves(stream, context, stats, "victory_road_ace_mariah", true);
             }
         }
     }
@@ -635,7 +630,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "victory_road_ace_omar");
+                fight_trainer_using_moves(stream, context, stats, "victory_road_ace_omar", true);
             }
         }
     }
@@ -699,7 +694,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "victory_road_ace_sydney");
+                fight_trainer_using_moves(stream, context, stats, "victory_road_ace_sydney", true);
             }
         }
     }
@@ -826,7 +821,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "victory_road_blackbelt_miles");
+                fight_trainer_using_moves(stream, context, stats, "victory_road_blackbelt_miles", true);
             }
         }
     }
@@ -892,7 +887,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "victory_road_psychic_valencia");
+                fight_trainer_using_moves(stream, context, stats, "victory_road_psychic_valencia", true);
             }
         }
     }
@@ -947,7 +942,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "victory_road_dragontamer_andre");
+                fight_trainer_using_moves(stream, context, stats, "victory_road_dragontamer_andre", true);
             }
         }
     }
@@ -1025,7 +1020,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "victory_road_veteran_edgar");
+                fight_trainer_using_moves(stream, context, stats, "victory_road_veteran_edgar", true);
             }
         }
     }
@@ -1232,13 +1227,13 @@ static bool ready_in_front_of_elite_4(VideoStream& stream,
             break;
         case PreparationStage::MEDICINE:
             stream.log("League preparation: stock Full Restores at the League mart.");
-            // Reuse the recorded nurse-to-mart crossing after the second heal.
+            // Use the nurse-to-mart crossing after the second heal.
             repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 13, false);
             repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 2, false);
             if (!buy_items(stream, context, ShoppingLists::ASSISTED_LEAGUE_MEDICINE, options.language)){
                 return false;
             }
-            // Reverse the same crossing to restore the recorded nurse-side exit.
+            // Reverse the crossing to return to the nurse-side exit.
             repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 13, false);
             repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 2, false);
             stage = PreparationStage::EXIT_LEAGUE;
@@ -1385,8 +1380,8 @@ static bool approach_elite_four_member(VideoStream& stream,
 
     stream.log("Elite Four: board the lift and wait for its ascent.");
     repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 3);
-    // The recording shows a continuous lift animation, not a black transition.
-    // e4r1 waits 6378ms here; no upper-landing input may run during the ascent.
+    // The lift uses a continuous animation, not a black transition. Wait 6378ms before sending
+    // upper-landing input.
     pbf_wait(context, 6500ms);
     context.wait_for_all_requests();
     {
@@ -1510,9 +1505,8 @@ static bool deal_with_cynthia_and_finish(SingleSwitchProgramEnvironment& env,
     // cynthiaapproach: room entry starts the dialogue without interaction.
     wait_for_dialog(stream, context, "Champion Cynthia automatic introduction", 20s);
     fight_trainer_using_moves(stream, context, stats, "champion_cynthia", false, false, options.language);
-    // 2026-11-06 16-50-50: battle exit ~5:26, last dialogue ~6:51,
-    // first scrolling credits ~7:40. Mash through the recorded ending for
-    // 138 seconds plus 2 seconds into the credits; no ending detector needed.
+    // Advance ending dialogue for 138 seconds, plus two seconds into the scrolling credits. No
+    // ending detector is needed.
     stream.log("[AutoStory] Clearing the ending and Hall of Fame; mashing A for 140 seconds.");
     pbf_mash_button(context, BUTTON_A, 140000ms);
     context.wait_for_all_requests();

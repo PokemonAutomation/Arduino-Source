@@ -72,8 +72,8 @@ void fight_Natalie(VideoStream& stream, ProControllerContext& context);
 
 void catch_1_pokemon(VideoStream& stream, ProControllerContext& context);
 
-// One wild encounter using move slot 1, followed by verified Potion healing.
-void battle_1_pokemon(VideoStream& stream, ProControllerContext& context);
+// Heal/check level first; train only below level 7, with at most three encounters.
+void battle_1_pokemon(VideoStream& stream, ProControllerContext& context, const AutoStoryOptions& options);
 
 // Burst wiggle variant of catch_1_pokemon for testing.
 // Commented out in the .cpp - uncomment both to enable.
@@ -83,7 +83,7 @@ void battle_1_pokemon(VideoStream& stream, ProControllerContext& context);
 //     ProControllerContext& context
 // );
 
-void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context);
+void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context, uint8_t* level);
 
 // ---------------------------------------------------------------------------
 // Grass movement helpers
@@ -98,7 +98,8 @@ void walk_through_grass(VideoStream& stream,
     BattleType battle_type = BattleType::STANDARD,
     Milliseconds movement_duration = Milliseconds(200),
     OverworldMatchResult (*destination)(const ImageRGB32&) = nullptr,
-    bool fight_encounters = false);
+    bool fight_encounters = false,
+    const AutoStoryOptions* training_options = nullptr);
 
 bool detect_black_screen_after_movement(VideoStream& stream, ProControllerContext& context, Milliseconds timeout);
 

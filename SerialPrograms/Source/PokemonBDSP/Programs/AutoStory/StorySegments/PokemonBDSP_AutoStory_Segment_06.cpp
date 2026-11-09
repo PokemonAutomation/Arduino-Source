@@ -48,20 +48,6 @@ move_back_after_unexpected_battle(VideoStream& stream, ProControllerContext& con
     }
 }
 
-static bool handle_battle(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, const std::string& trainerid){
-    fight_trainer_using_moves(stream, context, stats, trainerid, true);
-    return true;
-}
-
-static bool test(VideoStream& stream, ProControllerContext& context){
-    context.wait_for_all_requests();
-    pbf_wait(context, 2000ms);
-    context.wait_for_all_requests();
-    stream.log("test: Testing...");
-    activate_repel(stream, context);
-    return true;
-}
-
 // ---------------------------------------------------------------------------
 //  Named route navigation blocks
 // ---------------------------------------------------------------------------
@@ -200,7 +186,7 @@ static bool go_through_route_218(VideoStream& stream, ProControllerContext& cont
                 stream.log("go_through_route_218_sailor_skyler: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "route_218_sailor_skyler");
+                fight_trainer_using_moves(stream, context, stats, "route_218_sailor_skyler", true);
                 context.wait_for_all_requests();
                 pbf_wait(context, 3000ms);
                 move_back_after_unexpected_battle(stream, context, "route_218_sailor_skyler");
@@ -337,7 +323,7 @@ static bool go_to_clint_and_pokemon_center(VideoStream& stream, ProControllerCon
                 stream.log("go_to_clint_and_pokemon_center_clint: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "canalave_clint");
+                fight_trainer_using_moves(stream, context, stats, "canalave_clint", true);
                 context.wait_for_all_requests();
                 pbf_wait(context, 3000ms);
             }
@@ -419,9 +405,8 @@ static bool go_to_canalave_gym(VideoStream& stream, ProControllerContext& contex
     return true;
 }
 
-// Start: inside Canalave Gym at the entrance, after the entry transition.
-// End: at Byron with battle/reward dialogue finished.
-// The checkpoint calls the recorded return to the inside entrance next.
+// Start inside Canalave Gym at the entrance, after the entry transition. End at Byron with
+// battle/reward dialogue finished. The checkpoint then returns to the inside entrance.
 static void canalave_gym_puzzle_and_byron(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryStats& stats){
@@ -435,8 +420,8 @@ static void canalave_gym_puzzle_and_byron(SingleSwitchProgramEnvironment& env,
     DpadState dpad;
     dpad.last_dir = DPAD_UP; // The Gym entry approach ends facing north.
 
-    // Add a facing press on direction changes and synchronize known NPC turns after battles.
-    // Retain pauses of at least one second after their recorded platform/approach press.
+    // Add a facing press on direction changes and synchronize NPC turns after battles. Pause for
+    // at least one second after each platform/approach press.
     const std::vector<Move> sequence1 = {
         {DPAD_UP, 9, 0ms},
         {DPAD_LEFT, 7, 0ms},
@@ -495,8 +480,8 @@ static void canalave_gym_puzzle_and_byron(SingleSwitchProgramEnvironment& env,
     };
 
     const std::vector<Move> sequence4 = {
-        // Resume the nine recorded eastward steps after the Worker's battle.
-        // Preserve the platform pauses instead of sending these inputs into dialogue.
+        // Resume the nine eastward steps after the Worker's battle. Preserve the platform pauses
+        // and wait for dialogue to finish before moving.
         {DPAD_RIGHT, 3, 1696ms},
         {DPAD_RIGHT, 3, 0ms},
         {DPAD_RIGHT, 1, 1806ms},
@@ -561,8 +546,8 @@ static void canalave_gym_puzzle_and_byron(SingleSwitchProgramEnvironment& env,
         fight_trainer_using_moves(stream, context, stats, label, gym_leader);
         clear_dialog(stream, context, BUTTON_B, gym_leader ? 6000ms : 3000ms);
         if (stage == 1 || stage == 2 || stage == 3){
-            // Cesar, the Worker, and David turn the player north after their approaches.
-            // Synchronize facing before resuming the recorded west/east movement.
+            // Cesar, the Worker, and David turn the player north after approaching. Synchronize
+            // facing before resuming west/east movement.
             dpad.last_dir = DPAD_UP;
         }else if (stage == 4){
             // Breanna approaches from the west and turns the player toward her.
@@ -583,7 +568,7 @@ static void return_to_canalave_gym_entrance(VideoStream& stream, ProControllerCo
     };
 
     stream.log("[Canalave Gym return] Returning from Byron to the inside entrance.");
-    // Preserve the opening input and settling pause from the recorded route.
+    // Preserve the opening input and settling pause.
     pbf_move_right_joystick(context, {0, 1}, 146ms, 0ms);
     pbf_wait(context, 3617ms);
     context.wait_for_all_requests();

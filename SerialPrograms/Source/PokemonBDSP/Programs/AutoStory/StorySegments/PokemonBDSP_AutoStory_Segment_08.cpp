@@ -67,11 +67,6 @@ move_back_after_unexpected_battle(VideoStream& stream, ProControllerContext& con
     }
 }
 
-static bool handle_battle(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, const std::string& trainerid){
-    fight_trainer_using_moves(stream, context, stats, trainerid, true);
-    return true;
-}
-
 static bool heal_and_exit(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, const std::string& label){
     return heal_pokemon(stream, context, label, &stats);
 }
@@ -388,7 +383,7 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
                 stream.log("veilstone_warehouse_warehouse_grunt_1: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "veilstone_warehouse_warehouse_grunt_1");
+                fight_trainer_using_moves(stream, context, stats, "veilstone_warehouse_warehouse_grunt_1", true);
                 context.wait_for_all_requests();
                 pbf_wait(context, 3000ms);
                 move_back_after_unexpected_battle(stream, context, "veilstone_warehouse_warehouse_grunt_1");
@@ -424,7 +419,7 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
                 stream.log("veilstone_warehouse_warehouse_grunt_2: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "veilstone_warehouse_warehouse_grunt_2");
+                fight_trainer_using_moves(stream, context, stats, "veilstone_warehouse_warehouse_grunt_2", true);
                 context.wait_for_all_requests();
                 pbf_wait(context, 3000ms);
                 move_back_after_unexpected_battle(stream, context, "veilstone_warehouse_warehouse_grunt_2");
@@ -511,7 +506,7 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
                 stream.log("galactic_hq_grunt_1: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "galactic_hq_grunt_1");
+                fight_trainer_using_moves(stream, context, stats, "galactic_hq_grunt_1", true);
                 context.wait_for_all_requests();
                 pbf_wait(context, 3000ms);
                 move_back_after_unexpected_battle(stream, context, "galactic_hq_grunt_1");
@@ -650,7 +645,7 @@ static bool go_through_warehouse(VideoStream& stream, ProControllerContext& cont
                 stream.log("galactic_hq_scientist_fredrick: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "galactic_hq_scientist_fredrick");
+                fight_trainer_using_moves(stream, context, stats, "galactic_hq_scientist_fredrick", true);
             }
         }
     }
@@ -906,7 +901,7 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                // The recorded approach reaches this grunt's lane after about 2s.
+                // The approach reaches this grunt's lane after about two seconds.
                 pbf_move_left_joystick(context, {+1, 0}, 2000ms, 100ms);
                 context.wait_for_all_requests();
                 for (size_t pulse = 0; pulse < 20; pulse++){
@@ -934,7 +929,7 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
                 stream.log("galactic_hq_grunt_2: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "galactic_hq_grunt_2");
+                fight_trainer_using_moves(stream, context, stats, "galactic_hq_grunt_2", true);
             }
         }
     }
@@ -966,7 +961,7 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
         }else if (ret == 0){
             context.wait_for_all_requests();
 
-            handle_battle(stream, context, stats, "galactic_hq_grunt_3");
+            fight_trainer_using_moves(stream, context, stats, "galactic_hq_grunt_3", true);
             context.wait_for_all_requests();
             pbf_wait(context, 2000ms);
         }
@@ -1047,7 +1042,7 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
                 stream.log("galactic_hq_grunt_4: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "galactic_hq_grunt_4");
+                fight_trainer_using_moves(stream, context, stats, "galactic_hq_grunt_4", true);
             }
         }
     }
@@ -1067,7 +1062,7 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
             return false;
         }
         stream.log("galactic_hq_grunt_5: battle menu detected; starting battle handler.");
-        handle_battle(stream, context, stats, "galactic_hq_grunt_5");
+        fight_trainer_using_moves(stream, context, stats, "galactic_hq_grunt_5", true);
     }
     context.wait_for_all_requests();
     pbf_wait(context, 3000ms);
@@ -1168,7 +1163,7 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
                 stream.log("galactic_hq_cyrus: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "galactic_hq_cyrus");
+                fight_trainer_using_moves(stream, context, stats, "galactic_hq_cyrus", true);
             }
         }
     }
@@ -1259,7 +1254,7 @@ static bool go_through_galactic_hq(VideoStream& stream, ProControllerContext& co
                 stream.log("galactic_hq_commander_saturn: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "galactic_hq_commander_saturn");
+                fight_trainer_using_moves(stream, context, stats, "galactic_hq_commander_saturn", true);
             }
         }
     }
@@ -1423,8 +1418,7 @@ static bool go_to_mount_coronet(VideoStream& stream,
     AutoStoryOptions /*options*/){
     stream.log("[08.05] Following the recorded Eterna approach with an optional Justin encounter.");
     context.wait_for_all_requests();
-    // Keep the saved gear first; it passed the recorded gates on recent runs.
-    // An early reset tries the other setup by toggling B while mounted.
+    // Try the saved gear first. An early reset tries the other setup by toggling B while mounted.
     stream.log("[08.05] Mounting the bicycle for the recorded approach.");
     pbf_press_button(context, BUTTON_PLUS, 80ms, 800ms);
     context.wait_for_all_requests();
@@ -1451,14 +1445,13 @@ static bool go_to_mount_coronet(VideoStream& stream,
             [gate](ProControllerContext& ctx){
                 switch (gate){
                 case 0:
-                    // Recorded from the Eterna Center doorway.
                     pbf_move_left_joystick(ctx, {0, -1}, 3502ms, 0ms);
                     break;
                 case 1:
                     pbf_move_left_joystick(ctx, {0, -1}, 1880ms, 0ms);
                     break;
                 case 2:
-                    // Combine the recorded 1572ms, 249ms, and 674ms downhill holds.
+                    // Combine the 1572ms, 249ms, and 674ms downhill holds.
                     pbf_move_left_joystick(ctx, {0, -1}, 2495ms, 0ms);
                     pbf_wait(ctx, 4700ms);
                     // Clear the trainer, then let Cycling Road's slope carry us to Kayla.
@@ -1591,7 +1584,7 @@ static bool go_through_mount_coronet(VideoStream& stream,
         pbf_wait(context, 706ms);
         pbf_move_left_joystick(context, {1.000000, -0.000000}, 633ms, 0ms);
         pbf_wait(context, 158ms);
-        // Surf: keep the recorded approach, then clear the field-move prompts.
+        // Surf: complete the approach, then clear the field-move prompts.
         pbf_press_button(context, BUTTON_A, 169ms, 0ms);
         clear_dialog(stream, context, BUTTON_A, 6000ms);
         pbf_move_left_joystick(context, {1.000000, -0.000000}, 4373ms, 0ms);
@@ -1602,10 +1595,10 @@ static bool go_through_mount_coronet(VideoStream& stream,
         pbf_wait(context, 871ms);
         pbf_move_left_joystick(context, {0.000000, 1.000000}, 90ms, 0ms);
         pbf_wait(context, 588ms);
-        // Rock Climb: keep the recorded approach, then clear the field-move prompts.
+        // Rock Climb: complete the approach, then clear the field-move prompts.
         pbf_press_button(context, BUTTON_A, 193ms, 0ms);
         clear_dialog(stream, context, BUTTON_A, 6000ms);
-        // Enter the stair vestibule where the replacement room recording begins.
+        // Enter the stair vestibule before continuing through the next room.
         context.wait_for_all_requests();
         BlackScreenWatcher vestibule_entry(COLOR_RED);
         const int vestibule_entered = run_until<ProControllerContext>(stream,
@@ -1666,8 +1659,8 @@ static bool go_through_mount_coronet(VideoStream& stream,
             {{-1, -1}, 489ms, 0ms},
             {{0, -1}, 323ms, 688ms},
         };
-        // There are no trainers in this room. Stop for the recorded natural
-        // expiry, then use the existing dialogue routine to accept renewal.
+        // There are no trainers in this room. Wait for natural Repel expiry, then accept renewal
+        // through the dialogue routine.
         size_t completed_room_moves = 0;
         ShortDialogWatcher room_repel_dialogue(COLOR_YELLOW);
         const int room_expiry = run_until<ProControllerContext>(stream,
@@ -1723,10 +1716,9 @@ static bool go_through_mount_coronet(VideoStream& stream,
             stream.log("[08.05] Repel expired before reaching the bridge-room renewal lane; stopping before skipping movement.", COLOR_RED);
             return false;
         }
-        // Renew in the clear east/west corridor before the left turn.
-        // An interrupted 500ms wiggle can leave us west of the starting tile.
-        // Restore the east-boulder stop before replaying the recorded crossing;
-        // extending the west hold alone can overshoot the stairs.
+        // Renew in the clear east/west corridor before the left turn. An interrupted 500ms wiggle
+        // can leave the player west of the starting tile. Reestablish the east-boulder stop
+        // before crossing; extending the west hold alone can overshoot the stairs.
         context.wait_for_all_requests();
         stream.log("[08.05] Bridge room: forcing east/west Repel expiration and renewal before restoring the east-boulder stop.");
         force_repel_expiry(stream, context, RepelRenewalChoice::YES, false, true);
@@ -1751,8 +1743,8 @@ static bool go_through_mount_coronet(VideoStream& stream,
             },
             {{late_room_repel}});
         if (late_expiry == 0){
-            // No second renewal was recorded on this leg. Do not discard the
-            // interrupted movement and pretend the doorway position is established.
+            // Do not add a second renewal on this leg. Resume interrupted movement before
+            // assuming the doorway position is established.
             stream.log("[08.05] Bridge-room exit leg interrupted by another expiry; position requires review.", COLOR_RED);
             return false;
         }
@@ -1868,8 +1860,8 @@ static bool go_through_mount_coronet(VideoStream& stream,
         pbf_wait(context, 79ms);
         pbf_move_left_joystick(context, {0.000000, 1.000000}, 1254ms, 0ms);
         pbf_wait(context, 358ms);
-        // Finish the snowfield approach before tapping A at the Rock Climb wall.
-        // The recorded A holds overlapped movement accidentally; retain only the movement.
+        // Finish the snowfield approach before tapping A at the Rock Climb wall. Keep movement
+        // separate from field-move interaction.
         pbf_move_left_joystick(context, {0.000000, 1.000000}, 189ms, 0ms);
         pbf_move_left_joystick(context, {0.000000, 1.000000}, 173ms, 0ms);
         pbf_move_left_joystick(context, {0.000000, 1.000000}, 1283ms, 0ms);
@@ -1879,8 +1871,8 @@ static bool go_through_mount_coronet(VideoStream& stream,
         pbf_press_button(context, BUTTON_A, 80ms, 100ms);
         wait_for_dialog(stream, context, "[08.05] Snowfield Rock Climb", 10s);
         clear_dialog(stream, context, BUTTON_A, 6000ms);
-        // Turn west at the landing. Skip the recorded eastward detour and leave
-        // the next outdoor wall alone; descend south into the grass instead.
+        // Turn west at the landing, then descend south into the grass. Do not detour east or
+        // approach the next outdoor wall.
         pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2078ms, 0ms);
         pbf_wait(context, 68ms);
         pbf_move_left_joystick(context, {-1.000000, -0.000000}, 599ms, 0ms);
@@ -1932,7 +1924,7 @@ static bool go_through_mount_coronet(VideoStream& stream,
         stream.log("[08.05] Snowfield cave entered; continuing the recorded interior route.", COLOR_GREEN);
         pbf_move_left_joystick(context, {0.000000, 1.000000}, 1333ms, 0ms);
         pbf_wait(context, 66ms);
-        // Continue the recorded Rock Climb inside the cave.
+        // Continue Rock Climb inside the cave.
         pbf_press_button(context, BUTTON_A, 199ms, 0ms);
         clear_dialog(stream, context, BUTTON_A, 6000ms);
         pbf_move_left_joystick(context, {0.000000, 1.000000}, 1056ms, 0ms);
@@ -2022,8 +2014,8 @@ static bool go_through_mount_coronet(VideoStream& stream,
         pbf_wait(context, 85ms);
         pbf_move_left_joystick(context, {1.000000, -0.000000}, 1551ms, 0ms);
         pbf_wait(context, 951ms);
-        // Face north and step into the exit lane, then face east and enter.
-        // The recording's single Right press only turned here on the latest run.
+        // Face north and step into the exit lane, then face east and enter. A single Right press
+        // may only turn the player.
         context.wait_for_all_requests();
         {
             BlackScreenWatcher snowfield_entry(COLOR_RED);
@@ -2079,7 +2071,7 @@ static bool go_through_mount_coronet(VideoStream& stream,
         pbf_wait(context, 379ms);
         pbf_move_left_joystick(context, {-1.000000, -0.000000}, 325ms, 0ms);
         pbf_wait(context, 403ms);
-        // Rock Climb: keep the recorded approach, then clear the field-move prompts.
+        // Rock Climb: complete the approach, then clear the field-move prompts.
         pbf_press_button(context, BUTTON_A, 167ms, 0ms);
         clear_dialog(stream, context, BUTTON_A, 6000ms);
         pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2156ms, 0ms);
@@ -2087,7 +2079,7 @@ static bool go_through_mount_coronet(VideoStream& stream,
         pbf_move_left_joystick(context, {0.000000, 1.000000}, 1125ms, 0ms);
         pbf_wait(context, 117ms);
         pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1294ms, 0ms);
-        // Cave field-move prompt: keep the recorded approach, then clear the field-move prompts.
+        // Complete the cave approach, then clear the field-move prompts.
         pbf_press_button(context, BUTTON_A, 194ms, 0ms);
         clear_dialog(stream, context, BUTTON_A, 6000ms);
         pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1410ms, 0ms);
@@ -2234,8 +2226,8 @@ static bool go_through_mount_coronet(VideoStream& stream,
         pbf_move_left_joystick(context, {0.000000, 1.000000}, 1577ms, 0ms);
         pbf_wait(context, 881ms);
         context.wait_for_all_requests();
-        // Take one eastward step with a separate facing press. Longer recorded
-        // presses can carry us past the doorway. Arm both fade watches before entry.
+        // Take one eastward step with a separate facing press. Longer presses can carry past the
+        // doorway. Arm both fade watchers before entry.
         {
             BlackScreenWatcher entered(COLOR_RED);
             WhiteScreenWatcher entered_white;
@@ -2280,9 +2272,9 @@ static bool go_through_mount_coronet(VideoStream& stream,
         stream.log("[08.06] Could not clear new-item flags before the summit route.", COLOR_RED);
         return false;
     }
-    // Outside-help setup leaves a usable Pokemon in Box 1, slot 1, with
-    // Box 1 selected. Move it into party slot 2 without replacing the starter.
-    // These are the recorded box-transfer inputs; no field movement is involved.
+    // Outside-help setup leaves a usable Pokemon in Box 1, slot 1, with Box 1 selected. Move it
+    // into party slot 2 without replacing the starter. These inputs transfer the Pokemon without
+    // field movement.
     stream.log("[08.06] Withdrawing Box 1, slot 1 into party slot 2 for the summit double battle.");
     open_menu(stream, context, MenuCursorPosition::POKEMON, 8);
     pbf_wait(context, GameSettings::instance().MENU_TO_POKEMON_DELAY0);
@@ -2343,8 +2335,8 @@ static bool go_through_mount_coronet(VideoStream& stream,
             stream.log("[08.06] Box screen not detected before depositing the second Pokemon.", COLOR_RED);
             return false;
         }
-        // Reverse the recorded withdrawal: select party slot 2, pick it up,
-        // then move up and right to the empty first slot of Box 1.
+        // Reverse the withdrawal: select party slot 2, pick it up, then move up and right to the
+        // empty first slot of Box 1.
         pbf_press_dpad(context, DPAD_LEFT, 80ms, 388ms);
         pbf_press_dpad(context, DPAD_DOWN, 80ms, 309ms);
         pbf_press_button(context, BUTTON_A, 171ms, 642ms);
@@ -2391,8 +2383,7 @@ static bool go_through_mount_coronet(VideoStream& stream,
             stream.log("[08.06] Cyrus battle menu not detected after Barry's recovery and the cutscene.", COLOR_RED);
             return false;
         }
-        // Barry's scripted recovery occurs between the commanders and Cyrus.
-        // The recording shows full HP and full move PP at this handoff.
+        // Barry restores full HP and move PP between the commanders and Cyrus.
         stats.move_pp_remaining = stats.move_pp_capacity;
         stream.log("[Move PP] Barry's summit recovery restored the party before Cyrus.");
         fight_trainer_using_moves(stream, context, stats, "spear_pillar_cyrus", true);
@@ -2482,8 +2473,7 @@ static bool go_through_mount_coronet(VideoStream& stream,
     // Expire on the clear summit platform along the doorway column.
     // Scripted movement may already have exhausted it; no prompt is valid.
     force_repel_expiry(stream, context, RepelRenewalChoice::NO, true, false);
-    // The recording returns inside Coronet before using the Escape Rope.
-    // Omit its extra northward reversal and walk south until entry starts.
+    // Walk south into Coronet before using the Escape Rope.
     {
         BlackScreenWatcher entered(COLOR_RED);
         const int ret = run_until<ProControllerContext>(stream,
@@ -2652,14 +2642,13 @@ static bool go_to_house_west_sunyshore(VideoStream& stream, ProControllerContext
     pbf_move_left_joystick(context, {0, -1}, 6200ms, 100ms); // 31+
     context.wait_for_all_requests();
 
-    // Keep the original Super Repel through the grass. Without the expiry
-    // wiggle here, the eastward reset is unnecessary. Preserve the recorded
-    // nine left presses: one facing change followed by eight walking steps.
+    // Keep the original Super Repel through the grass. Without an expiry wiggle, no eastward
+    // reset is needed. Use nine left presses: one facing change followed by eight walking steps.
     dpad.last_dir = DPAD_DOWN;
     repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 8);
-    // The reviewed crossing leaves the grass about three seconds into this
-    // south leg. Stop at four seconds, in the clearing, and decline renewal.
-    // North/south expiry movement keeps the column for the remaining south hold.
+    // This southward crossing leaves the grass after about three seconds. Stop at four seconds in
+    // the clearing and decline renewal. North/south expiry movement keeps the column for the
+    // remaining south hold.
     pbf_move_left_joystick(context, {0, -1}, 4000ms, 100ms);
     force_repel_expiry(stream, context, RepelRenewalChoice::NO, true, true);
     pbf_move_left_joystick(context, {0, -1}, 4400ms, 100ms);
@@ -2709,7 +2698,7 @@ static bool go_to_house_west_sunyshore(VideoStream& stream, ProControllerContext
                 stream.log("go_to_house_west_sunyshore_route_222_sailor_luther: black screen not detected!", COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "route_222_sailor_luther");
+                fight_trainer_using_moves(stream, context, stats, "route_222_sailor_luther", true);
             }
         }
     }
@@ -2959,8 +2948,8 @@ static bool go_to_sunyshore_gym(VideoStream& stream, ProControllerContext& conte
         stream.log("go_to_sunyshore_gym: entered the gym.", COLOR_GREEN);
     }
 
-    // The recorded entry tour takes about seven seconds after the entry fade.
-    // Let it finish before any puzzle input can be swallowed by the camera tour.
+    // The gym entry tour takes about seven seconds after the entry fade. Let it finish before
+    // sending puzzle inputs.
     pbf_wait(context, 8000ms);
     context.wait_for_all_requests();
     OverworldWatcher entrance_ready;
@@ -3004,9 +2993,8 @@ static bool go_to_sunyshore_gym(VideoStream& stream, ProControllerContext& conte
             {DPAD_UP, 1, 173ms, 2371ms},
         },
         {
-            // Sunyshore Gym School Kid Forrest
-            // Keep the recorded switch waits. Use a separate facing tap when
-            // aligning west with the blue bridge lane.
+            // Sunyshore Gym School Kid Forrest. Preserve the switch waits. Use a separate facing
+            // tap when aligning west with the blue bridge lane.
             {DPAD_UP, 1, 127ms, 573ms},
             {DPAD_UP, 1, 127ms, 806ms},
             {DPAD_UP, 1, 127ms, 2232ms},
@@ -3135,8 +3123,8 @@ static bool go_to_sunyshore_gym(VideoStream& stream, ProControllerContext& conte
             {DPAD_DOWN, 1},
             {DPAD_UP, 1},
             {DPAD_UP, 1, 80ms, 1824ms},
-            // Preserve the recorded walking distances, plus one facing press
-            // at each turn. Keep the waits for the gear rotations.
+            // Preserve walking distances and gear-rotation waits. Add one facing press at each
+            // turn.
             {DPAD_DOWN, 6},
             {DPAD_RIGHT, 6},
             {DPAD_UP, 6},
@@ -3150,9 +3138,8 @@ static bool go_to_sunyshore_gym(VideoStream& stream, ProControllerContext& conte
             {DPAD_DOWN, 1, 80ms, 1388ms},
         },
         {
-            // Volkner
-            // Include a facing press at each turn so the 80 ms taps preserve
-            // the recorded walking distances and clear the stairs before turning west.
+            // Volkner. Include a facing press at each turn so the 80ms taps preserve walking
+            // distances and clear the stairs before turning west.
             {DPAD_DOWN, 16},
             {DPAD_LEFT, 4},
             {DPAD_UP, 5},
@@ -3673,7 +3660,6 @@ void checkpoint_0806(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            // Same existing helper, now split at the proposed summit boundary.
             if (!go_through_mount_coronet(env.console, context, stats, options, true)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "08.06: Summit story did not complete.", env.console);

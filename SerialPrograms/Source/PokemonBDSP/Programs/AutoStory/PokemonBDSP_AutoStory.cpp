@@ -485,7 +485,6 @@ void BDSPAutoStory::load_json(const JsonValue& json){
                 if (old_index == 5){
                     revised_index = 6;
                 }else if (old_index == 4 && selection == 1){
-                    // Old 00.04 included both the catch and post-catch route.
                     revised_index = 5;
                 }
                 tutorial_selections[selection]->set_by_slug("00.0" + std::to_string(revised_index));

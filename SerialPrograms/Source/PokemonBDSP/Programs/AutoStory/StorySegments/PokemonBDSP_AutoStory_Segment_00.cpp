@@ -27,8 +27,10 @@
 #include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Pokemon_Strings.h"
 
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 #include "PokemonBDSP/Programs/AutoStory/PokemonBDSP_AutoStoryTools.h"
+#include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Dialog.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Segment_00_tools.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_OverworldMatchers.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
@@ -45,8 +47,8 @@ namespace PokemonBDSP {
 // Starter selection
 // ---------------------------------------------------------------------------
 
-// Watch before movement starts, release on the fade, and hold the
-// following recorded wait until the destination is visible again.
+// Watch before movement starts, release on the fade, and wait until the destination is visible
+// again.
 static void recorded_move_until_transition(VideoStream& stream,
     ProControllerContext& context,
     double x,
@@ -65,7 +67,7 @@ static void recorded_move_until_transition(VideoStream& stream,
             }else{
                 pbf_move_left_joystick(ctx, {x, y}, duration, 0ms);
             }
-            // Keep observing a delayed fade after the recorded hold.
+            // Keep observing a delayed fade after the movement hold ends.
             pbf_wait(ctx, 5000ms);
         },
         {{black}});
@@ -206,7 +208,7 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
 
     wait_for_dialog(stream, context, "Phase 1 (Mom)");
 
-    pbf_mash_button(context, BUTTON_A, 5000ms);
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_A);
     pbf_wait(context, 300ms);
 
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1662ms, 0ms);
@@ -216,7 +218,7 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
 
     wait_for_dialog(stream, context, "Phase 2 (Mom Warning)");
 
-    pbf_mash_button(context, BUTTON_A, 2500ms);
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_A);
     pbf_wait(context, 300ms);
     context.wait_for_all_requests();
 
@@ -233,11 +235,9 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     context.wait_for_all_requests();
 
     wait_for_dialog(stream, context, "Phase 3 (Barry 1st)");
-    pbf_mash_button(context, BUTTON_A, 6000ms);
-    pbf_wait(context, 800ms);
-    wait_for_dialog(stream, context, "Phase 3 (Barry 1st)");
-    pbf_mash_button(context, BUTTON_A, 6000ms);
-    pbf_wait(context, 800ms);
+    // Barry starts to leave, then returns for a second line about his forgotten bag.
+    // Keep clearing across that camera/walking gap before entering his house.
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_A, 10000ms);
 
     pbf_wait(context, 1306ms);
     context.wait_for_all_requests();
@@ -273,20 +273,20 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     // Align left after entry before the next upward stair approach.
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 400ms, 0ms);
     pbf_move_left_joystick(context, {-1.000000, 0.000000}, 1600ms, 0ms);
-    // The north hold reaches the stair corner. Turn east directly;
-    // the recorded left/up repetitions only push into the same walls.
+    // The north hold reaches the stair corner. Turn east directly; further left/up movement only
+    // pushes into the walls.
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 2722ms, 0ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 975ms, 0ms);
     pbf_wait(context, 1422ms);
 
     wait_for_dialog(stream, context, "Phase 8 (Barry 2nd dialog)");
-    pbf_mash_button(context, BUTTON_A, 10000ms);
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_A);
 
     pbf_wait(context, 856ms);
 
 
-    // Recorded route from the top of Barry's stairs. Moves rounded to
-    // 100ms, waits to 50ms; transition waits gate both floor changes.
+    // Start at the top of Barry's stairs. Moves are rounded to 100ms and waits to 50ms;
+    // transition waits gate both floor changes.
     recorded_move_until_transition(stream, context, -1.0, 0.0, 900ms, "Barry house downstairs");
     pbf_wait(context, 750ms);
     pbf_move_left_joystick(context, {-1.0, 0.0}, 2000ms, 0ms);
@@ -296,8 +296,7 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_move_left_joystick(context, {1.0, 0.0}, 1400ms, 0ms);
     pbf_wait(context, 500ms);
     recorded_move_until_transition(stream, context, 0.0, -1.0, 1200ms, "Barry house exit");
-    // First-run video placed the player east of the northbound path.
-    // Shorten the rightward approach; tune further from the next recording.
+    // Keep the eastward approach short enough to stay aligned with the northbound path.
     stream.log("[Route 201] Aligning east for 2300ms before northbound approach.");
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 2300ms, 0ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 5861ms, 0ms);
@@ -305,7 +304,7 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
 
     wait_for_dialog(stream, context, "Phase 9 (Barry Route 201)");
 
-    pbf_mash_button(context, BUTTON_B, 6000ms);
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B);
     pbf_wait(context, 800ms);
 
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 700ms, 0ms);
@@ -343,9 +342,7 @@ static void starter_nav(VideoStream& stream, ProControllerContext& context){
 
     wait_for_dialog(stream, context, "Phase 10 (Barry before the starter selection)");
 
-    pbf_mash_button(context, BUTTON_A, 1000ms);
-
-    pbf_wait(context, 500ms);
+    // The briefcase watcher below owns the dialogue and automatic walking.
     std::shared_ptr<const ImageRGB32> briefcase =
         std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
 
@@ -373,7 +370,11 @@ static void starter_nav(VideoStream& stream, ProControllerContext& context){
     pbf_mash_button(context, BUTTON_B, 2000ms);
 }
 static void post_starly_clenaup(VideoStream& stream, ProControllerContext& context){
-    pbf_mash_button(context, BUTTON_B, 60000ms);
+    // Dawn retrieves the briefcase, then the game walks us out of the lake.
+    // Observe that transition before clearing Barry's final conversation.
+    recorded_move_until_transition(stream, context, 0, 0, 90000ms, "Leaving Lake Verity after Starly", true);
+    wait_for_dialog(stream, context, "Barry after leaving Lake Verity", 20s);
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
 }
 // ---------------------------------------------------------------------------
 // End of Segment 00 - 02
@@ -399,7 +400,10 @@ tutorial_part_2_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     context.wait_for_all_requests();
 
     wait_for_dialog(stream, context, "Phase 10 (Professor dialog to mom)");
-    pbf_mash_button(context, BUTTON_B, 40000ms);
+    // The professor's departure leads to a fade and a new conversation at home.
+    recorded_move_until_transition(stream, context, 0, 0, 90000ms, "Returning home after meeting Rowan", true);
+    wait_for_dialog(stream, context, "Mom and Running Shoes", 20s);
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 820ms, 0ms);
     pbf_wait(context, 4000ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 800ms, 0ms);
@@ -491,7 +495,8 @@ tutorial_part_2_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
 
 
 static void
-tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
+tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
+    const AutoStoryOptions& options){
     // Arm exit detection before movement and finish the fade before
     // starting the dialogue watcher, which cancels queued commands.
     recorded_move_until_transition(stream, context, 0.0, -1.0, 2010ms, "Rowan lab exit");
@@ -499,7 +504,8 @@ tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
 
     wait_for_dialog(stream, context, "Phase 14 (dawn tour)");
 
-    pbf_mash_button(context, BUTTON_B, 25000ms);
+    // Allow the automatic walks between the Center and Mart explanations.
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 90, BUTTON_B, 6000ms);
 
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 5125ms, 0ms);
     pbf_wait(context, 336ms);
@@ -528,7 +534,8 @@ tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
 
     wait_for_dialog(stream, context, "Phase 15 (Mom conversation to accept parcel)");
 
-    pbf_mash_button(context, BUTTON_B, 40000ms);
+    // Barry's mother walks in between Mom's explanation and the parcel dialogue.
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 90, BUTTON_B, 10000ms);
 
     context.wait_for_all_requests();
     pbf_wait(context, 1500ms);
@@ -559,14 +566,14 @@ tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     // Before Dawn gives Poke Balls, wild commands have no ball shortcut.
     // Reuse the starter-layout detector for these training encounters.
     walk_through_grass(stream, context, 1, 0, 12, "right through grass to path",
-        BattleType::STARTER, 200ms, nullptr, true);
+        BattleType::STARTER, 200ms, nullptr, true, &options);
     pbf_move_left_joystick(context, { 1.000000, 0.000000 }, 7300ms, 0ms);
     dpad.last_dir = DPAD_RIGHT;
     repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 7);
     walk_through_grass(stream, context, 0, 1, 10, "up through grass 2",
-        BattleType::STARTER, 200ms, nullptr, true);
+        BattleType::STARTER, 200ms, nullptr, true, &options);
     walk_through_grass(stream, context, 1, 0, 5, "right through grass 2",
-        BattleType::STARTER, 200ms, nullptr, true);
+        BattleType::STARTER, 200ms, nullptr, true, &options);
     context.wait_for_all_requests();
     pbf_wait(context, 500ms);
     dpad.last_dir = DPAD_RIGHT;
@@ -588,7 +595,23 @@ tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
 
     wait_for_dialog(stream, context, "Phase 16 (catch tutorial)");
 
-    pbf_mash_button(context, BUTTON_B, 70000ms);
+    // Confirm the demonstration has reached battle commands before watching its exit.
+    // STARTER accepts the demonstration menu without the player's ball shortcut.
+    BattleMenuWatcher demonstration_menu(BattleType::STARTER, COLOR_YELLOW);
+    int demonstration_ret = run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+            pbf_mash_button(ctx, BUTTON_B, 90000ms);
+        },
+        {{demonstration_menu}});
+    if (demonstration_ret != 0){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Catch tutorial: Demonstration battle menu not detected.", stream);
+    }
+    // A quiet battle animation is not an overworld. Wait for the actual exit fade.
+    recorded_move_until_transition(stream, context, 0, 0, 90000ms, "Dawn catching demonstration exit", true);
+    wait_for_dialog(stream, context, "Dawn after catching demonstration", 20s);
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
     catch_1_pokemon(stream, context);
@@ -596,8 +619,8 @@ tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     context.wait_for_all_requests();
 }
 
-// Align to a route reference before continuing recorded navigation.
-// Matcher offsets and thresholds are fractions of screen width/height.
+// Align to a route reference before continuing navigation. Matcher offsets and thresholds are
+// fractions of screen width/height.
 static void align_to_tutorial_landmarks(VideoStream& stream,
     ProControllerContext& context,
     OverworldMatchResult (*matcher)(const ImageRGB32&),
@@ -678,29 +701,26 @@ static void align_to_tutorial_landmarks(VideoStream& stream,
         stream);
 }
 
-[[maybe_unused]] static void align_to_sandgem_junction(VideoStream& stream, ProControllerContext& context){
-    align_to_tutorial_landmarks(stream, context, match_sandgem_junction, "Sandgem junction");
-}
-
 // Resumes from the save made after catching the second Pokemon.
 static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironment& env,
     VideoStream& stream,
-    ProControllerContext& context){
+    ProControllerContext& context,
+    const AutoStoryOptions& options){
     pbf_wait(context, 1500ms);
     // Potions were collected before Rowan. Stay in the Route 202 catch
     // grass for healing and training instead of returning to Route 201.
     stream.log("[Tutorial] Checking starter HP after catching the second Pokemon.");
-    use_potion_first_pokemon(stream, context);
-    context.wait_for_all_requests();
-    battle_1_pokemon(stream, context);
+    battle_1_pokemon(stream, context, options);
 
     // Continue on to jubilife
-    walk_through_grass(stream, context, -1, 0, 18, "left through grass 3");
-    walk_through_grass(stream, context, 0, 1, 18, "up through grass 3");
+    // Twelve steps retain a margin beyond the tree boundary in each direction.
+    // Keep the established per-step movement and encounter observation unchanged.
+    walk_through_grass(stream, context, -1, 0, 12, "left through grass 3");
+    walk_through_grass(stream, context, 0, 1, 12, "up through grass 3");
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1000ms, 0ms);
     wait_for_dialog(stream, context, "Phase 18 (tristan encounter dialog)");
 
-    pbf_mash_button(context, BUTTON_B, 5000ms);
+    // The battle helper advances the introduction while watching for commands.
     fight_tristan(stream, context);
 
     use_potion_first_pokemon(stream, context);
@@ -717,8 +737,7 @@ static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironmen
 
     wait_for_dialog(stream, context, "Phase 19 (natalie encounter dialog)");
 
-    pbf_mash_button(context, BUTTON_B, 5000ms);
-
+    // The battle helper advances the introduction while watching for commands.
     fight_Natalie(stream, context);
     context.wait_for_all_requests();
     use_potion_first_pokemon(stream, context);
@@ -732,7 +751,6 @@ static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironmen
 
     wait_for_dialog(stream, context, "Phase 20 (logan encounter dialog)");
 
-    pbf_mash_button(context, BUTTON_B, 5000ms);
     fight_Natalie(stream, context);
     context.wait_for_all_requests();
     use_potion_first_pokemon(stream, context);
@@ -742,7 +760,7 @@ static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironmen
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 2469ms, 0ms);
     wait_for_dialog(stream, context, "Phase 21 (dawn Jubilife dialog)");
 
-    pbf_mash_button(context, BUTTON_B, 5000ms);
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
 }
 // ---------------------------------------------------------------------------
 // End of Segment 00 - 04
@@ -962,28 +980,28 @@ tutorial_part_4_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 200ms, 0ms);
     pbf_wait(context, 581ms);
     pbf_press_button(context, BUTTON_A, 150ms, 0ms);
-    pbf_wait(context, 795ms);
+    pbf_wait(context, 500ms);
 
     wait_for_dialog(stream, context, "Phase 22 (barry town map dialog)");
 
-    pbf_mash_button(context, BUTTON_B, 15000ms);
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
     context.wait_for_all_requests();
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1521ms, 0ms);
     pbf_wait(context, 602ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1100ms, 0ms);
-    pbf_wait(context, 864ms);
+    pbf_wait(context, 500ms);
     pbf_press_dpad(context, DPAD_RIGHT, 138ms, 0ms);
-    pbf_wait(context, 2398ms);
+    pbf_wait(context, 500ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 1018ms, 0ms);
-    pbf_wait(context, 3811ms);
+    pbf_wait(context, 500ms);
 
     wait_for_dialog(stream, context, "Phase 23 (poketech challenge dialog)");
 
-    pbf_mash_button(context, BUTTON_B, 5000ms);
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
     context.wait_for_all_requests();
 
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 192ms, 0ms);
-    pbf_wait(context, 820ms);
+    pbf_wait(context, 500ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 980ms, 0ms);
     pbf_wait(context, 543ms);
     pbf_press_dpad(context, DPAD_UP, 203ms, 0ms);
@@ -993,7 +1011,7 @@ tutorial_part_4_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1567ms, 0ms);
     pbf_wait(context, 538ms);
     pbf_press_dpad(context, DPAD_LEFT, 157ms, 0ms);
-    pbf_wait(context, 735ms);
+    pbf_wait(context, 500ms);
     pbf_press_dpad(context, DPAD_LEFT, 164ms, 0ms);
     pbf_wait(context, 564ms);
     pbf_press_dpad(context, DPAD_LEFT, 250ms, 0ms);
@@ -1024,11 +1042,11 @@ tutorial_part_4_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 2013ms, 0ms);
     pbf_wait(context, 369ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1448ms, 0ms);
-    pbf_wait(context, 2435ms);
+    pbf_wait(context, 500ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 1077ms, 0ms);
-    pbf_wait(context, 1084ms);
+    pbf_wait(context, 500ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1280ms, 0ms);
-    pbf_wait(context, 1895ms);
+    pbf_wait(context, 500ms);
     pbf_press_dpad(context, DPAD_LEFT, 88ms, 0ms);
 
     context.wait_for_all_requests();
@@ -1039,15 +1057,15 @@ tutorial_part_4_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
 
     context.wait_for_all_requests();
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 511ms, 0ms);
-    pbf_wait(context, 1318ms);
+    pbf_wait(context, 500ms);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 140ms, 0ms);
-    pbf_wait(context, 1502ms);
+    pbf_wait(context, 500ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2093ms, 0ms);
-    pbf_wait(context, 2327ms);
+    pbf_wait(context, 500ms);
     pbf_press_dpad(context, DPAD_LEFT, 151ms, 0ms);
     pbf_wait(context, 549ms);
     pbf_press_dpad(context, DPAD_LEFT, 118ms, 0ms);
-    pbf_wait(context, 999ms);
+    pbf_wait(context, 500ms);
     pbf_press_dpad(context, DPAD_UP, 206ms, 0ms);
     pbf_wait(context, 474ms);
     pbf_press_dpad(context, DPAD_UP, 249ms, 0ms);
@@ -1062,37 +1080,37 @@ tutorial_part_4_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
 
     context.wait_for_all_requests();
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1098ms, 0ms);
-    pbf_wait(context, 2779ms);
+    pbf_wait(context, 500ms);
     pbf_press_dpad(context, DPAD_LEFT, 177ms, 0ms);
     pbf_wait(context, 488ms);
     pbf_press_dpad(context, DPAD_LEFT, 200ms, 0ms);
     pbf_wait(context, 649ms);
     pbf_press_dpad(context, DPAD_LEFT, 160ms, 0ms);
-    pbf_wait(context, 4285ms);
+    pbf_wait(context, 500ms);
     pbf_press_dpad(context, DPAD_DOWN, 307ms, 0ms);
     pbf_wait(context, 639ms);
     pbf_press_dpad(context, DPAD_DOWN, 463ms, 0ms);
-    pbf_wait(context, 2521ms);
+    pbf_wait(context, 500ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 3600ms, 0ms);
     pbf_wait(context, 610ms);
     approach_poketch_landmarks(stream, context);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 192ms, 0ms);
-    pbf_wait(context, 3238ms);
+    pbf_wait(context, 500ms);
     align_and_talk_to_poketch_man(stream, context);
 
-    pbf_mash_button(context, BUTTON_B, 15000ms);
+    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
     context.wait_for_all_requests();
 
     // poketech acquired
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1194ms, 0ms);
-    pbf_wait(context, 1984ms);
+    pbf_wait(context, 500ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 832ms, 0ms);
-    pbf_wait(context, 1522ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 144ms, 0ms);
-    pbf_wait(context, 1767ms);
+    pbf_wait(context, 500ms);
+    dpad.last_dir = DPAD_RIGHT;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 1);
     align_and_enter_jubilife_center(stream, context);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 1099ms, 0ms);
-    pbf_wait(context, 1222ms);
+    pbf_wait(context, 500ms);
     pbf_press_dpad(context, DPAD_RIGHT, 228ms, 0ms);
     pbf_wait(context, 625ms);
     pbf_press_dpad(context, DPAD_RIGHT, 238ms, 0ms);
@@ -1315,7 +1333,7 @@ void checkpoint_0004(SingleSwitchProgramEnvironment& env,
         stats,
         [&](size_t /*attempt*/){
             // Segment 00-003: Poketech acquisition
-            tutorial_part_3_navigation(env, env.console, context);
+            tutorial_part_3_navigation(env, env.console, context, options);
         },
         true);
 }
@@ -1346,7 +1364,7 @@ void checkpoint_0005(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            tutorial_part_3_after_catch_navigation(env, env.console, context);
+            tutorial_part_3_after_catch_navigation(env, env.console, context, options);
         },
         true);
 }

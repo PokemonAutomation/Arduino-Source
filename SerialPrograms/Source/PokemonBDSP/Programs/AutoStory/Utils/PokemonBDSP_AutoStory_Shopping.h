@@ -37,6 +37,7 @@ enum class ShopItem {
     XAttack,
     XSpAtk,
     XSpeed,
+    XSpDef,
 };
 
 // Pass as the `quantity` field to buy the maximum available amount.

@@ -303,8 +303,8 @@ OverworldMatchResult match_oreburgh_mart(const ImageRGB32& frame){
         1,
         POSITION_TOLERANCE_X,
         POSITION_TOLERANCE_Y);
-    // The recorded daytime roof appearance narrowly missed the old template.
-    // Preserve both confidence gates and reject disagreement between variants.
+    // Use roof variants for daytime lighting. Preserve both confidence requirements and reject
+    // position disagreement between variants.
     auto recorded = match_landmarks(frame,
         {{"Mart emblem",
                 "PokemonBDSP/Autostory/OreburghMart/MartEmblemRecorded.png",
@@ -328,9 +328,9 @@ OverworldMatchResult match_oreburgh_mart(const ImageRGB32& frame){
     return original;
 }
 OverworldMatchResult match_jubilife_center_entrance(const ImageRGB32& frame){
-    // Native lighting-test captures avoid resizing artifacts in the reference.
-    // The emblem is about 5.73% of screen width left of the player at approach:
-    // shift its target right to center the door, preserving the approach height.
+    // Use native-resolution references to avoid resizing artifacts. The emblem is about 5.73% of
+    // screen width left of the player during approach; shift its target right to center the door,
+    // preserving approach height.
     OverworldMatchResult clear = match_landmarks(frame,
         {{"Center entrance",
                 "PokemonBDSP/Autostory/JubilifeCenter/CenterEmblem.png",
@@ -555,13 +555,12 @@ static OverworldMatchResult match_lighting_pair(const ImageRGB32& frame,
     return result;
 }
 OverworldMatchResult match_eterna_center_entrance(const ImageRGB32& frame){
-    // Native screenshot-20261016-214300767696 is the intended doorway pose.
-    // The Pokeball is primary. Sign and bush assist when visible, but cloud
-    // shadows must not prevent arrival from a strong, unique emblem match.
+    // Target the doorway pose using the Pokeball as the primary landmark. Sign and bush assist
+    // when visible, but cloud shadows must not block arrival from a strong, unique emblem match.
     OverworldMatchResult best;
     double best_score = -1;
     bool best_primary_only = false;
-    // Recorded evening/daytime appearances retain the same destination and gates.
+    // Evening/daytime variants use the same destination and confidence requirements.
     for (int appearance = 0; appearance < 5; appearance++){
         for (double scale : {.90, .95, 1.0, 1.05, 1.10}){
             std::vector<LandmarkConfig> configs = {{"Center Pokeball",
@@ -606,8 +605,8 @@ OverworldMatchResult match_eterna_center_entrance(const ImageRGB32& frame){
                         .20}};
             }
             if (appearance >= 3){
-                // Recorded daylight changes the bush/planter contrast. These
-                // crops retain the original doorway geometry and all three votes.
+                // Daylight changes the bush/planter contrast. These crops preserve the doorway
+                // geometry and require all three landmark votes.
                 configs[0].path = appearance == 3 ? "PokemonBDSP/Autostory/EternaCenter/BallDaytime1.png"
                     : "PokemonBDSP/Autostory/EternaCenter/BallDaytime2.png";
                 configs[1].path = appearance == 3 ? "PokemonBDSP/Autostory/EternaCenter/RightSignDaytime1.png"
@@ -655,12 +654,12 @@ OverworldMatchResult match_eterna_center_entrance(const ImageRGB32& frame){
     return best;
 }
 OverworldMatchResult match_route208_stair_top(const ImageRGB32& frame){
-    // Native screenshot 20261022-213928168268: centered above the east stairs.
-    // The isolated upper rock and lower rock pair must both agree before descent.
+    // Target the position centered above the east stairs. Both the isolated upper rock and lower
+    // rock pair must agree before descent.
     OverworldMatchResult best;
     double best_score = -1;
-    // Stationary hourly captures supply lighting appearances, not new goals.
-    // Both physical rock groups still need the same confidence and agreement.
+    // Lighting variants do not define new goals. Both physical rock groups must still meet the
+    // same confidence and position-agreement requirements.
     const char* references[][2] = {
         {"PokemonBDSP/Autostory/Route208Stairs/UpperRock.png", "PokemonBDSP/Autostory/Route208Stairs/LowerRocks.png"},
         {"PokemonBDSP/Autostory/Route208Stairs/Hour0Frame1Upper.png",
@@ -777,8 +776,8 @@ OverworldMatchResult match_route208_stair_top(const ImageRGB32& frame){
     return best;
 }
 OverworldMatchResult match_route208_lower_stair_lane(const ImageRGB32& frame){
-    // Successful 1825ms descent endpoint at video 230s (2026-10-24 15-38-06).
-    // Independent cliff/tree anchors must agree before movement is authorized.
+    // Target the 1825ms descent endpoint. Independent cliff/tree anchors must agree before
+    // movement is authorized.
     OverworldMatchResult best;
     double best_score = -1;
     for (double scale : {.90, .95, 1.0, 1.05, 1.10}){
@@ -833,8 +832,8 @@ OverworldMatchResult match_route208_lower_stair_lane(const ImageRGB32& frame){
     return best;
 }
 OverworldMatchResult match_route209_repel_point(const ImageRGB32& frame){
-    // butters' marked sign frame and rock pair; the cloud-sensitive pillar is excluded.
-    // Only the sign's left frame/post is used; lettering is excluded.
+    // Use the sign frame and rock pair, excluding the cloud-sensitive pillar. Only the sign's
+    // left frame/post is used; lettering is excluded.
     OverworldMatchResult best;
     double best_score = -1;
     // Lighting samples are translated back to the original marked target.
@@ -983,9 +982,9 @@ OverworldMatchResult match_route208_hannah_departure(const ImageRGB32& frame){
                     .93,
                     .20}};
             if (appearance){
-                // Recorded dodges stand farther east, with the stairs clipped.
-                // These agreeing signs guide acquisition only; the successful
-                // departure reference above alone may confirm arrival.
+                // Dodging can leave the player farther east with the stairs clipped. These
+                // agreeing signs guide acquisition only; only the departure reference above may
+                // confirm arrival.
                 configs.erase(configs.begin());
                 configs[0].path = appearance == 865 ? "PokemonBDSP/Autostory/Route208Hannah/FieldSign865.png"
                     : appearance == 930             ? "PokemonBDSP/Autostory/Route208Hannah/FieldSign930.png"
@@ -1030,8 +1029,8 @@ OverworldMatchResult match_route208_hannah_departure(const ImageRGB32& frame){
     return best;
 }
 OverworldMatchResult match_hearthome_center_entrance(const ImageRGB32& frame){
-    // Real stationary hourly views cover daylight, night, dusk and cloud edges.
-    // The target is butters' street pose below the door; entry remains watched.
+    // Lighting variants cover daylight, night, dusk and cloud edges. Target the street pose below
+    // the door; watch for entry during movement.
     struct Reference {
         const char* ball;
         const char* awning;
@@ -1083,8 +1082,8 @@ OverworldMatchResult match_hearthome_center_entrance(const ImageRGB32& frame){
         1.0 / 128);
 }
 OverworldMatchResult match_hearthome_center_interior(const ImageRGB32& frame){
-    // Three observed entry-camera angles. Perspective changes the machine
-    // and register independently, so require a pair from the same real view.
+    // Perspective changes the machine and register independently. Require both landmarks from the
+    // same entry-camera angle.
     struct View {
         const char* machine;
         const char* desk;
@@ -1137,8 +1136,8 @@ OverworldMatchResult match_hearthome_center_interior(const ImageRGB32& frame){
     return best;
 }
 OverworldMatchResult match_hearthome_contest_fantina(const ImageRGB32& frame){
-    // Static sign rim above localized text and roof emblem; Fantina can move.
-    // Hourly captures vary the sign illumination. The roof remains reliable.
+    // Use the static sign rim above localized text and the roof emblem; Fantina can move. The
+    // roof remains reliable when lighting changes the sign's illumination.
     const char* signs[] = {"PokemonBDSP/Autostory/HearthomeContest/SignRim.png",
         "PokemonBDSP/Autostory/HearthomeContest/RimLighting00Sign.png",
         "PokemonBDSP/Autostory/HearthomeContest/RimLighting01Sign.png",
@@ -1172,7 +1171,7 @@ OverworldMatchResult match_hearthome_contest_fantina(const ImageRGB32& frame){
     }
     return match_lighting_pair(frame, variants, "Contest Hall sign frame", "Contest Hall roof emblem", 1.0 / 128);
 }
-// Fixed city landmarks preserve the recorded passage and western stair lane.
+// Fixed city landmarks preserve the passage and western stair lane.
 OverworldMatchResult match_veilstone_city_passage(const ImageRGB32& frame){
     auto fine = match_landmarks(frame,
         {{"Passage house",
@@ -1194,10 +1193,9 @@ OverworldMatchResult match_veilstone_city_passage(const ImageRGB32& frame){
     if (fine.located){
         return fine;
     }
-    // The former reference column lies just inside the left cliff in the
-    // live corridor. Recenter eight pixels horizontally and two vertically in the
-    // matcher image; keep both arrival tolerances unchanged.
-    // A farther-east expiry may expose only the house's right window.
+    // Recenter eight pixels horizontally and two vertically in the matcher image to keep the
+    // target outside the left cliff. Preserve both arrival tolerances. A farther-east expiry may
+    // expose only the house's right window.
     std::vector<LandmarkConfig> variants;
     for (double scale : {.85, .90, .95, 1.0, 1.05, 1.10}){
         const double hw = 95.0 / 960 * scale, hh = 80.0 / 540 * scale;
@@ -1252,8 +1250,8 @@ OverworldMatchResult match_veilstone_dawn_stairs(const ImageRGB32& frame){
 }
 
 OverworldMatchResult match_hearthome_gym_entrance(const ImageRGB32& frame){
-    // Wider fixed facade distinguishes the window bays at night. Real hourly
-    // references cover the illuminated windows; cursor, NPCs and text stay out.
+    // A wider fixed facade distinguishes the window bays at night. Lighting variants cover
+    // illuminated windows; exclude the cursor, NPCs and text.
     const char* facades[] = {"PokemonBDSP/Autostory/HearthomeGym/LeftFacade.png",
         "PokemonBDSP/Autostory/HearthomeGym/Lighting00Facade.png",
         "PokemonBDSP/Autostory/HearthomeGym/Lighting01Facade.png",
@@ -1283,8 +1281,8 @@ OverworldMatchResult match_hearthome_gym_entrance(const ImageRGB32& frame){
 }
 
 OverworldMatchResult match_eterna_gym_entrance(const ImageRGB32& frame){
-    // Recorded centered doorway pose. All three stationary landmarks must agree
-    // before entering; two can guide acquisition without confirming arrival.
+    // Target the centered doorway pose. All three stationary landmarks must agree before entry;
+    // two can guide acquisition without confirming arrival.
     OverworldMatchResult best;
     double best_score = -1;
     for (int appearance : {19, 16}){
@@ -1526,9 +1524,9 @@ OverworldMatchResult match_galactic_hq_jupiter(const ImageRGB32& frame){
         }
     }
     if (!result.located){
-        // Existing recorded chair views can guide recovery from the old row.
-        // Their coordinates still point to the new north-side destination;
-        // only the three canonical above-Jupiter references confirm arrival.
+        // Chair references can guide recovery from the southern row. Their coordinates point to
+        // the north-side destination; only the three canonical above-Jupiter references confirm
+        // arrival.
         auto approach = std::vector<LandmarkConfig>{configs[0], configs[1]};
         approach[0].path = "PokemonBDSP/Autostory/GalacticHQ/LeftChairs.png";
         approach[1].path = "PokemonBDSP/Autostory/GalacticHQ/RightChairs.png";
@@ -1580,9 +1578,9 @@ OverworldMatchResult match_galactic_hq_cut(const ImageRGB32& frame){
     if (!result.located && result.landmarks.size() == 2){
         const auto& sign = result.landmarks[0];
         const auto& ball = result.landmarks[1];
-        // In the recorded far-west misses, the low fascia emblem shifts 1.31
-        // screen pixels per sign pixel. Calibrate that acquisition observation
-        // before applying the same position-agreement bound; never use it for arrival.
+        // Far west of the target, the low fascia emblem shifts 1.31 screen pixels per sign pixel.
+        // Calibrate that acquisition offset before applying the position-agreement bound; never
+        // use it for arrival.
         const double calibrated_ball_dx = ball.dx / 1.31;
         if (sign.accepted && ball.accepted && sign.dx * ball.dx > 0 && std::abs(sign.dx) > .03 &&
             std::abs(sign.dx) <= .20 && std::abs(sign.dx - calibrated_ball_dx) <= AGREEMENT_X &&
@@ -1593,8 +1591,8 @@ OverworldMatchResult match_galactic_hq_cut(const ImageRGB32& frame){
             result.dx = (sign.dx + calibrated_ball_dx) / 2;
         }
     }
-    // The recorded approach already clamps against the hedge. Correct only
-    // its column; the watched Up/A loop owns the final north interaction.
+    // The approach clamps against the hedge. Correct only the column; the watched Up/A loop
+    // handles the final north interaction.
     result.dy = 0;
     result.at_target = result.located && !result.coarse && std::abs(result.dx) <= 1.0 / 128;
     return result;
@@ -1742,7 +1740,7 @@ OverworldMatchResult match_cycling_road_bridge_approach(const ImageRGB32& frame)
     cv::resize(pixels, small, cv::Size(960, 540), 0, 0, cv::INTER_AREA);
     cv::cvtColor(small, bgr, cv::COLOR_BGRA2BGR);
     cv::cvtColor(bgr, hsv, cv::COLOR_BGR2HSV);
-    // Hue/saturation retain the cyan rail under the recorded moving shadows.
+    // Hue/saturation preserve the cyan rail under moving shadows.
     cv::inRange(hsv, cv::Scalar(78, 95, 55), cv::Scalar(105, 255, 255), cyan);
     cv::morphologyEx(cyan, cyan, cv::MORPH_CLOSE, cv::Mat::ones(3, 3, CV_8U));
     const int w = hsv.cols, h = hsv.rows;
@@ -1849,10 +1847,8 @@ OverworldMatchResult match_cycling_road_bridge_approach(const ImageRGB32& frame)
         candidate.located = true;
         candidate.dx = inner / w - .55;
         candidate.dy = (double)deck_y / h - .36;
-        // Park on the upper white platform beside the right rail. The user
-        // demonstrated this stationary pose in the 12:33:35 recording; the
-        // downhill section starts well beyond it. Measure the rail at wheel
-        // height, not at its distant cap or the offset cliff wall.
+        // Park on the upper white platform beside the right rail, before the downhill section.
+        // Measure the rail at wheel height, not its distant cap or the offset cliff wall.
         candidate.at_target = std::abs(candidate.dx) <= .012 && std::abs(candidate.dy) <= 1.0 / 54;
         OverworldLandmarkResult rail_anchor;
         rail_anchor.name = "Bridge right rail inner edge";
@@ -1906,8 +1902,8 @@ OverworldMatchResult match_galactic_hq_exterior(const ImageRGB32& frame){
 }
 
 OverworldMatchResult match_eterna_center_departure(const ImageRGB32& frame){
-    // Center-exit pose in the recorded Center->Mart and bicycle-shop route.
-    // Reuse the existing shadow/appearance-aware Center identification.
+    // Use the Center-exit pose for the Center-to-Mart and bicycle-shop routes. Reuse the
+    // shadow/appearance-aware Center identification.
     auto result = match_eterna_center_entrance(frame);
     result.dy -= .070463;
     result.at_target = result.located && !result.coarse && std::abs(result.dx) <= 1.0 / 128 &&
@@ -1916,8 +1912,7 @@ OverworldMatchResult match_eterna_center_departure(const ImageRGB32& frame){
 }
 
 OverworldMatchResult match_eterna_gym_statues(const ImageRGB32& frame){
-    // Actual crops from screenshot-20261018-171535781091. Separate left/right
-    // search regions prevent one identical statue from satisfying both votes.
+    // Use separate left/right search regions so one identical statue cannot satisfy both votes.
     OverworldMatchResult best;
     double best_score = -1;
     if (!frame){
@@ -1968,9 +1963,8 @@ OverworldMatchResult match_eterna_gym_statues(const ImageRGB32& frame){
     return best;
 }
 OverworldMatchResult match_eterna_underground_house(const ImageRGB32& frame){
-    // User's doorway pose: the Center ball and the same house sign, viewed
-    // from the east. The sign is optional when a strong unique ball confirms
-    // the doorway pose; cloud shadow on the sign must not block entry.
+    // Target the Center doorway from the east using the Pokeball and house sign. A strong, unique
+    // Pokeball match can confirm arrival when cloud shadows obscure the sign.
     OverworldMatchResult best;
     double best_score = -1;
     bool best_primary_only = false;
@@ -2064,9 +2058,8 @@ OverworldMatchResult match_eterna_underground_man(const ImageRGB32& frame){
     return result;
 }
 OverworldMatchResult match_jubilife_street_approach(const ImageRGB32& frame){
-    // The lighting-run pose was 1/108 screen height south of the original
-    // screenshot. Targets preserve the original destination height.
-    // Capture-derived references cover lamp, daylight, and moving tree shadows.
+    // The lighting-reference pose is 1/108 screen height south of the destination. Preserve the
+    // destination height. Lighting variants cover lamps, daylight and moving tree shadows.
     return match_lighting_pair(frame,
         {{"BuildingCorner",
                 "PokemonBDSP/Autostory/JubilifeStreet/BuildingCornerHour3Frame4.png",
@@ -2391,9 +2384,9 @@ OverworldMatchResult match_route205_kelsey(const ImageRGB32& frame){
     return best;
 }
 OverworldMatchResult match_route205_bank_tree(const ImageRGB32& frame){
-    // Use the tree crown above the player's reach, plus the stationary child.
-    // Recorded cloud-edge views retain both anchor gates and agreement.
-    // Trunk crops can include the player's cap when he stands under the tree.
+    // Use the tree crown above the player's reach and the stationary child. Cloud-edge variants
+    // retain both anchor requirements and position agreement. Trunk crops can include the
+    // player's cap beneath the tree.
     OverworldMatchResult best;
     double best_score = -1;
     for (int view : {0, 1, 2, 3, 4, 5, 6, 7, 8}){
@@ -2622,8 +2615,8 @@ OverworldMatchResult match_route204_north_approach(const ImageRGB32& frame){
     return result;
 }
 OverworldMatchResult match_floaroma_house_entrance(const ImageRGB32& frame){
-    // Fixed facade details above/aside the player avoid door/player occlusion.
-    // Both must agree on the pose recorded just outside the central house.
+    // Fixed facade details above and beside the player avoid door/player occlusion. Both must
+    // agree on the pose just outside the central house.
     return match_landmarks(frame,
         {{"House window",
                 "PokemonBDSP/Autostory/FloaromaHouse/Window.png",
@@ -2663,9 +2656,8 @@ OverworldMatchResult match_floaroma_center_entrance(const ImageRGB32& frame){
             best = candidate;
         }
     }
-    // At the west wall the camera makes the emblem nearly circular, unlike
-    // the vertically compressed doorway reference. Search that recorded
-    // perspective without lowering the score or uniqueness requirements.
+    // At the west wall, perspective makes the emblem nearly circular rather than vertically
+    // compressed. Search this perspective without lowering score or uniqueness requirements.
     if (!best.located){
         for (double scale_x : {1.0, 1.05, 1.10, 1.15, 1.20}){
             for (double scale_y : {1.15, 1.25, 1.35, 1.45}){
@@ -2766,9 +2758,8 @@ OverworldMatchResult match_route204_north_stairs(const ImageRGB32& frame){
 }
 OverworldMatchResult match_teighler_alcove_corner(const ImageRGB32& frame){
     auto result = match_route204_north_stairs(frame);
-    // Reuse the fixed stairs only as an anchor. The destination is the
-    // bottom-left of Teighler's alcove, east of the stairs, not their center.
-    // Geometry comes from the recorded 1920x1080 corner reference.
+    // Use the fixed stairs only as an anchor. The destination is the bottom-left of Teighler's
+    // alcove, east of the stairs, not their center. Geometry uses the 1920x1080 corner reference.
     constexpr double shift_x = 393.0 / 1920, shift_y = 182.0 / 1080;
     result.dx += shift_x;
     result.dy += shift_y;
@@ -3131,10 +3122,9 @@ OverworldMatchResult match_route215_ace_renewal(const ImageRGB32& frame){
     }
     const auto& upper = approach.landmarks[0];
     const auto& lower = approach.landmarks[1];
-    // Keep the shared row when both bends already agree. In the recorded
-    // perspective-shifted rows the nearer bend moves 1.35 times as far;
-    // compare those acquisition errors in the farther bend's plane.
-    // Neither model changes the strict fine-arrival checks above.
+    // Keep the shared row when both bends agree. Under perspective shifts, the nearer bend moves
+    // 1.35 times as far; compare acquisition errors in the farther bend's plane. Neither model
+    // changes the fine-arrival checks.
     const double lower_plane_dy = std::abs(upper.dy - lower.dy) <= AGREEMENT_Y ? lower.dy : lower.dy / 1.35;
     approach.dy = (upper.dy + lower_plane_dy) / 2;
     const double nearest = std::min(std::abs(upper.dx), std::abs(lower.dx));
@@ -3375,9 +3365,9 @@ OverworldMatchResult match_route215_jogger_corner(const ImageRGB32& frame){
     if (!frame){
         return {};
     }
-    // These references describe the game capture, without the recording canvas.
-    // Smooth only this locator before contrast normalization to suppress rain
-    // streaks and capture resampling noise; other detectors retain their inputs.
+    // References cover only the game image, excluding the surrounding canvas. Smooth this locator
+    // before contrast normalization to suppress rain streaks and capture resampling noise; other
+    // detectors retain their inputs.
     cv::Mat gray, smoothed;
     cv::resize(gray_image(frame), gray, cv::Size(960, 540), 0, 0, cv::INTER_AREA);
     cv::GaussianBlur(gray, smoothed, cv::Size(0, 0), .8);
@@ -3566,8 +3556,8 @@ OverworldMatchResult match_route215_jogger_corner(const ImageRGB32& frame){
     // West of the visible fence, bridge/cliff pairs establish the walking row.
     // Their x coordinates are acquisition-only and can never confirm arrival.
     const std::vector<std::vector<LandmarkConfig>> approaches = {
-        {// The observed lane-4 to lane-3 step changes the bridge-foot view.
-            // Both corners must agree; this pair never confirms arrival.
+        {// Moving from lane 4 to lane 3 changes the bridge-foot view. Both corners must agree;
+        // this pair never confirms arrival.
             {"Bridge west corner",
                 "PokemonBDSP/Autostory/Route215JoggerV2/BridgeWestNightLane3.png",
                 {106.0 / 960 - .435625, 297.0 / 540 - 70.0 / 1080, 60.0 / 960, 75.0 / 540},
@@ -3659,11 +3649,10 @@ OverworldMatchResult match_route215_jogger_corner(const ImageRGB32& frame){
     return best;
 }
 OverworldMatchResult match_oreburgh_gym_entrance(const ImageRGB32& frame){
-    // References cover the centered approach and the recorded west-pillar
-    // stops in sun, cloud shadow, evening and night lighting. The darker
-    // 02:00-03:59 sign uses a separate reference. All use the centered pose.
-    // Only the fixed sign symbol and doorway emblem vote, never the player
-    // or sign lettering. Each needs a unique match and agreeing position.
+    // References cover the centered approach and west-pillar stops in sun, cloud shadow, evening
+    // and night. The darker 02:00-03:59 sign uses a separate reference. All use the centered
+    // pose. Only the fixed sign symbol and doorway emblem vote, excluding the player and
+    // lettering. Both need unique matches and agreeing positions.
     return match_lighting_pair(frame,
         {{"Gym sign symbol",
                 "PokemonBDSP/Autostory/OreburghGym/SignSymbolAligned.png",

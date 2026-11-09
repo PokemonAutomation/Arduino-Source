@@ -193,7 +193,7 @@ public:
 //  verified via overworld detection, false if all feedback-based save attempts failed.
 bool save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
-// Fake save game to be replaced with save_game when program runs smoothly
+// Placeholder save helper; use save_game for verified saving.
 void checkpoint_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 //  Save the game from the overworld, increment the checkpoint counter,
@@ -393,7 +393,8 @@ bool find_bag_item(VideoStream& stream,
     int target_pocket,
     int num_icons = 8,
     size_t max_scrolls_per_pocket = 512,
-    std::chrono::milliseconds search_timeout = std::chrono::minutes(10));
+    std::chrono::milliseconds search_timeout = std::chrono::minutes(10),
+    bool bag_already_open = false);
 
 // Find Escape Rope, choose Use, and verify a transition back to the overworld.
 bool use_escape_rope(VideoStream& stream, ProControllerContext& context, int num_icons = 8);
@@ -457,7 +458,8 @@ bool test_fly_locations(VideoStream& stream, ProControllerContext& context);
 // num_icons: 5 (early-game layout) or 8 (late-game layout).
 void open_menu(VideoStream& stream, ProControllerContext& context, MenuCursorPosition target, int num_icons);
 
-void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context);
+// Optionally read the lead's level while verifying full HP in the Bag.
+void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context, uint8_t* level = nullptr);
 
 enum class GearLevel {
     Fast,
