@@ -930,7 +930,7 @@ static bool restock_super_repels_snowpoint(VideoStream& stream,
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 845ms, 0ms);
     pbf_wait(context, 503ms);
     context.wait_for_all_requests();
-    if (!buy_items(stream, context, {{ShopItem::SuperRepel, quantity}}, language)){
+    if (!buy_items(stream, context, {{ShopItem::SuperRepel, quantity}}, language, DPAD_UP)){
         stream.log("Snowpoint Mart: Could not buy " + std::to_string(quantity) + " Super Repels.", COLOR_RED);
         return false;
     }
@@ -1107,16 +1107,14 @@ static bool walk_through_route_214(VideoStream& stream, ProControllerContext& co
     pbf_move_left_joystick(context, {0, -1}, 600ms, 100ms); // 3+
     repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 2, true);
 
+    // Keep the recorded southward stop against the trees at 41:00.
+    // Skip the expiry wiggle and shorten the following westward alignment
+    // from four seconds to three before continuing along the existing route.
     pbf_move_left_joystick(context, {0, -1}, 6200ms, 100ms); // 31+
-    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, {-1, 0}, 3000ms, 100ms);
 
-    force_repel_expiry(stream, context, RepelRenewalChoice::YES, false, true);
-    // Footage reaches the tree line in about two seconds. Four seconds keeps
-    // alignment margin without the old eleven-second hold and extra renewal.
-    pbf_move_left_joystick(context, {-1, 0}, 4000ms, 100ms);
-
-    // Keep this Super Repel through the remaining grass. The existing expiry/NO
-    // inside Lake Valor follows at most 21.46s of movement after this renewal.
+    // Carry the original Super Repel into the lake. Do not deliberately renew
+    // it here just to expire the replacement again at the lake stair landing.
     pbf_move_left_joystick(context, {0, -1}, 2800ms, 100ms); // 14+
     dpad.last_dir = DPAD_DOWN;
     repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 2);
@@ -1127,14 +1125,15 @@ static bool walk_through_route_214(VideoStream& stream, ProControllerContext& co
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+                // Recorded entry completes in under three seconds, including the fade.
+                pbf_move_left_joystick(context, {-1, 0}, 4000ms, 100ms);
             },
             {{black_screen}});
         if (ret < 0){
             stream.log("walk_through_route_214: black screen not detected!", COLOR_RED);
             return false;
         }
-        stream.log("walk_through_route_214: entered Valor Lakefront", COLOR_GREEN);
+        stream.log("walk_through_route_214: entered Lake Valor", COLOR_GREEN);
     }
 
     return true;
@@ -1933,7 +1932,9 @@ static bool snowpoint_gym_puzzle_and_candice(VideoStream& stream,
         {DPAD_RIGHT, 1, 80ms, 300ms},
         {DPAD_RIGHT, 1, 80ms, 2500ms},
         {DPAD_LEFT, 1, 80ms, 300ms},
-        {DPAD_LEFT, 1, 176ms, 1000ms},
+        // Finish the west slide before the south-facing input; one second
+        // swallowed that turn in the 2026-11-08 replay. Restore the verified wait.
+        {DPAD_LEFT, 1, 176ms, 2538ms},
         {DPAD_DOWN, 1, 80ms, 300ms},
         {DPAD_DOWN, 1, 80ms, 3390ms},
         {DPAD_LEFT, 1, 80ms, 300ms},
@@ -2070,11 +2071,11 @@ std::string AutoStory_Segment_07::name() const {
 }
 
 std::string AutoStory_Segment_07::start_text() const {
-    return "Start: Inside Canalave Gym at the entrance, after Byron, with sixth-badge rewards and dialogue finished.";
+    return AutoStory_Checkpoint_0701().start_text();
 }
 
 std::string AutoStory_Segment_07::end_text() const {
-    return "Seventh badge and rewards finished; outside Snowpoint Gym at the doorway, facing south, Repel inactive.";
+    return AutoStory_Checkpoint_0707().end_text();
 }
 
 void AutoStory_Segment_07::run_segment(SingleSwitchProgramEnvironment& env,
@@ -2107,7 +2108,7 @@ std::string AutoStory_Checkpoint_0701::name() const {
 }
 
 std::string AutoStory_Checkpoint_0701::start_text() const {
-    return "Inside Canalave Gym at the entrance, after Byron, with sixth-badge rewards and dialogue finished.";
+    return "Inside Canalave Gym at the entrance, facing east, after defeating Byron and acquiring the Mine Badge, with reward dialogue finished.";
 }
 
 std::string AutoStory_Checkpoint_0701::end_text() const {

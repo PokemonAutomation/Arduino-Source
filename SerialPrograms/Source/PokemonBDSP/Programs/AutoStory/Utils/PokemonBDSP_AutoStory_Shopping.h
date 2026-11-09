@@ -54,14 +54,16 @@ struct ItemToBuy {
 };
 
 // Start facing a vendor at interaction distance; navigate through the Buy menu,
-// and purchase each item in `items` in order. The function presses DPAD_DOWN
-// until the matching item name is found via OCR, so items may appear in any
-// list order. TARGET_STOCK buys only the deficit and verifies the resulting stock.
+// and purchase each item in `items` in order. search_direction must be DPAD_DOWN
+// or DPAD_UP; use UP to wrap toward items near the bottom of the list. Search
+// starts at the current selection for each item and confirms its name via OCR.
+// TARGET_STOCK buys only the deficit and verifies the resulting stock.
 // Unknown stock or an unconfirmed purchase fails rather than replaying the list.
 bool buy_items(VideoStream& stream,
     ProControllerContext& context,
     const std::vector<ItemToBuy>& items,
-    Language language = Language::English);
+    Language language = Language::English,
+    DpadPosition search_direction = DPAD_DOWN);
 
 
 // Lists are visited in this order. Empty lists skip interaction at that vendor.

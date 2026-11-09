@@ -626,11 +626,11 @@ std::string AutoStory_Segment_06::name() const {
 }
 
 std::string AutoStory_Segment_06::start_text() const {
-    return "Start: Outside Hearthome Gym at the post-Cynthia position, with her dialogue finished and the fifth badge acquired.";
+    return AutoStory_Checkpoint_0601().start_text();
 }
 
 std::string AutoStory_Segment_06::end_text() const {
-    return "Sixth badge acquired; back inside Canalave Gym at the entrance, with reward dialogue finished.";
+    return AutoStory_Checkpoint_0604().end_text();
 }
 
 void AutoStory_Segment_06::run_segment(SingleSwitchProgramEnvironment& env,
@@ -808,7 +808,7 @@ std::string AutoStory_Checkpoint_0604::start_text() const {
 }
 
 std::string AutoStory_Checkpoint_0604::end_text() const {
-    return "Inside Canalave Gym at the entrance, facing east, with Byron defeated and reward dialogue finished.";
+    return "Inside Canalave Gym at the entrance, facing east, after defeating Byron and acquiring the Mine Badge, with reward dialogue finished.";
 }
 
 void AutoStory_Checkpoint_0604::run_checkpoint(SingleSwitchProgramEnvironment& env,

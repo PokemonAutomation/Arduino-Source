@@ -29,6 +29,7 @@
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_TownBannerDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_TransitionWatchers.h"
 #include "PokemonBDSP/Programs/AutoStory/Detect/PokemonBDSP_AutoStory_OverworldDetector.h"
 #include "PokemonBDSP/Programs/AutoStory/PokemonBDSP_AutoStoryTools.h"
@@ -439,32 +440,7 @@ static void recover_route204_female_trainer(VideoStream& stream, ProControllerCo
     }
 }
 
-static void recover_route204_youngster(VideoStream& stream, ProControllerContext& context){
-    // The recording ends above the youngster after passing left.
-    // Cross his row down/up instead of resetting after one miss.
-    const bool recovered = watch_route204_trainer_event(
-        stream,
-        context,
-        [](ProControllerContext& ctx){
-            for (size_t pair = 0; pair < 6; pair++){
-                pbf_move_left_joystick(ctx, {0, -1}, 500ms, 200ms);
-                // Body collision can leave us adjacent without a sightline trigger.
-                pbf_press_button(ctx, BUTTON_A, 100ms, 250ms);
-                pbf_move_left_joystick(ctx, {0, 1}, 500ms, 200ms);
-                pbf_press_button(ctx, BUTTON_A, 100ms, 250ms);
-                ctx.wait_for_all_requests();
-            }
-            pbf_wait(ctx, 2500ms);
-        },
-        "Route 204 youngster sightline recovery");
-    if (!recovered){
-        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "Route 204 youngster: No trigger after bounded down/up recovery.",
-            stream);
-    }
-}
-
-static void floaroma_house_transition(VideoStream& stream, ProControllerContext& context, double y){
+static void floaroma_center_transition(VideoStream& stream, ProControllerContext& context, double y){
     context.wait_for_all_requests();
     BlackScreenWatcher black;
     const int result = run_until<ProControllerContext>(stream,
@@ -476,7 +452,7 @@ static void floaroma_house_transition(VideoStream& stream, ProControllerContext&
         {{black}});
     if (result != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "Floaroma house: Door transition not detected.",
+            "Floaroma Center: Door transition not detected.",
             stream);
     }
     context.wait_for_all_requests();
@@ -487,7 +463,7 @@ static void floaroma_house_transition(VideoStream& stream, ProControllerContext&
         const auto frame = stream.video().snapshot();
         if (!frame){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Floaroma house: No video frame after transition.",
+                "Floaroma Center: No video frame after transition.",
                 stream);
         }
         const auto now = std::chrono::steady_clock::now();
@@ -502,15 +478,29 @@ static void floaroma_house_transition(VideoStream& stream, ProControllerContext&
         context.wait_for_all_requests();
     }
     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-        "Floaroma house: Door transition did not finish.",
+        "Floaroma Center: Door transition did not finish.",
         stream);
 }
 
-static void establish_floaroma_house_exit(VideoStream& stream, ProControllerContext& context){
-    stream.log("[Floaroma checkpoint] Blind northward house entry, then immediate exit.");
-    floaroma_house_transition(stream, context, 1);
-    floaroma_house_transition(stream, context, -1);
-    stream.log("[Floaroma checkpoint] House entry/exit completed; ready for checkpoint save.", COLOR_GREEN);
+static void establish_floaroma_center_exit(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
+    // The town-entry lane is west of the Center. Bring its emblem fully
+    // into view before asking the existing matcher to align the doorway.
+    DpadState dpad;
+    // The expiry wiggle leaves a vertical facing direction. Include a turn.
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 2);
+    context.wait_for_all_requests();
+    align_to_overworld_landmarks(stream, context, match_floaroma_center_entrance, "Floaroma Center alignment");
+    floaroma_center_transition(stream, context, 1);
+    // This helper heals and observes the exit transition itself.
+    if (!heal_pokemon(stream, context, "Floaroma", &stats)){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Floaroma Center: Healing/exit did not complete.",
+            stream);
+    }
+    pbf_wait(context, 1000ms);
+    context.wait_for_all_requests();
+    stream.log("[Floaroma checkpoint] Center healing/exit completed; ready for checkpoint save.", COLOR_GREEN);
 }
 
 static void recover_teighler_trigger(VideoStream& stream, ProControllerContext& context){
@@ -537,89 +527,6 @@ static void recover_teighler_trigger(VideoStream& stream, ProControllerContext& 
             "Teighler: No battle after five-second left/right ledge recovery.",
             stream);
     }
-}
-
-// True means the next trainer triggered before the position was reached.
-// False means the sign position was confirmed. Both outcomes are explicit.
-// Route 204 arrival accepts a small standing area, rather than one
-// exact pose. Preserve strong observations through passing shadows
-// only while stationary; every movement invalidates this history.
-static bool align_to_route204_floaroma_turn(VideoStream& stream, ProControllerContext& context){
-    context.wait_for_all_requests();
-    ShortDialogDetector dialogue(COLOR_YELLOW);
-    BattleMenuDetector battle_menu(BattleType::TRAINER, COLOR_GREEN);
-    size_t confirmed = 0, missing = 0, blocked_left = 0;
-    double previous_dx = 1;
-    bool previously_left = false;
-    stream.log("[Route 204 north turn] Locate left to the sign; correct height after horizontal alignment.");
-    for (size_t attempt = 0; attempt < 60; attempt++){
-        const auto frame = stream.video().snapshot();
-        if (!frame){
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Route 204 north turn: No video frame.",
-                stream);
-        }
-        if (dialogue.detect(*frame.frame) || battle_menu.detect(*frame.frame)){
-            return true;
-        }
-        const auto result = match_route204_floaroma_turn(*frame.frame);
-        if (result.at_target){
-            if (++confirmed >= 3){
-                stream.log("[Route 204 north turn] Sign position confirmed; ready to continue west.", COLOR_GREEN);
-                return false;
-            }
-            pbf_wait(context, 150ms);
-            context.wait_for_all_requests();
-            continue;
-        }
-        confirmed = 0;
-        double x = -1, y = 0;
-        Milliseconds duration = 100ms;
-        if (result.located){
-            missing = 0;
-            stream.log("[Route 204 north turn] Sign offset=(" + std::to_string(result.dx) + "," +
-                std::to_string(result.dy) + ")");
-            const bool horizontal = std::abs(result.dx) > 1.0 / 50;
-            if (previously_left && std::abs(result.dx - previous_dx) < 1.0 / 384){
-                blocked_left++;
-            }else{
-                blocked_left = 0;
-            }
-            // Primarily locate left. If a fence/NPC blocks progress,
-            // correct height briefly before resuming measured travel.
-            const bool correct_height = !horizontal || (blocked_left >= 3 && std::abs(result.dy) > 1.0 / 54);
-            x = correct_height ? 0.0 : (result.dx < 0 ? -1.0 : 1.0);
-            y = correct_height ? (result.dy > 0 ? -1.0 : 1.0) : 0.0;
-            const double error = correct_height ? std::abs(result.dy) : std::abs(result.dx);
-            duration = error < .08 ? 40ms : 100ms;
-            previous_dx = result.dx;
-            previously_left = x < 0;
-            if (correct_height){
-                blocked_left = 0;
-            }
-        }else{
-            previously_left = false;
-            blocked_left = 0;
-            if (++missing > 12){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "Route 204 north turn: Sign unavailable during bounded leftward acquisition.",
-                    stream);
-            }
-        }
-        if (watch_route204_trainer_event(
-            stream,
-            context,
-            [x, y, duration](ProControllerContext& ctx){
-                    pbf_move_left_joystick(ctx, {x, y}, duration, 0ms);
-                    pbf_wait(ctx, 250ms);
-                },
-            "Route 204 north sign alignment")){
-            return true;
-        }
-    }
-    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-        "Route 204 north turn: Sign position did not converge.",
-        stream);
 }
 
 static void align_to_windworks_sign(VideoStream& stream, ProControllerContext& context){
@@ -727,168 +634,64 @@ struct Route204ArrivalTracker {
     }
 };
 
-static bool align_to_route204_sign(VideoStream& stream, ProControllerContext& context, bool northbound = false){
+static void align_to_route204_fence(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     context.wait_for_all_requests();
+    stream.log("[Route 204 fence] Two steps south of Sara, six west into the pond fence, then four north.");
+    // The 2026-11-07 recording's 19 post-Sara endpoints share this row.
+    // Two down steps clear her relocated body before crossing west. Six
+    // west steps deliberately overtravel into the pond fence to fix the
+    // column; four north steps return to the road beside the grass.
+    // Counts use 80/300 D-pad steps, plus repeat_dpad's facing correction.
+    DpadState dpad;
+    dpad.last_dir = DPAD_LEFT; // Facing Sara after her eastward approach.
+    repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 2);
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 6);
+    context.wait_for_all_requests();
+
+    // This lane may bypass Tyler. Never seek him out or assume a battle.
+    // Watch one north step at a time so his approach cannot consume the
+    // remainder of a queued route. The recorded exclamation/approach takes
+    // about three seconds before dialogue becomes detectable.
     ShortDialogDetector dialogue(COLOR_YELLOW);
     BattleMenuDetector menu(BattleType::TRAINER, COLOR_GREEN);
-    BlackScreenDetector black;
-    WhiteScreenDetector white;
-    size_t confirmations = 0, missing = 0, blocked_east = 0, detours = 0;
-    double previous_dx = 1;
-    bool previous_east = false;
-    Route204ArrivalTracker arrival;
-    for (size_t attempt = 0; attempt < 80; attempt++){
+    size_t north_steps = 0;
+    bool trainer_handled = false;
+    while (north_steps < 4){
         const auto frame = stream.video().snapshot();
         if (!frame){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Route 204 sign: No video frame.",
-                stream);
+                "Route 204 fence: No video frame before northward step.", stream);
         }
-        if (dialogue.detect(*frame.frame) || menu.detect(*frame.frame)){
-            stream.log("[Route 204 sign] Next trainer triggered; stopping alignment.");
-            return true;
-        }
-        double x = 0, y = 0;
-        bool detour = false, measured = false;
-        double measured_dx = 0;
-        Milliseconds duration = 250ms;
-        VideoOverlaySet overlays(stream.overlay());
-        dialogue.make_overlays(overlays);
-        menu.make_overlays(overlays);
-        if (black.detect(*frame.frame) || white.detect(*frame.frame)){
-            confirmations = 0;
-            arrival.reset();
-        }else{
-            const auto result =
-                northbound ? match_route204_north_approach(*frame.frame) : match_route204_sign(*frame.frame);
-            measured = result.located;
-            measured_dx = result.dx;
-            for (const auto& landmark : result.landmarks){
-                overlays.add(COLOR_CYAN, landmark.search);
-                if (landmark.accepted){
-                    overlays.add(COLOR_GREEN, landmark.found);
-                }
-                stream.log("[Route 204 sign] " + landmark.name + " score=" + std::to_string(landmark.score) +
-                    ", margin=" + std::to_string(landmark.margin) + ", accepted=" + std::to_string(landmark.accepted) +
-                    ", offset=(" + std::to_string(landmark.dx) + "," + std::to_string(landmark.dy) + ")");
-            }
-            const auto now = Route204ArrivalTracker::Clock::now();
-            // The broad pre-battle cache tolerance can accept the sign
-            // while still inside the fence's collision column.
-            bool clear_column = true;
-            if (northbound){
-                for (const auto& landmark : result.landmarks){
-                    if (landmark.accepted && std::abs(landmark.dx) > 1.0 / 128){
-                        clear_column = false;
-                    }
-                }
-            }
-            if (!clear_column){
-                arrival.reset();
-            }
-            const bool arrived = clear_column && arrival.observe(result, now);
-            if (arrived){
-                if (++confirmations >= 3){
-                    stream.log(northbound
-                        ? "[Route 204 sign] Left-of-sign northbound position confirmed."
-                        : "[Route 204 sign] Position confirmed; ready for the next trainer approach.");
-                    return false;
-                }
-            }else if (arrival.wait_for_shadow(now)){
-                // One strong nearby anchor is enough to hold still,
-                // but both are still required to confirm arrival.
-                confirmations = 0;
-                missing = 0;
-                duration = 250ms;
-                stream.log("[Route 204 sign] Holding near target while waiting for shadowed landmark.");
-            }else if (result.located){
-                confirmations = 0;
-                missing = 0;
-                stream.log(std::string("[Route 204 sign] ") +
-                    (result.coarse ? "Sign-guided acquisition." : "Both landmarks located."));
-                // At the wrong height, leftward movement can hit the
-                // grass boundary. Acquire the sign's height first.
-                const bool horizontal = (!result.coarse || std::abs(result.dy) <= 1.0 / 54) &&
-                    std::abs(result.dx) >= std::abs(result.dy) * 9.0 / 16;
-                const double error = horizontal ? result.dx : result.dy * 9.0 / 16;
-                x = horizontal ? (result.dx > 0 ? 1.0 : -1.0) : 0.0;
-                y = horizontal ? 0.0 : (result.dy < 0 ? 1.0 : -1.0);
-                duration = std::abs(error) > 1.0 / 24 ? 80ms : std::abs(error) > 1.0 / 64 ? 40ms : 16ms;
-                if (result.coarse && std::abs(result.dx) <= 1.0 / 128 && std::abs(result.dy) <= 1.0 / 72){
-                    // Resume fine acquisition after the bounded shadow wait.
-                    // The bounded shadow wait has ended. Make a small
-                    // correction instead of holding indefinitely.
-                    duration = 40ms;
-                }
-            }else{
-                confirmations = 0;
-                if (++missing > 24){
-                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "Route 204 sign: Landmarks missing during bounded acquisition.",
-                        stream);
-                }
-                // The sign is north of the defeated female trainer.
-                // Search that height first, then return below it.
-                if (northbound){
-                    // Tyler leaves us west of the sign. Search east
-                    // along the road instead of climbing into grass.
-                    x = 1.0;
-                    y = 0.0;
-                }else{
-                    y = missing <= 8 ? 1.0 : -1.0;
-                }
-                duration = 100ms;
-            }
-        }
-        if (northbound && measured && x > 0 && previous_east && std::abs(previous_dx - measured_dx) < 1.0 / 384){
-            blocked_east++;
-        }else{
-            blocked_east = 0;
-        }
-        previous_east = northbound && measured && x > 0;
-        // Reuse this snapshot; no movement has been sent since it.
-        if (previous_east){
-            previous_dx = measured_dx;
-        }
-        if (blocked_east >= 3){
-            if (++detours > 2){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "Route 204 north approach: Tyler obstruction did not clear.",
-                    stream);
-            }
-            stream.log("[Route 204 sign] Eastward movement blocked; passing below defeated Tyler.");
-            detour = true;
-            blocked_east = 0;
-            previous_east = false;
-        }
-        if (x != 0 || y != 0 || detour){
-            arrival.reset();
-        }
-        // Observe throughout each correction and its settle period,
-        // so an early next-trainer trigger cancels remaining movement.
-        if (watch_route204_trainer_event(
-            stream,
-            context,
-            [x, y, duration, detour](ProControllerContext& ctx){
-                    if (detour){
-                        pbf_move_left_joystick(ctx, {0, -1}, 180ms, 0ms);
-                        pbf_move_left_joystick(ctx, {1, 0}, 400ms, 0ms);
-                        pbf_move_left_joystick(ctx, {0, 1}, 180ms, 0ms);
-                        pbf_wait(ctx, 500ms);
-                    }else if (x != 0 || y != 0){
-                        pbf_move_left_joystick(ctx, {x, y}, duration, 0ms);
-                        pbf_wait(ctx, 500ms);
-                    }else{
-                        pbf_wait(ctx, duration);
-                    }
+        bool interrupted = dialogue.detect(*frame.frame) || menu.detect(*frame.frame);
+        if (!interrupted){
+            interrupted = watch_route204_trainer_event(stream, context,
+                [&dpad](ProControllerContext& ctx){
+                    repeat_dpad(ctx, dpad, DPAD_UP, 80ms, 300ms, 1);
+                    pbf_wait(ctx, 3s);
                 },
-            "Route 204 sign alignment")){
-            return true;
+                "Route 204 fence northward step");
+            context.wait_for_all_requests();
+            // A newly triggered trainer interrupts the settle after the
+            // entering step. Count that step; do not replay it after combat.
+            north_steps++;
+        }
+        if (interrupted){
+            if (trainer_handled){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Route 204 fence: Repeated trainer interruption during bounded approach.", stream);
+            }
+            stream.log("[Route 204 fence] Optional Tyler battle triggered; completing it before continuing north.");
+            wait_for_trainer_battle_menu(stream, context);
+            fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
+            clear_dialog(stream, context);
+            context.wait_for_all_requests();
+            trainer_handled = true;
+            dpad.last_dir = DPAD_LEFT; // Tyler approaches from the west.
         }
     }
-    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-        "Route 204 sign: Position could not be confirmed.",
-        stream);
+    stream.log(trainer_handled
+        ? "[Route 204 fence] Northward steps complete after Tyler; continuing toward Ravaged Path."
+        : "[Route 204 fence] Northward steps complete without a Tyler battle; continuing toward Ravaged Path.");
 }
 
 static void enter_ravaged_path_from_route204(SingleSwitchProgramEnvironment& env,
@@ -921,7 +724,6 @@ static void enter_ravaged_path_from_route204(SingleSwitchProgramEnvironment& env
     size_t position_confirmations = 0;
     auto missing_since = std::chrono::steady_clock::now();
     bool initial_approach = true;
-    size_t acquisition_pulses = 0;
     size_t blocked_north = 0;
     double previous_north_dy = 1;
     bool previous_coarse_north = false;
@@ -951,11 +753,14 @@ static void enter_ravaged_path_from_route204(SingleSwitchProgramEnvironment& env
         double x = 0, y = 0;
         Milliseconds duration = 250ms;
         if (initial_approach){
-            // Retain the northbound approach from Tyler. Subsequent
-            // movement is landmark-guided, without the old right sweep.
+            // Continue north from the fence-aligned road beside the grass,
+            // whether Tyler was bypassed or fought. The cave entrance retains
+            // its own locator and watched transition. The 08:01:36 run
+            // needed three southward corrections after 2400ms; stop earlier
+            // so the locator can finish the doorway approach from below.
             initial_approach = false;
             y = 1;
-            duration = 2400ms;
+            duration = 2200ms;
         }else{
             auto result = match_ravaged_path_south_entrance(*before.frame);
             for (const auto& landmark : result.landmarks){
@@ -1049,23 +854,11 @@ static void enter_ravaged_path_from_route204(SingleSwitchProgramEnvironment& env
             }else{
                 position_confirmations = 0;
                 if (now - missing_since > 10s){
-                    // Failed recording: still beside the Route 204
-                    // sign, blocked below the northbound approach.
-                    // Only this recognizable route authorizes search.
-                    const auto route = match_route204_sign(*before.frame);
-                    const bool known_route = !route.landmarks.empty() && route.landmarks[0].accepted &&
-                        route.landmarks[0].score >= .94 && route.landmarks[0].margin >= .30;
-                    if (known_route && acquisition_pulses < 8){
-                        const bool sidestep = acquisition_pulses++ % 2 == 0;
-                        x = sidestep ? -1.0 : 0.0;
-                        y = sidestep ? 0.0 : 1.0;
-                        duration = sidestep ? 150ms : 500ms;
-                        stream.log("[Ravaged Path locator] Recognized Route 204 sign; bounded left/north acquisition.");
-                    }else{
-                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                            "Ravaged Path locator: Landmarks unavailable after bounded acquisition.",
-                            stream);
-                    }
+                    // The southern route now uses the pond fence. Do not
+                    // reintroduce sign-dependent recovery or blind searches.
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "Ravaged Path locator: Entrance landmarks unavailable after the fence approach.",
+                        stream);
                 }
             }
         }
@@ -1187,7 +980,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 1128ms, 0ms);
     pbf_wait(context, 2924ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 885ms, 0ms);
-    buy_items(stream, context, {{ShopItem::Repel, BUY_MAX}});
+    buy_items(stream, context, {{ShopItem::Repel, BUY_MAX}}, Language::English, DPAD_UP);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1193ms, 0ms);
     pbf_wait(context, 2226ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2544ms, 0ms);
@@ -1343,43 +1136,9 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
             stream);
     }
     context.wait_for_all_requests();
-    const bool next_trainer_started = align_to_route204_sign(stream, context);
-    if (!next_trainer_started){
-        const bool triggered = watch_route204_trainer_event(
-            stream,
-            context,
-            [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {-1.0, 0.0}, 1200ms, 0ms);
-                pbf_wait(ctx, 2500ms);
-            },
-            "Route 204 next trainer approach");
-        if (!triggered){
-            recover_route204_youngster(stream, context);
-        }
-    }
-    // An early locator interruption still has to complete combat;
-    // it must never fall through into overworld movement mid-battle.
-    wait_for_trainer_battle_menu(stream, context);
-    fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
-    clear_dialog(stream, context);
-    // Keep the recently activated Repel through Ravaged Path.
-    // Reacquire west of the sign after Tyler before moving north;
-    // do not spend its remaining steps on an early expiry search.
-    bool northbound_aligned = false;
-    for (size_t recovery = 0; recovery < 3; recovery++){
-        if (!align_to_route204_sign(stream, context, true)){
-            northbound_aligned = true;
-            break;
-        }
-        wait_for_trainer_battle_menu(stream, context);
-        fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
-        clear_dialog(stream, context);
-    }
-    if (!northbound_aligned){
-        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "Route 204 north approach: Trainer interruptions exhausted.",
-            stream);
-    }
+    // One fence-guided lane replaces both southern sign alignments.
+    // Tyler is optional; an interruption resumes the remaining north steps.
+    align_to_route204_fence(stream, context, stats);
     enter_ravaged_path_from_route204(env, stream, context, stats);
     //cave navigation
 
@@ -1394,7 +1153,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     auto battle = [&](const std::string& label){
         stream.log("[Segment 02 battle] " + label);
         wait_for_trainer_battle_menu(stream, context);
-        fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
+        fight_trainer_using_moves(stream, context, stats, label, false);
         clear_dialog(stream, context);
     };
     // Break the blocking rock using the existing HM confirmation helper.
@@ -1470,7 +1229,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
                         stream);
                 }
                 battle("Route 204 north Bug Catcher");
-                // The sign locator establishes the next turn after this
+                // The west wall establishes the next turn after this
                 // battle; do not finish an obsolete northward timer.
                 if (stop_after_battle){
                     return;
@@ -1489,30 +1248,72 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     // recording. The former 3200ms up stopped at the Bug Catcher,
     // well short of town, and omitted the flower-bed detour.
     northbound_move(0, 1, 2200ms, true);
-    // Locate left to the sign after the Bug Catcher, or proceed
-    // directly if skipped. Do not seek out a missed trainer.
-    for (size_t recovery = 0; align_to_route204_floaroma_turn(stream, context); recovery++){
-        if (recovery >= 2){
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Route 204 north turn: Too many trainer interruptions.",
-                stream);
-        }
-        battle("Route 204 north Bug Catcher");
+    // Cross west below the flower beds until the fence/tree wall fixes
+    // the column. The recorded route reaches this same northbound lane
+    // after its sign corrections; overtravel absorbs the horizontal offset.
+    // Keep trainer handling active if the Bug Catcher was not yet fought.
+    stream.log("[Route 204 north turn] Moving west into the flower-bed wall, then north toward Floaroma.");
+    northbound_move(-1, 0, 4200ms);
+    // The expected town transition follows this known Route 204 lane.
+    // The banner confirms a fresh location transition, not the town name.
+    TownBannerWatcher no_banner(COLOR_CYAN, TownBannerWatcher::FinderType::GONE, 300ms);
+    if (wait_until(stream, context, 3s, {{no_banner}}) != 0){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Floaroma approach: Previous location banner did not clear.", stream);
     }
-    northbound_move(-1, 0, 1100ms);
-    northbound_move(0, 1, 150ms);
-    northbound_move(-1, 0, 1200ms);
-    northbound_move(-1, 0, 800ms);
-    // Continue through Floaroma's southern fence opening before
-    // turning east. The shorter approach stopped against the fence.
-    stream.log("[Floaroma approach] Moving farther north before Center approach.");
-    northbound_move(0, 1, 2700ms);
-    // Expire the Repel in the town approach lane before moving
-    // toward the Center. Alignment corrects any partial final step.
-    force_repel_expiry(stream, context, RepelRenewalChoice::NO, true);
-    establish_floaroma_house_exit(stream, context);
+    bool town_entered = false;
+    bool repel_declined = false;
+    Milliseconds remaining = 4000ms;
+    for (size_t attempt = 0; attempt < 2 && remaining > 0ms; attempt++){
+        TownBannerWatcher banner(COLOR_CYAN);
+        ShortDialogWatcher expired(COLOR_YELLOW);
+        BattleMenuWatcher unexpected_battle(BattleType::TRAINER, COLOR_RED);
+        const auto approach_started = std::chrono::steady_clock::now();
+        const int event = run_until<ProControllerContext>(stream, context,
+            [remaining](ProControllerContext& ctx){
+                pbf_move_left_joystick(ctx, {0, 1}, remaining, 0ms);
+                pbf_wait(ctx, 500ms);
+            },
+            {{banner}, {expired}, {unexpected_battle}});
+        context.wait_for_all_requests();
+        if (event == 0){
+            town_entered = true;
+            break;
+        }
+        const auto elapsed = std::chrono::duration_cast<Milliseconds>(std::chrono::steady_clock::now() - approach_started);
+        remaining -= std::min(remaining, elapsed);
+        if (event != 1 || repel_declined){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Floaroma approach: Town banner not observed, or unexpected battle/dialogue.", stream);
+        }
+        // Trainers are behind us. This leg can show a Repel renewal;
+        // confirm its Yes/No prompt instead of entering the battle handler.
+        // A banner can finish sliding in just as the expiry text stops us.
+        // Latch it before cleanup consumes its short display window.
+        town_entered = wait_until(stream, context, 1s, {{banner}}) == 0;
+        force_repel_expiry(stream, context, RepelRenewalChoice::NO, true, true);
+        repel_declined = true;
+        if (town_entered){
+            break;
+        }
+    }
+    if (!town_entered){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Floaroma approach: Town transition not confirmed within movement limit.", stream);
+    }
+    stream.log("[Floaroma approach] Fresh town banner observed; northward movement stopped.");
+    if (!repel_declined){
+        // Keep this in the north/south entry lane, away from NPC prompts.
+        force_repel_expiry(stream, context, RepelRenewalChoice::NO, true, true);
+    }
+    TownBannerWatcher cleared(COLOR_CYAN, TownBannerWatcher::FinderType::GONE, 300ms);
+    if (wait_until(stream, context, 6s, {{cleared}}) != 0){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Floaroma approach: Town banner did not clear before Center alignment.", stream);
+    }
+    establish_floaroma_center_exit(stream, context, stats);
     context.wait_for_all_requests();
-    stream.log("[Segment 02] Floaroma house exit established; ready for town checkpoint.", COLOR_GREEN);
+    stream.log("[Segment 02] Floaroma Center exit established; ready for town checkpoint.", COLOR_GREEN);
 }
 
 static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
@@ -1573,7 +1374,7 @@ static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& s
     auto battle = [&](const std::string& label){
         stream.log("[Segment 02 battle] " + label);
         wait_for_trainer_battle_menu(stream, context);
-        fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
+        fight_trainer_using_moves(stream, context, stats, label, false);
         clear_dialog(stream, context);
     };
     auto talk = [&](const std::string& label, Button response = BUTTON_B){
@@ -1584,24 +1385,7 @@ static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& s
         clear_dialog(stream, context, response);
     };
 
-    // The house exit fixes the start pose. Use the median of the
-    // twenty successful recorded approaches: 24 south taps, then
-    // nine east taps. Retain the recorded tap cadence; replacing
-    // it with one continuous hold changes acceleration/step timing.
-    stream.log("[Floaroma Center] Blind south/east approach from the house exit.");
-    for (size_t step = 0; step < 24; step++){
-        move(0, -1, 80ms, 250ms);
-    }
-    for (size_t step = 0; step < 9; step++){
-        move(1, 0, 80ms, 500ms);
-    }
-    transition(0, 1, 950ms, "Floaroma Pokemon Center entrance");
-    // heal_pokemon includes a watched exit; do not exit a second time.
-    if (!heal_pokemon(stream, context, "Floaroma", &stats)){
-        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "Floaroma Center: Healing/exit did not complete.",
-            stream);
-    }
+    // Checkpoint 0201 already healed and exited this Center.
     pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
     // Clear the Center doorway to the west before turning north,
@@ -1954,7 +1738,7 @@ void mars_to_eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& str
     auto battle = [&](const std::string& label){
         stream.log("[Route 205 battle] " + label);
         wait_for_trainer_battle_menu(stream, context);
-        fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
+        fight_trainer_using_moves(stream, context, stats, label, false);
         clear_dialog(stream, context);
     };
     auto patrol_battle = [&](const std::string& label,
@@ -2664,10 +2448,10 @@ std::string AutoStory_Segment_02::name() const {
     return "02: First Badge to Second Badge";
 }
 std::string AutoStory_Segment_02::start_text() const {
-    return "Start: First Gym Badge acquired (Oreburgh City).";
+    return AutoStory_checkpoint_0201().start_text();
 }
 std::string AutoStory_Segment_02::end_text() const {
-    return "End: Second Gym Badge acquired (Eterna City).";
+    return AutoStory_checkpoint_0206().end_text();
 }
 
 void AutoStory_Segment_02::run_segment(SingleSwitchProgramEnvironment& env,
@@ -2693,10 +2477,10 @@ std::string AutoStory_checkpoint_0201::name() const {
     return "02.01 - Outside Gym 1";
 }
 std::string AutoStory_checkpoint_0201::start_text() const {
-    return "First Gym Badge acquired (Oreburgh City).";
+    return "Outside Oreburgh Gym after defeating Roark, acquiring the Coal Badge, and clearing the reward dialogue, facing south.";
 }
 std::string AutoStory_checkpoint_0201::end_text() const {
-    return "Outside the central house in Floaroma Town immediately after exiting, facing south, with Repel inactive.";
+    return "Outside the Floaroma Pokemon Center immediately after healing and exiting, facing south, with Repel inactive.";
 }
 
 void AutoStory_checkpoint_0201::run_checkpoint(SingleSwitchProgramEnvironment& env,
@@ -2726,7 +2510,7 @@ std::string AutoStory_checkpoint_0202::name() const {
     return "02.02 - Floaroma Town";
 }
 std::string AutoStory_checkpoint_0202::start_text() const {
-    return "Outside the central house in Floaroma Town immediately after exiting, facing south, with Repel inactive.";
+    return "Outside the Floaroma Pokemon Center immediately after healing and exiting, facing south, with Repel inactive.";
 }
 std::string AutoStory_checkpoint_0202::end_text() const {
     return "Standing in Valley Windworks after defeating Commander Mars.";
@@ -2856,7 +2640,7 @@ std::string AutoStory_checkpoint_0206::start_text() const {
     return "Inside Eterna Gym at the entrance, facing north.";
 }
 std::string AutoStory_checkpoint_0206::end_text() const {
-    return "Outside Eterna Gym after defeating Gardenia and acquiring the Forest Badge.";
+    return "Outside Eterna Gym after defeating Gardenia and acquiring the Forest Badge, facing south with reward dialogue finished.";
 }
 
 void AutoStory_checkpoint_0206::run_checkpoint(SingleSwitchProgramEnvironment& env,

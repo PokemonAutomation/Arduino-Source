@@ -157,9 +157,15 @@ static std::string make_buy_label(const std::vector<ItemToBuy>& items){
 bool buy_items(VideoStream& stream,
     ProControllerContext& context,
     const std::vector<ItemToBuy>& items,
-    Language language){
+    Language language,
+    DpadPosition search_direction){
     if (items.empty()){
         return true;
+    }
+
+    if (search_direction != DPAD_UP && search_direction != DPAD_DOWN){
+        stream.log("buy_items: item search direction must be UP or DOWN.", COLOR_RED);
+        return false;
     }
 
     for (const ItemToBuy& item : items){
@@ -381,8 +387,10 @@ bool buy_items(VideoStream& stream,
                                 return false;
                             }
                             // Only move between rows while searching the item list.
-                            stream.log("Not on the right item, moving...", COLOR_GREEN);
-                            pbf_press_dpad(context, DPAD_DOWN, 80ms, 300ms);
+                            stream.log(search_direction == DPAD_UP
+                                ? "Not on the right item, searching upward..."
+                                : "Not on the right item, searching downward...", COLOR_GREEN);
+                            pbf_press_dpad(context, search_direction, 80ms, 300ms);
                             pbf_wait(context, 300ms);
                             break;
                         }

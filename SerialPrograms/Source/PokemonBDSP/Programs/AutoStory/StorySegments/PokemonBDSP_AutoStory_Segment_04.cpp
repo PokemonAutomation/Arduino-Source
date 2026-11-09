@@ -744,6 +744,14 @@ static void pastoria_gym_puzzle_and_wake(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryStats& stats){
     VideoStream& stream = env.console;
+    // The door fade ends before the opening camera tour. In the 2026-11-08
+    // run it consumed the initial northward presses on all three attempts.
+    // Let the view return to the entrance before spending puzzle movements.
+    context.wait_for_all_requests();
+    stream.log("[Pastoria Gym puzzle] Waiting for the entry camera tour to finish.");
+    pbf_wait(context, 8000ms);
+    context.wait_for_all_requests();
+
     struct Move {
         DpadPosition dir;
         int count;
@@ -896,11 +904,11 @@ std::string AutoStory_Segment_04::name() const {
 }
 
 std::string AutoStory_Segment_04::start_text() const {
-    return "Start: Inside Veilstone Gym in front of Maylene, facing north, with third-badge rewards and dialogue finished.";
+    return AutoStory_Checkpoint_0401().start_text();
 }
 
 std::string AutoStory_Segment_04::end_text() const {
-    return "Outside Pastoria Gym at the doorway, facing south, with fourth-badge rewards and dialogue finished.";
+    return AutoStory_Checkpoint_0405().end_text();
 }
 
 void AutoStory_Segment_04::run_segment(SingleSwitchProgramEnvironment& env,

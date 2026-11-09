@@ -297,8 +297,9 @@ BDSPAutoStory::BDSPAutoStory()
         LockMode::LOCK_WHILE_RUNNING,
         true)
     , SETUP_NOTE(
-        "NOTE: Select the correct Start Point and place your character in its exact starting position and facing direction. "
-        "Read the Start description before starting the program.")
+        "NOTE: With Advanced mode off, the program runs every checkpoint in each selected segment, "
+        "including the Start Segment and End Segment. Begin at the location shown under Start, "
+        "with the stated facing direction and menus and dialogue closed.")
     // DIAGNOSTIC ONLY: Remove before pushing to production.
     , DIAGNOSTIC_FAKE_CHECKPOINT_SAVE(
         "<b>Diagnostic only: Fake checkpoint saves</b><br>"
@@ -313,10 +314,12 @@ BDSPAutoStory::BDSPAutoStory()
         LockMode::LOCK_WHILE_RUNNING,
         StorySection::TUTORIAL)
     , MAINSTORY_NOTE(
-        "Return your maxed starter from Pokemon HOME before starting Main Story. "
-        "Use the required moveset and the starting position shown below.")
+        "For Outside Help, return the same starter from Pokemon HOME fully evolved at level 100, "
+        "with the wiki IV/EV spread and moves in the listed slot order. Put it in party slot 1 with full HP. "
+        "Box the other Pokemon in Box 1, slot 1, not fainted, and leave Box 1 selected. "
+        "Start at the position shown below; later segments require their own starting positions.")
     , ENABLE_ADVANCED_MODE("<b>Advanced mode:</b><br>"
-        "Select the start/end checkpoints instead of segments. i.e. finer control over start/end points.",
+        "Select individual start and end checkpoints instead of whole segments. Both selected checkpoints are included.",
         LockMode::UNLOCK_WHILE_RUNNING,
         false)
     , START_CHECKPOINT_TUTORIAL("<b>Start Checkpoint:</b>",
@@ -658,10 +661,11 @@ void BDSPAutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     std::string completion_message;
     if (tutorial_completed){
         context.wait_for_all_requests();
-        completion_message = "Tutorial complete. Deposit your starter in the Jubilife Pokemon Center PC, "
-            "save and close BDSP, then transfer it through Pokemon HOME. Return your fully evolved "
-            "level-100 starter to the first party slot with the wiki moveset and full HP and PP "
-            "before starting Main Story.";
+        completion_message = "Tutorial complete. For Outside Help, deposit your starter in the Jubilife Pokemon Center PC, "
+            "save and close BDSP, then prepare it through Pokemon HOME. Return the same starter fully evolved "
+            "at level 100 with the wiki IV/EV spread and moves in the listed order. Put it in party slot 1 "
+            "with full HP, and box the other Pokemon in Box 1, slot 1, not fainted. Leave Box 1 selected, "
+            "close menus, and stand in front of the Jubilife PC facing north before starting Main Story at Segment 01.";
         MAINSTORY_NOTE.set_text(completion_message);
         MAINSTORY_NOTE.set_visibility(ConfigOptionState::ENABLED);
         env.log_to_ui(completion_message, COLOR_GREEN);

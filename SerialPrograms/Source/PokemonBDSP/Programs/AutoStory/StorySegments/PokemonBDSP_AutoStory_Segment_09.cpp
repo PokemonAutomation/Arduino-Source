@@ -742,7 +742,8 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "victory_road_veteran_clayton");
+                fight_trainer_using_moves(stream, context, stats,
+                    "victory_road_veteran_clayton", true, false, options.language);
             }
         }
     }
@@ -1073,7 +1074,8 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                handle_battle(stream, context, stats, "victory_road_dragontamer_clinton");
+                fight_trainer_using_moves(stream, context, stats,
+                    "victory_road_dragontamer_clinton", true, false, options.language);
             }
         }
     }
@@ -1215,7 +1217,7 @@ static bool ready_in_front_of_elite_4(VideoStream& stream,
             // Clear the west statue even when healing finishes one tile west of the nurse.
             repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 8, false);
             repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 3, false);
-            fight_trainer_using_moves(stream, context, stats, "pokemon_league_rival", true);
+            fight_trainer_using_moves(stream, context, stats, "pokemon_league_rival", true, false, options.language);
             stage = PreparationStage::HEAL_AFTER_RIVAL;
             break;
         case PreparationStage::HEAL_AFTER_RIVAL:
@@ -1472,7 +1474,7 @@ static bool deal_with_flint_elite_4(VideoStream& stream,
     wait_for_dialog(stream, context, "Elite Four Flint", 15s);
     // The battle handler clears the introduction and camera cutscene with B,
     // stopping on the battle menu before choosing a move.
-    fight_trainer_using_moves(stream, context, stats, "elite_four_flint", false);
+    fight_trainer_using_moves(stream, context, stats, "elite_four_flint", false, false, language);
     clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
     context.wait_for_all_requests();
     use_item_in_battle(stream, context, language, "full-restore", true);
@@ -1490,7 +1492,7 @@ static bool deal_with_lucian_elite_4(VideoStream& stream,
     wait_for_dialog(stream, context, "Elite Four Lucian", 15s);
     // The battle handler clears the introduction and camera cutscene with B,
     // stopping on the battle menu before choosing a move.
-    fight_trainer_using_moves(stream, context, stats, "elite_four_lucian", false);
+    fight_trainer_using_moves(stream, context, stats, "elite_four_lucian", false, false, language);
     clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
     context.wait_for_all_requests();
     use_item_in_battle(stream, context, language, "full-restore", true);
@@ -1544,11 +1546,11 @@ std::string AutoStory_Segment_09::name() const {
 }
 
 std::string AutoStory_Segment_09::start_text() const {
-    return "Start: Outside Sunyshore Gym at the doorway, with eighth-badge rewards and dialogue finished.";
+    return AutoStory_Checkpoint_0901().start_text();
 }
 
 std::string AutoStory_Segment_09::end_text() const {
-    return "Cynthia defeated, Hall of Fame sequence advanced into credits, game restarted, and final save verified.";
+    return AutoStory_Checkpoint_0909().end_text();
 }
 
 void AutoStory_Segment_09::run_segment(SingleSwitchProgramEnvironment& env,
@@ -1581,7 +1583,7 @@ std::string AutoStory_Checkpoint_0901::name() const {
 }
 
 std::string AutoStory_Checkpoint_0901::start_text() const {
-    return "Outside Sunyshore Gym at the doorway, with eighth-badge rewards and dialogue finished.";
+    return "Outside Sunyshore Gym at the doorway, facing south, with eighth-badge rewards and dialogue finished.";
 }
 
 std::string AutoStory_Checkpoint_0901::end_text() const {

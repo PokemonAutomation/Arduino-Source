@@ -10,6 +10,12 @@
 namespace PokemonAutomation {
 namespace NintendoSwitch {
 namespace PokemonBDSP {
+// The shared template path defaults to grayscale normalized correlation,
+// with opt-in local-contrast normalization or blue-fraction color features.
+// Grayscale reduces reliance on exact RGB values; it does not guarantee
+// capture-card independence. Channel shifts, clipping, gamma and lost detail
+// still require cross-capture validation, including negative examples.
+// See LandmarkFeatures and match_landmarks() in the implementation.
 struct OverworldLandmarkResult {
     std::string name;
     double score = 0, margin = 0;
@@ -31,6 +37,9 @@ struct OverworldMatcher {
 };
 // Register additional functions here; each owns its landmarks and coordinate system.
 const std::vector<OverworldMatcher>& overworld_matchers();
+// Interior exit: grayscale indicator/button features. Horizontal alignment only;
+// start on the clear row south of the lift, then watch the northward entry fade.
+OverworldMatchResult match_sunyshore_lighthouse_elevator(const ImageRGB32& frame);
 OverworldMatchResult match_route204_north_approach(const ImageRGB32& frame);
 OverworldMatchResult match_teighler_alcove_corner(const ImageRGB32& frame);
 OverworldMatchResult match_route204_north_stairs(const ImageRGB32& frame);
@@ -53,6 +62,8 @@ OverworldMatchResult match_jubilife_street_approach(const ImageRGB32& frame);
 OverworldMatchResult match_jubilife_plaza_approach(const ImageRGB32& frame);
 OverworldMatchResult match_poketch_landmarks(const ImageRGB32& frame);
 OverworldMatchResult match_oreburgh_mart(const ImageRGB32& frame);
+// Two fixed gym features; reference pose is centered outside the doorway.
+OverworldMatchResult match_oreburgh_gym_entrance(const ImageRGB32& frame);
 OverworldMatchResult match_jubilife_center_entrance(const ImageRGB32& frame);
 OverworldMatchResult match_eterna_center_entrance(const ImageRGB32& frame);
 OverworldMatchResult match_hearthome_center_entrance(const ImageRGB32& frame);

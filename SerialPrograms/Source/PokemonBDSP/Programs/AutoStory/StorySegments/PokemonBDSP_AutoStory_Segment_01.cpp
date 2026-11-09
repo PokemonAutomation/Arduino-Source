@@ -3,6 +3,7 @@
  *  From: https://github.com/PokemonAutomation/
  */
 
+#include <algorithm>
 #include <array>
 #include <cmath>
 #include <memory>
@@ -26,8 +27,10 @@
 #include "PokemonBDSP/Inference/PokemonBDSP_TransitionWatchers.h"
 #include "PokemonBDSP/Programs/AutoStory/Detect/PokemonBDSP_AutoStory_OverworldDetector.h"
 #include "PokemonBDSP/Programs/AutoStory/PokemonBDSP_AutoStoryTools.h"
+#include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Dialog.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Segment_00_tools.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_Autostory_Segment_01_tools.h"
+#include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_OverworldMatchers.h"
 
 #include "PokemonBDSP_AutoStory_Segment_01.h"
 
@@ -100,17 +103,17 @@ struct DoorwayWalkOptions {
     std::chrono::milliseconds grace = 1600ms;
     //  How long to watch for a black screen after each step.
     std::chrono::milliseconds black_screen_window = 1500ms;
-    //  After a black screen, how long to wait for a battle menu before deciding it was a doorway.
-    std::chrono::milliseconds battle_menu_window = 8000ms;
+    //  Bound the wait for a command menu after recognizing a battle introduction.
+    std::chrono::milliseconds battle_menu_window = 20000ms;
     size_t max_battles = 10;
-    //  Also treat a white screen as the doorway transition (e.g. leaving the Oreburgh Gate).
+    //  Also classify white transitions (both gate exits and wild encounters can flash white).
     bool detect_white_screen = false;
 };
 
 //  Reusable: walk in `direction` for a cumulative `travel_time` of active movement until
-//  a black screen NOT followed by a battle menu (a doorway/area transition) is seen.
-//  Wild battles (black screen followed by the battle menu, e.g. in caves or grass) are
-//  escaped and do not consume the time budget.
+//  a transition followed by a confirmed main game menu is seen. A timeout is not
+//  proof of arrival. Wild battle introductions and menus are handled separately;
+//  escape and transition waits do not consume the movement budget.
 //  Throws OperationFailedException if the doorway is not found within
 //  travel_time + options.grace, if more than options.max_battles occur, or if a battle
 //  cannot be escaped.
@@ -122,7 +125,7 @@ static std::chrono::milliseconds walk_until_doorway(VideoStream& stream,
     const DoorwayWalkOptions& options = DoorwayWalkOptions()){
     enum class NavState {
         WALKING,
-        BLACK_SCREEN,
+        TRANSITION,
         IN_BATTLE,
         DONE
     };
@@ -149,26 +152,68 @@ static std::chrono::milliseconds walk_until_doorway(VideoStream& stream,
 
             BlackScreenWatcher black_screen;
             WhiteScreenWatcher white_screen;
-            if (options.detect_white_screen){
-                int ret = wait_until(stream, context, options.black_screen_window, {{black_screen}, {white_screen}});
-                if (ret == 0){
-                    state = NavState::BLACK_SCREEN;
-                }else if (ret == 1){
-                    stream.log("[AutoStory] White screen detected.", COLOR_ORANGE);
-                    state = NavState::DONE;
-                }
-            }else if (wait_until(stream, context, options.black_screen_window, {{black_screen}}) == 0){
-                state = NavState::BLACK_SCREEN;
+            BattleMenuWatcher battle_menu(options.battle_type, COLOR_YELLOW);
+            BattleDialogWatcher battle_dialog(COLOR_YELLOW);
+            const int ret = options.detect_white_screen
+                ? wait_until(stream, context, options.black_screen_window,
+                    {{battle_menu}, {battle_dialog}, {black_screen}, {white_screen}})
+                : wait_until(stream, context, options.black_screen_window,
+                    {{battle_menu}, {battle_dialog}, {black_screen}});
+            if (ret == 0){
+                state = NavState::IN_BATTLE;
+            }else if (ret >= 1){
+                state = NavState::TRANSITION;
             }
             break;
         }
-        case NavState::BLACK_SCREEN: {
-            stream.log("[AutoStory] Black screen detected. Checking for battle menu.", COLOR_ORANGE);
+        case NavState::TRANSITION: {
+            stream.log("[Doorway] Classifying transition; waiting for battle or main game menu.");
             BattleMenuWatcher battle_menu(options.battle_type, COLOR_YELLOW);
-            if (wait_until(stream, context, options.battle_menu_window, {{battle_menu}}) == 0){
+            BattleDialogWatcher battle_dialog(COLOR_YELLOW);
+            MenuWatcher game_menu;
+            // X cannot confirm a battle command. Stop probing as soon as battle UI appears.
+            // Main-menu proof avoids interpreting a slow send-out animation as an exit.
+            const int result = run_until<ProControllerContext>(stream,
+                context,
+                [](ProControllerContext& controller){
+                    pbf_wait(controller, 2s);
+                    for (size_t attempt = 0; attempt < 6; attempt++){
+                        pbf_press_button(controller, BUTTON_X, 80ms, 2920ms);
+                    }
+                    controller.wait_for_all_requests();
+                },
+                {battle_menu, battle_dialog, game_menu});
+            context.wait_for_all_requests();
+            if (result == 0 || result == 1){
+                if (result == 1){
+                    stream.log("[Doorway] Battle introduction detected; waiting for command menu.");
+                    BattleMenuWatcher ready(options.battle_type, COLOR_YELLOW);
+                    if (wait_until(stream, context, options.battle_menu_window, {{ready}}) != 0){
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                            "walk_until_doorway: Battle introduction did not reach the command menu.", stream);
+                    }
+                }
                 state = NavState::IN_BATTLE;
-            }else{
+            }else if (result == 2){
+                stream.log("[Doorway] Main game menu confirmed after transition; closing it.");
+                bool closed = false;
+                for (size_t attempt = 0; attempt < 3 && !closed; attempt++){
+                    pbf_press_button(context, BUTTON_B, 80ms, 300ms);
+                    context.wait_for_all_requests();
+                    BlackScreenWatcher visible(COLOR_YELLOW, {0.1, 0.1, 0.8, 0.8},
+                        100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
+                    OverworldWatcher overworld;
+                    closed = wait_until(stream, context, 2s, {{visible}}) == 0 &&
+                        wait_until(stream, context, 2s, {{overworld}}) == 0;
+                }
+                if (!closed){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "walk_until_doorway: Could not close the confirmed main game menu.", stream);
+                }
                 state = NavState::DONE;
+            }else{
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "walk_until_doorway: Transition unresolved; neither battle nor main game menu confirmed.", stream);
             }
             break;
         }
@@ -284,9 +329,25 @@ void oreburgh_gate_nav(SingleSwitchProgramEnvironment& env, VideoStream& stream,
 void oreburgh_gate_to_mine(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
     pbf_wait(context, 2000ms);
     context.wait_for_all_requests();
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 1056ms, 0ms);
-    while (!try_detect_dialogue(stream, context, "Phase 2 (oreburgh tour)", 1, 3000ms)){
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1056ms, 0ms);
+    const auto tour_deadline = std::chrono::steady_clock::now() + 30s;
+    bool tour_dialogue = false;
+    for (size_t attempt = 0; attempt < 10 && !tour_dialogue; attempt++){
+        auto remaining = std::chrono::duration_cast<Milliseconds>(tour_deadline - std::chrono::steady_clock::now());
+        if (remaining <= 0ms){
+            break;
+        }
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, std::min(1056ms, remaining), 0ms);
+        context.wait_for_all_requests();
+        remaining = std::chrono::duration_cast<Milliseconds>(tour_deadline - std::chrono::steady_clock::now());
+        if (remaining <= 0ms){
+            break;
+        }
+        tour_dialogue = try_detect_dialogue(stream, context, "Phase 2 (oreburgh tour)", 1,
+            std::min(3000ms, remaining));
+    }
+    if (!tour_dialogue){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Oreburgh tour: No dialogue within 30 seconds or 10 approach movements.", stream);
     }
     pbf_mash_button(context, BUTTON_B, 12000ms);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 319ms, 0ms);
@@ -935,6 +996,7 @@ struct MinePictureStep {
     size_t max_movements = 30;
     double max_average = 20.0;
     double max_patch = 30.0;
+    double vertical_range = 2.0 / 135;
 };
 
 static bool mine_run_picture_step(VideoStream& stream, ProControllerContext& context, const MinePictureStep& step){
@@ -946,7 +1008,7 @@ static bool mine_run_picture_step(VideoStream& stream, ProControllerContext& con
     options.max_average = step.max_average;
     options.max_patch = step.max_patch;
     options.horizontal_range = 1.0 / 60;
-    options.vertical_range = 2.0 / 135;
+    options.vertical_range = step.vertical_range;
     options.initial_settle = 700ms;
     options.settle = 700ms;
     const std::array<const char*, 1> files = {step.file};
@@ -1114,8 +1176,10 @@ static bool oreburgh_mine_09_to_14(VideoStream& stream, ProControllerContext& co
         ImageFloatBox(0.550, 0.720, 0.030, 0.040)  // Lower small rock
     };
 
+    // The preceding wall descent can leave the scenery 12 pixels lower at 540p.
+    // Keep the four-patch thresholds; allow that vertical variation only here.
     const MinePictureStep path10_boxes_step =
-        {"mine_path_10.png", "[Mine endpoint 10]", path10_boxes, 1.0, 0.0, 80ms, 30, 20.0, 30.0};
+        {"mine_path_10.png", "[Mine endpoint 10]", path10_boxes, 1.0, 0.0, 80ms, 30, 20.0, 30.0, 0.025};
     if (!mine_run_picture_step(stream, context, path10_boxes_step)){
         return false;
     }
@@ -1542,7 +1606,7 @@ void oreburgh_mine_nav(VideoStream& stream, ProControllerContext& context){
 // ---------------------------------------------------------------------------
 //  Segment 1 Part 3: Oreburgh Mine to Gym
 //  Assumes that escape rope was picked up and used to exit the mine.
-//  Follows the validated blind route into the gym.
+//  Finishes the approach with D-pad steps and confirms the gym entry fade.
 //  ----------------------------------------------------------------------------
 void oreburgh_mine_to_gym(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
 
@@ -1555,45 +1619,108 @@ void oreburgh_mine_to_gym(SingleSwitchProgramEnvironment& env, VideoStream& stre
     pbf_wait(context, 468ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 1081ms, 0ms);
     pbf_wait(context, 420ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2445ms, 0ms);
-    pbf_wait(context, 1056ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 95ms, 0ms);
-    pbf_wait(context, 4787ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 1309ms, 0ms);
-
-    //pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 4450ms, 0ms);
-    //pbf_wait(context, 3635ms);
-    //pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 640ms, 0ms);
-    //pbf_wait(context, 3795ms);
+    // Stop east of the doorway, then finish the westward alignment in steps.
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2100ms, 300ms);
+    DpadState dpad;
+    dpad.last_dir = DPAD_LEFT;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 4);
     context.wait_for_all_requests();
 
-    //stream.log("[Mine to gym] Staying west of the hiker; moving north along the left fence.");
-    //pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 2000ms, 0ms);
-    //pbf_wait(context, 602ms);
-    //pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 2364ms, 0ms);
-    //pbf_wait(context, 5069ms);
-    //pbf_move_left_joystick(context, { 0.000000, -1.000000 }, 1079ms, 0ms);
-    //pbf_wait(context, 605ms);
-    //pbf_move_left_joystick(context, { -1.000000, -0.000000 }, 728ms, 0ms);
-    //pbf_wait(context, 1081ms);
-    //pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 155ms, 0ms);
-    //pbf_wait(context, 2642ms);
-    //pbf_move_left_joystick(context, { 1.000000, -0.000000 }, 64ms, 0ms);
-    //pbf_wait(context, 5340ms);
-    //context.wait_for_all_requests();
+    // Watch before stepping north so a missed doorway cannot advance the checkpoint.
+    stream.log("[Mine to gym] Aligned west; stepping north into the gym.");
+    BlackScreenWatcher black;
+    const int result = run_until<ProControllerContext>(stream,
+        context,
+        [&stream, &dpad](ProControllerContext& ctx){
+            // The watcher covers every entry attempt and correction, so a fade
+            // cancels all remaining outdoor movement immediately.
+            repeat_dpad(ctx, dpad, DPAD_UP, 80ms, 300ms, 2);
+            pbf_wait(ctx, 5000ms);
+            ctx.wait_for_all_requests();
 
-    //pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 541ms, 0ms);
-    //pbf_wait(context, 140ms);
-    //pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 47ms, 0ms);
-    //context.wait_for_all_requests();
-    //stream.log("[Mine to gym] Recorded movement finished; waiting for gym entry to settle.");
-    // walk_until_doorway(stream, context, MoveDirection::UP, 5s);
-    // Finish entering the doorway with a bounded blind input.
-    //pbf_move_left_joystick(context, { 0.000000, 1.000000 }, 1000ms, 0ms);
-    //context.wait_for_all_requests();
-    //pbf_wait(context, 1500ms);
-    //context.wait_for_all_requests();
-    stream.log("[Mine to gym] Blind mine-to-gym sequence completed.", COLOR_GREEN);
+            // Eight recorded misses stopped at the left pillar. Slide northeast
+            // toward the door once; the watcher cancels input at the entry fade.
+            stream.log("[Mine to gym] Entry missed; trying a short northeast drag.");
+            pbf_move_left_joystick(ctx, {1.0, 1.0}, 300ms, 300ms);
+            // Diagonal input can leave either cardinal facing. Let repeat_dpad
+            // establish facing again before any later landmark correction.
+            dpad = DpadState{};
+            pbf_wait(ctx, 5000ms);
+            ctx.wait_for_all_requests();
+
+            stream.log("[Mine to gym] Entry still missing; acquiring gym sign and doorway emblem.");
+            size_t confirmations = 0, missing = 0, corrections = 0;
+            for (size_t observation = 0; observation < 24; observation++){
+                // Let the camera settle after every step before reading offsets.
+                pbf_wait(ctx, 500ms);
+                ctx.wait_for_all_requests();
+                const auto frame = stream.video().snapshot();
+                if (!frame){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "Oreburgh Gym alignment: No video frame.", stream);
+                }
+                const auto pose = match_oreburgh_gym_entrance(*frame.frame);
+                stream.log("[Oreburgh Gym alignment] located=" + std::to_string(pose.located) +
+                    ", target=" + std::to_string(pose.at_target) + ", offset=(" +
+                    std::to_string(pose.dx) + "," + std::to_string(pose.dy) + ")");
+                if (!pose.located){
+                    confirmations = 0;
+                    if (++missing >= 6){
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                            "Oreburgh Gym alignment: Sign/emblem missing; no blind search.", stream);
+                    }
+                    continue;
+                }
+                missing = 0;
+                if (std::abs(pose.dx) > .15 || std::abs(pose.dy) > .12){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "Oreburgh Gym alignment: Position outside the doorway approach.", stream);
+                }
+                if (pose.at_target){
+                    if (++confirmations >= 3){
+                        stream.log("[Mine to gym] Gym landmarks aligned; making final entry attempt.");
+                        repeat_dpad(ctx, dpad, DPAD_UP, 80ms, 300ms, 2);
+                        pbf_wait(ctx, 5000ms);
+                        ctx.wait_for_all_requests();
+                        return;
+                    }
+                    continue;
+                }
+                confirmations = 0;
+                if (corrections >= 6){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "Oreburgh Gym alignment: D-pad correction limit reached.", stream);
+                }
+                // Align the door column before advancing north. match_landmarks
+                // reports scenery offsets, so negative dy means move north.
+                const DpadPosition direction = std::abs(pose.dx) > 1.0 / 64
+                    ? (pose.dx > 0 ? DPAD_RIGHT : DPAD_LEFT)
+                    : (pose.dy < 0 ? DPAD_UP : DPAD_DOWN);
+                repeat_dpad(ctx, dpad, direction, 80ms, 300ms, 1);
+                ++corrections;
+            }
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Oreburgh Gym alignment: Position did not converge.", stream);
+        },
+        {{black}});
+    if (result != 0){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Oreburgh Gym entry: Black transition not detected.",
+            stream);
+    }
+
+    BlackScreenWatcher visible(COLOR_YELLOW,
+        ImageFloatBox(0.1, 0.1, 0.8, 0.8),
+        100,
+        10,
+        BlackScreenWatcher::FinderType::GONE,
+        500ms);
+    if (wait_until(stream, context, 15s, {{visible}}) != 0){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Oreburgh Gym entry: Transition did not finish.",
+            stream);
+    }
+    stream.log("[Mine to gym] Gym entry transition confirmed.", COLOR_GREEN);
 }
 
 // ---------------------------------------------------------------------------
@@ -1635,46 +1762,43 @@ void gym_Puzzle_01(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
     pbf_press_button(context, BUTTON_A, 180ms, 0ms);
     wait_for_dialog(stream, context, "Phase 3 (Roark fight dialog)");
     pbf_mash_button(context, BUTTON_B, 5000ms);
-    //Barry 1 battle logic can be used here since the moves don't matter this early.
-    fight_trainer_using_moves(stream, context, stats, "Roark", false);
+    fight_trainer_using_moves(stream, context, stats, "Roark", true);
 
+    // Match Gardenia and Maylene: the badge animation hides the dialogue
+    // for more than four seconds. Keep clearing through that reward gap.
+    stream.log("[Oreburgh Gym puzzle] Shared battle cleanup returned; clearing remaining Roark rewards with B.");
+    clear_dialog(stream, context, BUTTON_B, 6000ms);
     context.wait_for_all_requests();
-    wait_for_dialog(stream, context, "Phase 4 (Roark post battle dialog)");
-    ShortDialogDetector post_battle_dialogue(COLOR_YELLOW);
-    const auto dialogue_deadline = std::chrono::steady_clock::now() + 180s;
-    auto dialogue_absent_since = std::chrono::steady_clock::now();
-    bool dialogue_finished = false;
-    stream.log("[Gym post battle] Clearing dialogue until absent for 4 seconds.");
-    while (std::chrono::steady_clock::now() < dialogue_deadline){
-        const VideoSnapshot frame = stream.video().snapshot();
-        if (!frame){
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Gym post battle: No video frame while clearing dialogue.",
-                stream);
-        }
-        const auto now = std::chrono::steady_clock::now();
-        if (post_battle_dialogue.detect(frame)){
-            dialogue_absent_since = now;
-        }else if (now - dialogue_absent_since >= 4s){
-            dialogue_finished = true;
-            break;
-        }
-        pbf_mash_button(context, BUTTON_B, 100ms);
-        context.wait_for_all_requests();
-    }
-    if (!dialogue_finished){
+    stream.log("[Oreburgh Gym puzzle] Roark rewards cleared; starting exit path.");
+
+    // Do not report the segment complete if reward dialogue or an obstacle
+    // consumed the exit inputs. Cancel movement as soon as the doorway fades.
+    BlackScreenWatcher leaving;
+    if (run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+            for (int i = 0; i < 21; i++){
+                pbf_press_dpad(ctx, DPAD_DOWN, 80ms, 300ms);
+            }
+            pbf_wait(ctx, 5000ms);
+        },
+        {{leaving}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "Gym post battle: Dialogue did not finish within 180 seconds.",
-            stream);
+            "Oreburgh Gym exit: Doorway transition not detected after Roark rewards.", stream);
     }
-    stream.log("[Gym post battle] Dialogue absent for 4 seconds. Walking down.");
-
-    for (int i = 0; i < 21; i++){
-        pbf_press_dpad(context, DPAD_DOWN, 80ms, 300ms);
+    BlackScreenWatcher visible(COLOR_YELLOW,
+        ImageFloatBox(0.1, 0.1, 0.8, 0.8),
+        100,
+        10,
+        BlackScreenWatcher::FinderType::GONE,
+        500ms);
+    if (wait_until(stream, context, 15s, {{visible}}) != 0){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Oreburgh Gym exit: Transition did not finish.", stream);
     }
-
-    // Exit the building.
     pbf_wait(context, 1000ms);
+    context.wait_for_all_requests();
+    stream.log("[Oreburgh Gym puzzle] Outside the gym after Roark rewards.", COLOR_GREEN);
 }
 
 
@@ -1682,10 +1806,10 @@ std::string AutoStory_Segment_01::name() const {
     return "01: Jubilife City to First Badge";
 }
 std::string AutoStory_Segment_01::start_text() const {
-    return "Start: Received Starter back from Pokemon Home. Max leveled pokemon should have the moveset in the wiki.";
+    return AutoStory_checkpoint_0101().start_text();
 }
 std::string AutoStory_Segment_01::end_text() const {
-    return "End: First Gym Badge acquired (Oreburgh City).";
+    return AutoStory_checkpoint_0103().end_text();
 }
 
 void AutoStory_Segment_01::run_segment(SingleSwitchProgramEnvironment& env,
@@ -1709,10 +1833,10 @@ std::string AutoStory_checkpoint_0101::name() const {
     return "01.01 - Maxed Starter from Home";
 }
 std::string AutoStory_checkpoint_0101::start_text() const {
-    return "Received Starter back from Pokemon Home. Max leveled pokemon should have the moveset in the wiki.";
+    return "Standing in front of the Jubilife Pokemon Center PC, facing north with menus closed, where the tutorial ended. Complete the team preparation for your selected Help Mode before starting.";
 }
 std::string AutoStory_checkpoint_0101::end_text() const {
-    return "Standing outside the Oreburgh Gate on the Jubilife City side.";
+    return "Outside Oreburgh Gate on the Oreburgh City side, facing east, after receiving Rock Smash.";
 }
 // ========================
 // Checkpoint 0101 Wrapper
@@ -1795,7 +1919,7 @@ std::string AutoStory_checkpoint_0103::start_text() const {
     return AutoStory_checkpoint_0102().end_text();
 }
 std::string AutoStory_checkpoint_0103::end_text() const {
-    return "Standing at Roark after defeating him and acquiring the first badge.";
+    return "Outside Oreburgh Gym after defeating Roark, acquiring the Coal Badge, and clearing the reward dialogue, facing south.";
 }
 
 void AutoStory_checkpoint_0103::run_checkpoint(SingleSwitchProgramEnvironment& env,
