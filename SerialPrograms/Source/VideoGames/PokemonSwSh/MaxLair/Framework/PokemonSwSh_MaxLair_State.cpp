@@ -22,6 +22,11 @@ bool is_boss_battle(const GlobalState& state){
     return state.wins == 3;
 }
 
+//  Battles 1-3 are against rentals. After the fourth there is no battle.
+bool is_rental_battle(const GlobalState& state){
+    return state.wins < 3;
+}
+
 bool has_boss_candidate(const std::set<std::string>& candidates){
     for (const std::string& slug : candidates){
         if (is_boss(slug)){
@@ -45,7 +50,7 @@ bool GlobalState::accept_opponent(){
         //  Forms sharing one OCR species name (Lycanroc, Basculin) stay
         //  ambiguous even after the summary read. That is fine for a rental
         //  battle as long as no candidate is a boss. It cannot identify the boss.
-        return !is_boss_battle(*this) && !has_boss_candidate(opponent);
+        return is_rental_battle(*this) && !has_boss_candidate(opponent);
     }
     const std::string& opponent_slug = *opponent.begin();
     //  Reject the OCR read if the opponent species doesn't match the current stage:
