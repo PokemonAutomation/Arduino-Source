@@ -81,6 +81,10 @@ const BossStateTestCase CASES[] = {
         .expectation = {.accepted = true, .boss = "nihilego", .boss_if_caught = ""},
     },
     {
+        .input = {.name = "Persian forms at battle one", .wins = 0, .opponent = {"persian", "persian-alola"}, .boss = "", .final_wins = 0},
+        .expectation = {.accepted = true, .boss = "", .boss_if_caught = ""},
+    },
+    {
         .input = {.name = "Basculin forms at battle three", .wins = 2, .opponent = {"basculin-blue-striped", "basculin-red-striped"}, .boss = "nihilego", .final_wins = 2},
         .expectation = {.accepted = true, .boss = "nihilego", .boss_if_caught = ""},
     },

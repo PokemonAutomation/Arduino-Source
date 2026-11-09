@@ -55,6 +55,20 @@ bool process_header_read(
     return false;
 }
 
+//  An empty summary read tells us less than an ambiguous header read
+//  (e.g. both Persian forms): keep the header's candidates.
+std::set<std::string> summary_or_header_read(
+    Logger& logger,
+    std::set<std::string> summary,
+    const std::set<std::string>& header
+){
+    if (summary.empty() && header.size() > 1){
+        logger.log("Summary read failed. Keeping the battle read: " + set_to_str(header), COLOR_ORANGE);
+        return header;
+    }
+    return summary;
+}
+
 
 bool read_battle_menu(
     ProgramEnvironment& env,
@@ -74,7 +88,7 @@ bool read_battle_menu(
     //  Read raid mon.
     std::set<std::string> mon = reader.read_opponent(stream.logger(), context, stream.video());
 
-    bool retry = !process_header_read(stream.logger(), state, std::move(mon));
+    bool retry = !process_header_read(stream.logger(), state, mon);
 
     //  The fourth battle must be a boss; earlier battles must be rentals.
     if (!state.accept_opponent()){
@@ -90,9 +104,9 @@ bool read_battle_menu(
         context.wait_for_all_requests();
 
         snapshot = stream.video().snapshot();
-        mon = reader.read_opponent_in_summary(stream.logger(), snapshot);
+        std::set<std::string> summary = reader.read_opponent_in_summary(stream.logger(), snapshot);
         pbf_mash_button(context, BUTTON_B, 3000ms);
-        state.opponent = std::move(mon);
+        state.opponent = summary_or_header_read(stream.logger(), std::move(summary), mon);
 
         if (state.in_boss_battle_with_known_boss()){
             if (!state.opponent.empty() && *state.opponent.begin() != state.boss){
