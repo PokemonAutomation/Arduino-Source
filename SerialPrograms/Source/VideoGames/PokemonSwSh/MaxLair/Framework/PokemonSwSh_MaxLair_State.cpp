@@ -45,7 +45,7 @@ bool GlobalState::accept_opponent(){
         //  Forms sharing one OCR species name (Lycanroc, Basculin) stay
         //  ambiguous even after the summary read. That is fine for a rental
         //  battle as long as no candidate is a boss. It cannot identify the boss.
-        return wins < 3 && !has_boss_candidate(opponent);
+        return !is_boss_battle(*this) && !has_boss_candidate(opponent);
     }
     const std::string& opponent_slug = *opponent.begin();
     //  Reject the OCR read if the opponent species doesn't match the current stage:
