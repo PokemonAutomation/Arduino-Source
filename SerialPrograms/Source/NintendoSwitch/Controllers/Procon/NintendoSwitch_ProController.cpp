@@ -146,11 +146,6 @@ void ProController::run_controller_input(const ControllerInputState& state){
     };
 
     switch (state.type()){
-    case ControllerInputType::StandardGamepad:{
-        const ProControllerState& controller_state = static_cast<const GamepadInputState&>(state).controller_state;
-        execute_state(controller_state);
-        break;
-    }
     case ControllerInputType::HID_Keyboard:{
         ProControllerState controller_state;
         ProControllerDeltas deltas;
@@ -167,6 +162,11 @@ void ProController::run_controller_input(const ControllerInputState& state){
         }
 
         deltas.to_state(controller_state);
+        execute_state(controller_state);
+        break;
+    }
+    case ControllerInputType::StandardGamepad:{
+        const ProControllerState& controller_state = static_cast<const GamepadInputState&>(state).controller_state;
         execute_state(controller_state);
         break;
     }

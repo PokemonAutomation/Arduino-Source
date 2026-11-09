@@ -11,11 +11,15 @@
 #include <string>
 #include <SDL3/SDL.h>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Logging/GlobalLogger.h"
+//#include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "GamepadInput_SDL.h"
 #include "GlobalGamepadTracker.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -32,7 +36,7 @@ void GamepadTracker::start(){
     if (m_initialized){
         return;
     }
-    // Qt owns the window/event loop. SDL only owns joystick input.
+    //  Qt owns the window/event loop. SDL only owns joystick input.
     SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
     if (!SDL_InitSubSystem(SDL_INIT_GAMEPAD)){
         global_logger_tagged().log(
@@ -99,8 +103,8 @@ void GamepadTracker::thread_loop(){
         if (m_reset.exchange(false, std::memory_order_acq_rel)){
             gate.reset();
         }
-        // Require release after focus/console changes or automation. A held
-        // button must never leak to the newly selected console.
+        //  Require release after focus/console changes or automation. A held
+        //  button must never leak to the newly selected console.
         gate.filter(current, !m_listeners.empty());
         if (current != last || (!current.is_neutral() && now >= refresh)){
             try{

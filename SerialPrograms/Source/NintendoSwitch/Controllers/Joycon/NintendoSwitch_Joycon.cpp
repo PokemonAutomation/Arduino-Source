@@ -132,6 +132,25 @@ void JoyconController::run_controller_input(const ControllerInputState& state){
     };
 
     switch (state.type()){
+    case ControllerInputType::HID_Keyboard:{
+        JoyconState controller_state;
+        JoyconDeltas deltas;
+        const KeyboardInputState& lstate = static_cast<const KeyboardInputState&>(state);
+        const std::map<KeyboardKey, JoyconDeltas>& map = m_data->m_keyboard_mapping;
+
+    //    cout << "keys() = " << lstate.keys().size() << endl;
+
+        for (KeyboardKey key : lstate.keys()){
+            auto iter = map.find(key);
+            if (iter != map.end()){
+                deltas += iter->second;
+            }
+        }
+
+        deltas.to_state(controller_state);
+        execute_state(controller_state);
+        break;
+    }
     case ControllerInputType::StandardGamepad:{
         JoyconState controller_state;
         const ProControllerState& pro = static_cast<const GamepadInputState&>(state).controller_state;
@@ -153,25 +172,6 @@ void JoyconController::run_controller_input(const ControllerInputState& state){
         }else{
             controller_state.joystick = pro.right_joystick;
         }
-        execute_state(controller_state);
-        break;
-    }
-    case ControllerInputType::HID_Keyboard:{
-        JoyconState controller_state;
-        JoyconDeltas deltas;
-        const KeyboardInputState& lstate = static_cast<const KeyboardInputState&>(state);
-        const std::map<KeyboardKey, JoyconDeltas>& map = m_data->m_keyboard_mapping;
-
-    //    cout << "keys() = " << lstate.keys().size() << endl;
-
-        for (KeyboardKey key : lstate.keys()){
-            auto iter = map.find(key);
-            if (iter != map.end()){
-                deltas += iter->second;
-            }
-        }
-
-        deltas.to_state(controller_state);
         execute_state(controller_state);
         break;
     }
