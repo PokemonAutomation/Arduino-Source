@@ -10,14 +10,7 @@
 #include "../ControllerStates/StandardHid_Keyboard_State.h"
 #include "SerialPABotBase_Protocol.h"
 
-#if _WIN32
 #pragma pack(push, 1)
-#define PABB_PACK
-#elif __GNUC__
-#define PABB_PACK   __attribute__((packed))
-#else
-#define PABB_PACK
-#endif
 
 
 #ifdef __cplusplus
@@ -30,7 +23,7 @@ typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
     pabb_HID_Keyboard_State report;
-} PABB_PACK pabb_Message_Command_HID_Keyboard_State;
+} pabb_Message_Command_HID_Keyboard_State;
 
 
 
@@ -39,8 +32,6 @@ typedef struct{
 #endif
 
 
-#if _WIN32
 #pragma pack(pop)
-#endif
 
 #endif

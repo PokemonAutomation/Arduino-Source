@@ -10,14 +10,7 @@
 #include "../ControllerStates/NintendoSwitch_OemController_State.h"
 #include "SerialPABotBase_Protocol.h"
 
-#if _WIN32
 #pragma pack(push, 1)
-#define PABB_PACK
-#elif __GNUC__
-#define PABB_PACK   __attribute__((packed))
-#else
-#define PABB_PACK
-#endif
 
 
 #ifdef __cplusplus
@@ -40,7 +33,7 @@ typedef struct{
 #define PABB_MSG_INFO_NS1_OEM_CONTROLLER_RUMBLE             0x30
 typedef struct{
     OemController_RumbleState rumble;
-} PABB_PACK pabb_MsgInfo_NS1_OemController_Rumble;
+} pabb_MsgInfo_NS1_OemController_Rumble;
 
 #define PABB_MSG_INFO_NS1_OEM_CONTROLLER_USB_DISALLOWED     0x31
 
@@ -52,7 +45,7 @@ typedef struct{
     uint32_t controller_type;
     uint32_t address;
     uint8_t bytes;
-} PABB_PACK pabb_Message_NS1_OemController_ReadSpi;
+} pabb_Message_NS1_OemController_ReadSpi;
 
 #define PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_WRITE_SPI       0x61
 typedef struct{
@@ -60,13 +53,13 @@ typedef struct{
     uint32_t controller_type;
     uint32_t address;
     uint8_t bytes;
-} PABB_PACK pabb_Message_NS1_OemController_WriteSpi;
+} pabb_Message_NS1_OemController_WriteSpi;
 
 #define PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_PLAYER_LIGHTS   0x62
 typedef struct{
     seqnum_t seqnum;
     uint32_t controller_type;
-} PABB_PACK pabb_MsgInfo_NS1_OemController_PlayerLights;
+} pabb_MsgInfo_NS1_OemController_PlayerLights;
 
 
 
@@ -75,7 +68,7 @@ typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
     pabb_NintendoSwitch_OemController_State0x30_Buttons buttons;
-} PABB_PACK pabb_Message_Command_NS1_OemController_Buttons;
+} pabb_Message_Command_NS1_OemController_Buttons;
 
 
 #define PABB_MSG_COMMAND_NS1_OEM_CONTROLLER_FULL_STATE      0xa1
@@ -83,7 +76,7 @@ typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
     pabb_NintendoSwitch_OemController_State0x30 state;
-} PABB_PACK pabb_Message_Command_NS1_OemController_FullState;
+} pabb_Message_Command_NS1_OemController_FullState;
 
 
 
@@ -94,9 +87,7 @@ typedef struct{
 
 
 
-#if _WIN32
 #pragma pack(pop)
-#endif
 
 
 #endif
