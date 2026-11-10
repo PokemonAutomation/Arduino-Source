@@ -169,6 +169,11 @@ struct OemController_State0x07_Optical{
     uint8_t coveredness;   // ~0xff uncovered/lifted, ~0x00 resting on a surface
 };
 
+struct OemController_State0x07_Buttons{
+    uint8_t buttons[2];
+    uint8_t stick[3];
+};
+
 struct OemController_State0x07{
     uint8_t counter;
     uint8_t power_info;    // [0] ext power, [1] charging, [2:5] level, [6:7] reserved
@@ -199,6 +204,11 @@ bool OemController_State0x07_equals(
 //
 
 
+struct OemController_State0x08_Buttons{
+    uint8_t buttons[2];
+    uint8_t stick[3];
+};
+
 struct OemController_State0x08{
     uint8_t counter;
     uint8_t power_info;
@@ -226,6 +236,12 @@ bool OemController_State0x08_equals(
 //  Report 0x09 (Pro Controller 2 native)
 //
 
+
+struct OemController_State0x09_Buttons{
+    uint8_t buttons[3];
+    uint8_t left_stick[3];
+    uint8_t right_stick[3];
+};
 
 struct OemController_State0x09{
     uint8_t counter;
@@ -256,6 +272,14 @@ bool OemController_State0x09_equals(
 //  Report 0x0A (NSO GameCube native)
 //
 
+
+struct OemController_State0x0A_Buttons{
+    uint8_t buttons[3];
+    uint8_t left_stick[3];
+    uint8_t right_stick[3];
+    uint8_t left_trigger;
+    uint8_t right_trigger;
+};
 
 struct OemController_State0x0A{
     uint8_t counter;

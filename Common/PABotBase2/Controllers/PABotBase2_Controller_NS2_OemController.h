@@ -20,20 +20,30 @@ namespace PABotBase2{
 //
 //  Report format
 //
-//  The S1 normalized all of its OEM targets to report 0x30; the S2
-//  normalizes to report 0x05 - the one input report format every S2
-//  controller type can produce (the "grip" format). The S2 host selects
-//  it on the physical controller (command 0x03 sub 0x0A over USB, the
-//  0x000a characteristic over BLE), so the 0x05 report bytes pass through
-//  the firmware unmodified from the physical controller to the target.
+//  Each S2 target CID presents its real controller's input report format,
+//  matching the real controller's behavior:
+//
+//    PABB_CID_NintendoSwitch2_WiredController    (0x1010, grip/combined)  0x05
+//    PABB_CID_NintendoSwitch2_WiredProController / _WirelessProController  0x09
+//    PABB_CID_NintendoSwitch2_WiredLeftJoycon / _WirelessLeftJoycon       0x07
+//    PABB_CID_NintendoSwitch2_WiredRightJoycon / _WirelessRightJoycon     0x08
+//
+//  (The NSO GameCube's 0x0A is available to a future GC CID.) The target
+//  streams that format by default and implements 0x03/0x0A so the host
+//  can switch it to 0x05, as a real S2 does. The serial messages below
+//  carry the 63-byte report for the CID's format verbatim - the CC fills
+//  the matching struct and the firmware passes the bytes through without
+//  translation. The 40-byte native motion payload is bit-packed with a
+//  different codec per format, so it is generated on the CC side.
 //
 
 
 //
 //  Flash access on the physical S2 (S2 command 0x02).
 //
-//  Reads cap at 0x50 bytes over USB and 0x4F over BLE; the handler
-//  enforces the smaller of the two for the session in use.
+//  The controller allows 0x50-byte reads over USB and 0x4F over BLE; the
+//  72-byte serial message cap limits the payload to 68 bytes, so the CC
+//  steps the address for longer regions.
 //
 
 
@@ -63,26 +73,76 @@ struct Message_Feedback_NS2_OemController_Rumble : MessageHeader{
 //
 //  Target input
 //
-//  Note: the full-state message is 69 bytes (4 header + 2 ms + 63 report),
-//  which is above the current PABB2_MAX_INCOMING_MESSAGE_SIZE of 64 - raise
-//  the board cap when the S2 targets are wired in.
+//  Per report format: a fast-path buttons message (buttons + sticks, and
+//  the GameCube triggers where the format has them) and a full-state
+//  message (the complete 63-byte report). The full-state messages are
+//  69 bytes: they fit the 72-byte incoming message cap and, at the 96
+//  byte packet cap, travel as a single RSC packet.
 //
 
 
-//  Fast path: buttons + sticks + GameCube triggers (12 bytes). The
-//  remaining 0x05 fields (counter, optical, magnetometer, battery, motion)
-//  are untouched by this command.
-#define PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_BUTTONS            0xa3
-struct Message_Command_NS2_OemController_Buttons : MessageHeader{
+#define PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_BUTTONS_0X05       0xa3
+struct Message_Command_NS2_OemController_Buttons0x05 : MessageHeader{
     uint16_t milliseconds;
     NintendoSwitch2::OemController_State0x05_Buttons buttons;
 };
 
-
-#define PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_FULL_STATE         0xa4
-struct Message_Command_NS2_OemController_FullState : MessageHeader{
+#define PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_FULL_STATE_0X05    0xa4
+struct Message_Command_NS2_OemController_FullState0x05 : MessageHeader{
     uint16_t milliseconds;
     NintendoSwitch2::OemController_State0x05 state;
+};
+
+
+#define PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_BUTTONS_0X07       0xa5
+struct Message_Command_NS2_OemController_Buttons0x07 : MessageHeader{
+    uint16_t milliseconds;
+    NintendoSwitch2::OemController_State0x07_Buttons buttons;
+};
+
+#define PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_FULL_STATE_0X07    0xa6
+struct Message_Command_NS2_OemController_FullState0x07 : MessageHeader{
+    uint16_t milliseconds;
+    NintendoSwitch2::OemController_State0x07 state;
+};
+
+
+#define PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_BUTTONS_0X08       0xa7
+struct Message_Command_NS2_OemController_Buttons0x08 : MessageHeader{
+    uint16_t milliseconds;
+    NintendoSwitch2::OemController_State0x08_Buttons buttons;
+};
+
+#define PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_FULL_STATE_0X08    0xa8
+struct Message_Command_NS2_OemController_FullState0x08 : MessageHeader{
+    uint16_t milliseconds;
+    NintendoSwitch2::OemController_State0x08 state;
+};
+
+
+#define PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_BUTTONS_0X09       0xa9
+struct Message_Command_NS2_OemController_Buttons0x09 : MessageHeader{
+    uint16_t milliseconds;
+    NintendoSwitch2::OemController_State0x09_Buttons buttons;
+};
+
+#define PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_FULL_STATE_0X09    0xaa
+struct Message_Command_NS2_OemController_FullState0x09 : MessageHeader{
+    uint16_t milliseconds;
+    NintendoSwitch2::OemController_State0x09 state;
+};
+
+
+#define PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_BUTTONS_0X0A       0xab
+struct Message_Command_NS2_OemController_Buttons0x0A : MessageHeader{
+    uint16_t milliseconds;
+    NintendoSwitch2::OemController_State0x0A_Buttons buttons;
+};
+
+#define PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_FULL_STATE_0X0A    0xac
+struct Message_Command_NS2_OemController_FullState0x0A : MessageHeader{
+    uint16_t milliseconds;
+    NintendoSwitch2::OemController_State0x0A state;
 };
 
 
