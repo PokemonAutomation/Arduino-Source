@@ -24,7 +24,8 @@ constexpr size_t MAX_REQUEST_LINE_BYTES = 8192;
 constexpr size_t MAX_HEADER_SECTION_BYTES = 65536;
 constexpr size_t MAX_HEADER_COUNT = 100;
 constexpr size_t MAX_BODY_BYTES = 1u << 20;      //  1 MiB
-//  Headers + a full body + room for a few pipelined requests.
+//  The total per-connection receive buffer; enforced when data is
+//  appended, not at parse time.
 constexpr size_t MAX_BUFFER_BYTES = 2u << 20;
 
 //  A stalled peer is declared dead after this; loopback writes of a few MB
@@ -56,6 +57,22 @@ std::string trim_ows(std::string value){
     const auto end = value.find_last_not_of(OWS);
     return value.substr(begin, end - begin + 1);
 }
+
+
+//  The concrete HandlerContext: "connection_alive()" is simply the
+//  connection's dead flag.
+struct HandlerContextImpl : AbstractHttpServer::HandlerContext{
+    explicit HandlerContextImpl(const std::atomic<bool>& dead)
+        : m_dead(dead)
+    {}
+
+    virtual bool connection_alive() const override{
+        return !m_dead.load(std::memory_order_acquire);
+    }
+
+private:
+    const std::atomic<bool>& m_dead;
+};
 
 
 
@@ -145,17 +162,6 @@ std::string HttpServer::format_response(const Response& response, bool keep_aliv
 }
 
 
-const char* HttpServer::Request::header(const std::string& name) const{
-    const auto it = headers.find(to_lower(name));
-    return (it == headers.end()) ? "" : it->second.c_str();
-}
-
-
-bool HttpServer::HandlerContext::connection_alive() const{
-    return !m_dead.load(std::memory_order_acquire);
-}
-
-
 
 HttpServer::HttpServer(ThreadPool& thread_pool)
     : m_thread_pool(thread_pool)
@@ -207,25 +213,33 @@ void HttpServer::stop(){
     //  closes them without dispatching a connection task.
     socket->close_connection();
 
-    //  Wait for the in-flight connection task. Loop, because a task may
-    //  have been dispatched between the previous one being consumed and
-    //  the socket being destroyed.
+    //  Wait for the in-flight connection tasks. The handles are moved out
+    //  under m_task_lock (never destroyed while holding m_lock: a task's
+    //  final cleanup takes m_lock, and destroying a handle blocks until
+    //  the task finishes). Loop, because a task may have been dispatched
+    //  between the previous ones being joined and the socket being
+    //  destroyed.
     while (true){
-        AsyncTask task;
+        std::vector<AsyncTask> tasks;
         {
-            std::lock_guard<Mutex> lg(m_lock);
-            task = std::move(m_connection_task);
-            m_connection_task = AsyncTask();
+            std::lock_guard<Mutex> lg(m_task_lock);
+            tasks.swap(m_tasks);
         }
-        if (!task){
+        if (tasks.empty()){
             break;
         }
-        task.wait_and_ignore_exceptions();
+        for (auto& task : tasks){
+            task.wait_and_ignore_exceptions();
+        }
     }
 
+    //  Take the socket out under m_lock and destroy it after releasing
+    //  the lock: "~ServerSocket" joins the socket's worker threads, and
+    //  their callbacks (on_connect and friends) take m_lock.
+    std::unique_ptr<AbstractServerSocket> owned;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        m_socket = nullptr;
+        owned = std::move(m_socket);
         m_connection = nullptr;
         m_handler = Handler();
     }
@@ -246,30 +260,63 @@ void HttpServer::on_listen_finished(const std::string& error_message){
 
 void HttpServer::on_connect(){
     AbstractServerSocket* socket = nullptr;
+    std::shared_ptr<Connection> conn;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        if (m_stop_requested.load(std::memory_order_acquire)){
-            //  Stopping: close the connection without a connection task.
-            socket = m_socket.get();
-        }else{
-            auto conn = std::make_shared<Connection>();
+        socket = m_socket.get();
+        if (socket != nullptr
+            && !m_stop_requested.load(std::memory_order_acquire)
+        ){
+            conn = std::make_shared<Connection>();
             m_connection = conn;
-            try{
-                m_connection_task = m_thread_pool.dispatch(
-                    [this, conn, socket = m_socket.get()]{
-                        connection_task(conn, socket);
-                    }
-                );
-            }catch (...){
-                //  The task could not be started: drop the connection and
-                //  keep listening.
-                m_connection.reset();
-                socket = m_socket.get();
-            }
         }
     }
-    if (socket != nullptr){
-        socket->close_connection();
+    if (conn == nullptr){
+        //  Stopping (or the socket is gone): close the connection without
+        //  a connection task.
+        if (socket != nullptr){
+            socket->close_connection();
+        }
+    }else{
+        //  Dispatch outside m_lock: the task's final cleanup takes
+        //  m_lock, and so does stop(). The task handles live in m_tasks
+        //  under a dedicated m_task_lock (the socket library's
+        //  m_task_lock pattern): destroying an AsyncTask handle blocks
+        //  until its task finishes, so a handle must never be destroyed
+        //  while holding m_lock.
+        try{
+            AsyncTask task = m_thread_pool.dispatch(
+                [this, conn, socket]{
+                    connection_task(conn, socket);
+                }
+            );
+            {
+                std::lock_guard<Mutex> lg(m_task_lock);
+                //  Reap finished handles (destroying one that is already
+                //  finished is a no-op). Keep unfinished ones: the
+                //  previous connection's task may still be finishing up
+                //  (for example, still inside a long handler call) by the
+                //  time this connection is accepted; it holds only its
+                //  own (dead) connection.
+                m_tasks.erase(
+                    std::remove_if(m_tasks.begin(), m_tasks.end(), [](const AsyncTask& task){
+                        return task.is_finished();
+                    }),
+                    m_tasks.end()
+                );
+                m_tasks.push_back(std::move(task));
+            }
+        }catch (...){
+            //  The task could not be started: drop the connection and
+            //  keep listening.
+            {
+                std::lock_guard<Mutex> lg(m_lock);
+                if (m_connection.get() == conn.get()){
+                    m_connection = nullptr;
+                }
+            }
+            socket->close_connection();
+        }
     }
     m_listeners.run_method(&Listener::on_connect);
 }
@@ -282,19 +329,33 @@ void HttpServer::on_connect_rejected(){
 
 void HttpServer::on_receive_data(const void* data, size_t bytes){
     std::shared_ptr<Connection> conn;
+    AbstractServerSocket* socket = nullptr;
     {
         std::lock_guard<Mutex> lg(m_lock);
         conn = m_connection;
+        socket = m_socket.get();
     }
     if (conn == nullptr){
         return;
     }
+    bool exceeded = false;
     {
         std::lock_guard<Mutex> lg(conn->lock);
-        const char* ptr = (const char*)data;
-        conn->buffer.append(ptr, bytes);
+        exceeded = conn->buffer.size() + bytes > MAX_BUFFER_BYTES;
+        if (!exceeded){
+            const char* ptr = (const char*)data;
+            conn->buffer.append(ptr, bytes);
+        }
     }
     conn->cv.notify_all();
+    if (exceeded && socket != nullptr){
+        //  The stream is longer than we are willing to buffer. It is
+        //  likely in the middle of a request, so there is no reliable
+        //  response left to send: just end the connection. ("socket" can
+        //  be null only while stop() is tearing the socket down, in which
+        //  case there is no connection task left to wake up.)
+        end_connection(conn, socket);
+    }
 }
 
 
@@ -331,17 +392,23 @@ void HttpServer::connection_task(const std::shared_ptr<Connection>& conn, Abstra
         }
 
         ParsedRequest parsed;
+        size_t buffer_size;
         {
             std::lock_guard<Mutex> lg(conn->lock);
             parsed = try_parse(conn->buffer);
+            buffer_size = conn->buffer.size();
         }
 
         if (parsed.state == ParseState::NEED_MORE){
-            //  Wait for the rest of this request, a disconnect, or a stop.
+            //  Wait for the rest of this request, a disconnect, or a
+            //  stop. The predicate requires the buffer to have grown past
+            //  what the parse just saw: with a partial request,
+            //  "!buffer.empty()" alone is permanently true and would spin
+            //  this loop at 100% CPU until the request completes.
             {
                 std::unique_lock<Mutex> lg(conn->lock);
-                conn->cv.wait_for(lg, std::chrono::milliseconds(10), [this, &conn]{
-                    return !conn->buffer.empty()
+                conn->cv.wait_for(lg, std::chrono::milliseconds(10), [this, &conn, buffer_size]{
+                    return conn->buffer.size() != buffer_size
                         || conn->dead.load(std::memory_order_relaxed)
                         || m_stop_requested.load(std::memory_order_relaxed);
                 });
@@ -369,7 +436,7 @@ void HttpServer::connection_task(const std::shared_ptr<Connection>& conn, Abstra
 
         Response response;
         {
-            HandlerContext context(conn->dead);
+            HandlerContextImpl context(conn->dead);
             try{
                 if (handler){
                     handler(parsed.request, response, context);
@@ -412,7 +479,7 @@ void HttpServer::connection_task(const std::shared_ptr<Connection>& conn, Abstra
     {
         std::lock_guard<Mutex> lg(m_lock);
         if (m_connection.get() == conn.get()){
-            m_connection.reset();
+            m_connection = nullptr;
         }
     }
 }
@@ -539,7 +606,10 @@ HttpServer::ParsedRequest HttpServer::try_parse(std::string& buffer){
 
     //  Special headers.
     if (result.request.headers.count("transfer-encoding") != 0){
-        error(411, "Chunked transfer encoding is not supported.");
+        //  "Not Implemented" rather than "Length Required": chunked
+        //  encoding is a (unsupported) representation of the body, not a
+        //  missing length (RFC 9112).
+        error(501, "Chunked transfer encoding is not supported.");
         return result;
     }
 
@@ -582,11 +652,12 @@ HttpServer::ParsedRequest HttpServer::try_parse(std::string& buffer){
 
     const size_t consumed = header_end + 4 + (size_t)content_length;
     if (buffer.size() < consumed){
-        if (buffer.size() > MAX_BUFFER_BYTES){
-            error(413, "Request too large.");
-            return result;
-        }
-        return result;   //  NEED_MORE: the body has not fully arrived yet.
+        //  NEED_MORE: the body has not fully arrived yet. In this state
+        //  the buffer holds nothing but the bytes of this one incomplete
+        //  request ("consumed" is at most a header section plus the body
+        //  cap), so the buffer cannot exceed MAX_BUFFER_BYTES here; the
+        //  overall cap is enforced when data is appended instead.
+        return result;
     }
 
     result.state = ParseState::READY;
@@ -606,6 +677,16 @@ HttpServer::ParsedRequest HttpServer::try_parse(std::string& buffer){
 void HttpServer::end_connection(const std::shared_ptr<Connection>& conn, AbstractServerSocket* socket){
     conn->dead.store(true, std::memory_order_release);
     conn->cv.notify_all();
+    //  Close the socket's connection only while it still belongs to this
+    //  connection: by the time a task notices its own connection died,
+    //  the socket may already be serving the next client, and closing
+    //  unconditionally would kill that client's connection instead.
+    {
+        std::lock_guard<Mutex> lg(m_lock);
+        if (m_connection.get() != conn.get()){
+            return;
+        }
+    }
     socket->close_connection();
 }
 

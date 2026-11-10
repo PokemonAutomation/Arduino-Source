@@ -532,7 +532,7 @@ public:
 };
 
 
-//  Chunked request bodies are not supported: 411 and a closed connection,
+//  Chunked request bodies are not supported: 501 and a closed connection,
 //  and the handler is never called.
 class Test_Http_ChunkedRejected : public TestHttpServer{
 public:
@@ -568,7 +568,7 @@ public:
                 error = "The client did not send the request";
             }else{
                 const std::string expected =
-                    "HTTP/1.1 411 Length Required\r\n"
+                    "HTTP/1.1 501 Not Implemented\r\n"
                     "Content-Length: 44\r\n"
                     "Connection: close\r\n"
                     "\r\n"
@@ -641,6 +641,87 @@ public:
 
         if (error.empty() && handler_called.load()){
             error = "The handler was called for a rejected request";
+        }
+
+        server.stop();
+        if (!error.empty()){
+            return error;
+        }
+        return true;
+    }
+};
+
+
+//  A connection that sends more data than the receive buffer cap (about
+//  2 MiB) is closed without a response, and the server keeps listening.
+class Test_Http_BufferCap : public TestHttpServer{
+public:
+    using TestHttpServer::TestHttpServer;
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        TestServerListener server_listener;
+        HttpServer server(m_thread_pool);
+        server.add_listener(server_listener);
+
+        std::atomic<int> handler_calls{0};
+        auto handler = [&handler_calls](const HttpServer::Request&, HttpServer::Response& response, HttpServer::HandlerContext&){
+            handler_calls++;
+            response.status = 200;
+            response.body = "ok";
+        };
+
+        uint16_t port;
+        if (!start_server(server, server_listener, handler, port)){
+            return "Failed to start the server";
+        }
+
+        std::string error;
+        {
+            TestClient client(m_thread_pool);
+            if (!client.connect(port)){
+                error = "The client did not connect";
+            }else{
+                //  A never-completing request far larger than the buffer
+                //  cap: the server closes the connection without a
+                //  response. (The send may fail partway through once the
+                //  server has hung up; that is expected.)
+                const std::string flood(3u << 20, 'A');
+                client.send_all(flood);
+                if (!client.waiter.wait_for(
+                    HTTP_TEST_WAIT,
+                    [&client]{ return client.disconnected.load() >= 1; }
+                )){
+                    error = "The server did not close the over-cap connection";
+                }
+            }
+        }
+
+        if (error.empty() && handler_calls.load() != 0){
+            error = "The handler was called for a capped connection";
+        }
+
+        if (error.empty()){
+            //  The server must still be listening afterwards.
+            TestClient client(m_thread_pool);
+            if (!client.connect(port)){
+                error = "The client did not connect after the cap test";
+            }else if (!client.send_all(
+                "POST / HTTP/1.1\r\n"
+                "Content-Length: 0\r\n"
+                "\r\n"
+            )){
+                error = "The client did not send the request";
+            }else{
+                const std::string expected =
+                    "HTTP/1.1 200 OK\r\n"
+                    "Content-Length: 2\r\n"
+                    "Connection: keep-alive\r\n"
+                    "\r\n"
+                    "ok";
+                if (!client.wait_for_bytes(expected.size()) || client.received != expected){
+                    error = "The server did not answer after the cap test:\n" + client.received;
+                }
+            }
         }
 
         server.stop();
@@ -902,7 +983,7 @@ public:
         }
 
         if (error.empty()){
-            //  Start again on the same port and serve a fresh request.
+            //  Start again (on a fresh port) and serve a fresh request.
             auto simple_handler = [](const HttpServer::Request&, HttpServer::Response& response, HttpServer::HandlerContext&){
                 response.status = 200;
                 response.body = "ok";
@@ -1015,6 +1096,9 @@ void add_tests_HttpServer(UnitTestDatabase& database, ThreadPool& thread_pool){
     );
     database.add<Test_Http_BodyTooLarge>(
         thread_pool, "HttpServer - Oversized content-length is rejected"
+    );
+    database.add<Test_Http_BufferCap>(
+        thread_pool, "HttpServer - A connection over the buffer cap is closed"
     );
     database.add<Test_Http_ExpectContinue>(
         thread_pool, "HttpServer - Expect: 100-continue"
