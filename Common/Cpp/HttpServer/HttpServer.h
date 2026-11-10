@@ -161,13 +161,15 @@ private:
     enum class ParseState{
         NEED_MORE,
         READY,
-        ERROR,
+        //  Named "ERROR_RESPONSE" rather than "ERROR" because "ERROR" is
+        //  a macro on Windows (winerror.h).
+        ERROR_RESPONSE,
     };
 
     struct ParsedRequest{
         ParseState state = ParseState::NEED_MORE;
 
-        //  ERROR
+        //  ERROR_RESPONSE
         int error_status = 400;
         std::string error_reason;
         std::vector<std::pair<std::string, std::string>> error_headers;

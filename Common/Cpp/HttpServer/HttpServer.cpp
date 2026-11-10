@@ -349,7 +349,7 @@ void HttpServer::connection_task(const std::shared_ptr<Connection>& conn, Abstra
             continue;
         }
 
-        if (parsed.state == ParseState::ERROR){
+        if (parsed.state == ParseState::ERROR_RESPONSE){
             Response response;
             response.status = parsed.error_status;
             response.headers = std::move(parsed.error_headers);
@@ -422,7 +422,7 @@ HttpServer::ParsedRequest HttpServer::try_parse(std::string& buffer){
     ParsedRequest result;
 
     auto error = [&result](int status, const char* reason, std::vector<std::pair<std::string, std::string>> headers = {}){
-        result.state = ParseState::ERROR;
+        result.state = ParseState::ERROR_RESPONSE;
         result.error_status = status;
         result.error_reason = reason;
         result.error_headers = std::move(headers);

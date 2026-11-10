@@ -890,7 +890,9 @@ public:
         if (error.empty()){
             //  stop() blocks until the in-flight handler returns. Release
             //  the handler from a pool thread so this thread can call it.
-            m_thread_pool.dispatch([&gate]{
+            //  The handle is kept (dispatch is [[nodiscard]]); its
+            //  destructor waits for the trivial release task to finish.
+            AsyncTask releaser_task = m_thread_pool.dispatch([&gate]{
                 gate.release();
             });
             server.stop();
