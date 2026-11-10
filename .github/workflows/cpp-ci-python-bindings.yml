@@ -8,7 +8,7 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 # Builds the GUI-free core plus the _pa_core pybind11 module 
 # (Source/PythonBindings/README.md) and runs the package's pytest suite.
