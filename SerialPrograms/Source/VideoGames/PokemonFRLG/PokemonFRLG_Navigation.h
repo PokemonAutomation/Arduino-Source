@@ -10,6 +10,7 @@
 #define PokemonAutomation_PokemonFRLG_Navigation_H
 
 #include "Common/Cpp/Logging/AbstractLogger.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
@@ -136,6 +137,8 @@ void open_party_menu_from_overworld(ConsoleHandle& console, ProControllerContext
 
 // Starting from the party menu, detect the last occupied party slot
 PartySlot detect_last_occupied_party_slot(ConsoleHandle& console);
+// Detect the last occupied party slot on a screenshot of the party menu
+PartySlot detect_last_occupied_party_slot(const ImageViewRGB32& screen);
 
 // Starting from the start menu, a sub-screen of the start menu, or the overworld, navigate to the bag
 void open_bag_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context = StartMenuContext::STANDARD);

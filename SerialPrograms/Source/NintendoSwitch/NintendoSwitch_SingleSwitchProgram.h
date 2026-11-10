@@ -86,6 +86,15 @@ public:
         FeedbackType feedback_type
     );
 
+    //  Called with the controller ready, just before program(env, context).
+    //  Override to check that the game is set up the way the program needs
+    //  (e.g. a free party slot) and throw UserSetupError if not, so a setup
+    //  mistake stops the program before it starts its work.
+    virtual void start_program_game_checks(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context
+    ){}
+
 private:
     virtual void program(GameConsole::ConsoleProgramEnvironment& env, CancellableScope& scope) override;
 };
