@@ -1881,6 +1881,7 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonHome/Inference/PokemonHome_SelectionArrowDetector.h
     Source/VideoGames/PokemonHome/Inference/PokemonHome_ShinyDetector.cpp
     Source/VideoGames/PokemonHome/Inference/PokemonHome_ShinyDetector.h
+    Source/VideoGames/PokemonHome/Inference/PokemonHome_StorageView.h
     Source/VideoGames/PokemonHome/Inference/PokemonHome_SummaryReader.cpp
     Source/VideoGames/PokemonHome/Inference/PokemonHome_SummaryReader.h
     Source/VideoGames/PokemonHome/Inference/PokemonHome_SummaryScreenDetector.cpp
