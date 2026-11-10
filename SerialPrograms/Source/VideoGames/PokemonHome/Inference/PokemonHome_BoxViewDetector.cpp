@@ -1,4 +1,4 @@
-/*  Button Detector
+/*  Pokemon Home Box View Detector
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -13,19 +13,27 @@
 #include "Tests/ImageUnitTest.h"
 #include "Tests/TestUtils.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_ButtonDetector.h"
+#include "PokemonHome_StorageView.h"
 #include "PokemonHome_BoxViewDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonHome{
 
-BoxViewDetector::BoxViewDetector(VideoOverlay* overlay) : m_button_plus_detector(COLOR_BLACK, ButtonType::ButtonPlus, { 0.100, 0.956, 0.107, 0.041 }, overlay){}
+BoxViewDetector::BoxViewDetector(VideoOverlay* overlay)
+    : m_button_plus_detector(COLOR_BLACK, ButtonType::ButtonPlus, STORAGE_PLUS_BUTTON, overlay)
+{}
 
 void BoxViewDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(COLOR_RED, STORAGE_HEADER_STRIP);
     m_button_plus_detector.make_overlays(items);
 }
 
 bool BoxViewDetector::detect(const ImageViewRGB32& screen){
+    if (classify_storage_header(screen) != StorageViewHeader::BoxView){
+        m_button_plus_detector.reset_state();
+        return false;
+    }
     return m_button_plus_detector.detect(screen);
 }
 
@@ -49,7 +57,10 @@ public:
         DummyVideoOverlay overlay;
         BoxViewDetector detector(&overlay);
         const ImageRGB32& image = images[0];
-        return detector.detect(image) == m_expected;
+        if (detector.detect(image) != m_expected){
+            return m_expected ? "Expected Box View." : "Unexpected Box View detection.";
+        }
+        return true;
     };
 
 private:
@@ -116,6 +127,8 @@ void add_tests_BoxViewDetector(UnitTestDatabase& database){
     database.add<Test_BoxViewDetector>("PokemonHome/BoxView/SelectionHand_Relocate_Grid_Row1_Column4_01.png", false);
     database.add<Test_BoxViewDetector>("PokemonHome/BoxView/SelectionHand_Relocate_Grid_Row2_Column4_01.png", false);
     database.add<Test_BoxViewDetector>("PokemonHome/BoxView/SelectionHand_Relocate_Grid_Row2_Column4_02.png", false);
+    // Page View also shows the Quit prompt.
+    database.add<Test_BoxViewDetector>("PokemonHome/PageView/Page10_Box293_Normal_Grid_R3C4_Frame01.png", false);
     database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/annihilape_Regular.png", false);
     database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/bidoof_Regular.png", false);
     database.add<Test_BoxViewDetector>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", false);
