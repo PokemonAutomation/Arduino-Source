@@ -190,7 +190,7 @@ void ControllerWithScheduler::issue_gyro_motion(
             m_scheduler.issue_to_resource(
                 schedule,
                 std::make_unique<SwitchCommand_GyroState>(sample.state),
-                WallDuration::zero(), sample.duration, WallDuration::zero()
+                sample.duration, sample.duration, WallDuration::zero()
             );
         }
     }

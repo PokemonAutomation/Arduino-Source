@@ -226,6 +226,7 @@ public:
     struct Entry{
         WallDuration duration;
         SwitchControllerState state;
+        bool has_gyro;
     };
     std::vector<Entry> entries;
 
@@ -237,9 +238,7 @@ private:
             static_cast<const SwitchCommand&>(*resource).apply(state);
             has_gyro |= resource->id == (size_t)SwitchResource::GYRO;
         }
-        if (has_gyro){
-            entries.push_back({entry.duration, state});
-        }
+        entries.push_back({entry.duration, state, has_gyro});
     }
 };
 
@@ -264,15 +263,14 @@ public:
             GyroRecordingController controller(logger, throttler);
             controller.issue_buttons(nullptr, 0ms, 62ms, 0ms, BUTTON_A);
             controller.issue_gyro_motion(nullptr, controller_class, motion);
-            controller.issue_barrier(nullptr);
             if (controller.entries.size() != motion.samples().size()){
-                return "Scheduling changed the prepared sample boundaries.";
+                return "Scheduling did not dispatch every prepared sample before returning.";
             }
             const double sign = controller_class == ControllerClass::NintendoSwitch_RightJoycon ? -1 : 1;
             for (size_t i = 0; i < motion.samples().size(); ++i){
                 const auto& expected = motion.samples()[i];
                 const auto& actual = controller.entries[i];
-                if (actual.duration != expected.duration || actual.state.buttons != BUTTON_A
+                if (!actual.has_gyro || actual.duration != expected.duration || actual.state.buttons != BUTTON_A
                     || actual.state.gyro.acceleration_g.x != expected.state.acceleration_g.x
                     || actual.state.gyro.acceleration_g.y != sign * expected.state.acceleration_g.y
                     || actual.state.gyro.acceleration_g.z != sign * expected.state.acceleration_g.z
@@ -292,8 +290,6 @@ public:
         legacy.issue_gyro_motion(nullptr, ControllerClass::NintendoSwitch_RightJoycon, 31ms, function);
         prepared.issue_gyro_motion(nullptr, ControllerClass::NintendoSwitch_RightJoycon,
             prepare_gyro_motion(nullptr, 31ms, function));
-        legacy.issue_barrier(nullptr);
-        prepared.issue_barrier(nullptr);
         if (legacy.entries.size() != 3 || prepared.entries.size() != 3){
             return "Callback and prepared APIs produced different sample counts.";
         }
@@ -302,6 +298,22 @@ public:
                 || legacy.entries[i].state.gyro.angular_velocity_dps.y != prepared.entries[i].state.gyro.angular_velocity_dps.y){
                 return "Callback and prepared APIs produced different schedules.";
             }
+        }
+
+        GyroRecordingController followed_by_wait(logger, throttler);
+        followed_by_wait.issue_gyro_motion(nullptr, ControllerClass::NintendoSwitch_RightJoycon, 15ms, function);
+        followed_by_wait.issue_nop(nullptr, 100ms);
+        if (followed_by_wait.entries.size() != 2
+            || !followed_by_wait.entries[0].has_gyro || followed_by_wait.entries[0].duration != 15ms
+            || followed_by_wait.entries[1].has_gyro || followed_by_wait.entries[1].duration != 100ms){
+            return "The wait after gyro motion did not get its full duration.";
+        }
+
+        prepared.issue_buttons(nullptr, 20ms, 20ms, 0ms, BUTTON_A);
+        if (prepared.entries.size() != 4 || prepared.entries[2].state.buttons != BUTTON_NONE
+            || prepared.entries[3].has_gyro || prepared.entries[3].state.buttons != BUTTON_A
+            || prepared.entries[3].duration != 20ms){
+            return "A button press after gyro motion did not start after the final sample.";
         }
 
         // Forward INT32_MIN is valid on X, but negating it is not encodable.
