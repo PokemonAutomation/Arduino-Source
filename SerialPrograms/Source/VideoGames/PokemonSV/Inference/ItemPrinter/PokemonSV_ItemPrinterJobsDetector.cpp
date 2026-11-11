@@ -188,6 +188,10 @@ void add_tests_ItemPrinterJobsDetector(UnitTestDatabase& database){
         "PokemonSV/ItemPrinterJobsDetector/Japanese_Jobs_1.png",
         1
     );
+    database.add<Test_ItemPrinterJobsDetector>(
+        "PokemonSV/ItemPrinterJobsDetector/Japanese_Jobs_10.png",
+        10
+    );
 }
 
 
