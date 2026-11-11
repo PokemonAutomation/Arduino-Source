@@ -851,6 +851,9 @@ struct StreamHistoryTracker_Ring::Data{
             src_planes[0] = (const uint8_t*)rgb_image.bits();
             src_strides[0] = (int)rgb_image.bytesPerLine();
         }
+        //  This frame converted, so log the next conversion failure again
+        //  (one line per failing stretch, not one per tracker).
+        m_logged_unsupported_format = false;
 
         if (m_vctx == nullptr){
             init_video_encoder(qframe.width(), qframe.height());
