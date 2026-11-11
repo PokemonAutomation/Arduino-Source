@@ -917,6 +917,131 @@ public:
 };
 
 
+//  The client disconnects while the handler is still running, and a new
+//  client connects before the handler returns: the old task must discard
+//  its response instead of writing it into the new client's socket.
+class Test_Http_ReconnectWhileHandlerRunning : public TestHttpServer{
+public:
+    using TestHttpServer::TestHttpServer;
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        TestServerListener server_listener;
+        HttpServer server(m_thread_pool);
+        server.add_listener(server_listener);
+
+        HandlerGate gate;
+        std::atomic<bool> first_call_alive{false};
+
+        auto handler = [&gate, &first_call_alive](
+            const HttpServer::Request& request,
+            HttpServer::Response& response,
+            HttpServer::HandlerContext& context
+        ){
+            if (request.path == "/a"){
+                first_call_alive = context.connection_alive();
+                gate.started.notify();
+                gate.wait_for_release(HTTP_TEST_WAIT);
+            }
+            response.status = 200;
+            response.body = (request.path == "/a") ? "A" : "ok";
+        };
+
+        uint16_t port;
+        if (!start_server(server, server_listener, handler, port)){
+            return "Failed to start the server";
+        }
+
+        std::string error;
+        TestClient client_a(m_thread_pool);
+        TestClient client_b(m_thread_pool);
+        {
+            if (!client_a.connect(port)){
+                error = "The first client did not connect";
+            }else if (!client_a.send_all(
+                "POST /a HTTP/1.1\r\n"
+                "Content-Length: 1\r\n"
+                "\r\n"
+                "x"
+            )){
+                error = "The first client did not send the request";
+            }else if (!gate.started.wait_for(
+                HTTP_TEST_WAIT,
+                [&first_call_alive]{ return first_call_alive.load(); }
+            )){
+                error = "The handler did not start";
+            }
+        }
+
+        if (error.empty()){
+            //  Disconnect the first client (closing its socket while it is
+            //  still in scope, so its connection task keeps running) and
+            //  wait for the server to report the disconnect.
+            client_a.socket.close();
+            if (!server_listener.waiter.wait_for(
+                HTTP_TEST_WAIT,
+                [&server_listener]{ return server_listener.disconnected.load() >= 1; }
+            )){
+                error = "The server did not report the first client's disconnect";
+            }
+        }
+
+        if (error.empty()){
+            //  Connect the second client while the first connection's
+            //  handler is still blocked on the gate. Waiting for the
+            //  second on_connect guarantees the second connection has
+            //  replaced the first one in the server by the time the gate
+            //  is released.
+            if (!client_b.connect(port)){
+                error = "The second client did not connect";
+            }else if (!server_listener.waiter.wait_for(
+                HTTP_TEST_WAIT,
+                [&server_listener]{ return server_listener.connected.load() >= 2; }
+            )){
+                error = "The server did not accept the second client";
+            }
+        }
+
+        if (error.empty()){
+            gate.release();
+        }
+
+        if (error.empty()){
+            //  The second client's first bytes must be its own response:
+            //  the first client's late response was discarded, not
+            //  written into this socket.
+            if (!client_b.send_all(
+                "POST /b HTTP/1.1\r\n"
+                "Content-Length: 1\r\n"
+                "\r\n"
+                "y"
+            )){
+                error = "The second client did not send the request";
+            }else{
+                const std::string expected =
+                    "HTTP/1.1 200 OK\r\n"
+                    "Content-Length: 2\r\n"
+                    "Connection: keep-alive\r\n"
+                    "\r\n"
+                    "ok";
+                if (!client_b.wait_for_bytes(expected.size()) || client_b.received != expected){
+                    error = "The second client received a stray response:\n" + client_b.received;
+                }
+            }
+        }
+
+        if (error.empty() && !first_call_alive.load()){
+            error = "The handler did not see the connection as alive on entry";
+        }
+
+        server.stop();
+        if (!error.empty()){
+            return error;
+        }
+        return true;
+    }
+};
+
+
 //  "stop()" while the handler is still running blocks until the handler
 //  returns, and "start()" works afterwards.
 class Test_Http_StopDuringHandler : public TestHttpServer{
@@ -1105,6 +1230,9 @@ void add_tests_HttpServer(UnitTestDatabase& database, ThreadPool& thread_pool){
     );
     database.add<Test_Http_DisconnectDuringHandler>(
         thread_pool, "HttpServer - Disconnect while the handler is running"
+    );
+    database.add<Test_Http_ReconnectWhileHandlerRunning>(
+        thread_pool, "HttpServer - Reconnect while the previous handler is still running"
     );
     database.add<Test_Http_StopDuringHandler>(
         thread_pool, "HttpServer - stop() while the handler is running"

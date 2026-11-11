@@ -268,6 +268,19 @@ void HttpServer::on_connect(){
             && !m_stop_requested.load(std::memory_order_acquire)
         ){
             conn = std::make_shared<Connection>();
+            //  The previous socket connection is over (the socket only
+            //  accepts a new client once the previous one is gone), but
+            //  its task may still be finishing (for example, still inside
+            //  a long handler call), and the socket's on_disconnect
+            //  callback for it may not have run yet: it runs after the
+            //  socket has already moved back to listening. Mark it dead
+            //  now, before the new connection takes over the socket's
+            //  active fd, so the old task discards its response instead
+            //  of delivering it to the new client.
+            if (m_connection != nullptr){
+                m_connection->dead.store(true, std::memory_order_release);
+                m_connection->cv.notify_all();
+            }
             m_connection = conn;
         }
     }
@@ -363,7 +376,18 @@ void HttpServer::on_disconnect(const std::string& error_message){
     std::shared_ptr<Connection> conn;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        conn = m_connection;
+        //  The socket may already be serving the next client by the time
+        //  this callback runs: the socket's connection thread sets the
+        //  state back to LISTENING before it reports the disconnect, so a
+        //  fast reconnect can be accepted in between. In that case this
+        //  disconnect is about the previous connection, which on_connect()
+        //  has already marked dead; the current one belongs to the new
+        //  client and must not be killed.
+        if (m_socket == nullptr
+            || m_socket->state() != AbstractServerSocket::State::CONNECTED
+        ){
+            conn = m_connection;
+        }
     }
     if (conn != nullptr){
         conn->dead.store(true, std::memory_order_release);
@@ -453,8 +477,9 @@ void HttpServer::connection_task(const std::shared_ptr<Connection>& conn, Abstra
             }
         }
 
-        //  The connection may have closed while the handler was running;
-        //  discard the response in that case.
+        //  The connection may have closed or been replaced by a new
+        //  client while the handler was running; discard the response in
+        //  that case.
         if (conn->dead.load(std::memory_order_acquire) ||
             m_stop_requested.load(std::memory_order_acquire)
         ){
