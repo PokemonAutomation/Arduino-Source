@@ -772,6 +772,7 @@ struct StreamHistoryTracker_Ring::Data{
 
 
     //  Blocks until the queue is empty and no frame is being encoded.
+    //  only called from the stream-history unit tests. Production code never calls this.
     void wait_until_idle(){
         std::unique_lock<Mutex> queue_guard(m_queue_lock);
         m_idle_cv.wait(queue_guard, [this]{
