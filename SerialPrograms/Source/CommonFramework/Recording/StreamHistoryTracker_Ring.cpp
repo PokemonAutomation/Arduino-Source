@@ -253,12 +253,12 @@ std::set<std::string> poisoned_encoders;
 //  other candidate (the hardware wrappers and Media Foundation) is leaked and
 //  poisoned. Contexts that merely fail to open are released by
 //  init_video_encoder() instead: no device was exercised through them.
-void abandon_video_encoder(Logger& logger, const char* name, AVCodecContext*& ctx){
+void abandon_video_encoder(Logger& logger, const char* name, CodecContextPtr& ctx){
     if (ctx == nullptr){
         return;
     }
     if (std::strcmp(name, "mpeg4") == 0){
-        avcodec_free_context(&ctx);
+        ctx.reset();
     }else{
         {
             std::lock_guard<Mutex> lg(poisoned_encoder_mutex);
@@ -271,8 +271,10 @@ void abandon_video_encoder(Logger& logger, const char* name, AVCodecContext*& ct
             + " process.",
             COLOR_YELLOW
         );
+        //  Deliberately leaked; see above.
+        AVCodecContext* leaked = ctx.release();
+        (void)leaked;
     }
-    ctx = nullptr;
 }
 
 
@@ -362,8 +364,8 @@ struct StreamHistoryTracker_Ring::Data{
     //  Video encoder (initialized on the worker thread at the first frame).
     bool m_video_enabled;
     bool m_logged_frame_skip = false; // A skipped video frame was logged since the last frame reached the encoder; see log_frame_skip()
-    AVCodecContext* m_video_context = nullptr; // ffmpeg video encoder context
-    SwsContext* m_sws = nullptr; // libswscale context: converts and scales the captured frame into the encoder’s pixel format and output size.
+    CodecContextPtr m_video_context; // ffmpeg video encoder context
+    SwsContextPtr m_sws; // libswscale context: converts and scales the captured frame into the encoder’s pixel format and output size.
     int m_sws_in_format = AV_PIX_FMT_NONE; // source pixel format
     int m_sws_width = 0; // source pixel width
     int m_sws_height = 0; // source pixel height
@@ -392,12 +394,12 @@ struct StreamHistoryTracker_Ring::Data{
     //  Each snapshot is refreshed on its encoder's own thread when the first
     //  packet arrives and whenever the extradata size changes (the hardware
     //  encoders fill it in lazily).
-    AVCodecParameters* m_video_params = nullptr;
+    CodecParametersPtr m_video_params;
     AVRational m_video_time_base = {1, 1000};
-    AVCodecParameters* m_audio_params = nullptr;
+    CodecParametersPtr m_audio_params;
 
     //  Audio encoder (used by push_samples).
-    AVCodecContext* m_audio_context = nullptr;  // audio encoder context
+    CodecContextPtr m_audio_context;  // audio encoder context
     AVChannelLayout m_audio_layout = {};
     int64_t m_audio_samples_total = 0;    //  Samples (per channel) sent to the encoder.
     //  The audio sample clock: sample m_audio_anchor_sample was captured at
@@ -447,16 +449,6 @@ struct StreamHistoryTracker_Ring::Data{
         }
     }
 
-    //  Releases the ffmpeg resources (the worker thread is already stopped
-    //  by ~StreamHistoryTracker_Ring()).
-    ~Data(){
-        if (m_sws != nullptr) sws_freeContext(m_sws);
-        if (m_video_params != nullptr) avcodec_parameters_free(&m_video_params);
-        if (m_audio_params != nullptr) avcodec_parameters_free(&m_audio_params);
-        if (m_video_context != nullptr) avcodec_free_context(&m_video_context);
-        if (m_audio_context != nullptr) avcodec_free_context(&m_audio_context);
-    }
-
 
     //  Allocates + opens the AAC encoder (FLTP, 48 kHz, 1024-sample frames,
     //  96 kbps, stream config in the container header) at the tracker's
@@ -470,7 +462,7 @@ struct StreamHistoryTracker_Ring::Data{
         }
 
         // allocate an AAC encoder context
-        m_audio_context = avcodec_alloc_context3(codec);
+        m_audio_context.reset(avcodec_alloc_context3(codec));
         if (m_audio_context == nullptr){
             m_logger.log("Stream history: Failed to allocate AAC encoder. Disabling audio.", COLOR_RED);
             m_have_audio = false;
@@ -501,14 +493,13 @@ struct StreamHistoryTracker_Ring::Data{
                 + std::to_string((int)m_audio_channels) + " channels). Disabling audio.",
                 COLOR_RED
             );
-            avcodec_free_context(&m_audio_context);
-            m_audio_context = nullptr;
+            m_audio_context.reset();
             m_have_audio = false;
             return;
         }
 
         // open the AAC encoder
-        int open_err = avcodec_open2(m_audio_context, codec, nullptr);
+        int open_err = avcodec_open2(m_audio_context.get(), codec, nullptr);
         if (open_err < 0){
             m_logger.log(
                 "Stream history: Failed to open AAC encoder: "
@@ -516,8 +507,7 @@ struct StreamHistoryTracker_Ring::Data{
                 + ". Disabling audio.",
                 COLOR_RED
             );
-            avcodec_free_context(&m_audio_context);
-            m_audio_context = nullptr;
+            m_audio_context.reset();
             m_have_audio = false;
             return;
         }
@@ -578,7 +568,7 @@ struct StreamHistoryTracker_Ring::Data{
                 m_video_encoder_index = i + 1;
                 continue;
             }
-            AVCodecContext* ctx = avcodec_alloc_context3(codec);
+            CodecContextPtr ctx(avcodec_alloc_context3(codec));
             if (ctx == nullptr){
                 m_video_encoder_index = i + 1;
                 continue;
@@ -624,7 +614,7 @@ struct StreamHistoryTracker_Ring::Data{
             //  terminated by AV_PIX_FMT_NONE, or is NULL when every format is
             //  supported, in which case the YUV420P default below applies.)
             int ret = avcodec_get_supported_config(
-                ctx, codec, AV_CODEC_CONFIG_PIX_FORMAT, 0, (const void**)&pix_fmts, nullptr
+                ctx.get(), codec, AV_CODEC_CONFIG_PIX_FORMAT, 0, (const void**)&pix_fmts, nullptr
             );
             if (ret < 0){
                 pix_fmts = nullptr;
@@ -648,9 +638,9 @@ struct StreamHistoryTracker_Ring::Data{
                 preferred = AV_PIX_FMT_YUV420P;
             }
             ctx->pix_fmt = preferred;
-            int err = avcodec_open2(ctx, codec, nullptr);
+            int err = avcodec_open2(ctx.get(), codec, nullptr);
             if (err == 0){
-                m_video_context = ctx;
+                m_video_context = std::move(ctx);
                 m_video_encoder_index = i + 1;
                 size_t dropped_packets;
                 {
@@ -659,7 +649,7 @@ struct StreamHistoryTracker_Ring::Data{
                     //  matches what the ring will hold going forward;
                     //  drain_one_video_packet() refreshes it on the first
                     //  encoded packet.
-                    avcodec_parameters_free(&m_video_params);
+                    m_video_params.reset();
                     //  The video packets already in the ring came from the
                     //  previous encoder (after a runtime fallback) and cannot
                     //  be muxed with the new encoder's parameters, so drop
@@ -685,7 +675,7 @@ struct StreamHistoryTracker_Ring::Data{
                 m_logger.log(
                     "Stream history: video encoder = " + std::string(name)
                     + " ("
-                    + std::string(av_get_pix_fmt_name(ctx->pix_fmt)) + ")"
+                    + std::string(av_get_pix_fmt_name(m_video_context->pix_fmt)) + ")"
                     + " at " + std::to_string(target_width) + "x" + std::to_string(target_height)
                     + ", " + std::to_string(bitrate_kbps) + " kbps."
                 );
@@ -697,10 +687,10 @@ struct StreamHistoryTracker_Ring::Data{
                 + ffmpeg_error(err),
                 COLOR_YELLOW
             );
-            //  The encoder never opened, so no device was ever exercised;
-            //  releasing the context is safe (unlike a context that failed at
-            //  runtime - see abandon_video_encoder()).
-            avcodec_free_context(&ctx);
+            //  'ctx' is released at the end of this iteration. The encoder
+            //  never opened, so no device was ever exercised and releasing it
+            //  is safe (unlike a context that failed at runtime - see
+            //  abandon_video_encoder()).
         }
         m_logger.log("Stream history: No usable video encoder found. Disabling video.", COLOR_RED);
         WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
@@ -722,7 +712,7 @@ struct StreamHistoryTracker_Ring::Data{
             m_logger.log("Stream history: Failed to allocate video packet.", COLOR_RED);
             return DrainResult::NO_MEMORY;
         }
-        int err = avcodec_receive_packet(m_video_context, packet.get());
+        int err = avcodec_receive_packet(m_video_context.get(), packet.get());
         if (err == AVERROR(EAGAIN) || err == AVERROR_EOF){
             return DrainResult::EMPTY;
         }
@@ -756,15 +746,15 @@ struct StreamHistoryTracker_Ring::Data{
                 || m_video_params->extradata_size != m_video_context->extradata_size
             ){
                 if (m_video_params == nullptr){
-                    m_video_params = avcodec_parameters_alloc();
+                    m_video_params.reset(avcodec_parameters_alloc());
                 }
                 if (m_video_params == nullptr
-                    || avcodec_parameters_from_context(m_video_params, m_video_context) < 0
+                    || avcodec_parameters_from_context(m_video_params.get(), m_video_context.get()) < 0
                 ){
                     //  Drop the (partially reset) snapshot so that the next
                     //  packet retries; until then, save() cannot set up the
                     //  video stream.
-                    avcodec_parameters_free(&m_video_params);
+                    m_video_params.reset();
                     snapshot_failed = true;
                 }else{
                     m_video_time_base = m_video_context->time_base;
@@ -920,15 +910,12 @@ struct StreamHistoryTracker_Ring::Data{
         //  preferred pixel format changed (e.g. after an encoder fallback).
         if (src_format != m_sws_in_format || src_width != m_sws_width || src_height != m_sws_height
             || m_video_context->pix_fmt != m_sws_out_format){
-            if (m_sws != nullptr){
-                sws_freeContext(m_sws);
-                m_sws = nullptr;
-            }
-            m_sws = sws_getContext(
+            m_sws.reset();
+            m_sws.reset(sws_getContext(
                 src_width, src_height, (AVPixelFormat)src_format,
                 m_video_width, m_video_height, m_video_context->pix_fmt,
                 SWS_BILINEAR, nullptr, nullptr, nullptr
-            );
+            ));
             if (m_sws == nullptr){
                 //  sws_getContext() is deterministic for a given input/output
                 //  shape, so retrying on the next frame would fail the same
@@ -960,7 +947,7 @@ struct StreamHistoryTracker_Ring::Data{
         }
 
         int scaled = sws_scale(
-            m_sws,
+            m_sws.get(),
             src_planes, src_strides,
             0, src_height,
             frame->data, frame->linesize
@@ -1001,7 +988,7 @@ struct StreamHistoryTracker_Ring::Data{
         //  so a send can fail with EAGAIN while output packets are pending:
         //  drain one packet and retry instead of giving up.
         while (true){
-            int err = avcodec_send_frame(m_video_context, frame.get());
+            int err = avcodec_send_frame(m_video_context.get(), frame.get());
             if (err == AVERROR(EAGAIN)){
                 DrainResult drained = drain_one_video_packet(err);
                 if (drained == DrainResult::STORED){
@@ -1262,7 +1249,7 @@ struct StreamHistoryTracker_Ring::Data{
                 m_audio_acc.erase(m_audio_acc.begin(), erase_end);
             }
 
-            int err = avcodec_send_frame(m_audio_context, frame.get());
+            int err = avcodec_send_frame(m_audio_context.get(), frame.get());
             frame.reset();
             if (err < 0){
                 m_logger.log("Stream history: Audio encode failed: " + ffmpeg_error(err), COLOR_RED);
@@ -1278,7 +1265,7 @@ struct StreamHistoryTracker_Ring::Data{
                     m_have_audio = false;
                     return;
                 }
-                err = avcodec_receive_packet(m_audio_context, packet.get());
+                err = avcodec_receive_packet(m_audio_context.get(), packet.get());
                 if (err == AVERROR(EAGAIN)){
                     break;
                 }
@@ -1315,12 +1302,12 @@ struct StreamHistoryTracker_Ring::Data{
                         || m_audio_params->extradata_size != m_audio_context->extradata_size
                     ){
                         if (m_audio_params == nullptr){
-                            m_audio_params = avcodec_parameters_alloc();
+                            m_audio_params.reset(avcodec_parameters_alloc());
                         }
                         if (m_audio_params == nullptr
-                            || avcodec_parameters_from_context(m_audio_params, m_audio_context) < 0
+                            || avcodec_parameters_from_context(m_audio_params.get(), m_audio_context.get()) < 0
                         ){
-                            avcodec_parameters_free(&m_audio_params);
+                            m_audio_params.reset();
                             snapshot_failed = true;
                         }
                     }
@@ -1719,8 +1706,8 @@ struct StreamHistoryTracker_Ring::Data{
             WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
             video_snapshot = this->m_video;
             audio_snapshot = this->m_audio;
-            video_params = copy_codec_parameters(m_video_params);
-            audio_params = copy_codec_parameters(m_audio_params);
+            video_params = copy_codec_parameters(m_video_params.get());
+            audio_params = copy_codec_parameters(m_audio_params.get());
             video_time_base = m_video_time_base;
         }
         if (video_snapshot.empty() && audio_snapshot.empty()){
