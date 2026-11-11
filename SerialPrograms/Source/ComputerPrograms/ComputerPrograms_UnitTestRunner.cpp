@@ -365,7 +365,7 @@ void UnitTestRunner::on_test_finished(
 
 
 
-bool CommandLineUnitTestRunner::run(bool augment_color_distortions){
+bool CommandLineUnitTestRunner::run(bool augment_color_distortions, const std::string& test_substring){
     if (augment_color_distortions){
         //  Load the distortion data before any test runs. Each `ImageUnitTest` checks the global
         //  manager when it runs, and only runs with distortions if it is loaded.
@@ -391,8 +391,19 @@ bool CommandLineUnitTestRunner::run(bool augment_color_distortions){
         GlobalThreadPools::unlimited_normal()
     );
     runner.add_listener(*this);
+    size_t num_matching = 0;
     for (const auto& test : UNIT_TESTS_ALL()){
-        runner.add_test(test.second);
+        if (test_substring.empty() || test.first.contains(test_substring)){
+            num_matching++;
+            runner.add_test(test.second);
+        }
+    }
+    if (!test_substring.empty()){
+        if (num_matching == 0){
+            m_logger.log("No test name contains \"" + test_substring + "\". No tests will be run.", COLOR_ORANGE);
+        }else{
+            m_logger.log("Running the " + tostr_u_commas(num_matching) + " tests whose name contains \"" + test_substring + "\"");
+        }
     }
     runner.run();
 

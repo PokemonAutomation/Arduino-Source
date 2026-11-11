@@ -94,7 +94,10 @@ public:
     //  distortion augmentation to widen the test coverage, using the distortion data in the
     //  CaptureCardCalibration/ folder of the test repo. If that data can't be loaded, log the
     //  error and return true without running any test.
-    bool run(bool augment_color_distortions);
+    //  If `test_substring` is not empty, only run the tests whose name contains that substring
+    //  (case sensitive, the same matching as the GUI's "Run All Tests Containing This Substring"
+    //  mode). If nothing matches, no test runs and a warning is logged.
+    bool run(bool augment_color_distortions, const std::string& test_substring);
 
 
 private:

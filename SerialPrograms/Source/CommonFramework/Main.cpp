@@ -220,9 +220,12 @@ int run_program(int argc, char *argv[]){
     GlobalThreadPools::qt_event_threadpool();
 
     bool augment_test_color_distortions = false;
+    std::string test_substring;
+    bool test_substring_missing_value = false;
     for (size_t i = 0; i < argc; i++){
         constexpr const char* force_run_tests = "--command-line-test-mode";
         constexpr const char* distort_test_images = "--augment-color-distortions";
+        constexpr const char* filter_tests_substring = "--test-substring";
 
         if (strcmp(argv[i], force_run_tests) == 0){
             GlobalSettings::instance().COMMAND_LINE_TEST_MODE = true;
@@ -230,10 +233,21 @@ int run_program(int argc, char *argv[]){
         if (strcmp(argv[i], distort_test_images) == 0){
             augment_test_color_distortions = true;
         }
+        if (strcmp(argv[i], filter_tests_substring) == 0){
+            if (i + 1 < argc){
+                test_substring = argv[++i];
+            }else{
+                test_substring_missing_value = true;
+            }
+        }
+    }
+    if (test_substring_missing_value){
+        global_logger_command_line().log("--test-substring requires a value", COLOR_RED);
+        return 1;
     }
 
     if (GlobalSettings::instance().COMMAND_LINE_TEST_MODE){
-        return run_command_line_tests(augment_test_color_distortions);
+        return run_command_line_tests(augment_test_color_distortions, test_substring);
     }
 
     //  Check whether the hardware is powerful enough to run this program.
