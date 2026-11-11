@@ -29,11 +29,10 @@
 #include "NintendoSwitch/Inference/NintendoSwitch_FailedToConnectDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "NintendoSwitch/Programs/Typewriter/NintendoSwitch_Typewriter_Tests.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_GyroTests.h"
 #include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_Connection.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_GyroTests.h"
-#include "UnitTestRunner.h"
 
 #include "VideoGames/PokemonHome/PokemonHome_Tests.h"
 #include "VideoGames/PokemonSwSh/PokemonSwSh_Tests.h"

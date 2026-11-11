@@ -164,6 +164,7 @@ JoyconGyroTester_Descriptor::JoyconGyroTester_Descriptor()
         "Nintendo Switch", "Joycon Gyro Tester",
         "",
         "Build a motion trajectory using acceleration in g and angular velocity in degrees per second.",
+        PanelQualityStanding::DEVELOPER,
         ProgramControllerClass::SpecializedController,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
@@ -196,6 +197,7 @@ JoyconGyroTester::~JoyconGyroTester() = default;
 
 void JoyconGyroTester::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     JoyconController& controller = env.console.controller<JoyconController>();
+    controller.check_gyro_motion_supported();
     const std::string error = PHASES.check_validity();
     if (!error.empty()){
         throw UserSetupError(env.logger(), error);

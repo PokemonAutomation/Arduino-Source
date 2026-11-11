@@ -177,7 +177,7 @@ struct OemController_Status{
     uint8_t player_lights;
 
     uint8_t paired_mac_address[6];
-    
+
     // 0 = Standard
     // 1 = Quaternion
     //uint8_t gyro_protocol = 1;

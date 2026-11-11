@@ -97,9 +97,12 @@ public:
         const JoystickPosition& position
     ) = 0;
 
+    // Throws if the connected controller cannot execute physical gyro motion.
+    virtual void check_gyro_motion_supported() const = 0;
+
     // Issue a complete physical gyro trajectory. The callback is evaluated
     // synchronously while this command is constructed and is never retained.
-    // A non-positive duration is a no-op. 
+    // A non-positive duration is a no-op.
     virtual void issue_gyro_motion(
         Cancellable* cancellable,
         Milliseconds duration,

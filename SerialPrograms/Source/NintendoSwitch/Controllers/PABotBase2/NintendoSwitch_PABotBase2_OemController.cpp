@@ -5,6 +5,8 @@
  */
 
 #include <algorithm>
+#include "Common/Cpp/ColoredText.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/PABotBase2/Controllers/PABotBase2_Controller_NS1_OemController.h"
 #include "Controllers/SerialPort/SerialPABotBase.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -22,7 +24,8 @@ using namespace std::chrono_literals;
 
 namespace {
 
-constexpr uint32_t PHYSICAL_MOTION_PROTOCOL_VERSION = 2026061805;
+// Protocol 2026061806 from main does not support the physical motion opcode.
+constexpr uint32_t PHYSICAL_MOTION_PROTOCOL_VERSION = 2026061807;
 
 }
 
@@ -443,6 +446,15 @@ Button PABotBase2_OemController::populate_report_buttons(
     return all_buttons;
 }
 
+void PABotBase2_OemController::require_gyro_motion_protocol() const{
+    if (m_connection.device().device_protocol_version() < PHYSICAL_MOTION_PROTOCOL_VERSION){
+        throw UserSetupError(
+            m_logger, "Gyro motion requires firmware protocol " +
+                std::to_string(PHYSICAL_MOTION_PROTOCOL_VERSION) + " or newer."
+        );
+    }
+}
+
 void PABotBase2_OemController::issue_motion_report(
     Cancellable* cancellable,
     WallDuration duration,
@@ -455,9 +467,7 @@ void PABotBase2_OemController::issue_motion_report(
         return;
     }
 
-    if (m_connection.device().device_protocol_version() < PHYSICAL_MOTION_PROTOCOL_VERSION){
-        throw std::runtime_error("Gyro motion requires firmware protocol 2026061805 or newer.");
-    }
+    require_gyro_motion_protocol();
 
     const GyroState& state = controller_state.gyro;
     PABotBase2::Message_Command_NS1_OemController_Motion request{};

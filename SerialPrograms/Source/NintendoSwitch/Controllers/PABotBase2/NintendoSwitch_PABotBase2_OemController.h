@@ -54,6 +54,7 @@ protected:
         OemController_State0x30_Buttons& buttons,
         const SwitchControllerState& controller_state
     );
+    void require_gyro_motion_protocol() const;
     void issue_motion_report(
         Cancellable* cancellable,
         WallDuration duration,

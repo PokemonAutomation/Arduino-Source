@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_NintendoSwitch_PABotBase2_Joycon_H
 #define PokemonAutomation_NintendoSwitch_PABotBase2_Joycon_H
 
-#include <stdexcept>
 #include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.h"
 #include "NintendoSwitch_PABotBase2_OemController.h"
 
@@ -125,14 +124,16 @@ public:
         }
     }
 
+    virtual void check_gyro_motion_supported() const override{
+        require_gyro_motion_protocol();
+    }
     virtual void issue_gyro_motion(
         Cancellable* cancellable,
         Milliseconds duration,
         const GyroFunction& function
     ) override{
-        if (duration > Milliseconds::zero()
-            && m_connection.device().device_protocol_version() < 2026061805){
-            throw std::runtime_error("Gyro motion requires firmware protocol 2026061805 or newer.");
+        if (duration > Milliseconds::zero()){
+            check_gyro_motion_supported();
         }
         ControllerWithScheduler::issue_gyro_motion(
             cancellable, this->controller_class(), duration, function
@@ -142,9 +143,8 @@ public:
         Cancellable* cancellable,
         const GyroMotion& motion
     ) override{
-        if (!motion.empty()
-            && m_connection.device().device_protocol_version() < 2026061805){
-            throw std::runtime_error("Gyro motion requires firmware protocol 2026061805 or newer.");
+        if (!motion.empty()){
+            check_gyro_motion_supported();
         }
         ControllerWithScheduler::issue_gyro_motion(cancellable, this->controller_class(), motion);
     }
