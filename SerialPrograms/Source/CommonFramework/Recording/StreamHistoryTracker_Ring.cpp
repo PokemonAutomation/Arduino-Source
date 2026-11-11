@@ -929,7 +929,7 @@ struct StreamHistoryTracker_Ring::Data{
             m_sws_out_format = m_video_context->pix_fmt;
         }
 
-        AVFrame* frame = av_frame_alloc();
+        AVFrame* frame = av_frame_alloc(); // An AVFrame filled with default values
         if (frame == nullptr){
             unmap_if_needed();
             log_frame_skip("Failed to allocate a video frame");
