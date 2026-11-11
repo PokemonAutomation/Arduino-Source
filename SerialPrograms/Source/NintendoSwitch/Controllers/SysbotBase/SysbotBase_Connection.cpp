@@ -11,10 +11,17 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "SysbotBase_Connection.h"
 
+#include <atomic>
 #include <charconv>
+#include <chrono>
 #include <cstdint>
+#include <cstring>
+#include <memory>
+#include <random>
+#include <thread>
 #include <vector>
 
+#include "Common/Cpp/Sockets/ServerSocket_Qt.h"
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 
@@ -98,7 +105,12 @@ TcpSysbotBase_Connection::TcpSysbotBase_Connection(
 
 TcpSysbotBase_Connection::~TcpSysbotBase_Connection(){
     try{
-        write_data("detachController\r\n");
+        //  Bounded: the peer may have stopped reading with the send
+        //  buffer full, in which case an unlimited send would stall
+        //  the application's shutdown for the whole TCP retransmission
+        //  timeout. The detach is best-effort; the socket close below
+        //  is what matters.
+        write_data("detachController\r\n", 1s);
     }catch (...){}
     m_socket.remove_listener(*this);
     m_socket.close();
@@ -110,10 +122,10 @@ TcpSysbotBase_Connection::~TcpSysbotBase_Connection(){
 }
 
 
-void TcpSysbotBase_Connection::write_data(const std::string& data){
+void TcpSysbotBase_Connection::write_data(const std::string& data, std::chrono::milliseconds timeout){
     WriteSpinLock lg(m_send_lock, "TcpSysbotBase_Connection::write_data()");
 //    cout << "Sending: " << data << endl;
-    m_socket.send(data.data(), data.size());
+    m_socket.send(data.data(), data.size(), timeout);
 }
 
 
@@ -151,10 +163,13 @@ void TcpSysbotBase_Connection::thread_loop(){
             }
 
             m_active_pings[m_ping_seqnum] = m_last_ping_send;
-            write_data("ping " + std::to_string(m_ping_seqnum) + "\r\n");
+            //  Bounded: this holds m_send_lock while the destructor's
+            //  detachController send waits for it, so a ping stalled on
+            //  a non-reading peer must not hold the shutdown path.
+            write_data("ping " + std::to_string(m_ping_seqnum) + "\r\n", 1s);
             m_ping_seqnum++;
         }else{
-            write_data("getVersion\r\n");
+            write_data("getVersion\r\n", 1s);
         }
         m_cv.wait_for(lg, std::chrono::seconds(1));
     }
@@ -511,6 +526,207 @@ void add_tests_SysbotBaseReceiveLine(UnitTestDatabase& database){
     database.add<ReceiveLineBoundTest>("ReceiveLine(max+1 no newline)", std::string(17, 'A'), 16, std::vector<std::string>{}, true, "");
     database.add<ReceiveLineBoundTest>("ReceiveLine(CR ignored)", "a\rb\n", 16, std::vector<std::string>{"ab"}, false, "");
     database.add<ReceiveLineBoundTest>("ReceiveLine(overflow before newline)", std::string(100, 'A') + "\n", 16, std::vector<std::string>{}, true, "");
+}
+
+
+namespace{
+//  Starvation probe (the same one the socket tests use): if the
+//  machine is this starved, the timing assertions of the test that
+//  called this cannot be trusted - that test should skip instead of
+//  fail.
+bool timing_unreliable(){
+    const size_t SIZE = 32u << 20;
+    std::vector<uint8_t> src(SIZE, 0x5A), dst(SIZE);
+    const auto t0 = std::chrono::steady_clock::now();
+    std::memcpy(dst.data(), src.data(), SIZE);
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    return std::chrono::steady_clock::now() - t0 > std::chrono::seconds(2);
+}
+
+
+//  Accepts the connection, then blocks the server's event thread on
+//  the first received byte (until "stop" is set or the stall elapses).
+//  A peer that stops reading stalls the client's send path the same
+//  way.
+struct StallingServerListener : AbstractServerSocket::Listener{
+    std::atomic<bool> listen_ok{false};
+    std::atomic<bool> connected{false};
+    std::atomic<bool> stalled{false};
+    std::atomic<bool> stop{false};
+
+    virtual void on_listen_finished(const std::string& error_message) override{
+        listen_ok.store(error_message.empty(), std::memory_order_release);
+    }
+
+    virtual void on_connect() override{
+        connected.store(true, std::memory_order_release);
+    }
+
+    virtual void on_receive_data(const void*, size_t) override{
+        if (!stalled.exchange(true, std::memory_order_acq_rel)){
+            const auto end = std::chrono::steady_clock::now() + std::chrono::seconds(30);
+            while (std::chrono::steady_clock::now() < end
+                && !stop.load(std::memory_order_acquire)){
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
+        }
+    }
+};
+
+
+//  Verifies that the shutdown path's sends are bounded when the peer
+//  stops reading (audit: "non-reading server stalls shutdown"):
+//  - a write_data() with a 1-second deadline returns within a bounded
+//    time, and
+//  - the destructor, which sends detachController with the same
+//    deadline, completes within a bounded time even while the peer is
+//    still stalling.
+//  Before the fix both used unlimited sends and could hang shutdown
+//  for the whole TCP retransmission timeout (or forever, if the peer
+//  never errors the connection).
+class SysbotBaseShutdownBoundTest : public UnitTest{
+public:
+    SysbotBaseShutdownBoundTest(const std::string& name)
+        : UnitTest("NintendoSwitch::SysbotBase - " + name)
+    {
+        //  The 16 MiB payload below (large enough to exceed the kernel
+        //  send buffer so the stalled peer genuinely blocks the send
+        //  path), plus a transient 16 MiB copy in the Qt backend's
+        //  in-flight send data (overreported on the other backends).
+        this->m_memory = 2ull * (16ull << 20);
+    }
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        if (timing_unreliable()){
+            return UnitTestResult(
+                UnitTestResult::SKIPPED,
+                "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
+            );
+        }
+
+        //  Shared budget for the waits below: the sends under test are
+        //  bounded at 1 s, so this only has to prove boundedness; 60 s
+        //  tolerates extremely loaded CI runners (the pre-fix behavior
+        //  is an unbounded hang).
+        const int64_t BUDGET_MS = 60 * 1000;
+
+        StallingServerListener server_listener;
+        ServerSocket_Qt server(GlobalThreadPools::unlimited_normal());
+        server.add_listener(server_listener);
+
+        uint16_t port = 0;
+        {
+            std::mt19937 rng{std::random_device{}()};
+            for (int attempt = 0; attempt < 8; attempt++){
+                uint16_t candidate = (uint16_t)(40000 + rng() % 20000);
+                server.start("127.0.0.1", candidate);
+                const auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(BUDGET_MS);
+                while (std::chrono::steady_clock::now() < end
+                    && !server_listener.listen_ok.load(std::memory_order_acquire)){
+                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                }
+                if (server_listener.listen_ok.load(std::memory_order_acquire)){
+                    port = candidate;
+                    break;
+                }
+            }
+        }
+        if (port == 0){
+            if (timing_unreliable()){
+                return UnitTestResult(
+                    UnitTestResult::SKIPPED,
+                    "The server did not start listening on a starved machine."
+                );
+            }
+            return "Failed to start the server";
+        }
+
+        std::string error;
+        {
+            try{
+                //  Held through a unique_ptr so the destructor under
+                //  test can be run (and timed) at an explicit point;
+                //  the guard still deletes it on every exception path.
+                TcpSysbotBase_Connection* conn_ptr =
+                    new TcpSysbotBase_Connection(logger, "127.0.0.1:" + std::to_string(port));
+                std::unique_ptr<TcpSysbotBase_Connection> conn(conn_ptr);
+
+                const auto end = std::chrono::steady_clock::now() + std::chrono::milliseconds(BUDGET_MS);
+                while (std::chrono::steady_clock::now() < end
+                    && !server_listener.connected.load(std::memory_order_acquire)){
+                    std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                }
+                if (!server_listener.connected.load(std::memory_order_acquire)){
+                    if (timing_unreliable()){
+                        return UnitTestResult(
+                            UnitTestResult::SKIPPED,
+                            "The connection did not reach the server on a starved machine."
+                        );
+                    }
+                    error = "The connection did not reach the server";
+                }else{
+                    //  Phase 1: the send path is now stalled (the server
+                    //  blocks on the first byte the connection sent
+                    //  after connecting). A write with a 1-second
+                    //  deadline must return within the budget.
+                    std::string payload(16ull << 20, '\xAB');
+                    const auto s0 = std::chrono::steady_clock::now();
+                    conn->write_data(payload, 1s);
+                    const auto send_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        std::chrono::steady_clock::now() - s0
+                    ).count();
+                    if (send_ms > BUDGET_MS){
+                        if (timing_unreliable()){
+                            return UnitTestResult(
+                                UnitTestResult::SKIPPED,
+                                "write_data() took " + std::to_string(send_ms) + " ms on a starved machine."
+                            );
+                        }
+                        error = "write_data() with a 1 s deadline took " + std::to_string(send_ms) + " ms";
+                    }
+
+                    //  Phase 2: the destructor's detachController send
+                    //  (the same 1-second deadline) must also be
+                    //  bounded, even though the peer is still stalling.
+                    if (error.empty()){
+                        const auto d0 = std::chrono::steady_clock::now();
+                        conn.reset();  // The destructor runs here.
+                        const auto dtor_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::steady_clock::now() - d0
+                        ).count();
+                        if (dtor_ms > BUDGET_MS){
+                            if (timing_unreliable()){
+                                return UnitTestResult(
+                                    UnitTestResult::SKIPPED,
+                                    "The destructor took " + std::to_string(dtor_ms) + " ms on a starved machine."
+                                );
+                            }
+                            error = "The destructor took " + std::to_string(dtor_ms) + " ms (the shutdown send should be bounded)";
+                        }
+                    }
+                }
+            }catch (const std::exception& e){
+                error = std::string("The connection threw: ") + e.what();
+            }catch (...){
+                error = "The connection threw";
+            }
+        }
+
+        //  Release the stalled reader so the server's teardown does
+        //  not wait out the stall.
+        server_listener.stop.store(true, std::memory_order_release);
+
+        if (!error.empty()){
+            return error;
+        }
+        return true;
+    }
+};
+}
+
+
+void add_tests_SysbotBaseShutdown(UnitTestDatabase& database){
+    database.add<SysbotBaseShutdownBoundTest>("shutdown send is bounded against a stalled peer");
 }
 
 
