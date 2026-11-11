@@ -299,6 +299,38 @@ void abandon_video_encoder(Logger& logger, const char* name, AVCodecContext*& ct
 }
 
 
+//  Maps a QVideoFrame read-only for the lifetime of this object; unmap()
+//  releases the mapping early. QVideoFrame is explicitly shared and its maps
+//  are reference-counted, so a missed unmap() would keep the frame mapped for
+//  every holder, and a second unmap() would release another holder's map.
+class ReadOnlyFrameMap{
+public:
+    explicit ReadOnlyFrameMap(QVideoFrame& frame)
+        : m_frame(frame)
+        , m_mapped(frame.map(QVideoFrame::ReadOnly))
+    {}
+    ~ReadOnlyFrameMap(){
+        unmap();
+    }
+    ReadOnlyFrameMap(const ReadOnlyFrameMap&) = delete;
+    void operator=(const ReadOnlyFrameMap&) = delete;
+
+    bool is_mapped() const{
+        return m_mapped;
+    }
+    void unmap(){
+        if (m_mapped){
+            m_frame.unmap();
+            m_mapped = false;
+        }
+    }
+
+private:
+    QVideoFrame& m_frame;
+    bool m_mapped;
+};
+
+
 }  // namespace
 
 
@@ -861,17 +893,13 @@ struct StreamHistoryTracker_Ring::Data{
         }
 
         QVideoFrame qframe = vf->frame;    //  Local copy (implicit sharing).
-        if (!qframe.map(QVideoFrame::ReadOnly)){
+        //  Unmapped early once the source pixels are no longer needed (after
+        //  the RGB conversion or the scale), and on every other return.
+        ReadOnlyFrameMap mapping(qframe);
+        if (!mapping.is_mapped()){
             log_frame_skip("Could not map a video frame");
             return;
         }
-        bool still_mapped = true;
-        auto unmap_if_needed = [&qframe, &still_mapped]{
-            if (still_mapped){
-                qframe.unmap();
-                still_mapped = false;
-            }
-        };
 
         //  NV12 (the common capture card format) goes straight to the scaler;
         //  everything else is converted to RGB888 through Qt, like the
@@ -892,7 +920,7 @@ struct StreamHistoryTracker_Ring::Data{
             src_strides[1] = qframe.bytesPerLine(1);
         }else{
             rgb_image = qframe.toImage().convertToFormat(QImage::Format_RGB888);
-            unmap_if_needed();
+            mapping.unmap();
             if (rgb_image.isNull()){
                 log_frame_skip("Could not convert a video frame to RGB");
                 return;
@@ -907,7 +935,6 @@ struct StreamHistoryTracker_Ring::Data{
         if (m_video_context == nullptr){
             init_video_encoder(qframe.width(), qframe.height());
             if (!m_video_enabled){
-                unmap_if_needed();
                 return;
             }
         }
@@ -934,7 +961,6 @@ struct StreamHistoryTracker_Ring::Data{
                     WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
                     m_video_enabled = false;
                 }
-                unmap_if_needed();
                 return;
             }
             m_sws_in_format = src_format;
@@ -945,7 +971,6 @@ struct StreamHistoryTracker_Ring::Data{
 
         FramePtr frame(av_frame_alloc()); // An AVFrame filled with default values
         if (frame == nullptr){
-            unmap_if_needed();
             log_frame_skip("Failed to allocate a video frame");
             return;
         }
@@ -953,7 +978,6 @@ struct StreamHistoryTracker_Ring::Data{
         frame->width = m_video_width;
         frame->height = m_video_height;
         if (av_frame_get_buffer(frame.get(), 0) < 0){
-            unmap_if_needed();
             log_frame_skip("Failed to allocate a video frame buffer");
             return;
         }
@@ -964,7 +988,7 @@ struct StreamHistoryTracker_Ring::Data{
             0, src_height,
             frame->data, frame->linesize
         );
-        unmap_if_needed();
+        mapping.unmap();
         if (scaled != m_video_height){
             log_frame_skip("Failed to scale a video frame");
             return;
