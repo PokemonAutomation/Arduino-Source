@@ -125,14 +125,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#if _WIN32
 #pragma pack(push, 1)
-#define PABB_PACK
-#elif __GNUC__
-#define PABB_PACK   __attribute__((packed))
-#else
-#define PABB_PACK
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -170,42 +163,42 @@ typedef uint32_t seqnum_t;
 #define PABB_MSG_ERROR_INVALID_MESSAGE          0x01
 typedef struct{
     uint8_t message_length;
-} PABB_PACK pabb_MsgInfoInvalidMessage;
+} pabb_MsgInfoInvalidMessage;
 
 #define PABB_MSG_ERROR_CHECKSUM_MISMATCH        0x02
 typedef struct{
     uint8_t message_length;
-} PABB_PACK pabb_MsgInfoChecksumMismatch;
+} pabb_MsgInfoChecksumMismatch;
 
 #define PABB_MSG_ERROR_INVALID_TYPE             0x03
 typedef struct{
     uint8_t type;
-} PABB_PACK pabb_MsgInfoInvalidType;
+} pabb_MsgInfoInvalidType;
 
 #define PABB_MSG_ERROR_INVALID_REQUEST          0x04
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_MsgInfoInvalidRequest;
+} pabb_MsgInfoInvalidRequest;
 
 #define PABB_MSG_ERROR_MISSED_REQUEST           0x05
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_MsgInfoMissedRequest;
+} pabb_MsgInfoMissedRequest;
 
 #define PABB_MSG_ERROR_COMMAND_DROPPED          0x06
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_MsgInfoCommandDropped;
+} pabb_MsgInfoCommandDropped;
 
 #define PABB_MSG_ERROR_WARNING                  0x07
 typedef struct{
     uint16_t error_code;
-} PABB_PACK pabb_MsgInfoWARNING;
+} pabb_MsgInfoWARNING;
 
 #define PABB_MSG_ERROR_DISCONNECTED             0x08
 typedef struct{
     uint16_t error_code;
-} PABB_PACK pabb_MsgInfoDisconnected;
+} pabb_MsgInfoDisconnected;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Ack
@@ -213,35 +206,35 @@ typedef struct{
 #define PABB_MSG_ACK_COMMAND                    0x10
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_MsgAckCommand;
+} pabb_MsgAckCommand;
 
 #define PABB_MSG_ACK_REQUEST                    0x11
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_MsgAckRequest;
+} pabb_MsgAckRequest;
 
 #define PABB_MSG_ACK_REQUEST_I8                 0x12
 typedef struct{
     seqnum_t seqnum;
     uint8_t data;
-} PABB_PACK pabb_MsgAckRequestI8;
+} pabb_MsgAckRequestI8;
 
 #define PABB_MSG_ACK_REQUEST_I16                0x13
 typedef struct{
     seqnum_t seqnum;
     uint16_t data;
-} PABB_PACK pabb_MsgAckRequestI16;
+} pabb_MsgAckRequestI16;
 
 #define PABB_MSG_ACK_REQUEST_I32                0x14
 typedef struct{
     seqnum_t seqnum;
     uint32_t data;
-} PABB_PACK pabb_MsgAckRequestI32;
+} pabb_MsgAckRequestI32;
 
 #define PABB_MSG_ACK_REQUEST_DATA               0x1f
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_MsgAckRequestData;
+} pabb_MsgAckRequestData;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Custom Info
@@ -250,12 +243,12 @@ typedef struct{
 typedef struct{
     uint8_t tag;
     uint32_t data;
-} PABB_PACK pabb_MsgInfoI32;
+} pabb_MsgInfoI32;
 
 #define PABB_MSG_INFO_DATA                      0x21
 typedef struct{
     uint32_t tag;
-} PABB_PACK pabb_MsgInfoData;
+} pabb_MsgInfoData;
 
 #define PABB_MSG_INFO_STRING                    0x23
 
@@ -263,7 +256,7 @@ typedef struct{
 #define PABB_MSG_INFO_H32_LABEL                 0x25
 typedef struct{
     uint32_t value;
-} PABB_PACK pabb_MsgInfoI32Label;
+} pabb_MsgInfoI32Label;
 
 typedef uint8_t pabb_DeviceResetReason;
 #define PABB_DeviceResetReason_UNKNOWN          0x00
@@ -277,7 +270,7 @@ typedef uint8_t pabb_DeviceResetReason;
 typedef struct{
     pabb_DeviceResetReason reason;
     uint32_t native_code;
-} PABB_PACK pabb_MsgDeviceReset;
+} pabb_MsgDeviceReset;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Static Requests
@@ -286,37 +279,37 @@ typedef struct{
 //  After you send this message, the next seqnum you should use is (seqnum + 1).
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_MsgInfoSeqnumReset;
+} pabb_MsgInfoSeqnumReset;
 
 #define PABB_MSG_REQUEST_PROTOCOL_VERSION       0x41
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_MsgRequestProtocolVersion;
+} pabb_MsgRequestProtocolVersion;
 
 #define PABB_MSG_REQUEST_PROGRAM_VERSION        0x42
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_MsgRequestProgramVersion;
+} pabb_MsgRequestProgramVersion;
 
 #define PABB_MSG_REQUEST_PROGRAM_ID             0x43
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_MsgRequestProgramID;
+} pabb_MsgRequestProgramID;
 
 #define PABB_MSG_REQUEST_PROGRAM_NAME           0x44
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_MsgRequestProgramName;
+} pabb_MsgRequestProgramName;
 
 #define PABB_MSG_REQUEST_CONTROLLER_LIST        0x45
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_MsgRequestControllerList;
+} pabb_MsgRequestControllerList;
 
 #define PABB_MSG_REQUEST_QUEUE_SIZE             0x46
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_MsgRequestQueueSize;
+} pabb_MsgRequestQueueSize;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Mode Requests
@@ -324,14 +317,14 @@ typedef struct{
 #define PABB_MSG_REQUEST_READ_CONTROLLER_MODE   0x47
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_MsgRequestReadControllerMode;
+} pabb_MsgRequestReadControllerMode;
 
 #define PABB_MSG_REQUEST_CHANGE_CONTROLLER_MODE 0x48    //  Change controller and keep settings.
 #define PABB_MSG_REQUEST_RESET_TO_CONTROLLER    0x49    //  Change controller and wipe settings. (unpair from host)
 typedef struct{
     seqnum_t seqnum;
     uint32_t controller_id;
-} PABB_PACK pabb_MsgRequestChangeControllerMode;
+} pabb_MsgRequestChangeControllerMode;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Command Queue Requests
@@ -342,17 +335,17 @@ typedef struct{
     seqnum_t seqnum;
     seqnum_t seq_of_original_command;
     uint32_t finish_time;
-} PABB_PACK pabb_MsgRequestCommandFinished;
+} pabb_MsgRequestCommandFinished;
 
 #define PABB_MSG_REQUEST_STOP                   0x4b
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_MsgRequestStop;
+} pabb_MsgRequestStop;
 
 #define PABB_MSG_REQUEST_NEXT_CMD_INTERRUPT     0x4c
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_MsgRequestNextCmdInterrupt;
+} pabb_MsgRequestNextCmdInterrupt;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Other Requests
@@ -360,24 +353,24 @@ typedef struct{
 #define PABB_MSG_REQUEST_CLOCK                  0x4f    //  Deprecated
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_system_clock;
+} pabb_system_clock;
 
 #define PABB_MSG_REQUEST_STATUS                 0x50
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_Message_RequestStatus;
+} pabb_Message_RequestStatus;
 
 #define PABB_MSG_REQUEST_READ_MAC_ADDRESS       0x51
 typedef struct{
     seqnum_t seqnum;
     uint32_t mode;
-} PABB_PACK pabb_MsgRequestReadMacAddress;
+} pabb_MsgRequestReadMacAddress;
 
 #define PABB_MSG_REQUEST_PAIRED_MAC_ADDRESS     0x52
 typedef struct{
     seqnum_t seqnum;
     uint32_t mode;
-} PABB_PACK pabb_MsgRequestPairedMacAddress;
+} pabb_MsgRequestPairedMacAddress;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Commands
@@ -389,7 +382,7 @@ typedef struct{
 typedef struct{
     seqnum_t seqnum;
     bool on;
-} PABB_PACK pabb_MsgCommandSetLeds;
+} pabb_MsgCommandSetLeds;
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -399,8 +392,6 @@ typedef struct{
 }
 #endif
 
-#if _WIN32
 #pragma pack(pop)
-#endif
 
 #endif
