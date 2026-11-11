@@ -874,7 +874,14 @@ struct StreamHistoryTracker_Ring::Data{
                 SWS_BILINEAR, nullptr, nullptr, nullptr
             );
             if (m_sws == nullptr){
-                m_logger.log("Stream history: Failed to create video scaler.", COLOR_RED);
+                //  sws_getContext() is deterministic for a given input/output
+                //  shape, so retrying on the next frame would fail the same
+                //  way (and log at the frame rate).
+                m_logger.log("Stream history: Failed to create video scaler. Disabling video.", COLOR_RED);
+                {
+                    WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
+                    m_video_enabled = false;
+                }
                 unmap_if_needed();
                 return;
             }
