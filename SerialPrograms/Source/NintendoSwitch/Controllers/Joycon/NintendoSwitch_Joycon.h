@@ -106,6 +106,13 @@ public:
         const GyroFunction& function
     ) = 0;
 
+    // Issue prepared canonical samples without resampling. The selected
+    // controller's frame and transport range are checked before queueing.
+    virtual void issue_gyro_motion(
+        Cancellable* cancellable,
+        const GyroMotion& motion
+    ) = 0;
+
     //
     //  Press all the following buttons/joysticks simultaneously for the
     //  specified duration. No wait is added at the end. Thus you can issue

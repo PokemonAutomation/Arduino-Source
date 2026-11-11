@@ -159,8 +159,21 @@ void ControllerWithScheduler::issue_gyro_motion(
     Milliseconds duration,
     const GyroFunction& function
 ){
-    const std::vector<Internal::GyroMotionSample> samples = Internal::sample_gyro_motion(
-        cancellable, controller_class, duration, function
+    if (duration <= Milliseconds::zero()){
+        return;
+    }
+    // Reject an unsupported controller before invoking the program's callback.
+    transform_gyro_state(controller_class, {});
+    issue_gyro_motion(cancellable, controller_class, prepare_gyro_motion(cancellable, duration, function));
+}
+
+void ControllerWithScheduler::issue_gyro_motion(
+    Cancellable* cancellable,
+    ControllerClass controller_class,
+    const GyroMotion& motion
+){
+    const std::vector<GyroMotionSample> samples = Internal::transform_gyro_motion(
+        cancellable, controller_class, motion
     );
     if (samples.empty()){
         return;
@@ -173,7 +186,7 @@ void ControllerWithScheduler::issue_gyro_motion(
         if (cancellable){
             cancellable->throw_if_cancelled();
         }
-        for (const Internal::GyroMotionSample& sample : samples){
+        for (const GyroMotionSample& sample : samples){
             m_scheduler.issue_to_resource(
                 schedule,
                 std::make_unique<SwitchCommand_GyroState>(sample.state),
@@ -184,7 +197,7 @@ void ControllerWithScheduler::issue_gyro_motion(
     execute_schedule(cancellable, schedule);
     if (m_logging_throttler){
         m_logger.log(
-            "issue_gyro_motion(): duration = " + std::to_string(duration.count()) +
+            "issue_gyro_motion(): duration = " + std::to_string(motion.duration().count()) +
                 "ms, samples = " + std::to_string(samples.size()),
             COLOR_DARKGREEN
         );

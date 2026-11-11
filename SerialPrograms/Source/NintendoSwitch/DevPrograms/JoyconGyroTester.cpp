@@ -20,20 +20,7 @@ namespace{
 constexpr double MAX_ACCEL = std::numeric_limits<int32_t>::max() / Internal::GYRO_ACCEL_TRANSPORT_SCALE;
 constexpr double MAX_GYRO = std::numeric_limits<int32_t>::max() / Internal::GYRO_ANGULAR_VELOCITY_TRANSPORT_SCALE;
 
-GyroState inverse_rotation(const GyroState& state){
-    return {{}, {
-        -state.angular_velocity_dps.x,
-        -state.angular_velocity_dps.y,
-        -state.angular_velocity_dps.z,
-    }};
-}
-
-}
-
-std::vector<JoyconGyroMotion> make_joycon_gyro_motion(
-    const std::vector<JoyconGyroPhase>& phases,
-    bool return_to_start
-){
+Milliseconds validate_phases(const std::vector<JoyconGyroPhase>& phases){
     if (phases.empty()){
         throw std::invalid_argument("Add at least one motion phase.");
     }
@@ -47,7 +34,17 @@ std::vector<JoyconGyroMotion> make_joycon_gyro_motion(
         }
         total += phase.duration;
     }
+    return total;
+}
 
+}
+
+GyroMotion make_joycon_gyro_motion(
+    const std::vector<JoyconGyroPhase>& phases,
+    bool return_to_start,
+    Cancellable* cancellable
+){
+    const Milliseconds total = validate_phases(phases);
     const GyroFunction forward = [phases](Milliseconds elapsed){
         GyroState previous{};
         for (const JoyconGyroPhase& phase : phases){
@@ -60,25 +57,9 @@ std::vector<JoyconGyroMotion> make_joycon_gyro_motion(
         return previous;
     };
 
-    std::vector<JoyconGyroMotion> motion{{total, forward}};
-    if (!return_to_start){
-        return motion;
-    }
-
-    // Sampling uses 15ms intervals with a potentially shorter final interval.
-    // Reverse that short interval first, then the full intervals. Combining
-    // them into one callback would shift the sample boundaries and would no
-    // longer undo exactly the rotations that were sent in the forward pass.
-    const Milliseconds tail{total.count() % GYRO_REPORT_INTERVAL.count()};
-    if (tail > 0ms){
-        const GyroState inverse = inverse_rotation(forward(total));
-        motion.push_back({tail, [inverse](Milliseconds){ return inverse; }});
-    }
-    const Milliseconds full_intervals = total - tail;
-    if (full_intervals > 0ms){
-        motion.push_back({full_intervals, [forward, full_intervals](Milliseconds elapsed){
-            return inverse_rotation(forward(full_intervals - elapsed + GYRO_REPORT_INTERVAL));
-        }});
+    GyroMotion motion = prepare_gyro_motion(cancellable, total, forward);
+    if (return_to_start){
+        motion.append_inverse_rotation(cancellable);
     }
     return motion;
 }
@@ -126,7 +107,7 @@ JoyconGyroPhaseTable::JoyconGyroPhaseTable()
         "<b>Motion phases:</b><br>"
         "Start at zero acceleration and angular velocity. Each row linearly ramps from the previous row's "
         "target to this row's target over its duration. Repeat a target in the next row to hold it. "
-        "The API samples every 15ms, including the final endpoint; shorter phases may fall between samples.<br>"
+        "The host samples the trajectory every 15ms, including the final endpoint; shorter phases may fall between samples.<br>"
         "<b>Canonical axes:</b> +X toward the triggers, +Y toward the controller's left when looking at its controls, "
         "+Z out through the controls. Positive rotation follows the right-hand rule. "
         "Acceleration is in g; angular velocity is in degrees per second, not an angle. "
@@ -150,7 +131,7 @@ std::string JoyconGyroPhaseTable::check_validity() const{
         return error;
     }
     try{
-        make_joycon_gyro_motion(snapshot<JoyconGyroPhase>(), false);
+        validate_phases(snapshot<JoyconGyroPhase>());
     }catch (const std::invalid_argument& e){
         return e.what();
     }
@@ -219,7 +200,7 @@ void JoyconGyroTester::program(SingleSwitchProgramEnvironment& env, CancellableS
     if (!error.empty()){
         throw UserSetupError(env.logger(), error);
     }
-    const auto motion = make_joycon_gyro_motion(PHASES.snapshot<JoyconGyroPhase>(), RETURN_TO_START);
+    const GyroMotion motion = make_joycon_gyro_motion(PHASES.snapshot<JoyconGyroPhase>(), RETURN_TO_START, &scope);
 
     controller.wait_for_all(&scope);
     const Milliseconds a_hold = A_HOLD;
@@ -229,11 +210,7 @@ void JoyconGyroTester::program(SingleSwitchProgramEnvironment& env, CancellableS
     }
     controller.issue_nop(&scope, START_DELAY);
 
-    // Queue all segments without waiting between them so host transmission
-    // time does not stretch the motion. The API owns the 15ms sampling.
-    for (const JoyconGyroMotion& segment : motion){
-        controller.issue_gyro_motion(&scope, segment.duration, segment.function);
-    }
+    controller.issue_gyro_motion(&scope, motion);
     controller.wait_for_all(&scope);
 }
 

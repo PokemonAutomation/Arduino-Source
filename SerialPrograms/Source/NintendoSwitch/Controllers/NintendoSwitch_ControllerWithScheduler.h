@@ -199,6 +199,11 @@ public:
         Milliseconds duration,
         const GyroFunction& function
     );
+    void issue_gyro_motion(
+        Cancellable* cancellable,
+        ControllerClass controller_class,
+        const GyroMotion& motion
+    );
 
     void issue_full_controller_state(
         Cancellable* cancellable,

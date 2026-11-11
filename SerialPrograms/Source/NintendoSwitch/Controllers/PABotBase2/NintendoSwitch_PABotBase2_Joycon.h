@@ -138,6 +138,16 @@ public:
             cancellable, this->controller_class(), duration, function
         );
     }
+    virtual void issue_gyro_motion(
+        Cancellable* cancellable,
+        const GyroMotion& motion
+    ) override{
+        if (!motion.empty()
+            && m_connection.device().device_protocol_version() < 2026061805){
+            throw std::runtime_error("Gyro motion requires firmware protocol 2026061805 or newer.");
+        }
+        ControllerWithScheduler::issue_gyro_motion(cancellable, this->controller_class(), motion);
+    }
     virtual void issue_full_controller_state(
         Cancellable* cancellable,
         bool enable_logging,

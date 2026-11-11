@@ -6,6 +6,7 @@
 #include <cmath>
 #include <limits>
 #include <stdexcept>
+#include "NintendoSwitch_ControllerWithScheduler.h"
 #include "NintendoSwitch_Gyro.h"
 #include "NintendoSwitch_GyroQuaternion.h"
 #include "NintendoSwitch_GyroTests.h"
@@ -28,30 +29,30 @@ public:
             ++calls;
             return GyroState{{(double)elapsed.count(), 0, 0}, {0, 0, 0}};
         };
-        if (!Internal::sample_gyro_motion(nullptr, ControllerClass::NintendoSwitch_LeftJoycon, 0ms, function).empty()){
+        if (!prepare_gyro_motion(nullptr, 0ms, function).empty()){
             return "0ms gyro motion generated a sample.";
         }
-        if (!Internal::sample_gyro_motion(nullptr, ControllerClass::NintendoSwitch_LeftJoycon, -1ms, function).empty()){
+        if (!prepare_gyro_motion(nullptr, -1ms, function).empty()){
             return "Negative gyro motion generated a sample.";
         }
         if (calls != 0){
             return "A non-positive gyro motion invoked its callback.";
         }
 
-        const auto one = Internal::sample_gyro_motion(nullptr, ControllerClass::NintendoSwitch_LeftJoycon, 1ms, function);
+        const auto one = prepare_gyro_motion(nullptr, 1ms, function).samples();
         if (one.size() != 1 || one[0].duration != 1ms || one[0].state.acceleration_g.x != 1){
             return "1ms gyro motion was not sampled at its right edge.";
         }
-        const auto fifteen = Internal::sample_gyro_motion(nullptr, ControllerClass::NintendoSwitch_LeftJoycon, 15ms, function);
+        const auto fifteen = prepare_gyro_motion(nullptr, 15ms, function).samples();
         if (fifteen.size() != 1 || fifteen[0].duration != 15ms || fifteen[0].state.acceleration_g.x != 15){
             return "15ms gyro motion was not sampled correctly.";
         }
-        const auto sixteen = Internal::sample_gyro_motion(nullptr, ControllerClass::NintendoSwitch_LeftJoycon, 16ms, function);
+        const auto sixteen = prepare_gyro_motion(nullptr, 16ms, function).samples();
         if (sixteen.size() != 2 || sixteen[0].duration != 15ms || sixteen[1].duration != 1ms
             || sixteen[0].state.acceleration_g.x != 15 || sixteen[1].state.acceleration_g.x != 16){
             return "16ms gyro motion does not preserve the short final interval.";
         }
-        const auto thirty_one = Internal::sample_gyro_motion(nullptr, ControllerClass::NintendoSwitch_LeftJoycon, 31ms, function);
+        const auto thirty_one = prepare_gyro_motion(nullptr, 31ms, function).samples();
         if (thirty_one.size() != 3 || thirty_one[0].duration != 15ms || thirty_one[1].duration != 15ms
             || thirty_one[2].duration != 1ms || thirty_one[2].state.acceleration_g.x != 31){
             return "31ms gyro motion does not have right-edge samples at 15, 30, and 31ms.";
@@ -59,7 +60,7 @@ public:
 
         bool threw = false;
         try{
-            Internal::sample_gyro_motion(nullptr, ControllerClass::NintendoSwitch_LeftJoycon, 31ms,
+            prepare_gyro_motion(nullptr, 31ms,
                 [](Milliseconds elapsed){
                     if (elapsed == 30ms){
                         throw std::runtime_error("expected");
@@ -82,7 +83,7 @@ public:
             for (int field = 0; field < 6; ++field){
                 bool invalid_threw = false;
                 try{
-                    Internal::sample_gyro_motion(nullptr, ControllerClass::NintendoSwitch_LeftJoycon, 1ms,
+                    prepare_gyro_motion(nullptr, 1ms,
                         [field, value](Milliseconds){
                             GyroState state{};
                             switch (field){
@@ -108,7 +109,7 @@ public:
         size_t range_calls = 0;
         bool range_threw = false;
         try{
-            Internal::sample_gyro_motion(nullptr, ControllerClass::NintendoSwitch_LeftJoycon, 16ms,
+            const GyroMotion motion = prepare_gyro_motion(nullptr, 16ms,
                 [&range_calls](Milliseconds elapsed){
                     ++range_calls;
                     GyroState state{};
@@ -120,16 +121,17 @@ public:
                     return state;
                 }
             );
+            Internal::transform_gyro_motion(nullptr, ControllerClass::NintendoSwitch_LeftJoycon, motion);
         }catch (const std::invalid_argument&){
             range_threw = true;
         }
         if (!range_threw || range_calls != 2){
-            return "A trajectory outside the firmware transport range was not rejected during sampling.";
+            return "A trajectory outside the firmware transport range was not rejected before scheduling.";
         }
 
         range_threw = false;
         try{
-            Internal::sample_gyro_motion(nullptr, ControllerClass::NintendoSwitch_LeftJoycon, 1ms,
+            const GyroMotion motion = prepare_gyro_motion(nullptr, 1ms,
                 [](Milliseconds){
                     GyroState state{};
                     state.angular_velocity_dps.x =
@@ -138,11 +140,186 @@ public:
                     return state;
                 }
             );
+            Internal::transform_gyro_motion(nullptr, ControllerClass::NintendoSwitch_LeftJoycon, motion);
         }catch (const std::invalid_argument&){
             range_threw = true;
         }
         if (!range_threw){
             return "An angular velocity outside the firmware transport range was accepted.";
+        }
+        return true;
+    }
+};
+
+class Test_GyroInverse : public UnitTest{
+public:
+    Test_GyroInverse()
+        : UnitTest("NintendoSwitch::Gyro - prepared inverse")
+    {}
+
+    virtual UnitTestResult run(Logger&, CancellableScope&) const override{
+        using namespace std::chrono_literals;
+        GyroMotion empty;
+        empty.append_inverse_rotation();
+        if (!empty.empty() || empty.duration() != 0ms){
+            return "An empty motion gained samples during inverse replay.";
+        }
+        for (Milliseconds duration : {1ms, 8ms, 15ms, 16ms, 31ms, 720ms}){
+            size_t calls = 0;
+            GyroMotion motion = prepare_gyro_motion(nullptr, duration, [&calls](Milliseconds elapsed){
+                // Deliberately stateful: reevaluating this callback cannot undo
+                // the original motion. Changing axes also exercises ordering.
+                const double n = (double)++calls;
+                return GyroState{{1, 2, 3}, {n * 10, (double)elapsed.count(), n * n}};
+            });
+            const auto forward = motion.samples();
+            motion.append_inverse_rotation();
+            if (calls != forward.size() || motion.samples().size() != 2 * calls
+                || motion.duration() != duration * 2){
+                return "Inverse replay resampled the callback or changed the total duration.";
+            }
+            for (size_t i = 0; i < forward.size(); ++i){
+                const GyroMotionSample& original = forward[i];
+                const GyroMotionSample& inverse = motion.samples()[motion.samples().size() - 1 - i];
+                if (inverse.duration != original.duration
+                    || inverse.state.acceleration_g.x != 0 || inverse.state.acceleration_g.y != 0
+                    || inverse.state.acceleration_g.z != 0
+                    || inverse.state.angular_velocity_dps.x != -original.state.angular_velocity_dps.x
+                    || inverse.state.angular_velocity_dps.y != -original.state.angular_velocity_dps.y
+                    || inverse.state.angular_velocity_dps.z != -original.state.angular_velocity_dps.z){
+                    return "Inverse replay did not preserve the original sample boundaries and opposite rotation.";
+                }
+            }
+            for (ControllerClass controller_class : {
+                ControllerClass::NintendoSwitch_LeftJoycon, ControllerClass::NintendoSwitch_RightJoycon,
+            }){
+                GyroQuaternion orientation{};
+                for (const auto& sample : Internal::transform_gyro_motion(nullptr, controller_class, motion)){
+                    orientation = integrate_angular_velocity(orientation, sample.state.angular_velocity_dps, sample.duration);
+                }
+                if (std::fabs(orientation.x) > 1e-12 || std::fabs(orientation.y) > 1e-12
+                    || std::fabs(orientation.z) > 1e-12 || std::fabs(orientation.w - 1) > 1e-12){
+                    return "Prepared multi-axis motion and its inverse did not return to the starting orientation.";
+                }
+            }
+        }
+
+        CancellableHolder<CancellableScope> cancelled;
+        cancelled.cancel(std::make_exception_ptr(std::runtime_error("expected cancellation")));
+        GyroMotion motion = prepare_gyro_motion(nullptr, 31ms, [](Milliseconds){ return GyroState{}; });
+        bool threw = false;
+        try{
+            motion.append_inverse_rotation(&cancelled);
+        }catch (const std::runtime_error&){
+            threw = true;
+        }
+        if (!threw || motion.duration() != 31ms || motion.samples().size() != 3){
+            return "Cancelled inverse preparation modified the original motion.";
+        }
+        return true;
+    }
+};
+
+class GyroRecordingController : public ControllerWithScheduler{
+public:
+    using ControllerWithScheduler::ControllerWithScheduler;
+    struct Entry{
+        WallDuration duration;
+        SwitchControllerState state;
+    };
+    std::vector<Entry> entries;
+
+private:
+    virtual void execute_state(Cancellable*, const SuperscalarScheduler::ScheduleEntry& entry) override{
+        SwitchControllerState state{};
+        bool has_gyro = false;
+        for (const auto& resource : entry.state){
+            static_cast<const SwitchCommand&>(*resource).apply(state);
+            has_gyro |= resource->id == (size_t)SwitchResource::GYRO;
+        }
+        if (has_gyro){
+            entries.push_back({entry.duration, state});
+        }
+    }
+};
+
+class Test_GyroScheduling : public UnitTest{
+public:
+    Test_GyroScheduling()
+        : UnitTest("NintendoSwitch::Gyro - prepared scheduling")
+    {}
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope&) const override{
+        using namespace std::chrono_literals;
+        RecursiveThrottler throttler;
+        ThrottleScope suppress_logging(throttler);
+        const GyroFunction function = [](Milliseconds elapsed){
+            return GyroState{{1, 2, 3}, {4, (double)elapsed.count(), 6}};
+        };
+        GyroMotion motion = prepare_gyro_motion(nullptr, 31ms, function);
+        motion.append_inverse_rotation();
+        for (ControllerClass controller_class : {
+            ControllerClass::NintendoSwitch_LeftJoycon, ControllerClass::NintendoSwitch_RightJoycon,
+        }){
+            GyroRecordingController controller(logger, throttler);
+            controller.issue_buttons(nullptr, 0ms, 62ms, 0ms, BUTTON_A);
+            controller.issue_gyro_motion(nullptr, controller_class, motion);
+            controller.issue_barrier(nullptr);
+            if (controller.entries.size() != motion.samples().size()){
+                return "Scheduling changed the prepared sample boundaries.";
+            }
+            const double sign = controller_class == ControllerClass::NintendoSwitch_RightJoycon ? -1 : 1;
+            for (size_t i = 0; i < motion.samples().size(); ++i){
+                const auto& expected = motion.samples()[i];
+                const auto& actual = controller.entries[i];
+                if (actual.duration != expected.duration || actual.state.buttons != BUTTON_A
+                    || actual.state.gyro.acceleration_g.x != expected.state.acceleration_g.x
+                    || actual.state.gyro.acceleration_g.y != sign * expected.state.acceleration_g.y
+                    || actual.state.gyro.acceleration_g.z != sign * expected.state.acceleration_g.z
+                    || actual.state.gyro.angular_velocity_dps.x != expected.state.angular_velocity_dps.x
+                    || actual.state.gyro.angular_velocity_dps.y != sign * expected.state.angular_velocity_dps.y
+                    || actual.state.gyro.angular_velocity_dps.z != sign * expected.state.angular_velocity_dps.z){
+                    return "Prepared motion lost button composition, timing, or canonical axis conversion.";
+                }
+            }
+        }
+        if (motion.samples()[0].state.acceleration_g.y != 2){
+            return "Dispatch modified the reusable canonical motion.";
+        }
+
+        GyroRecordingController legacy(logger, throttler);
+        GyroRecordingController prepared(logger, throttler);
+        legacy.issue_gyro_motion(nullptr, ControllerClass::NintendoSwitch_RightJoycon, 31ms, function);
+        prepared.issue_gyro_motion(nullptr, ControllerClass::NintendoSwitch_RightJoycon,
+            prepare_gyro_motion(nullptr, 31ms, function));
+        legacy.issue_barrier(nullptr);
+        prepared.issue_barrier(nullptr);
+        if (legacy.entries.size() != 3 || prepared.entries.size() != 3){
+            return "Callback and prepared APIs produced different sample counts.";
+        }
+        for (size_t i = 0; i < 3; ++i){
+            if (legacy.entries[i].duration != prepared.entries[i].duration
+                || legacy.entries[i].state.gyro.angular_velocity_dps.y != prepared.entries[i].state.gyro.angular_velocity_dps.y){
+                return "Callback and prepared APIs produced different schedules.";
+            }
+        }
+
+        // Forward INT32_MIN is valid on X, but negating it is not encodable.
+        // Detect even an invalid inverse before queueing any forward samples.
+        GyroMotion invalid = prepare_gyro_motion(nullptr, 16ms, [](Milliseconds){
+            return GyroState{{}, {std::numeric_limits<int32_t>::min() / Internal::GYRO_ANGULAR_VELOCITY_TRANSPORT_SCALE, 0, 0}};
+        });
+        invalid.append_inverse_rotation();
+        GyroRecordingController rejected(logger, throttler);
+        bool threw = false;
+        try{
+            rejected.issue_gyro_motion(nullptr, ControllerClass::NintendoSwitch_RightJoycon, invalid);
+        }catch (const std::invalid_argument&){
+            threw = true;
+        }
+        rejected.issue_barrier(nullptr);
+        if (!threw || !rejected.entries.empty()){
+            return "An invalid prepared motion changed scheduler state before validation finished.";
         }
         return true;
     }
@@ -254,6 +431,8 @@ public:
 
 void add_tests_Gyro(UnitTestDatabase& database){
     database.add<Test_GyroSampling>();
+    database.add<Test_GyroInverse>();
+    database.add<Test_GyroScheduling>();
     database.add<Test_GyroTransform>();
     database.add<Test_GyroQuaternion>();
 }

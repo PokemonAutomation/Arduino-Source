@@ -16,7 +16,6 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
-class UnitTestDatabase;
 namespace NintendoSwitch{
 
 
@@ -25,18 +24,12 @@ struct JoyconGyroPhase{
     GyroState target;
 };
 
-struct JoyconGyroMotion{
-    Milliseconds duration;
-    GyroFunction function;
-};
-
-// Build the forward trajectory and, optionally, its sampled inverse rotation.
-std::vector<JoyconGyroMotion> make_joycon_gyro_motion(
+// Describe the table's ramps and prepare them through the shared motion API.
+GyroMotion make_joycon_gyro_motion(
     const std::vector<JoyconGyroPhase>& phases,
-    bool return_to_start
+    bool return_to_start,
+    Cancellable* cancellable = nullptr
 );
-
-void add_tests_JoyconGyroTester(UnitTestDatabase& database);
 
 class JoyconGyroPhaseRow : public EditableTableRow{
 public:
