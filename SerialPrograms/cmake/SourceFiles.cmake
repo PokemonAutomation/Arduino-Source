@@ -3200,6 +3200,7 @@ file(GLOB LIBRARY_SOURCES
 # (CMake option PA_STREAM_HISTORY_FFMPEG; requires the ffmpeg shared libraries).
 if (PA_STREAM_HISTORY_FFMPEG)
     list(APPEND LIBRARY_SOURCES
+        Source/CommonFramework/Recording/StreamHistory_FfmpegPtr.h
         Source/CommonFramework/Recording/StreamHistoryTracker_Ring.cpp
     )
 endif()

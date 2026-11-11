@@ -53,6 +53,7 @@ extern "C" {
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "StreamHistory_FfmpegPtr.h"
 #include "StreamHistory_H264.h"
 #include "StreamHistoryTracker_Ring.h"
 
@@ -98,30 +99,6 @@ struct AudioRingPacket{
     std::vector<uint8_t> data;
 };
 
-
-//  Deleter for the codec parameter copies that save() hands to mux_to_file().
-struct CodecParametersDeleter{
-    void operator()(AVCodecParameters* params) const{
-        avcodec_parameters_free(&params);
-    }
-};
-using CodecParametersPtr = std::unique_ptr<AVCodecParameters, CodecParametersDeleter>;
-
-//  Owning pointers for frames and packets, so that every return path (and
-//  any exception) releases them.
-struct FrameDeleter{
-    void operator()(AVFrame* frame) const{
-        av_frame_free(&frame);
-    }
-};
-using FramePtr = std::unique_ptr<AVFrame, FrameDeleter>;
-
-struct PacketDeleter{
-    void operator()(AVPacket* packet) const{
-        av_packet_free(&packet);
-    }
-};
-using PacketPtr = std::unique_ptr<AVPacket, PacketDeleter>;
 
 //  Returns a copy of 'source', or null if 'source' is null or the copy fails.
 CodecParametersPtr copy_codec_parameters(const AVCodecParameters* source){
@@ -1399,15 +1376,21 @@ struct StreamHistoryTracker_Ring::Data{
         //  file can start playing and seeking immediately instead of waiting
         //  for the reader to scan the whole file. The muxer does one fast
         //  rewrite pass at av_write_trailer() time; fine for local files.
-        AVDictionary* muxer_options = nullptr;
+        FfmpegDictionary muxer_options;
         if (extension != "mkv"){
-            av_dict_set(&muxer_options, "movflags", "+faststart", 0);
+            av_dict_set(muxer_options.address(), "movflags", "+faststart", 0);
         }
 
-        AVFormatContext* format = nullptr;
-        if (avformat_alloc_output_context2(&format, nullptr, muxer, filename.c_str()) < 0
-            || format == nullptr
-        ){
+        //  Owns the output context and, once opened, its file: every return
+        //  below closes and frees them.
+        OutputFormatContextPtr format;
+        {
+            AVFormatContext* allocated = nullptr;
+            if (avformat_alloc_output_context2(&allocated, nullptr, muxer, filename.c_str()) >= 0){
+                format.reset(allocated);
+            }
+        }
+        if (format == nullptr){
             m_logger.log("Stream history: Failed to create output context for '" + filename + "'.", COLOR_RED);
             return false;
         }
@@ -1426,8 +1409,6 @@ struct StreamHistoryTracker_Ring::Data{
                     || (needs_extradata && vpar->extradata == nullptr)
                 ){
                     m_logger.log("Stream history: Failed to set up video stream (missing encoder state?).", COLOR_RED);
-                    av_dict_free(&muxer_options);
-                    avformat_free_context(format);
                     return false;
                 }
                 char hex[9] = {0};
@@ -1494,15 +1475,11 @@ struct StreamHistoryTracker_Ring::Data{
                     )
                     ){
                         m_logger.log("Stream history: Failed to convert the H.264 extradata from Annex B to AVCC.", COLOR_RED);
-                        av_dict_free(&muxer_options);
-                        avformat_free_context(format);
                         return false;
                     }
                     uint8_t* new_extradata = (uint8_t*)av_mallocz(avcc.size() + AV_INPUT_BUFFER_PADDING_SIZE);
                     if (new_extradata == nullptr){
                         m_logger.log("Stream history: Failed to allocate the converted H.264 extradata.", COLOR_RED);
-                        av_dict_free(&muxer_options);
-                        avformat_free_context(format);
                         return false;
                     }
                     memcpy(new_extradata, avcc.data(), avcc.size());
@@ -1515,20 +1492,16 @@ struct StreamHistoryTracker_Ring::Data{
             if (have_audio_stream){
                 if (apar == nullptr || apar->extradata == nullptr){
                     m_logger.log("Stream history: Failed to set up audio stream (missing encoder state?).", COLOR_RED);
-                    av_dict_free(&muxer_options);
-                    avformat_free_context(format);
                     return false;
                 }
             }
         }
         if (have_video){
-            video_stream = avformat_new_stream(format, nullptr);
+            video_stream = avformat_new_stream(format.get(), nullptr);
             if (video_stream == nullptr
                 || avcodec_parameters_copy(video_stream->codecpar, vpar) < 0
             ){
                 m_logger.log("Stream history: Failed to set up video stream (missing encoder state?).", COLOR_RED);
-                av_dict_free(&muxer_options);
-                avformat_free_context(format);
                 return false;
             }
             //  Matroska's write_header() rewrites every stream timebase to 1/1000
@@ -1541,13 +1514,11 @@ struct StreamHistoryTracker_Ring::Data{
                 : vtb;
         }
         if (have_audio_stream){
-            audio_stream = avformat_new_stream(format, nullptr);
+            audio_stream = avformat_new_stream(format.get(), nullptr);
             if (audio_stream == nullptr
                 || avcodec_parameters_copy(audio_stream->codecpar, apar) < 0
             ){
                 m_logger.log("Stream history: Failed to set up audio stream (missing encoder state?).", COLOR_RED);
-                av_dict_free(&muxer_options);
-                avformat_free_context(format);
                 return false;
             }
             //  Same as above: Matroska needs millisecond timestamps, while MP4
@@ -1562,8 +1533,7 @@ struct StreamHistoryTracker_Ring::Data{
         //  that aren't AVFMT_NOFILE: avformat_write_header() does not open
         //  format->url itself, and the muxer's write_header() dereferences
         //  s->pb (crashing on the NULL pointer). Opened here, just before the
-        //  header, so the setup-failure paths above never leak a file handle;
-        //  the success path closes it below. avio_open2() leaves the
+        //  header; the output context's deleter closes it. avio_open2() leaves the
         //  non-AVIO options (like movflags) in muxer_options for
         //  avformat_write_header().
         if (format->pb == nullptr && (format->flags & AVFMT_NOFILE) == 0){
@@ -1572,23 +1542,17 @@ struct StreamHistoryTracker_Ring::Data{
                 filename.c_str(),
                 AVIO_FLAG_WRITE,
                 &format->interrupt_callback,
-                &muxer_options
+                muxer_options.address()
             ) < 0 || format->pb == nullptr
             ){
                 m_logger.log("Stream history: Failed to open '" + filename + "' for writing.", COLOR_RED);
-                av_dict_free(&muxer_options);
-                avformat_free_context(format);
                 return false;
             }
         }
-        if (avformat_write_header(format, &muxer_options) < 0){
+        if (avformat_write_header(format.get(), muxer_options.address()) < 0){
             m_logger.log("Stream history: Failed to write file header for '" + filename + "'.", COLOR_RED);
-            av_dict_free(&muxer_options);
-            avio_closep(&format->pb);
-            avformat_free_context(format);
             return false;
         }
-        av_dict_free(&muxer_options);
 
         bool ok = true;
         PacketPtr packet(av_packet_alloc());
@@ -1670,7 +1634,7 @@ struct StreamHistoryTracker_Ring::Data{
                     packet->pts = dts;
                     packet->dts = dts;
                     packet->flags = vp.flags;
-                    if (av_interleaved_write_frame(format, packet.get()) < 0){
+                    if (av_interleaved_write_frame(format.get(), packet.get()) < 0){
                         m_logger.log("Stream history: Failed writing video data.", COLOR_RED);
                         ok = false;
                         break;
@@ -1709,7 +1673,7 @@ struct StreamHistoryTracker_Ring::Data{
                     packet->pts = dts;
                     packet->dts = dts;
                     packet->flags = 0;
-                    if (av_interleaved_write_frame(format, packet.get()) < 0){
+                    if (av_interleaved_write_frame(format.get(), packet.get()) < 0){
                         m_logger.log("Stream history: Failed writing audio data.", COLOR_RED);
                         ok = false;
                         break;
@@ -1727,14 +1691,10 @@ struct StreamHistoryTracker_Ring::Data{
             }
         }
 
-        if (ok && av_write_trailer(format) < 0){
+        if (ok && av_write_trailer(format.get()) < 0){
             m_logger.log("Stream history: Failed writing file trailer.", COLOR_RED);
             ok = false;
         }
-        if (format->pb != nullptr){
-            avio_closep(&format->pb);
-        }
-        avformat_free_context(format);
         return ok;
     }
 
