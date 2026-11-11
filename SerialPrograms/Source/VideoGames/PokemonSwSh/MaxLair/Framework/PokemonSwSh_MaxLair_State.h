@@ -174,7 +174,8 @@ struct GlobalState{
 
     //  Returns false when the opponent read doesn't fit this battle stage (a
     //  boss before the fourth battle), so the caller retries the read. On an
-    //  accepted read at the fourth battle, records the boss if none is known.
+    //  accepted read at the fourth battle, records the boss if none is known
+    //  and the read is a single boss species.
     bool accept_opponent();
 
     //  The same boss, but only if the adventure caught it, else empty: for the

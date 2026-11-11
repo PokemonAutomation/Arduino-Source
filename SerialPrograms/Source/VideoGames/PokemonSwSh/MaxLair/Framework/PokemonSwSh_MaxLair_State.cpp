@@ -30,8 +30,10 @@ bool GlobalState::accept_opponent(){
     if (!is_boss_battle(*this) && is_boss(opponent_slug)){
         return false;
     }
-    //  Infer the boss if we don't know it.
-    if (is_boss_battle(*this) && boss.empty()){
+    //  Infer the boss if we don't know it. Only a single boss species counts:
+    //  a rental read here is a misread (Kyurem read as Mimikyu, 2026-11-02)
+    //  and must not become the boss. A later turn's read can still record it.
+    if (is_boss_battle(*this) && boss.empty() && opponent.size() == 1 && is_boss(opponent_slug)){
         boss = opponent_slug;
     }
     return true;
