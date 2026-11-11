@@ -107,6 +107,22 @@ struct CodecParametersDeleter{
 };
 using CodecParametersPtr = std::unique_ptr<AVCodecParameters, CodecParametersDeleter>;
 
+//  Owning pointers for frames and packets, so that every return path (and
+//  any exception) releases them.
+struct FrameDeleter{
+    void operator()(AVFrame* frame) const{
+        av_frame_free(&frame);
+    }
+};
+using FramePtr = std::unique_ptr<AVFrame, FrameDeleter>;
+
+struct PacketDeleter{
+    void operator()(AVPacket* packet) const{
+        av_packet_free(&packet);
+    }
+};
+using PacketPtr = std::unique_ptr<AVPacket, PacketDeleter>;
+
 //  Returns a copy of 'source', or null if 'source' is null or the copy fails.
 CodecParametersPtr copy_codec_parameters(const AVCodecParameters* source){
     if (source == nullptr){
@@ -692,18 +708,16 @@ struct StreamHistoryTracker_Ring::Data{
 
     //  Receive and store a single encoded video packet.
     DrainResult drain_one_video_packet(int& error){
-        AVPacket* packet = av_packet_alloc();
+        PacketPtr packet(av_packet_alloc());
         if (packet == nullptr){
             m_logger.log("Stream history: Failed to allocate video packet.", COLOR_RED);
             return DrainResult::NO_MEMORY;
         }
-        int err = avcodec_receive_packet(m_video_context, packet);
+        int err = avcodec_receive_packet(m_video_context, packet.get());
         if (err == AVERROR(EAGAIN) || err == AVERROR_EOF){
-            av_packet_free(&packet);
             return DrainResult::EMPTY;
         }
         if (err < 0){
-            av_packet_free(&packet);
             error = err;
             return DrainResult::FAILED;
         }
@@ -718,7 +732,7 @@ struct StreamHistoryTracker_Ring::Data{
         );
         ring_packet->flags = (packet->flags & AV_PKT_FLAG_KEY) ? AV_PKT_FLAG_KEY : 0;
         ring_packet->data.assign(packet->data, packet->data + packet->size);
-        av_packet_free(&packet);
+        packet.reset();
 
         int64_t added = (int64_t)ring_packet->data.size();
         bool capped;
@@ -929,7 +943,7 @@ struct StreamHistoryTracker_Ring::Data{
             m_sws_out_format = m_video_context->pix_fmt;
         }
 
-        AVFrame* frame = av_frame_alloc(); // An AVFrame filled with default values
+        FramePtr frame(av_frame_alloc()); // An AVFrame filled with default values
         if (frame == nullptr){
             unmap_if_needed();
             log_frame_skip("Failed to allocate a video frame");
@@ -938,8 +952,7 @@ struct StreamHistoryTracker_Ring::Data{
         frame->format = m_video_context->pix_fmt;
         frame->width = m_video_width;
         frame->height = m_video_height;
-        if (av_frame_get_buffer(frame, 0) < 0){
-            av_frame_free(&frame);
+        if (av_frame_get_buffer(frame.get(), 0) < 0){
             unmap_if_needed();
             log_frame_skip("Failed to allocate a video frame buffer");
             return;
@@ -953,7 +966,6 @@ struct StreamHistoryTracker_Ring::Data{
         );
         unmap_if_needed();
         if (scaled != m_video_height){
-            av_frame_free(&frame);
             log_frame_skip("Failed to scale a video frame");
             return;
         }
@@ -971,7 +983,6 @@ struct StreamHistoryTracker_Ring::Data{
         //  sent frames a frame interval apart; drop any frame that would still
         //  not advance the pts (e.g. a capture timestamp going backwards).
         if (m_last_pts_us >= 0 && pts_us / 1000 <= m_last_pts_us / 1000){
-            av_frame_free(&frame);
             return;
         }
         m_last_pts_us = pts_us;
@@ -989,13 +1000,12 @@ struct StreamHistoryTracker_Ring::Data{
         //  so a send can fail with EAGAIN while output packets are pending:
         //  drain one packet and retry instead of giving up.
         while (true){
-            int err = avcodec_send_frame(m_video_context, frame);
+            int err = avcodec_send_frame(m_video_context, frame.get());
             if (err == AVERROR(EAGAIN)){
                 DrainResult drained = drain_one_video_packet(err);
                 if (drained == DrainResult::STORED){
                     continue;
                 }
-                av_frame_free(&frame);
                 if (drained == DrainResult::NO_MEMORY){
                     return;
                 }
@@ -1013,11 +1023,9 @@ struct StreamHistoryTracker_Ring::Data{
                 return;
             }
             if (err < 0){
-                av_frame_free(&frame);
                 fall_back_video_encoder(err, qframe.width(), qframe.height());
                 return;
             }
-            av_frame_free(&frame);
             break;
         }
         m_logged_frame_skip = false;
@@ -1214,7 +1222,7 @@ struct StreamHistoryTracker_Ring::Data{
 
         //  Encode each complete AAC frame.
         while (m_audio_acc.size() >= (size_t)AUDIO_FRAME_SAMPLES * m_audio_channels){
-            AVFrame* frame = av_frame_alloc();
+            FramePtr frame(av_frame_alloc());
             if (frame == nullptr){
                 m_logger.log("Stream history: Failed to allocate audio frame. Disabling audio.", COLOR_RED);
                 m_have_audio = false;
@@ -1225,13 +1233,11 @@ struct StreamHistoryTracker_Ring::Data{
             frame->nb_samples = AUDIO_FRAME_SAMPLES;
             int ret = av_channel_layout_copy(&frame->ch_layout, &m_audio_layout);
             if (ret < 0){
-                av_frame_free(&frame);
                 m_logger.log("Stream history: Failed to copy audio channel layout. Disabling audio.", COLOR_RED);
                 m_have_audio = false;
                 return;
             }
-            if (av_frame_get_buffer(frame, 0) < 0){
-                av_frame_free(&frame);
+            if (av_frame_get_buffer(frame.get(), 0) < 0){
                 m_logger.log("Stream history: Failed to allocate audio frame buffer. Disabling audio.", COLOR_RED);
                 m_have_audio = false;
                 return;
@@ -1255,15 +1261,15 @@ struct StreamHistoryTracker_Ring::Data{
                 m_audio_acc.erase(m_audio_acc.begin(), erase_end);
             }
 
-            int err = avcodec_send_frame(m_audio_context, frame);
-            av_frame_free(&frame);
+            int err = avcodec_send_frame(m_audio_context, frame.get());
+            frame.reset();
             if (err < 0){
                 m_logger.log("Stream history: Audio encode failed: " + ffmpeg_error(err), COLOR_RED);
                 m_have_audio = false;
                 return;
             }
             while (true){
-                AVPacket* packet = av_packet_alloc();
+                PacketPtr packet(av_packet_alloc());
                 if (packet == nullptr){
                     //  The encoder still holds the undrained packet, so the
                     //  next send would fail with EAGAIN anyway.
@@ -1271,13 +1277,11 @@ struct StreamHistoryTracker_Ring::Data{
                     m_have_audio = false;
                     return;
                 }
-                err = avcodec_receive_packet(m_audio_context, packet);
+                err = avcodec_receive_packet(m_audio_context, packet.get());
                 if (err == AVERROR(EAGAIN)){
-                    av_packet_free(&packet);
                     break;
                 }
                 if (err < 0){
-                    av_packet_free(&packet);
                     m_logger.log("Stream history: Audio packet failed: " + ffmpeg_error(err) + ". Disabling audio.", COLOR_RED);
                     m_have_audio = false;
                     return;
@@ -1296,7 +1300,7 @@ struct StreamHistoryTracker_Ring::Data{
                         : m_audio_samples_total - AUDIO_FRAME_SAMPLES
                 );
                 ring_packet->data.assign(packet->data, packet->data + packet->size);
-                av_packet_free(&packet);
+                packet.reset();
 
                 int64_t added = (int64_t)ring_packet->data.size();
                 bool capped;
@@ -1563,7 +1567,7 @@ struct StreamHistoryTracker_Ring::Data{
         av_dict_free(&muxer_options);
 
         bool ok = true;
-        AVPacket* packet = av_packet_alloc();
+        PacketPtr packet(av_packet_alloc());
         if (packet == nullptr){
             ok = false;
         }else{
@@ -1642,7 +1646,7 @@ struct StreamHistoryTracker_Ring::Data{
                     packet->pts = dts;
                     packet->dts = dts;
                     packet->flags = vp.flags;
-                    if (av_interleaved_write_frame(format, packet) < 0){
+                    if (av_interleaved_write_frame(format, packet.get()) < 0){
                         m_logger.log("Stream history: Failed writing video data.", COLOR_RED);
                         ok = false;
                         break;
@@ -1681,7 +1685,7 @@ struct StreamHistoryTracker_Ring::Data{
                     packet->pts = dts;
                     packet->dts = dts;
                     packet->flags = 0;
-                    if (av_interleaved_write_frame(format, packet) < 0){
+                    if (av_interleaved_write_frame(format, packet.get()) < 0){
                         m_logger.log("Stream history: Failed writing audio data.", COLOR_RED);
                         ok = false;
                         break;
@@ -1689,7 +1693,7 @@ struct StreamHistoryTracker_Ring::Data{
                     ai++;
                 }
             }
-            av_packet_free(&packet);
+            packet.reset();
             if (dropped_audio != 0){
                 m_logger.log(
                     "Stream history: dropped " + std::to_string(dropped_audio)
