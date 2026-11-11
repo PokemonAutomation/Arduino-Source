@@ -31,10 +31,12 @@ namespace PABotBase2{
 //  (The NSO GameCube's 0x0A is available to a future GC CID.) The target
 //  streams that format by default and implements 0x03/0x0A so the host
 //  can switch it to 0x05, as a real S2 does. The serial messages below
-//  carry the 63-byte report for the CID's format verbatim - the CC fills
-//  the matching struct and the firmware passes the bytes through without
-//  translation. The 40-byte native motion payload is bit-packed with a
-//  different codec per format, so it is generated on the CC side.
+//  carry the report minus the fields the firmware fills in (the report
+//  counter, the power-info byte on the native reports, and the USB
+//  report ID byte) - the CC fills the matching state struct and the
+//  firmware passes those bytes through without translation. The 40-byte
+//  native motion payload is bit-packed with a different codec per format,
+//  so it is generated on the CC side.
 //
 
 
@@ -75,9 +77,10 @@ struct Message_Feedback_NS2_OemController_Rumble : MessageHeader{
 //
 //  Per report format: a fast-path buttons message (buttons + sticks, and
 //  the GameCube triggers where the format has them) and a full-state
-//  message (the complete 63-byte report). The full-state messages are
-//  69 bytes: they fit the 72-byte incoming message cap and, at the 96
-//  byte packet cap, travel as a single RSC packet.
+//  message (the complete state payload: 59 bytes for 0x05, 61 for the
+//  native reports). The full-state messages are 65/67 bytes: they fit
+//  the 72-byte incoming message cap and, at the 96 byte packet cap,
+//  travel as a single RSC packet.
 //
 
 

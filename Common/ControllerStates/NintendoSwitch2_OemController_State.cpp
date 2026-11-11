@@ -12,13 +12,14 @@ namespace PokemonAutomation{
 namespace NintendoSwitch2{
 
 
-//  Every input report payload is exactly 63 bytes on the wire
-//  (64 over USB including the report ID byte).
-static_assert(sizeof(OemController_State0x05) == 63, "Report 0x05 must be 63 bytes");
-static_assert(sizeof(OemController_State0x07) == 63, "Report 0x07 must be 63 bytes");
-static_assert(sizeof(OemController_State0x08) == 63, "Report 0x08 must be 63 bytes");
-static_assert(sizeof(OemController_State0x09) == 63, "Report 0x09 must be 63 bytes");
-static_assert(sizeof(OemController_State0x0A) == 63, "Report 0x0A must be 63 bytes");
+//  The wire payload is 63 bytes; the structs hold the CC-filled portion
+//  (the firmware appends the counter / power-info prefix and the USB
+//  report ID byte): 59 bytes for 0x05, 61 for the native reports.
+static_assert(sizeof(OemController_State0x05) == 59, "Report 0x05 state must be 59 bytes");
+static_assert(sizeof(OemController_State0x07) == 61, "Report 0x07 state must be 61 bytes");
+static_assert(sizeof(OemController_State0x08) == 61, "Report 0x08 state must be 61 bytes");
+static_assert(sizeof(OemController_State0x09) == 61, "Report 0x09 state must be 61 bytes");
+static_assert(sizeof(OemController_State0x0A) == 61, "Report 0x0A state must be 61 bytes");
 
 
 const OemController_RumbleState OemController_RumbleState_NEUTRAL_STATE = {
@@ -34,7 +35,6 @@ const OemController_RumbleStateGC OemController_RumbleStateGC_NEUTRAL_STATE = {
 
 
 const OemController_State0x05 OemController_State0x05_NEUTRAL_STATE = {
-    .counter = 0,
     .buttons = {},
     .unknown_0x08 = {},
     .left_stick = {0x00, 0x08, 0x80},
@@ -63,8 +63,6 @@ bool OemController_State0x05_equals(
 
 
 const OemController_State0x07 OemController_State0x07_NEUTRAL_STATE = {
-    .counter = 0,
-    .power_info = 0,
     .buttons0 = 0,
     .buttons1 = 0,
     .unknown_0x04 = 0x07,
@@ -86,8 +84,6 @@ bool OemController_State0x07_equals(
 
 
 const OemController_State0x08 OemController_State0x08_NEUTRAL_STATE = {
-    .counter = 0,
-    .power_info = 0,
     .buttons0 = 0,
     .buttons1 = 0,
     .unknown_0x04 = 0x07,
@@ -110,8 +106,6 @@ bool OemController_State0x08_equals(
 
 
 const OemController_State0x09 OemController_State0x09_NEUTRAL_STATE = {
-    .counter = 0,
-    .power_info = 0,
     .buttons = {},
     .left_stick = {0x00, 0x08, 0x80},
     .right_stick = {0x00, 0x08, 0x80},
@@ -133,8 +127,6 @@ bool OemController_State0x09_equals(
 
 
 const OemController_State0x0A OemController_State0x0A_NEUTRAL_STATE = {
-    .counter = 0,
-    .power_info = 0,
     .buttons = {},
     .left_stick = {0x00, 0x08, 0x80},
     .right_stick = {0x00, 0x08, 0x80},

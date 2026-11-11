@@ -40,8 +40,19 @@ namespace NintendoSwitch2{
 //  the 0x03 sub 0x0A value in the known-good BLE startup sequence is
 //  0x09 even for Joy-Con 2, so it is not a literal report ID there.
 //
-//  All structs below are the 63-byte report payloads WITHOUT the USB
-//  report ID byte (BLE notifications omit it; USB reports prepend it).
+//  All structs below are the report payload MINUS the fields the
+//  firmware fills in - the same "header" information the S1 states omit:
+//
+//  - 0x05: 4-byte report counter at the start (struct is 59 bytes,
+//    63 on the wire)
+//  - Native reports: 1-byte counter + 1-byte power info at the start
+//    ([0] ext power, [1] charging, [2:5] battery level, [6:7] reserved)
+//    (struct is 61 bytes, 63 on the wire)
+//
+//  The USB report ID byte is also added by the firmware (BLE
+//  notifications omit it; USB reports prepend it). The unknown_0xNN
+//  field names below keep their on-wire offsets.
+//
 //  Multi-byte fields are little-endian on the wire. Sticks are packed
 //  12-bit: X = b0 | ((b1 & 0x0f) << 8); Y = (b1 >> 4) | (b2 << 4);
 //  neutral is ~0x800 but the true center comes from the controller's
@@ -118,8 +129,6 @@ struct OemController_State0x05_Buttons{
 };
 
 struct OemController_State0x05{
-    uint32_t counter;
-
     //  4 button bytes (MSB -> LSB):
     //  byte0: ZR R SL-R SR-R A B X Y
     //  byte1: C Capture Home Lstickclick Rstickclick Plus Minus
@@ -175,8 +184,6 @@ struct OemController_State0x07_Buttons{
 };
 
 struct OemController_State0x07{
-    uint8_t counter;
-    uint8_t power_info;    // [0] ext power, [1] charging, [2:5] level, [6:7] reserved
     uint8_t buttons0;      // MSB->LSB: Lstickclick Minus ZL L | Up Left Right Down
     uint8_t buttons1;      // MSB->LSB: SL SR | - - - - - | Capture
     uint8_t unknown_0x04;  // observed 0x07
@@ -210,8 +217,6 @@ struct OemController_State0x08_Buttons{
 };
 
 struct OemController_State0x08{
-    uint8_t counter;
-    uint8_t power_info;
     uint8_t buttons0;      // MSB->LSB: Rstickclick Plus ZR R | X Y A B
     uint8_t buttons1;      // MSB->LSB: SL SR | C | - - - | Home
     uint8_t unknown_0x04;  // observed 0x07
@@ -244,8 +249,6 @@ struct OemController_State0x09_Buttons{
 };
 
 struct OemController_State0x09{
-    uint8_t counter;
-    uint8_t power_info;
     uint8_t buttons[3];
     //  MSB->LSB, byte0: Rstickclick Plus ZR R | X Y A B
     //  MSB->LSB, byte1: Lstickclick Minus ZL L | Up Left Right Down
@@ -282,8 +285,6 @@ struct OemController_State0x0A_Buttons{
 };
 
 struct OemController_State0x0A{
-    uint8_t counter;
-    uint8_t power_info;
     uint8_t buttons[3];
     //  MSB->LSB, byte0: Rstickclick Plus R Z | X Y A B
     //  MSB->LSB, byte1: Lstickclick Minus L ZL | Up Left Right Down
