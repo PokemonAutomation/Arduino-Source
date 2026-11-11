@@ -292,8 +292,8 @@ void abandon_video_encoder(Logger& logger, const char* name, AVCodecContext*& ct
 //  - The encoder thread (worker_loop()) owns the video encoder and its state:
 //    m_video_context, m_sws and the m_sws_* fields, m_video_width, m_video_height,
 //    m_video_start, m_last_keyframe_us, m_last_pts_us,
-//    m_logged_unsupported_format and m_video_encoder_index. Nothing else
-//    touches them.
+//    m_logged_frame_skip and m_video_encoder_index. Nothing else touches
+//    them.
 //  - The audio thread (push_samples()) owns the AAC encoder, the sample
 //    accumulator and the audio clock: m_audio_context, m_audio_layout, m_have_audio,
 //    m_audio_acc, m_audio_samples_total, m_audio_anchored,
@@ -336,7 +336,7 @@ struct StreamHistoryTracker_Ring::Data{
 
     //  Video encoder (initialized on the worker thread at the first frame).
     bool m_video_enabled;
-    bool m_logged_unsupported_format = false; // If a frame can’t be converted to RGB888, the error is logged the first time only
+    bool m_logged_frame_skip = false; // A skipped video frame was logged since the last frame reached the encoder; see log_frame_skip()
     AVCodecContext* m_video_context = nullptr; // ffmpeg video encoder context
     SwsContext* m_sws = nullptr; // libswscale context: converts and scales the captured frame into the encoder’s pixel format and output size.
     int m_sws_in_format = AV_PIX_FMT_NONE; // source pixel format
@@ -683,23 +683,29 @@ struct StreamHistoryTracker_Ring::Data{
     }
 
 
+    enum class DrainResult{
+        STORED,     //  A packet was received and stored in the ring.
+        EMPTY,      //  The encoder has no packet ready (EAGAIN or EOF).
+        NO_MEMORY,  //  The packet could not be allocated; the encoder is fine.
+        FAILED,     //  The encoder failed; 'error' holds the ffmpeg error.
+    };
+
     //  Receive and store a single encoded video packet.
-    //  Returns 1 if a packet was stored, 0 if there is nothing to receive, or
-    //  the (negative) ffmpeg error if the encoder failed.
-    int drain_one_video_packet(){
+    DrainResult drain_one_video_packet(int& error){
         AVPacket* packet = av_packet_alloc();
         if (packet == nullptr){
             m_logger.log("Stream history: Failed to allocate video packet.", COLOR_RED);
-            return 0;
+            return DrainResult::NO_MEMORY;
         }
         int err = avcodec_receive_packet(m_video_context, packet);
         if (err == AVERROR(EAGAIN) || err == AVERROR_EOF){
             av_packet_free(&packet);
-            return 0;
+            return DrainResult::EMPTY;
         }
         if (err < 0){
             av_packet_free(&packet);
-            return err;
+            error = err;
+            return DrainResult::FAILED;
         }
         auto ring_packet = std::make_shared<VideoRingPacket>();
         //  Stamp the packet with the capture time of the frame it encodes.
@@ -716,6 +722,7 @@ struct StreamHistoryTracker_Ring::Data{
 
         int64_t added = (int64_t)ring_packet->data.size();
         bool capped;
+        bool snapshot_failed = false;
         {
             WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
             //  Refresh the mux-time parameter snapshot on this (the encoder's)
@@ -728,8 +735,15 @@ struct StreamHistoryTracker_Ring::Data{
                 if (m_video_params == nullptr){
                     m_video_params = avcodec_parameters_alloc();
                 }
-                if (m_video_params != nullptr){
-                    avcodec_parameters_from_context(m_video_params, m_video_context);
+                if (m_video_params == nullptr
+                    || avcodec_parameters_from_context(m_video_params, m_video_context) < 0
+                ){
+                    //  Drop the (partially reset) snapshot so that the next
+                    //  packet retries; until then, save() cannot set up the
+                    //  video stream.
+                    avcodec_parameters_free(&m_video_params);
+                    snapshot_failed = true;
+                }else{
                     m_video_time_base = m_video_context->time_base;
                 }
             }
@@ -737,10 +751,13 @@ struct StreamHistoryTracker_Ring::Data{
             m_ring_bytes += added;
             capped = evict();
         }
+        if (snapshot_failed){
+            m_logger.log("Stream history: Failed to copy the video encoder parameters. Retrying on the next packet.", COLOR_RED);
+        }
         if (capped){
             report_size_cap();
         }
-        return 1;
+        return DrainResult::STORED;
     }
 
 
@@ -800,6 +817,24 @@ struct StreamHistoryTracker_Ring::Data{
     }
 
 
+    //  Logs why a frame was skipped, once per stretch of skipped frames:
+    //  these failures are per-frame (the next frame may succeed), so video
+    //  stays enabled, but a failure that repeats on every frame must not
+    //  stop the video silently. The flag is cleared when a frame reaches the
+    //  encoder.
+    void log_frame_skip(const char* reason){
+        if (m_logged_frame_skip){
+            return;
+        }
+        m_logged_frame_skip = true;
+        m_logger.log(
+            "Stream history: " + std::string(reason)
+            + ". Skipping video frames until one succeeds.",
+            COLOR_RED
+        );
+    }
+
+
     //  Converts one frame to the encoder's pixel format (NV12 direct,
     //  everything else through RGB), (re)building the scaler as needed,
     //  then feeds it to the encoder: wall-clock-derived pts, a forced
@@ -813,6 +848,7 @@ struct StreamHistoryTracker_Ring::Data{
 
         QVideoFrame qframe = vf->frame;    //  Local copy (implicit sharing).
         if (!qframe.map(QVideoFrame::ReadOnly)){
+            log_frame_skip("Could not map a video frame");
             return;
         }
         bool still_mapped = true;
@@ -844,10 +880,7 @@ struct StreamHistoryTracker_Ring::Data{
             rgb_image = qframe.toImage().convertToFormat(QImage::Format_RGB888);
             unmap_if_needed();
             if (rgb_image.isNull()){
-                if (!m_logged_unsupported_format){
-                    m_logger.log("Stream history: Could not convert video frame to RGB. Skipping.", COLOR_RED);
-                    m_logged_unsupported_format = true;
-                }
+                log_frame_skip("Could not convert a video frame to RGB");
                 return;
             }
             src_format = AV_PIX_FMT_RGB24;
@@ -856,9 +889,6 @@ struct StreamHistoryTracker_Ring::Data{
             src_planes[0] = (const uint8_t*)rgb_image.bits();
             src_strides[0] = (int)rgb_image.bytesPerLine();
         }
-        //  This frame converted, so log the next conversion failure again
-        //  (one line per failing stretch, not one per tracker).
-        m_logged_unsupported_format = false;
 
         if (m_video_context == nullptr){
             init_video_encoder(qframe.width(), qframe.height());
@@ -902,6 +932,7 @@ struct StreamHistoryTracker_Ring::Data{
         AVFrame* frame = av_frame_alloc();
         if (frame == nullptr){
             unmap_if_needed();
+            log_frame_skip("Failed to allocate a video frame");
             return;
         }
         frame->format = m_video_context->pix_fmt;
@@ -910,6 +941,7 @@ struct StreamHistoryTracker_Ring::Data{
         if (av_frame_get_buffer(frame, 0) < 0){
             av_frame_free(&frame);
             unmap_if_needed();
+            log_frame_skip("Failed to allocate a video frame buffer");
             return;
         }
 
@@ -922,6 +954,7 @@ struct StreamHistoryTracker_Ring::Data{
         unmap_if_needed();
         if (scaled != m_video_height){
             av_frame_free(&frame);
+            log_frame_skip("Failed to scale a video frame");
             return;
         }
 
@@ -958,17 +991,26 @@ struct StreamHistoryTracker_Ring::Data{
         while (true){
             int err = avcodec_send_frame(m_video_context, frame);
             if (err == AVERROR(EAGAIN)){
-                int drained = drain_one_video_packet();
-                if (drained < 0){
-                    av_frame_free(&frame);
-                    fall_back_video_encoder(drained, qframe.width(), qframe.height());
+                DrainResult drained = drain_one_video_packet(err);
+                if (drained == DrainResult::STORED){
+                    continue;
+                }
+                av_frame_free(&frame);
+                if (drained == DrainResult::NO_MEMORY){
                     return;
                 }
-                if (drained == 0){
-                    av_frame_free(&frame);
-                    return;
+                if (drained == DrainResult::EMPTY){
+                    //  The encoder refuses input but has no output to drain.
+                    //  The send/receive API rules this out, so the encoder is
+                    //  stuck: it would refuse every later frame too.
+                    m_logger.log(
+                        "Stream history: video encoder refused a frame with nothing to drain.",
+                        COLOR_RED
+                    );
+                    err = AVERROR(EAGAIN);
                 }
-                continue;
+                fall_back_video_encoder(err, qframe.width(), qframe.height());
+                return;
             }
             if (err < 0){
                 av_frame_free(&frame);
@@ -978,14 +1020,16 @@ struct StreamHistoryTracker_Ring::Data{
             av_frame_free(&frame);
             break;
         }
+        m_logged_frame_skip = false;
 
         while (true){
-            int drained = drain_one_video_packet();
-            if (drained < 0){
-                fall_back_video_encoder(drained, qframe.width(), qframe.height());
+            int err = 0;
+            DrainResult drained = drain_one_video_packet(err);
+            if (drained == DrainResult::FAILED){
+                fall_back_video_encoder(err, qframe.width(), qframe.height());
                 return;
             }
-            if (drained == 0){
+            if (drained != DrainResult::STORED){
                 break;
             }
         }
@@ -1221,6 +1265,10 @@ struct StreamHistoryTracker_Ring::Data{
             while (true){
                 AVPacket* packet = av_packet_alloc();
                 if (packet == nullptr){
+                    //  The encoder still holds the undrained packet, so the
+                    //  next send would fail with EAGAIN anyway.
+                    m_logger.log("Stream history: Failed to allocate audio packet. Disabling audio.", COLOR_RED);
+                    m_have_audio = false;
                     return;
                 }
                 err = avcodec_receive_packet(m_audio_context, packet);
@@ -1230,9 +1278,9 @@ struct StreamHistoryTracker_Ring::Data{
                 }
                 if (err < 0){
                     av_packet_free(&packet);
-                    m_logger.log("Stream history: Audio packet failed: " + ffmpeg_error(err), COLOR_RED);
+                    m_logger.log("Stream history: Audio packet failed: " + ffmpeg_error(err) + ". Disabling audio.", COLOR_RED);
                     m_have_audio = false;
-                    break;
+                    return;
                 }
                 auto ring_packet = std::make_shared<AudioRingPacket>();
                 //  Stamp with the capture time of the samples this packet
@@ -1252,6 +1300,7 @@ struct StreamHistoryTracker_Ring::Data{
 
                 int64_t added = (int64_t)ring_packet->data.size();
                 bool capped;
+                bool snapshot_failed = false;
                 {
                     WriteSpinLock lg(m_lock, PA_CURRENT_FUNCTION);
                     //  Refresh the audio parameter snapshot on this (the
@@ -1263,13 +1312,19 @@ struct StreamHistoryTracker_Ring::Data{
                         if (m_audio_params == nullptr){
                             m_audio_params = avcodec_parameters_alloc();
                         }
-                        if (m_audio_params != nullptr){
-                            avcodec_parameters_from_context(m_audio_params, m_audio_context);
+                        if (m_audio_params == nullptr
+                            || avcodec_parameters_from_context(m_audio_params, m_audio_context) < 0
+                        ){
+                            avcodec_parameters_free(&m_audio_params);
+                            snapshot_failed = true;
                         }
                     }
                     m_audio.push_back(std::move(ring_packet));
                     m_ring_bytes += added;
                     capped = evict();
+                }
+                if (snapshot_failed){
+                    m_logger.log("Stream history: Failed to copy the audio encoder parameters. Retrying on the next packet.", COLOR_RED);
                 }
                 if (capped){
                     report_size_cap();
