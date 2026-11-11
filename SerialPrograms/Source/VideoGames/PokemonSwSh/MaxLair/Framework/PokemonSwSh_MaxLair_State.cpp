@@ -24,24 +24,33 @@ bool is_boss_battle(const GlobalState& state){
 
 } // namespace
 
-bool GlobalState::accept_opponent(){
+bool GlobalState::opponent_fits_stage() const{
     const std::string opponent_slug = opponent.empty() ? "" : *opponent.begin();
-    //  A boss before the end means something is out-of-sync.
-    if (!is_boss_battle(*this) && is_boss(opponent_slug)){
-        return false;
+    if (!is_boss_battle(*this)){
+        return !is_boss(opponent_slug);
     }
-    //  Infer the boss if we don't know it. Only a single boss species counts:
-    //  a rental read here is a misread (Kyurem read as Mimikyu, 2026-11-02)
-    //  and must not become the boss. A later turn's read can still record it.
-    if (is_boss_battle(*this) && boss.empty() && opponent.size() == 1 && is_boss(opponent_slug)){
-        boss = opponent_slug;
+    if (!boss.empty()){
+        return opponent.size() == 1 && opponent_slug == boss;
+    }
+    //  A rental read here is a misread (Kyurem read as Mimikyu, 2026-11-02).
+    return opponent.size() == 1 && is_boss(opponent_slug);
+}
+
+bool GlobalState::accept_opponent(){
+    const bool fits = opponent_fits_stage();
+    if (!is_boss_battle(*this)){
+        //  A boss before the end means something is out-of-sync.
+        return fits;
+    }
+    if (boss.empty() && fits){
+        boss = *opponent.begin();
     }
     return true;
 }
 
 std::string GlobalState::boss_if_caught() const{
-    //  The identified boss is reported whether or not it was caught.
-    return boss;
+    //  The boss is caught only if the fourth battle was won.
+    return wins == 4 ? boss : "";
 }
 
 std::string PlayerState::dump() const{

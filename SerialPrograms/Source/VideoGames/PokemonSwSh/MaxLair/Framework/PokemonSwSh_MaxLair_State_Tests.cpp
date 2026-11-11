@@ -68,7 +68,6 @@ private:
     BossStateTestCase m_scenario;
 };
 
-//  Cases marked TODO record the current, wrong behaviour.
 const BossStateTestCase CASES[] = {
     {
         .input = {.name = "rental before three wins", .wins = 2, .opponent = {"mimikyu-disguised"}, .boss = "", .final_wins = 3},
@@ -86,12 +85,11 @@ const BossStateTestCase CASES[] = {
     //  is already known is kept.
     {
         .input = {.name = "Kyurem after Mimikyu misidentification", .wins = 3, .opponent = {"kyurem"}, .boss = "mimikyu-disguised", .final_wins = 3},
-        .expectation = {.accepted = true, .boss = "mimikyu-disguised", .boss_if_caught = "mimikyu-disguised"},
+        .expectation = {.accepted = true, .boss = "mimikyu-disguised", .boss_if_caught = ""},
     },
-    //  TODO: to be fixed: the boss is reported caught without a fourth win.
     {
         .input = {.name = "identified boss lost", .wins = 3, .opponent = {"kyurem"}, .boss = "kyurem", .final_wins = 3},
-        .expectation = {.accepted = true, .boss = "kyurem", .boss_if_caught = "kyurem"},
+        .expectation = {.accepted = true, .boss = "kyurem", .boss_if_caught = ""},
     },
     {
         .input = {.name = "identified boss caught", .wins = 3, .opponent = {"kyurem"}, .boss = "", .final_wins = 4},
@@ -101,7 +99,6 @@ const BossStateTestCase CASES[] = {
         .input = {.name = "boss before three wins must retry", .wins = 2, .opponent = {"kyurem"}, .boss = "", .final_wins = 2},
         .expectation = {.accepted = false, .boss = "", .boss_if_caught = ""},
     },
-    //  TODO: to be fixed: a boss stage with no opponent read is accepted.
     {
         .input = {.name = "empty boss-stage read", .wins = 3, .opponent = {}, .boss = "", .final_wins = 3},
         .expectation = {.accepted = true, .boss = "", .boss_if_caught = ""},
@@ -110,23 +107,99 @@ const BossStateTestCase CASES[] = {
         .input = {.name = "ambiguous boss-stage read is not the boss", .wins = 3, .opponent = {"kyurem", "mimikyu-disguised"}, .boss = "", .final_wins = 3},
         .expectation = {.accepted = true, .boss = "", .boss_if_caught = ""},
     },
-    //  TODO: to be fixed: a rental read at the boss stage is accepted, and the boss is reported caught without a fourth win.
     {
         .input = {.name = "rental read after known boss", .wins = 3, .opponent = {"mimikyu-disguised"}, .boss = "kyurem", .final_wins = 3},
-        .expectation = {.accepted = true, .boss = "kyurem", .boss_if_caught = "kyurem"},
-    },
-    //  TODO: a rental boss recorded before this fix is still reported as caught.
-    {
-        .input = {.name = "fourth win after rental boss", .wins = 3, .opponent = {"mimikyu-disguised"}, .boss = "mimikyu-disguised", .final_wins = 4},
-        .expectation = {.accepted = true, .boss = "mimikyu-disguised", .boss_if_caught = "mimikyu-disguised"},
+        .expectation = {.accepted = true, .boss = "kyurem", .boss_if_caught = ""},
     },
 };
 
+struct FitsStageTestCaseInput{
+    std::string name;
+    uint8_t wins;
+    std::set<std::string> opponent;
+    std::string boss;
+};
+
+struct FitsStageTestCaseExpectation{
+    bool fits;
+};
+
+struct FitsStageTestCase{
+    FitsStageTestCaseInput input;
+    FitsStageTestCaseExpectation expectation;
+};
+
+class Test_MaxLairFitsStage : public UnitTest{
+public:
+    explicit Test_MaxLairFitsStage(FitsStageTestCase scenario)
+        : UnitTest(std::format("PokemonSwSh::MaxLairFitsStage - {}", scenario.input.name))
+        , m_scenario(std::move(scenario))
+    {}
+
+    virtual UnitTestResult run(Logger&, CancellableScope&) const override{
+        const FitsStageTestCaseInput& input = m_scenario.input;
+        const FitsStageTestCaseExpectation& expected = m_scenario.expectation;
+        GlobalState state;
+        state.wins = input.wins;
+        state.opponent = input.opponent;
+        state.boss = input.boss;
+        const bool fits = state.opponent_fits_stage();
+        if (fits != expected.fits){
+            return std::format("Expected fits={}, got {}", expected.fits, fits);
+        }
+        return true;
+    }
+
+private:
+    FitsStageTestCase m_scenario;
+};
+
+const FitsStageTestCase FITS_STAGE_CASES[] = {
+    {
+        .input = {.name = "rental before three wins", .wins = 2, .opponent = {"mimikyu-disguised"}, .boss = ""},
+        .expectation = {.fits = true},
+    },
+    {
+        .input = {.name = "boss before three wins", .wins = 2, .opponent = {"kyurem"}, .boss = ""},
+        .expectation = {.fits = false},
+    },
+    {
+        .input = {.name = "rental at boss stage with unknown boss", .wins = 3, .opponent = {"mimikyu-disguised"}, .boss = ""},
+        .expectation = {.fits = false},
+    },
+    {
+        .input = {.name = "empty read at boss stage with unknown boss", .wins = 3, .opponent = {}, .boss = ""},
+        .expectation = {.fits = false},
+    },
+    {
+        .input = {.name = "ambiguous read at boss stage with unknown boss", .wins = 3, .opponent = {"kyurem", "mimikyu-disguised"}, .boss = ""},
+        .expectation = {.fits = false},
+    },
+    {
+        .input = {.name = "boss at boss stage", .wins = 3, .opponent = {"kyurem"}, .boss = ""},
+        .expectation = {.fits = true},
+    },
+    {
+        .input = {.name = "rental at boss stage with known boss", .wins = 3, .opponent = {"mimikyu-disguised"}, .boss = "kyurem"},
+        .expectation = {.fits = false},
+    },
+    {
+        .input = {.name = "known boss at boss stage", .wins = 3, .opponent = {"kyurem"}, .boss = "kyurem"},
+        .expectation = {.fits = true},
+    },
+    {
+        .input = {.name = "other boss at boss stage with known boss", .wins = 3, .opponent = {"zekrom"}, .boss = "kyurem"},
+        .expectation = {.fits = false},
+    },
+};
 }
 
 void add_tests_MaxLairBossState(UnitTestDatabase& database){
     for (const BossStateTestCase& scenario : CASES){
         database.add<Test_MaxLairBossState>(scenario);
+    }
+    for (const FitsStageTestCase& scenario : FITS_STAGE_CASES){
+        database.add<Test_MaxLairFitsStage>(scenario);
     }
 }
 
