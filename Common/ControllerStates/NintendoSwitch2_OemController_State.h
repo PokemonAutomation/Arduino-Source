@@ -115,17 +115,17 @@ struct OemController_State0x05_Motion{
     int16_t  gyro_z;
 };
 
-//  The fast-path input fields of report 0x05: the buttons, sticks, and
-//  the GameCube analog triggers. It does not embed in
-//  OemController_State0x05 (the triggers sit after the motion block, so
-//  the fields are not contiguous on the wire); the remaining 0x05 fields
-//  only update on full-state commands.
+//  The fast-path input fields of report 0x05: an exact prefix of
+//  OemController_State0x05 (buttons, the unknown pair, sticks), so the
+//  firmware can memcpy it over the head of the state. The GameCube
+//  analog triggers sit after the motion block, so no contiguous prefix
+//  can reach them - the GC target uses report 0x0A, where they are part
+//  of the 0x0A buttons prefix.
 struct OemController_State0x05_Buttons{
     uint8_t buttons[4];
+    uint8_t unknown_0x08[2];
     uint8_t left_stick[3];
     uint8_t right_stick[3];
-    uint8_t left_trigger;
-    uint8_t right_trigger;
 };
 
 struct OemController_State0x05{
@@ -178,8 +178,10 @@ struct OemController_State0x07_Optical{
     uint8_t coveredness;   // ~0xff uncovered/lifted, ~0x00 resting on a surface
 };
 
+//  Exact prefix of OemController_State0x07.
 struct OemController_State0x07_Buttons{
     uint8_t buttons[2];
+    uint8_t unknown_0x04;
     uint8_t stick[3];
 };
 
@@ -211,8 +213,10 @@ bool OemController_State0x07_equals(
 //
 
 
+//  Exact prefix of OemController_State0x08.
 struct OemController_State0x08_Buttons{
     uint8_t buttons[2];
+    uint8_t unknown_0x04;
     uint8_t stick[3];
 };
 
@@ -242,6 +246,7 @@ bool OemController_State0x08_equals(
 //
 
 
+//  Exact prefix of OemController_State0x09.
 struct OemController_State0x09_Buttons{
     uint8_t buttons[3];
     uint8_t left_stick[3];
@@ -276,10 +281,12 @@ bool OemController_State0x09_equals(
 //
 
 
+//  Exact prefix of OemController_State0x0A.
 struct OemController_State0x0A_Buttons{
     uint8_t buttons[3];
     uint8_t left_stick[3];
     uint8_t right_stick[3];
+    uint8_t unknown_0x0B;
     uint8_t left_trigger;
     uint8_t right_trigger;
 };

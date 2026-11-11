@@ -75,12 +75,13 @@ struct Message_Feedback_NS2_OemController_Rumble : MessageHeader{
 //
 //  Target input
 //
-//  Per report format: a fast-path buttons message (buttons + sticks, and
-//  the GameCube triggers where the format has them) and a full-state
-//  message (the complete state payload: 59 bytes for 0x05, 61 for the
-//  native reports). The full-state messages are 65/67 bytes: they fit
-//  the 72-byte incoming message cap and, at the 96 byte packet cap,
-//  travel as a single RSC packet.
+//  Per report format: a fast-path buttons message and a full-state
+//  message. The buttons struct is an exact prefix of the full state
+//  (buttons + sticks + the format's unknown byte(s), and the GameCube
+//  triggers where the 0x0A format has them contiguously), so the firmware
+//  updates the cached state with a single memcpy. The full-state messages
+//  are 65/67 bytes: they fit the 72-byte incoming message cap and, at the
+//  96 byte packet cap, travel as a single RSC packet.
 //
 
 
