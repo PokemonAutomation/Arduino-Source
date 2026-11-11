@@ -7,6 +7,7 @@
 #include <map>
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
@@ -16,6 +17,8 @@
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Tests/ImageUnitTest.h"
+#include "Tests/TestUtils.h"
 #include "PokemonSV_ItemPrinterJobsDetector.h"
 
 namespace PokemonAutomation{
@@ -142,6 +145,52 @@ void ItemPrinterJobsDetector::set_print_jobs(
         "Failed to set jobs after 10 tries.",
         &stream,
         std::move(snapshot.frame)
+    );
+}
+
+
+
+class Test_ItemPrinterJobsDetector : public ImageUnitTest{
+public:
+    Test_ItemPrinterJobsDetector(
+        const std::string& image,
+        int expected_jobs
+    )
+        : ImageUnitTest("PokemonSV::ItemPrinterJobsDetector - " + image, {image})
+        , m_expected_jobs(expected_jobs)
+    {
+        //  Plus the PaddleOCR (ONNX) recognition session and its working set.
+        m_memory += PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+    }
+
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
+
+        ItemPrinterJobsDetector detector(COLOR_RED);
+        uint8_t jobs = detector.detect_jobs(logger, image);
+
+        TEST_RESULT_EQUAL_STR((int)jobs, m_expected_jobs);
+
+        return true;
+    };
+
+private:
+    int m_expected_jobs;
+};
+
+
+
+void add_tests_ItemPrinterJobsDetector(UnitTestDatabase& database){
+    database.add<Test_ItemPrinterJobsDetector>(
+        "PokemonSV/ItemPrinterJobsDetector/Japanese_Jobs_1.png",
+        1
+    );
+    database.add<Test_ItemPrinterJobsDetector>(
+        "PokemonSV/ItemPrinterJobsDetector/Japanese_Jobs_10.png",
+        10
     );
 }
 

@@ -61,6 +61,7 @@ UnitTestDatabase make_UNIT_TESTS_ALL(){
     add_tests_MoveOnlyFunction(ret);
     SysbotBase::add_tests_SysbotBasePing(ret);
     SysbotBase::add_tests_SysbotBaseReceiveLine(ret);
+    SysbotBase::add_tests_SysbotBaseShutdown(ret);
     add_tests_AudioInfo(ret);
     add_tests_ChannelMixerMatrix(ret);
     add_tests_FFTStreamer(ret);
