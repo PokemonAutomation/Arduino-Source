@@ -14,6 +14,8 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../3rdParty-Core/miniz-3.1.1/miniz.c
     ../3rdParty-Core/miniz-3.1.1/miniz.h
     ../Common/Compiler.h
+    ../Common/ControllerStates/NintendoSwitch2_OemController_State.cpp
+    ../Common/ControllerStates/NintendoSwitch2_OemController_State.h
     ../Common/ControllerStates/NintendoSwitch_OemController_State.cpp
     ../Common/ControllerStates/NintendoSwitch_OemController_State.h
     ../Common/ControllerStates/NintendoSwitch_WiredController_State.h
@@ -185,6 +187,7 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../Common/CRC32/pabb_CRC32.h
     ../Common/PABotBase2/Controllers/PABotBase2_Controller_HID_Keyboard.h
     ../Common/PABotBase2/Controllers/PABotBase2_Controller_NS1_OemController.h
+    ../Common/PABotBase2/Controllers/PABotBase2_Controller_NS2_OemController.h
     ../Common/PABotBase2/Controllers/PABotBase2_Controller_NS_WiredController.h
     ../Common/PABotBase2/PABotBase2_MessageProtocol.h
     ../Common/PABotBase2/PABotBase2CC_MessageDumper.cpp
