@@ -1706,14 +1706,23 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h
     Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.cpp
     Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h
+    Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogTextReader.cpp
+    Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogTextReader.h
     Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PartyDialogs.cpp
     Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PartyDialogs.h
     Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.cpp
     Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.h
     Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_MapDetector.cpp
     Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_MapDetector.h
+    Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_OverworldGeometry.h
+    Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_OverworldPosition.cpp
+    Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_OverworldPosition.h
+    Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_OverworldSprites.cpp
+    Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_OverworldSprites.h
     Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_PokemonLeagueDetectors.cpp
     Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_PokemonLeagueDetectors.h
+    Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_VsSeekerIconDetector.cpp
+    Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_VsSeekerIconDetector.h
     Source/VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_BagDetector.cpp
     Source/VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_BagDetector.h
     Source/VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_LoadMenuDetector.cpp
