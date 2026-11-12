@@ -30,16 +30,6 @@ const ImageFloatBox DIALOG_LINE_BOXES[2] = {
     {0.055, 0.850, 0.885, 0.088},
 };
 
-//  The bag's item description: two lines of white text on blue, right of the
-//  item's picture, at (40, 113) and (40, 129) of the 240x160 GBA screen.
-const ImageFloatBox BAG_DESCRIPTION_LINE_BOXES[2] = {
-    {40.0 / 240, 113.0 / 160, 188.0 / 240, 16.0 / 160},
-    {40.0 / 240, 129.0 / 160, 188.0 / 240, 16.0 / 160},
-};
-
-//  The Fly map's place name window, at (24, 16) to (144, 32) of the GBA screen.
-const ImageFloatBox FLY_MAP_NAME_BOX(24.0 / 240, 16.0 / 160, 120.0 / 240, 16.0 / 160);
-
 //  The text of one line of a text window: `box` in the game screen, with the
 //  text's colors between `min_color` and `max_color`. Line breaks become
 //  spaces and the ends are trimmed. (The OCR reads a single line.)
@@ -99,35 +89,6 @@ std::string read_dialog_line(
         );
     }
 }
-
-std::string read_fly_map_name(Logger& logger, Language language, const ImageViewRGB32& frame){
-    //  White text. The map behind it doesn't pass the filter.
-    return read_text_line(
-        logger, language, frame, FLY_MAP_NAME_BOX,
-        combine_rgb(190, 190, 190), combine_rgb(255, 255, 255),
-        "Fly map cursor on", "DebugDumps/ocr_fly_map_name.png"
-    );
-}
-
-std::string read_bag_description(Logger& logger, Language language, const ImageViewRGB32& frame){
-    std::string text;
-    for (const ImageFloatBox& box : BAG_DESCRIPTION_LINE_BOXES){
-        std::string line = read_text_line(
-            logger, language, frame, box,
-            combine_rgb(190, 190, 190), combine_rgb(255, 255, 255),
-            "Bag item description line", "DebugDumps/ocr_bag_description.png"
-        );
-        if (line.empty()){
-            continue;
-        }
-        if (!text.empty()){
-            text += ' ';
-        }
-        text += line;
-    }
-    return text;
-}
-
 
 bool text_contains_any(const std::string& text, const std::vector<std::string>& words){
     std::u32string normalized = OCR::normalize_utf32(text);

@@ -38,14 +38,6 @@ std::string read_dialog_line(
     DialogStyle style, int line
 );
 
-//  On the Fly map: the name of the place under the cursor, from the window at
-//  the top-left. Empty if the cursor isn't on a named place.
-std::string read_fly_map_name(Logger& logger, Language language, const ImageViewRGB32& frame);
-
-//  In the bag: the description of the item under the cursor, from the window
-//  at the bottom (both lines).
-std::string read_bag_description(Logger& logger, Language language, const ImageViewRGB32& frame);
-
 
 //  Whether `text` contains any of the words, comparing normalized text (see
 //  OCR::normalize_utf32()), so "POKéMON" matches "pokemon".

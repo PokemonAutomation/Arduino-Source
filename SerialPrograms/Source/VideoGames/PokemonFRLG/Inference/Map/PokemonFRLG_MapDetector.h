@@ -41,29 +41,6 @@ public:
     {}
 };
 
-// Detect the Fly map of any region: Kanto or the Sevii Islands. Checks the
-// blue title bar and the white side borders. (KantoMapDetector also checks
-// for Kanto's land, so it misses the Sevii Islands maps.)
-class FlyMapDetector : public StaticScreenDetector{
-public:
-    FlyMapDetector(Color color);
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) override;
-
-private:
-    Color m_color;
-    ImageFloatBox m_top_box;
-    ImageFloatBox m_left_box;
-    ImageFloatBox m_right_box;
-};
-class FlyMapWatcher : public DetectorToFinder<FlyMapDetector>{
-public:
-    FlyMapWatcher(Color color)
-        : DetectorToFinder("FlyMapWatcher", std::chrono::milliseconds(250), color)
-    {}
-};
-
 
 
 }
