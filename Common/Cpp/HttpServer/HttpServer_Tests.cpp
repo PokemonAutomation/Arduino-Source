@@ -78,6 +78,8 @@ struct HandlerGate{
 
 
 //  A raw TCP client that accumulates everything it receives.
+//  "received" and the error strings are protected by "waiter.lock": the
+//  socket's receive thread writes them, the test thread reads them.
 struct TestClient{
     Waiter waiter;
     std::string received;
@@ -90,18 +92,27 @@ struct TestClient{
         TestClient* client;
 
         virtual void on_connect_finished(const std::string& error_message) override{
-            client->connect_error = error_message;
+            {
+                std::lock_guard<Mutex> lg(client->waiter.lock);
+                client->connect_error = error_message;
+            }
             client->connected++;
             client->waiter.notify();
         }
 
         virtual void on_receive_data(const void* data, size_t bytes) override{
-            client->received.append((const char*)data, bytes);
+            {
+                std::lock_guard<Mutex> lg(client->waiter.lock);
+                client->received.append((const char*)data, bytes);
+            }
             client->waiter.notify();
         }
 
         virtual void on_disconnect(const std::string& error_message) override{
-            client->disconnect_error = error_message;
+            {
+                std::lock_guard<Mutex> lg(client->waiter.lock);
+                client->disconnect_error = error_message;
+            }
             client->disconnected++;
             client->waiter.notify();
         }
@@ -137,10 +148,18 @@ struct TestClient{
     }
 
     bool wait_for_bytes(size_t n){
+        //  The predicate runs with "waiter.lock" held, so it may read
+        //  "received" directly.
         return waiter.wait_for(
             HTTP_TEST_WAIT,
             [this, n]{ return received.size() >= n; }
         );
+    }
+
+    //  A consistent copy of everything received so far, for assertions.
+    std::string received_snapshot(){
+        std::lock_guard<Mutex> lg(waiter.lock);
+        return received;
     }
 };
 
@@ -148,15 +167,24 @@ struct TestClient{
 struct TestServerListener : HttpServer::Listener{
     Waiter waiter;
     std::atomic<int> listen_finished{0};
+    //  Protected by "waiter.lock" (written by the socket's thread).
     std::string last_listen_error;
     std::atomic<int> connected{0};
     std::atomic<int> rejected{0};
     std::atomic<int> disconnected{0};
 
     virtual void on_listen_finished(const std::string& error_message) override{
-        last_listen_error = error_message;
+        {
+            std::lock_guard<Mutex> lg(waiter.lock);
+            last_listen_error = error_message;
+        }
         listen_finished++;
         waiter.notify();
+    }
+
+    std::string last_listen_error_snapshot(){
+        std::lock_guard<Mutex> lg(waiter.lock);
+        return last_listen_error;
     }
 
     virtual void on_connect() override{
@@ -207,7 +235,7 @@ protected:
                 server.stop();
                 continue;
             }
-            if (listener.last_listen_error.empty()){
+            if (listener.last_listen_error_snapshot().empty()){
                 port = candidate;
                 return true;
             }
@@ -279,8 +307,8 @@ public:
                     "/mcp|session=abc|unit-test|hello";
                 if (!client.wait_for_bytes(expected.size())){
                     error = "The client did not receive the full response";
-                }else if (client.received != expected){
-                    error = "Bad response:\n" + client.received;
+                }else if (client.received_snapshot() != expected){
+                    error = "Bad response:\n" + client.received_snapshot();
                 }
             }
             //  The client goes out of scope here and closes the socket.
@@ -355,9 +383,9 @@ public:
                     "\r\n"
                     "rtwo";
                 if (!client.wait_for_bytes(expected.size())){
-                    error = "The client did not receive both responses (got " + std::to_string(client.received.size()) + " of " + std::to_string(expected.size()) + " bytes)";
-                }else if (client.received != expected){
-                    error = "Bad response:\n" + client.received;
+                    error = "The client did not receive both responses (got " + std::to_string(client.received_snapshot().size()) + " of " + std::to_string(expected.size()) + " bytes)";
+                }else if (client.received_snapshot() != expected){
+                    error = "Bad response:\n" + client.received_snapshot();
                 }
             }
         }
@@ -414,8 +442,8 @@ public:
                     "done";
                 if (!client.wait_for_bytes(expected.size())){
                     error = "The client did not receive the full response";
-                }else if (client.received != expected){
-                    error = "Bad response:\n" + client.received;
+                }else if (client.received_snapshot() != expected){
+                    error = "Bad response:\n" + client.received_snapshot();
                 }else if (!client.waiter.wait_for(
                     HTTP_TEST_WAIT,
                     [&client]{ return client.disconnected.load() >= 1; }
@@ -444,8 +472,8 @@ public:
                     "Connection: keep-alive\r\n"
                     "\r\n"
                     "done";
-                if (!client.wait_for_bytes(expected.size()) || client.received != expected){
-                    error = "The reconnected client did not get a good response:\n" + client.received;
+                if (!client.wait_for_bytes(expected.size()) || client.received_snapshot() != expected){
+                    error = "The reconnected client did not get a good response:\n" + client.received_snapshot();
                 }
             }
         }
@@ -494,8 +522,8 @@ public:
                     "Connection: close\r\n"
                     "\r\n"
                     "Malformed request.\n";
-                if (!client.wait_for_bytes(expected.size()) || client.received != expected){
-                    error = "Bad error response:\n" + client.received;
+                if (!client.wait_for_bytes(expected.size()) || client.received_snapshot() != expected){
+                    error = "Bad error response:\n" + client.received_snapshot();
                 }
             }
         }
@@ -517,8 +545,8 @@ public:
                     "Connection: keep-alive\r\n"
                     "\r\n"
                     "ok";
-                if (!client.wait_for_bytes(expected.size()) || client.received != expected){
-                    error = "The server did not recover:\n" + client.received;
+                if (!client.wait_for_bytes(expected.size()) || client.received_snapshot() != expected){
+                    error = "The server did not recover:\n" + client.received_snapshot();
                 }
             }
         }
@@ -573,8 +601,8 @@ public:
                     "Connection: close\r\n"
                     "\r\n"
                     "Chunked transfer encoding is not supported.\n";
-                if (!client.wait_for_bytes(expected.size()) || client.received != expected){
-                    error = "Bad error response:\n" + client.received;
+                if (!client.wait_for_bytes(expected.size()) || client.received_snapshot() != expected){
+                    error = "Bad error response:\n" + client.received_snapshot();
                 }
             }
         }
@@ -633,8 +661,77 @@ public:
                     "Connection: close\r\n"
                     "\r\n"
                     "Request body too large.\n";
-                if (!client.wait_for_bytes(expected.size()) || client.received != expected){
-                    error = "Bad error response:\n" + client.received;
+                if (!client.wait_for_bytes(expected.size()) || client.received_snapshot() != expected){
+                    error = "Bad error response:\n" + client.received_snapshot();
+                }
+            }
+        }
+
+        if (error.empty() && handler_called.load()){
+            error = "The handler was called for a rejected request";
+        }
+
+        server.stop();
+        if (!error.empty()){
+            return error;
+        }
+        return true;
+    }
+};
+
+
+//  A complete header section over the size limit is rejected with 400,
+//  even though it arrives in one piece (the in-progress limit check only
+//  fires while the terminator is still missing).
+class Test_Http_HeadersTooLarge : public TestHttpServer{
+public:
+    using TestHttpServer::TestHttpServer;
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        TestServerListener server_listener;
+        HttpServer server(m_thread_pool);
+        server.add_listener(server_listener);
+
+        std::atomic<bool> handler_called{false};
+        auto handler = [&handler_called](const HttpServer::Request&, HttpServer::Response& response, HttpServer::HandlerContext&){
+            handler_called = true;
+            response.status = 200;
+            response.body = "ok";
+        };
+
+        uint16_t port;
+        if (!start_server(server, server_listener, handler, port)){
+            return "Failed to start the server";
+        }
+
+        //  50 headers of about 1.5 KiB each: about 75 KiB of headers -
+        //  under the 100-header count limit, over the 64 KiB size limit.
+        std::string request = "POST / HTTP/1.1\r\n";
+        for (int i = 0; i < 50; i++){
+            request += "X-Filler-";
+            request += std::to_string(i);
+            request += ": ";
+            request += std::string(1490, 'a');
+            request += "\r\n";
+        }
+        request += "\r\n";
+
+        std::string error;
+        {
+            TestClient client(m_thread_pool);
+            if (!client.connect(port)){
+                error = "The client did not connect";
+            }else if (!client.send_all(request)){
+                error = "The client did not send the request";
+            }else{
+                const std::string expected =
+                    "HTTP/1.1 400 Bad Request\r\n"
+                    "Content-Length: 19\r\n"
+                    "Connection: close\r\n"
+                    "\r\n"
+                    "Malformed request.\n";
+                if (!client.wait_for_bytes(expected.size()) || client.received_snapshot() != expected){
+                    error = "Bad error response:\n" + client.received_snapshot();
                 }
             }
         }
@@ -718,8 +815,8 @@ public:
                     "Connection: keep-alive\r\n"
                     "\r\n"
                     "ok";
-                if (!client.wait_for_bytes(expected.size()) || client.received != expected){
-                    error = "The server did not answer after the cap test:\n" + client.received;
+                if (!client.wait_for_bytes(expected.size()) || client.received_snapshot() != expected){
+                    error = "The server did not answer after the cap test:\n" + client.received_snapshot();
                 }
             }
         }
@@ -733,8 +830,10 @@ public:
 };
 
 
-//  "Expect: 100-continue" is answered with "100 Continue" before the final
-//  response.
+//  "Expect: 100-continue" is answered with "100 Continue" as soon as the
+//  headers are validated - before the body arrives, which is what a
+//  client waiting for the interim response is waiting for - and the
+//  final response carries the body.
 class Test_Http_ExpectContinue : public TestHttpServer{
 public:
     using TestHttpServer::TestHttpServer;
@@ -764,19 +863,27 @@ public:
                 "Content-Length: 5\r\n"
                 "Expect: 100-continue\r\n"
                 "\r\n"
-                "hello"
             )){
-                error = "The client did not send the request";
+                error = "The client did not send the headers";
             }else{
-                const std::string expected =
-                    "HTTP/1.1 100 Continue\r\n\r\n"
-                    "HTTP/1.1 200 OK\r\n"
-                    "Content-Length: 5\r\n"
-                    "Connection: keep-alive\r\n"
-                    "\r\n"
-                    "hello";
-                if (!client.wait_for_bytes(expected.size()) || client.received != expected){
-                    error = "Bad response:\n" + client.received;
+                const std::string continue_response = "HTTP/1.1 100 Continue\r\n\r\n";
+                if (!client.wait_for_bytes(continue_response.size())
+                    || client.received_snapshot().compare(0, continue_response.size(), continue_response) != 0
+                ){
+                    error = "The server did not answer the interim response:\n" + client.received_snapshot();
+                }else if (!client.send_all("hello")){
+                    error = "The client did not send the body";
+                }else{
+                    const std::string expected =
+                        "HTTP/1.1 100 Continue\r\n\r\n"
+                        "HTTP/1.1 200 OK\r\n"
+                        "Content-Length: 5\r\n"
+                        "Connection: keep-alive\r\n"
+                        "\r\n"
+                        "hello";
+                    if (!client.wait_for_bytes(expected.size()) || client.received_snapshot() != expected){
+                        error = "Bad response:\n" + client.received_snapshot();
+                    }
                 }
             }
         }
@@ -882,8 +989,8 @@ public:
                     "Connection: keep-alive\r\n"
                     "\r\n"
                     "ok";
-                if (!client.wait_for_bytes(expected.size()) || client.received != expected){
-                    error = "The server did not recover:\n" + client.received;
+                if (!client.wait_for_bytes(expected.size()) || client.received_snapshot() != expected){
+                    error = "The server did not recover:\n" + client.received_snapshot();
                 }
             }
         }
@@ -1023,8 +1130,8 @@ public:
                     "Connection: keep-alive\r\n"
                     "\r\n"
                     "ok";
-                if (!client_b.wait_for_bytes(expected.size()) || client_b.received != expected){
-                    error = "The second client received a stray response:\n" + client_b.received;
+                if (!client_b.wait_for_bytes(expected.size()) || client_b.received_snapshot() != expected){
+                    error = "The second client received a stray response:\n" + client_b.received_snapshot();
                 }
             }
         }
@@ -1055,15 +1162,26 @@ public:
 
         HandlerGate gate;
         std::atomic<bool> handler_started{false};
+        std::atomic<bool> saw_disconnect_on_stop{false};
 
-        auto handler = [&gate, &handler_started](
+        auto handler = [&gate, &handler_started, &saw_disconnect_on_stop](
             const HttpServer::Request&,
             HttpServer::Response& response,
-            HttpServer::HandlerContext&
+            HttpServer::HandlerContext& context
         ){
             handler_started = true;
             gate.started.notify();
             gate.wait_for_release(HTTP_TEST_WAIT);
+            //  Then stay alive while the connection is alive: the pattern
+            //  a long-running tool call uses. stop() marks the connection
+            //  dead before it waits for this handler (the socket's
+            //  close_connection() close suppresses the disconnect
+            //  callback), so the loop must terminate - without that mark
+            //  this would spin forever and stop() would hang.
+            while (context.connection_alive()){
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            }
+            saw_disconnect_on_stop = !context.connection_alive();
             response.status = 200;
             response.body = "late";
         };
@@ -1107,6 +1225,10 @@ public:
             }
         }
 
+        if (error.empty() && !saw_disconnect_on_stop.load()){
+            error = "The handler did not see the connection as gone after stop()";
+        }
+
         if (error.empty()){
             //  Start again (on a fresh port) and serve a fresh request.
             auto simple_handler = [](const HttpServer::Request&, HttpServer::Response& response, HttpServer::HandlerContext&){
@@ -1132,8 +1254,8 @@ public:
                         "Connection: keep-alive\r\n"
                         "\r\n"
                         "ok";
-                    if (!client.wait_for_bytes(expected.size()) || client.received != expected){
-                        error = "The restarted server did not answer:\n" + client.received;
+                    if (!client.wait_for_bytes(expected.size()) || client.received_snapshot() != expected){
+                        error = "The restarted server did not answer:\n" + client.received_snapshot();
                     }
                 }
             }
@@ -1221,6 +1343,9 @@ void add_tests_HttpServer(UnitTestDatabase& database, ThreadPool& thread_pool){
     );
     database.add<Test_Http_BodyTooLarge>(
         thread_pool, "HttpServer - Oversized content-length is rejected"
+    );
+    database.add<Test_Http_HeadersTooLarge>(
+        thread_pool, "HttpServer - An oversized header section is rejected"
     );
     database.add<Test_Http_BufferCap>(
         thread_pool, "HttpServer - A connection over the buffer cap is closed"

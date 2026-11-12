@@ -14,6 +14,14 @@
  *    connection (from the thread pool) does all parsing and writing, so
  *    the handler may run for a long time without stalling the socket's
  *    receive loop.
+ *  - Every write goes through "AbstractServerSocket::send()" with the
+ *    connection's socket id (captured at accept time), so a response
+ *    that outlives its connection - the peer disconnected and the next
+ *    client was accepted in the meantime - is refused by the socket
+ *    instead of reaching the new client's stream.
+ *  - "Expect: 100-continue" is answered as soon as the headers are
+ *    validated, while the body is still pending (a waiting client is
+ *    blocked on that interim response).
  *  - Task handles live in "m_tasks" under a dedicated "m_task_lock"
  *    (the socket library's "m_task_lock" pattern): destroying an
  *    "AsyncTask" handle blocks until that task finishes, and the task's
@@ -21,9 +29,13 @@
  *    while holding "m_lock". "on_connect()" may therefore find the
  *    previous connection's task still finishing (for example, still in a
  *    long handler call); its handle is kept and reaped later.
- *  - "stop()" moves the socket out under "m_lock" and destroys it after
- *    releasing the lock: "~ServerSocket" joins the socket's worker
- *    threads, and their callbacks take "m_lock".
+ *  - "stop()" marks the active connection dead before it waits for the
+ *    in-flight task: the socket suppresses its disconnect callback for a
+ *    close_connection() close, so without the mark a handler polling
+ *    "connection_alive()" would never see the shutdown. "stop()" then
+ *    moves the socket out under "m_lock" and destroys it after releasing
+ *    the lock: "~ServerSocket" joins the socket's worker threads, and
+ *    their callbacks take "m_lock".
  *
  */
 
@@ -79,6 +91,7 @@ private:
     //  One request that is waiting to be parsed out of the buffer.
     enum class ParseState{
         NEED_MORE,
+        NEED_BODY,
         READY,
         //  Named "ERROR_RESPONSE" rather than "ERROR" because "ERROR" is
         //  a macro on Windows (winerror.h).
@@ -93,7 +106,7 @@ private:
         std::string error_reason;
         std::vector<std::pair<std::string, std::string>> error_headers;
 
-        //  READY
+        //  READY / NEED_BODY
         Request request;
         bool http_1_1 = true;
         bool connection_close_requested = false;
@@ -108,6 +121,11 @@ private:
         ConditionVariable cv;
         std::string buffer;
         std::atomic<bool> dead{false};
+
+        //  The server socket's connection_id() when this connection was
+        //  accepted. Passed to every send(), so a write that outlives the
+        //  connection is refused instead of reaching the next client.
+        uint64_t socket_id = 0;
     };
 
     //  Runs on a thread from the thread pool, one instance per

@@ -206,6 +206,18 @@ void HttpServer::stop(){
         return;
     }
 
+    //  Mark the active connection dead: the socket suppresses its
+    //  disconnect callback for a close_connection() close, so without
+    //  this a handler polling connection_alive() would never see the
+    //  shutdown, and the wait for it below would never end.
+    {
+        std::lock_guard<Mutex> lg(m_lock);
+        if (m_connection != nullptr){
+            m_connection->dead.store(true, std::memory_order_release);
+            m_connection->cv.notify_all();
+        }
+    }
+
     //  Kill the active connection, if any: it cancels in-flight writes and
     //  makes the socket's connection thread exit. The socket keeps
     //  listening until it is destroyed below, so it may accept a few more
@@ -282,6 +294,9 @@ void HttpServer::on_connect(){
                 m_connection->cv.notify_all();
             }
             m_connection = conn;
+            //  The token of the connection this one will serve; send()
+            //  refuses to write through a socket that has moved on.
+            conn->socket_id = socket->connection_id();
         }
     }
     if (conn == nullptr){
@@ -408,6 +423,10 @@ void HttpServer::connection_task(const std::shared_ptr<Connection>& conn, Abstra
         handler = m_handler;
     }
 
+    //  "Expect: 100-continue" is answered at most once, and only while
+    //  the body is still pending.
+    bool sent_continue = false;
+
     while (true){
         if (m_stop_requested.load(std::memory_order_acquire) ||
             conn->dead.load(std::memory_order_acquire)
@@ -423,7 +442,25 @@ void HttpServer::connection_task(const std::shared_ptr<Connection>& conn, Abstra
             buffer_size = conn->buffer.size();
         }
 
-        if (parsed.state == ParseState::NEED_MORE){
+        if (parsed.state == ParseState::NEED_BODY){
+            //  The headers are complete and valid, but the body has not
+            //  fully arrived. A client that sent "Expect: 100-continue" is
+            //  still waiting for this before sending the body: answer it
+            //  now, not after the (still missing) body arrives. (If the
+            //  whole request was already buffered, the state is READY and
+            //  the final response alone moves the client on; RFC 9110).
+            if (parsed.expect_continue && !sent_continue){
+                static const char CONTINUE_RESPONSE[] = "HTTP/1.1 100 Continue\r\n\r\n";
+                if (!write_raw(conn, socket, CONTINUE_RESPONSE)){
+                    break;
+                }
+                sent_continue = true;
+            }
+        }
+
+        if (parsed.state == ParseState::NEED_MORE
+            || parsed.state == ParseState::NEED_BODY
+        ){
             //  Wait for the rest of this request, a disconnect, or a
             //  stop. The predicate requires the buffer to have grown past
             //  what the parse just saw: with a partial request,
@@ -451,13 +488,6 @@ void HttpServer::connection_task(const std::shared_ptr<Connection>& conn, Abstra
         }
 
         //  A complete request is ready to be handled.
-        if (parsed.expect_continue){
-            static const char CONTINUE_RESPONSE[] = "HTTP/1.1 100 Continue\r\n\r\n";
-            if (!write_raw(conn, socket, CONTINUE_RESPONSE)){
-                break;
-            }
-        }
-
         Response response;
         {
             HandlerContextImpl context(conn->dead);
@@ -528,7 +558,15 @@ HttpServer::ParsedRequest HttpServer::try_parse(std::string& buffer){
         if (buffer.size() > MAX_HEADER_SECTION_BYTES){
             error(400, "Malformed request.");
         }
-        return result;   //  NEED_MORE
+        return result;   //  NEED_MORE: the headers have not fully arrived yet.
+    }
+    //  The same limit applies to a complete header section: the
+    //  in-progress check above only fires while the terminator is still
+    //  missing, so a large section that arrives in one piece would
+    //  otherwise sail through.
+    if (header_end + 4 > MAX_HEADER_SECTION_BYTES){
+        error(400, "Malformed request.");
+        return result;
     }
 
     const size_t line_end = buffer.find("\r\n");
@@ -677,11 +715,13 @@ HttpServer::ParsedRequest HttpServer::try_parse(std::string& buffer){
 
     const size_t consumed = header_end + 4 + (size_t)content_length;
     if (buffer.size() < consumed){
-        //  NEED_MORE: the body has not fully arrived yet. In this state
-        //  the buffer holds nothing but the bytes of this one incomplete
-        //  request ("consumed" is at most a header section plus the body
-        //  cap), so the buffer cannot exceed MAX_BUFFER_BYTES here; the
-        //  overall cap is enforced when data is appended instead.
+        //  NEED_BODY: the headers are complete and valid, the body has
+        //  not fully arrived yet. In this state the buffer holds nothing
+        //  but the bytes of this one request ("consumed" is at most a
+        //  header section plus the body cap), so the buffer cannot exceed
+        //  MAX_BUFFER_BYTES here; the overall cap is enforced when data
+        //  is appended instead.
+        result.state = ParseState::NEED_BODY;
         return result;
     }
 
@@ -717,7 +757,11 @@ void HttpServer::end_connection(const std::shared_ptr<Connection>& conn, Abstrac
 
 
 bool HttpServer::write_raw(const std::shared_ptr<Connection>& conn, AbstractServerSocket* socket, const std::string& bytes){
-    const size_t sent = socket->send(bytes.data(), bytes.size(), WRITE_TIMEOUT);
+    //  "conn->socket_id" is the socket's connection token when this
+    //  connection was accepted: if the socket has moved on to the next
+    //  client since then, the send is refused instead of being delivered
+    //  into the new client's socket.
+    const size_t sent = socket->send(bytes.data(), bytes.size(), WRITE_TIMEOUT, conn->socket_id);
     if (sent != bytes.size()){
         //  The peer went away, or the write stalled: the connection is
         //  unusable either way.
