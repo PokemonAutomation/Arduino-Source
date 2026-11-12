@@ -60,8 +60,12 @@ public:
 class EggRng : public RngProgramInstance, public ConfigOption::Listener{
 public:
     using Descriptor = EggRng_Descriptor;
-    //  The egg and the two wild Pokemon caught to confirm the seed.
-    virtual size_t free_party_slots_needed() const override{ return 3; }
+    virtual size_t free_party_slots_needed() const override{
+        if (STARTING_POINT == EggProgramState::pickup_calibration){
+            return 2;
+        }
+        return 3;
+    }
     ~EggRng();
     EggRng();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
