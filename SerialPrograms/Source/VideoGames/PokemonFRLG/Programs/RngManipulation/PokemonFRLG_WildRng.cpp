@@ -277,6 +277,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     /*
     * Settings: Text Speed fast
     */
+    check_free_party_slots(env, context);
 
     WildRng_Descriptor::Stats& stats = env.current_stats<WildRng_Descriptor::Stats>();
 

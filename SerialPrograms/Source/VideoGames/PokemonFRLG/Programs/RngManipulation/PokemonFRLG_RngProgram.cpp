@@ -35,7 +35,7 @@ std::string not_enough_free_slots_message(size_t party_size, size_t free_slots_n
 }  // namespace
 
 
-void RngProgramInstance::start_program_game_checks(
+void RngProgramInstance::check_free_party_slots(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context
 ){

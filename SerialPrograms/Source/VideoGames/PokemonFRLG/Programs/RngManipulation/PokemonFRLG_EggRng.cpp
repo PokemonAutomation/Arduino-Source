@@ -722,6 +722,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     /*
     * Settings: Text Speed fast
     */
+    check_free_party_slots(env, context);
 
     EggRng_Descriptor::Stats& stats = env.current_stats<EggRng_Descriptor::Stats>();
 

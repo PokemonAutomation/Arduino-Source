@@ -86,7 +86,6 @@ void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, C
     };
 
     try{
-        start_program_game_checks(env, context);
         program(env, context);
     }catch (FatalProgramException&){
         record_debug_video();

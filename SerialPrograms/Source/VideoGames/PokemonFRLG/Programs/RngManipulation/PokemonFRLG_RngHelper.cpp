@@ -242,6 +242,7 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     /*
     * Settings: Text Speed fast
     */
+    check_free_party_slots(env, context);
 
     RngHelper_Descriptor::Stats& stats = env.current_stats<RngHelper_Descriptor::Stats>();
 

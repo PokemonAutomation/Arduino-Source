@@ -3,9 +3,9 @@
  *  From: https://github.com/PokemonAutomation/
  *
  *  Base class for the FRLG RNG programs. Each program states what the game
- *  must look like when it starts, and the base class checks it before the
- *  program runs, so a setup mistake stops the run at once instead of failing
- *  in a misleading way many resets later.
+ *  must look like when it starts, and checks it first thing, so a setup
+ *  mistake stops the run at once instead of failing in a misleading way many
+ *  resets later.
  *
  */
 
@@ -21,8 +21,7 @@ namespace NintendoSwitch{
 namespace PokemonFRLG{
 
 
-//  Base class of the RNG programs. Before program() runs, it checks that the
-//  party has the free slots the program needs.
+//  Base class of the RNG programs.
 class RngProgramInstance : public SingleSwitchProgramInstance{
 public:
     using SingleSwitchProgramInstance::SingleSwitchProgramInstance;
@@ -37,13 +36,15 @@ public:
         return StartMenuContext::STANDARD;
     }
 
-    //  Runs with the game on the overworld where the player saved. May leave a
-    //  menu open: the program's first reset closes the game. Final so that
-    //  every RNG program runs the check free_party_slots_needed() asks for.
-    virtual void start_program_game_checks(
+protected:
+    //  Checks that the party has the free slots free_party_slots_needed()
+    //  asks for; throws UserSetupError if not. Call it first in program(),
+    //  with the game on the overworld where the player saved. May leave the
+    //  party menu open: the program's first reset closes the game.
+    void check_free_party_slots(
         SingleSwitchProgramEnvironment& env,
         ProControllerContext& context
-    ) override final;
+    );
 };
 
 

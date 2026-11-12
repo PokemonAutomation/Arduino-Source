@@ -226,6 +226,7 @@ void RoamingLegendaryRng::program(SingleSwitchProgramEnvironment& env, ProContro
     /*
     * Settings: Text Speed fast
     */
+    check_free_party_slots(env, context);
 
     RoamingLegendaryRng_Descriptor::Stats& stats = env.current_stats<RoamingLegendaryRng_Descriptor::Stats>();
 

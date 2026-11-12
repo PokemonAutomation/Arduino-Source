@@ -231,6 +231,7 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     /*
     * Settings: Text Speed fast
     */
+    check_free_party_slots(env, context);
 
     GiftRng_Descriptor::Stats& stats = env.current_stats<GiftRng_Descriptor::Stats>();
 

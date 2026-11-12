@@ -558,6 +558,7 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     /*
     * Settings: Text Speed fast
     */
+    check_free_party_slots(env, context);
 
     StarterRng_Descriptor::Stats& stats = env.current_stats<StarterRng_Descriptor::Stats>();
 
