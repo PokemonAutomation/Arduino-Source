@@ -10,6 +10,7 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_PartySlot.h"
+#include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_RngProgram.h"
 
 namespace PokemonAutomation{
@@ -46,7 +47,7 @@ void RngProgramInstance::check_free_party_slots(
     Logger& logger = env.console.logger();
     logger.log("Checking for " + std::to_string(free_slots_needed) + " free party slot(s)...");
     try{
-        open_party_menu_from_overworld(env.console, context, start_menu_context());
+        open_party_menu_from_overworld(env.console, context);
     }catch (OperationFailedException&){
         logger.log("Unable to open the party menu. Skipping the free party slot check.", COLOR_RED);
         return;

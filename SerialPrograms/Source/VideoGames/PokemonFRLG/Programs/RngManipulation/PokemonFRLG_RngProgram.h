@@ -14,7 +14,6 @@
 
 #include <cstddef>
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -30,11 +29,6 @@ public:
     //  catches or receives and then reads from the end of the party. In a full
     //  party that Pokemon would go to the PC instead.
     virtual size_t free_party_slots_needed() const = 0;
-
-    //  The start menu the player sees where the program starts.
-    virtual StartMenuContext start_menu_context() const{
-        return StartMenuContext::STANDARD;
-    }
 
 protected:
     //  Call first in program(), with the game on the overworld where the

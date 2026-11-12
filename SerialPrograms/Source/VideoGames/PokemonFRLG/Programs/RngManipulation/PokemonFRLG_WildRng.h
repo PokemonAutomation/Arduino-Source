@@ -36,9 +36,6 @@ class WildRng : public RngProgramInstance, private ConfigOption::Listener{
 public:
     using Descriptor = WildRng_Descriptor;
     virtual size_t free_party_slots_needed() const override{ return 1; }
-    virtual StartMenuContext start_menu_context() const override{
-        return in_safari_zone() ? StartMenuContext::SAFARI_ZONE : StartMenuContext::STANDARD;
-    }
     ~WildRng();
     WildRng();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
