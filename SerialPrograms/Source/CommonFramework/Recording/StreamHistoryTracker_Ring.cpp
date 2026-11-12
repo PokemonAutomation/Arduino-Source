@@ -984,15 +984,16 @@ struct StreamHistoryTracker_Ring::Data{
             frame->pict_type = AV_PICTURE_TYPE_I;
         }
 
-        //  Send the frame. Some encoders (notably hardware ones) buffer input,
+        //  Send the frame to the encoder.
+        //  Some encoders (notably hardware ones) buffer input,
         //  so a send can fail with EAGAIN while output packets are pending:
         //  drain one packet and retry instead of giving up.
         while (true){
-            int err = avcodec_send_frame(m_video_context.get(), frame.get());
-            if (err == AVERROR(EAGAIN)){
-                DrainResult drained = drain_one_video_packet(err);
+            int err = avcodec_send_frame(m_video_context.get(), frame.get()); // attempts to put a frame into the encoder
+            if (err == AVERROR(EAGAIN)){  // encoder is likely full
+                DrainResult drained = drain_one_video_packet(err);  // attempts to drain frames from the encoder. either fails or stores the packet in the ring
                 if (drained == DrainResult::STORED){
-                    continue;
+                    continue;  // loop back and send the same frame again to the encoder
                 }
                 if (drained == DrainResult::NO_MEMORY){
                     return;
@@ -1010,7 +1011,7 @@ struct StreamHistoryTracker_Ring::Data{
                 fall_back_video_encoder(err, qframe.width(), qframe.height());
                 return;
             }
-            if (err < 0){
+            if (err < 0){ // if any other errors
                 fall_back_video_encoder(err, qframe.width(), qframe.height());
                 return;
             }
@@ -1018,15 +1019,27 @@ struct StreamHistoryTracker_Ring::Data{
         }
         m_logged_frame_skip = false;
 
-        while (true){
+        // drain the packets from the encoder, until there are no more packets
+        bool keep_draining = true;
+        while (keep_draining){
             int err = 0;
-            DrainResult drained = drain_one_video_packet(err);
-            if (drained == DrainResult::FAILED){
+            switch (drain_one_video_packet(err)){
+            case DrainResult::STORED:
+                //  A packet went into the ring. Loop and try again.
+                break;
+            case DrainResult::EMPTY:
+                //  Nothing more is ready. This is the normal way the loop ends.
+                keep_draining = false;
+                break;
+            case DrainResult::NO_MEMORY:
+                //  Stop for now. The packet stays inside the encoder and comes
+                //  out on the next frame's drain, so nothing is lost.
+                //  (However, this error likely means something else is very wrong.)
+                keep_draining = false;
+                break;
+            case DrainResult::FAILED:
                 fall_back_video_encoder(err, qframe.width(), qframe.height());
                 return;
-            }
-            if (drained != DrainResult::STORED){
-                break;
             }
         }
     }
