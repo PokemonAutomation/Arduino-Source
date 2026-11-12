@@ -271,7 +271,7 @@ void UnitTestRunner::on_config_value_changed(void* object){
 
 
 void UnitTestRunner::program(ProgramEnvironment& env, CancellableScope& scope){
-    m_results.reset();
+    m_total_failed.store(0, std::memory_order_release);
     PASSED_TESTS.set("");
     FAILED_TESTS.set("");
 
@@ -333,37 +333,42 @@ void UnitTestRunner::on_test_finished(
     }
     UnitTestRunner_Descriptor::Stats& stats = m_env->current_stats<UnitTestRunner_Descriptor::Stats>();
     stats.tests++;
-    //  1-based index of this result within its bucket: PASSED -> passed #, FAILED/OOM -> failed #.
-    uint64_t index = m_results.add(result);
     switch (result.result){
     case UnitTestResult::NOT_RUN:
-    case UnitTestResult::SKIPPED:
         stats.skipped++;
         break;
-    case UnitTestResult::PASSED:
-        stats.passed++;
-        if (index <= 1000){
+    case UnitTestResult::PASSED:{
+        uint64_t passed = stats.passed.fetch_add(1) + 1;
+        if (passed <= 1000){
             PASSED_TESTS.append(test->name() + "\n");
-        }else if (index == 1001){
+        }else if (passed == 1001){
             PASSED_TESTS.append("<more not shown...>\n");
         }
         break;
-    case UnitTestResult::FAILED:
+    }
+    case UnitTestResult::FAILED:{
+        uint64_t failed = m_total_failed.fetch_add(1) + 1;
         stats.failed++;
-        if (index <= 1000){
+        if (failed <= 1000){
             FAILED_TESTS.append("FAILED: " + test->name() + "\n");
-        }else if (index == 1001){
+        }else if (failed == 1001){
             FAILED_TESTS.append("<more not shown...>\n");
         }
         break;
-    case UnitTestResult::OOM:
+    }
+    case UnitTestResult::SKIPPED:
+        stats.skipped++;
+        break;
+    case UnitTestResult::OOM:{
+        uint64_t failed = m_total_failed.fetch_add(1) + 1;
         stats.oom++;
-        if (index <= 1000){
+        if (failed <= 1000){
             FAILED_TESTS.append("OOM: " + test->name() + "\n");
-        }else if (index == 1001){
+        }else if (failed == 1001){
             FAILED_TESTS.append("<more not shown...>\n");
         }
         break;
+    }
     }
     m_env->update_stats();
 }
@@ -413,32 +418,36 @@ bool CommandLineUnitTestRunner::run(bool augment_color_distortions, const std::s
 
     m_logger.log(
         "Tests Finished:"
-        "\n    Passed:  " + tostr_u_commas(m_results.num_passed()) +
-        "\n    Failed:  " + tostr_u_commas(m_results.num_failed()) +
-        "\n    Skipped: " + tostr_u_commas(m_results.num_skipped())
+        "\n    Passed:  " + tostr_u_commas(m_passed_tests.load(std::memory_order_acquire)) +
+        "\n    Failed:  " + tostr_u_commas(m_failed_tests.load(std::memory_order_acquire)) +
+        "\n    Skipped: " + tostr_u_commas(m_skipped_tests.load(std::memory_order_acquire))
     );
-    return m_results.any_failed();
+    return m_failed_tests.load(std::memory_order_acquire) > 0;
 }
 void CommandLineUnitTestRunner::on_test_finished(
     std::shared_ptr<const UnitTest> test,
     UnitTestResult result
 ){
-    m_results.add(result);
     switch (result.result){
     case UnitTestResult::NOT_RUN:
         m_logger.log("NOT RUN: " + test->name(), COLOR_ORANGE);
+        m_skipped_tests++;
         break;
     case UnitTestResult::PASSED:
         m_logger.log("PASSED: " + test->name(), COLOR_BLUE);
+        m_passed_tests++;
         break;
     case UnitTestResult::FAILED:
         m_logger.log("FAILED: " + test->name(), COLOR_RED);
+        m_failed_tests++;
         break;
     case UnitTestResult::SKIPPED:
         m_logger.log("SKIPPED: " + test->name(), COLOR_ORANGE);
+        m_skipped_tests++;
         break;
     case UnitTestResult::OOM:
         m_logger.log("OOM: " + test->name(), COLOR_RED);
+        m_failed_tests++;
         break;
     }
 }

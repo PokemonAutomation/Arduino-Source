@@ -8,7 +8,6 @@
 #define PokemonAutomation_ComputerPrograms_UnitTestRunner_H
 
 #include <atomic>
-#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/TestRunners/ParallelUnitTestRunner.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
@@ -19,59 +18,6 @@
 
 namespace PokemonAutomation{
 namespace ComputerPrograms{
-
-
-//  Counters for finished test results, shared by the GUI and the command-line test runners.
-//  Both runners count OOM as a failure, and the GUI additionally tracks OOM separately.
-struct UnitTestResultCounters{
-    std::atomic<uint64_t> passed{0};
-    std::atomic<uint64_t> failed{0};
-    std::atomic<uint64_t> skipped{0};
-    std::atomic<uint64_t> oom{0};
-
-    //  Record a finished test. OOM is also a failure, and it is additionally counted in its own
-    //  bucket. Return the 1-based index of the result within its bucket: the order in which
-    //  results of that bucket were recorded, unique even when called from multiple threads.
-    uint64_t add(UnitTestResult result){
-        switch (result.result){
-        case UnitTestResult::NOT_RUN:
-        case UnitTestResult::SKIPPED:
-            return skipped.fetch_add(1) + 1;
-        case UnitTestResult::PASSED:
-            return passed.fetch_add(1) + 1;
-        case UnitTestResult::FAILED:
-            return failed.fetch_add(1) + 1;
-        case UnitTestResult::OOM:
-            oom.fetch_add(1);
-            return failed.fetch_add(1) + 1;
-        default:
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown unit test result");
-        }
-    }
-
-    //  Reset the counters for a new run.
-    void reset(){
-        passed.store(0, std::memory_order_release);
-        failed.store(0, std::memory_order_release);
-        skipped.store(0, std::memory_order_release);
-        oom.store(0, std::memory_order_release);
-    }
-
-    uint64_t num_passed() const{
-        return passed.load(std::memory_order_acquire);
-    }
-    uint64_t num_failed() const{
-        return failed.load(std::memory_order_acquire);
-    }
-    uint64_t num_skipped() const{
-        return skipped.load(std::memory_order_acquire);
-    }
-
-    //  True if any test failed, including OOM.
-    bool any_failed() const{
-        return num_failed() > 0;
-    }
-};
 
 
 class UnitTestRunner_Descriptor : public ComputerProgramDescriptor{
@@ -129,7 +75,7 @@ private:
     TextEditOption FAILED_TESTS;
 
     ProgramEnvironment* m_env = nullptr;
-    UnitTestResultCounters m_results;
+    std::atomic<uint64_t> m_total_failed;
 };
 
 
@@ -138,6 +84,9 @@ class CommandLineUnitTestRunner : public PokemonAutomation::UnitTestRunner::List
 public:
     CommandLineUnitTestRunner(Logger& logger)
         : m_logger(logger)
+        , m_skipped_tests(0)
+        , m_passed_tests(0)
+        , m_failed_tests(0)
     {}
 
     //  Run the unit tests. Return true if any test failed.
@@ -160,7 +109,9 @@ private:
 
 private:
     Logger& m_logger;
-    UnitTestResultCounters m_results;
+    std::atomic<size_t> m_skipped_tests;
+    std::atomic<size_t> m_passed_tests;
+    std::atomic<size_t> m_failed_tests;
 };
 
 
