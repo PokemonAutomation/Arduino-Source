@@ -28,6 +28,7 @@ SnapshotManager::~SnapshotManager(){
 }
 SnapshotManager::SnapshotManager(Logger& logger, QVideoFrameCache& cache)
     : m_logger(logger)
+    , m_converter(logger)
     , m_cache(cache)
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
 {}
@@ -46,9 +47,10 @@ VideoSnapshot SnapshotManager::convert(QVideoFrame frame, WallClock timestamp) n
     snapshot.timestamp = timestamp;
     try{
         WallClock time0 = current_time();
-        snapshot.frame = std::make_shared<const ImageRGB32>(
-            QImage_to_ImageRGB32(frame_to_image(frame))
-        );
+        //  Not QVideoFrame::toImage() once the own conversion matched it:
+        //  memory grows with each toImage() on some computers
+        //  (VideoFrameConversion.h).
+        snapshot.frame = std::make_shared<const ImageRGB32>(m_converter.convert(frame));
         WallClock time1 = current_time();
         WriteSpinLock lg(m_stats_lock);
         m_stats_conversion.report_data(

@@ -748,6 +748,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/VideoPipeline/Backends/QVideoFrameCache.h
     Source/CommonFramework/VideoPipeline/Backends/SnapshotManager.cpp
     Source/CommonFramework/VideoPipeline/Backends/SnapshotManager.h
+    Source/CommonFramework/VideoPipeline/Backends/VideoFrameConversion.cpp
+    Source/CommonFramework/VideoPipeline/Backends/VideoFrameConversion.h
     Source/CommonFramework/VideoPipeline/Backends/VideoFrameQt.cpp
     Source/CommonFramework/VideoPipeline/Backends/VideoFrameQt.h
     Source/CommonFramework/VideoPipeline/CameraInfo.cpp

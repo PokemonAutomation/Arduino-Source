@@ -14,6 +14,7 @@
 #include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "QVideoFrameCache.h"
+#include "VideoFrameConversion.h"
 
 namespace PokemonAutomation{
 
@@ -47,6 +48,7 @@ private:
 
 private:
     Logger& m_logger;
+    VideoFrameConverter m_converter;
     QVideoFrameCache& m_cache;
 
     Mutex m_lock;
