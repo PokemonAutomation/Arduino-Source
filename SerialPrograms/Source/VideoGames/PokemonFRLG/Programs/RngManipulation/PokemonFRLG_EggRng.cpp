@@ -188,7 +188,7 @@ EggRng::EggRng()
     , HELD_ADVANCES(
         "<b>Held Advances:</b><br>The total number of RNG advances for your held target.",
         LockMode::LOCK_WHILE_RUNNING,
-        10000, 700, 1000000000 // default, min
+        10000, 500, 1000000000 // default, min
         )
     , m_pickup_settings("Pickup Frame Settings")
     , PICKUP_SEED(

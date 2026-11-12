@@ -239,7 +239,7 @@ StateMachineAction run_move_select(
 
     bool all_moves_blocked = false;
 
-    while (true){
+    for (size_t attempts = 0;; attempts++){
         stream.log("Selecting move...");
 
         if (cheer_only){
@@ -254,7 +254,10 @@ StateMachineAction run_move_select(
             inferred,
             player_index
         );
-        stream.log("Choosing move " + std::to_string((int)move.first) + (move.second ? " (dmax)." : "."), COLOR_PURPLE);
+        stream.log(
+            "Choosing move " + std::to_string((int)move.first) + (move.second ? " (dmax)." : "."),
+            COLOR_PURPLE
+        );
 
         if (player.can_dmax && move.second){
             pbf_press_dpad(context, DPAD_LEFT, 80ms, 400ms);
@@ -318,6 +321,14 @@ StateMachineAction run_move_select(
 
         //  Reset position.
         pbf_mash_button(context, BUTTON_B, 2000ms);
+        if (attempts >= 5){
+            stream.log(
+                "Failed to select a move after 5 attempts. Performing full cursor reset...",
+                COLOR_RED
+            );
+            pbf_press_dpad(context, DPAD_RIGHT, 2000ms, 0ms);
+            pbf_press_dpad(context, DPAD_UP, 2000ms, 0ms);
+        }
         pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
         pbf_press_dpad(context, DPAD_RIGHT, 2000ms, 0ms);
         pbf_press_dpad(context, DPAD_UP, 2000ms, 0ms);

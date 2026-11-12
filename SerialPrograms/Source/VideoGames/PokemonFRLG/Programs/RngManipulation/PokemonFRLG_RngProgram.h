@@ -13,38 +13,12 @@
 #define PokemonAutomation_PokemonFRLG_RngProgram_H
 
 #include <cstddef>
-#include "Common/Cpp/Logging/AbstractLogger.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_PartySlot.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
-
-
-//  The game steps that check_party_free_slots() takes. They are injected so
-//  that its decisions run in tests without a Switch.
-class PartyCheckActions{
-public:
-    virtual ~PartyCheckActions() = default;
-
-    //  Open the party menu from the overworld. Returns false if it can't.
-    virtual bool open_party_menu() = 0;
-
-    //  Read the last occupied slot on the open party menu.
-    virtual PartySlot read_last_occupied_slot() = 0;
-};
-
-//  Checks that the party has at least `free_slots_needed` free slots,
-//  starting from the overworld. Throws UserSetupError if it doesn't. If the
-//  party menu can't be opened, logs that and returns. May leave the party
-//  menu open.
-void check_party_free_slots(
-    Logger& logger,
-    size_t free_slots_needed,
-    PartyCheckActions& actions
-);
 
 
 //  Base class of the RNG programs. Before program() runs, it checks that the
