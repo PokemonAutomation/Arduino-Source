@@ -107,6 +107,25 @@ const StringSelectDatabase& TEST_DATABASE(){
 }
 
 
+namespace{
+
+//  For each test in `UNIT_TESTS_ALL()` whose name contains `filter`, in name order, call
+//  `add_test(test)`. An empty `filter` matches all the tests. Return the number of tests
+//  visited.
+template <class AddTest>
+size_t add_tests_matching(const std::string& filter, AddTest&& add_test){
+    size_t count = 0;
+    for (const auto& test : UNIT_TESTS_ALL()){
+        if (filter.empty() || test.first.contains(filter)){
+            count++;
+            add_test(test.second);
+        }
+    }
+    return count;
+}
+
+}
+
 
 
 UnitTestRunner_Descriptor::UnitTestRunner_Descriptor()
@@ -237,15 +256,12 @@ void UnitTestRunner::on_config_value_changed(void* object){
     if (object == &SUBSTRING_TEST){
         std::string name = SUBSTRING_TEST;
         TESTS_TO_RUN.set("");
-        size_t count = 0;
-        for (const auto& test : UNIT_TESTS_ALL()){
-            if (test.first.contains(name)){
-                count++;
-                if (count <= 1000){
-                    TESTS_TO_RUN.append(test.first + "\n");
-                }
+        size_t num_shown = 0;
+        size_t count = add_tests_matching(name, [&](std::shared_ptr<const UnitTest> test){
+            if (++num_shown <= 1000){
+                TESTS_TO_RUN.append(test->name() + "\n");
             }
-        }
+        });
         if (count > 1000){
             TESTS_TO_RUN.append("<" + tostr_u_commas(count - 1000) + " more...>\n");
         }
@@ -255,7 +271,7 @@ void UnitTestRunner::on_config_value_changed(void* object){
 
 
 void UnitTestRunner::program(ProgramEnvironment& env, CancellableScope& scope){
-    m_total_failed.store(0, std::memory_order_release);
+    m_results.reset();
     PASSED_TESTS.set("");
     FAILED_TESTS.set("");
 
@@ -276,6 +292,12 @@ void UnitTestRunner::program(ProgramEnvironment& env, CancellableScope& scope){
 
     const UnitTestDatabase& all_tests = UNIT_TESTS_ALL();
 
+    auto add_matching = [&](const std::string& filter){
+        add_tests_matching(filter, [&](std::shared_ptr<const UnitTest> test){
+            runner.add_test(test);
+        });
+    };
+
     switch ((RunMode)RUN_MODE){
     case RunMode::RUN_ONE:{
         auto iter = all_tests.find(SINGLE_TEST.slug());
@@ -289,21 +311,12 @@ void UnitTestRunner::program(ProgramEnvironment& env, CancellableScope& scope){
         runner.add_test(iter->second);
         break;
     }
-    case RunMode::RUN_SUBSTRING_MATCH:{
-        std::string name = SUBSTRING_TEST;
-        for (const auto& test : all_tests){
-            if (test.first.contains(name)){
-                runner.add_test(test.second);
-            }
-        }
+    case RunMode::RUN_SUBSTRING_MATCH:
+        add_matching(SUBSTRING_TEST);
         break;
-    }
-    case RunMode::RUN_ALL:{
-        for (const auto& test : all_tests){
-            runner.add_test(test.second);
-        }
+    case RunMode::RUN_ALL:
+        add_matching("");
         break;
-    }
     }
 
     runner.run();
@@ -320,42 +333,37 @@ void UnitTestRunner::on_test_finished(
     }
     UnitTestRunner_Descriptor::Stats& stats = m_env->current_stats<UnitTestRunner_Descriptor::Stats>();
     stats.tests++;
+    //  1-based index of this result within its bucket: PASSED -> passed #, FAILED/OOM -> failed #.
+    uint64_t index = m_results.add(result);
     switch (result.result){
     case UnitTestResult::NOT_RUN:
-        stats.skipped++;
-        break;
-    case UnitTestResult::PASSED:{
-        uint64_t passed = stats.passed.fetch_add(1) + 1;
-        if (passed <= 1000){
-            PASSED_TESTS.append(test->name() + "\n");
-        }else if (passed == 1001){
-            PASSED_TESTS.append("<more not shown...>\n");
-        }
-        break;
-    }
-    case UnitTestResult::FAILED:{
-        uint64_t failed = m_total_failed.fetch_add(1) + 1;
-        stats.failed++;
-        if (failed <= 1000){
-            FAILED_TESTS.append("FAILED: " + test->name() + "\n");
-        }else if (failed == 1001){
-            FAILED_TESTS.append("<more not shown...>\n");
-        }
-        break;
-    }
     case UnitTestResult::SKIPPED:
         stats.skipped++;
         break;
-    case UnitTestResult::OOM:{
-        uint64_t failed = m_total_failed.fetch_add(1) + 1;
-        stats.oom++;
-        if (failed <= 1000){
-            FAILED_TESTS.append("OOM: " + test->name() + "\n");
-        }else if (failed == 1001){
+    case UnitTestResult::PASSED:
+        stats.passed++;
+        if (index <= 1000){
+            PASSED_TESTS.append(test->name() + "\n");
+        }else if (index == 1001){
+            PASSED_TESTS.append("<more not shown...>\n");
+        }
+        break;
+    case UnitTestResult::FAILED:
+        stats.failed++;
+        if (index <= 1000){
+            FAILED_TESTS.append("FAILED: " + test->name() + "\n");
+        }else if (index == 1001){
             FAILED_TESTS.append("<more not shown...>\n");
         }
         break;
-    }
+    case UnitTestResult::OOM:
+        stats.oom++;
+        if (index <= 1000){
+            FAILED_TESTS.append("OOM: " + test->name() + "\n");
+        }else if (index == 1001){
+            FAILED_TESTS.append("<more not shown...>\n");
+        }
+        break;
     }
     m_env->update_stats();
 }
@@ -391,13 +399,9 @@ bool CommandLineUnitTestRunner::run(bool augment_color_distortions, const std::s
         GlobalThreadPools::unlimited_normal()
     );
     runner.add_listener(*this);
-    size_t num_matching = 0;
-    for (const auto& test : UNIT_TESTS_ALL()){
-        if (test_substring.empty() || test.first.contains(test_substring)){
-            num_matching++;
-            runner.add_test(test.second);
-        }
-    }
+    size_t num_matching = add_tests_matching(test_substring, [&](std::shared_ptr<const UnitTest> test){
+        runner.add_test(test);
+    });
     if (!test_substring.empty()){
         if (num_matching == 0){
             m_logger.log("No test name contains \"" + test_substring + "\". No tests will be run.", COLOR_ORANGE);
@@ -409,36 +413,32 @@ bool CommandLineUnitTestRunner::run(bool augment_color_distortions, const std::s
 
     m_logger.log(
         "Tests Finished:"
-        "\n    Passed:  " + tostr_u_commas(m_passed_tests.load(std::memory_order_acquire)) +
-        "\n    Failed:  " + tostr_u_commas(m_failed_tests.load(std::memory_order_acquire)) +
-        "\n    Skipped: " + tostr_u_commas(m_skipped_tests.load(std::memory_order_acquire))
+        "\n    Passed:  " + tostr_u_commas(m_results.num_passed()) +
+        "\n    Failed:  " + tostr_u_commas(m_results.num_failed()) +
+        "\n    Skipped: " + tostr_u_commas(m_results.num_skipped())
     );
-    return m_failed_tests.load(std::memory_order_acquire) > 0;
+    return m_results.any_failed();
 }
 void CommandLineUnitTestRunner::on_test_finished(
     std::shared_ptr<const UnitTest> test,
     UnitTestResult result
 ){
+    m_results.add(result);
     switch (result.result){
     case UnitTestResult::NOT_RUN:
         m_logger.log("NOT RUN: " + test->name(), COLOR_ORANGE);
-        m_skipped_tests++;
         break;
     case UnitTestResult::PASSED:
         m_logger.log("PASSED: " + test->name(), COLOR_BLUE);
-        m_passed_tests++;
         break;
     case UnitTestResult::FAILED:
         m_logger.log("FAILED: " + test->name(), COLOR_RED);
-        m_failed_tests++;
         break;
     case UnitTestResult::SKIPPED:
         m_logger.log("SKIPPED: " + test->name(), COLOR_ORANGE);
-        m_skipped_tests++;
         break;
     case UnitTestResult::OOM:
         m_logger.log("OOM: " + test->name(), COLOR_RED);
-        m_failed_tests++;
         break;
     }
 }
