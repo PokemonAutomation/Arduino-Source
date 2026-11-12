@@ -42,8 +42,14 @@ public:
     virtual size_t send(
         const void* data,
         size_t bytes,
-        std::chrono::milliseconds timeout = std::chrono::milliseconds::max()
+        std::chrono::milliseconds timeout = std::chrono::milliseconds::max(),
+        uint64_t connection = 0
     ) override;
+
+    //  A token identifying the connection the socket is currently
+    //  serving. It changes every time a new client is accepted, and it
+    //  is 0 when no connection is active.
+    virtual uint64_t connection_id() override;
 
 
 private:
@@ -86,6 +92,12 @@ private:
     int m_listen = -1;
     int m_client = -1;
     bool m_close_requested = false;
+
+    //  A connection token, incremented (under m_lock) on every accept.
+    //  send() compares it against the token the caller captured, so a
+    //  write that outlived its connection cannot reach the client that
+    //  replaced it. 0 means no connection is active.
+    uint64_t m_connection_id = 0;
 
     //  One task per start() call. start() must never destroy the previous
     //  task's AsyncTask here: its destructor blocks until the task has
