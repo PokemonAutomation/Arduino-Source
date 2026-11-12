@@ -990,8 +990,8 @@ struct StreamHistoryTracker_Ring::Data{
         //  drain one packet and retry instead of giving up.
         while (true){
             int err = avcodec_send_frame(m_video_context.get(), frame.get()); // attempts to put a frame into the encoder
-            if (err == AVERROR(EAGAIN)){  // encoder is likely full
-                DrainResult drained = drain_one_video_packet(err);  // attempts to drain frames from the encoder. either fails or stores the packet in the ring
+            if (err == AVERROR(EAGAIN)){  // encoder is full
+                DrainResult drained = drain_one_video_packet(err);  // attempts to drain a packet from the encoder and store it in the ring
                 if (drained == DrainResult::STORED){
                     continue;  // loop back and send the same frame again to the encoder
                 }
