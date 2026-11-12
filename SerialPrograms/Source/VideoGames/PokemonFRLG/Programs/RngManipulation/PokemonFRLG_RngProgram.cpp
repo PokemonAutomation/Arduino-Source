@@ -64,8 +64,8 @@ void RngProgramInstance::run_precheck(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context
 ){
-    check_free_party_slots(env, context);
     home_black_border_check(env.console, context);
+    check_free_party_slots(env, context);
 }
 
 }  // namespace PokemonFRLG
