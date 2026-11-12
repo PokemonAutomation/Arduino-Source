@@ -1733,6 +1733,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_TrainerCardDetector.h
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleLevelUpReader.cpp
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleLevelUpReader.h
+    Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleMoveReader.cpp
+    Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleMoveReader.h
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.cpp
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.h
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleSelectionArrowDetector.cpp
@@ -1793,6 +1795,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_PickupFarmer.h
     Source/VideoGames/PokemonFRLG/Programs/PokemonFRLG_BattleMenuNavigation.cpp
     Source/VideoGames/PokemonFRLG/Programs/PokemonFRLG_BattleMenuNavigation.h
+    Source/VideoGames/PokemonFRLG/Programs/PokemonFRLG_BattleMoveChoice.cpp
+    Source/VideoGames/PokemonFRLG/Programs/PokemonFRLG_BattleMoveChoice.h
     Source/VideoGames/PokemonFRLG/Programs/PokemonFRLG_SafariOptimalAction.cpp
     Source/VideoGames/PokemonFRLG/Programs/PokemonFRLG_SafariOptimalAction.h
     Source/VideoGames/PokemonFRLG/Programs/PokemonFRLG_StartMenuNavigation.cpp
@@ -1861,6 +1865,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_SoundListener.h
     Source/VideoGames/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_TestPartyInference.cpp
     Source/VideoGames/PokemonFRLG/Programs/TestPrograms/PokemonFRLG_TestPartyInference.h
+    Source/VideoGames/PokemonFRLG/Resources/PokemonFRLG_BattleData.cpp
+    Source/VideoGames/PokemonFRLG/Resources/PokemonFRLG_BattleData.h
     Source/VideoGames/PokemonFRLG/Resources/PokemonFRLG_PokemonSprites.cpp
     Source/VideoGames/PokemonFRLG/Resources/PokemonFRLG_PokemonSprites.h
     Source/VideoGames/PokemonHome/Inference/PokemonHome_AlphaDetector.cpp
