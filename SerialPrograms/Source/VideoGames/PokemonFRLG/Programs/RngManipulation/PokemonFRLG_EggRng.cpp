@@ -722,11 +722,9 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     /*
     * Settings: Text Speed fast
     */
-    check_free_party_slots(env, context);
+    run_precheck(env, context);
 
     EggRng_Descriptor::Stats& stats = env.current_stats<EggRng_Descriptor::Stats>();
-
-    home_black_border_check(env.console, context);
 
     // prepare database of base stats and gender thresholds
     RngStatsDatabase STATS_DATA("PokemonFRLG/BaseStats.json");

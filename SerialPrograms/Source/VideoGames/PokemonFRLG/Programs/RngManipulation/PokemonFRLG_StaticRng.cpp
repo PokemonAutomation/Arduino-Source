@@ -232,11 +232,9 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     /*
     * Settings: Text Speed fast
     */
-    check_free_party_slots(env, context);
+    run_precheck(env, context);
 
     StaticRng_Descriptor::Stats& stats = env.current_stats<StaticRng_Descriptor::Stats>();
-
-    home_black_border_check(env.console, context);
 
     RNG_FILTERS.reset();
     RNG_CALIBRATION.reset_hits();

@@ -37,10 +37,16 @@ public:
     }
 
 protected:
-    //  Checks that the party has the free slots free_party_slots_needed()
-    //  asks for; throws UserSetupError if not. Call it first in program(),
-    //  with the game on the overworld where the player saved. May leave the
-    //  party menu open: the program's first reset closes the game.
+    //  Call first in program(), with the game on the overworld where the
+    //  player saved: checks the party has the free slots
+    //  free_party_slots_needed() asks for, then goes Home for the black
+    //  border check. Throws UserSetupError if a check fails.
+    void run_precheck(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context
+    );
+
+private:
     void check_free_party_slots(
         SingleSwitchProgramEnvironment& env,
         ProControllerContext& context
