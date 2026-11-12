@@ -843,7 +843,13 @@ PartySlot detect_last_occupied_party_slot(ConsoleHandle& console){
 }
 
 PartySlot detect_last_occupied_party_slot(const ImageViewRGB32& screen){
-    constexpr std::array slots{PartySlot::SIX, PartySlot::FIVE, PartySlot::FOUR, PartySlot::THREE, PartySlot::TWO};
+    constexpr std::array slots{
+        PartySlot::SIX,
+        PartySlot::FIVE,
+        PartySlot::FOUR,
+        PartySlot::THREE,
+        PartySlot::TWO,
+    };
 
     for (PartySlot slot : slots){
         PartyEmptySlotDetector empty_slot_detector(COLOR_RED, slot);
