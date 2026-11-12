@@ -1060,13 +1060,10 @@ struct StreamHistoryTracker_Ring::Data{
             return;
         }
 
-        //  Keyframe control. (Only now that the frame is ready to send, so
-        //  that a frame skipped above does not take a forced keyframe with it.)
-        m_last_pts_us = pts_us;
+        //  Keyframe control. m_last_keyframe_us and m_last_pts_us are updated
+        //  only after the send below succeeds, so that a frame that never
+        //  reaches the encoder does not take a forced keyframe with it.
         bool force_keyframe = (pts_us - m_last_keyframe_us) >= VIDEO_KEYFRAME_INTERVAL_US;
-        if (force_keyframe){
-            m_last_keyframe_us = pts_us;
-        }
         //  The video timebase is 1/1000 (milliseconds); see init_video_encoder.
         frame->pts = pts_us / 1000;
         //  Set on every frame: the frame is reused, and a stale I would make
@@ -1105,6 +1102,10 @@ struct StreamHistoryTracker_Ring::Data{
                 return;
             }
             break;
+        }
+        m_last_pts_us = pts_us;
+        if (force_keyframe){
+            m_last_keyframe_us = pts_us;
         }
         m_logged_frame_skip = false;
 
