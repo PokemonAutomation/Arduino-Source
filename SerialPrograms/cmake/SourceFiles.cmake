@@ -186,6 +186,8 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../Common/Cpp/UiWrapper.h
     ../Common/CRC32/pabb_CRC32.c
     ../Common/CRC32/pabb_CRC32.h
+    ../Common/NintendoSwitch2/NintendoSwitch2_Protocol.cpp
+    ../Common/NintendoSwitch2/NintendoSwitch2_Protocol.h
     ../Common/PABotBase2/Controllers/PABotBase2_Controller_HID_Keyboard.h
     ../Common/PABotBase2/Controllers/PABotBase2_Controller_NS1_OemController.h
     ../Common/PABotBase2/Controllers/PABotBase2_Controller_NS2_OemController.h
