@@ -15,7 +15,10 @@
 #include "CommonFramework/VideoPipeline/Backends/VideoFrameQt.h"
 #include "CommonFramework/Recording/StreamHistoryOption.h"
 
-#if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
+#if defined(PA_STREAM_HISTORY_FFMPEG)
+#include "StreamHistoryTracker_Ring.h"
+using StreamHistoryTracker = PokemonAutomation::StreamHistoryTracker_Ring;
+#elif (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
 #include "StreamHistoryTracker_SaveFrames.h"
 //#include "StreamHistoryTracker_RecordOnTheFly.h"
 //#include "StreamHistoryTracker_ParallelStreams.h"
@@ -124,6 +127,11 @@ void StreamHistorySession::push_samples(size_t samples, size_t stride, const flo
     if (!state.m_current || samples == 0 || state.m_active_channels == 0){
         return;
     }
+#if defined(PA_STREAM_HISTORY_FFMPEG)
+    //  The ring takes the planar stream as is, at its fixed 48 kHz stereo
+    //  attach shape.
+    state.m_current->push_samples(samples, stride, data);
+#else
     //  The working stream is split (planar) channels: channel "c" starts at
     //  "data[c * stride]" and runs for "samples" samples. (stride may be 0
     //  for the single-channel pass-through.) Re-interleave for the tracker.
@@ -138,6 +146,7 @@ void StreamHistorySession::push_samples(size_t samples, size_t stride, const flo
         }
     }
     state.m_current->on_samples(state.m_interleaved.data(), samples);
+#endif
 }
 void StreamHistorySession::on_frame(std::shared_ptr<const VideoFrame> frame){
     Data& data = *m_data;
@@ -178,7 +187,14 @@ void StreamHistorySession::initialize(){
     const size_t rate = choice ? choice.format().sample_rate() : 0;
     data.m_active_channels = channels;
     data.m_active_rate = rate;
+#if defined(PA_STREAM_HISTORY_FFMPEG)
+    //  The ring records at a fixed 48 kHz stereo (see
+    //  attach_working_listener()); the choice only decides whether there is
+    //  audio at all.
+    data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, channels != 0, data.m_has_video));
+#else
     data.m_current.reset(new StreamHistoryTracker(data.m_logger, data.m_window, channels, rate, data.m_has_video));
+#endif
 }
 void StreamHistorySession::pre_input_change(){
 //    cout << "pre_input_change()" << endl;
@@ -225,9 +241,19 @@ void StreamHistorySession::attach_working_listener(){
     //  The remove quiesces any in-flight pushes in the old shape (and is a
     //  no-op if not attached yet); the node is then built for the new one.
     audio_session->remove_working_stream_listener(*this);
+#if defined(PA_STREAM_HISTORY_FFMPEG)
+    //  The ring encodes AAC at 48 kHz stereo; the per-listener node mixes and
+    //  resamples every input preset into that shape.
+    QAudioFormat ring_format;
+    ring_format.setSampleRate(48000);
+    ring_format.setChannelCount(2);
+    ring_format.setChannelConfig(QAudioFormat::ChannelConfigStereo);
+    audio_session->add_working_stream_listener(AudioFormat(ring_format), *this);
+#else
     audio_session->add_working_stream_listener(
         AudioFormat(target.format().native_format()), *this
     );
+#endif
 }
 void StreamHistorySession::pre_shutdown(){
 //    cout << "pre_shutdown()" << endl;

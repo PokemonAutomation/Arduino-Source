@@ -117,33 +117,6 @@ std::vector<uchar> compress_video_frame(const QVideoFrame& const_frame){
     return compressed_buffer; // Store this in the circular buffer
 }
 
-size_t get_target_fps(){
-    const StreamHistoryOption& settings = GlobalSettings::instance().STREAM_HISTORY;
-    size_t target_fps;
-    switch (settings.VIDEO_FPS){
-    case StreamHistoryOption::VideoFPS::FPS_30:
-        target_fps = 30;
-        break;
-    case StreamHistoryOption::VideoFPS::FPS_15:
-        target_fps = 15;
-        break;
-    case StreamHistoryOption::VideoFPS::FPS_10:
-        target_fps = 10;
-        break;
-    case StreamHistoryOption::VideoFPS::FPS_05:
-        target_fps = 5;
-        break;
-    case StreamHistoryOption::VideoFPS::FPS_01:
-        target_fps = 1;
-        break;
-    default:
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "VideoFPS: Unknown enum.");                
-    }
-
-    return target_fps;
-}
-
-
 StreamHistoryTracker::~StreamHistoryTracker(){
     m_stopping = true;
     m_cv.notify_all();
@@ -164,7 +137,7 @@ StreamHistoryTracker::StreamHistoryTracker(
     // , m_audio_samples_per_second(audio_samples_per_frame * audio_frames_per_second)
     // , m_microseconds_per_sample(1. / (m_audio_samples_per_second * 1000000.))
     // , m_has_video(has_video)
-    , m_target_fps(get_target_fps())
+    , m_target_fps(GlobalSettings::instance().STREAM_HISTORY->target_fps())
     , m_frame_interval(1000000 / m_target_fps)
     , m_next_frame_time(WallClock::min())
 {
