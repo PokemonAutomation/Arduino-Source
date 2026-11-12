@@ -39,6 +39,19 @@ namespace PokemonAutomation{
 
 struct StreamHistorySession::Data{
     Logger& m_logger;
+    //  Known issue, deliberately deferred: the tracker is used while holding
+    //  this lock. push_samples() runs the tracker's audio work under it (with
+    //  PA_STREAM_HISTORY_FFMPEG, an inline AAC encode), and initialize() and
+    //  clear() build and destroy the tracker under it. Destroying a tracker
+    //  waits for its video worker thread, which may be busy encoding or
+    //  opening a (hardware) encoder. Meanwhile the video and audio threads
+    //  spin on this lock in on_frame() and push_samples().
+    //  The expected costs are small (well under 1 ms per AAC frame; teardown is
+    //  rare), so we keep the simpler locking for now instead of adding
+    //  complexity to this infra. The fix, if it is ever needed (e.g. a hung
+    //  hardware encoder freezing the video feed on an input change): copy the
+    //  shared_ptr under the lock and call the tracker outside it, and
+    //  build/destroy trackers outside the lock, swapping m_current under it.
     mutable SpinLock m_lock;
     std::chrono::seconds m_window;
     //  The resolved input choice for the active device input (invalid
