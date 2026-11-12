@@ -279,110 +279,76 @@ void add_tests_ExitWildBattle(UnitTestDatabase& database){
 }
 
 
-std::string slot_name(PartySlot slot){
-    return std::to_string(static_cast<unsigned>(slot) + 1);
-}
-
-// Reads the last occupied slot from a party menu screenshot, as the RNG programs' party check does.
-class Test_LastOccupiedPartySlot : public ImageUnitTest{
+// Party menu steps on a screenshot of the open menu: the real slot detector reads it,
+// and the steps check_party_free_slots() asked for are recorded.
+class ImagePartyCheck : public PartyCheckActions{
 public:
-    Test_LastOccupiedPartySlot(std::string_view image, PartySlot expected)
-        : ImageUnitTest("PokemonFRLG::LastOccupiedPartySlot - " + std::string(image), {std::string(image)})
-        , m_expected(expected)
+    ImagePartyCheck(const ImageViewRGB32& screen, bool menu_opens)
+        : m_screen(screen)
+        , m_menu_opens(menu_opens)
+    {}
+
+    virtual bool open_party_menu() override{
+        steps += steps.empty() ? "open" : " open";
+        return m_menu_opens;
+    }
+    virtual PartySlot read_last_occupied_slot() override{
+        steps += steps.empty() ? "read" : " read";
+        return detect_last_occupied_party_slot(m_screen);
+    }
+
+    std::string steps;
+
+private:
+    const ImageViewRGB32& m_screen;
+    const bool m_menu_opens;
+};
+
+struct PartyCheckCase{
+    std::string image;
+    size_t free_slots_needed = 1;
+    bool menu_opens = true;
+    std::string steps = "open read";
+    // Start of the UserSetupError message; empty if the check passes.
+    std::string error = "";
+};
+
+// Runs check_party_free_slots() on a party menu screenshot.
+class Test_PartyCheck : public ImageUnitTest{
+public:
+    Test_PartyCheck(PartyCheckCase test_case)
+        : ImageUnitTest(
+            std::format(
+                "PokemonFRLG::RngPartyCheck - {} free slots needed{}, {}",
+                test_case.free_slots_needed,
+                test_case.menu_opens ? "" : ", menu not opened",
+                test_case.image
+            ),
+            {test_case.image}
+        )
+        , m_case(std::move(test_case))
     {}
 
     virtual UnitTestResult run_on_images(
         Logger&, CancellableScope&,
         const std::vector<ImageRGB32>& images
     ) const override{
-        const PartySlot slot = detect_last_occupied_party_slot(images[0]);
-        if (slot != m_expected){
-            return std::format("Expected last occupied slot {}, got {}", slot_name(m_expected), slot_name(slot));
-        }
-        return true;
-    }
-
-private:
-    const PartySlot m_expected;
-};
-
-void add_tests_LastOccupiedPartySlot(UnitTestDatabase& database){
-    for (unsigned occupied = 1; occupied <= 6; occupied++){
-        database.add<Test_LastOccupiedPartySlot>(
-            "PokemonFRLG/Party/Party_" + std::to_string(occupied) + ".png",
-            static_cast<PartySlot>(occupied - 1)
-        );
-    }
-    database.add<Test_LastOccupiedPartySlot>("PokemonFRLG/Party/Party_6_With_Held_Items.png", PartySlot::SIX);
-    database.add<Test_LastOccupiedPartySlot>("PokemonFRLG/Party/JPN_HeldItem.png", PartySlot::SIX);
-    database.add<Test_LastOccupiedPartySlot>("PokemonFRLG/Party/JPN_Party.png", PartySlot::FOUR);
-    database.add<Test_LastOccupiedPartySlot>("PokemonFRLG/Party/SPA_HeldItem.png", PartySlot::SIX);
-}
-
-// Steps that return scripted reads, and record what check_party_free_slots() asked for.
-class ScriptedPartyCheck : public PartyCheckActions{
-public:
-    bool menu_opens = true;
-    PartySlot last_occupied = PartySlot::ONE;
-    std::string steps;
-
-    virtual bool open_party_menu() override{
-        steps += steps.empty() ? "open" : " open";
-        return menu_opens;
-    }
-    virtual PartySlot read_last_occupied_slot() override{
-        steps += steps.empty() ? "read" : " read";
-        return last_occupied;
-    }
-};
-
-struct PartyCheckInput{
-    std::string name;
-    size_t free_slots_needed = 1;
-    bool menu_opens = true;
-    PartySlot last_occupied = PartySlot::ONE;
-};
-
-struct PartyCheckExpectation{
-    std::string steps = "";
-    // Start of the UserSetupError message; empty if the check passes.
-    std::string error = "";
-};
-
-struct PartyCheckCase{
-    PartyCheckInput input;
-    PartyCheckExpectation expectation;
-};
-
-class Test_PartyCheck : public UnitTest{
-public:
-    Test_PartyCheck(PartyCheckCase test_case)
-        : UnitTest("PokemonFRLG::RngPartyCheck - " + test_case.input.name)
-        , m_case(std::move(test_case))
-    {}
-
-    virtual UnitTestResult run(Logger&, CancellableScope&) const override{
-        const PartyCheckInput& input = m_case.input;
-        const PartyCheckExpectation& expected = m_case.expectation;
-        ScriptedPartyCheck actions;
-        actions.menu_opens = input.menu_opens;
-        actions.last_occupied = input.last_occupied;
-
+        ImagePartyCheck actions(images[0], m_case.menu_opens);
         NullLogger logger;
         std::string error;
         try{
-            check_party_free_slots(logger, input.free_slots_needed, actions);
+            check_party_free_slots(logger, m_case.free_slots_needed, actions);
         }catch (UserSetupError& e){
             error = e.message();
         }
-        const bool error_matches = expected.error.empty()
+        const bool error_matches = m_case.error.empty()
             ? error.empty()
-            : error.rfind(expected.error, 0) == 0;
+            : error.rfind(m_case.error, 0) == 0;
         if (!error_matches){
-            return std::format("Expected error: \"{}\"\nActual error:   \"{}\"", expected.error, error);
+            return std::format("Expected error: \"{}\"\nActual error:   \"{}\"", m_case.error, error);
         }
-        if (actions.steps != expected.steps){
-            return std::format("Expected steps: {}\nActual steps:   {}", expected.steps, actions.steps);
+        if (actions.steps != m_case.steps){
+            return std::format("Expected steps: {}\nActual steps:   {}", m_case.steps, actions.steps);
         }
         return true;
     }
@@ -392,98 +358,26 @@ private:
 };
 
 void add_tests_PartyCheck(UnitTestDatabase& database){
+    const std::string FULL = "Your party is full. Leave a party slot free";
+    for (unsigned occupied = 1; occupied <= 5; occupied++){
+        database.add<Test_PartyCheck>(PartyCheckCase{.image = "PokemonFRLG/Party/Party_" + std::to_string(occupied) + ".png"});
+    }
     const PartyCheckCase cases[] = {
-        {
-            // Programs that don't add a Pokemon to the party don't open the menu.
-            .input = {.name = "no free slot needed, full party", .free_slots_needed = 0, .last_occupied = PartySlot::SIX},
-            .expectation = {},
-        },
-        {
-            .input = {.name = "one free slot needed, one Pokemon"},
-            .expectation = {.steps = "open read"},
-        },
-        {
-            .input = {.name = "one free slot needed, five Pokemon", .last_occupied = PartySlot::FIVE},
-            .expectation = {.steps = "open read"},
-        },
-        {
-            .input = {.name = "three free slots needed, three Pokemon", .free_slots_needed = 3, .last_occupied = PartySlot::THREE},
-            .expectation = {.steps = "open read"},
-        },
-        {
-            // A menu that can't be opened skips the check rather than stopping the program.
-            .input = {.name = "party menu not opened", .menu_opens = false, .last_occupied = PartySlot::SIX},
-            .expectation = {.steps = "open"},
-        },
+        {.image = "PokemonFRLG/Party/Party_6.png", .error = FULL},
+        {.image = "PokemonFRLG/Party/Party_6_With_Held_Items.png", .error = FULL},
+        {.image = "PokemonFRLG/Party/JPN_HeldItem.png", .error = FULL},
+        {.image = "PokemonFRLG/Party/SPA_HeldItem.png", .error = FULL},
+        {.image = "PokemonFRLG/Party/JPN_Party.png"},
+        {.image = "PokemonFRLG/Party/Party_3.png", .free_slots_needed = 3},
+        {.image = "PokemonFRLG/Party/JPN_Party.png", .free_slots_needed = 3, .error = "Your party has 4 "},
+        // Programs that don't add a Pokemon to the party don't open the menu.
+        {.image = "PokemonFRLG/Party/Party_6.png", .free_slots_needed = 0, .steps = ""},
+        // A menu that can't be opened skips the check rather than stopping the program.
+        {.image = "PokemonFRLG/Party/Party_6.png", .menu_opens = false, .steps = "open"},
     };
     for (const PartyCheckCase& test_case : cases){
         database.add<Test_PartyCheck>(test_case);
     }
-}
-
-// Party menu steps for a menu that is already open on the given screenshot.
-class ImagePartyCheck : public PartyCheckActions{
-public:
-    explicit ImagePartyCheck(const ImageViewRGB32& screen)
-        : m_screen(screen)
-    {}
-
-    virtual bool open_party_menu() override{
-        return true;
-    }
-    virtual PartySlot read_last_occupied_slot() override{
-        return detect_last_occupied_party_slot(m_screen);
-    }
-
-private:
-    const ImageViewRGB32& m_screen;
-};
-
-// Runs check_party_free_slots() on a party menu screenshot.
-class Test_PartyCheckOnImage : public ImageUnitTest{
-public:
-    // expected_error: start of the UserSetupError message; empty if the check passes.
-    Test_PartyCheckOnImage(std::string_view image, size_t free_slots_needed, std::string_view expected_error)
-        : ImageUnitTest(
-            std::format("PokemonFRLG::RngPartyCheck - {} free slots needed, {}", free_slots_needed, image),
-            {std::string(image)}
-        )
-        , m_free_slots_needed(free_slots_needed)
-        , m_expected_error(expected_error)
-    {}
-
-    virtual UnitTestResult run_on_images(
-        Logger&, CancellableScope&,
-        const std::vector<ImageRGB32>& images
-    ) const override{
-        ImagePartyCheck actions(images[0]);
-        NullLogger logger;
-        std::string error;
-        try{
-            check_party_free_slots(logger, m_free_slots_needed, actions);
-        }catch (UserSetupError& e){
-            error = e.message();
-        }
-        const bool error_matches = m_expected_error.empty()
-            ? error.empty()
-            : error.rfind(m_expected_error, 0) == 0;
-        if (!error_matches){
-            return std::format("Expected error: \"{}\"\nActual error:   \"{}\"", m_expected_error, error);
-        }
-        return true;
-    }
-
-private:
-    const size_t m_free_slots_needed;
-    const std::string m_expected_error;
-};
-
-void add_tests_PartyCheckOnImage(UnitTestDatabase& database){
-    database.add<Test_PartyCheckOnImage>(
-        "PokemonFRLG/Party/Party_6_With_Held_Items.png", 1, "Your party is full. Leave a party slot free"
-    );
-    database.add<Test_PartyCheckOnImage>("PokemonFRLG/Party/JPN_Party.png", 3, "Your party has 4 ");
-    database.add<Test_PartyCheckOnImage>("PokemonFRLG/Party/JPN_Party.png", 1, "");
 }
 
 
@@ -624,9 +518,7 @@ void add_tests(UnitTestDatabase& database){
     add_tests_EliteFourRoomDetector(database);
     add_tests_ExitWildBattle(database);
     add_tests_HallOfFameSavingDetector(database);
-    add_tests_LastOccupiedPartySlot(database);
     add_tests_PartyCheck(database);
-    add_tests_PartyCheckOnImage(database);
     add_tests_PartyEmptySlotDetector(database);
     add_tests_PartyHeldItemDetector(database);
     add_tests_PartyLevelUpReader(database);
