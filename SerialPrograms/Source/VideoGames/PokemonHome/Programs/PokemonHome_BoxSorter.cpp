@@ -222,8 +222,9 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     BoxCursor dest_cursor;
     BoxCursor nav_cursor = {0, 0, 0};
 
-    exit_menus(env, context, VIDEO_DELAY.get());
-    
+    exit_menus(env, context);
+    switch_selection_mode(env, context, BoxSelectionMode::Normal);
+
     BoxViewWatcher box_view_watcher(&env.console.overlay());
     SummaryScreenWatcher summary_screen_watcher(&env.console.overlay());
 
