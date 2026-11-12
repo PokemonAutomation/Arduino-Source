@@ -166,7 +166,7 @@ void open_summary_screen(SingleSwitchProgramEnvironment& env, ProControllerConte
 // Currently only reads shininess, but could be extended to read other summary information.
 void scan_box_summaries(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-    const BoxSelectionModeDetector& selection_detector, BoxCursor& cursor,
+    Language language, const BoxSelectionModeDetector& selection_detector, BoxCursor& cursor,
     std::vector<std::optional<CollectedPokemonInfo>>& boxes_data
 ){
     const size_t box_start = cursor.box * BOX_ROWS * BOX_COLS;
@@ -194,7 +194,7 @@ void scan_box_summaries(
         auto& pokemon = *boxes_data[index];
         const VideoSnapshot screen = env.console.video().snapshot();
         PokemonFRLG_Stats current_stats;
-        reader.read_page1(env.logger(), Language::English, screen, current_stats);
+        reader.read_page1(env.logger(), language, screen, current_stats);
         if (current_stats.name != pokemon.name_slug || current_stats.level != pokemon.level){
             std::ostringstream ss;
             ss << "Box Sorter: Summary species mismatch at " << BoxCursor(index)
@@ -421,7 +421,7 @@ std::string make_missing_living_dex_report(
 
 BoxOrganizationScan scan_box_data(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-    const std::vector<SortingRule>& preferences, size_t num_boxes, bool read_shininess
+    Language language, const std::vector<SortingRule>& preferences, size_t num_boxes, bool read_shininess
 ){
     bool read_summary = read_shininess || std::any_of(preferences.begin(), preferences.end(), [](const SortingRule& rule){
         return rule.sort_type == SortingRuleType::Shiny;
@@ -496,7 +496,7 @@ BoxOrganizationScan scan_box_data(
                 continue;
             }
 
-            const std::string name = cell_reader.read_name(env.logger(), Language::English, screen);
+            const std::string name = cell_reader.read_name(env.logger(), language, screen);
             const int level = cell_reader.read_level(env.logger(), screen);
             const auto& dex_numbers = SLUGS_TO_NATIONAL_DEX();
             const auto dex = dex_numbers.find(name);
@@ -521,7 +521,7 @@ BoxOrganizationScan scan_box_data(
             env.update_stats();
         }
         if (read_summary){
-            scan_box_summaries(env, context, selection_detector, cursor, boxes_data);
+            scan_box_summaries(env, context, language, selection_detector, cursor, boxes_data);
         }
     }
     return {std::move(boxes_data), cursor, scan_mode};

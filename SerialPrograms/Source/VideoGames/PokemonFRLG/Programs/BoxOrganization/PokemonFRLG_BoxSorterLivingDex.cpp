@@ -28,7 +28,7 @@ BoxSorterLivingDex_Descriptor::BoxSorterLivingDex_Descriptor()
         STRING_POKEMON + " FRLG", "Box Sorter Living Dex",
         "Programs/PokemonFRLG/BoxSorterLivingDex.html",
         "Arrange boxes of " + STRING_POKEMON + " into living dex order. Start in Move " + STRING_POKEMON +
-        " with an empty hand in the first box to organize. Uses English species names.",
+        " with an empty hand in the first box to organize.",
         PanelQualityStanding::OFFICIAL_BETA,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
@@ -41,7 +41,20 @@ std::unique_ptr<StatsTracker> BoxSorterLivingDex_Descriptor::make_stats() const{
 }
 
 BoxSorterLivingDex::BoxSorterLivingDex()
-    : NUM_BOXES(
+    : LANGUAGE(
+        "<b>Game Language:</b><br>Select the language of your game so the program can read " + STRING_POKEMON + " species names.",
+        {
+            Language::English,
+            Language::Japanese,
+            Language::Spanish,
+            Language::French,
+            Language::German,
+            Language::Italian,
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
+    , NUM_BOXES(
         "<b>Number of Boxes to Organize:</b><br>Starting with the current box and continuing to the right. "
         "Include room after the template for duplicates and other Pokemon.",
         LockMode::LOCK_WHILE_RUNNING, 8, 1, 14
@@ -63,6 +76,7 @@ BoxSorterLivingDex::BoxSorterLivingDex()
     )
     , NOTIFICATIONS({&NOTIFICATION_PROGRAM_FINISH, &NOTIFICATION_ERROR_FATAL})
 {
+    PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(NUM_BOXES);
     PA_ADD_OPTION(LIVING_DEX_TEMPLATE);
     PA_ADD_OPTION(SHINY_DEX);
@@ -96,7 +110,7 @@ void BoxSorterLivingDex::program(SingleSwitchProgramEnvironment& env, ProControl
     const std::vector<SortingRule> preferences{{SortingRuleType::DexNo, false}};
     auto& stats = env.current_stats<BoxSorterLivingDex_Descriptor::Stats>();
     const bool shiny_dex = SHINY_DEX;
-    BoxOrganizationScan scan = scan_box_data(env, context, preferences, (uint16_t)NUM_BOXES, shiny_dex);
+    BoxOrganizationScan scan = scan_box_data(env, context, LANGUAGE, preferences, (uint16_t)NUM_BOXES, shiny_dex);
     const auto boxes_sorted = make_living_dex_order(
         env.logger(), scan.boxes_data, living_dex_order, obey_gender_differences, shiny_dex
     );
