@@ -841,6 +841,10 @@ public:
         }
 
         std::string error;
+        if (server.connection_id() != 0){
+            error = "connection_id() was not 0 before any connection";
+        }
+
         uint64_t first_id = 0;
         {
             ClientListener client_listener;
@@ -868,6 +872,12 @@ public:
             [&server_listener]{ return server_listener.disconnected.load() >= 1; }
         )){
             error = "The server did not call on_disconnect";
+        }
+
+        //  The counter is monotonic and not reset, but with no active
+        //  connection the id must report 0.
+        if (error.empty() && server.connection_id() != 0){
+            error = "connection_id() was not 0 while no connection was active";
         }
 
         uint64_t second_id = 0;

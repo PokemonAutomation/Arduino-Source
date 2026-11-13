@@ -96,7 +96,13 @@ void ServerSocket_WinSocket::start(const std::string& address, uint16_t port){
 
 uint64_t ServerSocket_WinSocket::connection_id(){
     std::lock_guard<Mutex> lg(m_lock);
-    return m_connection_id;
+    //  "m_connection_id" is not reset when the connection closes: it is
+    //  monotonic so that writes queued for a closed connection keep
+    //  being refused even after the next client is accepted. 0 simply
+    //  means "no connection is active".
+    return m_state.load(std::memory_order_relaxed) == State::CONNECTED
+        ? m_connection_id
+        : 0;
 }
 
 
