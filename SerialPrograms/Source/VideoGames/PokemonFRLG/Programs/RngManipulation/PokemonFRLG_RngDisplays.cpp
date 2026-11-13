@@ -17,6 +17,20 @@ namespace PokemonFRLG{
 
 using namespace Pokemon;
 
+namespace{
+
+// Unown forms are not in the name database, 
+// so add their form for clarity
+std::string species_display_name(const std::string& slug){
+    if (slug.rfind("unown-", 0) == 0 && slug.size() > 6){
+        char form = char(toupper((unsigned char)slug[6]));
+        return get_pokemon_name("unown").display_name() + " (" + form + ")";
+    }
+    return get_pokemon_name(slug).display_name();
+}
+
+}
+
 SidHelperDisplay::SidHelperDisplay()
     : GroupOption("TID/SID Results", LockMode::READ_ONLY)
     , tid(false, "<b>Trainer ID:</b>", LockMode::READ_ONLY, "-", "")
@@ -52,13 +66,7 @@ std::string RngTargetDisplay::result_to_string(const AdvPokemonResult& pokemon, 
 }   
 
 std::string RngTargetDisplay::result_to_string(const AdvWildPokemonResult& pokemon, const int16_t& gender_threshold){
-    std::string name;
-    if (pokemon.species.find("unown") != std::string::npos){
-        char form = char(toupper(pokemon.species.substr(6,1)[0]));
-        name = get_pokemon_name("unown").display_name() + " (" + form + ")";
-    }else{
-        name = get_pokemon_name(pokemon.species).display_name();
-    }
+    std::string name = species_display_name(pokemon.species);
     std::string out;
     out += name + " ";
     out += "Lv" + std::to_string(pokemon.level) + " ";
@@ -116,7 +124,7 @@ std::string RngFilterDisplay::get_range_string(const IvRange& range){
 }
 
 void RngFilterDisplay::set(const AdvRngFilters& filter){
-    species.set(get_pokemon_name(filter.species).display_name());
+    species.set(species_display_name(filter.species));
     gender.set(gender_to_string(filter.gender));
     nature.set(nature_to_string(filter.nature));
     level.set(std::to_string(filter.level));

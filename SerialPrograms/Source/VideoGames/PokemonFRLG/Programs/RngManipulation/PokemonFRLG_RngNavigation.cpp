@@ -126,12 +126,20 @@ AdvObservedPokemon read_summary(
         break;
     }
     
+    // Unown forms all share one name, so only the sprite can tell them apart.
+    const bool unown = stats.name.rfind("unown", 0) == 0;
     if (
            stats.name.empty()
         || stats.name == "nidoran-m"
         || stats.name == "nidoran-f"
+        || unown
     ){
-        SummarySpriteReader sprite_reader(species);
+        ShinySymbolDetector shiny_checker(COLOR_YELLOW);
+        bool shiny = shiny_checker.read(console.logger(), screen1);
+        SummarySpriteReader sprite_reader(
+            unown ? std::set<std::string>{"unown"} : species,
+            COLOR_RED, shiny
+        );
         ImageMatch::ImageMatchResult result = sprite_reader.read(screen1);
         if (result.results.size() > 0){
             stats.name = result.results.begin()->second;

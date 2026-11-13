@@ -532,6 +532,13 @@ void add_tests_StatsReader(UnitTestDatabase& database){
     database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/moltres_1_eng.png");
     database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/nidoran_m_eng.png");
     database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/pidgey_1_ita.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/unown_c_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/unown_ex_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/unown_h_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/unown_j_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/unown_n_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/unown_p_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/unown_qu_eng.png");
     database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/venonat_4k_eng.png");
     database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/abra_1_deu.png");
     database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/deoxys_1_jpn.png");

@@ -96,14 +96,15 @@ public:
         Logger& logger, CancellableScope& scope,
         const std::vector<ImageRGB32>& images
     ) const override{
+        // Filename: <language>_<species>[_<anything>...]
         const std::vector<std::string> words =
                 parse_words(Filesystem::Path(image_paths()[0]).stem().string());
         if (words.size() < 2){
-            return "Error: filename must be <anything>_<language>_<species>.";
+            return "Error: filename must be <language>_<species>[_<anything>...].";
         }
 
-        std::string language_word = words[words.size() - 2];
-        const std::string& target_species = words[words.size() - 1];
+        const std::string& language_word = words[0];
+        const std::string& target_species = words[1];
 
         Language language = language_code_to_enum(language_word);
         if (language == Language::None || language == Language::EndOfList){
@@ -122,15 +123,24 @@ public:
 
 
 void add_tests_WildEncounterReader(UnitTestDatabase& database){
-    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_chansey.jpg");
-    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_machop.jpg");
-    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_kakuna.jpg");
-    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_ho-oh.jpg");
-    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_heracross.jpg");
-    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_dragonair.jpg");
     database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_articuno.jpg");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_chansey.jpg");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_chansey_dark.png");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_dragonair.jpg");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_heracross.jpg");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_ho-oh.jpg");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_kakuna.jpg");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_machop.jpg");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_pikachu.jpg");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_unown_c.png");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_unown_ex.jpg");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_unown_h.png");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_unown_j.png");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_unown_n.png");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_unown_p.png");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_unown_qu.jpg");
+    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/eng_unown_s.png");
     database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/fra_snorlax.jpg");
-    database.add<Test_WildEncounterReader>("PokemonFRLG/WildEncounterReader/dark_eng_chansey.png");
 }
 
 

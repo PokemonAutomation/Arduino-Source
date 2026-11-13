@@ -24,6 +24,7 @@
 #include "Inference/PokemonFRLG_BattleLevelUpReader.h"
 #include "Inference/PokemonFRLG_BattleSelectionArrowDetector.h"
 #include "Inference/PokemonFRLG_PartyLevelUpReader.h"
+#include "Inference/PokemonFRLG_PokemonSpriteReader.h"
 #include "Inference/PokemonFRLG_ShinySymbolDetector.h"
 #include "Inference/PokemonFRLG_StatsReader.h"
 #include "Inference/PokemonFRLG_TrainerIdReader.h"
@@ -45,6 +46,7 @@ void add_tests(UnitTestDatabase& database){
     add_tests_BattleLevelUpReader(database);
     add_tests_BattleMenuDetector(database);
     add_tests_BattleMoveSelectionArrow(database);
+    add_tests_BattleSpriteReader(database);
     add_tests_BoxCellOccupiedDetector(database);
     add_tests_BoxCellReader(database);
     add_tests_BoxGenderReader(database);
@@ -61,6 +63,7 @@ void add_tests(UnitTestDatabase& database){
     add_tests_StatsReader(database);
     add_tests_SelectionDialogDetector(database);
     add_tests_ShinySymbolDetector(database);
+    add_tests_SummarySpriteReader(database);
     add_tests_TrainerIdReader(database);
     add_tests_WildEncounterReader(database);
 }
