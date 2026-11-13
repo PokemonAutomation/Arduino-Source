@@ -226,10 +226,9 @@ void RoamingLegendaryRng::program(SingleSwitchProgramEnvironment& env, ProContro
     /*
     * Settings: Text Speed fast
     */
+    run_precheck(env, context);
 
     RoamingLegendaryRng_Descriptor::Stats& stats = env.current_stats<RoamingLegendaryRng_Descriptor::Stats>();
-
-    home_black_border_check(env.console, context);
 
     RNG_FILTERS.reset();
     RNG_CALIBRATION.reset_hits();

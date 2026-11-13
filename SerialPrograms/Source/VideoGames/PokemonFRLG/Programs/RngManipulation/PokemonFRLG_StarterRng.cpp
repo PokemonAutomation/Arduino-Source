@@ -558,10 +558,9 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     /*
     * Settings: Text Speed fast
     */
+    run_precheck(env, context);
 
     StarterRng_Descriptor::Stats& stats = env.current_stats<StarterRng_Descriptor::Stats>();
-
-    home_black_border_check(env.console, context);
 
     RNG_FILTERS.reset();
     RNG_CALIBRATION.reset_hits();

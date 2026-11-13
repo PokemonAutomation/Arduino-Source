@@ -242,10 +242,9 @@ void RngHelper::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     /*
     * Settings: Text Speed fast
     */
+    run_precheck(env, context);
 
     RngHelper_Descriptor::Stats& stats = env.current_stats<RngHelper_Descriptor::Stats>();
-
-    home_black_border_check(env.console, context);
 
     bool shiny_found = false;
 

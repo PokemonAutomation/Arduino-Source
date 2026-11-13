@@ -12,11 +12,11 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/LanguageOCROption.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Pokemon/Pokemon_StatsCalculation.h"
 #include "Pokemon/Pokemon_AdvRng.h"
 #include "PokemonFRLG_RngDisplays.h"
+#include "PokemonFRLG_RngProgram.h"
 #include "PokemonFRLG_SeedsDatabase.h"
 
 namespace PokemonAutomation{
@@ -30,9 +30,12 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class StarterRng : public SingleSwitchProgramInstance, private ConfigOption::Listener{
+//  Calibrates timings to hit an RNG target for a starter.
+class StarterRng : public RngProgramInstance, private ConfigOption::Listener{
 public:
     using Descriptor = StarterRng_Descriptor;
+    //  The party is empty before the starter, so there is nothing to check.
+    virtual size_t free_party_slots_needed() const override{ return 0; }
     ~StarterRng();
     StarterRng();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;

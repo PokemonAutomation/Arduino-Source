@@ -231,10 +231,9 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     /*
     * Settings: Text Speed fast
     */
+    run_precheck(env, context);
 
     GiftRng_Descriptor::Stats& stats = env.current_stats<GiftRng_Descriptor::Stats>();
-
-    home_black_border_check(env.console, context);
 
     RNG_FILTERS.reset();
     RNG_CALIBRATION.reset_hits();

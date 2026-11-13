@@ -14,12 +14,12 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/LabelCellOption.h"
 #include "CommonTools/Options/LanguageOCROption.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Pokemon/Options/Pokemon_NameSelectOption.h"
 #include "Pokemon/Pokemon_AdvRng.h"
 #include "PokemonFRLG_BlindNavigation.h"
 #include "PokemonFRLG_RngCalibration.h"
+#include "PokemonFRLG_RngProgram.h"
 #include "PokemonFRLG_RngStatsDatabase.h"
 #include "PokemonFRLG_RngDisplays.h"
 #include "PokemonFRLG_RngLoopRoutines.h"
@@ -56,9 +56,16 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class EggRng : public SingleSwitchProgramInstance, public ConfigOption::Listener{
+//  Calibrates timings to hit an RNG target for a daycare egg.
+class EggRng : public RngProgramInstance, public ConfigOption::Listener{
 public:
     using Descriptor = EggRng_Descriptor;
+    virtual size_t free_party_slots_needed() const override{
+        if (STARTING_POINT == EggProgramState::pickup_calibration){
+            return 2;
+        }
+        return 3;
+    }
     ~EggRng();
     EggRng();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;

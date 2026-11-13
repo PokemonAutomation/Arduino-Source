@@ -13,11 +13,11 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "CommonTools/Options/StringSelectOption.h"
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Pokemon/Pokemon_AdvRng.h"
 #include "PokemonFRLG_BlindNavigation.h"
 #include "PokemonFRLG_RngDisplays.h"
+#include "PokemonFRLG_RngProgram.h"
 #include "PokemonFRLG_SeedsDatabase.h"
 
 namespace PokemonAutomation{
@@ -31,9 +31,11 @@ public:
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class WildRng : public SingleSwitchProgramInstance, private ConfigOption::Listener{
+//  Calibrates timings to hit an RNG target for a random wild encounter.
+class WildRng : public RngProgramInstance, private ConfigOption::Listener{
 public:
     using Descriptor = WildRng_Descriptor;
+    virtual size_t free_party_slots_needed() const override{ return 1; }
     ~WildRng();
     WildRng();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
