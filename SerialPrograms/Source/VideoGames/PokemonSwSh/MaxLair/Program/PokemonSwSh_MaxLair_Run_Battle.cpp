@@ -32,7 +32,7 @@ bool process_header_read(
 ){
     if (mon.size() == 1){
         state.opponent = std::move(mon);
-        return true;
+        return state.opponent_fits_stage();
     }
     if (mon.size() > 1){
         logger.log("Ambiguous Read Result: " + set_to_str(mon), COLOR_PURPLE);
@@ -41,7 +41,7 @@ bool process_header_read(
                 "Using previous known value to disambiguate: " + set_to_str(mon),
                 COLOR_PURPLE
             );
-            return true;
+            return state.opponent_fits_stage();
         }
     }
     if (state.opponent.size() == 1){
@@ -49,7 +49,7 @@ bool process_header_read(
             "Failed to read opponent from battle. Using previously known value: " + set_to_str(state.opponent),
             COLOR_ORANGE
         );
-        return true;
+        return state.opponent_fits_stage();
     }
 
     return false;
@@ -75,14 +75,6 @@ bool read_battle_menu(
     std::set<std::string> mon = reader.read_opponent(stream.logger(), context, stream.video());
 
     bool retry = !process_header_read(stream.logger(), state, std::move(mon));
-    std::string opponent = state.opponent.empty()
-        ? ""
-        : *state.opponent.begin();
-
-    //  If we see a boss before the end. Something is wrong. Retry.
-    if (state.wins != 3 && is_boss(opponent)){
-        retry = true;
-    }
 
     VideoSnapshot snapshot;
     if (retry){
@@ -363,14 +355,14 @@ StateMachineAction throw_balls(
     state.players[2].health.value.dead = 0;
     state.players[3].health.value.dead = 0;
 
-
     GlobalState inferred = state_tracker.synchronize(stream.logger(), console_index);
-
 
     std::string ball;
 
     bool boss = inferred.wins == 4;
     if (boss){
+        //  This will crash if `inferred.boss` is still empty after battle-screen
+        //  and the fallback summary read (OCR misses).
         ball = decider.boss_ball(console_index, inferred.boss);
     }else{
         ball = decider.normal_ball(console_index);
