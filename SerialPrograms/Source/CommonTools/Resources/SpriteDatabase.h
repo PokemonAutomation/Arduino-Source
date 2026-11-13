@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_CommonTools_Resources_SpriteCompositeImage_H
 #define PokemonAutomation_CommonTools_Resources_SpriteCompositeImage_H
 
+#include <functional>
 #include <map>
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 
@@ -32,7 +33,14 @@ public:
     //          (next pokemon) ...
     //      }
     //  }
-    SpriteDatabase(const char* sprite_path, const char* json_path);
+    //
+    //  If "mirror_horizontally" is set, each sprite for which it returns true
+    //  is flipped left-to-right in place. This avoids storing a separate
+    //  flipped copy of the image.
+    SpriteDatabase(
+        const char* sprite_path, const char* json_path,
+        const std::function<bool(const std::string& slug)>& mirror_horizontally = nullptr
+    );
 
 public:
     struct Sprite{
