@@ -7,11 +7,14 @@
 #include <algorithm>
 #include <map>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "PokemonFRLG_BoxOrganization.h"
+#include "PokemonFRLG_BoxSorter.h"
 #include "PokemonFRLG_BoxSorter_Tests.h"
 
 namespace PokemonAutomation{
@@ -72,6 +75,29 @@ public:
         std::stable_sort(slots.begin(), slots.end());
         if (slots != std::vector<std::optional<CollectedPokemonInfo>>{low, high, shiny, std::nullopt}){
             return "Reversed shiny sorting must put non-shinies first and empty slots last.";
+        }
+        auto poke_ball = low;
+        poke_ball->ball_slug = "poke-ball";
+        auto master_ball = poke_ball;
+        master_ball->ball_slug = "master-ball";
+        auto high_poke_ball = high;
+        high_poke_ball->ball_slug = "poke-ball";
+        rules = {{SortingRuleType::Ball_Slug, false}, {SortingRuleType::Level, false}};
+        const std::vector<std::optional<CollectedPokemonInfo>> original{
+            poke_ball, master_ball, high_poke_ball, std::nullopt
+        };
+        slots = {high_poke_ball, std::nullopt, poke_ball, master_ball};
+        std::stable_sort(slots.begin(), slots.end());
+        if (slots != std::vector<std::optional<CollectedPokemonInfo>>{master_ball, poke_ball, high_poke_ball, std::nullopt}){
+            return "Ball Type sorting must group balls alphabetically and break ties by level.";
+        }
+        if (make_box_sorting_plan(original, slots).chains != std::vector<std::vector<size_t>>{{0, 1, 0}}){
+            return "The swap plan must distinguish Pokemon that differ only by ball type.";
+        }
+        rules[0].reverse = true;
+        std::stable_sort(slots.begin(), slots.end());
+        if (slots != std::vector<std::optional<CollectedPokemonInfo>>{poke_ball, high_poke_ball, master_ball, std::nullopt}){
+            return "Reversing Ball Type must leave the level tie-breaker and empty slots in order.";
         }
         if (SLUGS_TO_NATIONAL_DEX().at("bulbasaur") != 1 || SLUGS_TO_NATIONAL_DEX().at("deoxys") != 386){
             return "Species conversion must use National Dex numbers.";

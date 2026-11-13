@@ -12,7 +12,6 @@
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonFRLG_BoxOrganization.h"
-#include "PokemonFRLG_BoxSorterLivingDex.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_BoxSorterLivingDex.h"
 
