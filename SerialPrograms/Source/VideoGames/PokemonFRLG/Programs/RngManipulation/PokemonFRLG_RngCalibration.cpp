@@ -309,7 +309,7 @@ bool validate_level(
 ){
     std::vector<AdvEncounterSlot> valid_slots;
     for (const AdvEncounterSlot& slot : ENCOUNTER_SLOTS){
-        if (base_species_slug(filters.species) == base_species_slug(slot.species)){
+        if (species_matches(filters.species, slot.species)){
             valid_slots.push_back(slot);
         }
     }

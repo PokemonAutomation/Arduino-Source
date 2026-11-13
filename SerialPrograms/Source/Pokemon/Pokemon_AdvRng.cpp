@@ -270,6 +270,18 @@ std::string base_species_slug(const std::string& species){
     return species;
 }
 
+bool species_matches(const std::string& observed, const std::string& candidate){
+    const std::string base = base_species_slug(observed);
+    if (base != base_species_slug(candidate)){
+        return false;
+    }
+    //  Accept matches with the base slug in case form couldn't be read
+    if (observed == base || candidate == base){
+        return true;
+    }
+    return observed == candidate;
+}
+
 int slot_to_unownform(AdvEncounterSlot slot){
     if (slot.species.find("unown") == std::string::npos){
         return -1;
@@ -521,7 +533,7 @@ bool check_for_match(AdvPokemonResult res, AdvRngFilters target, int16_t gender_
 }
 
 bool check_for_match(AdvWildPokemonResult res, AdvRngFilters target, int16_t gender_threshold, uint16_t tid_xor_sid){
-    return (base_species_slug(target.species) == base_species_slug(res.species))
+    return species_matches(target.species, res.species)
         && (target.level == res.level)
         && (target.nature == AdvNature::Any || (res.nature == target.nature))
         && (target.ability == AdvAbility::Any || (res.ability == target.ability))
