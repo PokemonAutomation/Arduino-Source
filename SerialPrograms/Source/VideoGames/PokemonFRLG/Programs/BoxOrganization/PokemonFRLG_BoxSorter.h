@@ -11,6 +11,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_BoxSortingTable.h"
 
@@ -39,6 +40,7 @@ public:
 
 
 private:
+    OCR::LanguageOCROption LANGUAGE;
     SimpleIntegerOption<uint16_t> NUM_BOXES;
     Pokemon::BoxSortingTable SORT_TABLE;
     BooleanCheckBoxOption DRY_RUN;

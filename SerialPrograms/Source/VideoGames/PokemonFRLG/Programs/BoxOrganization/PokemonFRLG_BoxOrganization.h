@@ -11,6 +11,7 @@
 #include <cstdint>
 #include <optional>
 #include <vector>
+#include "CommonFramework/Language.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "Pokemon/Pokemon_BoxCursor.h"
@@ -77,7 +78,7 @@ struct BoxOrganizationScan{
 // Detecting Shiny requires reading the summary screen, this is much slower than just reading the box data.
 BoxOrganizationScan scan_box_data(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-    const std::vector<Pokemon::SortingRule>& preferences, size_t num_boxes,
+    Language language, const std::vector<Pokemon::SortingRule>& preferences, size_t num_boxes,
     bool read_shininess = false
 );
 
