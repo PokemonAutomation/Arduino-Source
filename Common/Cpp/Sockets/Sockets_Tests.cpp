@@ -822,6 +822,117 @@ public:
 };
 
 
+//  "send()" for a connection that has already been replaced must not
+//  reach the new client's socket: the connection id changes on every
+//  accept, and a stale id is refused.
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_Sockets_StaleSend : public TestSockets<ClientSocketType, ServerSocketType>{
+public:
+    using TestSockets<ClientSocketType, ServerSocketType>::TestSockets;
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        ServerListener server_listener;
+        ServerSocketType server(this->m_thread_pool);
+        server.add_listener(server_listener);
+
+        uint16_t port;
+        if (!this->start_server(server, server_listener, port)){
+            return "Failed to start the server";
+        }
+
+        std::string error;
+        if (server.connection_id() != 0){
+            error = "connection_id() was not 0 before any connection";
+        }
+
+        uint64_t first_id = 0;
+        {
+            ClientListener client_listener;
+            ClientSocketType client(this->m_thread_pool);
+            client.add_listener(client_listener);
+
+            if (!this->connect_client(client, client_listener, port, 1)){
+                error = "The first client did not finish connecting";
+            }else if (!server_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&server_listener]{ return server_listener.connected.load() >= 1; }
+            )){
+                error = "The server did not call on_connect";
+            }else{
+                first_id = server.connection_id();
+                if (first_id == 0){
+                    error = "The server did not assign a connection id";
+                }
+                client.close();
+            }
+        }
+
+        if (error.empty() && !server_listener.waiter.wait_for(
+            SOCKET_TEST_WAIT,
+            [&server_listener]{ return server_listener.disconnected.load() >= 1; }
+        )){
+            error = "The server did not call on_disconnect";
+        }
+
+        //  The counter is monotonic and not reset, but with no active
+        //  connection the id must report 0.
+        if (error.empty() && server.connection_id() != 0){
+            error = "connection_id() was not 0 while no connection was active";
+        }
+
+        uint64_t second_id = 0;
+        {
+            ClientListener client_listener;
+            ClientSocketType client(this->m_thread_pool);
+            client.add_listener(client_listener);
+
+            if (!this->connect_client(client, client_listener, port, 1)){
+                error = "The second client did not finish connecting";
+            }else if (!server_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&server_listener]{ return server_listener.connected.load() >= 2; }
+            )){
+                error = "The server did not call on_connect for the second client";
+            }else{
+                second_id = server.connection_id();
+                if (second_id == first_id){
+                    error = "The connection id did not change after reconnect";
+                }
+                //  A send for the replaced connection must be refused,
+                //  not delivered into the new client's socket.
+                if (error.empty() &&
+                    server.send("stale", 5, std::chrono::milliseconds::max(), first_id) != 0
+                ){
+                    error = "A send for a replaced connection was not refused";
+                }
+                //  A send for the current connection still goes through.
+                if (error.empty() &&
+                    server.send("hello", 5, std::chrono::milliseconds::max(), second_id) != 5
+                ){
+                    error = "The send for the current connection was not delivered";
+                }
+                if (error.empty() && !client_listener.waiter.wait_for(
+                    SOCKET_TEST_WAIT,
+                    [&client_listener]{ return client_listener.received.size() >= 5; }
+                )){
+                    error = "The second client did not receive the data";
+                }else if (error.empty() &&
+                    std::memcmp(client_listener.received.data(), "hello", 5) != 0
+                ){
+                    error = "The second client received the wrong data";
+                }
+                client.close();
+            }
+        }
+
+        if (!error.empty()){
+            return error;
+        }
+        return true;
+    }
+};
+
+
 //  Starting a second server on an already-bound port must fail through
 //  on_listen_finished and leave the server not running.
 template <typename ClientSocketType, typename ServerSocketType>
@@ -2675,6 +2786,9 @@ void add_socket_tests(UnitTestDatabase& database, ThreadPool& thread_pool, const
     );
     database.add<Test_Sockets_RejectSecondClient<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "Reject a second client"
+    );
+    database.add<Test_Sockets_StaleSend<ClientSocketType, ServerSocketType>>(
+        thread_pool, prefix + "A send for a replaced connection is refused"
     );
     database.add<Test_Sockets_PortInUse<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "Port in use"

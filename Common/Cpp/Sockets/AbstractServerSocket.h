@@ -13,6 +13,7 @@
 #define PokemonAutomation_Sockets_AbstractServerSocket_H
 
 #include <chrono>
+#include <cstdint>
 #include <string>
 #include "Common/Cpp/ListenerSet.h"
 
@@ -58,6 +59,18 @@ public:
         return m_state.load(std::memory_order_relaxed);
     }
 
+    //  A token identifying the connection the socket is currently
+    //  serving. It changes every time a new client is accepted, and it
+    //  is 0 when no connection is active. Capture it when a write
+    //  starts and pass it to "send()", so that a write that outlives its
+    //  connection (the peer disconnected and a new client was accepted
+    //  in the meantime) refuses to reach the new client's socket.
+    //  Implementations keep the underlying counter monotonic (never
+    //  reset it when a connection closes, or a queued write for the old
+    //  connection could match the next connection's id); 0 is only the
+    //  "no connection is active" report, never a counter value.
+    virtual uint64_t connection_id() = 0;
+
     //  Binds to "address" and listens on "port".
     //  Use "0.0.0.0" to accept connections on all interfaces.
     virtual void start(const std::string& address, uint16_t port) = 0;
@@ -69,7 +82,10 @@ public:
     virtual size_t send(
         const void* data,
         size_t bytes,
-        std::chrono::milliseconds timeout = std::chrono::milliseconds::max()
+        std::chrono::milliseconds timeout = std::chrono::milliseconds::max(),
+        //  The connection_id() captured when this write started. 0 skips
+        //  the check: the call applies to whatever connection is active.
+        uint64_t connection = 0
     ) = 0;
 
 

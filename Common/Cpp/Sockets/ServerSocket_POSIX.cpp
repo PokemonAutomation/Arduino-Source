@@ -83,6 +83,14 @@ void ServerSocket_POSIX::start(const std::string& address, uint16_t port){
     }
 }
 
+uint64_t ServerSocket_POSIX::connection_id(){
+    std::lock_guard<Mutex> lg(m_lock);
+    return m_state.load(std::memory_order_relaxed) == State::CONNECTED
+        ? m_connection_id
+        : 0;
+}
+
+
 void ServerSocket_POSIX::close_connection(){
     int socket;
     {
@@ -159,16 +167,16 @@ void ServerSocket_POSIX::close_and_wait() noexcept{
     }
 }
 
-size_t ServerSocket_POSIX::send(const void* data, size_t bytes, std::chrono::milliseconds timeout){
+size_t ServerSocket_POSIX::send(const void* data, size_t bytes, std::chrono::milliseconds timeout, uint64_t connection){
     int socket;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        socket = m_state.load(std::memory_order_relaxed) == State::CONNECTED
-            ? m_client
-            : -1;
-    }
-    if (socket == -1){
-        return 0;
+        if (m_state.load(std::memory_order_relaxed) != State::CONNECTED
+            || (connection != 0 && m_connection_id != connection)
+        ){
+            return 0;
+        }
+        socket = m_client;
     }
 
     const char* ptr = (const char*)data;
@@ -184,7 +192,12 @@ size_t ServerSocket_POSIX::send(const void* data, size_t bytes, std::chrono::mil
     while (bytes > 0){
         {
             std::lock_guard<Mutex> lg(m_lock);
-            if (m_state.load(std::memory_order_relaxed) != State::CONNECTED){
+            //  The connection may have been replaced (or closed) since the
+            //  last iteration: in that case this write must stop rather
+            //  than reach the new client's socket.
+            if (m_state.load(std::memory_order_relaxed) != State::CONNECTED
+                || (connection != 0 && m_connection_id != connection)
+            ){
                 return sent;
             }
         }
@@ -359,6 +372,7 @@ void ServerSocket_POSIX::accept_thread_loop(std::string address, uint16_t port, 
                 fcntl(client_socket, F_SETFL, O_NONBLOCK);
                 m_client = client_socket;
                 m_close_requested = false;
+                m_connection_id++;
                 m_state.store(State::CONNECTED, std::memory_order_release);
                 accepted = true;
             }

@@ -174,13 +174,16 @@ void ServerSocket_Qt::close_and_wait() noexcept{
     m_close_requested = false;
 }
 
-size_t ServerSocket_Qt::send(const void* data, size_t bytes, std::chrono::milliseconds timeout){
+size_t ServerSocket_Qt::send(const void* data, size_t bytes, std::chrono::milliseconds timeout, uint64_t connection){
     QTcpSocket* socket;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        socket = m_state.load(std::memory_order_relaxed) == State::CONNECTED
-            ? m_socket
-            : nullptr;
+        if (m_state.load(std::memory_order_relaxed) != State::CONNECTED
+            || (connection != 0 && m_connection_id != connection)
+        ){
+            return 0;
+        }
+        socket = m_socket;
     }
     if (socket == nullptr){
         return 0;
@@ -188,6 +191,7 @@ size_t ServerSocket_Qt::send(const void* data, size_t bytes, std::chrono::millis
 
     QSharedPointer<SendData> send_data = QSharedPointer<SendData>::create();
     send_data->packet.assign((const char*)data, bytes);
+    send_data->connection = connection;
     //  "time_point::max()" (the infinite default) is never reached; using
     //  it also avoids overflowing "now() + timeout".
     send_data->deadline =
@@ -213,7 +217,8 @@ size_t ServerSocket_Qt::send(const void* data, size_t bytes, std::chrono::millis
         std::lock_guard<Mutex> lg(m_lock);
         registered =
             m_state.load(std::memory_order_relaxed) == State::CONNECTED
-            && m_socket != nullptr;
+            && m_socket != nullptr
+            && (connection == 0 || m_connection_id == connection);
         if (registered){
             m_inflight_sends.push_back(send_data);
         }
@@ -310,6 +315,7 @@ void ServerSocket_Qt::on_new_connection(){
             }else{
                 m_socket = sock;
                 m_close_requested = false;
+                m_connection_id++;
                 m_state.store(State::CONNECTED, std::memory_order_release);
                 accepted = true;
                 rejected = false;
@@ -434,11 +440,28 @@ void ServerSocket_Qt::on_close_connection(QSharedPointer<CloseCompletion> comple
     completion->cv.notify_all();
 }
 
+uint64_t ServerSocket_Qt::connection_id(){
+    std::lock_guard<Mutex> lg(m_lock);
+    return m_state.load(std::memory_order_relaxed) == State::CONNECTED
+        ? m_connection_id
+        : 0;
+}
+
+
 void ServerSocket_Qt::on_send(QSharedPointer<SendData> send_data){
     QTcpSocket* sock;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        sock = m_socket;
+        if (send_data->connection != 0
+            && m_connection_id != send_data->connection
+        ){
+            //  The connection this send was queued for was replaced (or
+            //  torn down) while it was waiting in the queue: the write
+            //  loop must not reach into the new connection's socket.
+            sock = nullptr;
+        }else{
+            sock = m_socket;
+        }
     }
 
     {
