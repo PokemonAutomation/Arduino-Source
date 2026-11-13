@@ -33,7 +33,8 @@ sudo apt install libxkbcommon-dev libxkbcommon-x11-dev libxcb-cursor-dev \
     libxext-dev libxfixes-dev libxi-dev libxrender-dev libfontconfig1-dev \
     libfreetype-dev libssl-dev
 
-# FFmpeg dev libs so Qt Multimedia gets a working webcam/video backend
+# FFmpeg dev libs: needed for the stream history (PA_STREAM_HISTORY_FFMPEG,
+# on by default), and give Qt Multimedia a working webcam/video backend
 sudo apt install libavcodec-dev libavformat-dev libavutil-dev libswscale-dev \
     libswresample-dev
 ```

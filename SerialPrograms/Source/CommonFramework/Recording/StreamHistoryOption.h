@@ -59,6 +59,8 @@ public:
         FPS_01,
     };
     EnumDropdownOption<VideoFPS> VIDEO_FPS;
+    //  VIDEO_FPS as a number of frames per second.
+    size_t target_fps() const;
     SimpleIntegerOption<uint16_t> JPEG_QUALITY;
 };
 
