@@ -65,6 +65,10 @@ public:
     //  starts and pass it to "send()", so that a write that outlives its
     //  connection (the peer disconnected and a new client was accepted
     //  in the meantime) refuses to reach the new client's socket.
+    //  Implementations keep the underlying counter monotonic (never
+    //  reset it when a connection closes, or a queued write for the old
+    //  connection could match the next connection's id); 0 is only the
+    //  "no connection is active" report, never a counter value.
     virtual uint64_t connection_id() = 0;
 
     //  Binds to "address" and listens on "port".
