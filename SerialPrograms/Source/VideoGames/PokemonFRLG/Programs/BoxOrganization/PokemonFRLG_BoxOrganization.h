@@ -75,11 +75,11 @@ struct BoxOrganizationScan{
     BoxSelectionMode mode;
 };
 
-// Detecting Shiny requires reading the summary screen, this is much slower than just reading the box data.
+// Scan summaries for rules that need summary data or when the caller requests a summary scan.
 BoxOrganizationScan scan_box_data(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     Language language, const std::vector<Pokemon::SortingRule>& preferences, size_t num_boxes,
-    bool read_shininess = false
+    bool force_summary_scan = false
 );
 
 void execute_box_sorting_plan(

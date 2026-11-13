@@ -23,6 +23,7 @@
 #include "VideoGames/PokemonFRLG/Inference/Box/PokemonFRLG_BoxGenderReader.h"
 #include "VideoGames/PokemonFRLG/Inference/Box/PokemonFRLG_BoxSelectionModeDetector.h"
 #include "VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h"
+#include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_BallReader.h"
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_SelectionArrowDetector.h"
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h"
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_StatsReader.h"
@@ -162,8 +163,7 @@ void open_summary_screen(SingleSwitchProgramEnvironment& env, ProControllerConte
     wait_for_summary_animation(env, context);
 }
 
-// Scroll through the detected pokemon and read their summary screens.
-// Currently only reads shininess, but could be extended to read other summary information.
+// Scroll through the detected Pokemon and read their shininess and ball type.
 void scan_box_summaries(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     Language language, const BoxSelectionModeDetector& selection_detector, BoxCursor& cursor,
@@ -180,7 +180,7 @@ void scan_box_summaries(
         return;
     }
 
-    env.log("Reading shininess in box " + std::to_string(cursor.box + 1));
+    env.log("Reading summaries in box " + std::to_string(cursor.box + 1));
     move_cursor_to(env, context, selection_detector, cursor, BoxCursor(occupied.back()), BoxSelectionMode::Normal);
     
     open_summary_screen(env, context);
@@ -189,6 +189,8 @@ void scan_box_summaries(
     ShinySymbolDetector shiny_detector(COLOR_YELLOW);
     VideoOverlaySet overlays(env.console.overlay());
     shiny_detector.make_overlays(overlays);
+    BallReader ball_reader(env.console);
+
     for (size_t remaining = occupied.size(); remaining > 0; remaining--){
         const size_t index = occupied[remaining - 1];
         auto& pokemon = *boxes_data[index];
@@ -203,6 +205,21 @@ void scan_box_summaries(
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, ss.str(), env.console);
         }
         pokemon.shiny = shiny_detector.read(env.logger(), screen);
+        pokemon.ball_slug = ball_reader.read_ball(screen);
+        if (pokemon.ball_slug.empty()){
+            std::ostringstream ss;
+            ss << "Box Sorter: Unable to read the ball type at " << BoxCursor(index) << ".";
+            env.log(ss.str(), COLOR_RED);
+        }
+
+        std::ostringstream overview;
+        overview << "index:" << index
+                 << ", name:" << pokemon.name_slug
+                 << ", lvl:" << level_str(pokemon.level)
+                 << ", shiny:" << (pokemon.shiny ? "True" : "False")
+                 << ", ball:" << pokemon.ball_slug;
+        env.log(overview.str());
+
         pbf_press_dpad(context, DPAD_UP, 80ms, 300ms);
         context.wait_for_all_requests();
         wait_for_summary_animation(env, context);
@@ -421,10 +438,16 @@ std::string make_missing_living_dex_report(
 
 BoxOrganizationScan scan_box_data(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-    Language language, const std::vector<SortingRule>& preferences, size_t num_boxes, bool read_shininess
+    Language language, const std::vector<SortingRule>& preferences, size_t num_boxes, bool force_summary_scan
 ){
-    bool read_summary = read_shininess || std::any_of(preferences.begin(), preferences.end(), [](const SortingRule& rule){
-        return rule.sort_type == SortingRuleType::Shiny;
+    const bool read_summary = force_summary_scan || std::any_of(preferences.begin(), preferences.end(), [](const SortingRule& rule){
+        switch (rule.sort_type){
+        case SortingRuleType::Shiny:
+        case SortingRuleType::Ball_Slug:
+            return true;
+        default:
+            return false;
+        }
     });
     auto& stats = env.current_stats<BoxOrganizationStats>();
     const size_t slot_count = num_boxes * BOX_ROWS * BOX_COLS;

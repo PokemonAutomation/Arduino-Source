@@ -65,7 +65,13 @@ BoxSorter::BoxSorter()
     )
     , SORT_TABLE(
         "<b>Sort Order Rules:</b><br>Sort order rules will be applied top to bottom.",
-        {SortingRuleType::DexNo, SortingRuleType::Level, SortingRuleType::Gender, SortingRuleType::Shiny}
+        {
+            SortingRuleType::DexNo,
+            SortingRuleType::Level,
+            SortingRuleType::Gender,
+            SortingRuleType::Shiny,
+            SortingRuleType::Ball_Slug,
+        }
     )
     , DRY_RUN(
         "<b>Dry Run:</b><br>Scan boxes and write frlg-box_order.json and "
