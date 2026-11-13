@@ -18,6 +18,8 @@
 #include "Programs/Farming/PokemonFRLG_NuggetBridgeFarmer.h"
 #include "Programs/Farming/PokemonFRLG_PickupFarmer.h"
 #include "Programs/Farming/PokemonFRLG_EvTrainer.h"
+#include "Programs/Farming/PokemonFRLG_ExpFarmer.h"
+
 #include "Programs/ShinyHunting/PokemonFRLG_GiftReset.h"
 #include "Programs/ShinyHunting/PokemonFRLG_LegendaryReset.h"
 #include "Programs/ShinyHunting/PokemonFRLG_LegendaryRunAway.h"
@@ -94,6 +96,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back("---- Untested/Beta/WIP ----");
         ret.emplace_back(make_SingleSwitchProgram<BoxSorter>());
         ret.emplace_back(make_SingleSwitchProgram<BoxSorterLivingDex>());
+        ret.emplace_back(make_SingleSwitchProgram<ExpFarmer>());
     }
 
     if (STATIC_GLOBALS.DEVELOPER_MODE){

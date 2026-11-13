@@ -1706,12 +1706,16 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h
     Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.cpp
     Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h
+    Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogTextReader.cpp
+    Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogTextReader.h
     Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PartyDialogs.cpp
     Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PartyDialogs.h
     Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.cpp
     Source/VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.h
     Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_MapDetector.cpp
     Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_MapDetector.h
+    Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_OverworldReaders.cpp
+    Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_OverworldReaders.h
     Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_PokemonLeagueDetectors.cpp
     Source/VideoGames/PokemonFRLG/Inference/Map/PokemonFRLG_PokemonLeagueDetectors.h
     Source/VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_BagDetector.cpp
@@ -1733,6 +1737,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_TrainerCardDetector.h
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleLevelUpReader.cpp
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleLevelUpReader.h
+    Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleMoveReader.cpp
+    Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleMoveReader.h
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.cpp
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.h
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleSelectionArrowDetector.cpp
@@ -1779,10 +1785,14 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonFRLG/Programs/BoxOrganization/PokemonFRLG_BoxSorterLivingDex.h
     Source/VideoGames/PokemonFRLG/Programs/BoxOrganization/PokemonFRLG_BoxSorter_Tests.cpp
     Source/VideoGames/PokemonFRLG/Programs/BoxOrganization/PokemonFRLG_BoxSorter_Tests.h
+    Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_BattleMoveData.cpp
+    Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_BattleMoveData.h
     Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_EliteFourFarmer.cpp
     Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_EliteFourFarmer.h
     Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_EvTrainer.cpp
     Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_EvTrainer.h
+    Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_ExpFarmer.cpp
+    Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_ExpFarmer.h
     Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_HeldItemFarmer-SafariZone.cpp
     Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_HeldItemFarmer-SafariZone.h
     Source/VideoGames/PokemonFRLG/Programs/Farming/PokemonFRLG_ItemDuplication.cpp
