@@ -8,6 +8,9 @@
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_Qt.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
+#include "VideoFrameQt.h"
 #include "SnapshotManager.h"
 
 //#include <iostream>
@@ -46,9 +49,19 @@ VideoSnapshot SnapshotManager::convert(QVideoFrame frame, WallClock timestamp) n
     snapshot.timestamp = timestamp;
     try{
         WallClock time0 = current_time();
-        snapshot.frame = std::make_shared<const ImageRGB32>(
-            QImage_to_ImageRGB32(frame_to_image(frame))
-        );
+
+        //  Qt's conversion ignores the frame's color range. Ours returns an empty
+        //  image for formats it doesn't handle.
+        const VideoPipelineOptions& options = *GlobalSettings::instance().VIDEO_PIPELINE;
+        ImageRGB32 image;
+        if (!options.USE_QT_YUV_CONVERSION){
+            image = frame_to_ImageRGB32(frame, options.FORCE_FULL_COLOR_RANGE);
+        }
+        if (!image){
+            image = QImage_to_ImageRGB32(frame_to_image(frame));
+        }
+        snapshot.frame = std::make_shared<const ImageRGB32>(std::move(image));
+
         WallClock time1 = current_time();
         WriteSpinLock lg(m_stats_lock);
         m_stats_conversion.report_data(

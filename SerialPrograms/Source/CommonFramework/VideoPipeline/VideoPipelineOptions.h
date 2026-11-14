@@ -42,11 +42,32 @@ public:
             5
 #endif
         )
+        , FORCE_FULL_COLOR_RANGE(
+            "<b>Force Full Color Range:</b><br>"
+            "Treat YUV frames as full range (0-255) instead of whatever the capture device "
+            "reports. Many capture cards deliver full range YUV but do not say so, which makes "
+            "saturated colors come out over-saturated and breaks color-based detection. "
+            "Symptom: detectors never recognize a state even though the video looks fine. "
+            "Only affects the frames sent to detection, not the on-screen preview.",
+            LockMode::UNLOCK_WHILE_RUNNING,
+            false
+        )
+        , USE_QT_YUV_CONVERSION(
+            "<b>Use Qt's YUV Conversion:</b><br>"
+            "Fall back to Qt for converting captured frames to RGB. Qt ignores the color "
+            "range the frame declares and always assumes limited range, which over-saturates "
+            "full range sources and breaks color-based detection. It is also much slower. "
+            "Only turn this on if our conversion misbehaves on your hardware.",
+            LockMode::UNLOCK_WHILE_RUNNING,
+            false
+        )
     {
         PA_ADD_OPTION(SHOW_ALL_FPS);
         PA_ADD_OPTION(VIDEO_BACKEND0);
 
         PA_ADD_OPTION(AUTO_RESET_SECONDS);
+        PA_ADD_OPTION(FORCE_FULL_COLOR_RANGE);
+        PA_ADD_OPTION(USE_QT_YUV_CONVERSION);
     }
 
 public:
@@ -54,6 +75,8 @@ public:
     VideoBackendOption VIDEO_BACKEND0;
 
     SimpleIntegerOption<uint8_t> AUTO_RESET_SECONDS;
+    BooleanCheckBoxOption FORCE_FULL_COLOR_RANGE;
+    BooleanCheckBoxOption USE_QT_YUV_CONVERSION;
 };
 
 
