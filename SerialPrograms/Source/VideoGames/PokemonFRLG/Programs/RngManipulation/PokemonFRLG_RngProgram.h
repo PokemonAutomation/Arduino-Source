@@ -14,10 +14,16 @@
 
 #include <cstddef>
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_Prechecks.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonFRLG{
+
+
+//  The prechecks of an RNG program that needs free_party_slots_needed free
+//  party slots: black_border, then free_party_slots when it needs any.
+PrecheckList rng_prechecks(size_t free_party_slots_needed);
 
 
 //  Base class of the RNG programs.
@@ -30,18 +36,15 @@ public:
     //  party that Pokemon would go to the PC instead.
     virtual size_t free_party_slots_needed() const = 0;
 
+    //  What the program needs before it starts, in the order run_precheck()
+    //  checks it. Does not touch the console.
+    PrecheckList prechecks() const;
+
 protected:
     //  Call first in program(), with the game on the overworld where the
-    //  player saved: checks the party has the free slots
-    //  free_party_slots_needed() asks for, then goes Home for the black
-    //  border check. Throws UserSetupError if a check fails.
+    //  player saved: runs prechecks(). "Run Start Checks" off in the FRLG Game
+    //  Settings skips the optional ones. Throws UserSetupError if a check fails.
     void run_precheck(
-        SingleSwitchProgramEnvironment& env,
-        ProControllerContext& context
-    );
-
-private:
-    void check_free_party_slots(
         SingleSwitchProgramEnvironment& env,
         ProControllerContext& context
     );

@@ -30,6 +30,7 @@
 #include "Programs/BoxOrganization/PokemonFRLG_BoxSorter_Tests.h"
 #include "Tests/TestUtils.h"
 
+#include "PokemonFRLG_Prechecks_Tests.h"
 #include "PokemonFRLG_Tests.h"
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -54,6 +55,7 @@ void add_tests(UnitTestDatabase& database){
     add_tests_PartyHeldItemDetector(database);
     add_tests_PartyLevelUpReader(database);
     add_tests_PartyMenuDetector(database);
+    add_tests_Prechecks(database);
     add_tests_PrizeSelectDetector(database);
     add_tests_PartySlotDetector(database);
     add_tests_StatsReader(database);

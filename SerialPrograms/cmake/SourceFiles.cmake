@@ -1417,6 +1417,10 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.h
     Source/NintendoSwitch/Programs/NintendoSwitch_MenuStabilityTester.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_MenuStabilityTester.h
+    Source/NintendoSwitch/Programs/NintendoSwitch_Prechecks.cpp
+    Source/NintendoSwitch/Programs/NintendoSwitch_Prechecks.h
+    Source/NintendoSwitch/Programs/NintendoSwitch_Prechecks_Tests.cpp
+    Source/NintendoSwitch/Programs/NintendoSwitch_Prechecks_Tests.h
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.h
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.cpp
@@ -1767,6 +1771,10 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h
     Source/VideoGames/PokemonFRLG/PokemonFRLG_Panels.cpp
     Source/VideoGames/PokemonFRLG/PokemonFRLG_Panels.h
+    Source/VideoGames/PokemonFRLG/PokemonFRLG_Prechecks.cpp
+    Source/VideoGames/PokemonFRLG/PokemonFRLG_Prechecks.h
+    Source/VideoGames/PokemonFRLG/PokemonFRLG_Prechecks_Tests.cpp
+    Source/VideoGames/PokemonFRLG/PokemonFRLG_Prechecks_Tests.h
     Source/VideoGames/PokemonFRLG/PokemonFRLG_Settings.cpp
     Source/VideoGames/PokemonFRLG/PokemonFRLG_Settings.h
     Source/VideoGames/PokemonFRLG/PokemonFRLG_Tests.cpp
