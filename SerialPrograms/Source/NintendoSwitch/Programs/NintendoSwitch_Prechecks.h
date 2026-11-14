@@ -23,6 +23,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+//  How one precheck ended.
 enum class PrecheckStatus{
     PASSED,
     FAILED,
@@ -31,12 +32,12 @@ enum class PrecheckStatus{
 
 //  Whether a precheck can be turned off.
 enum class PrecheckPolicy{
-    REQUIRED,   //  Always runs.
-    OPTIONAL,   //  Runs unless the program turns its optional checks off.
+    ALWAYS_RUNS,
+    SKIPPABLE,      //  Left out when the program turns its skippable checks off.
 };
 
-//  Whether run_prechecks() runs the OPTIONAL checks.
-enum class OptionalPrechecks{
+//  Whether run_prechecks() runs the SKIPPABLE checks.
+enum class SkippablePrechecks{
     RUN,
     SKIP,
 };
@@ -80,13 +81,13 @@ private:
 using PrecheckList = std::vector<std::unique_ptr<const Precheck>>;
 
 
-//  Runs the checks in order, each through run_check, leaving out the OPTIONAL
-//  ones when optional is SKIP. Throws UserSetupError with the check's message
+//  Runs the checks in order, each through run_check, leaving out the SKIPPABLE
+//  ones when skippable is SKIP. Throws UserSetupError with the check's message
 //  at the first FAILED one. Returns one result per check.
 std::vector<PrecheckResult> run_prechecks(
     Logger& logger,
     const PrecheckList& checks,
-    OptionalPrechecks optional,
+    SkippablePrechecks skippable,
     const std::function<PrecheckOutcome(const Precheck&)>& run_check
 );
 
@@ -95,10 +96,10 @@ std::vector<PrecheckResult> run_prechecks(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     const PrecheckList& checks,
-    OptionalPrechecks optional
+    SkippablePrechecks skippable
 );
 
 
-}
-}
+}  // namespace NintendoSwitch
+}  // namespace PokemonAutomation
 #endif

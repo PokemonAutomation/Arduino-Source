@@ -40,7 +40,7 @@ public:
         : Precheck(
             "black_border",
             "Screen size at 100% with no black border, and the controller connected.",
-            PrecheckPolicy::REQUIRED
+            PrecheckPolicy::ALWAYS_RUNS
         )
     {}
     virtual PrecheckOutcome run(SingleSwitchProgramEnvironment& env, ProControllerContext& context) const override{
@@ -56,7 +56,7 @@ public:
         : Precheck(
             "free_party_slots",
             std::format("At least {} free party slot(s), on the overworld where the game was saved.", free_slots_needed),
-            PrecheckPolicy::OPTIONAL
+            PrecheckPolicy::SKIPPABLE
         )
         , m_free_slots_needed(free_slots_needed)
     {}
@@ -95,6 +95,6 @@ PrecheckOutcome free_party_slots_outcome(size_t party_size, size_t free_slots_ne
 }
 
 
-}
-}
-}
+}  // namespace PokemonFRLG
+}  // namespace NintendoSwitch
+}  // namespace PokemonAutomation

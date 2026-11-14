@@ -30,10 +30,10 @@ void RngProgramInstance::run_precheck(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context
 ){
-    const OptionalPrechecks optional = GameSettings::instance().RUN_RNG_START_CHECKS
-        ? OptionalPrechecks::RUN
-        : OptionalPrechecks::SKIP;
-    run_prechecks(env, context, prechecks(), optional);
+    const SkippablePrechecks skippable = GameSettings::instance().RUN_RNG_START_CHECKS
+        ? SkippablePrechecks::RUN
+        : SkippablePrechecks::SKIP;
+    run_prechecks(env, context, prechecks(), skippable);
 }
 
 }  // namespace PokemonFRLG

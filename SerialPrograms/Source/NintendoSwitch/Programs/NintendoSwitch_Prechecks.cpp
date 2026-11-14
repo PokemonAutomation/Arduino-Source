@@ -4,6 +4,7 @@
  *
  */
 
+#include <format>
 #include "Common/Cpp/Exceptions.h"
 #include "NintendoSwitch_Prechecks.h"
 
@@ -21,23 +22,23 @@ Precheck::Precheck(std::string name, std::string needs, PrecheckPolicy policy)
 std::vector<PrecheckResult> run_prechecks(
     Logger& logger,
     const PrecheckList& checks,
-    OptionalPrechecks optional,
+    SkippablePrechecks skippable,
     const std::function<PrecheckOutcome(const Precheck&)>& run_check
 ){
     std::vector<PrecheckResult> results;
     for (const std::unique_ptr<const Precheck>& check : checks){
-        if (check->policy() == PrecheckPolicy::OPTIONAL && optional == OptionalPrechecks::SKIP){
-            logger.log("Precheck " + check->name() + ": skipped, optional prechecks are off.");
-            results.emplace_back(PrecheckResult{check->name(), {PrecheckStatus::SKIPPED, "Optional prechecks are off."}});
+        if (check->policy() == PrecheckPolicy::SKIPPABLE && skippable == SkippablePrechecks::SKIP){
+            logger.log(std::format("Precheck {}: skipped, skippable prechecks are off.", check->name()));
+            results.emplace_back(PrecheckResult{check->name(), {PrecheckStatus::SKIPPED, "Skippable prechecks are off."}});
             continue;
         }
-        logger.log("Precheck " + check->name() + ": " + check->needs());
+        logger.log(std::format("Precheck {}: {}", check->name(), check->needs()));
         PrecheckOutcome outcome = run_check(*check);
         if (outcome.status == PrecheckStatus::FAILED){
             throw UserSetupError(logger, std::move(outcome.message));
         }
         if (outcome.status == PrecheckStatus::SKIPPED){
-            logger.log("Precheck " + check->name() + ": skipped. " + outcome.message, COLOR_RED);
+            logger.log(std::format("Precheck {}: skipped. {}", check->name(), outcome.message), COLOR_RED);
         }
         results.emplace_back(PrecheckResult{check->name(), std::move(outcome)});
     }
@@ -48,10 +49,10 @@ std::vector<PrecheckResult> run_prechecks(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     const PrecheckList& checks,
-    OptionalPrechecks optional
+    SkippablePrechecks skippable
 ){
     return run_prechecks(
-        env.console.logger(), checks, optional,
+        env.console.logger(), checks, skippable,
         [&](const Precheck& check){
             return check.run(env, context);
         }
@@ -59,5 +60,5 @@ std::vector<PrecheckResult> run_prechecks(
 }
 
 
-}
-}
+}  // namespace NintendoSwitch
+}  // namespace PokemonAutomation

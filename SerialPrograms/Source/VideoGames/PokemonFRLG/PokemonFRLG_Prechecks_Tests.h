@@ -14,10 +14,11 @@ namespace NintendoSwitch{
 namespace PokemonFRLG{
 
 
+//  Registers the precheck unit tests.
 void add_tests_Prechecks(UnitTestDatabase& database);
 
 
-}
-}
-}
+}  // namespace PokemonFRLG
+}  // namespace NintendoSwitch
+}  // namespace PokemonAutomation
 #endif

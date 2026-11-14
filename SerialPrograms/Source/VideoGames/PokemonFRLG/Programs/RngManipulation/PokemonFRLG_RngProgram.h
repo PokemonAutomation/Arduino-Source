@@ -43,7 +43,7 @@ public:
 protected:
     //  Call first in program(), with the game on the overworld where the
     //  player saved: runs prechecks(). "Run Start Checks" off in the FRLG Game
-    //  Settings skips the optional ones. Throws UserSetupError if a check fails.
+    //  Settings skips the SKIPPABLE ones. Throws UserSetupError if a check fails.
     void run_precheck(
         SingleSwitchProgramEnvironment& env,
         ProControllerContext& context

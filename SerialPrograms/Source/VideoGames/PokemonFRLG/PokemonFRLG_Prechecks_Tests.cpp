@@ -5,6 +5,7 @@
  *  The FRLG precheck lists and verdicts: no console, no GUI.
  */
 
+#include <format>
 #include <string>
 #include <vector>
 #include "Common/Cpp/TestRunners/UnitTest.h"
@@ -27,22 +28,24 @@ struct ListedPrecheck{
     bool operator==(const ListedPrecheck&) const = default;
 };
 
+struct RngPrechecksInput{
+    size_t free_party_slots_needed;
+};
+
+struct RngPrechecksExpectation{
+    std::vector<ListedPrecheck> checks;
+};
+
 struct RngPrechecksCase{
-    struct Input{
-        size_t free_party_slots_needed;
-    };
-    struct Expectation{
-        std::vector<ListedPrecheck> checks;
-    };
     std::string name;
-    Input input;
-    Expectation expectation;
+    RngPrechecksInput input;
+    RngPrechecksExpectation expectation;
 };
 
 class Test_RngPrechecks : public UnitTest{
 public:
     explicit Test_RngPrechecks(RngPrechecksCase test_case)
-        : UnitTest("PokemonFRLG::Prechecks::RngPrechecks - " + test_case.name)
+        : UnitTest(std::format("PokemonFRLG::Prechecks::RngPrechecks - {}", test_case.name))
         , m_case(std::move(test_case))
     {}
 
@@ -50,7 +53,7 @@ public:
         std::vector<ListedPrecheck> listed;
         for (const std::unique_ptr<const Precheck>& check : rng_prechecks(m_case.input.free_party_slots_needed)){
             if (check->needs().empty()){
-                return "Precheck " + check->name() + " must say what it needs.";
+                return std::format("Precheck {} must say what it needs.", check->name());
             }
             listed.emplace_back(ListedPrecheck{check->name(), check->policy()});
         }
@@ -65,25 +68,27 @@ private:
 };
 
 
+struct FreePartySlotsInput{
+    size_t party_size;
+    size_t free_slots_needed;
+};
+
+struct FreePartySlotsExpectation{
+    PrecheckStatus status;
+    //  Checked only on FAILED: the message the user sees.
+    std::string message;
+};
+
 struct FreePartySlotsCase{
-    struct Input{
-        size_t party_size;
-        size_t free_slots_needed;
-    };
-    struct Expectation{
-        PrecheckStatus status;
-        //  Checked only on FAILED: the message the user sees.
-        std::string message;
-    };
     std::string name;
-    Input input;
-    Expectation expectation;
+    FreePartySlotsInput input;
+    FreePartySlotsExpectation expectation;
 };
 
 class Test_FreePartySlotsOutcome : public UnitTest{
 public:
     explicit Test_FreePartySlotsOutcome(FreePartySlotsCase test_case)
-        : UnitTest("PokemonFRLG::Prechecks::FreePartySlotsOutcome - " + test_case.name)
+        : UnitTest(std::format("PokemonFRLG::Prechecks::FreePartySlotsOutcome - {}", test_case.name))
         , m_case(std::move(test_case))
     {}
 
@@ -92,10 +97,10 @@ public:
             m_case.input.party_size, m_case.input.free_slots_needed
         );
         if (outcome.status != m_case.expectation.status){
-            return "Wrong verdict: \"" + outcome.message + "\"";
+            return std::format("Wrong verdict: \"{}\"", outcome.message);
         }
         if (outcome.status == PrecheckStatus::FAILED && outcome.message != m_case.expectation.message){
-            return "Wrong message: \"" + outcome.message + "\"";
+            return std::format("Wrong message: \"{}\"", outcome.message);
         }
         return true;
     }
@@ -105,54 +110,54 @@ private:
 };
 
 
-std::vector<RngPrechecksCase> rng_prechecks_cases(){
-    const ListedPrecheck black_border{"black_border", PrecheckPolicy::REQUIRED};
-    const ListedPrecheck free_party_slots{"free_party_slots", PrecheckPolicy::OPTIONAL};
-    return {
-        {"NeedsNoSlots", {0}, {{black_border}}},
-        {"NeedsOneSlot", {1}, {{black_border, free_party_slots}}},
-        {"NeedsTwoSlots", {2}, {{black_border, free_party_slots}}},
-    };
-}
+const ListedPrecheck BLACK_BORDER{"black_border", PrecheckPolicy::ALWAYS_RUNS};
+const ListedPrecheck FREE_PARTY_SLOTS{"free_party_slots", PrecheckPolicy::SKIPPABLE};
 
-std::vector<FreePartySlotsCase> free_party_slots_cases(){
-    using enum PrecheckStatus;
-    return {
-        {"FiveOfSixNeedsOne", {5, 1}, {PASSED, ""}},
-        {
-            "FullPartyNeedsOne", {6, 1},
-            {
-                FAILED,
-                "Your party is full. Leave a party slot free so the program can check the "
-                "Pokémon it catches or receives.",
-            },
+const std::vector<RngPrechecksCase> RNG_PRECHECKS_CASES{
+    {.name = "NeedsNoSlots", .input = {0}, .expectation = {{BLACK_BORDER}}},
+    {.name = "NeedsOneSlot", .input = {1}, .expectation = {{BLACK_BORDER, FREE_PARTY_SLOTS}}},
+    {.name = "NeedsTwoSlots", .input = {2}, .expectation = {{BLACK_BORDER, FREE_PARTY_SLOTS}}},
+};
+
+//  The messages are the ones the party check showed before it moved onto the
+//  precheck list.
+const std::vector<FreePartySlotsCase> FREE_PARTY_SLOTS_CASES{
+    {.name = "FiveOfSixNeedsOne", .input = {5, 1}, .expectation = {PrecheckStatus::PASSED, ""}},
+    {
+        .name = "FullPartyNeedsOne",
+        .input = {6, 1},
+        .expectation = {
+            PrecheckStatus::FAILED,
+            "Your party is full. Leave a party slot free so the program can check the "
+            "Pokémon it catches or receives.",
         },
-        {"FourOfSixNeedsTwo", {4, 2}, {PASSED, ""}},
-        {
-            "FiveOfSixNeedsTwo", {5, 2},
-            {
-                FAILED,
-                "Your party has 5 Pokémon. Leave at least 2 party slots free for the "
-                "Pokémon the program catches or receives.",
-            },
+    },
+    {.name = "FourOfSixNeedsTwo", .input = {4, 2}, .expectation = {PrecheckStatus::PASSED, ""}},
+    {
+        .name = "FiveOfSixNeedsTwo",
+        .input = {5, 2},
+        .expectation = {
+            PrecheckStatus::FAILED,
+            "Your party has 5 Pokémon. Leave at least 2 party slots free for the "
+            "Pokémon the program catches or receives.",
         },
-    };
-}
+    },
+};
 
 
 }  // namespace
 
 
 void add_tests_Prechecks(UnitTestDatabase& database){
-    for (RngPrechecksCase& test_case : rng_prechecks_cases()){
-        database.add<Test_RngPrechecks>(std::move(test_case));
+    for (const RngPrechecksCase& test_case : RNG_PRECHECKS_CASES){
+        database.add<Test_RngPrechecks>(test_case);
     }
-    for (FreePartySlotsCase& test_case : free_party_slots_cases()){
-        database.add<Test_FreePartySlotsOutcome>(std::move(test_case));
+    for (const FreePartySlotsCase& test_case : FREE_PARTY_SLOTS_CASES){
+        database.add<Test_FreePartySlotsOutcome>(test_case);
     }
 }
 
 
-}
-}
-}
+}  // namespace PokemonFRLG
+}  // namespace NintendoSwitch
+}  // namespace PokemonAutomation
