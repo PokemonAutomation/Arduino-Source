@@ -129,6 +129,13 @@ void add_tests_BallReader(UnitTestDatabase& database){
     database.add<Test_BallReader>("moltres_1_eng.png", "master-ball");
     database.add<Test_BallReader>("nidoran_m_eng.png", "ultra-ball");
     database.add<Test_BallReader>("pidgey_1_ita.png", "poke-ball");
+    database.add<Test_BallReader>("unown_c_eng.png", "timer-ball");
+    database.add<Test_BallReader>("unown_ex_eng.png", "poke-ball");
+    database.add<Test_BallReader>("unown_h_eng.png", "net-ball");
+    database.add<Test_BallReader>("unown_j_eng.png", "luxury-ball");
+    database.add<Test_BallReader>("unown_n_eng.png", "repeat-ball");
+    database.add<Test_BallReader>("unown_p_eng.png", "nest-ball");
+    database.add<Test_BallReader>("unown_qu_eng.png", "poke-ball");
     database.add<Test_BallReader>("venonat_4k_eng.png", "master-ball");
 }
 
