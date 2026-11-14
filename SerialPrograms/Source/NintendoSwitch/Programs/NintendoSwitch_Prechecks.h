@@ -67,7 +67,8 @@ public:
     const std::string& needs() const{ return m_needs; }
     PrecheckPolicy policy() const{ return m_policy; }
 
-    //  Reads the console. Never resets, saves or changes options.
+    //  May navigate (open a menu, go Home) but must return to the screen it started on.
+    //  Never resets, saves or changes options.
     virtual PrecheckOutcome run(SingleSwitchProgramEnvironment& env, ProControllerContext& context) const = 0;
 
 private:

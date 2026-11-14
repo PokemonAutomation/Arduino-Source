@@ -5,6 +5,7 @@
  */
 
 #include <format>
+#include <utility>
 #include "Common/Cpp/Exceptions.h"
 #include "NintendoSwitch_Prechecks.h"
 
@@ -36,6 +37,9 @@ std::vector<PrecheckResult> run_prechecks(
         PrecheckOutcome outcome = run_check(*check);
         if (outcome.status == PrecheckStatus::FAILED){
             throw UserSetupError(logger, std::move(outcome.message));
+        }
+        if (outcome.status == PrecheckStatus::PASSED && !outcome.message.empty()){
+            logger.log(std::format("Precheck {}: passed. {}", check->name(), outcome.message));
         }
         if (outcome.status == PrecheckStatus::SKIPPED){
             logger.log(std::format("Precheck {}: skipped. {}", check->name(), outcome.message), COLOR_RED);

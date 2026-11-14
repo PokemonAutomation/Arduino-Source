@@ -5,10 +5,12 @@
  */
 
 #include <format>
+#include <memory>
 #include <string>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonFRLG_Navigation.h"
+#include "VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_PartySlot.h"
 #include "PokemonFRLG_Prechecks.h"
 
 namespace PokemonAutomation{
