@@ -28,6 +28,7 @@ enum class BoxSelectionLocation{
     BoxName,
     BoxSpaces,
     Newest30,
+    Back,
 };
 
 struct BoxSelection{
