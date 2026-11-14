@@ -119,8 +119,7 @@ bool ensure_poketch_visible(VideoStream& stream, ProControllerContext& context){
             pbf_press_button(context, BUTTON_R, 205ms, 0ms);
         }else{
             //  Long press hides it, then a tap shows it at the normal size.
-            pbf_press_button(context, BUTTON_R, 1548ms, 0ms);
-            pbf_wait(context, 1418ms);
+            pbf_press_button(context, BUTTON_R, 1548ms, 1418ms);
             pbf_press_button(context, BUTTON_R, 143ms, 0ms);
         }
     }

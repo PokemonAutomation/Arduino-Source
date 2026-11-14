@@ -21,6 +21,9 @@ public:
     static constexpr double MAX_LOG10P_SPREAD = 0.50;
 
 public:
+    // Builds OCR candidates from the shared Pokemon item categories and
+    // Pokemon/ItemNameDisplay.json Ball/Berry names. BDSP_TM.json supplies
+    // localized TM numbers and move names as aliases for tm01 through tm100.
     ShopItemNameReader();
 
     static const ShopItemNameReader& instance();

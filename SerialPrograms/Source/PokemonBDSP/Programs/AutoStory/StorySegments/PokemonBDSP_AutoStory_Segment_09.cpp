@@ -84,7 +84,7 @@ enter_sunyshore_pokemon_center(VideoStream& stream, ProControllerContext& contex
 }
 
 static bool
-go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, AutoStoryOptions /*options*/){
+go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, AutoStoryOptions options){
     DpadState dpad;
     context.wait_for_all_requests();
     stream.log("Route 223: following the recorded eastern bypass to Victory Road.");
@@ -106,8 +106,7 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
         ShortDialogWatcher jasmine_dialog(COLOR_YELLOW);
         int ret = run_until<ProControllerContext>(stream, context,
             [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {0, +1}, 6800ms, 100ms);
-                pbf_wait(ctx, 3000ms);
+                pbf_move_left_joystick(ctx, {0, +1}, 6800ms, 3100ms);
             },
             {{jasmine_mark}, {jasmine_dialog}});
         if (ret < 0){
@@ -125,7 +124,7 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
     context.wait_for_all_requests();
     // The second manual route reaches the Center on one Super Repel.
     // Battle/menu time does not consume steps; expire it on the upper shore.
-    if (!activate_repel(stream, context, 8, 1)){
+    if (!activate_repel(stream, context, options.language, 8, 1)){
         stream.log("Route 223: Could not activate a Super Repel.", COLOR_RED);
         return false;
     }
@@ -152,8 +151,7 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
         BattleMenuWatcher battle(BattleType::TRAINER, COLOR_GREEN);
         int ret = run_until<ProControllerContext>(stream, context,
             [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {0, +1}, 1479ms, 100ms);
-                pbf_wait(ctx, 3000ms);
+                pbf_move_left_joystick(ctx, {0, +1}, 1479ms, 3100ms);
             },
             {{mark}, {dialogue}, {battle}});
         if (ret < 0){
@@ -285,18 +283,12 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
     // Follow the eastern bypass from the rock to the shallow-water landing. Preserve holds and
     // pauses while validating the route.
     stream.log("Route 223: bypassing Ricardo, Wesley, and Crystal on the east.");
-    pbf_move_left_joystick(context, {0, +1}, 400ms, 0ms);
-    pbf_wait(context, 517ms);
-    pbf_move_left_joystick(context, {+1, 0}, 800ms, 0ms);
-    pbf_wait(context, 404ms);
-    pbf_move_left_joystick(context, {0, +1}, 450ms, 0ms);
-    pbf_wait(context, 305ms);
-    pbf_move_left_joystick(context, {+1, 0}, 1800ms, 0ms);
-    pbf_wait(context, 281ms);
-    pbf_move_left_joystick(context, {0, +1}, 3250ms, 0ms);
-    pbf_wait(context, 454ms);
-    pbf_move_left_joystick(context, {-1, 0}, 350ms, 0ms);
-    pbf_wait(context, 401ms);
+    pbf_move_left_joystick(context, {0, +1}, 400ms, 517ms);
+    pbf_move_left_joystick(context, {+1, 0}, 800ms, 404ms);
+    pbf_move_left_joystick(context, {0, +1}, 450ms, 305ms);
+    pbf_move_left_joystick(context, {+1, 0}, 1800ms, 281ms);
+    pbf_move_left_joystick(context, {0, +1}, 3250ms, 454ms);
+    pbf_move_left_joystick(context, {-1, 0}, 350ms, 401ms);
     context.wait_for_all_requests();
 
     // Crystal can notice us on the north approach or as we turn northwest.
@@ -308,12 +300,9 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
         BattleMenuWatcher battle(BattleType::TRAINER, COLOR_GREEN);
         int ret = run_until<ProControllerContext>(stream, context,
             [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {0, +1}, 2200ms, 0ms);
-                pbf_wait(ctx, 673ms);
-                pbf_move_left_joystick(ctx, {-1, 0}, 200ms, 0ms);
-                pbf_wait(ctx, 413ms);
-                pbf_move_left_joystick(ctx, {0, +1}, 1175ms, 0ms);
-                pbf_wait(ctx, 3000ms);
+                pbf_move_left_joystick(ctx, {0, +1}, 2200ms, 673ms);
+                pbf_move_left_joystick(ctx, {-1, 0}, 200ms, 413ms);
+                pbf_move_left_joystick(ctx, {0, +1}, 1175ms, 3000ms);
             },
             {{mark}, {dialogue}, {battle}});
         if (ret >= 0){
@@ -324,8 +313,7 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
             // the short west turn. These recovery holds need live validation.
             pbf_move_left_joystick(context, {+1, 0}, 350ms, 100ms);
             pbf_move_left_joystick(context, {0, +1}, 2200ms, 100ms);
-            pbf_move_left_joystick(context, {-1, 0}, 200ms, 0ms);
-            pbf_wait(context, 413ms);
+            pbf_move_left_joystick(context, {-1, 0}, 200ms, 413ms);
             pbf_move_left_joystick(context, {0, +1}, 1175ms, 0ms);
         }else{
             stream.log("Route 223: North approach clear; continuing the recorded northwest slide.");
@@ -339,8 +327,7 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
         BattleMenuWatcher battle(BattleType::TRAINER, COLOR_GREEN);
         int ret = run_until<ProControllerContext>(stream, context,
             [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {-1, +1}, 6100ms, 0ms);
-                pbf_wait(ctx, 3000ms);
+                pbf_move_left_joystick(ctx, {-1, +1}, 6100ms, 3000ms);
             },
             {{mark}, {dialogue}, {battle}});
         if (ret >= 0){
@@ -357,8 +344,7 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
             stream.log("Route 223: Northwest slide clear; continuing from the landing.");
         }
     }
-    pbf_move_left_joystick(context, {0, +1}, 39ms, 0ms);
-    pbf_wait(context, 500ms); // Dismount here before moving west along the shore.
+    pbf_move_left_joystick(context, {0, +1}, 39ms, 500ms); // Dismount here before moving west along the shore.
     pbf_move_left_joystick(context, {-1, 0}, 800ms, 100ms);
     pbf_move_left_joystick(context, {0, -1}, 175ms, 100ms);
     context.wait_for_all_requests();
@@ -367,8 +353,7 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
     context.wait_for_all_requests();
 
     pbf_move_left_joystick(context, {-1, 0}, 609ms, 100ms);
-    pbf_move_left_joystick(context, {0, +1}, 1988ms, 100ms);
-    pbf_wait(context, 500ms); // Finish dismounting before the next shore input.
+    pbf_move_left_joystick(context, {0, +1}, 1988ms, 600ms); // Finish dismounting before the next shore input.
     dpad.last_dir = DPAD_UP;
     repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 1);
     pbf_move_left_joystick(context, {0, +1}, 2850ms, 100ms);
@@ -414,8 +399,7 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
         BattleMenuWatcher battle(BattleType::TRAINER, COLOR_GREEN);
         int ret = run_until<ProControllerContext>(stream, context,
             [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {0, +1}, 4400ms, 100ms);
-                pbf_wait(ctx, 3000ms);
+                pbf_move_left_joystick(ctx, {0, +1}, 4400ms, 3100ms);
             },
             {{mark}, {dialogue}, {battle}});
         if (ret < 0){
@@ -433,8 +417,7 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
     context.wait_for_all_requests();
     use_HM(stream, context, "Waterfall");
     pbf_wait(context, 3000ms);
-    pbf_move_left_joystick(context, {0, +1}, 3000ms, 100ms);
-    pbf_wait(context, 500ms); // Finish dismounting before the next shore input.
+    pbf_move_left_joystick(context, {0, +1}, 3000ms, 600ms); // Finish dismounting before the next shore input.
     context.wait_for_all_requests();
 
     // Safely ashore beside the Center. Decline renewal, then use the cliff
@@ -496,7 +479,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
     context.wait_for_all_requests();
     stream.log("go_through_victory_road_cave: going through Victory Road's cave and heading to the Elite 4...");
 
-    if (!activate_repel(stream, context, 8, 1)){
+    if (!activate_repel(stream, context, options.language, 8, 1)){
         stream.log("go_through_victory_road_cave: Could not activate a Super Repel.", COLOR_RED);
         return false;
     }
@@ -1080,11 +1063,6 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
 
     pbf_move_left_joystick(context, {0, +1}, 5600ms, 100ms); // 28+
 
-    // TODO(live verification): measure the final exit approach and verify wiggle clearance.
-    // Keep this reset for now: Clinton, the full exit hold, and the League approach
-    // total about 25s of commanded movement since the previous renewal.
-    stream.log("[Victory Road] Renewing Super Repel before the final cave exit.");
-    force_repel_expiry(stream, context, RepelRenewalChoice::YES, false, true);
     dpad.last_dir = DPAD_UP;
     repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 1);
 
@@ -1114,7 +1092,9 @@ static bool enter_elite_4_pokemon_center(VideoStream& stream, ProControllerConte
     stream.log("enter_elite_4_pokemon_center: Entering the Elite 4 building...");
 
     dpad.last_dir = DPAD_LEFT;
-    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 6);
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 7);
+    // Expire on the dry approach; reversing above the waterfall can carry us back down.
+    force_repel_expiry(stream, context, RepelRenewalChoice::NO, true, true);
     pbf_move_left_joystick(context, {0, +1}, 2000ms, 100ms); // 10+
 
     context.wait_for_all_requests();
@@ -1127,10 +1107,6 @@ static bool enter_elite_4_pokemon_center(VideoStream& stream, ProControllerConte
 
     context.wait_for_all_requests();
     pbf_wait(context, 3000ms);
-
-    // TODO(live verification): verify north/south clearance below the League doorway; keep the door column fixed.
-    // Planned before the next leg exceeds the 22s Super Repel movement budget.
-    force_repel_expiry(stream, context, RepelRenewalChoice::NO, true, true);
 
     {
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
@@ -1249,8 +1225,7 @@ static bool ready_in_front_of_elite_4(VideoStream& stream,
                 [](ProControllerContext& ctx){
                     // The timed east crossing can end just east of the door.
                     // Slide west along the south wall until the doorway fade.
-                    pbf_move_left_joystick(ctx, {-1, -1}, 2500ms, 0ms);
-                    pbf_wait(ctx, 10000ms);
+                    pbf_move_left_joystick(ctx, {-1, -1}, 2500ms, 10000ms);
                 },
                 {{black}});
             if (ret < 0){

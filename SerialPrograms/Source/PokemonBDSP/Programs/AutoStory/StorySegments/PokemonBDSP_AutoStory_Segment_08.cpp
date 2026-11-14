@@ -107,7 +107,7 @@ static bool heal_at_snowpoint_city_pokemon_center(VideoStream& stream, ProContro
     return true;
 }
 
-static bool go_to_lake_acuity(VideoStream& stream, ProControllerContext& context){
+static bool go_to_lake_acuity(VideoStream& stream, ProControllerContext& context, Language language){
     DpadState dpad;
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
@@ -129,7 +129,7 @@ static bool go_to_lake_acuity(VideoStream& stream, ProControllerContext& context
     pbf_move_left_joystick(context, {0, -1}, 1600ms, 100ms); // 8+
 
     context.wait_for_all_requests();
-    if (!activate_repel(stream, context, 8, 1)){
+    if (!activate_repel(stream, context, language, 8, 1)){
         stream.log("go_to_lake_acuity: Could not activate a Super Repel.", COLOR_RED);
         return false;
     }
@@ -1452,14 +1452,11 @@ static bool go_to_mount_coronet(VideoStream& stream,
                     break;
                 case 2:
                     // Combine the 1572ms, 249ms, and 674ms downhill holds.
-                    pbf_move_left_joystick(ctx, {0, -1}, 2495ms, 0ms);
-                    pbf_wait(ctx, 4700ms);
+                    pbf_move_left_joystick(ctx, {0, -1}, 2495ms, 4700ms);
                     // Clear the trainer, then let Cycling Road's slope carry us to Kayla.
-                    pbf_move_left_joystick(ctx, {1, 0}, 2852ms, 0ms);
-                    pbf_wait(ctx, 7922ms);
+                    pbf_move_left_joystick(ctx, {1, 0}, 2852ms, 7922ms);
                     // Line up with the south-gate doorway.
-                    pbf_move_left_joystick(ctx, {-1, 0}, 407ms, 0ms);
-                    pbf_wait(ctx, 836ms);
+                    pbf_move_left_joystick(ctx, {-1, 0}, 407ms, 836ms);
                     pbf_move_left_joystick(ctx, {0, -1}, 985ms, 0ms);
                     break;
                 case 3:
@@ -1497,12 +1494,9 @@ static bool go_to_mount_coronet(VideoStream& stream,
             COLOR_GREEN);
     }
     // Leave the gate, dismount, and approach Justin on foot.
-    pbf_move_left_joystick(context, {0, -1}, 1931ms, 0ms);
-    pbf_wait(context, 962ms);
-    pbf_press_button(context, BUTTON_PLUS, 163ms, 0ms);
-    pbf_wait(context, 994ms);
-    pbf_move_left_joystick(context, {0, -1}, 472ms, 0ms);
-    pbf_wait(context, 179ms);
+    pbf_move_left_joystick(context, {0, -1}, 1931ms, 962ms);
+    pbf_press_button(context, BUTTON_PLUS, 163ms, 994ms);
+    pbf_move_left_joystick(context, {0, -1}, 472ms, 179ms);
     context.wait_for_all_requests();
     ShortDialogWatcher justin_dialogue;
     StartBattleDetector justin_starting(stream.overlay());
@@ -1510,9 +1504,7 @@ static bool go_to_mount_coronet(VideoStream& stream,
     const int justin_encounter = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& ctx){
-            pbf_move_left_joystick(ctx, {1, 0}, 6105ms, 0ms);
-            pbf_wait(ctx, 1045ms);
-            pbf_wait(ctx, 3000ms);
+            pbf_move_left_joystick(ctx, {1, 0}, 6105ms, 4045ms);
         },
         {{justin_dialogue}, {justin_starting}, {justin_menu}});
     if (justin_encounter < 0){
@@ -1523,10 +1515,8 @@ static bool go_to_mount_coronet(VideoStream& stream,
         fight_trainer_using_moves(stream, context, stats, "Route 207 Hiker Justin", false);
     }
     // Position by the sign above the Coronet entrance.
-    pbf_move_left_joystick(context, {1, 0}, 1376ms, 0ms);
-    pbf_wait(context, 1069ms);
-    pbf_move_left_joystick(context, {0, 1}, 816ms, 0ms);
-    pbf_wait(context, 1822ms);
+    pbf_move_left_joystick(context, {1, 0}, 1376ms, 1069ms);
+    pbf_move_left_joystick(context, {0, 1}, 816ms, 1822ms);
     context.wait_for_all_requests();
     BlackScreenWatcher cave_black;
     WhiteScreenWatcher cave_white;
@@ -1537,9 +1527,8 @@ static bool go_to_mount_coronet(VideoStream& stream,
             pbf_press_dpad(ctx, DPAD_DOWN, 80ms, 100ms);
             pbf_press_dpad(ctx, DPAD_DOWN, 80ms, 100ms);
             pbf_press_dpad(ctx, DPAD_RIGHT, 80ms, 100ms);
-            pbf_press_dpad(ctx, DPAD_RIGHT, 80ms, 100ms);
             // Keep watching for the entry fade after the final step.
-            pbf_wait(ctx, 2000ms);
+            pbf_press_dpad(ctx, DPAD_RIGHT, 80ms, 2100ms);
         },
         {{cave_black}, {cave_white}});
     if (cave_entered < 0){
@@ -1574,27 +1563,21 @@ static bool go_through_mount_coronet(VideoStream& stream,
     context.wait_for_all_requests();
     if (!summit_events){
         stream.log("[08.05] Recorded Coronet ascent to the Spear Pillar entrance.");
-        if (!activate_repel(stream, context, 8, 1)){
+        if (!activate_repel(stream, context, options.language, 8, 1)){
             stream.log("[08.05] Could not activate the Super Repel.", COLOR_RED);
             return false;
         }
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 141ms, 0ms);
-        pbf_wait(context, 611ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 322ms, 0ms);
-        pbf_wait(context, 706ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 633ms, 0ms);
-        pbf_wait(context, 158ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 141ms, 611ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 322ms, 706ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 633ms, 158ms);
         // Surf: complete the approach, then clear the field-move prompts.
         pbf_press_button(context, BUTTON_A, 169ms, 0ms);
         clear_dialog(stream, context, BUTTON_A, 6000ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 4373ms, 0ms);
-        pbf_wait(context, 627ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 4373ms, 627ms);
         pbf_move_left_joystick(context, {1.000000, -0.000000}, 37ms, 0ms);
         pbf_move_left_joystick(context, {1.000000, -1.000000}, 6526ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 34ms, 0ms);
-        pbf_wait(context, 871ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 90ms, 0ms);
-        pbf_wait(context, 588ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 34ms, 871ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 90ms, 588ms);
         // Rock Climb: complete the approach, then clear the field-move prompts.
         pbf_press_button(context, BUTTON_A, 193ms, 0ms);
         clear_dialog(stream, context, BUTTON_A, 6000ms);
@@ -1604,12 +1587,10 @@ static bool go_through_mount_coronet(VideoStream& stream,
         const int vestibule_entered = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {-1, 0}, 747ms, 0ms);
-                pbf_wait(ctx, 15ms);
+                pbf_move_left_joystick(ctx, {-1, 0}, 747ms, 15ms);
                 pbf_move_left_joystick(ctx, {0, 1}, 651ms, 0ms);
                 pbf_move_left_joystick(ctx, {1, 1}, 50ms, 0ms);
-                pbf_move_left_joystick(ctx, {1, 0}, 768ms, 0ms);
-                pbf_wait(ctx, 1771ms);
+                pbf_move_left_joystick(ctx, {1, 0}, 768ms, 1771ms);
             },
             {{vestibule_entry}});
         if (vestibule_entered != 0){
@@ -1758,8 +1739,7 @@ static bool go_through_mount_coronet(VideoStream& stream,
         const int stair_room_entered = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {0, 1}, 528ms, 0ms);
-                pbf_wait(ctx, 2000ms);
+                pbf_move_left_joystick(ctx, {0, 1}, 528ms, 2000ms);
             },
             {{stair_room_entry}});
         if (stair_room_entered != 0){
@@ -1778,16 +1758,11 @@ static bool go_through_mount_coronet(VideoStream& stream,
             return false;
         }
         stream.log("[08.05] Replacement second-room route complete; continuing toward the landing grunt.", COLOR_GREEN);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 893ms, 0ms);
-        pbf_wait(context, 117ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 127ms, 0ms);
-        pbf_wait(context, 513ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1244ms, 0ms);
-        pbf_wait(context, 817ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 760ms, 0ms);
-        pbf_wait(context, 338ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 151ms, 0ms);
-        pbf_wait(context, 461ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 893ms, 117ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 127ms, 513ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1244ms, 817ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 760ms, 338ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 151ms, 461ms);
         context.wait_for_all_requests();
         ShortDialogWatcher landing_dialogue;
         StartBattleDetector landing_starting(stream.overlay());
@@ -1846,37 +1821,24 @@ static bool go_through_mount_coronet(VideoStream& stream,
             fight_trainer_using_moves(stream, context, stats, "coronet_ascent_grunt_1", true);
         }
         pbf_press_dpad(context, DPAD_LEFT, 80ms, 100ms);
-        pbf_press_dpad(context, DPAD_LEFT, 80ms, 100ms);
-        pbf_wait(context, 962ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1790ms, 0ms);
-        pbf_wait(context, 905ms);
-        pbf_press_dpad(context, DPAD_RIGHT, 185ms, 0ms);
-        pbf_wait(context, 632ms);
-        pbf_press_dpad(context, DPAD_DOWN, 194ms, 0ms);
-        pbf_wait(context, 7097ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 409ms, 0ms);
-        pbf_wait(context, 100ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 2677ms, 0ms);
-        pbf_wait(context, 79ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1254ms, 0ms);
-        pbf_wait(context, 358ms);
+        pbf_press_dpad(context, DPAD_LEFT, 80ms, 1062ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1790ms, 905ms);
+        pbf_press_dpad(context, DPAD_RIGHT, 185ms, 632ms);
+        pbf_press_dpad(context, DPAD_DOWN, 194ms, 7097ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 409ms, 100ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 2677ms, 79ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1254ms, 358ms);
         // Finish the snowfield approach before tapping A at the Rock Climb wall. Keep movement
         // separate from field-move interaction.
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 189ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 173ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1283ms, 0ms);
-        pbf_wait(context, 77ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 378ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 75ms, 0ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1645ms, 77ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 453ms, 0ms);
         pbf_press_button(context, BUTTON_A, 80ms, 100ms);
         wait_for_dialog(stream, context, "[08.05] Snowfield Rock Climb", 10s);
         clear_dialog(stream, context, BUTTON_A, 6000ms);
         // Turn west at the landing, then descend south into the grass. Do not detour east or
         // approach the next outdoor wall.
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2078ms, 0ms);
-        pbf_wait(context, 68ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 599ms, 0ms);
-        pbf_wait(context, 120ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2078ms, 68ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 599ms, 120ms);
         // Keep the westward stop, then turn and step one tile east into the stairs' lane.
         context.wait_for_all_requests();
         DpadState snow_stair_direction;
@@ -1886,10 +1848,8 @@ static bool go_through_mount_coronet(VideoStream& stream,
         pbf_move_left_joystick(context, {0.000000, -1.000000}, 1458ms, 0ms);
         pbf_move_left_joystick(context, {-1.000000, -0.000000}, 589ms, 0ms);
         pbf_move_left_joystick(context, {-1.000000, 1.000000}, 211ms, 0ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 665ms, 0ms);
-        pbf_wait(context, 56ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 634ms, 0ms);
-        pbf_wait(context, 68ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 665ms, 56ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 634ms, 68ms);
         context.wait_for_all_requests();
         stream.log("[08.05] Snowfield cave approach: renewing Repel east/west in the grass.");
         force_repel_expiry(stream, context, RepelRenewalChoice::YES, false, true);
@@ -1922,13 +1882,11 @@ static bool go_through_mount_coronet(VideoStream& stream,
             }
         }
         stream.log("[08.05] Snowfield cave entered; continuing the recorded interior route.", COLOR_GREEN);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1333ms, 0ms);
-        pbf_wait(context, 66ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1333ms, 66ms);
         // Continue Rock Climb inside the cave.
         pbf_press_button(context, BUTTON_A, 199ms, 0ms);
         clear_dialog(stream, context, BUTTON_A, 6000ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1056ms, 0ms);
-        pbf_wait(context, 315ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1056ms, 315ms);
         pbf_press_button(context, BUTTON_A, 213ms, 0ms);
         {
             BattleMenuWatcher menu(BattleType::TRAINER);
@@ -1944,12 +1902,9 @@ static bool go_through_mount_coronet(VideoStream& stream,
             }
             fight_trainer_using_moves(stream, context, stats, "coronet_ascent_grunt_2", true);
         }
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 544ms, 0ms);
-        pbf_wait(context, 277ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 812ms, 0ms);
-        pbf_wait(context, 123ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 344ms, 0ms);
-        pbf_wait(context, 656ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 544ms, 277ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 812ms, 123ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 344ms, 656ms);
         // This grunt can be dodged on the east pass and again on the south turn.
         // Watch dialogue and the battle transition too, so movement stops before the menu appears.
         context.wait_for_all_requests();
@@ -1960,10 +1915,8 @@ static bool go_through_mount_coronet(VideoStream& stream,
         const int east_encounter = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {1, 0}, 2077ms, 0ms);
-                pbf_wait(ctx, 922ms);
-                pbf_move_left_joystick(ctx, {1, 0}, 555ms, 0ms);
-                pbf_wait(ctx, 342ms);
+                pbf_move_left_joystick(ctx, {1, 0}, 2077ms, 922ms);
+                pbf_move_left_joystick(ctx, {1, 0}, 555ms, 342ms);
             },
             {{east_menu}, {east_dialogue}, {east_starting}});
         if (east_encounter >= 0){
@@ -1982,11 +1935,9 @@ static bool go_through_mount_coronet(VideoStream& stream,
             const int south_encounter = run_until<ProControllerContext>(stream,
                 context,
                 [](ProControllerContext& ctx){
-                    pbf_move_left_joystick(ctx, {0, -1}, 300ms, 0ms);
-                    pbf_wait(ctx, 750ms);
+                    pbf_move_left_joystick(ctx, {0, -1}, 300ms, 750ms);
                     // No encounter on the short turn: continue to the cliff edge.
-                    pbf_move_left_joystick(ctx, {0, -1}, 2000ms, 0ms);
-                    pbf_wait(ctx, 1000ms);
+                    pbf_move_left_joystick(ctx, {0, -1}, 2000ms, 1000ms);
                 },
                 {{south_menu}, {south_dialogue}, {south_starting}});
             if (south_encounter >= 0){
@@ -2006,14 +1957,10 @@ static bool go_through_mount_coronet(VideoStream& stream,
         grunt_stair_direction.last_dir = DPAD_DOWN;
         repeat_dpad(context, grunt_stair_direction, DPAD_RIGHT, 80ms, 300ms, 2, true);
         context.wait_for_all_requests();
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 508ms, 0ms);
-        pbf_wait(context, 434ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 777ms, 0ms);
-        pbf_wait(context, 130ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 564ms, 0ms);
-        pbf_wait(context, 85ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1551ms, 0ms);
-        pbf_wait(context, 951ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 508ms, 434ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 777ms, 130ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 564ms, 85ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 1551ms, 951ms);
         // Face north and step into the exit lane, then face east and enter. A single Right press
         // may only turn the player.
         context.wait_for_all_requests();
@@ -2052,44 +1999,33 @@ static bool go_through_mount_coronet(VideoStream& stream,
             }
         }
         stream.log("[08.05] Upper snowfield exit complete; continuing toward the renewal lane.", COLOR_GREEN);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 988ms, 0ms);
-        pbf_wait(context, 34ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 988ms, 34ms);
         pbf_move_left_joystick(context, {0.000000, 1.000000}, 536ms, 0ms);
         pbf_move_left_joystick(context, {1.000000, 1.000000}, 36ms, 0ms);
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 557ms, 0ms);
-        pbf_wait(context, 84ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 566ms, 0ms);
-        pbf_wait(context, 599ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 661ms, 0ms);
-        pbf_wait(context, 306ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 557ms, 84ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 566ms, 599ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 661ms, 306ms);
         // Renew in the clear north/south lane before the next Rock Climb approach.
         context.wait_for_all_requests();
         stream.log("[08.05] Snowy climb approach: renewing Repel north/south.");
         force_repel_expiry(stream, context, RepelRenewalChoice::YES, true, true);
         // Add one 500ms expiry half-cycle to restore the north-cliff stop.
-        pbf_move_left_joystick(context, {0, 1}, 2360ms, 0ms);
-        pbf_wait(context, 379ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 325ms, 0ms);
-        pbf_wait(context, 403ms);
+        pbf_move_left_joystick(context, {0, 1}, 2360ms, 379ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 325ms, 403ms);
         // Rock Climb: complete the approach, then clear the field-move prompts.
         pbf_press_button(context, BUTTON_A, 167ms, 0ms);
         clear_dialog(stream, context, BUTTON_A, 6000ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2156ms, 0ms);
-        pbf_wait(context, 132ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1125ms, 0ms);
-        pbf_wait(context, 117ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2156ms, 132ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1125ms, 117ms);
         pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1294ms, 0ms);
         // Complete the cave approach, then clear the field-move prompts.
         pbf_press_button(context, BUTTON_A, 194ms, 0ms);
         clear_dialog(stream, context, BUTTON_A, 6000ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1410ms, 0ms);
-        pbf_wait(context, 196ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1410ms, 196ms);
         pbf_move_left_joystick(context, {0.000000, 1.000000}, 400ms, 0ms);
         pbf_move_left_joystick(context, {-1.000000, 1.000000}, 26ms, 0ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1153ms, 0ms);
-        pbf_wait(context, 120ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 640ms, 0ms);
-        pbf_wait(context, 94ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1153ms, 120ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 640ms, 94ms);
         context.wait_for_all_requests();
         {
             BlackScreenWatcher passage_entry(COLOR_RED);
@@ -2097,8 +2033,7 @@ static bool go_through_mount_coronet(VideoStream& stream,
             const int entered = run_until<ProControllerContext>(stream,
                 context,
                 [](ProControllerContext& ctx){
-                    pbf_move_left_joystick(ctx, {1, 0}, 690ms, 0ms);
-                    pbf_wait(ctx, 2000ms);
+                    pbf_move_left_joystick(ctx, {1, 0}, 690ms, 2000ms);
                 },
                 {{passage_entry}, {passage_entry_white}});
             if (entered < 0){
@@ -2124,8 +2059,7 @@ static bool go_through_mount_coronet(VideoStream& stream,
         }
         // Restore both axes against fixed stops: south wall, west wall, then north boulder.
         // Clear the doorway and reach the south wall before expiring north/south.
-        pbf_move_left_joystick(context, {1.000000, -0.000000}, 317ms, 0ms);
-        pbf_wait(context, 389ms);
+        pbf_move_left_joystick(context, {1.000000, -0.000000}, 317ms, 389ms);
         pbf_move_left_joystick(context, {0, -1}, 1500ms, 0ms);
         context.wait_for_all_requests();
         stream.log("[08.05] Upper cave south wall: renewing Repel north/south, clear of the entrance.");
@@ -2140,8 +2074,7 @@ static bool go_through_mount_coronet(VideoStream& stream,
             const int stairs_entered = run_until<ProControllerContext>(stream,
                 context,
                 [](ProControllerContext& ctx){
-                    pbf_move_left_joystick(ctx, {1, 0}, 4000ms, 0ms);
-                    pbf_wait(ctx, 2000ms);
+                    pbf_move_left_joystick(ctx, {1, 0}, 4000ms, 2000ms);
                 },
                 {{stairs_entry}});
             if (stairs_entered != 0){
@@ -2161,10 +2094,8 @@ static bool go_through_mount_coronet(VideoStream& stream,
             }
         }
         // Clear the stair landing to the east before descending toward the next grunt.
-        pbf_move_left_joystick(context, {1, 0}, 423ms, 0ms);
-        pbf_wait(context, 205ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1784ms, 0ms);
-        pbf_wait(context, 2522ms);
+        pbf_move_left_joystick(context, {1, 0}, 423ms, 205ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1784ms, 2522ms);
         pbf_press_button(context, BUTTON_A, 223ms, 0ms);
         {
             BattleMenuWatcher menu(BattleType::TRAINER);
@@ -2180,12 +2111,9 @@ static bool go_through_mount_coronet(VideoStream& stream,
             }
             fight_trainer_using_moves(stream, context, stats, "coronet_ascent_grunt_4", true);
         }
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 506ms, 0ms);
-        pbf_wait(context, 444ms);
-        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1131ms, 0ms);
-        pbf_wait(context, 166ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1011ms, 0ms);
-        pbf_wait(context, 376ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 506ms, 444ms);
+        pbf_move_left_joystick(context, {0.000000, -1.000000}, 1131ms, 166ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1011ms, 376ms);
         pbf_press_button(context, BUTTON_A, 157ms, 0ms);
         {
             BattleMenuWatcher menu(BattleType::TRAINER);
@@ -2201,12 +2129,9 @@ static bool go_through_mount_coronet(VideoStream& stream,
             }
             fight_trainer_using_moves(stream, context, stats, "coronet_ascent_grunt_5", true);
         }
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1744ms, 0ms);
-        pbf_wait(context, 1295ms);
-        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 625ms, 0ms);
-        pbf_wait(context, 255ms);
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 2011ms, 0ms);
-        pbf_wait(context, 3323ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1744ms, 1295ms);
+        pbf_move_left_joystick(context, {-1.000000, -0.000000}, 625ms, 255ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 2011ms, 3323ms);
         pbf_press_button(context, BUTTON_A, 196ms, 0ms);
         {
             BattleMenuWatcher menu(BattleType::TRAINER);
@@ -2223,8 +2148,7 @@ static bool go_through_mount_coronet(VideoStream& stream,
             fight_trainer_using_moves(stream, context, stats, "coronet_ascent_grunt_6", true);
         }
         // The north hold reaches the wall one tile west of the summit doorway.
-        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1577ms, 0ms);
-        pbf_wait(context, 881ms);
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 1577ms, 881ms);
         context.wait_for_all_requests();
         // Take one eastward step with a separate facing press. Longer presses can carry past the
         // doorway. Arm both fade watchers before entry.
@@ -2237,8 +2161,7 @@ static bool go_through_mount_coronet(VideoStream& stream,
                     DpadState doorway_direction;
                     doorway_direction.last_dir = DPAD_UP;
                     repeat_dpad(ctx, doorway_direction, DPAD_RIGHT, 80ms, 300ms, 1, true);
-                    pbf_move_left_joystick(ctx, {0, 1}, 4000ms, 0ms);
-                    pbf_wait(ctx, 2000ms);
+                    pbf_move_left_joystick(ctx, {0, 1}, 4000ms, 2000ms);
                 },
                 {{entered}, {entered_white}});
             if (ret < 0){
@@ -2281,7 +2204,8 @@ static bool go_through_mount_coronet(VideoStream& stream,
     pbf_press_button(context, BUTTON_R, 160ms, GameSettings::instance().POKEMON_TO_BOX_DELAY1);
     context.wait_for_all_requests();
     {
-        BoxWatcher boxes;
+        // A single small Pokemon may not satisfy the full-row variation check.
+        BoxWatcher boxes(COLOR_RED, true);
         if (wait_until(stream, context, 10s, {{boxes}}) != 0){
             stream.log("[08.06] Box screen not detected before withdrawing the second Pokemon.", COLOR_RED);
             return false;
@@ -2446,7 +2370,7 @@ static bool go_through_mount_coronet(VideoStream& stream,
         pbf_wait(context, GameSettings::instance().MENU_TO_POKEMON_DELAY0);
         pbf_press_button(context, BUTTON_R, 160ms, GameSettings::instance().POKEMON_TO_BOX_DELAY1);
         context.wait_for_all_requests();
-        BoxWatcher boxes;
+        BoxWatcher boxes(COLOR_RED, true);
         if (wait_until(stream, context, 10s, {{boxes}}) != 0){
             stream.log("[08.06] Box screen not detected before depositing the box legendary.", COLOR_RED);
             return false;
@@ -2493,7 +2417,7 @@ static bool go_through_mount_coronet(VideoStream& stream,
             return false;
         }
     }
-    if (!use_escape_rope(stream, context, 8)){
+    if (!use_escape_rope(stream, context, options.language, 8)){
         stream.log("[08.06] Escape Rope could not be used.", COLOR_RED);
         return false;
     }
@@ -2613,7 +2537,7 @@ static bool go_to_house_west_sunyshore(VideoStream& stream, ProControllerContext
     dpad.last_dir = DPAD_DOWN;
     repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 8);
 
-    if (!activate_repel(stream, context, 8, 1)){
+    if (!activate_repel(stream, context, options.language, 8, 1)){
         stream.log("go_to_house_west_sunyshore: Could not activate a Super Repel.", COLOR_RED);
         return false;
     }
@@ -2642,16 +2566,14 @@ static bool go_to_house_west_sunyshore(VideoStream& stream, ProControllerContext
     pbf_move_left_joystick(context, {0, -1}, 6200ms, 100ms); // 31+
     context.wait_for_all_requests();
 
-    // Keep the original Super Repel through the grass. Without an expiry wiggle, no eastward
-    // reset is needed. Use nine left presses: one facing change followed by eight walking steps.
+    // Six walking steps put the southward crossing east of the trees at the grass exit.
     dpad.last_dir = DPAD_DOWN;
-    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 8);
-    // This southward crossing leaves the grass after about three seconds. Stop at four seconds in
-    // the clearing and decline renewal. North/south expiry movement keeps the column for the
-    // remaining south hold.
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 6);
+    // Keep the Super Repel through the grass and decline renewal in the clearing.
     pbf_move_left_joystick(context, {0, -1}, 4000ms, 100ms);
     force_repel_expiry(stream, context, RepelRenewalChoice::NO, true, true);
-    pbf_move_left_joystick(context, {0, -1}, 4400ms, 100ms);
+    // Allow for expiry during a northward pulse, then align against the hotel-side bushes.
+    pbf_move_left_joystick(context, {0, -1}, 4900ms, 100ms);
     dpad.last_dir = DPAD_DOWN;
     repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 4);
     repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 5);
@@ -3246,8 +3168,7 @@ static bool go_to_sunyshore_gym(VideoStream& stream, ProControllerContext& conte
                             pbf_press_dpad(ctx, move.dir, move.hold, move.delay);
                         }
                     }
-                    pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 1942ms, 0ms);
-                    pbf_wait(ctx, 271ms);
+                    pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 1942ms, 271ms);
                     pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 685ms, 0ms);
                     pbf_move_left_joystick(ctx, {-1.000000, -1.000000}, 2742ms, 0ms);
                 }else if (room == 1){
@@ -3257,27 +3178,19 @@ static bool go_to_sunyshore_gym(VideoStream& stream, ProControllerContext& conte
                     pbf_move_left_joystick(ctx, {-1.000000, -1.000000}, 105ms, 0ms);
                     pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 1638ms, 0ms);
                     pbf_move_left_joystick(ctx, {-1.000000, 1.000000}, 1765ms, 0ms);
-                    pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 111ms, 0ms);
-                    pbf_wait(ctx, 392ms);
+                    pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 111ms, 392ms);
                     pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 780ms, 0ms);
                     pbf_move_left_joystick(ctx, {-1.000000, -1.000000}, 918ms, 0ms);
                     pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 1330ms, 0ms);
                     pbf_move_left_joystick(ctx, {-1.000000, -1.000000}, 1469ms, 0ms);
                 }else{
-                    pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 3935ms, 0ms);
-                    pbf_wait(ctx, 252ms);
-                    pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 1465ms, 0ms);
-                    pbf_wait(ctx, 1470ms);
-                    pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 885ms, 0ms);
-                    pbf_wait(ctx, 116ms);
-                    pbf_move_left_joystick(ctx, {1.000000, -0.000000}, 1112ms, 0ms);
-                    pbf_wait(ctx, 921ms);
-                    pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 1139ms, 0ms);
-                    pbf_wait(ctx, 91ms);
-                    pbf_move_left_joystick(ctx, {1.000000, -0.000000}, 857ms, 0ms);
-                    pbf_wait(ctx, 1141ms);
-                    pbf_move_left_joystick(ctx, {1.000000, -0.000000}, 3093ms, 0ms);
-                    pbf_wait(ctx, 75ms);
+                    pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 3935ms, 252ms);
+                    pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 1465ms, 1470ms);
+                    pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 885ms, 116ms);
+                    pbf_move_left_joystick(ctx, {1.000000, -0.000000}, 1112ms, 921ms);
+                    pbf_move_left_joystick(ctx, {-1.000000, -0.000000}, 1139ms, 91ms);
+                    pbf_move_left_joystick(ctx, {1.000000, -0.000000}, 857ms, 1141ms);
+                    pbf_move_left_joystick(ctx, {1.000000, -0.000000}, 3093ms, 75ms);
                     pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 1725ms, 0ms);
                 }
                 pbf_wait(ctx, 5000ms);
@@ -3423,7 +3336,7 @@ void checkpoint_0802(SingleSwitchProgramEnvironment& env,
         stats,
         [&](size_t /*attempt*/){
             {
-                if (!go_to_lake_acuity(env.console, context)){
+                if (!go_to_lake_acuity(env.console, context, options.language)){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         "go_to_lake_acuity: transition not detected.",
                         env.console);

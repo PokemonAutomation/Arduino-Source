@@ -2,8 +2,11 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  Provides access to move metadata, pokemon base stats, and the trainer
- *  database used by the outside-help battle handler.
+ *  The move, Pokemon, and trainer lookup APIs are not called by current story
+ *  routes. Retained as a foundation for future unassisted battle planning;
+ *  the assisted route uses established move lists and species checks.
+ *  Their JSON resources must be supplied and validated before enabling them.
+ *  BDSPBattleType is still used by active opponent-name OCR.
  */
 
 #ifndef PokemonAutomation_PokemonBDSP_AutoStory_BDSPData_H

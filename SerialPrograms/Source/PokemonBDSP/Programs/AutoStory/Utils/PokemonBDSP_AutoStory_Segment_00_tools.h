@@ -42,7 +42,7 @@ void align_to_overworld_landmarks(VideoStream& stream,
     double moderate_entry_confidence = 0,
     bool* rock_acquisition_timed_out = nullptr);
 
-void verify_tutorial_settings(VideoStream& stream, ProControllerContext& context);
+void verify_tutorial_settings(VideoStream& stream, ProControllerContext& context, Language language);
 
 void set_time_fast(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -72,7 +72,7 @@ void fight_Natalie(VideoStream& stream, ProControllerContext& context);
 
 void catch_1_pokemon(VideoStream& stream, ProControllerContext& context);
 
-// Heal/check level first; train only below level 7, with at most three encounters.
+// Heal/check lead level after each battle; train to level 7 with a no-level-progress timeout.
 void battle_1_pokemon(VideoStream& stream, ProControllerContext& context, const AutoStoryOptions& options);
 
 // Burst wiggle variant of catch_1_pokemon for testing.
@@ -83,7 +83,7 @@ void battle_1_pokemon(VideoStream& stream, ProControllerContext& context, const 
 //     ProControllerContext& context
 // );
 
-void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context, uint8_t* level);
+void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context, Language language, uint8_t* level);
 
 // ---------------------------------------------------------------------------
 // Grass movement helpers

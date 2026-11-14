@@ -8,10 +8,11 @@
 #include <cmath>
 #include <memory>
 
+#include <opencv2/imgproc.hpp>
+
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -252,16 +253,12 @@ void jubilife_to_oreburgh_gate(SingleSwitchProgramEnvironment& env,
     pbf_wait(context, 2000ms);
     context.wait_for_all_requests();
 
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1465ms, 0ms);
-    pbf_wait(context, 127ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 644ms, 0ms);
-    pbf_wait(context, 698ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1465ms, 127ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 644ms, 698ms);
     leave_pokemon_center_before_barry_1(stream, context);
     pbf_wait(context, 2340ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 742ms, 0ms);
-    pbf_wait(context, 348ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 2694ms, 0ms);
-    pbf_wait(context, 482ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 742ms, 348ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 2694ms, 482ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 3810ms, 0ms);
 
     wait_for_dialog(stream, context, "Phase 1 (Barry 1 fight dialog)");
@@ -269,8 +266,7 @@ void jubilife_to_oreburgh_gate(SingleSwitchProgramEnvironment& env,
     fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
     pbf_mash_button(context, BUTTON_B, 5000ms);
     context.wait_for_all_requests();
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 2761ms, 0ms);
-    pbf_wait(context, 1647ms);
+    pbf_move_left_joystick(context, {1.000000, -0.000000}, 2761ms, 1647ms);
     walk_through_grass(stream, context, 1, 0, 5, "right through grass");
     wait_for_dialog(stream, context, "Dallas fight dialog)");
     pbf_mash_button(context, BUTTON_B, 5000ms);
@@ -289,8 +285,7 @@ void jubilife_to_oreburgh_gate(SingleSwitchProgramEnvironment& env,
         stream.log("Sebastian dialogue never appeared. Skipping fight.", COLOR_ORANGE);
     }
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 2000ms, 0ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 8000ms, 0ms);
-    pbf_wait(context, 200ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 8000ms, 200ms);
     context.wait_for_all_requests();
     enter_cave_with_down_right_search(stream, context, "jubilife_to_oreburgh_gate", 10000ms);
 }
@@ -352,8 +347,7 @@ void oreburgh_gate_to_mine(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_mash_button(context, BUTTON_B, 12000ms);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 319ms, 0ms);
     pbf_move_left_joystick(context, {1.000000, -1.000000}, 332ms, 0ms);
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 3124ms, 0ms);
-    pbf_wait(context, 23ms);
+    pbf_move_left_joystick(context, {1.000000, -0.000000}, 3124ms, 23ms);
     bool black_screen_found = false;
     for (size_t attempt = 0; attempt < 3 && !black_screen_found; attempt++){
         BlackScreenWatcher black_screen;
@@ -387,6 +381,43 @@ void oreburgh_gate_to_mine(SingleSwitchProgramEnvironment& env, VideoStream& str
 
 // Diagnostic only: identifies the entrance start without moving the player.
 
+
+// Mine scenery uses grayscale normalized correlation, not raw RGB differences.
+// Mean/contrast normalization tolerates uniform brightness gain and offset.
+// Unequal channel changes, clipping, gamma and lost detail still require capture tests.
+// Scores are 100 * (1 - correlation); smaller is better. Reject flat patches.
+static double mine_offset_patch_score(const ImageRGB32& reference,
+    const ImageRGB32& live,
+    const ImageFloatBox& box,
+    double horizontal,
+    double vertical){
+    const ImageViewRGB32 reference_crop = extract_box_reference(reference, box);
+    ImageFloatBox shifted = box;
+    shifted.x += horizontal;
+    shifted.y += vertical;
+    const ImageViewRGB32 live_crop = extract_box_reference(live, shifted);
+    if (!reference_crop || !live_crop || reference_crop.width() != live_crop.width() ||
+        reference_crop.height() != live_crop.height()){
+        return 1000.0;
+    }
+    cv::Mat reference_pixels((int)reference_crop.height(), (int)reference_crop.width(), CV_8UC4,
+        const_cast<uint32_t*>(reference_crop.data()), reference_crop.bytes_per_row());
+    cv::Mat live_pixels((int)live_crop.height(), (int)live_crop.width(), CV_8UC4,
+        const_cast<uint32_t*>(live_crop.data()), live_crop.bytes_per_row());
+    cv::Mat reference_gray, live_gray;
+    cv::cvtColor(reference_pixels, reference_gray, cv::COLOR_BGRA2GRAY);
+    cv::cvtColor(live_pixels, live_gray, cv::COLOR_BGRA2GRAY);
+    cv::Scalar mean, reference_deviation, live_deviation;
+    cv::meanStdDev(reference_gray, mean, reference_deviation);
+    cv::meanStdDev(live_gray, mean, live_deviation);
+    if (reference_deviation[0] < 3.0 || live_deviation[0] < 3.0){
+        return 1000.0;
+    }
+    cv::Mat correlation;
+    cv::matchTemplate(live_gray, reference_gray, correlation, cv::TM_CCOEFF_NORMED);
+    const double score = correlation.at<float>(0, 0);
+    return std::isfinite(score) ? 100.0 * (1.0 - std::clamp(score, -1.0, 1.0)) : 1000.0;
+}
 
 struct MineCenterOffset {
     bool valid;
@@ -423,12 +454,8 @@ static MineCenterOffset measure_mine_center_offset(const ImageViewRGB32& referen
         double worst = 0.0;
 
         for (const ImageFloatBox& box : boxes){
-            const ImageViewRGB32 reference_crop = extract_box_reference(reference_scaled, box);
-
-            // Translate the same crop horizontally in the live image.
-            const ImageViewRGB32 live_crop = extract_box_reference(live_scaled, box, shift, 0);
-
-            const double score = ImageMatch::pixel_RMSD(reference_crop, live_crop);
+            const double score = mine_offset_patch_score(reference_scaled, live_scaled, box,
+                static_cast<double>(shift) / live_scaled.width(), 0.0);
 
             total += score;
             if (score > worst){
@@ -464,12 +491,14 @@ static MineCenterOffset measure_mine_center_offset(const ImageViewRGB32& referen
 
     const size_t best_index = static_cast<size_t>(best_shift + search_radius);
 
-    const bool valid = best_score <= 20.0 && worst_regions[best_index] <= 30.0 &&
+    // Require normalized grayscale agreement in all three entrance regions,
+    // with a distinct best position inside the search range.
+    const bool valid = best_score <= 25.0 && worst_regions[best_index] <= 30.0 &&
         alternative_score - best_score >= 3.0 && std::abs(best_shift) < search_radius;
 
     return {valid, static_cast<double>(best_shift) / live_scaled.width(), best_score};
 }
-// Test only: align with the entrance center, then stop.
+// Align with the entrance center before following the mine route.
 static bool oreburgh_mine_alignment_test(VideoStream& stream, ProControllerContext& context){
     const ImageRGB32 reference(mine_navigation_resource_path() + "mine_start_center.png");
 
@@ -478,6 +507,7 @@ static bool oreburgh_mine_alignment_test(VideoStream& stream, ProControllerConte
 
     size_t movements = 0;
     size_t center_streak = 0;
+    size_t uncertain_frames = 0;
 
     context.wait_for_all_requests();
     pbf_wait(context, 500ms);
@@ -492,15 +522,21 @@ static bool oreburgh_mine_alignment_test(VideoStream& stream, ProControllerConte
             ", score=" + std::to_string(measurement.score) + (measurement.valid ? ", trusted" : ", unsure"));
 
         if (!measurement.valid){
-            stream.log("[Mine align] Entrance position unsure. Stopping.", COLOR_ORANGE);
-            return false;
+            center_streak = 0;
+            if (++uncertain_frames >= 8){
+                stream.log("[Mine align] Entrance position could not be confirmed reliably. Stopping.", COLOR_ORANGE);
+                return false;
+            }
+            pbf_wait(context, 250ms);
+            context.wait_for_all_requests();
+            continue;
         }
 
         if (std::abs(measurement.offset) <= CENTER_TOLERANCE){
             center_streak++;
 
             if (center_streak >= 3){
-                stream.log("[Mine align] Center reached. Test complete.", COLOR_GREEN);
+                stream.log("[Mine align] Entrance center confirmed.", COLOR_GREEN);
                 return true;
             }
 
@@ -531,8 +567,7 @@ static bool oreburgh_mine_alignment_test(VideoStream& stream, ProControllerConte
         const int result = run_until<ProControllerContext>(stream,
             context,
             [x, duration](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {x, 0.0}, duration, 0ms);
-                pbf_wait(ctx, 500ms);
+                pbf_move_left_joystick(ctx, {x, 0.0}, duration, 500ms);
                 ctx.wait_for_all_requests();
             },
             {black, menu, dialog});
@@ -600,8 +635,7 @@ static bool mine_force_encounter_test(VideoStream& stream, ProControllerContext&
         const int result = run_until<ProControllerContext>(stream,
             context,
             [y](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {0.0, y}, 120ms, 0ms);
-                pbf_wait(ctx, 400ms);
+                pbf_move_left_joystick(ctx, {0.0, y}, 120ms, 400ms);
                 ctx.wait_for_all_requests();
             },
             {black, menu, dialog});
@@ -664,8 +698,7 @@ static bool mine_timed_walk(VideoStream& stream,
     return mine_run_with_encounters(stream, context, [&](ProControllerContext& ctx){
         while (remaining > 0ms){
             const auto pulse = remaining < 100ms ? remaining : 100ms;
-            pbf_move_left_joystick(ctx, {x, y}, pulse, 0ms);
-            pbf_wait(ctx, 700ms);
+            pbf_move_left_joystick(ctx, {x, y}, pulse, 700ms);
             ctx.wait_for_all_requests();
 
             // An interrupted pulse is retried after escaping.
@@ -684,8 +717,8 @@ struct MinePictureScore {
     double vertical = 0;
 };
 
-// Supports four, five, or six regions. Existing four-region callers keep
-// their original search ranges through the default arguments.
+// Every scenery patch must agree on one offset. Scores are 100 * (1 - NCC),
+// so 20/30 require mean correlation >= 0.80 and every patch >= 0.70.
 template <size_t Regions>
 static MinePictureScore mine_score_picture(const ImageRGB32& reference,
     const ImageRGB32& live,
@@ -693,22 +726,46 @@ static MinePictureScore mine_score_picture(const ImageRGB32& reference,
     double horizontal_range = 1.0 / 60,
     double vertical_range = 2.0 / 135){
     MinePictureScore best;
+    if (!reference || !live || reference.width() != live.width() || reference.height() != live.height()){
+        return best;
+    }
     const int radius_x = (int)std::lround(horizontal_range * live.width());
     const int radius_y = (int)std::lround(vertical_range * live.height());
+    cv::Mat reference_pixels((int)reference.height(), (int)reference.width(), CV_8UC4,
+        const_cast<uint32_t*>(reference.data()), reference.bytes_per_row());
+    cv::Mat live_pixels((int)live.height(), (int)live.width(), CV_8UC4,
+        const_cast<uint32_t*>(live.data()), live.bytes_per_row());
+    cv::Mat reference_gray, live_gray;
+    cv::cvtColor(reference_pixels, reference_gray, cv::COLOR_BGRA2GRAY);
+    cv::cvtColor(live_pixels, live_gray, cv::COLOR_BGRA2GRAY);
+    std::array<cv::Mat, Regions> correlations;
+    for (size_t i = 0; i < Regions; i++){
+        const auto box = floatbox_to_pixelbox(reference, boxes[i]);
+        const cv::Rect patch((int)box.min_x, (int)box.min_y, (int)box.width(), (int)box.height());
+        const cv::Rect search(patch.x - radius_x, patch.y - radius_y,
+            patch.width + 2 * radius_x, patch.height + 2 * radius_y);
+        if (patch.width == 0 || patch.height == 0 || search.x < 0 || search.y < 0 ||
+            search.x + search.width > live_gray.cols || search.y + search.height > live_gray.rows){
+            return best;
+        }
+        cv::Scalar mean, deviation;
+        cv::meanStdDev(reference_gray(patch), mean, deviation);
+        if (deviation[0] < 3.0){
+            return best;
+        }
+        cv::matchTemplate(live_gray(search), reference_gray(patch), correlations[i], cv::TM_CCOEFF_NORMED);
+    }
     for (int y = -radius_y; y <= radius_y; y++){
         for (int x = -radius_x; x <= radius_x; x++){
             double total = 0.0;
             double worst = 0.0;
-            for (const ImageFloatBox& box : boxes){
-                const ImageViewRGB32 ref = extract_box_reference(reference, box);
-                const ImageViewRGB32 patch = extract_box_reference(live, box, x, y);
-                const double score = ImageMatch::pixel_RMSD(ref, patch);
+            for (const auto& correlation : correlations){
+                const double value = correlation.at<float>(y + radius_y, x + radius_x);
+                const double score = std::isfinite(value) ? 100.0 * (1.0 - std::clamp(value, -1.0, 1.0)) : 1000.0;
                 total += score;
-                if (score > worst){
-                    worst = score;
-                }
+                worst = std::max(worst, score);
             }
-            const double average = total / boxes.size();
+            const double average = total / Regions;
             if (average < best.average){
                 best.average = average;
                 best.worst = worst;
@@ -719,6 +776,7 @@ static MinePictureScore mine_score_picture(const ImageRGB32& reference,
     }
     return best;
 }
+
 
 
 static bool mine_check_picture(VideoStream& stream,
@@ -874,8 +932,7 @@ static bool mine_walk_to_endpoints(VideoStream& stream,
 
                 // Count issued commands, including interrupted commands.
                 movements++;
-                pbf_move_left_joystick(ctx, {options.x, options.y}, options.pulse, 0ms);
-                pbf_wait(ctx, options.settle);
+                pbf_move_left_joystick(ctx, {options.x, options.y}, options.pulse, options.settle);
                 ctx.wait_for_all_requests();
             }
         });
@@ -1220,8 +1277,7 @@ static bool oreburgh_mine_09_to_14(VideoStream& stream, ProControllerContext& co
     }
 
     // Turn left, then verify position before starting the interaction.
-    pbf_move_left_joystick(context, {-1.0, 0.0}, 40ms, 0ms);
-    pbf_wait(context, 500ms);
+    pbf_move_left_joystick(context, {-1.0, 0.0}, 40ms, 500ms);
     context.wait_for_all_requests();
 
     if (!mine_check_picture(stream, context, "mine_path_14.png", path13_boxes, "[Mine position 14]", 3)){
@@ -1237,36 +1293,6 @@ static bool oreburgh_mine_09_to_14(VideoStream& stream, ProControllerContext& co
 
 // Compare a reference patch with a shifted live patch using the same
 // brightness adjustment as the native ImageMatchDetector.
-static double mine_offset_patch_score(const ImageRGB32& reference,
-    const ImageRGB32& live,
-    const ImageFloatBox& box,
-    double horizontal,
-    double vertical){
-    const ImageViewRGB32 reference_crop = extract_box_reference(reference, box);
-    ImageFloatBox shifted = box;
-    shifted.x += horizontal;
-    shifted.y += vertical;
-    const ImageViewRGB32 live_crop = extract_box_reference(live, shifted);
-    ImageRGB32 adjusted = live_crop.scale_to(reference_crop.width(), reference_crop.height());
-
-    const auto reference_average = ImageMatch::pixel_average(reference_crop, reference_crop);
-    const auto live_average = ImageMatch::pixel_average(adjusted, reference_crop);
-    auto scale = reference_average / live_average;
-    if (std::isnan(scale.r)){
-        scale.r = 1.0;
-    }
-    if (std::isnan(scale.g)){
-        scale.g = 1.0;
-    }
-    if (std::isnan(scale.b)){
-        scale.b = 1.0;
-    }
-    scale.bound(0.8, 1.2);
-    ImageMatch::scale_brightness(adjusted, scale);
-
-    return ImageMatch::pixel_RMSD(reference_crop, adjusted);
-}
-
 struct MineRoarkOffsetScore {
     double left = 1000.0;
     double right = 1000.0;
@@ -1334,7 +1360,7 @@ static MineRoarkOffsetScore mine_score_roark_offsets(const ImageRGB32& reference
 static bool oreburgh_mine_align_to_18(VideoStream& stream, ProControllerContext& context){
     const ImageRGB32 reference(mine_navigation_resource_path() + "Mine_path_18.png");
     const ImageRGB32 reference_scaled = reference.scale_to(960, 540);
-    const double max_rmsd = 65.0;
+    const double max_error = 30.0; // Every patch must have correlation >= 0.70.
     size_t movements = 0;
 
     return mine_run_with_encounters(stream, context, [&](ProControllerContext& ctx){
@@ -1359,7 +1385,7 @@ static bool oreburgh_mine_align_to_18(VideoStream& stream, ProControllerContext&
                 std::to_string(score.vertical) + "), helmet screen-relative extra=(" +
                 std::to_string(score.helmet_horizontal) + "," + std::to_string(score.helmet_vertical) + ")");
 
-            if (score.left <= max_rmsd && score.right <= max_rmsd && score.helmet <= max_rmsd){
+            if (score.left <= max_error && score.right <= max_error && score.helmet <= max_error){
                 if (++matching_frames >= 3){
                     stream.log("[Mine endpoint 18] Rocks and helmet confirmed.", COLOR_GREEN);
                     return true;
@@ -1375,15 +1401,15 @@ static bool oreburgh_mine_align_to_18(VideoStream& stream, ProControllerContext&
                 return false;
             }
 
-            const bool approaching = score.left <= 120.0 && score.right <= 120.0 && score.helmet <= 150.0;
-            const bool near = score.left <= 100.0 && score.right <= 100.0 && score.helmet <= 100.0;
+            // Weaker correlation only shortens the next pulse; it cannot confirm arrival.
+            const bool approaching = score.left <= 95.0 && score.right <= 95.0 && score.helmet <= 95.0;
+            const bool near = score.left <= 80.0 && score.right <= 80.0 && score.helmet <= 80.0;
             const auto pulse = near ? 20ms : approaching ? 40ms : 60ms;
 
             // Use the outer encounter watcher; do not nest mine_timed_walk.
             // Count issued pulses, including any interrupted by a battle.
             movements++;
-            pbf_move_left_joystick(ctx, {1.0, 0.0}, pulse, 0ms);
-            pbf_wait(ctx, 700ms);
+            pbf_move_left_joystick(ctx, {1.0, 0.0}, pulse, 700ms);
             ctx.wait_for_all_requests();
         }
     });
@@ -1423,8 +1449,7 @@ static bool oreburgh_mine_14_to_19(VideoStream& stream, ProControllerContext& co
     }
 
     // Position 19 is the upward turn toward Roark.
-    pbf_move_left_joystick(context, {0.0, 1.0}, 40ms, 0ms);
-    pbf_wait(context, 500ms);
+    pbf_move_left_joystick(context, {0.0, 1.0}, 40ms, 500ms);
     context.wait_for_all_requests();
 
     stream.log("[Mine endpoint 19] Position 18 confirmed; north turn sent.", COLOR_GREEN);
@@ -1433,6 +1458,7 @@ static bool oreburgh_mine_14_to_19(VideoStream& stream, ProControllerContext& co
 
 bool oreburgh_mine_route(VideoStream& stream, ProControllerContext& context, const MineRouteTestOptions& options){
     stream.log("[Mine resources] " + mine_navigation_resource_path());
+    stream.log("[Mine matching] Grayscale normalized correlation; lower error is better.");
     struct Step {
         const char* name;
         bool (*run)(VideoStream&, ProControllerContext&);
@@ -1549,26 +1575,26 @@ bool oreburgh_mine_first_leg_test(VideoStream& stream,
 }
 
 // Shared final step for the live route and the entrance-start test.
-static bool mine_talk_and_escape(VideoStream& stream, ProControllerContext& context){
+static bool mine_talk_and_escape(VideoStream& stream, ProControllerContext& context, Language language){
     if (!mine_talk_to_roark(stream, context)){
         return false;
     }
     stream.log("[Mine exit] Finding Escape Rope in the Bag.");
-    if (!use_escape_rope(stream, context, 8)){
+    if (!use_escape_rope(stream, context, language, 8)){
         return false;
     }
     stream.log("[Mine exit] Roark conversation and Escape Rope exit succeeded.", COLOR_GREEN);
     return true;
 }
 
-bool oreburgh_mine_route_and_escape_test(VideoStream& stream, ProControllerContext& context){
+bool oreburgh_mine_route_and_escape_test(VideoStream& stream, ProControllerContext& context, Language language){
     MineRouteTestOptions route;
     route.reset_on_failure = false;
     if (!oreburgh_mine_first_leg_test(stream, context, route)){
         return false;
     }
     try {
-        if (!mine_talk_and_escape(stream, context)){
+        if (!mine_talk_and_escape(stream, context, language)){
             stream.log("[Mine exit test] Failed. Stopping without resetting.", COLOR_ORANGE);
             return false;
         }
@@ -1580,7 +1606,7 @@ bool oreburgh_mine_route_and_escape_test(VideoStream& stream, ProControllerConte
     return true;
 }
 
-void oreburgh_mine_nav(VideoStream& stream, ProControllerContext& context){
+void oreburgh_mine_nav(VideoStream& stream, ProControllerContext& context, Language language){
     walk_through_grass(stream, context, 0, -1, 1, "down into mine");
     context.wait_for_all_requests();
     walk_until_doorway(stream, context, MoveDirection::DOWN, 4350ms);
@@ -1597,7 +1623,7 @@ void oreburgh_mine_nav(VideoStream& stream, ProControllerContext& context){
     }
 
 
-    if (!mine_talk_and_escape(stream, context)){
+    if (!mine_talk_and_escape(stream, context, language)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Mine route: Roark conversation or Escape Rope exit failed.",
             stream);
@@ -1613,12 +1639,9 @@ void oreburgh_mine_to_gym(SingleSwitchProgramEnvironment& env, VideoStream& stre
     stream.log("[Mine to gym] Following recorded route from the mine exit.");
     pbf_wait(context, 700ms);
     context.wait_for_all_requests();
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 3995ms, 0ms);
-    pbf_wait(context, 672ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 681ms, 0ms);
-    pbf_wait(context, 468ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 1081ms, 0ms);
-    pbf_wait(context, 420ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 3995ms, 672ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 681ms, 468ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 1081ms, 420ms);
     // Stop east of the doorway, then finish the westward alignment in steps.
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2100ms, 300ms);
     DpadState dpad;
@@ -1897,10 +1920,10 @@ void checkpoint_0102(SingleSwitchProgramEnvironment& env,
         stats,
         [&](size_t /*attempt*/){
             oreburgh_gate_to_mine(env, env.console, context);
-            oreburgh_mine_nav(env.console, context);
+            oreburgh_mine_nav(env.console, context, options.language);
             // Standalone test entry points are not part of the checkpoint route.
             // oreburgh_mine_first_leg_test(env.console, context);
-            // oreburgh_mine_route_and_escape_test(env.console, context);
+            // oreburgh_mine_route_and_escape_test(env.console, context, options.language);
             oreburgh_mine_to_gym(env, env.console, context);
         },
 

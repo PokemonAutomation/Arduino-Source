@@ -71,7 +71,7 @@ class ShopItemHoverDetector : public VisualInferenceCallback{
 public:
     // scan_area: normalized screen region that covers the entire shop item list.
     // item_slug: identifies the expected item (e.g. "full-restore"). Must match
-    //            a key in ShopItemNameOCR.json.
+    //            a key in the item-name resources loaded by ShopItemNameReader.
     // language:  language used for OCR dictionary lookup.
     ShopItemHoverDetector(
         Logger& logger,

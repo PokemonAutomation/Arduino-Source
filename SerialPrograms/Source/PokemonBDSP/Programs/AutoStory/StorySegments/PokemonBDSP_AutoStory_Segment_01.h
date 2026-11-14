@@ -44,7 +44,7 @@ void oreburgh_gate_nav(SingleSwitchProgramEnvironment& env, VideoStream& stream,
 
 void oreburgh_gate_to_mine(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context);
 
-void oreburgh_mine_nav(VideoStream& stream, ProControllerContext& context);
+void oreburgh_mine_nav(VideoStream& stream, ProControllerContext& context, Language language);
 
 void oreburgh_mine_to_gym(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context);
 
@@ -52,9 +52,12 @@ void gym_Puzzle_01(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
 
 // Starts inside the mine at an entrance position; stops outside after
 // talking to Roark and using Escape Rope. Does not reset on failure.
-bool oreburgh_mine_route_and_escape_test(VideoStream& stream, ProControllerContext& context);
+bool oreburgh_mine_route_and_escape_test(VideoStream& stream, ProControllerContext& context, Language language);
 
 // Shared stage runner for production navigation and isolated route tests.
+// Scenery matching uses grayscale normalized correlation with shared offsets
+// and repeated confirmation. This reduces brightness sensitivity; it does not
+// guarantee recognition after clipping, lost detail or arbitrary capture changes.
 bool oreburgh_mine_route(VideoStream& stream, ProControllerContext& context, const MineRouteTestOptions& options);
 
 bool oreburgh_mine_first_leg_test(VideoStream& stream,

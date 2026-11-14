@@ -26,7 +26,7 @@ static const StringSelectDatabase& lighting_matcher_database(size_t segment){
     static const std::array<StringSelectDatabase,10> databases=[](){
         // Include shared locations in each segment that visits them.
         const std::array<std::vector<std::string>,10> slugs{{
-            {"poketch-landmarks","jubilife-center","route201-potion-exit",
+            {"poketch-landmarks","jubilife-trainers-school","jubilife-center","route201-potion-exit",
                 "sandgem-junction","route202-grass-exit"},
             {"oreburgh-mart","oreburgh-gym"},
             {"oreburgh-mart","jubilife-street-approach","jubilife-plaza-approach",

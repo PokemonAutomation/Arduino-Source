@@ -102,7 +102,7 @@ static const char* shop_item_name(ShopItem item){
     }
 }
 
-// Returns the OCR slug used as the dictionary key in ShopItemNameOCR.json.
+// Returns the item slug used by the BDSP item-name resources.
 static const char* shop_item_slug(ShopItem item){
     switch (item){
     case ShopItem::FullRestore:
@@ -357,8 +357,7 @@ bool buy_items(VideoStream& stream,
                                 }
                             }
                             quantity_selected = true;
-                            pbf_press_button(context, BUTTON_A, 80ms, 300ms);
-                            pbf_wait(context, 1000ms);
+                            pbf_press_button(context, BUTTON_A, 80ms, 1300ms);
                             break;
 
                         case 2: // correct item highlighted → press A to open quantity selector
@@ -382,8 +381,7 @@ bool buy_items(VideoStream& stream,
                                 quantity_to_buy = item.quantity - owned;
                             }
                             hover_confirmed = true;
-                            pbf_press_button(context, BUTTON_A, 80ms, 300ms);
-                            pbf_wait(context, 1000ms);
+                            pbf_press_button(context, BUTTON_A, 80ms, 1300ms);
                             break;
 
                         default:
@@ -397,8 +395,7 @@ bool buy_items(VideoStream& stream,
                             stream.log(search_direction == DPAD_UP
                                 ? "Not on the right item, searching upward..."
                                 : "Not on the right item, searching downward...", COLOR_GREEN);
-                            pbf_press_dpad(context, search_direction, 80ms, 300ms);
-                            pbf_wait(context, 300ms);
+                            pbf_press_dpad(context, search_direction, 80ms, 600ms);
                             break;
                         }
                     }

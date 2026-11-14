@@ -14,6 +14,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_AutoStory_Battle_H
 #define PokemonAutomation_PokemonBDSP_AutoStory_Battle_H
 
+#include <array>
 #include <functional>
 #include <string>
 #include <vector>
@@ -41,20 +42,48 @@ namespace PokemonBDSP {
 void run_battle_press_A(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
 
 
-// Singles command-screen HP fraction; -1 means the screen is not confirmed.
-double read_player_hp_ratio(const ImageViewRGB32& frame);
+enum class BattleHPLayout{
+    SINGLES,
+    NPC_PARTNER,
+    OWN_PARTNER,
+};
 
-// Starts at the singles trainer command menu. Confirms Bag, item name, Use,
-// and the return to battle narration. Supports X Attack and X Sp. Def on the
-// active Pokemon, and Full Restore on the first party Pokemon. Throws on unconfirmed states;
-// the caller must finish narration before selecting another battle action.
-// after_battle starts/ends in the overworld, checks exact Bag HP numbers,
-// and uses Full Restore only below full HP, verifying full HP afterward.
+struct BattleHPReading{
+    int current = -1;
+    int maximum = -1;
+    size_t command_owner = 0;
+    bool operator==(const BattleHPReading&) const = default;
+};
+
+// Exact numeric command-screen HP fraction, cross-checked against that slot's
+// HP bar; -1 means unconfirmed. Separate raised/lowered left/right crops are
+// enlarged before OCR. No threshold/grayscale conversion is used.
+// Slots are battlefield positions (1=left, 2=right), not persistent identities.
+// OWN_PARTNER requires both panels; switching/survivor identity is unverified.
+// Call only immediately before a decision and require fresh matching readings.
+double read_player_hp_ratio(const ImageViewRGB32& frame,
+    BattleHPLayout layout = BattleHPLayout::SINGLES,
+    size_t slot = 1,
+    BattleHPReading* reading = nullptr);
+
+// Current PP by move slot; -1 means absent or unreadable. Caller confirms across frames.
+std::array<int, 4> read_all_pp(Logger& logger, const ImageViewRGB32& frame);
+
+// Starts at trainer commands. The Bag target is an explicit PARTY slot (1-6),
+// independent of the command owner. Own-party doubles can request both items
+// for the same target from different command owners; targets must be confirmed.
+// X items currently assume active party slots 1/2 with no switching; NPC allies
+// are not party targets. Double targeting still requires live validation.
+// Returns on narration or the next own-party command, without canceling it.
+// after_battle retains the first-party-Pokemon exact-HP heal/recheck routine.
 void use_item_in_battle(VideoStream& stream,
     ProControllerContext& context,
     Language language,
     const std::string& item_slug,
-    bool after_battle = false);
+    bool after_battle = false,
+    BattleHPLayout layout = BattleHPLayout::SINGLES,
+    size_t target_party_slot = 1,
+    size_t expected_command_owner = 0);
 
 
 // ---------------------------------------------------------------------------
@@ -79,7 +108,11 @@ void handle_unexpected_battle(const ProgramInfo& info,
 //  Outside-help battle handler
 // ---------------------------------------------------------------------------
 
-//  Handle a scripted trainer battle where the configured human helper joins.
+//  Not called by current story routes. Retained for possible reuse in future
+//  unassisted battle planning; the assisted route uses established move lists.
+//  Validate the required game data and level-100 Torterra assumptions before reuse.
+//
+//  Handle a scripted trainer battle with the configured outside-help Pokemon.
 //  Each turn it:
 //    1. OCRs current PP for all 4 configured moves.
 //    2. Calculates damage against all on-field opponents.
@@ -99,6 +132,10 @@ void handle_battle_with_outside_help(const ProgramInfo& info,
 //  Expert battle handler (sequence-aware, per-turn status/HP check)
 // ---------------------------------------------------------------------------
 
+//  Not called by current story routes. Retained for future unassisted work on
+//  move selection and PP planning. Its data, damage model, and level-100 Torterra
+//  assumptions require validation and adaptation before enabling it.
+//
 //  Handle one scripted trainer battle with intelligent per-turn move selection.
 //
 //  `all_trainers` — the full upcoming sequence of trainer battles. Used to

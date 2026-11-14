@@ -21,6 +21,10 @@ namespace NintendoSwitch {
 namespace PokemonBDSP {
 
 
+// These lazy databases are retained for future unassisted battle planning.
+// Current story routes do not call the lookup APIs; the assisted route uses
+// established move lists. Supply and validate the referenced JSON resources
+// before connecting these loaders to an active battle path.
 static const std::string RESOURCE_DIR = "PokemonBDSP/AutoStory/";
 
 

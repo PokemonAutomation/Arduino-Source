@@ -330,7 +330,7 @@ static bool go_to_route_214(VideoStream& stream, ProControllerContext& context){
 }
 
 static bool
-walk_through_route_214(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
+walk_through_route_214(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, Language language){
     context.wait_for_all_requests();
     stream.log("walk_through_route_214: Continuing on the first part of route 214");
     pbf_wait(context, 3000ms);
@@ -341,7 +341,7 @@ walk_through_route_214(VideoStream& stream, ProControllerContext& context, AutoS
     dpad.last_dir = DPAD_RIGHT;
     repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 3, true);
 
-    if (!activate_repel(stream, context)){
+    if (!activate_repel(stream, context, language)){
         return false;
     }
 
@@ -513,7 +513,7 @@ static bool go_through_building_route_213(VideoStream& stream, ProControllerCont
 }
 
 static bool
-go_through_route_213(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
+go_through_route_213(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, Language language){
     context.wait_for_all_requests();
     stream.log("Going through route 213");
     pbf_wait(context, 2000ms);
@@ -620,7 +620,7 @@ go_through_route_213(VideoStream& stream, ProControllerContext& context, AutoSto
     pbf_move_left_joystick(context, {+1, 0}, 800ms, 100ms);  // 5
     pbf_move_left_joystick(context, {0, +1}, 1000ms, 100ms); // 8
 
-    if (!activate_repel(stream, context)){
+    if (!activate_repel(stream, context, language)){
         return false;
     }
 
@@ -1092,7 +1092,7 @@ void checkpoint_0403(SingleSwitchProgramEnvironment& env,
                 }
             }
             {
-                if (!walk_through_route_214(env.console, context, stats)){
+                if (!walk_through_route_214(env.console, context, stats, options.language)){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         "walk_through_route_214: transition not detected.",
                         env.console);
@@ -1147,7 +1147,7 @@ void checkpoint_0404(SingleSwitchProgramEnvironment& env,
         stats,
         [&](size_t /*attempt*/){
             {
-                if (!go_through_route_213(env.console, context, stats)){
+                if (!go_through_route_213(env.console, context, stats, options.language)){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         "go_through_route_213: transition not detected.",
                         env.console);

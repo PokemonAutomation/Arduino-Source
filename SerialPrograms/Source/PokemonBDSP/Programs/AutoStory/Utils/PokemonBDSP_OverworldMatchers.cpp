@@ -207,6 +207,27 @@ static OverworldMatchResult match_landmarks(const ImageRGB32& frame,
     result.at_target = result.located && std::abs(result.dx) <= tolerance_x && std::abs(result.dy) <= tolerance_y;
     return result;
 }
+OverworldMatchResult match_jubilife_trainers_school_sign(const ImageRGB32& frame){
+    // Grayscale sign structure at the school approach, with a uniqueness gate.
+    // Center the sign over the player. The entry corridor includes the
+    // recorded approach and the stationary position used by the lighting test.
+    auto result = match_landmarks(frame,
+        {{"Trainers School Pokeball sign",
+                "PokemonBDSP/Autostory/JubilifeTrainersSchool/SignNight.png",
+                {884.0 / 1920, 210.0 / 1080, 152.0 / 1920, 128.0 / 1080},
+                {0.05, 0.05, 0.70, 0.55},
+                .90,
+                .15}},
+        1,
+        7.0 / 960,
+        7.0 / 540,
+        true);
+    // Off-height matches remain located so navigation can correct vertically.
+    // Only the exterior approach corridor authorizes the watched entry move.
+    result.at_target = result.located && std::abs(result.dx) <= 7.0 / 960 &&
+        result.dy >= -0.08 && result.dy <= 1.0 / 54;
+    return result;
+}
 OverworldMatchResult match_poketch_landmarks(const ImageRGB32& frame){
     // Same cropped reference emblems and local search windows as production.
     OverworldMatchResult fine = match_landmarks(frame,
@@ -1669,18 +1690,17 @@ OverworldMatchResult match_eterna_cycle_shop_reward(const ImageRGB32& frame){
 }
 
 OverworldMatchResult match_eterna_bike_riding_card(const ImageRGB32& frame){
-    // Fixed UI card: require both the blue illustration and B Close prompt.
+    // Fixed UI card: require both the grayscale bicycle illustration and language-independent B icon.
     // Small search boxes tolerate capture offsets without matching other menus.
-    const std::vector<LandmarkConfig> configs{{"Blue Bike illustration",
-            "PokemonBDSP/Autostory/EternaBikeShop/BikeRidingBlueFeature.png",
+    const std::vector<LandmarkConfig> configs{{"Bike illustration",
+            "PokemonBDSP/Autostory/EternaBikeShop/BikeRidingIllustration.png",
             {104.0 / 1920, 314.0 / 1080, 520.0 / 1920, 450.0 / 1080},
             {.035, .26, .32, .48},
             .93,
-            .20,
-            LandmarkFeatures::BLUE_FRACTION},
-        {"B Close prompt",
-            "PokemonBDSP/Autostory/EternaBikeShop/BikeRidingClosePrompt.png",
-            {1570.0 / 1920, 730.0 / 1080, 160.0 / 1920, 60.0 / 1080},
+            .20},
+        {"B button icon",
+            "PokemonBDSP/Autostory/EternaBikeShop/BikeRidingBButton.png",
+            {1570.0 / 1920, 730.0 / 1080, 56.0 / 1920, 56.0 / 1080},
             {.79, .65, .14, .10},
             .93,
             .20}};
@@ -2053,6 +2073,22 @@ OverworldMatchResult match_eterna_underground_man(const ImageRGB32& frame){
             coarse.coarse = true;
             coarse.at_target = false;
             return coarse;
+        }
+    }
+    if (!result.located){
+        // Entry recognition needs room identity, not the interaction pose.
+        // Keep the precise four-anchor result above unchanged. Three unique,
+        // agreeing furniture matches can identify the room across capture differences.
+        auto room_configs = configs;
+        for (auto& config : room_configs){
+            config.threshold = .85;
+            config.margin = .15;
+        }
+        auto room = match_landmarks(frame, room_configs, 3, 1.0 / 128, POSITION_TOLERANCE_Y, true);
+        if (room.located){
+            room.coarse = true;
+            room.at_target = false;
+            return room;
         }
     }
     return result;
@@ -2955,7 +2991,7 @@ OverworldMatchResult match_route215_ace_renewal(const ImageRGB32& frame){
                 "PokemonBDSP/Autostory/Route215Renewal/AceFence.png",
                 {165.0 / 960, 389.0 / 540, 110.0 / 960, 78.0 / 540},
                 {.05, .25, .90, .75},
-                .90,
+                .86,
                 .10,
                 LandmarkFeatures::LOCAL_CONTRAST}},
         2,
@@ -3125,7 +3161,9 @@ OverworldMatchResult match_route215_ace_renewal(const ImageRGB32& frame){
     // Keep the shared row when both bends agree. Under perspective shifts, the nearer bend moves
     // 1.35 times as far; compare acquisition errors in the farther bend's plane. Neither model
     // changes the fine-arrival checks.
-    const double lower_plane_dy = std::abs(upper.dy - lower.dy) <= AGREEMENT_Y ? lower.dy : lower.dy / 1.35;
+    const double projected_lower_dy = lower.dy / 1.35;
+    const double lower_plane_dy = std::abs(upper.dy - lower.dy) <= std::abs(upper.dy - projected_lower_dy) ?
+        lower.dy : projected_lower_dy;
     approach.dy = (upper.dy + lower_plane_dy) / 2;
     const double nearest = std::min(std::abs(upper.dx), std::abs(lower.dx));
     const bool horizontal_support =
@@ -3785,6 +3823,7 @@ const std::vector<OverworldMatcher>& overworld_matchers(){
         {"route205-forest", "Route 205 outside Eterna Forest", match_route205_forest_entrance},
         {"jubilife-street-approach", "Jubilife street before Galactic plaza", match_jubilife_street_approach},
         {"jubilife-plaza-approach", "Jubilife Galactic plaza approach", match_jubilife_plaza_approach},
+        {"jubilife-trainers-school", "Jubilife Trainers School Pokeball sign (locator)", match_jubilife_trainers_school_sign},
         {"poketch-landmarks", "Jubilife Poketch landmarks", match_poketch_landmarks},
         {"oreburgh-mart", "Oreburgh Mart emblem", match_oreburgh_mart},
         {"jubilife-center", "Jubilife Pokemon Center entrance", match_jubilife_center_entrance},

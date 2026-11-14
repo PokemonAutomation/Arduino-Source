@@ -10,6 +10,7 @@
 #include <cctype>
 #include <chrono>
 #include <cmath>
+#include <iterator>
 #include <map>
 #include <memory>
 
@@ -36,6 +37,7 @@
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_OptionsDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_ReceivePokemonDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_TransitionWatchers.h"
@@ -139,130 +141,9 @@ void clown_dialog_helper(VideoStream& stream, ProControllerContext& context, Dpa
 // Time helper
 // ---------------------------------------------------------------------------
 
-// Options chrome and position detectors are independent of setting values.
-class TutorialOptionsDetector {
-public:
-    bool detect(const ImageViewRGB32& screen) const {
-        ImageViewRGB32 panel = extract_box_reference(screen, ImageFloatBox{0.04, 0.065, 0.93, 0.70});
-        size_t white = 0;
-        for (size_t y = 0; y < panel.height(); y += 4){
-            for (size_t x = 0; x < panel.width(); x += 4){
-                uint32_t p = panel.pixel(x, y);
-                if (((p >> 16) & 255) > 225 && ((p >> 8) & 255) > 225 && (p & 255) > 225){
-                    white++;
-                }
-            }
-        }
-        double samples = (double)(((panel.width() + 3) / 4) * ((panel.height() + 3) / 4));
-        // Distinguish Options from the icon menu and bag using its
-        // blue heading and full-width white settings panel.
-        ImageViewRGB32 heading = extract_box_reference(screen, ImageFloatBox{0.01, 0.005, 0.20, 0.025});
-        size_t blue = 0, total = 0;
-        for (size_t y = 0; y < heading.height(); y++){
-            for (size_t x = 0; x < heading.width(); x++){
-                uint32_t p = heading.pixel(x, y);
-                int r = (p >> 16) & 255, g = (p >> 8) & 255, b = p & 255;
-                blue += b > r + 20 && g > r + 10;
-                total++;
-            }
-        }
-        return samples > 0 && white / samples > 0.70 && total > 0 && blue > total / 4;
-    }
-};
-
-class TutorialOptionPositionDetector {
-public:
-    // Locate the two long red horizontal lines surrounding the
-    // selected row. Scrolling changes their position automatically.
-    double selected_row(const ImageViewRGB32& screen) const {
-        int first = -1, last = -1;
-        for (size_t y = (size_t)(screen.height() * 0.08); y < screen.height() * 0.75; y++){
-            size_t red = 0, total = 0;
-            for (size_t x = (size_t)(screen.width() * 0.08); x < screen.width() * 0.90; x += 2){
-                uint32_t p = screen.pixel(x, y);
-                int r = (p >> 16) & 255, g = (p >> 8) & 255, b = p & 255;
-                red += r > 150 && r > g + 40 && r > b + 40;
-                total++;
-            }
-            if (total && red > total * 0.70){
-                if (first < 0){
-                    first = (int)y;
-                }
-                last = (int)y;
-            }
-        }
-        if (first < 0 || last - first < screen.height() * 0.04 || last - first > screen.height() * 0.12){
-            return -1;
-        }
-        return (first + last) / (2.0 * screen.height());
-    }
-    // Locate selected red value text separately from the row border.
-    bool selected_value(const ImageViewRGB32& screen, double y) const {
-        ImageViewRGB32 value = extract_box_reference(screen, ImageFloatBox{0.33, y - 0.025, 0.54, 0.05});
-        size_t red = 0;
-        for (size_t py = 0; py < value.height(); py++){
-            for (size_t px = 0; px < value.width(); px++){
-                uint32_t p = value.pixel(px, py);
-                int r = (p >> 16) & 255, g = (p >> 8) & 255, b = p & 255;
-                red += r > g + 20 && r > b + 20;
-            }
-        }
-        return red > value.width() * value.height() * 0.0005;
-    }
-};
-
-
-// Compare binary visual shapes with small alignment tolerance.
-// No text recognition is needed for fixed English option labels.
-static double
-option_image_score(const ImageViewRGB32& screen, const ImageFloatBox& box, const ImageRGB32& reference, bool red_only){
-    ImageRGB32 actual = extract_box_reference(screen, box).scale_to(384, 32);
-    ImageRGB32 expected = reference.scale_to(384, 32);
-    auto ink = [red_only](uint32_t p){
-        int r = (p >> 16) & 255, g = (p >> 8) & 255, b = p & 255;
-        return red_only ? r > g + 20 && r > b + 20 : r + g + b < 500;
-    };
-    double best = 0;
-    for (int dy = -2; dy <= 2; dy++){
-        for (int dx = -2; dx <= 2; dx++){
-            size_t overlap = 0, count = 0;
-            for (int y = 2; y < 30; y++){
-                for (int x = 2; x < 382; x++){
-                    bool a = ink(actual.pixel(x + dx, y + dy));
-                    bool b = ink(expected.pixel(x, y));
-                    overlap += a && b;
-                    count += a + b;
-                }
-            }
-            if (count){
-                best = std::max(best, 2.0 * overlap / count);
-            }
-        }
-    }
-    return best;
-}
-
-static bool autosave_off_highlight(const ImageViewRGB32& screen, double y){
-    auto red_count = [&](const ImageFloatBox& box){
-        ImageViewRGB32 image = extract_box_reference(screen, box);
-        size_t red = 0;
-        for (size_t py = 0; py < image.height(); py++){
-            for (size_t px = 0; px < image.width(); px++){
-                uint32_t p = image.pixel(px, py);
-                int r = (p >> 16) & 255, g = (p >> 8) & 255, b = p & 255;
-                red += r > g + 30 && r > b + 30;
-            }
-        }
-        return red;
-    };
-    size_t off = red_count({0.63, y - 0.022, 0.055, 0.044});
-    size_t on = red_count({0.34, y - 0.022, 0.055, 0.044});
-    // Require a clear Off highlight and reject any competing On highlight.
-    return off >= 10 && on * 10 < off;
-}
-
-static void verify_tutorial_settings_once(VideoStream& stream, ProControllerContext& context){
+static void verify_tutorial_settings_once(VideoStream& stream, ProControllerContext& context, Language language){
     context.wait_for_all_requests();
+    DpadState dpad;
     MenuDetector menu;
     VideoOverlaySet detector_overlays(stream.overlay());
     menu.make_overlays(detector_overlays);
@@ -289,7 +170,7 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
     // Verify the main menu before navigating to the neighboring icon.
     bool options_open = false;
     for (size_t attempt = 0; attempt < 2; attempt++){
-        pbf_press_dpad(context, attempt == 0 ? DPAD_RIGHT : DPAD_LEFT, 80ms, 350ms);
+        repeat_dpad(context, dpad, attempt == 0 ? DPAD_RIGHT : DPAD_LEFT, 80ms, 300ms, 1, false);
         pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
         context.wait_for_all_requests();
         auto frame = stream.video().snapshot();
@@ -326,15 +207,12 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
         {"gyroscope", "use"},
         {"autosave", "off"},
         {"shownicknames", "show"},
-        {"backgroundmusic", "8"},
-        {"soundeffects", "8"},
+        {"backgroundmusic", "volume8"},
+        {"soundeffects", "volume8"},
     };
     for (size_t row = 0; row < sizeof(settings) / sizeof(settings[0]); row++){
         // Detect the selected row afresh after every navigation/correction.
         double y = -1;
-        const std::string base = RESOURCE_PATH() + "PokemonBDSP/Autostory/Options/" + settings[row].label;
-        const ImageRGB32 label_reference(base + "_label.png");
-        const ImageRGB32 value_reference(base + "_value.png");
         bool slider_reset = false;
         bool correct = false;
         for (size_t attempt = 0; attempt < 30; attempt++){
@@ -346,81 +224,76 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
                 y = -1;
             }
             const bool value_visible = y >= 0 && position.selected_value(frame, y);
-            const double label_score =
-                y >= 0 ? option_image_score(frame, {0.08, y - 0.025, 0.24, 0.05}, label_reference, false) : 0;
+            const std::string label = y >= 0
+                ? position.read_text(stream.logger(), language, frame, y) : "";
             stream.log("[Tutorial settings] Expected row=" + std::string(settings[row].label) +
-                " row_y=" + std::to_string(y) + " highlighted_value=" + std::to_string(value_visible) +
-                " label_match=" + std::to_string(label_score));
-            if (y < 0 || !value_visible || label_score < 0.80){
-                // A menu can be detected while its row/text is still
-                // fading in. Re-read without directional inputs first.
+                " row_y=" + std::to_string(y) + " OCR row=" + label);
+            if (y < 0 || !value_visible || label.empty()){
                 if (attempt < 4){
-                    pbf_wait(context, 200ms);
-                    context.wait_for_all_requests();
+                    pbf_wait(context, 300ms);
                     continue;
                 }
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "Settings checkpoint: Unable to confirm expected row " + std::string(settings[row].label),
-                    stream);
+                    "Settings checkpoint: Unable to read selected row.", stream);
+            }
+            if (label != settings[row].label){
+                size_t actual = 0;
+                for (; actual < std::size(settings); actual++){
+                    if (label == settings[actual].label){
+                        break;
+                    }
+                }
+                if (actual == std::size(settings)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "Settings checkpoint: Unexpected row " + label, stream);
+                }
+                repeat_dpad(context, dpad, actual < row ? DPAD_DOWN : DPAD_UP, 80ms, 300ms, 1, false);
+                continue;
             }
             // The overlay display control shows or hides every active ROI.
             OverlayBoxScope row_overlay(stream.overlay(), COLOR_RED, {0.07, y - 0.04, 0.84, 0.08}, "");
             OverlayBoxScope label_overlay(stream.overlay(), COLOR_YELLOW, {0.08, y - 0.025, 0.24, 0.05}, "");
             OverlayBoxScope value_overlay(stream.overlay(), COLOR_GREEN, {0.33, y - 0.025, 0.54, 0.05}, "");
-            VideoOverlaySet autosave_rois(stream.overlay());
-            if (row == 7){
-                autosave_rois.add(COLOR_GREEN, {0.63, y - 0.022, 0.055, 0.044});
-                autosave_rois.add(COLOR_RED, {0.34, y - 0.022, 0.055, 0.044});
+            const std::string value = position.read_text(stream.logger(), language, frame, y, label);
+            if (value.empty()){
+                if (attempt < 4){
+                    pbf_wait(context, 300ms);
+                    continue;
+                }
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Settings checkpoint: Unable to read selected value for " + label, stream);
             }
-            double score;
-            if (row >= 9){
-                // Compare the numeric value rather than the long slider:
-                // neighboring slider levels otherwise look too similar.
-                ImageViewRGB32 number = value_reference.sub_image(value_reference.width() * 82 / 100,
-                    0,
-                    value_reference.width() - value_reference.width() * 82 / 100,
-                    value_reference.height());
-                ImageRGB32 number_reference = number.scale_to(96, 32);
-                score = option_image_score(frame, {0.7728, y - 0.025, 0.0972, 0.05}, number_reference, true);
-            }else{
-                score = option_image_score(frame, {0.33, y - 0.025, 0.54, 0.05}, value_reference, true);
-            }
-            stream.log(
-                "[Tutorial settings] " + std::string(settings[row].label) + " target match=" + std::to_string(score));
-            // The inactive row uses pale-red text; the focused row uses a thicker dark-red glyph
-            // mask. Fast scores 0.734 while Slow/Normal score 0.
-            if (score >= 0.65 && (row != 7 || autosave_off_highlight(frame, y))){
+            if (value == settings[row].value){
                 if (row == 7){
+                    auto previous = frame;
                     for (size_t confirmation = 0; confirmation < 3; confirmation++){
-                        pbf_wait(context, 200ms);
+                        pbf_wait(context, 300ms);
                         context.wait_for_all_requests();
-                        auto check = stream.video().snapshot();
-                        double check_y = check ? position.selected_row(check) : -1;
-                        if (!check || !options_screen.detect(check) || check_y < 0 ||
-                            option_image_score(check, {0.08, check_y - 0.025, 0.24, 0.05}, label_reference, false) <
-                            0.80 ||
-                            !autosave_off_highlight(check, check_y)){
+                        const auto check = stream.video().snapshot();
+                        const double check_y = check ? position.selected_row(check) : -1;
+                        if (!check || check.timestamp <= previous.timestamp || !options_screen.detect(check) ||
+                            position.read_text(stream.logger(), language, check, check_y) != "autosave" ||
+                            position.read_text(stream.logger(), language, check, check_y, "autosave") != "off"){
                             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                                "Autosave Off could not be confirmed. Stopping before movement.",
-                                stream);
+                                "Autosave Off could not be confirmed. Stopping before movement.", stream);
                         }
+                        previous = check;
                     }
                 }
-                stream.log(
-                    "[Tutorial settings] Verified " + std::string(settings[row].label) + "=" + settings[row].value);
+                stream.log("[Tutorial settings] Verified " + label + "=" + value);
                 correct = true;
                 break;
             }
             stream.log("[Tutorial settings] Correcting " + std::string(settings[row].label));
             if (row >= 9 && !slider_reset){
                 // Sliders clamp at zero. Establish a known endpoint,
-                // then increment; verify the target image afterward.
+                // then increment; verify the selected number with OCR.
                 for (size_t step = 0; step < 12; step++){
-                    pbf_press_dpad(context, DPAD_LEFT, 80ms, 100ms);
+                    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 1, false);
                 }
                 slider_reset = true;
             }else{
-                pbf_press_dpad(context, DPAD_RIGHT, 80ms, 350ms);
+                repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 1, false);
             }
             context.wait_for_all_requests();
         }
@@ -430,7 +303,7 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
                 stream);
         }
         if (row + 1 < sizeof(settings) / sizeof(settings[0])){
-            pbf_press_dpad(context, DPAD_DOWN, 80ms, 350ms);
+            repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 1, false);
         }
     }
     // Confirm settings before exiting: A A A A B B.
@@ -472,31 +345,52 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
         if (wait_until(stream, context, 5s, {{return_menu}}) != 0){
             break;
         }
-        pbf_press_dpad(context, DPAD_RIGHT, 80ms, 350ms);
+        repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 1, false);
     }
     if (!reopened){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Autosave verification: Could not reopen saved Options.",
             stream);
     }
-    // Options starts on Text Speed; Autosave is seven rows below it.
-    for (size_t step = 0; step < 7; step++){
-        pbf_press_dpad(context, DPAD_DOWN, 80ms, 350ms);
-    }
-    context.wait_for_all_requests();
-    const ImageRGB32 autosave_label(RESOURCE_PATH() + "PokemonBDSP/Autostory/Options/autosave_label.png");
-    for (size_t confirmation = 0; confirmation < 3; confirmation++){
-        auto check = stream.video().snapshot();
-        double check_y = check ? position.selected_row(check) : -1;
-        if (!check || !options_screen.detect(check) || check_y < 0 ||
-            option_image_score(check, {0.08, check_y - 0.025, 0.24, 0.05}, autosave_label, false) < 0.80 ||
-            !autosave_off_highlight(check, check_y)){
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Saved Autosave setting is not verified Off. Stopping before movement.",
-                stream);
-        }
-        pbf_wait(context, 200ms);
+    bool autosave_found = false;
+    for (size_t step = 0; step < 20; step++){
+        pbf_wait(context, 300ms);
         context.wait_for_all_requests();
+        const auto check = stream.video().snapshot();
+        const double check_y = check && options_screen.detect(check) ? position.selected_row(check) : -1;
+        const std::string label = check_y >= 0
+            ? position.read_text(stream.logger(), language, check, check_y) : "";
+        if (label == "autosave"){
+            autosave_found = true;
+            break;
+        }
+        size_t actual = 0;
+        for (; actual < std::size(settings); actual++){
+            if (label == settings[actual].label){
+                break;
+            }
+        }
+        if (actual < std::size(settings)){
+            repeat_dpad(context, dpad, actual < 7 ? DPAD_DOWN : DPAD_UP, 80ms, 300ms, 1, false);
+        }
+    }
+    if (!autosave_found){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Autosave verification: Could not locate the saved Autosave row.", stream);
+    }
+    auto previous = stream.video().snapshot();
+    for (size_t confirmation = 0; confirmation < 3; confirmation++){
+        pbf_wait(context, 300ms);
+        context.wait_for_all_requests();
+        const auto check = stream.video().snapshot();
+        const double check_y = check ? position.selected_row(check) : -1;
+        if (!check || (previous && check.timestamp <= previous.timestamp) || !options_screen.detect(check) ||
+            position.read_text(stream.logger(), language, check, check_y) != "autosave" ||
+            position.read_text(stream.logger(), language, check, check_y, "autosave") != "off"){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Saved Autosave setting is not verified Off. Stopping before movement.", stream);
+        }
+        previous = check;
     }
     stream.log("[Tutorial settings] Autosave = Off: confirmed after reopening saved Options (3 frames).");
     // Confirm settings before exiting: A A A A B B.
@@ -513,9 +407,9 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
             "Autosave verification: Could not return to the overworld.",
             stream);
     }
-    // Report inferred values explicitly: these are visual matches,
+    // Report the values read back from the selected settings,
     // allowing the user to compare our conclusions with the screen.
-    stream.log("[Tutorial settings] Completed. Values believed applied (visual matches before saving):");
+    stream.log("[Tutorial settings] Completed. Values verified by OCR/selection before saving (Autosave rechecked after saving):");
     stream.log(
         "[Tutorial settings] Text Speed = Fast; Change Window = Type 1; Battle Effects = Off; Battle Style = Set.");
     stream.log("[Tutorial settings] Send to Boxes = Automatic; Give Nicknames = Don't give; Gyroscope = Use.");
@@ -523,14 +417,14 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
 }
 
 
-void verify_tutorial_settings(VideoStream& stream, ProControllerContext& context){
+void verify_tutorial_settings(VideoStream& stream, ProControllerContext& context, Language language){
     // Settings-only recovery: initial attempt plus three retries.
     // Never permit route movement unless the complete check succeeds.
     constexpr size_t MAX_RETRIES = 3;
     for (size_t attempt = 0; attempt <= MAX_RETRIES; attempt++){
         stream.log("[Tutorial settings] Attempt " + std::to_string(attempt + 1) + "/4.");
         try {
-            verify_tutorial_settings_once(stream, context);
+            verify_tutorial_settings_once(stream, context, language);
             return;
         } catch (OperationFailedException& error){
             stream.log("[Tutorial settings] Attempt failed: " + error.message(), COLOR_ORANGE);
@@ -659,7 +553,10 @@ static size_t select_battle_move_slot(VideoStream& stream,
     bool confirm_default_target = false,
     size_t current_move = 1,
     bool control_second_pokemon = false,
-    bool prefer_third_move = false){
+    bool prefer_third_move = false,
+    std::array<size_t, 4>* exhausted_pp = nullptr,
+    const std::vector<size_t>* allowed_moves = nullptr,
+    size_t pp_cost = 1){
     BattleMenuDetector commands(battle_type, COLOR_RED, control_second_pokemon);
     VideoOverlaySet overlays(stream.overlay());
     commands.make_overlays(overlays);
@@ -701,6 +598,43 @@ static size_t select_battle_move_slot(VideoStream& stream,
             stream);
     }
     pbf_press_button(context, BUTTON_A, 80ms, confirm_default_target ? 1000ms : 500ms);
+    if (exhausted_pp){
+        const std::vector<size_t> eligible = allowed_moves ? *allowed_moves : std::vector<size_t>{target};
+        std::array<int, 4> previous{-1, -1, -1, -1};
+        std::array<size_t, 4> stable{0, 0, 0, 0};
+        bool available = false;
+        for (size_t check = 0; check < 10; check++){
+            context.wait_for_all_requests();
+            const auto frame = stream.video().snapshot();
+            const auto observed = read_all_pp(stream.logger(), frame);
+            for (size_t slot : eligible){
+                const size_t i = slot - 1;
+                stable[i] = observed[i] >= 0 && observed[i] == previous[i] ? stable[i] + 1
+                    : observed[i] >= 0 ? 1 : 0;
+                previous[i] = observed[i];
+                if (stable[i] >= 3){
+                    (*exhausted_pp)[i] = static_cast<size_t>(observed[i]);
+                }
+            }
+            for (size_t slot : eligible){
+                if (stable[slot - 1] >= 3 && (*exhausted_pp)[slot - 1] >= pp_cost){
+                    target = slot;
+                    available = true;
+                    break;
+                }
+            }
+            if (available){
+                stream.log("[PP OCR] Slot " + std::to_string(target) + ": confirmed " +
+                    std::to_string((*exhausted_pp)[target - 1]) + " PP; continuing.", COLOR_GREEN);
+                break;
+            }
+            pbf_wait(context, 150ms);
+        }
+        if (!available){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                label + ": Exhausted budget; OCR could not confirm enough actual PP in an allowed move.", stream);
+        }
+    }
     if (confirm_default_target){
         // Reuse the farming move/target confirmation sequence, but
         // navigate relative to this battle's retained move cursor.
@@ -1034,7 +968,8 @@ static void encounter_one_wild_pokemon(VideoStream& stream, ProControllerContext
     pbf_wait(context, 500ms);
 }
 
-static void confirm_battle_overworld(VideoStream& stream, ProControllerContext& context, const std::string& label){
+static void confirm_battle_overworld(VideoStream& stream, ProControllerContext& context, const std::string& label,
+    bool verify_menu = false){
     OverworldDetector overworld;
     ShortDialogDetector dialogue(COLOR_YELLOW);
     BlackScreenDetector black;
@@ -1053,18 +988,44 @@ static void confirm_battle_overworld(VideoStream& stream, ProControllerContext& 
                 stream);
         }
         const auto now = std::chrono::steady_clock::now();
-        if (dialogue.detect(frame) || black.detect(frame) || !overworld.detect(frame)){
+        const bool dialogue_visible = dialogue.detect(frame);
+        if (dialogue_visible || black.detect(frame) || !overworld.detect(frame)){
             quiet_since = now;
         }else if (now - quiet_since >= 4s){
+            if (verify_menu){
+                // Evolution has a quiet animation before its cancellation message.
+                // Require a usable overworld menu before returning the partner to storage.
+                pbf_press_button(context, BUTTON_X, 80ms, 300ms);
+                context.wait_for_all_requests();
+                MenuWatcher menu;
+                if (wait_until(stream, context, 2s, {{menu}}) != 0){
+                    quiet_since = std::chrono::steady_clock::now();
+                    continue;
+                }
+                pbf_press_button(context, BUTTON_B, 80ms, 300ms);
+                context.wait_for_all_requests();
+                OverworldWatcher closed;
+                if (wait_until(stream, context, 5s, {{closed}}) != 0){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        label + ": Verified menu did not close after partner-battle cleanup.", stream);
+                }
+                stream.log("[" + label + "] Overworld menu verified after partner-battle cleanup.");
+            }
             finished = true;
             break;
         }
-        pbf_mash_button(context, BUTTON_B, 100ms);
+        if (verify_menu && dialogue_visible){
+            // B cancels evolution, but A is needed to dismiss its result message.
+            pbf_press_button(context, BUTTON_A, 80ms, 300ms);
+        }else{
+            pbf_mash_button(context, BUTTON_B, 100ms);
+        }
         context.wait_for_all_requests();
     }
     if (!finished){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            label + ": Dialogue-free overworld not confirmed for four seconds.",
+            label + (verify_menu ? ": Partner-battle cleanup could not verify an accessible overworld menu." :
+                ": Dialogue-free overworld not confirmed for four seconds."),
             stream);
     }
     context.wait_for_all_requests();
@@ -1230,12 +1191,18 @@ static void fight_using_move_list(VideoStream& stream,
                 stream.log("[" + label + "] Confirmed opponent: " + opponent + ".");
                 if (setup->max_full_restores != 0){
                     double hp = -1;
+                    BattleHPReading hp_reading;
+                    WallClock last_hp_frame = WallClock::min();
                     size_t stable_hp = 0;
                     for (size_t check = 0; check < 20 && stable_hp < 3; check++){
                         context.wait_for_all_requests();
                         const auto frame = stream.video().snapshot();
-                        const double observed = frame ? read_player_hp_ratio(frame) : -1;
-                        stable_hp = observed > 0 && std::abs(observed - hp) < 0.02 ? stable_hp + 1 : 0;
+                        BattleHPReading observed_reading;
+                        const double observed = frame && frame.timestamp > last_hp_frame
+                            ? read_player_hp_ratio(frame, BattleHPLayout::SINGLES, 1, &observed_reading) : -1;
+                        stable_hp = observed > 0 ? (observed_reading == hp_reading ? stable_hp + 1 : 1) : 0;
+                        hp_reading = observed_reading;
+                        last_hp_frame = frame.timestamp;
                         hp = observed;
                         if (stable_hp < 3){
                             pbf_wait(context, 100ms);
@@ -1245,6 +1212,8 @@ static void fight_using_move_list(VideoStream& stream,
                         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                             label + ": HP not confirmed; no item or attack selected.", stream);
                     }
+                    stream.log("[" + label + "] Confirmed HP: " + std::to_string(hp_reading.current) +
+                        "/" + std::to_string(hp_reading.maximum) + ".");
                     if (hp_before_restore >= 0){
                         // The opponent attacks after the item. Its damage can erase
                         // the healing gain, so net HP cannot verify whether it worked.
@@ -1294,6 +1263,7 @@ static void fight_using_move_list(VideoStream& stream,
             }
 
             auto* player_pp = player == 1 ? remaining_pp : nullptr;
+            bool refresh_pp = false;
             size_t selected_move = setup ? setup->moves.at(opponent) : player == 2 ? 1 : move_slots[move_index];
             stream.log("[" + label + "] Selecting for player Pokemon " + std::to_string(player) + ".");
             if (player_pp && !ordered_moves && !setup){
@@ -1305,16 +1275,13 @@ static void fight_using_move_list(VideoStream& stream,
                     }
                 }
                 if (selected_move == 0){
-                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        label + ": Allowed move PP budgets exhausted; heal before continuing.",
-                        stream);
+                    refresh_pp = true;
+                    selected_move = move_slots.front();
                 }
             }
 
             if (player_pp && (ordered_moves || setup) && (*player_pp)[selected_move - 1] < pp_cost){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    label + ": Scripted move PP budget exhausted; heal before continuing.",
-                    stream);
+                refresh_pp = true;
             }
             stream.log("[AutoStory] Battle menu detected.", COLOR_BLUE);
 
@@ -1333,7 +1300,10 @@ static void fight_using_move_list(VideoStream& stream,
                 confirm_default_target,
                 current_move[player - 1],
                 control_second_pokemon,
-                prefer_third_move);
+                prefer_third_move,
+                refresh_pp ? player_pp : nullptr,
+                refresh_pp && !ordered_moves && !setup ? &move_slots : nullptr,
+                pp_cost);
             // A rejected move leaves the Fight list open and consumes no PP.
             // Do not charge the software budget for that rejected selection.
             if (player_pp){
@@ -1408,21 +1378,24 @@ static void fight_using_move_list(VideoStream& stream,
                 context.wait_for_all_requests();
                 return;
             }
-            // Story NPCs and gym leaders opt into the existing cleanup.
-            OverworldWatcher overworld;
-            int cleanup_ret = run_until<ProControllerContext>(stream,
-                context,
-                [](ProControllerContext& ctx){
-                    pbf_mash_button(ctx, BUTTON_B, 120000ms);
-                },
-                {{overworld}});
-            if (cleanup_ret != 0){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    label + ": Post-battle cleanup timed out.",
-                    stream);
+            // Partner cleanup must also advance the evolution-cancellation message.
+            if (!control_second_pokemon){
+                // Story NPCs and gym leaders opt into the existing cleanup.
+                OverworldWatcher overworld;
+                int cleanup_ret = run_until<ProControllerContext>(stream,
+                    context,
+                    [](ProControllerContext& ctx){
+                        pbf_mash_button(ctx, BUTTON_B, 120000ms);
+                    },
+                    {{overworld}});
+                if (cleanup_ret != 0){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        label + ": Post-battle cleanup timed out.",
+                        stream);
+                }
             }
             context.wait_for_all_requests();
-            confirm_battle_overworld(stream, context, label + " cleanup");
+            confirm_battle_overworld(stream, context, label + " cleanup", control_second_pokemon);
             return;
         }
 
@@ -1703,8 +1676,7 @@ void align_to_overworld_landmarks(VideoStream& stream,
             pbf_move_left_joystick(context,
                 {horizontal ? (result.dx > 0 ? 1.0 : -1.0) : 0.0, horizontal ? 0.0 : (error < 0 ? 1.0 : -1.0)},
                 duration,
-                0ms);
-            pbf_wait(context, 500ms);
+                500ms);
         }else{
             confirmations = 0;
             if (plaza_located || matcher == match_floaroma_center_entrance ||
@@ -1868,8 +1840,10 @@ void fight_trainer_using_moves(VideoStream& stream,
             // four Flamethrower PP for the remaining ascent and summit script.
             priorities = {1, 2};
         }else if (label == "coronet_ascent_grunt_3"){
-            priorities = {1, 2};
+            // Flamethrower avoids Stunky's Aftermath; Thunder Punch covers Golbat.
+            priorities = {2, 1};
             ordered_moves = true;
+            advance_on_experience = true;
         }else if (label == "coronet_ascent_grunt_4"){
             priorities = {2, 1};
             ordered_moves = true;
@@ -1885,6 +1859,11 @@ void fight_trainer_using_moves(VideoStream& stream,
             ordered_moves = true;
         }else if (label == "spear_pillar_grunts"){
             priorities = {3, 2, 1, 4};
+        }else if (label == "verity_lakefront_grunt_1" ||
+            label == "galactic_hq_grunt_4" || label == "galactic_hq_grunt_5"){
+            // These parties contain Stunky. Keep every attack noncontact,
+            // including retries and the final KO that can trigger Aftermath.
+            priorities = {2};
         }else if (label == "Byron" ||
             (label.find("Canalave Gym trainer ") == 0 && label != "Canalave Gym trainer 5")){
             // Onix/Steelix block Electric; Byron's Bronzor also blocks Ground.
@@ -2153,19 +2132,28 @@ void fight_tristan(VideoStream& stream, ProControllerContext& context){
 void battle_1_pokemon(VideoStream& stream, ProControllerContext& context, const AutoStoryOptions& options){
     // Level 7 retains the demonstrated pre-Tristan level; route encounters may
     // already have supplied that experience. Never skip the full-HP check.
-    for (size_t battles = 0; battles <= 3; battles++){
+    uint8_t previous_level = 0;
+    auto progress_deadline = std::chrono::steady_clock::now() + 10min;
+    while (true){
         uint8_t level = 0;
-        use_potion_first_pokemon(stream, context, &level);
+        use_potion_first_pokemon(stream, context, options.language, &level);
         if (level >= 7){
             stream.log("[Training] Full HP and level " + std::to_string(level) +
                 " confirmed; ready for Route 202 trainers.", COLOR_GREEN);
             return;
         }
-        if (battles == 3){
+        if (level < previous_level){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Training: Level 7 not reached after three additional encounters.", stream);
+                "Training: Lead level decreased; stopping on an inconsistent reading.", stream);
         }
-        stream.log("[Training] Level " + std::to_string(level) + "; finding one additional encounter.");
+        if (level > previous_level){
+            previous_level = level;
+            progress_deadline = std::chrono::steady_clock::now() + 10min;
+        }else if (std::chrono::steady_clock::now() >= progress_deadline){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Training: No lead level increase for ten minutes.", stream);
+        }
+        stream.log("[Training] Level " + std::to_string(level) + "/7; finding one additional encounter.");
         encounter_one_wild_pokemon(stream, context);
         fight_using_move_slot(stream, context, BattleType::STANDARD, 1, "Tutorial training", &options, true);
     }
@@ -2523,6 +2511,10 @@ void walk_through_grass(VideoStream& stream,
     OverworldMatchResult (*destination)(const ImageRGB32&),
     bool fight_encounters,
     const AutoStoryOptions* training_options){
+    if (fight_encounters && (!training_options || training_options->language == Language::None)){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Grass training: Supply the selected game language for Potion OCR.", stream);
+    }
     size_t movements = 0, confirmations = 0;
     while (true){
         context.wait_for_all_requests();
@@ -2600,7 +2592,7 @@ void walk_through_grass(VideoStream& stream,
                 std::to_string(steps) + ": encounter trigger=" + std::to_string(ret));
             if (fight_encounters){
                 fight_using_move_slot(stream, context, battle_type, 1, "Route training", training_options);
-                use_potion_first_pokemon(stream, context);
+                use_potion_first_pokemon(stream, context, training_options->language);
                 context.wait_for_all_requests();
                 stream.log("[Grass] Training battle and healing complete; resuming " + direction_name + ".");
             }else{
