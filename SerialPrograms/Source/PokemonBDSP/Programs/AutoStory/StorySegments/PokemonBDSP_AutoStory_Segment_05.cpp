@@ -116,8 +116,7 @@ static bool go_to_pastoria_pokemon_center(VideoStream& stream, ProControllerCont
     if (run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {0, +1}, 5000ms, 0ms);
-                pbf_wait(ctx, 1000ms);
+                pbf_move_left_joystick(ctx, {0, +1}, 5000ms, 1000ms);
             },
         {{entry_black}}) != 0){
         stream.log("[Pastoria Center] Entrance transition did not start.", COLOR_RED);
@@ -257,7 +256,7 @@ static bool go_through_house_east_pastoria(VideoStream& stream, ProControllerCon
 }
 
 static bool
-go_through_route_213_chasing(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
+go_through_route_213_chasing(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, Language language){
     DpadState dpad;
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
@@ -265,7 +264,7 @@ go_through_route_213_chasing(VideoStream& stream, ProControllerContext& context,
     stream.log("go_through_route_213_chasing: continuing the drama");
 
     pbf_move_left_joystick(context, {+1, 0}, 1600ms, 100ms); // 12
-    if (!activate_repel(stream, context)){
+    if (!activate_repel(stream, context, language)){
         return false;
     }
     context.wait_for_all_requests();
@@ -601,7 +600,7 @@ static bool heal_at_solaceon_pokemon_center(VideoStream& stream, ProControllerCo
 }
 
 static bool
-go_to_the_psyduck_route_210(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
+go_to_the_psyduck_route_210(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, Language language){
     DpadState dpad;
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
@@ -617,7 +616,7 @@ go_to_the_psyduck_route_210(VideoStream& stream, ProControllerContext& context, 
     repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 1);
     context.wait_for_all_requests();
     pbf_wait(context, 1000ms);
-    if (!activate_repel(stream, context)){
+    if (!activate_repel(stream, context, language)){
         return false;
     }
 
@@ -737,7 +736,7 @@ go_to_the_psyduck_route_210(VideoStream& stream, ProControllerContext& context, 
     repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 3);
     context.wait_for_all_requests();
 
-    if (!activate_repel(stream, context)){
+    if (!activate_repel(stream, context, language)){
         return false;
     }
 
@@ -1502,7 +1501,7 @@ void checkpoint_0502(SingleSwitchProgramEnvironment& env,
                 }
             }
             {
-                if (!go_through_route_213_chasing(env.console, context, stats)){
+                if (!go_through_route_213_chasing(env.console, context, stats, options.language)){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         "go_through_route_213_chasing: transition not detected.",
                         env.console);
@@ -1571,7 +1570,7 @@ void checkpoint_0503(SingleSwitchProgramEnvironment& env,
         stats,
         [&](size_t /*attempt*/){
             {
-                if (!go_to_the_psyduck_route_210(env.console, context, stats)){
+                if (!go_to_the_psyduck_route_210(env.console, context, stats, options.language)){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         "go_to_the_psyduck_route_210: transition not detected.",
                         env.console);

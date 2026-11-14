@@ -221,13 +221,14 @@ size_t BattleMenuDetector::active_player(const ImageViewRGB32& screen){
         return 0;
     }
     // The command owner's status panel is raised. The other panel's lower
-    // white strip stays visible; names, HP values and menu language are unused.
+    // white strip stays visible. Sample between the HP text and EXP bar
+    // so changing HP digits do not obscure the partner strip.
     const bool partner_present = is_white(extract_box_reference(screen, ImageFloatBox{0.505, 0.905, 0.010, 0.005}));
     if (!partner_present){
         return 1;
     }
     const bool lead_lower = is_white(extract_box_reference(screen, ImageFloatBox{0.140, 0.930, 0.040, 0.006}));
-    const bool partner_lower = is_white(extract_box_reference(screen, ImageFloatBox{0.330, 0.930, 0.040, 0.006}));
+    const bool partner_lower = is_white(extract_box_reference(screen, ImageFloatBox{0.370, 0.930, 0.020, 0.006}));
     if (lead_lower == partner_lower){
         return 0;
     }

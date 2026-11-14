@@ -201,10 +201,8 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_move_left_joystick(context, {1.000000, 1.000000}, 456ms, 0ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 915ms, 0ms);
     pbf_move_left_joystick(context, {1.000000, 1.000000}, 642ms, 0ms);
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 557ms, 0ms);
-    pbf_wait(context, 978ms);
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1112ms, 0ms);
-    pbf_wait(context, 4967ms);
+    pbf_move_left_joystick(context, {1.000000, -0.000000}, 557ms, 978ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1112ms, 4967ms);
 
     wait_for_dialog(stream, context, "Phase 1 (Mom)");
 
@@ -213,8 +211,7 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
 
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1662ms, 0ms);
     pbf_move_left_joystick(context, {-1.000000, -1.000000}, 49ms, 0ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1215ms, 0ms);
-    pbf_wait(context, 1419ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1215ms, 1419ms);
 
     wait_for_dialog(stream, context, "Phase 2 (Mom Warning)");
 
@@ -222,16 +219,13 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_wait(context, 300ms);
     context.wait_for_all_requests();
 
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 680ms, 0ms);
-
-    pbf_wait(context, 4000ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 680ms, 4000ms);
 
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1748ms, 0ms);
     pbf_move_left_joystick(context, {-1.000000, 1.000000}, 18ms, 0ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 2763ms, 0ms);
     pbf_move_left_joystick(context, {-1.000000, 1.000000}, 58ms, 0ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1364ms, 0ms);
-    pbf_wait(context, 4000ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1364ms, 4000ms);
     context.wait_for_all_requests();
 
     wait_for_dialog(stream, context, "Phase 3 (Barry 1st)");
@@ -276,8 +270,7 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     // The north hold reaches the stair corner. Turn east directly; further left/up movement only
     // pushes into the walls.
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 2722ms, 0ms);
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 975ms, 0ms);
-    pbf_wait(context, 1422ms);
+    pbf_move_left_joystick(context, {1.000000, -0.000000}, 975ms, 1422ms);
 
     wait_for_dialog(stream, context, "Phase 8 (Barry 2nd dialog)");
     clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_A);
@@ -289,18 +282,14 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     // transition waits gate both floor changes.
     recorded_move_until_transition(stream, context, -1.0, 0.0, 900ms, "Barry house downstairs");
     pbf_wait(context, 750ms);
-    pbf_move_left_joystick(context, {-1.0, 0.0}, 2000ms, 0ms);
-    pbf_wait(context, 250ms);
-    pbf_move_left_joystick(context, {0.0, -1.0}, 2000ms, 0ms);
-    pbf_wait(context, 150ms);
-    pbf_move_left_joystick(context, {1.0, 0.0}, 1400ms, 0ms);
-    pbf_wait(context, 500ms);
+    pbf_move_left_joystick(context, {-1.0, 0.0}, 2000ms, 250ms);
+    pbf_move_left_joystick(context, {0.0, -1.0}, 2000ms, 150ms);
+    pbf_move_left_joystick(context, {1.0, 0.0}, 1400ms, 500ms);
     recorded_move_until_transition(stream, context, 0.0, -1.0, 1200ms, "Barry house exit");
     // Keep the eastward approach short enough to stay aligned with the northbound path.
     stream.log("[Route 201] Aligning east for 2300ms before northbound approach.");
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 2300ms, 0ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 5861ms, 0ms);
-    pbf_wait(context, 134ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 5861ms, 134ms);
 
     wait_for_dialog(stream, context, "Phase 9 (Barry Route 201)");
 
@@ -315,9 +304,7 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_move_left_joystick(context, {-1.000000, 1.000000}, 140ms, 0ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 1700ms, 0ms);
     pbf_move_left_joystick(context, {-1.000000, 1.000000}, 39ms, 0ms);
-    pbf_move_left_joystick(context, {-1.000000, 0.000000}, 544ms, 1000ms);
-
-    pbf_wait(context, 1000ms);
+    pbf_move_left_joystick(context, {-1.000000, 0.000000}, 544ms, 2000ms);
 
     // save_game(stream, context);  // Disabled: checkpoint save mode controls saving.
     context.wait_for_all_requests();
@@ -332,13 +319,11 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
 // ---------------------------------------------------------------------------
 static void starter_nav(VideoStream& stream, ProControllerContext& context){
     // re-sync control
-    pbf_press_button(context, BUTTON_B, 20ms, 200ms);
-    pbf_wait(context, 2000ms);
+    pbf_press_button(context, BUTTON_B, 20ms, 2200ms);
     context.wait_for_all_requests();
 
     // continue movement
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 300ms, 0ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 300ms, 0ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 600ms, 0ms);
 
     wait_for_dialog(stream, context, "Phase 10 (Barry before the starter selection)");
 
@@ -395,8 +380,7 @@ tutorial_part_2_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_move_left_joystick(context, {1.000000, -1.000000}, 510ms, 0ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 50ms, 0ms);
     pbf_move_left_joystick(context, {1.000000, -1.000000}, 310ms, 0ms);
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 5500ms, 0ms);
-    pbf_wait(context, 3963ms);
+    pbf_move_left_joystick(context, {1.000000, -0.000000}, 5500ms, 3963ms);
     context.wait_for_all_requests();
 
     wait_for_dialog(stream, context, "Phase 10 (Professor dialog to mom)");
@@ -404,14 +388,10 @@ tutorial_part_2_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     recorded_move_until_transition(stream, context, 0, 0, 90000ms, "Returning home after meeting Rowan", true);
     wait_for_dialog(stream, context, "Mom and Running Shoes", 20s);
     clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 820ms, 0ms);
-    pbf_wait(context, 4000ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 800ms, 0ms);
-    pbf_wait(context, 555ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 50ms, 0ms);
-    pbf_wait(context, 23ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 5020ms, 0ms);
-    pbf_wait(context, 169ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 820ms, 4000ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 800ms, 555ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 50ms, 23ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 5020ms, 169ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 745ms, 0ms);
     DateTime t{2026, 1, 1, 0, 0, 50};
     set_time_fast(env, context, t);
@@ -434,8 +414,7 @@ tutorial_part_2_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 1);
     walk_through_grass(stream, context, 0, 1, 2, "Route 201 north tree alignment", BattleType::STARTER);
     walk_through_grass(stream, context, 1, 0, 10, "right through grass 2", BattleType::STARTER);
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 730ms, 0ms);
-    pbf_wait(context, 941ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 730ms, 941ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1950ms, 0ms);
     wait_for_dialog(stream, context, "Phase 11 (dawn conversation)");
     clear_dialog(stream, context, ClearDialogMode::STOP_PROMPT, 120, BUTTON_B);
@@ -507,28 +486,18 @@ tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     // Allow the automatic walks between the Center and Mart explanations.
     clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 90, BUTTON_B, 6000ms);
 
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 5125ms, 0ms);
-    pbf_wait(context, 336ms);
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1700ms, 0ms);
-    pbf_wait(context, 213ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 5125ms, 336ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1700ms, 213ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2325ms, 0ms);
     pbf_move_left_joystick(context, {-1.000000, 1.000000}, 950ms, 0ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2360ms, 0ms);
-    pbf_wait(context, 253ms);
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 4610ms, 0ms);
-    pbf_wait(context, 954ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 220ms, 0ms);
-    pbf_wait(context, 587ms);
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1375ms, 0ms);
-    pbf_wait(context, 464ms);
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 775ms, 0ms);
-    pbf_wait(context, 1655ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 640ms, 0ms);
-    pbf_wait(context, 3128ms);
-    pbf_press_dpad(context, DPAD_UP, 180ms, 0ms);
-    pbf_wait(context, 472ms);
-    pbf_press_dpad(context, DPAD_UP, 130ms, 0ms);
-    pbf_wait(context, 1621ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2360ms, 253ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 4610ms, 954ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 220ms, 587ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1375ms, 464ms);
+    pbf_move_left_joystick(context, {1.000000, -0.000000}, 775ms, 1655ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 640ms, 3128ms);
+    pbf_press_dpad(context, DPAD_UP, 180ms, 472ms);
+    pbf_press_dpad(context, DPAD_UP, 130ms, 1621ms);
     pbf_press_dpad(context, DPAD_RIGHT, 130ms, 0ms);
     pbf_press_button(context, BUTTON_A, 180ms, 0ms);
 
@@ -555,8 +524,7 @@ tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B);
     // Clear the doorway column before heading north toward Route 201.
     pbf_move_left_joystick(context, {-1, 0}, 240ms, 300ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 5300ms, 0ms);
-    pbf_wait(context, 500ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 5300ms, 500ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 260ms, 0ms);
     context.wait_for_all_requests();
     pbf_wait(context, 500ms);
@@ -579,18 +547,13 @@ tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     dpad.last_dir = DPAD_RIGHT;
     repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 5);
 
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 560ms, 0ms);
-    pbf_wait(context, 500ms);
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 5000ms, 0ms);
-    pbf_wait(context, 500ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 560ms, 500ms);
+    pbf_move_left_joystick(context, {1.000000, -0.000000}, 5000ms, 500ms);
     dpad.last_dir = DPAD_LEFT;
     repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 6);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 1855ms, 0ms);
-    pbf_wait(context, 500ms);
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 430ms, 0ms);
-    pbf_wait(context, 500ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 850ms, 0ms);
-    pbf_wait(context, 500ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 1855ms, 500ms);
+    pbf_move_left_joystick(context, {1.000000, -0.000000}, 430ms, 500ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 850ms, 500ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1120ms, 0ms);
 
     wait_for_dialog(stream, context, "Phase 16 (catch tutorial)");
@@ -723,16 +686,12 @@ static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironmen
     // The battle helper advances the introduction while watching for commands.
     fight_tristan(stream, context);
 
-    use_potion_first_pokemon(stream, context);
+    use_potion_first_pokemon(stream, context, options.language);
     context.wait_for_all_requests();
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 1366ms, 0ms);
-    pbf_wait(context, 467ms);
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1018ms, 0ms);
-    pbf_wait(context, 311ms);
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 353ms, 0ms);
-    pbf_wait(context, 660ms);
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 580ms, 0ms);
-    pbf_wait(context, 1672ms);
+    pbf_move_left_joystick(context, {1.000000, -0.000000}, 1366ms, 467ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1018ms, 311ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 353ms, 660ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 580ms, 1672ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1344ms, 0ms);
 
     wait_for_dialog(stream, context, "Phase 19 (natalie encounter dialog)");
@@ -740,20 +699,19 @@ static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironmen
     // The battle helper advances the introduction while watching for commands.
     fight_Natalie(stream, context);
     context.wait_for_all_requests();
-    use_potion_first_pokemon(stream, context);
+    use_potion_first_pokemon(stream, context, options.language);
     context.wait_for_all_requests();
 
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1301ms, 0ms);
     walk_through_grass(stream, context, 0, 1, 15, "up through grass");
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 392ms, 0ms);
-    pbf_wait(context, 1261ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 392ms, 1261ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 815ms, 0ms);
 
     wait_for_dialog(stream, context, "Phase 20 (logan encounter dialog)");
 
     fight_Natalie(stream, context);
     context.wait_for_all_requests();
-    use_potion_first_pokemon(stream, context);
+    use_potion_first_pokemon(stream, context, options.language);
     context.wait_for_all_requests();
     walk_through_grass(stream, context, -1, 0, 8, "left through grass");
 
@@ -860,8 +818,7 @@ static void align_and_talk_to_poketch_man(VideoStream& stream, ProControllerCont
                 acquisition_misses = 0;
                 stream.log("[Poketch landmarks] Bounded vertical visibility probe " + std::to_string(vertical_probe) +
                     "/10: " + (probe < 0 ? "down " : "up ") + std::to_string(std::abs(probe)) + "ms.");
-                pbf_move_left_joystick(context, {0, probe < 0 ? -1.0 : 1.0}, Milliseconds(std::abs(probe)), 0ms);
-                pbf_wait(context, 700ms);
+                pbf_move_left_joystick(context, {0, probe < 0 ? -1.0 : 1.0}, Milliseconds(std::abs(probe)), 700ms);
             }else{
                 stream.log("[Poketch landmarks] No trustworthy acquisition; waiting for another frame.");
                 pbf_wait(context, 250ms);
@@ -901,8 +858,7 @@ static void align_and_talk_to_poketch_man(VideoStream& stream, ProControllerCont
             pbf_move_left_joystick(context,
                 {horizontal ? (dx > 0 ? 1.0 : -1.0) : 0.0, horizontal ? 0.0 : (dy < 0 ? 1.0 : -1.0)},
                 duration,
-                0ms);
-            pbf_wait(context, 700ms);
+                700ms);
         }
         context.wait_for_all_requests();
     }
@@ -954,8 +910,7 @@ void align_and_enter_jubilife_center(VideoStream& stream, ProControllerContext& 
             pbf_move_left_joystick(context,
                 {horizontal ? (result.dx > 0 ? 1.0 : -1.0) : 0.0, horizontal ? 0.0 : (result.dy < 0 ? 1.0 : -1.0)},
                 duration,
-                0ms);
-            pbf_wait(context, 700ms);
+                700ms);
         }
         context.wait_for_all_requests();
     }
@@ -966,62 +921,117 @@ void align_and_enter_jubilife_center(VideoStream& stream, ProControllerContext& 
 
 static void
 tutorial_part_4_navigation(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 2580ms, 0ms);
-    pbf_wait(context, 504ms);
-    // Face west, then cross six tiles to the school doorway.
-    // repeat_dpad adds the facing-change press before the six steps.
+    context.wait_for_all_requests();
     DpadState dpad;
-    dpad.last_dir = DPAD_UP;
-    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 6);
-    // Confirm entry before approaching Barry.
+    const auto starting_frame = stream.video().snapshot();
+    if (!starting_frame){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Trainers School approach: No video frame.", stream);
+    }
+    if (!match_jubilife_trainers_school_sign(*starting_frame.frame).located){
+        pbf_move_left_joystick(context, {0.000000, 1.000000}, 2580ms, 504ms);
+        dpad.last_dir = DPAD_UP;
+        repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 6);
+        context.wait_for_all_requests();
+    }
+    size_t confirmed = 0;
+    size_t missing = 0;
+    bool aligned = false;
+    auto previous_frame = stream.video().snapshot();
+    for (size_t attempt = 0; attempt < 48; attempt++){
+        pbf_wait(context, 300ms);
+        context.wait_for_all_requests();
+        const auto frame = stream.video().snapshot();
+        if (!frame){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Trainers School alignment: No video frame.", stream);
+        }
+        if (previous_frame && frame.timestamp <= previous_frame.timestamp){
+            continue;
+        }
+        previous_frame = frame;
+        const auto result = match_jubilife_trainers_school_sign(*frame.frame);
+        VideoOverlaySet overlays(stream.overlay());
+        for (const auto& landmark : result.landmarks){
+            overlays.add(COLOR_CYAN, landmark.search);
+            if (landmark.accepted){
+                overlays.add(COLOR_GREEN, landmark.found);
+            }
+            stream.log("[Trainers School alignment] score=" + std::to_string(landmark.score) +
+                " margin=" + std::to_string(landmark.margin) + " offset=(" +
+                std::to_string(landmark.dx) + "," + std::to_string(landmark.dy) + ")");
+        }
+        if (!result.located){
+            confirmed = 0;
+            if (++missing >= 6){
+                break;
+            }
+            continue;
+        }
+        missing = 0;
+        if (result.at_target){
+            if (++confirmed >= 3){
+                aligned = true;
+                break;
+            }
+            continue;
+        }
+        confirmed = 0;
+        // Reach the clear exterior row before crossing toward the door column.
+        // Screen y increases downward: a sign above its reference needs northward travel.
+        const bool vertical = result.dy < -0.08 || result.dy > 1.0 / 54;
+        const double error = vertical ? (result.dy + 0.04) * 9.0 / 16 : result.dx;
+        const DpadPosition direction = vertical
+            ? (error < 0 ? DPAD_UP : DPAD_DOWN)
+            : (error < 0 ? DPAD_LEFT : DPAD_RIGHT);
+        stream.log(std::string("[Trainers School alignment] Correcting ") +
+            (vertical ? "vertical" : "horizontal") + " offset.");
+        if (std::abs(error) >= 0.04){
+            repeat_dpad(context, dpad, direction, 80ms, 300ms, 1);
+        }else{
+            // A partial-tile error needs a smaller correction than a full D-pad step.
+            pbf_move_left_joystick(context,
+                {vertical ? 0.0 : (error < 0 ? -1.0 : 1.0),
+                    vertical ? (error < 0 ? 1.0 : -1.0) : 0.0},
+                16ms, 300ms);
+            dpad.last_dir = direction;
+        }
+    }
+    if (!aligned){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Trainers School alignment: Doorway position not confirmed; entry not attempted.", stream);
+    }
+    stream.log("[Trainers School alignment] Doorway position confirmed; watching entry fade.");
     recorded_move_until_transition(stream, context, 0, 1, 2000ms, "Jubilife Trainers School entry");
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 2000ms, 0ms);
-    pbf_wait(context, 598ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 200ms, 0ms);
-    pbf_wait(context, 581ms);
-    pbf_press_button(context, BUTTON_A, 150ms, 0ms);
-    pbf_wait(context, 500ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 2000ms, 598ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 200ms, 581ms);
+    pbf_press_button(context, BUTTON_A, 150ms, 500ms);
 
     wait_for_dialog(stream, context, "Phase 22 (barry town map dialog)");
 
     clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
     context.wait_for_all_requests();
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1521ms, 0ms);
-    pbf_wait(context, 602ms);
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 1100ms, 0ms);
-    pbf_wait(context, 500ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 138ms, 0ms);
-    pbf_wait(context, 500ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 1018ms, 0ms);
-    pbf_wait(context, 500ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1521ms, 602ms);
+    pbf_move_left_joystick(context, {1.000000, -0.000000}, 1100ms, 500ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 138ms, 500ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 1018ms, 500ms);
 
     wait_for_dialog(stream, context, "Phase 23 (poketech challenge dialog)");
 
     clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
     context.wait_for_all_requests();
 
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 192ms, 0ms);
-    pbf_wait(context, 500ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 980ms, 0ms);
-    pbf_wait(context, 543ms);
-    pbf_press_dpad(context, DPAD_UP, 203ms, 0ms);
-    pbf_wait(context, 593ms);
-    pbf_press_dpad(context, DPAD_UP, 115ms, 0ms);
-    pbf_wait(context, 566ms);
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 1567ms, 0ms);
-    pbf_wait(context, 538ms);
-    pbf_press_dpad(context, DPAD_LEFT, 157ms, 0ms);
-    pbf_wait(context, 500ms);
-    pbf_press_dpad(context, DPAD_LEFT, 164ms, 0ms);
-    pbf_wait(context, 564ms);
-    pbf_press_dpad(context, DPAD_LEFT, 250ms, 0ms);
-    pbf_wait(context, 513ms);
-    pbf_press_dpad(context, DPAD_LEFT, 250ms, 0ms);
-    pbf_wait(context, 513ms);
-    pbf_press_dpad(context, DPAD_DOWN, 163ms, 0ms);
-    pbf_wait(context, 609ms);
-    pbf_press_dpad(context, DPAD_DOWN, 193ms, 0ms);
-    pbf_wait(context, 584ms);
+    pbf_move_left_joystick(context, {1.000000, -0.000000}, 192ms, 500ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 980ms, 543ms);
+    pbf_press_dpad(context, DPAD_UP, 203ms, 593ms);
+    pbf_press_dpad(context, DPAD_UP, 115ms, 566ms);
+    pbf_move_left_joystick(context, {1.000000, -0.000000}, 1567ms, 538ms);
+    pbf_press_dpad(context, DPAD_LEFT, 157ms, 500ms);
+    pbf_press_dpad(context, DPAD_LEFT, 164ms, 564ms);
+    pbf_press_dpad(context, DPAD_LEFT, 250ms, 513ms);
+    pbf_press_dpad(context, DPAD_LEFT, 250ms, 513ms);
+    pbf_press_dpad(context, DPAD_DOWN, 163ms, 609ms);
+    pbf_press_dpad(context, DPAD_DOWN, 193ms, 584ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 151ms, 0ms);
     context.wait_for_all_requests();
 
@@ -1029,24 +1039,15 @@ tutorial_part_4_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     clown_dialog_helper(stream, context, DPAD_RIGHT);
     context.wait_for_all_requests();
 
-    pbf_press_dpad(context, DPAD_UP, 187ms, 0ms);
-    pbf_wait(context, 106ms);
-    pbf_press_dpad(context, DPAD_UP, 32ms, 0ms);
-    pbf_wait(context, 671ms);
-    pbf_press_dpad(context, DPAD_UP, 262ms, 0ms);
-    pbf_wait(context, 684ms);
-    pbf_press_dpad(context, DPAD_UP, 372ms, 0ms);
-    pbf_wait(context, 392ms);
-    pbf_press_dpad(context, DPAD_UP, 419ms, 0ms);
-    pbf_wait(context, 658ms);
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 2013ms, 0ms);
-    pbf_wait(context, 369ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1448ms, 0ms);
-    pbf_wait(context, 500ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 1077ms, 0ms);
-    pbf_wait(context, 500ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1280ms, 0ms);
-    pbf_wait(context, 500ms);
+    pbf_press_dpad(context, DPAD_UP, 187ms, 106ms);
+    pbf_press_dpad(context, DPAD_UP, 32ms, 671ms);
+    pbf_press_dpad(context, DPAD_UP, 262ms, 684ms);
+    pbf_press_dpad(context, DPAD_UP, 372ms, 392ms);
+    pbf_press_dpad(context, DPAD_UP, 419ms, 658ms);
+    pbf_move_left_joystick(context, {1.000000, -0.000000}, 2013ms, 369ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1448ms, 500ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 1077ms, 500ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1280ms, 500ms);
     pbf_press_dpad(context, DPAD_LEFT, 88ms, 0ms);
 
     context.wait_for_all_requests();
@@ -1056,22 +1057,14 @@ tutorial_part_4_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     clown_dialog_helper(stream, context, DPAD_UP);
 
     context.wait_for_all_requests();
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 511ms, 0ms);
-    pbf_wait(context, 500ms);
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 140ms, 0ms);
-    pbf_wait(context, 500ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2093ms, 0ms);
-    pbf_wait(context, 500ms);
-    pbf_press_dpad(context, DPAD_LEFT, 151ms, 0ms);
-    pbf_wait(context, 549ms);
-    pbf_press_dpad(context, DPAD_LEFT, 118ms, 0ms);
-    pbf_wait(context, 500ms);
-    pbf_press_dpad(context, DPAD_UP, 206ms, 0ms);
-    pbf_wait(context, 474ms);
-    pbf_press_dpad(context, DPAD_UP, 249ms, 0ms);
-    pbf_wait(context, 333ms);
-    pbf_press_dpad(context, DPAD_UP, 212ms, 0ms);
-    pbf_wait(context, 427ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 511ms, 500ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 140ms, 500ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2093ms, 500ms);
+    pbf_press_dpad(context, DPAD_LEFT, 151ms, 549ms);
+    pbf_press_dpad(context, DPAD_LEFT, 118ms, 500ms);
+    pbf_press_dpad(context, DPAD_UP, 206ms, 474ms);
+    pbf_press_dpad(context, DPAD_UP, 249ms, 333ms);
+    pbf_press_dpad(context, DPAD_UP, 212ms, 427ms);
     pbf_press_dpad(context, DPAD_UP, 210ms, 0ms);
     context.wait_for_all_requests();
     //phase 26 Clown 3 dialog
@@ -1079,46 +1072,31 @@ tutorial_part_4_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     clown_dialog_helper(stream, context, DPAD_LEFT);
 
     context.wait_for_all_requests();
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 1098ms, 0ms);
-    pbf_wait(context, 500ms);
-    pbf_press_dpad(context, DPAD_LEFT, 177ms, 0ms);
-    pbf_wait(context, 488ms);
-    pbf_press_dpad(context, DPAD_LEFT, 200ms, 0ms);
-    pbf_wait(context, 649ms);
-    pbf_press_dpad(context, DPAD_LEFT, 160ms, 0ms);
-    pbf_wait(context, 500ms);
-    pbf_press_dpad(context, DPAD_DOWN, 307ms, 0ms);
-    pbf_wait(context, 639ms);
-    pbf_press_dpad(context, DPAD_DOWN, 463ms, 0ms);
-    pbf_wait(context, 500ms);
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 3600ms, 0ms);
-    pbf_wait(context, 610ms);
+    pbf_move_left_joystick(context, {1.000000, -0.000000}, 1098ms, 500ms);
+    pbf_press_dpad(context, DPAD_LEFT, 177ms, 488ms);
+    pbf_press_dpad(context, DPAD_LEFT, 200ms, 649ms);
+    pbf_press_dpad(context, DPAD_LEFT, 160ms, 500ms);
+    pbf_press_dpad(context, DPAD_DOWN, 307ms, 639ms);
+    pbf_press_dpad(context, DPAD_DOWN, 463ms, 500ms);
+    pbf_move_left_joystick(context, {1.000000, -0.000000}, 3600ms, 610ms);
     approach_poketch_landmarks(stream, context);
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 192ms, 0ms);
-    pbf_wait(context, 500ms);
+    pbf_move_left_joystick(context, {1.000000, -0.000000}, 192ms, 500ms);
     align_and_talk_to_poketch_man(stream, context);
 
     clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
     context.wait_for_all_requests();
 
     // poketech acquired
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1194ms, 0ms);
-    pbf_wait(context, 500ms);
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 832ms, 0ms);
-    pbf_wait(context, 500ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1194ms, 500ms);
+    pbf_move_left_joystick(context, {1.000000, -0.000000}, 832ms, 500ms);
     dpad.last_dir = DPAD_RIGHT;
     repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 1);
     align_and_enter_jubilife_center(stream, context);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 1099ms, 0ms);
-    pbf_wait(context, 500ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 228ms, 0ms);
-    pbf_wait(context, 625ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 238ms, 0ms);
-    pbf_wait(context, 537ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 210ms, 0ms);
-    pbf_wait(context, 566ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 179ms, 0ms);
-    pbf_wait(context, 692ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 1099ms, 500ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 228ms, 625ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 238ms, 537ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 210ms, 566ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 179ms, 692ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 642ms, 0ms);
 }
 // ---------------------------------------------------------------------------
@@ -1188,11 +1166,11 @@ void AutoStory_Checkpoint_0000::run_checkpoint(SingleSwitchProgramEnvironment& e
 
 void checkpoint_0000(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    AutoStoryOptions /*options*/,
+    AutoStoryOptions options,
     AutoStoryStats& /*stats*/){
     // Before any route movement or checkpoint save: fail visibly if
     // options cannot be read, rather than navigate with unknown settings.
-    verify_tutorial_settings(env.console, context);
+    verify_tutorial_settings(env.console, context, options.language);
     context.wait_for_all_requests();
 }
 

@@ -60,6 +60,10 @@ OverworldMatchResult match_route205_forest_entrance(const ImageRGB32& frame);
 OverworldMatchResult match_route204_floaroma_turn(const ImageRGB32& frame);
 OverworldMatchResult match_jubilife_street_approach(const ImageRGB32& frame);
 OverworldMatchResult match_jubilife_plaza_approach(const ImageRGB32& frame);
+// Grayscale sign alignment for a watched northward doorway entry.
+// dx/dy guide corrections on both axes. at_target requires horizontal
+// alignment and the exterior approach height.
+OverworldMatchResult match_jubilife_trainers_school_sign(const ImageRGB32& frame);
 OverworldMatchResult match_poketch_landmarks(const ImageRGB32& frame);
 OverworldMatchResult match_oreburgh_mart(const ImageRGB32& frame);
 // Two fixed gym features; reference pose is centered outside the doorway.
@@ -89,6 +93,7 @@ OverworldMatchResult match_galactic_hq_jupiter(const ImageRGB32& frame);
 OverworldMatchResult match_eterna_cycle_shop_entrance(const ImageRGB32& frame);
 OverworldMatchResult match_eterna_cycle_shop_interior(const ImageRGB32& frame);
 OverworldMatchResult match_eterna_cycle_shop_reward(const ImageRGB32& frame);
+// Language-independent Bike Riding card: grayscale illustration and B icon.
 OverworldMatchResult match_eterna_bike_riding_card(const ImageRGB32& frame);
 OverworldMatchResult match_eterna_cycle_shop_counter(const ImageRGB32& frame);
 OverworldMatchResult match_cycling_road_bridge_approach(const ImageRGB32& frame);
@@ -103,6 +108,8 @@ double overworld_entry_confidence(const OverworldMatchResult& result,
     double tolerance_y = 1.0 / 27,
     double minimum_margin = .15);
 OverworldMatchResult match_eterna_underground_house(const ImageRGB32& frame);
+// located/coarse may identify the room from three agreeing furniture anchors.
+// Only at_target confirms the precise four-anchor interaction pose.
 OverworldMatchResult match_eterna_underground_man(const ImageRGB32& frame);
 OverworldMatchResult match_route201_potion_exit(const ImageRGB32& frame);
 OverworldMatchResult match_sandgem_junction(const ImageRGB32& frame);

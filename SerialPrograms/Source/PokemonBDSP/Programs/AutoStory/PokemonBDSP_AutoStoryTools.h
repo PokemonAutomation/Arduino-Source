@@ -343,7 +343,8 @@ bool clear_new_item_flags(VideoStream& stream, ProControllerContext& context, in
         std::chrono::seconds(13), std::chrono::seconds(13),
         std::chrono::seconds(13), std::chrono::seconds(13)});
 bool bag_list_is_empty(const ImageViewRGB32& frame);
-int bag_cursor_position(const ImageViewRGB32& frame);
+// party_target reads the highlighted party card (1-6), not the item list.
+int bag_cursor_position(const ImageViewRGB32& frame, bool party_target = false);
 // Shared geometry and navigation for an already-open Bag, including in battle.
 ImageFloatBox bag_list_name_box(size_t row);
 bool bag_navigate_to_pocket(VideoStream& stream, ProControllerContext& context, int target);
@@ -383,8 +384,9 @@ BagPocketMovePlan plan_bag_pocket_move(int current, int target);
 
 // Starts in the overworld, opens the Bag, and leaves the requested item
 // highlighted. Navigates to the requested pocket, then searches its item rows.
-// Checks all seven visible rows and the cursor, then confirms the selected
-// item in the green header. Makes up to three passes per pocket.
+// Template mode checks all seven visible rows, with up to three passes.
+// OCR mode reads the selected row using item.label as a dictionary slug,
+// requires three confident reads, and searches Down then Up with bounded scans.
 // Limits report an incomplete search, not absence.
 // Returns false on missing frames, timeout, or no match; does not use an item.
 bool find_bag_item(VideoStream& stream,
@@ -394,10 +396,12 @@ bool find_bag_item(VideoStream& stream,
     int num_icons = 8,
     size_t max_scrolls_per_pocket = 512,
     std::chrono::milliseconds search_timeout = std::chrono::minutes(10),
-    bool bag_already_open = false);
+    bool bag_already_open = false,
+    Language ocr_language = Language::None);
 
-// Find Escape Rope, choose Use, and verify a transition back to the overworld.
-bool use_escape_rope(VideoStream& stream, ProControllerContext& context, int num_icons = 8);
+// Find Escape Rope by OCR, choose Use, and verify a transition to the overworld.
+// Read localized item names using the selected game language.
+bool use_escape_rope(VideoStream& stream, ProControllerContext& context, Language language, int num_icons = 8);
 
 // Reuse the tutorial's verified Jubilife Center alignment and entry.
 void align_and_enter_jubilife_center(VideoStream& stream, ProControllerContext& context);
@@ -405,8 +409,8 @@ void align_and_enter_jubilife_center(VideoStream& stream, ProControllerContext& 
 //  Open the bag, navigate to the repel compartment tab, and use a repel.
 //  Returns false if the repel compartment tab could not be found.
 //  num_icons: early/late menu layout (preserved for existing callers).
-//  repel_type: 0=Repel, 1=Super Repel, 2=Max Repel. English item names.
-bool activate_repel(VideoStream& stream, ProControllerContext& context, int num_icons = 8, int repel_type = 0);
+//  repel_type: 0=Repel, 1=Super Repel, 2=Max Repel.
+bool activate_repel(VideoStream& stream, ProControllerContext& context, Language language, int num_icons = 8, int repel_type = 0);
 
 //  Press A until the any HM selection arrow appears, confirm with A, then mash B for 3 s.
 void use_HM(VideoStream& stream, ProControllerContext& context, const std::string& label);
@@ -459,7 +463,7 @@ bool test_fly_locations(VideoStream& stream, ProControllerContext& context);
 void open_menu(VideoStream& stream, ProControllerContext& context, MenuCursorPosition target, int num_icons);
 
 // Optionally read the lead's level while verifying full HP in the Bag.
-void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context, uint8_t* level = nullptr);
+void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context, Language language, uint8_t* level = nullptr);
 
 enum class GearLevel {
     Fast,

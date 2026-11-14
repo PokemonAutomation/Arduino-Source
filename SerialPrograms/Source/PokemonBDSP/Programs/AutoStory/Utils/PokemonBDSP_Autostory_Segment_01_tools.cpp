@@ -90,8 +90,7 @@ static bool mine_confirm_escape_via_menu(VideoStream& stream, ProControllerConte
             detected = run_until<ProControllerContext>(stream,
                 context,
                 [](ProControllerContext& controller){
-                    pbf_press_button(controller, BUTTON_X, 160ms, 840ms);
-                    pbf_wait(controller, 3s);
+                    pbf_press_button(controller, BUTTON_X, 160ms, 3840ms);
                     controller.wait_for_all_requests();
                 },
                 {game_menu, battle_menu});
@@ -190,8 +189,7 @@ void escape_wild_battle(VideoStream& stream,
         const int result = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& controller){
-                pbf_press_button(controller, BUTTON_A, 60ms, 0ms);
-                pbf_wait(controller, 4s);
+                pbf_press_button(controller, BUTTON_A, 60ms, 4000ms);
                 controller.wait_for_all_requests();
             },
             {battle_end});

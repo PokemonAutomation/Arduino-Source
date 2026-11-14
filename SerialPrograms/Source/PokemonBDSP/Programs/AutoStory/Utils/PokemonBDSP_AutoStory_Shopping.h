@@ -63,7 +63,7 @@ struct ItemToBuy {
 bool buy_items(VideoStream& stream,
     ProControllerContext& context,
     const std::vector<ItemToBuy>& items,
-    Language language = Language::English,
+    Language language,
     DpadPosition search_direction = DPAD_DOWN);
 
 

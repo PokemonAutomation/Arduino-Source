@@ -16,12 +16,13 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/Images/ImageManip.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 
@@ -108,52 +109,80 @@ void handle_unexpected_battle(const ProgramInfo& info,
 
 
 // ---------------------------------------------------------------------------
-//  Internal helpers for handle_battle_with_outside_help
+//  Shared PP OCR and helpers for the retained battle planners
 // ---------------------------------------------------------------------------
 
 static constexpr int TORTERRA_ATK = 238;
 static constexpr int TORTERRA_SPATK = 170;
 
-//  ⚠️ Estimated PP regions (fight menu, 2×2 move grid); require calibration.
-static const ImageFloatBox PP_BOX[4] = {
-    {0.36, 0.590, 0.10, 0.060},
-    {0.75, 0.590, 0.10, 0.060},
-    {0.36, 0.730, 0.10, 0.060},
-    {0.75, 0.730, 0.10, 0.060},
-};
-
 static int ocr_pp_slot(Logger& logger, Language language, const ImageViewRGB32& frame, const ImageFloatBox& box){
-    ImageViewRGB32 region = extract_box_reference(frame, box);
-    std::string text = OCR::ocr_read(language, region, OCR::PageSegMode::SINGLE_LINE);
-    text.erase(0, text.find_first_not_of(" \t\r\n"));
-    if (!text.empty()){
-        text.erase(text.find_last_not_of(" \t\r\n") + 1);
-    }
-
-    size_t slash = text.find('/');
-    std::string num_str = (slash != std::string::npos) ? text.substr(0, slash) : text;
-    size_t digit_pos = num_str.find_first_of("0123456789");
-    if (digit_pos == std::string::npos){
-        logger.log("PP OCR: no digit in \"" + text + "\"", COLOR_YELLOW);
+    if (!frame){
         return -1;
     }
-    try {
-        return std::stoi(num_str.substr(digit_pos));
-    } catch (...){
-        logger.log("PP OCR: parse failed \"" + num_str + "\"", COLOR_YELLOW);
-        return -1;
+    // Padding separates digits from panel borders; wider text and a white-background
+    // filter recover narrow or highlighted numerals without guessing missing digits.
+    for (size_t variant = 0; variant < 4; variant++){
+        ImageFloatBox crop_box = box;
+        if (variant > 0){
+            crop_box.x += 0.005;
+            crop_box.width -= 0.0145;
+        }
+        const auto region = extract_box_reference(frame, crop_box);
+        if (!region || region.height() == 0){
+            return -1;
+        }
+        const size_t height = variant == 3 ? 64 : 48;
+        const auto filtered = variant == 3
+            ? to_blackwhite_rgb32_range(region, false, 0xffc0c0c0, 0xffffffff) : region.copy();
+        const size_t width = filtered.width() * height / filtered.height();
+        const auto enlarged = filtered.scale_to(variant == 2 ? width * 3 / 2 : width, height);
+        ImageRGB32 padded(enlarged.width() + 10, enlarged.height() + 10);
+        padded.fill(0xffffffff);
+        for (size_t y = 0; y < enlarged.height(); y++){
+            for (size_t x = 0; x < enlarged.width(); x++){
+                padded.pixel(x + 5, y + 5) = enlarged.pixel(x, y);
+            }
+        }
+        const std::string text = OCR::ocr_read(language, padded, OCR::PageSegMode::SINGLE_LINE);
+        std::string digits;
+        for (char c : text){
+            if (c != ' ' && c != '\n' && c != '\r' && c != '\t'){
+                digits += c;
+            }
+        }
+        const size_t slash = digits.find('/');
+        if (slash == std::string::npos || slash == 0 || slash > 2 ||
+            slash + 1 >= digits.size() || digits.size() - slash - 1 > 2 ||
+            digits.find('/', slash + 1) != std::string::npos ||
+            digits.find_first_not_of("0123456789/") != std::string::npos){
+            logger.log("[PP OCR] Unreadable current/max: " + text, COLOR_ORANGE);
+            continue;
+        }
+        const int current = std::atoi(digits.substr(0, slash).c_str());
+        const int maximum = std::atoi(digits.substr(slash + 1).c_str());
+        if (maximum < 1 || maximum > 64 || current > maximum){
+            continue;
+        }
+        return current;
     }
+    return -1;
 }
 
-static std::array<int, 4> read_all_pp(Logger& logger, VideoStream& stream, Language language){
-    VideoSnapshot frame = stream.video().snapshot();
-    std::array<int, 4> result;
-    for (int i = 0; i < 4; i++){
-        result[i] = ocr_pp_slot(logger, language, frame, PP_BOX[i]);
+std::array<int, 4> read_all_pp(Logger& logger, const ImageViewRGB32& frame){
+    std::array<int, 4> result{-1, -1, -1, -1};
+    const auto moves = detect_battle_move_menu(frame);
+    for (size_t i = 0; i < moves.move_count; i++){
+        const auto& button = moves.buttons[i];
+        const double center = button.y + button.height / 2;
+        // PP is numeric in every language; locate rows from the actual Fight menu.
+        result[i] = ocr_pp_slot(logger, Language::English, frame,
+            ImageFloatBox{0.918, center - 0.020, 0.058, 0.040});
     }
     return result;
 }
 
+// Damage scoring is retained for future unassisted planning; only the unused
+// battle planners below call it. The PP OCR above remains in active use.
 static std::pair<int, int> damage_range(int level, int base_power, int atk, int def, double type_mult){
     if (base_power == 0){
         return {0, 0};
@@ -237,6 +266,9 @@ static void navigate_to_slot(ProControllerContext& context, int slot){
 //  handle_battle_with_outside_help
 // ---------------------------------------------------------------------------
 
+// Not called by current story routes. Retained for future unassisted planning;
+// validate the game data and replace the fixed Torterra assumptions before reuse.
+// The assisted route currently uses fight_trainer_using_moves().
 void handle_battle_with_outside_help(const ProgramInfo& /*info*/,
     VideoStream& stream,
     ProControllerContext& context,
@@ -284,7 +316,7 @@ void handle_battle_with_outside_help(const ProgramInfo& /*info*/,
 
         // OCR current PP
         {
-            auto ocr_pp = read_all_pp(logger, stream, options.language);
+            auto ocr_pp = read_all_pp(logger, stream.video().snapshot());
             for (int i = 0; i < 4; i++){
                 if (ocr_pp[i] >= 0){
                     pp_remaining[i] = ocr_pp[i];
@@ -412,42 +444,93 @@ void handle_battle_with_outside_help(const ProgramInfo& /*info*/,
 
 
 // ---------------------------------------------------------------------------
-//  Internal helpers for handle_expert_battle
+//  Shared HP/item handling and helpers for the retained expert planner
 // ---------------------------------------------------------------------------
-
-// Singles command-screen HP bar, excluding the HP label and border.
-static const ImageFloatBox PLAYER_HP_BAR{0.046, 0.883, 0.200, 0.012};
 
 //  ⚠️ Estimated player-side status badge region — calibrate against a real capture.
 static const ImageFloatBox PLAYER_STATUS_BOX{0.140, 0.710, 0.080, 0.018};
 
-//  Returns the fraction [0.0, 1.0] of the player's HP bar that is filled.
-//  Scans each pixel column; a column with high colour saturation counts as "HP present".
-double read_player_hp_ratio(const ImageViewRGB32& frame){
-    BattleMenuDetector commands(BattleType::TRAINER, COLOR_RED);
-    if (!commands.detect(frame) || !is_white(extract_box_reference(frame, ImageFloatBox{0.12, 0.910, 0.12, 0.025}))){
+// Digits are read only on a confirmed command menu. Slot is a battlefield
+// position, not the command owner or a persistent Pokemon identity.
+double read_player_hp_ratio(const ImageViewRGB32& frame,
+    BattleHPLayout layout, size_t slot, BattleHPReading* reading){
+    if (reading){
+        *reading = {};
+    }
+    if (!frame || slot < 1 || slot > 2 || (layout == BattleHPLayout::SINGLES && slot != 1)){
         return -1;
     }
-    ImageViewRGB32 strip = extract_box_reference(frame, PLAYER_HP_BAR);
-    int total = (int)strip.width();
-    int mid_row = (int)(strip.height() / 2);
-    if (total <= 0){
+    const bool own_partner = layout == BattleHPLayout::OWN_PARTNER;
+    BattleMenuDetector commands(BattleType::TRAINER, COLOR_RED, own_partner);
+    if (!commands.detect(frame)){
         return -1;
     }
-
-    int colored_cols = 0;
-    for (int x = 0; x < total; x++){
-        uint32_t px = strip.pixel(x, mid_row);
-        uint8_t r = (px >> 16) & 0xFF;
-        uint8_t g = (px >> 8) & 0xFF;
-        uint8_t b = px & 0xFF;
-        int mx = std::max({(int)r, (int)g, (int)b});
-        int mn = std::min({(int)r, (int)g, (int)b});
-        if (mx - mn > 30){
-            colored_cols++;
+    size_t owner = 1;
+    if (own_partner){
+        // A lone survivor is not necessarily the original lead. Reacquiring
+        // its identity after fainting/switching remains an unassisted-route test.
+        if (!is_white(extract_box_reference(frame, ImageFloatBox{0.505, 0.905, 0.010, 0.005}))){
+            return -1;
+        }
+        owner = commands.active_player(frame);
+        if (owner == 0){
+            return -1;
         }
     }
-    return (double)colored_cols / total;
+    const bool raised = layout != BattleHPLayout::SINGLES && slot == owner;
+    const double dx = slot == 2 ? 0.265 : 0.0;
+    const double dy = raised ? -0.014 : 0.0;
+    if (!is_white(extract_box_reference(frame, ImageFloatBox{0.12 + dx, 0.927 + dy, 0.12, 0.009}))){
+        return -1;
+    }
+    const auto crop = extract_box_reference(frame, ImageFloatBox{0.020 + dx, 0.904 + dy, 0.085, 0.035});
+    if (crop.height() == 0){
+        return -1;
+    }
+    // Enlarged original-color numbers outperformed thresholded text in the
+    // recorded tests. English OCR reads digits/slash, not localized item names.
+    const ImageRGB32 enlarged = crop.scale_to(crop.width() * 48 / crop.height(), 48);
+    const std::string text = OCR::tesseract_ocr_read(Language::English, enlarged, OCR::PageSegMode::SINGLE_WORD);
+    std::string digits;
+    for (char c : text){
+        if (c != ' ' && c != '\n' && c != '\r' && c != '\t'){
+            digits += c;
+        }
+    }
+    const size_t slash = digits.find('/');
+    if (slash == std::string::npos || slash == 0 || slash > 3 ||
+        slash + 1 >= digits.size() || digits.size() - slash - 1 > 3 ||
+        digits.find('/', slash + 1) != std::string::npos ||
+        digits.find_first_not_of("0123456789/") != std::string::npos){
+        return -1;
+    }
+    const int current = std::atoi(digits.substr(0, slash).c_str());
+    const int maximum = std::atoi(digits.substr(slash + 1).c_str());
+    if (maximum <= 0 || current > maximum){
+        return -1;
+    }
+    const double ratio = static_cast<double>(current) / maximum;
+    const auto strip = extract_box_reference(frame, ImageFloatBox{0.046 + dx, 0.883 + dy, 0.200, 0.012});
+    if (strip.width() == 0 || strip.height() == 0){
+        return -1;
+    }
+    size_t colored = 0;
+    for (size_t x = 0; x < strip.width(); x++){
+        const uint32_t pixel = strip.pixel(x, strip.height() / 2);
+        const int r = (pixel >> 16) & 255;
+        const int g = (pixel >> 8) & 255;
+        const int b = pixel & 255;
+        colored += std::max({r, g, b}) - std::min({r, g, b}) > 30;
+    }
+    // A coarse cross-check catches plausible missing/changed OCR digits.
+    // The measured command-frame bar error was below one percentage point.
+    if (std::abs(ratio - static_cast<double>(colored) / strip.width()) > 0.05){
+        return -1;
+    }
+    if (reading){
+        *reading = {current, maximum, owner};
+    }
+    return ratio;
 }
 
 //  Returns true if a coloured status badge is visible on the player's active pokemon.
@@ -462,8 +545,10 @@ static void use_item_in_open_bag(VideoStream& stream,
     Language language,
     const std::string& item_slug,
     int pocket,
-    bool select_first_pokemon,
-    bool outside_battle = false){
+    size_t target_party_slot,
+    bool outside_battle = false,
+    bool own_partner = false,
+    size_t command_owner = 1){
     if (!bag_navigate_to_pocket(stream, context, pocket)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Battle item: requested pocket was not confirmed.", stream);
@@ -516,7 +601,33 @@ static void use_item_in_open_bag(VideoStream& stream,
             "Battle item: Use menu not confirmed for " + item_slug + ".", stream);
     }
     pbf_press_button(context, BUTTON_A, 80ms, 300ms);
-    if (select_first_pokemon){
+    if (target_party_slot != 0){
+        size_t stable_target = 0;
+        DpadState dpad;
+        for (size_t check = 0; check < 40 && stable_target < 3; check++){
+            context.wait_for_all_requests();
+            const auto frame = stream.video().snapshot();
+            const int selected = frame && bag_pocket_position(frame) != 0 ? bag_cursor_position(frame, true) : 0;
+            if (selected == static_cast<int>(target_party_slot)){
+                stable_target++;
+                pbf_wait(context, 100ms);
+            }else{
+                stable_target = 0;
+                if (selected == 0){
+                    pbf_wait(context, 100ms);
+                }else{
+                    repeat_dpad(context, dpad,
+                        selected < static_cast<int>(target_party_slot) ? DPAD_DOWN : DPAD_UP,
+                        80ms, 300ms, 1, false);
+                }
+            }
+        }
+        if (stable_target < 3){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Battle item: party target " + std::to_string(target_party_slot) +
+                    " was not confirmed; no target confirmation sent.", stream);
+        }
+        stream.log("[Battle item] Confirmed party target " + std::to_string(target_party_slot) + ".");
         pbf_press_button(context, BUTTON_A, 80ms, 800ms);
     }
     if (outside_battle){
@@ -524,17 +635,21 @@ static void use_item_in_open_bag(VideoStream& stream,
         context.wait_for_all_requests();
         return;
     }
-    // X items act on the active Pokemon without a party-target selection.
-    // Require the Bag to close into battle narration; never send another A
-    // on a returned command menu and accidentally select a move.
+    // Singles X items apply directly; own-party doubles require target selection.
+    // An item can return to the other player's command before turn narration.
+    // Never send another A on that menu or B that cancels a queued action.
     BattleDialogDetector narration;
+    BattleMenuDetector commands(BattleType::TRAINER, COLOR_RED, own_partner);
     size_t stable = 0;
     for (size_t check = 0; check < 50; check++){
         context.wait_for_all_requests();
         const auto frame = stream.video().snapshot();
-        if (frame && bag_pocket_position(frame) == 0 && narration.detect(frame)){
+        const size_t next_owner = own_partner && frame ? commands.active_player(frame) : 0;
+        const bool next_command = next_owner != 0 && next_owner != command_owner;
+        if (frame && bag_pocket_position(frame) == 0 && (narration.detect(frame) || next_command)){
             if (++stable >= 3){
-                stream.log("[Battle item] Submitted " + item_slug + "; awaiting the opponent's turn.");
+                stream.log("[Battle item] Submitted " + item_slug + "; " +
+                    (next_command ? "next player command confirmed." : "battle narration confirmed."));
                 return;
             }
         }else{
@@ -548,13 +663,15 @@ static void use_item_in_open_bag(VideoStream& stream,
 
 // BDSP's battle commands are vertical. Confirm the highlighted command before
 // opening Bag rather than relying on a remembered cursor position.
-static void open_battle_bag(VideoStream& stream, ProControllerContext& context){
-    BattleMenuDetector commands(BattleType::TRAINER, COLOR_RED);
+static void open_battle_bag(VideoStream& stream, ProControllerContext& context,
+    bool own_partner, size_t command_owner){
+    BattleMenuDetector commands(BattleType::TRAINER, COLOR_RED, own_partner);
     size_t stable = 0;
     for (size_t check = 0; check < 30 && stable < 3; check++){
         context.wait_for_all_requests();
         const auto frame = stream.video().snapshot();
-        const auto selected = frame ? commands.selected_option(frame) : BattleMenuOption::UNKNOWN;
+        const bool correct_owner = frame && (!own_partner || commands.active_player(frame) == command_owner);
+        const auto selected = correct_owner ? commands.selected_option(frame) : BattleMenuOption::UNKNOWN;
         if (selected == BattleMenuOption::BAG){
             stable++;
             pbf_wait(context, 100ms);
@@ -580,7 +697,15 @@ void use_item_in_battle(VideoStream& stream,
     ProControllerContext& context,
     Language language,
     const std::string& item_slug,
-    bool after_battle){
+    bool after_battle,
+    BattleHPLayout layout,
+    size_t target_party_slot,
+    size_t expected_command_owner){
+    if (language == Language::None || target_party_slot < 1 || target_party_slot > 6 ||
+        (after_battle && (target_party_slot != 1 || layout != BattleHPLayout::SINGLES))){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Battle item: invalid language, party target, or post-battle mode.", stream);
+    }
     if (after_battle){
         if (item_slug != "full-restore" || language == Language::None){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
@@ -589,6 +714,11 @@ void use_item_in_battle(VideoStream& stream,
         for (size_t pass = 0; pass < 2; pass++){
             open_menu(stream, context, MenuCursorPosition::BAG, 5);
             pbf_wait(context, 750ms);
+            // The Bag remembers its pocket. TMs show compatibility instead of HP.
+            if (!bag_navigate_to_pocket(stream, context, 1)){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Post-battle healing: Medicine pocket not confirmed; cannot read HP.", stream);
+            }
             int hp_current = -1;
             int hp_maximum = -1;
             size_t stable = 0;
@@ -601,15 +731,15 @@ void use_item_in_battle(VideoStream& stream,
                 int observed_maximum = -1;
                 bool conflicting = false;
                 std::string reading = "pocket=" + std::to_string(pocket);
-                if (pocket != 0){
-                    // The Bag HP numbers are white on blue. Use the existing
-                    // white-text filters to tolerate capture brightness changes.
-                    // Valid filters must agree on both numbers, not just their ratio.
+                if (pocket == 1){
+                    // Only the HP fraction belongs in this crop; nearby panel edges
+                    // can be read as punctuation. Pad the filtered digits for line OCR.
+                    const auto hp_box = extract_box_reference(frame, ImageFloatBox{0.103, 0.181, 0.104, 0.039});
                     for (const auto& range : OCR::WHITE_TEXT_FILTERS()){
-                        const std::string text = OCR::tesseract_ocr_read(language,
-                            to_blackwhite_rgb32_range(
-                                extract_box_reference(frame, ImageFloatBox{0.108, 0.180, 0.150, 0.040}),
-                                true, range.mins, range.maxs), OCR::PageSegMode::SINGLE_WORD);
+                        const auto filtered = to_blackwhite_rgb32_range(hp_box, true, range.mins, range.maxs);
+                        const auto padded = pad_image(filtered, filtered.height() / 4, 0xffffffff);
+                        const std::string text = OCR::tesseract_ocr_read(Language::English, padded,
+                            OCR::PageSegMode::SINGLE_LINE);
                         std::string digits;
                         for (char c : text){
                             if (c != ' ' && c != '\n' && c != '\r' && c != '\t'){
@@ -674,7 +804,7 @@ void use_item_in_battle(VideoStream& stream,
                 return;
             }
             stream.log("[League healing] Starter below full HP; using Full Restore.");
-            use_item_in_open_bag(stream, context, language, "full-restore", 1, true, true);
+            use_item_in_open_bag(stream, context, language, "full-restore", 1, 1, true);
             OverworldWatcher overworld;
             if (wait_until(stream, context, 10s, {{overworld}}) != 0){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
@@ -686,9 +816,44 @@ void use_item_in_battle(VideoStream& stream,
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Battle item: unsupported item " + item_slug + ".", stream);
     }
-    open_battle_bag(stream, context);
+    const bool own_partner = layout == BattleHPLayout::OWN_PARTNER;
+    const bool healing = item_slug == "full-restore";
+    if (!healing && ((!own_partner && target_party_slot != 1) ||
+        (own_partner && target_party_slot > 2))){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Battle item: X-item target must be a confirmed active party slot; switching is not yet supported.", stream);
+    }
+    size_t command_owner = 1;
+    if (own_partner){
+        BattleMenuDetector commands(BattleType::TRAINER, COLOR_RED, true);
+        size_t stable = 0;
+        command_owner = 0;
+        for (size_t check = 0; check < 20 && stable < 3; check++){
+            context.wait_for_all_requests();
+            const auto frame = stream.video().snapshot();
+            const bool two_panels = frame && is_white(extract_box_reference(frame,
+                ImageFloatBox{0.505, 0.905, 0.010, 0.005}));
+            const size_t observed = two_panels ? commands.active_player(frame) : 0;
+            stable = observed != 0 ? (observed == command_owner ? stable + 1 : 1) : 0;
+            command_owner = observed;
+            if (stable < 3){
+                pbf_wait(context, 100ms);
+            }
+        }
+        if (stable < 3 || (expected_command_owner != 0 && expected_command_owner != command_owner)){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Battle item: double-battle command owner not confirmed; Bag not opened.", stream);
+        }
+    }else if (expected_command_owner > 1){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Battle item: only the player's command is available in this layout.", stream);
+    }
+    stream.log("[Battle item] Command owner " + std::to_string(command_owner) +
+        ", requested party target " + std::to_string(target_party_slot) + ": " + item_slug + ".");
+    open_battle_bag(stream, context, own_partner, command_owner);
     use_item_in_open_bag(stream, context, language, item_slug,
-        item_slug == "full-restore" ? 1 : 3, item_slug == "full-restore");
+        healing ? 1 : 3, healing || own_partner ? target_party_slot : 0,
+        false, own_partner, command_owner);
 }
 
 
@@ -915,6 +1080,9 @@ static void update_on_field(Logger& logger,
 }
 
 
+// Not called by current story routes. Retained with its planning helpers for
+// future unassisted move selection and PP budgeting. Validate the data and
+// damage model, and adapt the level-100 Torterra assumptions before enabling it.
 void handle_expert_battle(const ProgramInfo& /*info*/,
     VideoStream& stream,
     ProControllerContext& context,
@@ -986,14 +1154,35 @@ void handle_expert_battle(const ProgramInfo& /*info*/,
 
         // 1. Check HP / status → use Full Restore if needed
         {
-            VideoSnapshot frame = stream.video().snapshot();
-            double hp = read_player_hp_ratio(frame);
+            const BattleHPLayout layout = doubles ? BattleHPLayout::NPC_PARTNER : BattleHPLayout::SINGLES;
+            double hp = -1;
+            BattleHPReading hp_reading;
+            WallClock last_hp_frame = WallClock::min();
+            size_t stable_hp = 0;
+            VideoSnapshot frame;
+            for (size_t check = 0; check < 20 && stable_hp < 3; check++){
+                context.wait_for_all_requests();
+                frame = stream.video().snapshot();
+                BattleHPReading observed_reading;
+                hp = frame && frame.timestamp > last_hp_frame
+                    ? read_player_hp_ratio(frame, layout, 1, &observed_reading) : -1;
+                stable_hp = hp > 0 ? (observed_reading == hp_reading ? stable_hp + 1 : 1) : 0;
+                hp_reading = observed_reading;
+                last_hp_frame = frame.timestamp;
+                if (stable_hp < 3){
+                    pbf_wait(context, 100ms);
+                }
+            }
+            if (stable_hp < 3){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Expert battle: HP not confirmed; no item or attack selected.", stream);
+            }
             bool has_status = detect_player_status(frame);
             if (hp < 0.33 || has_status){
                 logger.log("Full Restore needed (HP=" + std::to_string((int)(hp * 100)) +
                     "%, status=" + (has_status ? "yes" : "no") + ")",
                     COLOR_WHITE);
-                use_item_in_battle(stream, context, options.language, "full-restore");
+                use_item_in_battle(stream, context, options.language, "full-restore", false, layout, 1);
                 BattleMenuWatcher commands(BattleType::TRAINER, COLOR_RED);
                 if (run_until<ProControllerContext>(stream, context,
                     [](ProControllerContext& ctx){
@@ -1011,7 +1200,7 @@ void handle_expert_battle(const ProgramInfo& /*info*/,
         context.wait_for_all_requests();
         context.wait_for(300ms);
         {
-            auto ocr_pp = read_all_pp(logger, stream, options.language);
+            auto ocr_pp = read_all_pp(logger, stream.video().snapshot());
             for (int i = 0; i < 4; i++){
                 if (ocr_pp[i] >= 0){
                     pp_remaining[i] = ocr_pp[i];

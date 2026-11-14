@@ -140,7 +140,7 @@ static bool go_through_jubilife_west_exit(VideoStream& stream, ProControllerCont
     return true;
 }
 
-static bool go_through_route_218(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
+static bool go_through_route_218(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, Language language){
     DpadState dpad;
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
@@ -153,7 +153,7 @@ static bool go_through_route_218(VideoStream& stream, ProControllerContext& cont
     pbf_move_left_joystick(context, {-1, 0}, 1800ms, 100ms); // 9+
     pbf_move_left_joystick(context, {0, +1}, 1800ms, 100ms); // 9+
     context.wait_for_all_requests();
-    activate_repel(stream, context);
+    activate_repel(stream, context, language);
     pbf_mash_button(context, BUTTON_A, 2000ms);
     context.wait_for_all_requests();
     pbf_wait(context, 6000ms);
@@ -569,8 +569,7 @@ static void return_to_canalave_gym_entrance(VideoStream& stream, ProControllerCo
 
     stream.log("[Canalave Gym return] Returning from Byron to the inside entrance.");
     // Preserve the opening input and settling pause.
-    pbf_move_right_joystick(context, {0, 1}, 146ms, 0ms);
-    pbf_wait(context, 3617ms);
+    pbf_move_right_joystick(context, {0, 1}, 146ms, 3617ms);
     context.wait_for_all_requests();
 
     DpadState dpad;
@@ -727,7 +726,7 @@ void checkpoint_0602(SingleSwitchProgramEnvironment& env,
                     "06.02: Jubilife west gate exit did not complete.",
                     env.console);
             }
-            if (!go_through_route_218(env.console, context, stats)){
+            if (!go_through_route_218(env.console, context, stats, options.language)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "06.02: Route 218 crossing did not complete.",
                     env.console);

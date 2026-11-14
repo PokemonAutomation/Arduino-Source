@@ -40,6 +40,7 @@
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_ShopItemNameReader.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_TransitionWatchers.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
@@ -714,11 +715,11 @@ static double confirmed_potion_hp(VideoStream& stream, ProControllerContext& con
         stream);
 }
 
-void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context, uint8_t* level){
+void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context, Language language, uint8_t* level){
     OverlayBoxScope hp_overlay(stream.overlay(), COLOR_GREEN, {0.137, 0.160, 0.202, 0.016}, "");
     BagItemTemplate potion;
     potion.reference_path = "PokemonBDSP/Autostory/Bag_Potion.png";
-    potion.label = "Potion";
+    potion.label = "potion";
     potion.reference_row = 1;
     open_menu(stream, context, MenuCursorPosition::BAG, 5);
     pbf_wait(context, 1000ms);
@@ -729,7 +730,7 @@ void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context
                 "Potion: Slot 1 appears fainted; a Potion cannot revive it.", stream);
         }
         stream.log("[Potion] Finding Potion; dose " + std::to_string(dose + 1) + "/3.");
-        if (!find_bag_item(stream, context, potion, 1, 5, 64, 45s, true)){
+        if (!find_bag_item(stream, context, potion, 1, 5, 64, 45s, true, language)){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 "Potion: Could not verify Potion in the Medicine pocket.", stream);
         }
@@ -1092,9 +1093,40 @@ void open_menu(VideoStream& stream, ProControllerContext& context, MenuCursorPos
 
 // One narrow strip on the left side of the red selection border. Divide its
 // height into the seven row bands; the item's art and NEW badge are outside it.
-int bag_cursor_position(const ImageViewRGB32& frame){
+int bag_cursor_position(const ImageViewRGB32& frame, bool party_target){
     if (!frame){
         return 0;
+    }
+    if (party_target){
+        // Target selection outlines a party card, not an item-list row.
+        // The right edge avoids the Pokemon artwork and changing HP digits.
+        double best = 0.0;
+        double second = 0.0;
+        int position = 0;
+        for (int row = 0; row < 6; row++){
+            const auto patch = extract_box_reference(frame,
+                ImageFloatBox{0.356, 0.137 + row * 0.137, 0.004, 0.040});
+            size_t red = 0;
+            for (size_t y = 0; y < patch.height(); y++){
+                for (size_t x = 0; x < patch.width(); x++){
+                    const uint32_t pixel = patch.pixel(x, y);
+                    const int r = (pixel >> 16) & 255;
+                    const int g = (pixel >> 8) & 255;
+                    const int b = pixel & 255;
+                    red += r > 150 && r > g + 45 && r > b + 45;
+                }
+            }
+            const size_t total = patch.width() * patch.height();
+            const double score = total == 0 ? 0.0 : static_cast<double>(red) / total;
+            if (score > best){
+                second = best;
+                best = score;
+                position = row + 1;
+            }else if (score > second){
+                second = score;
+            }
+        }
+        return best >= 0.15 && best - second >= 0.10 ? position : 0;
     }
     const ImageViewRGB32 strip = extract_box_reference(frame, ImageFloatBox(0.431, 0.229, 0.005, 0.470));
     double best = 0.0;
@@ -1442,7 +1474,8 @@ bool find_bag_item(VideoStream& stream,
     int num_icons,
     size_t max_scrolls_per_pocket,
     std::chrono::milliseconds search_timeout,
-    bool bag_already_open){
+    bool bag_already_open,
+    Language ocr_language){
     if (target_pocket < 1 || target_pocket > 8 || item.reference_row < 1 || item.reference_row > 7){
         stream.log("[Bag search] Invalid template reference row.", COLOR_ORANGE);
         return false;
@@ -1454,7 +1487,7 @@ bool find_bag_item(VideoStream& stream,
     //     const ImageRGB32 reference_name = extract_box_reference(
     //         *reference, bag_list_name_box(item.reference_row)
     //     ).copy();
-    ImageMatchDetector bag(reference, ImageFloatBox(0.055, 0.012, 0.044, 0.045), 35.0, true);
+    ImageMatchDetector bag(reference, ImageFloatBox(0.365, 0.22, 0.055, 0.10), 35.0, true);
     const auto deadline = std::chrono::steady_clock::now() + search_timeout;
 
     if (!bag_already_open){
@@ -1464,6 +1497,73 @@ bool find_bag_item(VideoStream& stream,
     context.wait_for_all_requests();
 
     if (!bag_navigate_to_pocket(stream, context, target_pocket)){
+        return false;
+    }
+    if (ocr_language != Language::None){
+        size_t commands = 0;
+        for (DpadPosition direction : {DPAD_DOWN, DPAD_UP}){
+            size_t confirmed = 0;
+            size_t unknown_cursor = 0;
+            int first_cursor = 0;
+            ImageRGB32 first_page;
+            for (size_t scan = 0; scan < 64 && std::chrono::steady_clock::now() < deadline; scan++){
+                context.wait_for_all_requests();
+                const VideoSnapshot frame = stream.video().snapshot();
+                // Verify the shared panel border and pocket without localized text or gender-specific icons.
+                const int pocket = frame ? bag_pocket_position(frame) : 0;
+                if (!frame || !bag.detect(frame) || pocket != target_pocket){
+                    stream.log("[Bag OCR] Pocket " + std::to_string(pocket) + ", expected " +
+                        std::to_string(target_pocket) + "; Bag layout/pocket check failed.", COLOR_ORANGE);
+                    return false;
+                }
+                if (bag_list_is_empty(frame)){
+                    return false;
+                }
+                const int cursor = bag_cursor_position(frame);
+                if (cursor == 0){
+                    confirmed = 0;
+                    if (++unknown_cursor >= 3){
+                        stream.log("[Bag OCR] Cursor location uncertain.", COLOR_ORANGE);
+                        return false;
+                    }
+                    pbf_wait(context, 150ms);
+                    continue;
+                }
+                unknown_cursor = 0;
+                auto result = ShopItemNameReader::instance().read_substring(
+                    stream.logger(), ocr_language, extract_box_reference(frame, bag_list_name_box(cursor)));
+                result.clear_beyond_log10p(ShopItemNameReader::MAX_LOG10P);
+                const bool matches = result.results.size() == 1 &&
+                    result.results.begin()->second.token == item.label;
+                if (matches){
+                    if (++confirmed >= 3){
+                        stream.log("[Bag OCR] " + item.label + " confirmed in row " +
+                            std::to_string(cursor) + ".", COLOR_GREEN);
+                        return true;
+                    }
+                    pbf_wait(context, 150ms);
+                    continue;
+                }
+                confirmed = 0;
+                const ImageRGB32 page =
+                    extract_box_reference(frame, ImageFloatBox(0.449, 0.212, 0.378, 0.500)).scale_to(378, 500);
+                if (first_page && cursor == first_cursor && ImageMatch::pixel_RMSD(first_page, page) <= 3.0){
+                    stream.log("[Bag OCR] Returned to the starting page; ending this direction.");
+                    break;
+                }
+                if (!first_page){
+                    first_cursor = cursor;
+                    first_page = page.copy();
+                }
+                if (commands >= max_scrolls_per_pocket || std::chrono::steady_clock::now() >= deadline){
+                    stream.log("[Bag OCR] Limit reached; search incomplete.", COLOR_ORANGE);
+                    return false;
+                }
+                commands++;
+                pbf_press_dpad(context, direction, 80ms, 300ms);
+            }
+        }
+        stream.log("[Bag OCR] Could not confirm " + item.label + "; no item selected.", COLOR_ORANGE);
         return false;
     }
     // Previously searched all eight pockets. Only inspect the requested pocket now.
@@ -1644,11 +1744,11 @@ bool find_bag_item(VideoStream& stream,
     return false;
 }
 
-bool use_escape_rope(VideoStream& stream, ProControllerContext& context, int num_icons){
+bool use_escape_rope(VideoStream& stream, ProControllerContext& context, Language language, int num_icons){
     const BagItemTemplate rope{// "PokemonBDSP/AutoStory/Bag_EscapeRope.png", "escape-rope"
         "PokemonBDSP/Autostory/Bag_EscapeRope.png",
         "escape-rope"};
-    if (!find_bag_item(stream, context, rope, 5, num_icons)){
+    if (!find_bag_item(stream, context, rope, 5, num_icons, 128, 60s, false, language)){
         return false;
     }
 
@@ -1707,7 +1807,7 @@ bool use_escape_rope(VideoStream& stream, ProControllerContext& context, int num
 }
 
 
-bool activate_repel(VideoStream& stream, ProControllerContext& context, int num_icons, int repel_type){
+bool activate_repel(VideoStream& stream, ProControllerContext& context, Language language, int num_icons, int repel_type){
     static const char* const slugs[] = {"repel", "super-repel", "max-repel"};
     if (repel_type < 0 || repel_type > 2){
         stream.log("activate_repel: type must be 0 (Repel), 1 (Super Repel), or 2 (Max Repel).", COLOR_RED);
@@ -1715,100 +1815,11 @@ bool activate_repel(VideoStream& stream, ProControllerContext& context, int num_
     }
     const std::string slug = slugs[repel_type];
     stream.log("Activating " + slug);
-    open_menu(stream, context, MenuCursorPosition::BAG, num_icons);
-    context.wait_for_all_requests();
-    pbf_wait(context, 1000ms);
-
-    auto repel_tab_ref = std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/Autostory/Bag_RepelTab.png");
-    // A smaller reference covers capture-resize sampling differences without
-    // loosening the match threshold or changing shared image processing.
-    auto repel_tab_small_ref =
-        std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/Autostory/Bag_RepelTabSmall.png");
-    // Obtaining Honey adds a NEW badge to the same selected Other Items tab.
-    // Keep the original references and threshold for the earlier route stages.
-    auto repel_tab_honey_ref =
-        std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/Autostory/Bag_RepelTabHoney.png");
-    auto repel_tab_honey_small_ref =
-        std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/Autostory/Bag_RepelTabHoneySmall.png");
-    const ImageFloatBox repel_tab_box{0.735000, 0.055000, 0.045000, 0.080000};
-    const double repel_tab_rmsd = 50.0;
-
-    // BDSP bag has 8 compartment tabs; check before each press so zero-press
-    // detection works when the bag already starts on the repel tab.
-    bool found = false;
-    for (int press = 0; press <= 8; press++){
-        context.wait_for_all_requests();
-
-        ImageMatchWatcher watcher(repel_tab_ref, repel_tab_box, repel_tab_rmsd);
-        ImageMatchWatcher small_watcher(repel_tab_small_ref, repel_tab_box, repel_tab_rmsd);
-        ImageMatchWatcher honey_watcher(repel_tab_honey_ref, repel_tab_box, repel_tab_rmsd);
-        ImageMatchWatcher honey_small_watcher(repel_tab_honey_small_ref, repel_tab_box, repel_tab_rmsd);
-        int ret =
-            wait_until(stream, context, 400ms, {{watcher}, {small_watcher}, {honey_watcher}, {honey_small_watcher}});
-        if (ret >= 0){
-            stream.log("[AutoStory] activate_repel: repel tab found after " + std::to_string(press) + " press(es).",
-                COLOR_GREEN);
-            found = true;
-            break;
-        }
-
-        if (press < 8){
-            stream.log(
-                "[AutoStory] activate_repel: tab not found, pressing right (" + std::to_string(press + 1) + "/8).");
-            pbf_press_dpad(context, DPAD_RIGHT, 80ms, 300ms);
-        }
-    }
-
-    if (!found){
-        stream.log("[AutoStory] activate_repel: failed to find repel compartment tab.", COLOR_RED);
-        return false;
-    }
-
-    // Reuse the Bag cursor/name geometry and existing Tesseract backend. A later
-    // save may contain all three Repels and unrelated Other Items in any order.
-    bool item_found = false;
-    size_t confirmed = 0;
-    size_t unknown_cursor = 0;
-    for (size_t scan = 0; scan < 256; scan++){
-        context.wait_for_all_requests();
-        const auto frame = stream.video().snapshot();
-        if (!frame || bag_list_is_empty(*frame.frame)){
-            break;
-        }
-        const int cursor = bag_cursor_position(*frame.frame);
-        if (!cursor){
-            if (++unknown_cursor >= 3){
-                break;
-            }
-            pbf_wait(context, 200ms);
-            continue;
-        }
-        unknown_cursor = 0;
-        // Use the existing Tesseract entry point directly so item selection
-        // does not depend on the optional Paddle/ONNX runtime configuration.
-        const std::string text =
-            OCR::tesseract_ocr_read(Language::English, extract_box_reference(*frame.frame, bag_list_name_box(cursor)));
-        std::string normalized;
-        for (unsigned char ch : text){
-            if (std::isalpha(ch)){
-                normalized.push_back((char)std::tolower(ch));
-            }
-        }
-        static const char* const names[] = {"repel", "superrepel", "maxrepel"};
-        if (normalized == names[repel_type]){
-            if (++confirmed >= 2){
-                item_found = true;
-                break;
-            }
-            pbf_wait(context, 150ms);
-        }else{
-            confirmed = 0;
-            // Search both directions so a non-wrapping list opened halfway
-            // down still reaches items above the initial cursor position.
-            pbf_press_dpad(context, scan < 128 ? DPAD_DOWN : DPAD_UP, 80ms, 300ms);
-        }
-    }
-    if (!item_found){
+    BagItemTemplate repel;
+    // OCR identifies the item; this reference is used only for the Bag layout.
+    repel.reference_path = "PokemonBDSP/Autostory/Bag_EscapeRope.png";
+    repel.label = slug;
+    if (!find_bag_item(stream, context, repel, 5, num_icons, 128, 60s, false, language)){
         stream.log("activate_repel: requested item not confirmed: " + slug, COLOR_RED);
         pbf_mash_button(context, BUTTON_B, 2000ms);
         context.wait_for_all_requests();

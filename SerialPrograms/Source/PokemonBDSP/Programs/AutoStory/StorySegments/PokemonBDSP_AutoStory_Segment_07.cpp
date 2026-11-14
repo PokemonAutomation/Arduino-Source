@@ -279,7 +279,7 @@ static bool drama_at_the_library(VideoStream& stream, ProControllerContext& cont
     return true;
 }
 
-static bool fly_and_enter_mount_coronet(VideoStream& stream, ProControllerContext& context){
+static bool fly_and_enter_mount_coronet(VideoStream& stream, ProControllerContext& context, Language language){
     DpadState dpad;
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
@@ -301,7 +301,7 @@ static bool fly_and_enter_mount_coronet(VideoStream& stream, ProControllerContex
     repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 11);
     pbf_move_left_joystick(context, {-1, 0}, 3200ms, 100ms); // 16+
     context.wait_for_all_requests();
-    activate_repel(stream, context);
+    activate_repel(stream, context, language);
     context.wait_for_all_requests();
 
     dpad.last_dir = DPAD_LEFT;
@@ -643,7 +643,7 @@ static bool leave_small_house_route_216(VideoStream& stream, ProControllerContex
     return true;
 }
 
-static bool continue_through_route_216(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
+static bool continue_through_route_216(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, Language language){
     DpadState dpad;
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
@@ -826,7 +826,7 @@ static bool continue_through_route_216(VideoStream& stream, ProControllerContext
     context.wait_for_all_requests();
     pbf_wait(context, 1000ms);
 
-    activate_repel(stream, context);
+    activate_repel(stream, context, language);
     context.wait_for_all_requests();
     pbf_wait(context, 1000ms);
 
@@ -893,22 +893,14 @@ static bool restock_super_repels_snowpoint(VideoStream& stream,
     Language language){
     stream.log("Snowpoint Mart: following the recorded route to buy " + std::to_string(quantity) + " Super Repels.");
     context.wait_for_all_requests();
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 944ms, 0ms);
-    pbf_wait(context, 54ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 1606ms, 0ms);
-    pbf_wait(context, 131ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2391ms, 0ms);
-    pbf_wait(context, 3328ms);
-    pbf_press_button(context, BUTTON_B, 229ms, 0ms);
-    pbf_wait(context, 2255ms);
-    pbf_press_button(context, BUTTON_B, 195ms, 0ms);
-    pbf_wait(context, 519ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1726ms, 0ms);
-    pbf_wait(context, 129ms);
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1126ms, 0ms);
-    pbf_wait(context, 82ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1264ms, 0ms);
-    pbf_wait(context, 236ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 944ms, 54ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 1606ms, 131ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2391ms, 3328ms);
+    pbf_press_button(context, BUTTON_B, 229ms, 2255ms);
+    pbf_press_button(context, BUTTON_B, 195ms, 519ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1726ms, 129ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1126ms, 82ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1264ms, 236ms);
     context.wait_for_all_requests();
 
     {
@@ -917,8 +909,7 @@ static bool restock_super_repels_snowpoint(VideoStream& stream,
             context,
             [](ProControllerContext& context){
                 pbf_move_left_joystick(context, {0.000000, 1.000000}, 768ms, 0ms);
-                pbf_move_left_joystick(context, {1.000000, 1.000000}, 1460ms, 0ms);
-                pbf_wait(context, 3577ms);
+                pbf_move_left_joystick(context, {1.000000, 1.000000}, 1460ms, 3577ms);
             },
             {{entrance}});
         if (ret != 0){
@@ -927,8 +918,7 @@ static bool restock_super_repels_snowpoint(VideoStream& stream,
         }
     }
 
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 845ms, 0ms);
-    pbf_wait(context, 503ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 845ms, 503ms);
     context.wait_for_all_requests();
     if (!buy_items(stream, context, {{ShopItem::SuperRepel, quantity}}, language, DPAD_UP)){
         stream.log("Snowpoint Mart: Could not buy " + std::to_string(quantity) + " Super Repels.", COLOR_RED);
@@ -941,9 +931,8 @@ static bool restock_super_repels_snowpoint(VideoStream& stream,
         const int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0.000000, -1.000000}, 1101ms, 0ms);
                 // Observe the doorway fade after movement ends.
-                pbf_wait(context, 5000ms);
+                pbf_move_left_joystick(context, {0.000000, -1.000000}, 1101ms, 5000ms);
             },
             {{exit}});
         if (ret != 0){
@@ -1069,7 +1058,7 @@ static bool go_through_house_south_veilstone(VideoStream& stream, ProControllerC
     return true;
 }
 
-static bool walk_through_route_214(VideoStream& stream, ProControllerContext& context){
+static bool walk_through_route_214(VideoStream& stream, ProControllerContext& context, Language language){
     DpadState dpad;
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
@@ -1081,7 +1070,7 @@ static bool walk_through_route_214(VideoStream& stream, ProControllerContext& co
     dpad.last_dir = DPAD_DOWN;
     repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 8);
 
-    if (!activate_repel(stream, context, 8, 1)){
+    if (!activate_repel(stream, context, language, 8, 1)){
         stream.log("walk_through_route_214: Could not activate a Super Repel.", COLOR_RED);
         return false;
     }
@@ -1176,50 +1165,28 @@ static bool go_through_lake_valor(VideoStream& stream,
     context.wait_for_all_requests();
     stream.log("Lake Valor: following the recorded route from the stair landing to Saturn.");
     // These taps include facing presses. Do not add another turn press.
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1627ms, 0ms);
-    pbf_wait(context, 390ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 434ms, 0ms);
-    pbf_wait(context, 165ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 570ms, 0ms);
-    pbf_wait(context, 919ms);
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 279ms, 0ms);
-    pbf_wait(context, 322ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1024ms, 0ms);
-    pbf_wait(context, 1871ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 160ms, 0ms);
-    pbf_wait(context, 145ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 79ms, 0ms);
-    pbf_wait(context, 454ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 106ms, 0ms);
-    pbf_wait(context, 441ms);
-    pbf_press_dpad(context, DPAD_DOWN, 199ms, 0ms);
-    pbf_wait(context, 190ms);
-    pbf_press_dpad(context, DPAD_DOWN, 155ms, 0ms);
-    pbf_wait(context, 256ms);
-    pbf_press_dpad(context, DPAD_DOWN, 199ms, 0ms);
-    pbf_wait(context, 682ms);
-    pbf_press_dpad(context, DPAD_DOWN, 144ms, 0ms);
-    pbf_wait(context, 564ms);
-    pbf_press_dpad(context, DPAD_LEFT, 187ms, 0ms);
-    pbf_wait(context, 639ms);
-    pbf_press_dpad(context, DPAD_DOWN, 184ms, 0ms);
-    pbf_wait(context, 267ms);
-    pbf_press_dpad(context, DPAD_DOWN, 199ms, 0ms);
-    pbf_wait(context, 483ms);
-    pbf_press_dpad(context, DPAD_DOWN, 184ms, 0ms);
-    pbf_wait(context, 388ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 145ms, 0ms);
-    pbf_wait(context, 336ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 176ms, 0ms);
-    pbf_wait(context, 305ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 143ms, 0ms);
-    pbf_wait(context, 388ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 131ms, 0ms);
-    pbf_wait(context, 376ms);
-    pbf_press_dpad(context, DPAD_DOWN, 212ms, 0ms);
-    pbf_wait(context, 1321ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 176ms, 0ms);
-    pbf_wait(context, 1104ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1627ms, 390ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 434ms, 165ms);
+    pbf_move_left_joystick(context, {0.000000, 1.000000}, 570ms, 919ms);
+    pbf_move_left_joystick(context, {0.000000, -1.000000}, 279ms, 322ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1024ms, 1871ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 160ms, 145ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 79ms, 454ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 106ms, 441ms);
+    pbf_press_dpad(context, DPAD_DOWN, 199ms, 190ms);
+    pbf_press_dpad(context, DPAD_DOWN, 155ms, 256ms);
+    pbf_press_dpad(context, DPAD_DOWN, 199ms, 682ms);
+    pbf_press_dpad(context, DPAD_DOWN, 144ms, 564ms);
+    pbf_press_dpad(context, DPAD_LEFT, 187ms, 639ms);
+    pbf_press_dpad(context, DPAD_DOWN, 184ms, 267ms);
+    pbf_press_dpad(context, DPAD_DOWN, 199ms, 483ms);
+    pbf_press_dpad(context, DPAD_DOWN, 184ms, 388ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 145ms, 336ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 176ms, 305ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 143ms, 388ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 131ms, 376ms);
+    pbf_press_dpad(context, DPAD_DOWN, 212ms, 1321ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 176ms, 1104ms);
     context.wait_for_all_requests();
     {
         BlackScreenWatcher battle_start;
@@ -1250,42 +1217,24 @@ static bool go_through_lake_valor(VideoStream& stream,
     dpad.last_dir = DPAD_LEFT;
     repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 5);
     repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 7);
-    pbf_press_dpad(context, DPAD_RIGHT, 211ms, 0ms);
-    pbf_wait(context, 404ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 196ms, 0ms);
-    pbf_wait(context, 429ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 187ms, 0ms);
-    pbf_wait(context, 347ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 168ms, 0ms);
-    pbf_wait(context, 341ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 168ms, 0ms);
-    pbf_wait(context, 324ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 143ms, 0ms);
-    pbf_wait(context, 632ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 179ms, 0ms);
-    pbf_wait(context, 390ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 198ms, 0ms);
-    pbf_wait(context, 300ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 194ms, 0ms);
-    pbf_wait(context, 441ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 175ms, 0ms);
-    pbf_wait(context, 425ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 199ms, 0ms);
-    pbf_wait(context, 401ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 109ms, 0ms);
-    pbf_wait(context, 624ms);
-    pbf_press_dpad(context, DPAD_UP, 202ms, 0ms);
-    pbf_wait(context, 520ms);
-    pbf_press_dpad(context, DPAD_UP, 171ms, 0ms);
-    pbf_wait(context, 362ms);
-    pbf_press_dpad(context, DPAD_UP, 189ms, 0ms);
-    pbf_wait(context, 423ms);
-    pbf_press_dpad(context, DPAD_UP, 198ms, 0ms);
-    pbf_wait(context, 350ms);
-    pbf_press_dpad(context, DPAD_UP, 186ms, 0ms);
-    pbf_wait(context, 465ms);
-    pbf_press_dpad(context, DPAD_LEFT, 160ms, 0ms);
-    pbf_wait(context, 628ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 211ms, 404ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 196ms, 429ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 187ms, 347ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 168ms, 341ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 168ms, 324ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 143ms, 632ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 179ms, 390ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 198ms, 300ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 194ms, 441ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 175ms, 425ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 199ms, 401ms);
+    pbf_press_dpad(context, DPAD_RIGHT, 109ms, 624ms);
+    pbf_press_dpad(context, DPAD_UP, 202ms, 520ms);
+    pbf_press_dpad(context, DPAD_UP, 171ms, 362ms);
+    pbf_press_dpad(context, DPAD_UP, 189ms, 423ms);
+    pbf_press_dpad(context, DPAD_UP, 198ms, 350ms);
+    pbf_press_dpad(context, DPAD_UP, 186ms, 465ms);
+    pbf_press_dpad(context, DPAD_LEFT, 160ms, 628ms);
     context.wait_for_all_requests();
     {
         BlackScreenWatcher black;
@@ -1293,16 +1242,11 @@ static bool go_through_lake_valor(VideoStream& stream,
         const int result = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& ctx){
-                pbf_press_dpad(ctx, DPAD_UP, 147ms, 0ms);
-                pbf_wait(ctx, 414ms);
-                pbf_press_dpad(ctx, DPAD_UP, 186ms, 0ms);
-                pbf_wait(ctx, 454ms);
-                pbf_press_dpad(ctx, DPAD_UP, 187ms, 0ms);
-                pbf_wait(ctx, 323ms);
-                pbf_press_dpad(ctx, DPAD_UP, 193ms, 0ms);
-                pbf_wait(ctx, 1741ms);
+                pbf_press_dpad(ctx, DPAD_UP, 147ms, 414ms);
+                pbf_press_dpad(ctx, DPAD_UP, 186ms, 454ms);
+                pbf_press_dpad(ctx, DPAD_UP, 187ms, 323ms);
                 // Observe a delayed fade without extending movement.
-                pbf_wait(ctx, 5000ms);
+                pbf_press_dpad(ctx, DPAD_UP, 193ms, 6741ms);
             },
             {{black}, {white}});
         if (result < 0){
@@ -1326,24 +1270,15 @@ static bool go_through_lake_valor(VideoStream& stream,
         }
     }
 
-    pbf_press_dpad(context, DPAD_UP, 180ms, 0ms);
-    pbf_wait(context, 443ms);
-    pbf_press_dpad(context, DPAD_UP, 156ms, 0ms);
-    pbf_wait(context, 321ms);
-    pbf_press_dpad(context, DPAD_UP, 159ms, 0ms);
-    pbf_wait(context, 376ms);
-    pbf_press_dpad(context, DPAD_UP, 158ms, 0ms);
-    pbf_wait(context, 273ms);
-    pbf_press_dpad(context, DPAD_UP, 167ms, 0ms);
-    pbf_wait(context, 366ms);
-    pbf_press_dpad(context, DPAD_UP, 169ms, 0ms);
-    pbf_wait(context, 298ms);
-    pbf_press_dpad(context, DPAD_UP, 180ms, 0ms);
-    pbf_wait(context, 321ms);
-    pbf_press_dpad(context, DPAD_UP, 176ms, 0ms);
-    pbf_wait(context, 412ms);
-    pbf_press_dpad(context, DPAD_UP, 172ms, 0ms);
-    pbf_wait(context, 1096ms);
+    pbf_press_dpad(context, DPAD_UP, 180ms, 443ms);
+    pbf_press_dpad(context, DPAD_UP, 156ms, 321ms);
+    pbf_press_dpad(context, DPAD_UP, 159ms, 376ms);
+    pbf_press_dpad(context, DPAD_UP, 158ms, 273ms);
+    pbf_press_dpad(context, DPAD_UP, 167ms, 366ms);
+    pbf_press_dpad(context, DPAD_UP, 169ms, 298ms);
+    pbf_press_dpad(context, DPAD_UP, 180ms, 321ms);
+    pbf_press_dpad(context, DPAD_UP, 176ms, 412ms);
+    pbf_press_dpad(context, DPAD_UP, 172ms, 1096ms);
     context.wait_for_all_requests();
     {
         BlackScreenWatcher battle_start;
@@ -1368,8 +1303,7 @@ static bool go_through_lake_valor(VideoStream& stream,
         const int result = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 1834ms, 0ms);
-                pbf_wait(ctx, 5000ms);
+                pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 1834ms, 5000ms);
             },
             {{black}, {white}});
         if (result < 0){
@@ -2176,7 +2110,7 @@ void checkpoint_0702(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!fly_and_enter_mount_coronet(env.console, context)){
+            if (!fly_and_enter_mount_coronet(env.console, context, options.language)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "07.02: fly_and_enter_mount_coronet did not complete.",
                     env.console);
@@ -2234,7 +2168,7 @@ void checkpoint_0703(SingleSwitchProgramEnvironment& env,
                     "07.03: rest house exit did not complete.",
                     env.console);
             }
-            if (!continue_through_route_216(env.console, context, stats)){
+            if (!continue_through_route_216(env.console, context, stats, options.language)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "07.03: continue_through_route_216 did not complete.",
                     env.console);
@@ -2292,7 +2226,7 @@ void checkpoint_0704(SingleSwitchProgramEnvironment& env,
                     "07.04: go_through_house_south_veilstone did not complete.",
                     env.console);
             }
-            if (!walk_through_route_214(env.console, context)){
+            if (!walk_through_route_214(env.console, context, options.language)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "07.04: walk_through_route_214 did not complete.",
                     env.console);
