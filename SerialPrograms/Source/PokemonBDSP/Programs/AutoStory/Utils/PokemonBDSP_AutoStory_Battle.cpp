@@ -1,0 +1,1385 @@
+/*  BDSP AutoStory - Battle Utilities
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#include <algorithm>
+#include <array>
+#include <cmath>
+#include <cstdlib>
+#include <map>
+#include <set>
+#include <string>
+#include <vector>
+
+#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/Tools/DebugDumper.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/Images/ImageFilter.h"
+#include "CommonTools/Images/ImageManip.h"
+#include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/OCR/OCR_Routines.h"
+
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+
+#include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "Pokemon/Pokemon_StatsCalculation.h"
+
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleOpponentNameReader.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_EndBattleDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_ShopItemNameReader.h"
+#include "PokemonBDSP/Programs/AutoStory/Data/PokemonBDSP_AutoStory_BDSPData.h"
+#include "PokemonBDSP/Programs/AutoStory/Detect/PokemonBDSP_AutoStory_OverworldDetector.h"
+
+#include "VideoGames/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.h"
+
+#include "PokemonBDSP_AutoStory_Battle.h"
+
+namespace PokemonAutomation {
+namespace NintendoSwitch {
+namespace PokemonBDSP {
+
+using namespace Pokemon;
+using namespace PokemonSwSh;
+using namespace std::chrono_literals;
+
+
+// ---------------------------------------------------------------------------
+//  run_battle_press_A
+// ---------------------------------------------------------------------------
+
+void run_battle_press_A(const ProgramInfo& /*info*/, VideoStream& stream, ProControllerContext& context){
+    EndBattleWatcher end_battle;
+    run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+            pbf_mash_button(ctx, BUTTON_A, 120000ms);
+        },
+        {{end_battle}});
+
+    OverworldWatcher overworld;
+    run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+            pbf_mash_button(ctx, BUTTON_A, 120000ms);
+        },
+        {{overworld}});
+}
+
+
+// ---------------------------------------------------------------------------
+//  handle_unexpected_battle
+// ---------------------------------------------------------------------------
+
+void handle_unexpected_battle(const ProgramInfo& info,
+    VideoStream& stream,
+    ProControllerContext& context,
+    std::function<void(const ProgramInfo&, VideoStream&, ProControllerContext&)>&& action,
+    std::function<void(const ProgramInfo&, VideoStream&, ProControllerContext&)>&& recovery_action,
+    size_t max_attempts){
+    for (size_t attempt = 0; attempt < max_attempts; attempt++){
+        StartBattleDetector start_battle(stream.overlay());
+        int result = run_until<ProControllerContext>(stream,
+            context,
+            [&](ProControllerContext& ctx){
+                action(info, stream, ctx);
+            },
+            {{start_battle}});
+        if (result < 0){
+            return;
+        }
+        run_battle_press_A(info, stream, context);
+        recovery_action(info, stream, context);
+    }
+    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+        "handle_unexpected_battle: exceeded max attempts",
+        stream);
+}
+
+
+// ---------------------------------------------------------------------------
+//  Shared PP OCR and helpers for the retained battle planners
+// ---------------------------------------------------------------------------
+
+static constexpr int TORTERRA_ATK = 238;
+static constexpr int TORTERRA_SPATK = 170;
+
+static int ocr_pp_slot(Logger& logger, Language language, const ImageViewRGB32& frame, const ImageFloatBox& box){
+    if (!frame){
+        return -1;
+    }
+    // Padding separates digits from panel borders; wider text and a white-background
+    // filter recover narrow or highlighted numerals without guessing missing digits.
+    for (size_t variant = 0; variant < 4; variant++){
+        ImageFloatBox crop_box = box;
+        if (variant > 0){
+            crop_box.x += 0.005;
+            crop_box.width -= 0.0145;
+        }
+        const auto region = extract_box_reference(frame, crop_box);
+        if (!region || region.height() == 0){
+            return -1;
+        }
+        const size_t height = variant == 3 ? 64 : 48;
+        const auto filtered = variant == 3
+            ? to_blackwhite_rgb32_range(region, false, 0xffc0c0c0, 0xffffffff) : region.copy();
+        const size_t width = filtered.width() * height / filtered.height();
+        const auto enlarged = filtered.scale_to(variant == 2 ? width * 3 / 2 : width, height);
+        ImageRGB32 padded(enlarged.width() + 10, enlarged.height() + 10);
+        padded.fill(0xffffffff);
+        for (size_t y = 0; y < enlarged.height(); y++){
+            for (size_t x = 0; x < enlarged.width(); x++){
+                padded.pixel(x + 5, y + 5) = enlarged.pixel(x, y);
+            }
+        }
+        const std::string text = OCR::ocr_read(language, padded, OCR::PageSegMode::SINGLE_LINE);
+        std::string digits;
+        for (char c : text){
+            if (c != ' ' && c != '\n' && c != '\r' && c != '\t'){
+                digits += c;
+            }
+        }
+        const size_t slash = digits.find('/');
+        if (slash == std::string::npos || slash == 0 || slash > 2 ||
+            slash + 1 >= digits.size() || digits.size() - slash - 1 > 2 ||
+            digits.find('/', slash + 1) != std::string::npos ||
+            digits.find_first_not_of("0123456789/") != std::string::npos){
+            logger.log("[PP OCR] Unreadable current/max: " + text, COLOR_ORANGE);
+            continue;
+        }
+        const int current = std::atoi(digits.substr(0, slash).c_str());
+        const int maximum = std::atoi(digits.substr(slash + 1).c_str());
+        if (maximum < 1 || maximum > 64 || current > maximum){
+            continue;
+        }
+        return current;
+    }
+    return -1;
+}
+
+std::array<int, 4> read_all_pp(Logger& logger, const ImageViewRGB32& frame){
+    std::array<int, 4> result{-1, -1, -1, -1};
+    const auto moves = detect_battle_move_menu(frame);
+    for (size_t i = 0; i < moves.move_count; i++){
+        const auto& button = moves.buttons[i];
+        const double center = button.y + button.height / 2;
+        // PP is numeric in every language; locate rows from the actual Fight menu.
+        result[i] = ocr_pp_slot(logger, Language::English, frame,
+            ImageFloatBox{0.918, center - 0.020, 0.058, 0.040});
+    }
+    return result;
+}
+
+// Damage scoring is retained for future unassisted planning; only the unused
+// battle planners below call it. The PP OCR above remains in active use.
+static std::pair<int, int> damage_range(int level, int base_power, int atk, int def, double type_mult){
+    if (base_power == 0){
+        return {0, 0};
+    }
+    int base = (((2 * level) / 5 + 2) * base_power * atk / def) / 50 + 2;
+    return {(int)(base * 85.0 / 100.0 * type_mult), (int)(base * type_mult)};
+}
+
+struct MoveScore {
+    int lower_sum = 0;
+    int upper_sum = 0;
+    bool ohko_all = false;
+};
+
+static MoveScore
+score_move(const BDSPMoveData& mdata, const std::vector<std::string>& on_field, const BDSPTrainerData& trainer_data){
+    if (mdata.category == MoveCategory::STATUS){
+        return {};
+    }
+
+    int atk_stat = (mdata.category == MoveCategory::PHYSICAL) ? TORTERRA_ATK : TORTERRA_SPATK;
+
+    MoveScore score;
+    score.ohko_all = !on_field.empty();
+
+    for (const std::string& slug : on_field){
+        if (slug.empty()){
+            score.ohko_all = false;
+            continue;
+        }
+
+        const BDSPTrainerPokemon* tp = nullptr;
+        for (const BDSPTrainer& trainer : trainer_data.trainers){
+            for (const BDSPTrainerPokemon& mon : trainer.pokemon){
+                if (mon.species == slug){
+                    tp = &mon;
+                    break;
+                }
+            }
+            if (tp){
+                break;
+            }
+        }
+        if (!tp){
+            score.ohko_all = false;
+            continue;
+        }
+
+        const BDSPPokemonData& pdata = bdsp_pokemon(slug);
+        uint16_t hp = calc_stats_hp(pdata.hp, tp->level, tp->ivs.hp, tp->evs.hp);
+        uint16_t def = (mdata.category == MoveCategory::PHYSICAL)
+            ? calc_stats_nonhp(pdata.defense, tp->level, tp->ivs.defense, tp->evs.defense, NatureAdjustment::NEUTRAL)
+            : calc_stats_nonhp(pdata.spdef, tp->level, tp->ivs.spdef, tp->evs.spdef, NatureAdjustment::NEUTRAL);
+
+        double mult = type_multiplier(mdata.type, pdata.type[0], pdata.type[1]);
+        if (mdata.spread && trainer_data.battle_type == BDSPBattleType::DOUBLES){
+            mult *= 0.75;
+        }
+
+        auto [lo, hi] = damage_range(100, (int)mdata.base_power, atk_stat, (int)def, mult);
+        score.lower_sum += lo;
+        score.upper_sum += hi;
+        if (lo < (int)hp){
+            score.ohko_all = false;
+        }
+    }
+    return score;
+}
+
+static void navigate_to_slot(ProControllerContext& context, int slot){
+    if (slot == 1 || slot == 3){
+        pbf_press_dpad(context, DPAD_RIGHT, 10ms, 40ms);
+    }
+    if (slot == 2 || slot == 3){
+        pbf_press_dpad(context, DPAD_DOWN, 10ms, 40ms);
+    }
+}
+
+
+// ---------------------------------------------------------------------------
+//  handle_battle_with_outside_help
+// ---------------------------------------------------------------------------
+
+// Not called by current story routes. Retained for future unassisted planning;
+// validate the game data and replace the fixed Torterra assumptions before reuse.
+// The assisted route currently uses fight_trainer_using_moves().
+void handle_battle_with_outside_help(const ProgramInfo& /*info*/,
+    VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& trainer_id,
+    const AutoStoryOptions& options){
+    Logger& logger = stream.logger();
+    const BDSPTrainerData& trainer_data = bdsp_trainer(trainer_id);
+    const OutsideHelpConfig& help = options.outside_help;
+
+    std::array<std::string, 4> move_slugs;
+    for (int i = 0; i < 4; i++){
+        move_slugs[i] = torterra_move_slug(help.attacks[i]);
+    }
+
+    std::array<int, 4> pp_remaining;
+    for (int i = 0; i < 4; i++){
+        pp_remaining[i] = (int)bdsp_move(move_slugs[i]).pp;
+    }
+
+    std::vector<std::string> on_field;
+    for (const BDSPTrainer& trainer : trainer_data.trainers){
+        if (!trainer.pokemon.empty()){
+            on_field.push_back(trainer.pokemon[0].species);
+        }
+    }
+
+    bool battle_active = true;
+    while (battle_active){
+
+        // Wait for the lead Pokemon's battle menu
+        {
+            BattleMenuWatcher menu(BattleType::TRAINER);
+            EndBattleWatcher end;
+            int r = wait_until(stream, context, 120s, {{menu}, {end}});
+            if (r == 1 || r < 0){
+                battle_active = false;
+                break;
+            }
+        }
+
+        // Open Fight menu
+        pbf_press_button(context, BUTTON_A, 10ms, 60ms);
+        context.wait_for_all_requests();
+        context.wait_for(300ms);
+
+        // OCR current PP
+        {
+            auto ocr_pp = read_all_pp(logger, stream.video().snapshot());
+            for (int i = 0; i < 4; i++){
+                if (ocr_pp[i] >= 0){
+                    pp_remaining[i] = ocr_pp[i];
+                }else{
+                    logger.log("PP OCR failed slot " + std::to_string(i) + "; using tracked", COLOR_YELLOW);
+                }
+            }
+        }
+
+        // Check for all-zero PP (Struggle)
+        bool all_zero = true;
+        for (int pp : pp_remaining){
+            if (pp > 0){
+                all_zero = false;
+                break;
+            }
+        }
+
+        if (all_zero){
+            logger.log("All PP at 0 — using Struggle", COLOR_YELLOW);
+            pbf_press_button(context, BUTTON_B, 10ms, 60ms);
+            context.wait_for_all_requests();
+        }else{
+            // Score all usable moves
+            int best_slot = -1, best_hi = -1;
+            bool best_ohko = false;
+
+            for (int i = 0; i < 4; i++){
+                if (pp_remaining[i] <= 0){
+                    continue;
+                }
+                MoveScore s = score_move(bdsp_move(move_slugs[i]), on_field, trainer_data);
+                if (bdsp_move(move_slugs[i]).category == MoveCategory::STATUS){
+                    continue;
+                }
+
+                bool prefer = (best_slot < 0) || (s.ohko_all && !best_ohko) ||
+                    (s.ohko_all && best_ohko && s.upper_sum < best_hi) ||
+                    (!s.ohko_all && !best_ohko && s.upper_sum > best_hi);
+
+                if (prefer){
+                    best_slot = i;
+                    best_hi = s.upper_sum;
+                    best_ohko = s.ohko_all;
+                }
+            }
+            if (best_slot < 0){
+                for (int i = 0; i < 4; i++){
+                    if (pp_remaining[i] > 0){
+                        best_slot = i;
+                        break;
+                    }
+                }
+            }
+
+            logger.log("Move slot " + std::to_string(best_slot) + " (" + move_slugs[best_slot] + ")" +
+                (best_ohko ? " [OHKO]" : " [best effort]"),
+                COLOR_WHITE);
+
+            navigate_to_slot(context, best_slot);
+            pbf_mash_button(context, BUTTON_A, 500ms);
+            context.wait_for_all_requests();
+            pp_remaining[best_slot]--;
+
+            // Single-target in doubles: confirm default target
+            if (!bdsp_move(move_slugs[best_slot]).spread && trainer_data.battle_type == BDSPBattleType::DOUBLES){
+                pbf_press_button(context, BUTTON_A, 10ms, 60ms);
+                context.wait_for_all_requests();
+            }
+
+            // Mash through target confirmation and partner's move selection
+            pbf_mash_button(context, BUTTON_A, 3000ms);
+            context.wait_for_all_requests();
+        }
+
+        // Wait for next event
+        {
+            BattleMenuWatcher menu2(BattleType::TRAINER);
+            ExperienceGainWatcher exp;
+            EndBattleWatcher end;
+
+            int event = wait_until(stream, context, 60s, {{menu2}, {exp}, {end}});
+
+            if (event == 2 || event < 0){
+                battle_active = false;
+            }else if (event == 1){
+                // XP gain — mash through, then update on_field via OCR
+                BattleMenuWatcher menu3(BattleType::TRAINER);
+                EndBattleWatcher end2;
+                int after = run_until<ProControllerContext>(stream,
+                    context,
+                    [](ProControllerContext& ctx){
+                        pbf_mash_button(ctx, BUTTON_A, 120000ms);
+                    },
+                    {{menu3}, {end2}});
+                if (after == 1 || after < 0){
+                    battle_active = false;
+                }else{
+                    // Update on_field via OCR
+                    VideoSnapshot frame = stream.video().snapshot();
+                    std::vector<std::string> names =
+                        read_battle_opponent_names(logger, options.language, frame, trainer_data.battle_type);
+                    for (size_t i = 0; i < names.size() && i < on_field.size(); i++){
+                        if (!names[i].empty() && names[i] != on_field[i]){
+                            logger.log("Slot " + std::to_string(i) + ": " + on_field[i] + " → " + names[i],
+                                COLOR_WHITE);
+                            on_field[i] = names[i];
+                        }
+                    }
+                }
+            }
+            // event == 0: next turn, loop continues
+        }
+    }
+
+    // Mash through XP/dialog until overworld
+    OverworldWatcher overworld;
+    run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+            pbf_mash_button(ctx, BUTTON_A, 120000ms);
+        },
+        {{overworld}});
+}
+
+
+// ---------------------------------------------------------------------------
+//  Shared HP/item handling and helpers for the retained expert planner
+// ---------------------------------------------------------------------------
+
+//  ⚠️ Estimated player-side status badge region — calibrate against a real capture.
+static const ImageFloatBox PLAYER_STATUS_BOX{0.140, 0.710, 0.080, 0.018};
+
+// Digits are read only on a confirmed command menu. Slot is a battlefield
+// position, not the command owner or a persistent Pokemon identity.
+double read_player_hp_ratio(const ImageViewRGB32& frame,
+    BattleHPLayout layout, size_t slot, BattleHPReading* reading){
+    if (reading){
+        *reading = {};
+    }
+    if (!frame || slot < 1 || slot > 2 || (layout == BattleHPLayout::SINGLES && slot != 1)){
+        return -1;
+    }
+    const bool own_partner = layout == BattleHPLayout::OWN_PARTNER;
+    BattleMenuDetector commands(BattleType::TRAINER, COLOR_RED, own_partner);
+    if (!commands.detect(frame)){
+        return -1;
+    }
+    size_t owner = 1;
+    if (own_partner){
+        // A lone survivor is not necessarily the original lead. Reacquiring
+        // its identity after fainting/switching remains an unassisted-route test.
+        if (!is_white(extract_box_reference(frame, ImageFloatBox{0.505, 0.905, 0.010, 0.005}))){
+            return -1;
+        }
+        owner = commands.active_player(frame);
+        if (owner == 0){
+            return -1;
+        }
+    }
+    const bool raised = layout != BattleHPLayout::SINGLES && slot == owner;
+    const double dx = slot == 2 ? 0.265 : 0.0;
+    const double dy = raised ? -0.014 : 0.0;
+    if (!is_white(extract_box_reference(frame, ImageFloatBox{0.12 + dx, 0.927 + dy, 0.12, 0.009}))){
+        return -1;
+    }
+    const auto crop = extract_box_reference(frame, ImageFloatBox{0.020 + dx, 0.904 + dy, 0.085, 0.035});
+    if (crop.height() == 0){
+        return -1;
+    }
+    // Enlarged original-color numbers outperformed thresholded text in the
+    // recorded tests. English OCR reads digits/slash, not localized item names.
+    const ImageRGB32 enlarged = crop.scale_to(crop.width() * 48 / crop.height(), 48);
+    const std::string text = OCR::tesseract_ocr_read(Language::English, enlarged, OCR::PageSegMode::SINGLE_WORD);
+    std::string digits;
+    for (char c : text){
+        if (c != ' ' && c != '\n' && c != '\r' && c != '\t'){
+            digits += c;
+        }
+    }
+    const size_t slash = digits.find('/');
+    if (slash == std::string::npos || slash == 0 || slash > 3 ||
+        slash + 1 >= digits.size() || digits.size() - slash - 1 > 3 ||
+        digits.find('/', slash + 1) != std::string::npos ||
+        digits.find_first_not_of("0123456789/") != std::string::npos){
+        return -1;
+    }
+    const int current = std::atoi(digits.substr(0, slash).c_str());
+    const int maximum = std::atoi(digits.substr(slash + 1).c_str());
+    if (maximum <= 0 || current > maximum){
+        return -1;
+    }
+    const double ratio = static_cast<double>(current) / maximum;
+    const auto strip = extract_box_reference(frame, ImageFloatBox{0.046 + dx, 0.883 + dy, 0.200, 0.012});
+    if (strip.width() == 0 || strip.height() == 0){
+        return -1;
+    }
+    size_t colored = 0;
+    for (size_t x = 0; x < strip.width(); x++){
+        const uint32_t pixel = strip.pixel(x, strip.height() / 2);
+        const int r = (pixel >> 16) & 255;
+        const int g = (pixel >> 8) & 255;
+        const int b = pixel & 255;
+        colored += std::max({r, g, b}) - std::min({r, g, b}) > 30;
+    }
+    // A coarse cross-check catches plausible missing/changed OCR digits.
+    // The measured command-frame bar error was below one percentage point.
+    if (std::abs(ratio - static_cast<double>(colored) / strip.width()) > 0.05){
+        return -1;
+    }
+    if (reading){
+        *reading = {current, maximum, owner};
+    }
+    return ratio;
+}
+
+//  Returns true if a coloured status badge is visible on the player's active pokemon.
+static bool detect_player_status(const ImageViewRGB32& frame){
+    return !is_white(extract_box_reference(frame, PLAYER_STATUS_BOX));
+}
+
+// Starts in an open Bag. Select a named item using the existing pocket/cursor
+// detectors; do not assume that it is the first item in the pocket.
+static void use_item_in_open_bag(VideoStream& stream,
+    ProControllerContext& context,
+    Language language,
+    const std::string& item_slug,
+    int pocket,
+    size_t target_party_slot,
+    bool outside_battle = false,
+    bool own_partner = false,
+    size_t command_owner = 1){
+    if (!bag_navigate_to_pocket(stream, context, pocket)){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Battle item: requested pocket was not confirmed.", stream);
+    }
+    size_t confirmed = 0;
+    size_t unknown_cursor = 0;
+    bool found = false;
+    for (size_t scan = 0; scan < 128; scan++){
+        context.wait_for_all_requests();
+        const auto frame = stream.video().snapshot();
+        if (!frame || bag_list_is_empty(frame)){
+            break;
+        }
+        const int cursor = bag_cursor_position(frame);
+        if (cursor == 0){
+            if (++unknown_cursor >= 5){
+                break;
+            }
+            pbf_wait(context, 150ms);
+            continue;
+        }
+        unknown_cursor = 0;
+        const auto result = ShopItemNameReader::instance().read_substring(
+            stream.logger(), language, extract_box_reference(frame, bag_list_name_box(cursor)));
+        const bool matches = !result.results.empty() &&
+            result.results.begin()->first <= ShopItemNameReader::MAX_LOG10P &&
+            result.results.begin()->second.token == item_slug;
+        if (matches){
+            if (++confirmed >= 3){
+                found = true;
+                break;
+            }
+            pbf_wait(context, 150ms);
+        }else{
+            confirmed = 0;
+            // Also search above a remembered cursor in a non-wrapping list.
+            pbf_press_dpad(context, scan < 64 ? DPAD_DOWN : DPAD_UP, 80ms, 300ms);
+        }
+    }
+    if (!found){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Battle item: could not confirm " + item_slug + "; no item used.", stream);
+    }
+
+    pbf_press_button(context, BUTTON_A, 80ms, 300ms);
+    context.wait_for_all_requests();
+    SelectionArrowFinder use_item(stream.overlay(), {0.70, 0.10, 0.28, 0.65}, COLOR_GREEN);
+    if (wait_until(stream, context, 3s, {{use_item}}) != 0){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Battle item: Use menu not confirmed for " + item_slug + ".", stream);
+    }
+    pbf_press_button(context, BUTTON_A, 80ms, 300ms);
+    if (target_party_slot != 0){
+        size_t stable_target = 0;
+        DpadState dpad;
+        for (size_t check = 0; check < 40 && stable_target < 3; check++){
+            context.wait_for_all_requests();
+            const auto frame = stream.video().snapshot();
+            const int selected = frame && bag_pocket_position(frame) != 0 ? bag_cursor_position(frame, true) : 0;
+            if (selected == static_cast<int>(target_party_slot)){
+                stable_target++;
+                pbf_wait(context, 100ms);
+            }else{
+                stable_target = 0;
+                if (selected == 0){
+                    pbf_wait(context, 100ms);
+                }else{
+                    repeat_dpad(context, dpad,
+                        selected < static_cast<int>(target_party_slot) ? DPAD_DOWN : DPAD_UP,
+                        80ms, 300ms, 1, false);
+                }
+            }
+        }
+        if (stable_target < 3){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Battle item: party target " + std::to_string(target_party_slot) +
+                    " was not confirmed; no target confirmation sent.", stream);
+        }
+        stream.log("[Battle item] Confirmed party target " + std::to_string(target_party_slot) + ".");
+        pbf_press_button(context, BUTTON_A, 80ms, 800ms);
+    }
+    if (outside_battle){
+        pbf_mash_button(context, BUTTON_B, 2000ms);
+        context.wait_for_all_requests();
+        return;
+    }
+    // Singles X items apply directly; own-party doubles require target selection.
+    // An item can return to the other player's command before turn narration.
+    // Never send another A on that menu or B that cancels a queued action.
+    BattleDialogDetector narration;
+    BattleMenuDetector commands(BattleType::TRAINER, COLOR_RED, own_partner);
+    size_t stable = 0;
+    for (size_t check = 0; check < 50; check++){
+        context.wait_for_all_requests();
+        const auto frame = stream.video().snapshot();
+        const size_t next_owner = own_partner && frame ? commands.active_player(frame) : 0;
+        const bool next_command = next_owner != 0 && next_owner != command_owner;
+        if (frame && bag_pocket_position(frame) == 0 && (narration.detect(frame) || next_command)){
+            if (++stable >= 3){
+                stream.log("[Battle item] Submitted " + item_slug + "; " +
+                    (next_command ? "next player command confirmed." : "battle narration confirmed."));
+                return;
+            }
+        }else{
+            stable = 0;
+        }
+        pbf_wait(context, 100ms);
+    }
+    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+        "Battle item: " + item_slug + " did not leave the Bag for battle narration.", stream);
+}
+
+// BDSP's battle commands are vertical. Confirm the highlighted command before
+// opening Bag rather than relying on a remembered cursor position.
+static void open_battle_bag(VideoStream& stream, ProControllerContext& context,
+    bool own_partner, size_t command_owner){
+    BattleMenuDetector commands(BattleType::TRAINER, COLOR_RED, own_partner);
+    size_t stable = 0;
+    for (size_t check = 0; check < 30 && stable < 3; check++){
+        context.wait_for_all_requests();
+        const auto frame = stream.video().snapshot();
+        const bool correct_owner = frame && (!own_partner || commands.active_player(frame) == command_owner);
+        const auto selected = correct_owner ? commands.selected_option(frame) : BattleMenuOption::UNKNOWN;
+        if (selected == BattleMenuOption::BAG){
+            stable++;
+            pbf_wait(context, 100ms);
+        }else{
+            stable = 0;
+            if (selected == BattleMenuOption::UNKNOWN){
+                pbf_wait(context, 150ms);
+            }else{
+                pbf_press_dpad(context,
+                    selected == BattleMenuOption::RUN ? DPAD_UP : DPAD_DOWN, 80ms, 300ms);
+            }
+        }
+    }
+    if (stable < 3){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Battle item: Bag command not confirmed.", stream);
+    }
+    pbf_press_button(context, BUTTON_A, 80ms, 800ms);
+    context.wait_for_all_requests();
+}
+
+void use_item_in_battle(VideoStream& stream,
+    ProControllerContext& context,
+    Language language,
+    const std::string& item_slug,
+    bool after_battle,
+    BattleHPLayout layout,
+    size_t target_party_slot,
+    size_t expected_command_owner){
+    if (language == Language::None || target_party_slot < 1 || target_party_slot > 6 ||
+        (after_battle && (target_party_slot != 1 || layout != BattleHPLayout::SINGLES))){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Battle item: invalid language, party target, or post-battle mode.", stream);
+    }
+    if (after_battle){
+        if (item_slug != "full-restore" || language == Language::None){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Post-battle healing requires Full Restore and a selected language.", stream);
+        }
+        for (size_t pass = 0; pass < 2; pass++){
+            open_menu(stream, context, MenuCursorPosition::BAG, 5);
+            pbf_wait(context, 750ms);
+            // The Bag remembers its pocket. TMs show compatibility instead of HP.
+            if (!bag_navigate_to_pocket(stream, context, 1)){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Post-battle healing: Medicine pocket not confirmed; cannot read HP.", stream);
+            }
+            int hp_current = -1;
+            int hp_maximum = -1;
+            size_t stable = 0;
+            std::string last_reading;
+            for (size_t check = 0; check < 20 && stable < 3; check++){
+                context.wait_for_all_requests();
+                const auto frame = stream.video().snapshot();
+                const int pocket = frame ? bag_pocket_position(frame) : 0;
+                int observed_current = -1;
+                int observed_maximum = -1;
+                bool conflicting = false;
+                std::string reading = "pocket=" + std::to_string(pocket);
+                if (pocket == 1){
+                    // Only the HP fraction belongs in this crop; nearby panel edges
+                    // can be read as punctuation. Pad the filtered digits for line OCR.
+                    const auto hp_box = extract_box_reference(frame, ImageFloatBox{0.103, 0.181, 0.104, 0.039});
+                    for (const auto& range : OCR::WHITE_TEXT_FILTERS()){
+                        const auto filtered = to_blackwhite_rgb32_range(hp_box, true, range.mins, range.maxs);
+                        const auto padded = pad_image(filtered, filtered.height() / 4, 0xffffffff);
+                        const std::string text = OCR::tesseract_ocr_read(Language::English, padded,
+                            OCR::PageSegMode::SINGLE_LINE);
+                        std::string digits;
+                        for (char c : text){
+                            if (c != ' ' && c != '\n' && c != '\r' && c != '\t'){
+                                digits += c;
+                            }
+                        }
+                        reading += " [" + digits.substr(0, 40) + "]";
+                        const auto slash = digits.find('/');
+                        if (slash == std::string::npos || slash == 0 || slash > 3 ||
+                            slash + 1 >= digits.size() || digits.size() - slash - 1 > 3 ||
+                            digits.find('/', slash + 1) != std::string::npos ||
+                            digits.find_first_not_of("0123456789/") != std::string::npos){
+                            continue;
+                        }
+                        const int current = std::atoi(digits.substr(0, slash).c_str());
+                        const int maximum = std::atoi(digits.substr(slash + 1).c_str());
+                        if (maximum > 0 && current > 0 && current <= maximum){
+                            conflicting |= observed_current > 0 &&
+                                (current != observed_current || maximum != observed_maximum);
+                            observed_current = current;
+                            observed_maximum = maximum;
+                        }
+                    }
+                }
+                if (conflicting){
+                    observed_current = -1;
+                    observed_maximum = -1;
+                    reading += " conflicting HP reads";
+                }
+                if (reading != last_reading){
+                    stream.log("[League healing] HP check: " + reading);
+                    last_reading = reading;
+                }
+                stable = observed_current > 0 && observed_current == hp_current &&
+                    observed_maximum == hp_maximum ? stable + 1 : 0;
+                hp_current = observed_current;
+                hp_maximum = observed_maximum;
+                pbf_wait(context, 150ms);
+            }
+            if (stable < 3 || (pass == 1 && hp_current != hp_maximum)){
+                context.wait_for_all_requests();
+                const auto frame = stream.video().snapshot();
+                if (frame){
+                    dump_debug_image(stream.logger(), "PokemonBDSP/LeagueHealing",
+                        "hp-check-failed", frame);
+                }
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    stable < 3
+                        ? "Post-battle healing: exact HP read was not stable. " + last_reading
+                        : "Post-battle healing: Full Restore did not restore full HP (" +
+                            std::to_string(hp_current) + "/" + std::to_string(hp_maximum) + ").", stream);
+            }
+            if (hp_current == hp_maximum){
+                stream.log("[League healing] Starter at full HP; no Full Restore needed.");
+                pbf_mash_button(context, BUTTON_B, 2000ms);
+                context.wait_for_all_requests();
+                OverworldWatcher overworld;
+                if (wait_until(stream, context, 10s, {{overworld}}) != 0){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "League healing: overworld return not confirmed.", stream);
+                }
+                return;
+            }
+            stream.log("[League healing] Starter below full HP; using Full Restore.");
+            use_item_in_open_bag(stream, context, language, "full-restore", 1, 1, true);
+            OverworldWatcher overworld;
+            if (wait_until(stream, context, 10s, {{overworld}}) != 0){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "League Full Restore: overworld return not confirmed.", stream);
+            }
+        }
+    }
+    if (item_slug != "x-attack" && item_slug != "x-sp-def" && item_slug != "full-restore"){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Battle item: unsupported item " + item_slug + ".", stream);
+    }
+    const bool own_partner = layout == BattleHPLayout::OWN_PARTNER;
+    const bool healing = item_slug == "full-restore";
+    if (!healing && ((!own_partner && target_party_slot != 1) ||
+        (own_partner && target_party_slot > 2))){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Battle item: X-item target must be a confirmed active party slot; switching is not yet supported.", stream);
+    }
+    size_t command_owner = 1;
+    if (own_partner){
+        BattleMenuDetector commands(BattleType::TRAINER, COLOR_RED, true);
+        size_t stable = 0;
+        command_owner = 0;
+        for (size_t check = 0; check < 20 && stable < 3; check++){
+            context.wait_for_all_requests();
+            const auto frame = stream.video().snapshot();
+            const bool two_panels = frame && is_white(extract_box_reference(frame,
+                ImageFloatBox{0.505, 0.905, 0.010, 0.005}));
+            const size_t observed = two_panels ? commands.active_player(frame) : 0;
+            stable = observed != 0 ? (observed == command_owner ? stable + 1 : 1) : 0;
+            command_owner = observed;
+            if (stable < 3){
+                pbf_wait(context, 100ms);
+            }
+        }
+        if (stable < 3 || (expected_command_owner != 0 && expected_command_owner != command_owner)){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Battle item: double-battle command owner not confirmed; Bag not opened.", stream);
+        }
+    }else if (expected_command_owner > 1){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Battle item: only the player's command is available in this layout.", stream);
+    }
+    stream.log("[Battle item] Command owner " + std::to_string(command_owner) +
+        ", requested party target " + std::to_string(target_party_slot) + ": " + item_slug + ".");
+    open_battle_bag(stream, context, own_partner, command_owner);
+    use_item_in_open_bag(stream, context, language, item_slug,
+        healing ? 1 : 3, healing || own_partner ? target_party_slot : 0,
+        false, own_partner, command_owner);
+}
+
+
+//  OCR the opponent name box and restrict matches to `candidates`.
+//  Returns the best matching slug in candidates, or the best unrestricted match
+//  if no candidate qualifies.
+static std::string ocr_opponent_restricted(Logger& logger,
+    Language language,
+    const ImageViewRGB32& frame,
+    const ImageFloatBox& box,
+    const std::vector<std::string>& candidates){
+    using namespace Pokemon;
+    ImageViewRGB32 cropped = extract_box_reference(frame, box);
+    OCR::StringMatchResult result =
+        PokemonNameReader::instance().read_substring(logger, language, cropped, OCR::BLACK_OR_WHITE_TEXT_FILTERS());
+    if (result.results.empty()){
+        return "";
+    }
+
+    // Prefer the best candidate-restricted match
+    for (const auto& [score, match] : result.results){
+        if (score > PokemonNameReader::MAX_LOG10P){
+            break;
+        }
+        for (const std::string& c : candidates){
+            if (match.token == c){
+                return c;
+            }
+        }
+    }
+    // Fallback: best unrestricted match (if it meets threshold)
+    const auto& best = result.results.begin();
+    if (best->first <= PokemonNameReader::MAX_LOG10P){
+        return best->second.token;
+    }
+    return "";
+}
+
+
+// ---------------------------------------------------------------------------
+//  Pre-plan computation
+// ---------------------------------------------------------------------------
+
+struct BattlePlan {
+    // species slug → move slot to use against that pokemon (for current trainer)
+    std::map<std::string, int> move_for_species;
+    // Estimated remaining PP after the full trainer sequence is played out
+    std::array<int, 4> estimated_pp_after{};
+};
+
+//  Returns the Intimidate attack-stage multiplier for `count` Intimidate activations.
+//  Stage formula: 2 / (2 + count), capped at 6 drops.
+static double intimidate_atk_mult(int count){
+    if (count <= 0){
+        return 1.0;
+    }
+    int capped = std::min(count, 6);
+    return 2.0 / (2.0 + capped);
+}
+
+//  Score move `slot` (0-3) against a single opponent pokemon.
+//  Returns {lower_damage, upper_damage, is_ohko}.
+static std::tuple<int, int, bool> score_move_expert(const BDSPMoveData& mdata,
+    const BDSPTrainerPokemon& tp,
+    int effective_atk,
+    int effective_spatk,
+    bool doubles){
+    if (mdata.category == MoveCategory::STATUS){
+        return {0, 0, false};
+    }
+
+    const BDSPPokemonData& pdata = bdsp_pokemon(tp.species);
+    uint16_t hp = calc_stats_hp(pdata.hp, tp.level, tp.ivs.hp, tp.evs.hp);
+
+    int atk_stat = (mdata.category == MoveCategory::PHYSICAL) ? effective_atk : effective_spatk;
+    uint16_t def = (mdata.category == MoveCategory::PHYSICAL)
+        ? calc_stats_nonhp(pdata.defense, tp.level, tp.ivs.defense, tp.evs.defense, NatureAdjustment::NEUTRAL)
+        : calc_stats_nonhp(pdata.spdef, tp.level, tp.ivs.spdef, tp.evs.spdef, NatureAdjustment::NEUTRAL);
+
+    double mult = type_multiplier(mdata.type, pdata.type[0], pdata.type[1]);
+    if (mdata.spread && doubles){
+        mult *= 0.75;
+    }
+
+    // Attacker level is always 100 (helper Pokemon); defender level is tp.level
+    auto [lo, hi] = damage_range(100, (int)mdata.base_power, atk_stat, (int)def, mult);
+    bool ohko = (lo >= (int)hp);
+    return {lo, hi, ohko};
+}
+
+static BattlePlan build_expert_plan(Logger& logger,
+    const std::array<std::string, 4>& move_slugs,
+    const std::array<int, 4>& current_pp,
+    const std::vector<Trainer>& all_trainers,
+    Trainer current_trainer,
+    int base_atk,
+    int base_spatk){
+    // Running PP budget across the full sequence
+    std::array<int, 4> pp = current_pp;
+
+    BattlePlan plan;
+    plan.estimated_pp_after = pp;
+
+    int intimidate_count = 0;
+
+    // Iterate through all listed trainers in sequence order.
+    // For current_trainer, populate move_for_species.
+    for (Trainer t : all_trainers){
+        const BDSPTrainerData& tdata = bdsp_trainer(trainer_slug(t));
+        bool is_current = (t == current_trainer);
+        bool doubles = (tdata.battle_type == BDSPBattleType::DOUBLES);
+
+        for (const BDSPTrainer& side : tdata.trainers){
+            // Check first-out pokemon for Intimidate (activates before we attack)
+            if (!side.pokemon.empty() && side.pokemon[0].has_intimidate){
+                intimidate_count++;
+            }
+        }
+
+        int eff_atk = (int)(base_atk * intimidate_atk_mult(intimidate_count));
+        int eff_spatk = base_spatk; // Intimidate doesn't affect SpAtk
+
+        for (const BDSPTrainer& side : tdata.trainers){
+            for (const BDSPTrainerPokemon& tp : side.pokemon){
+                // Find best move for this pokemon
+                int best_slot = -1;
+                int best_hi = -1;
+                bool best_ohko = false;
+
+                for (int i = 0; i < 4; i++){
+                    if (pp[i] <= 0){
+                        continue;
+                    }
+                    const BDSPMoveData& mdata = bdsp_move(move_slugs[i]);
+                    if (mdata.category == MoveCategory::STATUS){
+                        continue;
+                    }
+
+                    auto [lo, hi, ohko] = score_move_expert(mdata, tp, eff_atk, eff_spatk, doubles);
+                    (void)lo;
+
+                    // Log adjusted accuracy (informational only, not used in OHKO decisions)
+                    uint8_t acc = mdata.accuracy;
+                    if (acc > 0 && acc < 100){
+                        int adj = 100 - 2 * (100 - acc);
+                        logger.log(move_slugs[i] + " vs " + tp.species + ": accuracy=" + std::to_string(acc) +
+                            "% (adjusted=" + std::to_string(adj) + "%)",
+                            COLOR_YELLOW);
+                    }
+
+                    bool prefer = (best_slot < 0) || (ohko && !best_ohko) // new OHKO > non-OHKO
+                        || (ohko && best_ohko && hi < best_hi)            // both OHKO: lower overkill
+                        || (!ohko && !best_ohko && hi > best_hi);         // no OHKO: higher damage
+
+                    if (prefer){
+                        best_slot = i;
+                        best_hi = hi;
+                        best_ohko = ohko;
+                    }
+                }
+
+                if (best_slot < 0){
+                    // All PP at 0 — Struggle will be used in practice
+                    logger.log("PP exhausted for " + tp.species + " — Struggle expected", COLOR_YELLOW);
+                }else{
+                    pp[best_slot]--;
+                    logger.log(std::string(is_current ? "[plan] " : "[pre-plan] ") + tp.species + " → slot " +
+                        std::to_string(best_slot) + " (" + move_slugs[best_slot] + ")" +
+                        (best_ohko ? " [OHKO]" : " [best effort, hi=" + std::to_string(best_hi) + "]"),
+                        COLOR_WHITE);
+                    if (is_current){
+                        // Only override if this species hasn't been planned yet
+                        // (in case the same species appears twice — first occurrence wins)
+                        if (plan.move_for_species.find(tp.species) == plan.move_for_species.end()){
+                            plan.move_for_species[tp.species] = best_slot;
+                        }
+                    }
+                }
+
+                // Track Intimidate for subsequent pokemon (after the initial send-out)
+                if (tp.has_intimidate){
+                    intimidate_count++;
+                    eff_atk = (int)(base_atk * intimidate_atk_mult(intimidate_count));
+                }
+            }
+        }
+    }
+
+    plan.estimated_pp_after = pp;
+    return plan;
+}
+
+
+// ---------------------------------------------------------------------------
+//  handle_expert_battle
+// ---------------------------------------------------------------------------
+
+//  Snapshot the current frame, OCR on-field names, and update `on_field`.
+static void update_on_field(Logger& logger,
+    Language language,
+    VideoStream& stream,
+    BDSPBattleType battle_type,
+    const std::vector<std::string>& candidates,
+    std::vector<std::string>& on_field){
+    VideoSnapshot frame = stream.video().snapshot();
+    if (battle_type == BDSPBattleType::SINGLES){
+        static const ImageFloatBox BOX(0.505, 0.010, 0.420, 0.085);
+        std::string name = ocr_opponent_restricted(logger, language, frame, BOX, candidates);
+        if (!name.empty() && !on_field.empty()){
+            on_field[0] = name;
+        }
+    }else{
+        static const ImageFloatBox BOX_L(0.505, 0.010, 0.200, 0.085);
+        static const ImageFloatBox BOX_R(0.710, 0.010, 0.260, 0.085);
+        std::string l = ocr_opponent_restricted(logger, language, frame, BOX_L, candidates);
+        std::string r = ocr_opponent_restricted(logger, language, frame, BOX_R, candidates);
+        if (!l.empty() && on_field.size() > 0){
+            on_field[0] = l;
+        }
+        if (!r.empty() && on_field.size() > 1){
+            on_field[1] = r;
+        }
+    }
+}
+
+
+// Not called by current story routes. Retained with its planning helpers for
+// future unassisted move selection and PP budgeting. Validate the data and
+// damage model, and adapt the level-100 Torterra assumptions before enabling it.
+void handle_expert_battle(const ProgramInfo& /*info*/,
+    VideoStream& stream,
+    ProControllerContext& context,
+    const std::vector<Trainer>& all_trainers,
+    Trainer current_trainer,
+    const AutoStoryOptions& options){
+    using namespace Pokemon;
+
+    Logger& logger = stream.logger();
+    const BDSPTrainerData& trainer_data = bdsp_trainer(trainer_slug(current_trainer));
+    const OutsideHelpConfig& help = options.outside_help;
+    bool doubles = (trainer_data.battle_type == BDSPBattleType::DOUBLES);
+
+    // Move slugs for the helper's 4 moves
+    std::array<std::string, 4> move_slugs;
+    for (int i = 0; i < 4; i++){
+        move_slugs[i] = torterra_move_slug(help.attacks[i]);
+    }
+
+    // Helper stats — 0IV/0EV at level 100, neutral nature
+    const BDSPPokemonData& helper_base = bdsp_pokemon("torterra");
+    int base_atk = (int)calc_stats_nonhp(helper_base.attack, 100, 0, 0, NatureAdjustment::NEUTRAL);
+    int base_spatk = (int)calc_stats_nonhp(helper_base.spatk, 100, 0, 0, NatureAdjustment::NEUTRAL);
+
+    // Candidate species slugs for restricted OCR (all pokemon in current trainer's party)
+    std::vector<std::string> candidates;
+    for (const BDSPTrainer& side : trainer_data.trainers){
+        for (const BDSPTrainerPokemon& tp : side.pokemon){
+            candidates.push_back(tp.species);
+        }
+    }
+
+    // PP tracking — initialised to max PP from JSON; OCR updates each turn
+    std::array<int, 4> pp_remaining;
+    for (int i = 0; i < 4; i++){
+        pp_remaining[i] = (int)bdsp_move(move_slugs[i]).pp;
+    }
+
+    // Intimidate tracking across turns
+    int intimidate_count = 0;
+    std::set<std::string> intimidate_seen;
+
+    // Current on-field opponents (initialised to first pokemon of each side)
+    std::vector<std::string> on_field;
+    for (const BDSPTrainer& side : trainer_data.trainers){
+        on_field.push_back(side.pokemon.empty() ? "" : side.pokemon[0].species);
+    }
+
+    // plan is built on the first turn after PP are OCR'd
+    BattlePlan plan;
+    bool plan_built = false;
+
+    // ── Wait for the initial battle menu ─────────────────────────────────────
+    bool battle_active = true;
+    {
+        BattleMenuWatcher menu(BattleType::TRAINER);
+        EndBattleWatcher end;
+        int r = wait_until(stream, context, 60s, {{menu}, {end}});
+        if (r != 0 || r < 0){
+            battle_active = false;
+        }
+    }
+
+    // ── Main battle loop ──────────────────────────────────────────────────────
+    //  Each iteration starts with the battle menu (Fight/Pokemon/Bag/Run) visible.
+    //  We check HP/status, open the fight menu, OCR PP, identify the opponent,
+    //  select a move, then wait for the next event.
+    while (battle_active){
+
+        // 1. Check HP / status → use Full Restore if needed
+        {
+            const BattleHPLayout layout = doubles ? BattleHPLayout::NPC_PARTNER : BattleHPLayout::SINGLES;
+            double hp = -1;
+            BattleHPReading hp_reading;
+            WallClock last_hp_frame = WallClock::min();
+            size_t stable_hp = 0;
+            VideoSnapshot frame;
+            for (size_t check = 0; check < 20 && stable_hp < 3; check++){
+                context.wait_for_all_requests();
+                frame = stream.video().snapshot();
+                BattleHPReading observed_reading;
+                hp = frame && frame.timestamp > last_hp_frame
+                    ? read_player_hp_ratio(frame, layout, 1, &observed_reading) : -1;
+                stable_hp = hp > 0 ? (observed_reading == hp_reading ? stable_hp + 1 : 1) : 0;
+                hp_reading = observed_reading;
+                last_hp_frame = frame.timestamp;
+                if (stable_hp < 3){
+                    pbf_wait(context, 100ms);
+                }
+            }
+            if (stable_hp < 3){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "Expert battle: HP not confirmed; no item or attack selected.", stream);
+            }
+            bool has_status = detect_player_status(frame);
+            if (hp < 0.33 || has_status){
+                logger.log("Full Restore needed (HP=" + std::to_string((int)(hp * 100)) +
+                    "%, status=" + (has_status ? "yes" : "no") + ")",
+                    COLOR_WHITE);
+                use_item_in_battle(stream, context, options.language, "full-restore", false, layout, 1);
+                BattleMenuWatcher commands(BattleType::TRAINER, COLOR_RED);
+                if (run_until<ProControllerContext>(stream, context,
+                    [](ProControllerContext& ctx){
+                        pbf_mash_button(ctx, BUTTON_B, 120000ms);
+                    }, {{commands}}) != 0){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "Full Restore: battle commands did not return.", stream);
+                }
+                continue;
+            }
+        }
+
+        // 2. Open fight menu and re-read PP
+        pbf_press_button(context, BUTTON_A, 10ms, 60ms);
+        context.wait_for_all_requests();
+        context.wait_for(300ms);
+        {
+            auto ocr_pp = read_all_pp(logger, stream.video().snapshot());
+            for (int i = 0; i < 4; i++){
+                if (ocr_pp[i] >= 0){
+                    pp_remaining[i] = ocr_pp[i];
+                }else{
+                    logger.log("PP OCR failed slot " + std::to_string(i), COLOR_YELLOW);
+                }
+            }
+        }
+
+        // 3. Build plan on first turn (after we have real PP values from OCR)
+        if (!plan_built){
+            plan = build_expert_plan(logger,
+                move_slugs,
+                pp_remaining,
+                all_trainers,
+                current_trainer,
+                base_atk,
+                base_spatk);
+            plan_built = true;
+        }
+
+        // 4. Identify current on-field opponent(s) via restricted OCR
+        //    (Fight menu is open at bottom; opponent info boxes are at the top — still readable)
+        update_on_field(logger, options.language, stream, trainer_data.battle_type, candidates, on_field);
+
+        // 5. Track Intimidate from newly-observed opponents
+        {
+            int eff_atk = base_atk;
+            for (const std::string& slug : on_field){
+                if (slug.empty() || intimidate_seen.count(slug)){
+                    continue;
+                }
+                for (const BDSPTrainer& side : trainer_data.trainers){
+                    for (const BDSPTrainerPokemon& tp : side.pokemon){
+                        if (tp.species == slug && tp.has_intimidate){
+                            intimidate_count++;
+                            intimidate_seen.insert(slug);
+                            eff_atk = (int)(base_atk * intimidate_atk_mult(intimidate_count));
+                            logger.log(slug + " has Intimidate — ATK stage -" + std::to_string(intimidate_count) +
+                                " (effective ATK=" + std::to_string(eff_atk) + ")",
+                                COLOR_YELLOW);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 6. Select move — prefer pre-plan; fall back to live scoring if plan misses
+        int best_slot = -1;
+        if (!on_field.empty() && !on_field[0].empty()){
+            auto it = plan.move_for_species.find(on_field[0]);
+            if (it != plan.move_for_species.end() && pp_remaining[it->second] > 0){
+                best_slot = it->second;
+            }
+        }
+
+        if (best_slot < 0){
+            logger.log("Plan miss for " + (on_field.empty() ? "?" : on_field[0]) + " — live scoring", COLOR_YELLOW);
+            int eff_atk = (int)(base_atk * intimidate_atk_mult(intimidate_count));
+            int eff_spatk = base_spatk;
+            int best_hi = -1;
+            bool best_ohko = false;
+
+            for (int i = 0; i < 4; i++){
+                if (pp_remaining[i] <= 0){
+                    continue;
+                }
+                const BDSPMoveData& mdata = bdsp_move(move_slugs[i]);
+                if (mdata.category == MoveCategory::STATUS){
+                    continue;
+                }
+
+                int hi = 0;
+                bool ohko = false;
+                if (!on_field.empty() && !on_field[0].empty()){
+                    for (const BDSPTrainer& side : trainer_data.trainers){
+                        for (const BDSPTrainerPokemon& tp : side.pokemon){
+                            if (tp.species != on_field[0]){
+                                continue;
+                            }
+                            auto [lo, h, ok] = score_move_expert(mdata, tp, eff_atk, eff_spatk, doubles);
+                            hi = h;
+                            ohko = ok;
+                        }
+                    }
+                }
+
+                bool prefer = (best_slot < 0) || (ohko && !best_ohko) || (ohko && best_ohko && hi < best_hi) ||
+                    (!ohko && !best_ohko && hi > best_hi);
+
+                if (prefer){
+                    best_slot = i;
+                    best_hi = hi;
+                    best_ohko = ohko;
+                }
+            }
+            // Last resort: first move with any PP remaining
+            if (best_slot < 0){
+                for (int i = 0; i < 4; i++){
+                    if (pp_remaining[i] > 0){
+                        best_slot = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // 7. Execute selected move (or Struggle if all PP are gone)
+        if (best_slot < 0){
+            logger.log("All PP at 0 — Struggle", COLOR_YELLOW);
+            pbf_press_button(context, BUTTON_B, 10ms, 60ms); // close fight menu
+            context.wait_for_all_requests();
+        }else{
+            logger.log("Move slot " + std::to_string(best_slot) + " (" + move_slugs[best_slot] + ") vs " +
+                (on_field.empty() ? "?" : on_field[0]),
+                COLOR_WHITE);
+            navigate_to_slot(context, best_slot);
+            pbf_mash_button(context, BUTTON_A, 500ms);
+            context.wait_for_all_requests();
+            pp_remaining[best_slot]--;
+
+            // Single-target move in doubles: confirm default target
+            if (!bdsp_move(move_slugs[best_slot]).spread && doubles){
+                pbf_press_button(context, BUTTON_A, 10ms, 60ms);
+                context.wait_for_all_requests();
+            }
+            // Mash through target confirm and partner's move selection
+            pbf_mash_button(context, BUTTON_A, 3000ms);
+            context.wait_for_all_requests();
+        }
+
+        // 8. Wait for next event: next battle menu, XP gain, or battle end
+        {
+            BattleMenuWatcher menu2(BattleType::TRAINER);
+            ExperienceGainWatcher exp;
+            EndBattleWatcher end;
+
+            int event = wait_until(stream, context, 60s, {{menu2}, {exp}, {end}});
+
+            if (event == 2 || event < 0){
+                // Battle over
+                break;
+            }else if (event == 1){
+                // XP gain — mash until the NEXT battle menu appears (or battle ends)
+                BattleMenuWatcher menu3(BattleType::TRAINER);
+                EndBattleWatcher end2;
+                int after = run_until<ProControllerContext>(stream,
+                    context,
+                    [](ProControllerContext& ctx){
+                        pbf_mash_button(ctx, BUTTON_A, 120000ms);
+                    },
+                    {{menu3}, {end2}});
+                if (after != 0){
+                    // Battle ended during XP screens
+                    break;
+                }
+                // Update on-field now that the next pokemon is visible
+                update_on_field(logger, options.language, stream, trainer_data.battle_type, candidates, on_field);
+                for (size_t i = 0; i < on_field.size(); i++){
+                    logger.log("On-field[" + std::to_string(i) + "] = " + on_field[i], COLOR_WHITE);
+                }
+                // Continue loop — we're now at the next battle menu
+            }
+            // event == 0: next battle menu appeared (mid-turn switch or next turn)
+            // Loop continues from the top, which is the battle menu state
+        }
+    }
+
+    // Mash through any remaining XP/dialog until we're back in the overworld
+    OverworldWatcher overworld;
+    run_until<ProControllerContext>(stream,
+        context,
+        [](ProControllerContext& ctx){
+            pbf_mash_button(ctx, BUTTON_A, 120000ms);
+        },
+        {{overworld}});
+}
+
+
+}
+}
+}

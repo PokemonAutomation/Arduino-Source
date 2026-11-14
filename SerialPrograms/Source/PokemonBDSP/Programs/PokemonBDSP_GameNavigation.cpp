@@ -5,6 +5,8 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
+#include "CommonFramework/Tools/VideoStream.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -74,6 +76,12 @@ void overworld_to_menu(VideoStream& stream, ProControllerContext& context){
             {{detector}}
         );
         if (ret < 0){
+            const VideoSnapshot snapshot = stream.video().snapshot();
+            if (snapshot){
+                stream.log(detector.debug_report(snapshot), COLOR_ORANGE);
+            }else{
+                stream.log("MenuDetector report: no video frame available.", COLOR_ORANGE);
+            }
             OperationFailedExceptionWithScreenshot::fire(
                 ErrorReportMode::SEND_ERROR_REPORT,
                 "Menu not detected after 10 seconds.",

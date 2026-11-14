@@ -20,8 +20,9 @@ namespace PokemonBDSP{
 
 
 ExperienceGainDetector::~ExperienceGainDetector(){}
-ExperienceGainDetector::ExperienceGainDetector(Color color)
+ExperienceGainDetector::ExperienceGainDetector(Color color, bool allow_no_dialog)
     : m_color(color)
+    , m_allow_no_dialog(allow_no_dialog)
     , m_dialog(color)
     , m_middle_column(0.369, 0.01, 0.003, 0.79)
     , m_left_column(0.006, 0.01, 0.03, 0.79)
@@ -35,7 +36,8 @@ void ExperienceGainDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_lower_left_region);
 }
 bool ExperienceGainDetector::detect(const ImageViewRGB32& screen){
-    if (!m_dialog.detect(screen)){
+    const bool dialog = m_dialog.detect(screen);
+    if (!dialog && !m_allow_no_dialog){
 //        cout << "ExperienceGainDetector: No dialogue detected, return" << endl;
         return false;
     }
@@ -50,7 +52,10 @@ bool ExperienceGainDetector::detect(const ImageViewRGB32& screen){
     if (!is_solid(stats1, {0.3, 0.35, 0.35}, 0.1, 50)){
         return false;
     }
-    const ImageStats stats2 = image_stats(extract_box_reference(screen, m_lower_left_region));
+    // Without dialog the party panel extends to the bottom of the screen.
+    // Sample its left edge, away from the changing party-row artwork.
+    const ImageFloatBox lower_left = dialog ? m_lower_left_region : ImageFloatBox{0.006, 0.8, 0.08, 0.15};
+    const ImageStats stats2 = image_stats(extract_box_reference(screen, lower_left));
 //    cout << "ExperienceGainDetector: No m_lower_left_region detected, " << stats2.average.to_string() << ", " << stats2.stddev.to_string() << endl;
     if (!is_solid(stats2, {0.3, 0.35, 0.35}, 0.1, 40)){
         return false;
@@ -61,8 +66,8 @@ bool ExperienceGainDetector::detect(const ImageViewRGB32& screen){
 }
 
 
-ExperienceGainWatcher::ExperienceGainWatcher(Color color)
-     : ExperienceGainDetector(color)
+ExperienceGainWatcher::ExperienceGainWatcher(Color color, bool allow_no_dialog)
+     : ExperienceGainDetector(color, allow_no_dialog)
      , VisualInferenceCallback("ExperienceGainWatcher")
 {}
 void ExperienceGainWatcher::make_overlays(VideoOverlaySet& items) const{

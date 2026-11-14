@@ -1,0 +1,119 @@
+#pragma once
+
+#include <functional>
+#include <string>
+#include <vector>
+
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
+
+namespace PokemonAutomation {
+namespace NintendoSwitch {
+namespace PokemonBDSP {
+// The shared template path defaults to grayscale normalized correlation,
+// with opt-in local-contrast normalization or blue-fraction color features.
+// Grayscale reduces reliance on exact RGB values; it does not guarantee
+// capture-card independence. Channel shifts, clipping, gamma and lost detail
+// still require cross-capture validation, including negative examples.
+// See LandmarkFeatures and match_landmarks() in the implementation.
+struct OverworldLandmarkResult {
+    std::string name;
+    double score = 0, margin = 0;
+    // Signed fractions of screen width/height, independent of capture resolution.
+    double dx = 0, dy = 0;
+    bool accepted = false;
+    ImageFloatBox search, found;
+};
+struct OverworldMatchResult {
+    std::vector<OverworldLandmarkResult> landmarks;
+    bool located = false, at_target = false;
+    bool coarse = false;
+    // Signed fractions of screen width/height, independent of capture resolution.
+    double dx = 0, dy = 0;
+};
+struct OverworldMatcher {
+    std::string slug, name;
+    std::function<OverworldMatchResult(const ImageRGB32&)> match;
+};
+// Register additional functions here; each owns its landmarks and coordinate system.
+const std::vector<OverworldMatcher>& overworld_matchers();
+// Interior exit: grayscale indicator/button features. Horizontal alignment only;
+// start on the clear row south of the lift, then watch the northward entry fade.
+OverworldMatchResult match_sunyshore_lighthouse_elevator(const ImageRGB32& frame);
+OverworldMatchResult match_route204_north_approach(const ImageRGB32& frame);
+OverworldMatchResult match_teighler_alcove_corner(const ImageRGB32& frame);
+OverworldMatchResult match_route204_north_stairs(const ImageRGB32& frame);
+OverworldMatchResult match_floaroma_center_entrance(const ImageRGB32& frame);
+OverworldMatchResult match_floaroma_house_entrance(const ImageRGB32& frame);
+OverworldMatchResult match_ravaged_path_south_entrance(const ImageRGB32& frame);
+OverworldMatchResult match_route204_sign(const ImageRGB32& frame);
+OverworldMatchResult match_windworks_sign_approach(const ImageRGB32& frame);
+// Interior only: offsets from the player's red cap to the grunt's cyan hair.
+// Positive dy > .025 means the player is above him; otherwise below/level.
+OverworldMatchResult match_windworks_interior_grunt(const ImageRGB32& frame);
+OverworldMatchResult match_route205_bridge(const ImageRGB32& frame);
+OverworldMatchResult match_route205_bank_tree(const ImageRGB32& frame);
+OverworldMatchResult match_route205_zackary(const ImageRGB32& frame);
+OverworldMatchResult match_route205_kelsey(const ImageRGB32& frame);
+OverworldMatchResult match_route205_forest_entrance(const ImageRGB32& frame);
+// Northern sign: align primarily westward, then correct height below the flower bed.
+OverworldMatchResult match_route204_floaroma_turn(const ImageRGB32& frame);
+OverworldMatchResult match_jubilife_street_approach(const ImageRGB32& frame);
+OverworldMatchResult match_jubilife_plaza_approach(const ImageRGB32& frame);
+// Grayscale sign alignment for a watched northward doorway entry.
+// dx/dy guide corrections on both axes. at_target requires horizontal
+// alignment and the exterior approach height.
+OverworldMatchResult match_jubilife_trainers_school_sign(const ImageRGB32& frame);
+OverworldMatchResult match_poketch_landmarks(const ImageRGB32& frame);
+OverworldMatchResult match_oreburgh_mart(const ImageRGB32& frame);
+// Two fixed gym features; reference pose is centered outside the doorway.
+OverworldMatchResult match_oreburgh_gym_entrance(const ImageRGB32& frame);
+OverworldMatchResult match_jubilife_center_entrance(const ImageRGB32& frame);
+OverworldMatchResult match_eterna_center_entrance(const ImageRGB32& frame);
+OverworldMatchResult match_hearthome_center_entrance(const ImageRGB32& frame);
+OverworldMatchResult match_hearthome_center_interior(const ImageRGB32& frame);
+OverworldMatchResult match_hearthome_contest_fantina(const ImageRGB32& frame);
+OverworldMatchResult match_veilstone_city_passage(const ImageRGB32& frame);
+OverworldMatchResult match_veilstone_dawn_stairs(const ImageRGB32& frame);
+OverworldMatchResult match_hearthome_gym_entrance(const ImageRGB32& frame);
+OverworldMatchResult match_route208_stair_top(const ImageRGB32& frame);
+OverworldMatchResult match_route208_lower_stair_lane(const ImageRGB32& frame);
+// Sign frame and rock pair at the Route 209 renewal point.
+OverworldMatchResult match_route209_repel_point(const ImageRGB32& frame);
+// Lane 4 east corner; coarse bridge references only guide approach acquisition.
+OverworldMatchResult match_route215_jogger_corner(const ImageRGB32& frame);
+OverworldMatchResult match_route215_bridge_renewal(const ImageRGB32& frame);
+OverworldMatchResult match_route215_ace_renewal(const ImageRGB32& frame);
+OverworldMatchResult match_route215_derek_stairs_renewal(const ImageRGB32& frame);
+OverworldMatchResult match_route215_derek_stair_top_renewal(const ImageRGB32& frame);
+OverworldMatchResult match_route208_hannah_departure(const ImageRGB32& frame);
+OverworldMatchResult match_eterna_gym_entrance(const ImageRGB32& frame);
+OverworldMatchResult match_galactic_hq_cut(const ImageRGB32& frame);
+OverworldMatchResult match_galactic_hq_jupiter(const ImageRGB32& frame);
+OverworldMatchResult match_eterna_cycle_shop_entrance(const ImageRGB32& frame);
+OverworldMatchResult match_eterna_cycle_shop_interior(const ImageRGB32& frame);
+OverworldMatchResult match_eterna_cycle_shop_reward(const ImageRGB32& frame);
+// Language-independent Bike Riding card: grayscale illustration and B icon.
+OverworldMatchResult match_eterna_bike_riding_card(const ImageRGB32& frame);
+OverworldMatchResult match_eterna_cycle_shop_counter(const ImageRGB32& frame);
+OverworldMatchResult match_cycling_road_bridge_approach(const ImageRGB32& frame);
+OverworldMatchResult match_cycling_road_south_gate_interior(const ImageRGB32& frame);
+OverworldMatchResult match_galactic_hq_exterior(const ImageRGB32& frame);
+OverworldMatchResult match_eterna_center_departure(const ImageRGB32& frame);
+OverworldMatchResult match_eterna_gym_statues(const ImageRGB32& frame);
+// Two unique, agreeing landmarks close to the doorway; this confidence only
+// authorizes a watched entry attempt, never proves the interior location.
+double overworld_entry_confidence(const OverworldMatchResult& result,
+    double tolerance_x = 1.0 / 50,
+    double tolerance_y = 1.0 / 27,
+    double minimum_margin = .15);
+OverworldMatchResult match_eterna_underground_house(const ImageRGB32& frame);
+// located/coarse may identify the room from three agreeing furniture anchors.
+// Only at_target confirms the precise four-anchor interaction pose.
+OverworldMatchResult match_eterna_underground_man(const ImageRGB32& frame);
+OverworldMatchResult match_route201_potion_exit(const ImageRGB32& frame);
+OverworldMatchResult match_sandgem_junction(const ImageRGB32& frame);
+OverworldMatchResult match_route202_grass_exit(const ImageRGB32& frame);
+}
+}
+}
