@@ -330,6 +330,12 @@ file(GLOB CORE_LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_Gyro.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_Gyro.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_GyroQuaternion.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_GyroQuaternion.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_GyroTests.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_GyroTests.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.cpp
@@ -1332,6 +1338,8 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.cpp
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h
+    Source/NintendoSwitch/DevPrograms/JoyconGyroTester.cpp
+    Source/NintendoSwitch/DevPrograms/JoyconGyroTester.h
     Source/NintendoSwitch/DevPrograms/JoyconProgram.cpp
     Source/NintendoSwitch/DevPrograms/JoyconProgram.h
     Source/NintendoSwitch/DevPrograms/TestDudunsparceFormDetector.cpp

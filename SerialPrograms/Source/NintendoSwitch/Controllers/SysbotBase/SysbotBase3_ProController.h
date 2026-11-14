@@ -112,49 +112,6 @@ public:
         ControllerWithScheduler::issue_right_joystick(cancellable, delay, hold, cooldown, position);
     }
 
-    virtual void issue_gyro_accel_x(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) override{
-        ControllerWithScheduler::issue_gyro_accel_x(cancellable, delay, hold, cooldown, value);
-    }
-    virtual void issue_gyro_accel_y(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) override{
-        ControllerWithScheduler::issue_gyro_accel_y(cancellable, delay, hold, cooldown, value);
-    }
-    virtual void issue_gyro_accel_z(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) override{
-        ControllerWithScheduler::issue_gyro_accel_z(cancellable, delay, hold, cooldown, value);
-    }
-    virtual void issue_gyro_rotate_x(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) override{
-        ControllerWithScheduler::issue_gyro_rotate_x(cancellable, delay, hold, cooldown, value);
-    }
-    virtual void issue_gyro_rotate_y(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) override{
-        ControllerWithScheduler::issue_gyro_rotate_y(cancellable, delay, hold, cooldown, value);
-    }
-    virtual void issue_gyro_rotate_z(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) override{
-        ControllerWithScheduler::issue_gyro_rotate_z(cancellable, delay, hold, cooldown, value);
-    }
-
     virtual void issue_full_controller_state(
         Cancellable* cancellable,
         bool enable_logging,

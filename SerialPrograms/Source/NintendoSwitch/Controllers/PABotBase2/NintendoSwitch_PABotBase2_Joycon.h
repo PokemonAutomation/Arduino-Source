@@ -124,49 +124,30 @@ public:
         }
     }
 
-    virtual void issue_gyro_accel_x(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) override{
-        ControllerWithScheduler::issue_gyro_accel_x(cancellable, delay, hold, cooldown, value);
+    virtual void check_gyro_motion_supported() const override{
+        require_gyro_motion_protocol();
     }
-    virtual void issue_gyro_accel_y(
+    virtual void issue_gyro_motion(
         Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
+        Milliseconds duration,
+        const GyroFunction& function
     ) override{
-        ControllerWithScheduler::issue_gyro_accel_y(cancellable, delay, hold, cooldown, value);
+        if (duration > Milliseconds::zero()){
+            check_gyro_motion_supported();
+        }
+        ControllerWithScheduler::issue_gyro_motion(
+            cancellable, this->controller_class(), duration, function
+        );
     }
-    virtual void issue_gyro_accel_z(
+    virtual void issue_gyro_motion(
         Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
+        const GyroMotion& motion
     ) override{
-        ControllerWithScheduler::issue_gyro_accel_z(cancellable, delay, hold, cooldown, value);
+        if (!motion.empty()){
+            check_gyro_motion_supported();
+        }
+        ControllerWithScheduler::issue_gyro_motion(cancellable, this->controller_class(), motion);
     }
-    virtual void issue_gyro_rotate_x(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) override{
-        ControllerWithScheduler::issue_gyro_rotate_x(cancellable, delay, hold, cooldown, value);
-    }
-    virtual void issue_gyro_rotate_y(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) override{
-        ControllerWithScheduler::issue_gyro_rotate_y(cancellable, delay, hold, cooldown, value);
-    }
-    virtual void issue_gyro_rotate_z(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) override{
-        ControllerWithScheduler::issue_gyro_rotate_z(cancellable, delay, hold, cooldown, value);
-    }
-
     virtual void issue_full_controller_state(
         Cancellable* cancellable,
         bool enable_logging,
@@ -224,8 +205,10 @@ protected:
         const SuperscalarScheduler::ScheduleEntry& entry
     ){
         SwitchControllerState controller_state;
+        bool has_gyro_motion = false;
         for (auto& item : entry.state){
             static_cast<const SwitchCommand&>(*item).apply(controller_state);
+            has_gyro_motion |= item->id == (size_t)SwitchResource::GYRO;
         }
 
         OemController_State0x30_Buttons buttons{
@@ -253,22 +236,17 @@ protected:
             controller_state.left_joystick
         );
 
-        OemController_State0x30_Gyro gyro{};
-        bool gyro_active = populate_report_gyro(gyro, controller_state);
-
-        if (!gyro_active){
-            issue_report(cancellable, entry.duration, buttons);
-        }else{
-            issue_report(cancellable, entry.duration, buttons, gyro);
-        }
+        issue_motion_report(cancellable, entry.duration, buttons, controller_state, has_gyro_motion);
     }
     void execute_state_right_joycon(
         Cancellable* cancellable,
         const SuperscalarScheduler::ScheduleEntry& entry
     ){
         SwitchControllerState controller_state;
+        bool has_gyro_motion = false;
         for (auto& item : entry.state){
             static_cast<const SwitchCommand&>(*item).apply(controller_state);
+            has_gyro_motion |= item->id == (size_t)SwitchResource::GYRO;
         }
 
         OemController_State0x30_Buttons buttons{
@@ -294,14 +272,7 @@ protected:
              << std::chrono::duration_cast<Milliseconds>(entry.duration).count() << endl;
 #endif
 
-        OemController_State0x30_Gyro gyro{};
-        bool gyro_active = populate_report_gyro(gyro, controller_state);
-
-        if (!gyro_active){
-            issue_report(cancellable, entry.duration, buttons);
-        }else{
-            issue_report(cancellable, entry.duration, buttons, gyro);
-        }
+        issue_motion_report(cancellable, entry.duration, buttons, controller_state, has_gyro_motion);
     }
     virtual void execute_state(
         Cancellable* cancellable,
