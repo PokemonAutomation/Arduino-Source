@@ -8,35 +8,6 @@
  *  response types, the handler contract, and the threading rules are in
  *  "AbstractHttpServer.h"; this file documents the implementation.
  *
- *  Implementation notes:
- *  - The socket's receive/disconnect callbacks only append data to the
- *    per-connection buffer and flip flags. One "connection task" per
- *    connection (from the thread pool) does all parsing and writing, so
- *    the handler may run for a long time without stalling the socket's
- *    receive loop.
- *  - Every write goes through "AbstractServerSocket::send()" with the
- *    connection's socket id (captured at accept time), so a response
- *    that outlives its connection - the peer disconnected and the next
- *    client was accepted in the meantime - is refused by the socket
- *    instead of reaching the new client's stream.
- *  - "Expect: 100-continue" is answered as soon as the headers are
- *    validated, while the body is still pending (a waiting client is
- *    blocked on that interim response).
- *  - Task handles live in "m_tasks" under a dedicated "m_task_lock"
- *    (the socket library's "m_task_lock" pattern): destroying an
- *    "AsyncTask" handle blocks until that task finishes, and the task's
- *    final cleanup takes "m_lock", so a handle must never be destroyed
- *    while holding "m_lock". "on_connect()" may therefore find the
- *    previous connection's task still finishing (for example, still in a
- *    long handler call); its handle is kept and reaped later.
- *  - "stop()" marks the active connection dead before it waits for the
- *    in-flight task: the socket suppresses its disconnect callback for a
- *    close_connection() close, so without the mark a handler polling
- *    "connection_alive()" would never see the shutdown. "stop()" then
- *    moves the socket out under "m_lock" and destroys it after releasing
- *    the lock: "~ServerSocket" joins the socket's worker threads, and
- *    their callbacks take "m_lock".
- *
  */
 
 #ifndef PokemonAutomation_HttpServer_H
@@ -88,6 +59,8 @@ private:
     virtual void on_receive_data(const void* data, size_t bytes) override;
     virtual void on_disconnect(const std::string& error_message) override;
 
+
+private:
     //  One request that is waiting to be parsed out of the buffer.
     enum class ParseState{
         NEED_MORE,
@@ -130,7 +103,10 @@ private:
 
     //  Runs on a thread from the thread pool, one instance per
     //  connection.
-    void connection_task(const std::shared_ptr<Connection>& conn, AbstractServerSocket* socket);
+    void connection_task(
+        const std::shared_ptr<Connection>& conn,
+        AbstractServerSocket* socket
+    );
 
     //  Parses one complete request out of "buffer", removing it on
     //  success. Must be called with "conn->lock" held.
@@ -138,11 +114,18 @@ private:
 
     //  Marks the connection dead and closes it at the socket level. No-op
     //  if the socket is no longer connected to this client.
-    void end_connection(const std::shared_ptr<Connection>& conn, AbstractServerSocket* socket);
+    void end_connection(
+        const std::shared_ptr<Connection>& conn,
+        AbstractServerSocket* socket
+    );
 
     //  Writes "bytes" to the connection completely; returns false (and
     //  ends the connection) if the peer went away or the write stalled.
-    bool write_raw(const std::shared_ptr<Connection>& conn, AbstractServerSocket* socket, const std::string& bytes);
+    bool write_raw(
+        const std::shared_ptr<Connection>& conn,
+        AbstractServerSocket* socket,
+        const std::string& bytes
+    );
 
     //  Formats and writes the final response.
     bool write_response(
@@ -158,6 +141,8 @@ private:
     //  Builds the wire format of a response.
     static std::string format_response(const Response& response, bool keep_alive);
 
+
+private:
     ThreadPool& m_thread_pool;
 
     //  Guards m_socket, m_connection, and m_handler. Never held across a
