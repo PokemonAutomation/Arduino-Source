@@ -50,6 +50,26 @@ bool KantoMapDetector::detect(const ImageViewRGB32& screen){
 }
 
 
+FlyMapDetector::FlyMapDetector(Color color)
+    : m_color(color)
+    , m_top_box(0.010, 0.010, 0.500, 0.080) // blue (0, 122, 255)
+    , m_left_box(0.069, 0.110, 0.025, 0.880) // white
+    , m_right_box(0.902, 0.110, 0.025, 0.880) // white
+{}
+void FlyMapDetector::make_overlays(VideoOverlaySet& items) const{
+    const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
+    items.add(m_color, GAME_BOX.inner_to_outer(m_top_box));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_left_box));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_right_box));
+}
+bool FlyMapDetector::detect(const ImageViewRGB32& screen){
+    ImageViewRGB32 game_screen = extract_box_reference(screen, GameSettings::instance().GAME_BOX);
+    return is_solid(extract_box_reference(game_screen, m_top_box), { 0.0000, 0.3236, 0.6764 }, 0.25, 20)
+        && is_white(extract_box_reference(game_screen, m_left_box))
+        && is_white(extract_box_reference(game_screen, m_right_box));
+}
+
+
 
 }
 }
