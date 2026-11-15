@@ -3,13 +3,16 @@ SerialPrograms/bin/
 .vscode
 .qtcreator
 
+# 3rdPartyBinaries
 discord_social_sdk_win/
 discord_partner_sdk.dll
 3rdPartyBinaries/discord_social_sdk_mac/
 3rdPartyBinaries/discord_social_sdk_linux/
 3rdPartyBinaries/onnxruntime-osx-arm64-*/
 3rdPartyBinaries/onnxruntime-osx-x86_64-*/
-
+opencv_world4120.dll
+opencv_world4120d.dll
+3rdPartyBinaries/ffmpeg/*.dll
 
 # macOS hidden system file
 .DS_Store
@@ -59,8 +62,6 @@ SerialPrograms/*.lib
 Resources/*
 Packages/
 SerialPrograms/CMakeLists.txt.user
-opencv_world4120.dll
-opencv_world4120d.dll
 
 # Python cache
 __pycache__
