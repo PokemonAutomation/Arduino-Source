@@ -15,6 +15,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 
 namespace PokemonAutomation{
     class ImageViewRGB32;
@@ -100,6 +101,12 @@ bool screen_scrolled_one_tile(
     const ImageViewRGB32& before, const ImageViewRGB32& after,
     int dx, int dy
 );
+
+
+void add_tests_ScreenOdometry(UnitTestDatabase& database);
+void add_tests_ScreenScrolledOneTile(UnitTestDatabase& database);
+void add_tests_IndoorPosition(UnitTestDatabase& database);
+void add_tests_HouseRoof(UnitTestDatabase& database);
 
 
 

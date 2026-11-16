@@ -13,6 +13,7 @@
 #define PokemonAutomation_PokemonFRLG_VsSeekerIconDetector_H
 
 #include <vector>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 
 namespace PokemonAutomation{
     class ImageViewRGB32;
@@ -37,6 +38,9 @@ struct VsSeekerIconSighting{
     int y = 0;
 };
 std::vector<VsSeekerIconSighting> find_vs_seeker_icons(const ImageViewRGB32& frame);
+
+
+void add_tests_VsSeekerIcons(UnitTestDatabase& database);
 
 
 

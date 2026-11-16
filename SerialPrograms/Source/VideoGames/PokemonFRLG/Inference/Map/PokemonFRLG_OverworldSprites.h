@@ -11,6 +11,7 @@
 #define PokemonAutomation_PokemonFRLG_OverworldSprites_H
 
 #include <vector>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "PokemonFRLG_OverworldGeometry.h"
 
@@ -47,6 +48,9 @@ SpriteSighting find_purple_hair(const ImageViewRGB32& frame, const std::vector<T
 //  Works on any tile on screen, including the top rows where the head is cut
 //  off. Not found if no tile has enough.
 SpriteSighting find_sprite_feet(const ImageViewRGB32& frame, const std::vector<TileOffset>& tiles);
+
+
+void add_tests_OverworldSprites(UnitTestDatabase& database);
 
 
 

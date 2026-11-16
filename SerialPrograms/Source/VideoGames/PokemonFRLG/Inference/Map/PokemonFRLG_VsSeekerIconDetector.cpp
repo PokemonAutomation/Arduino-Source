@@ -7,7 +7,9 @@
 #include <stdlib.h>
 #include <algorithm>
 #include <cmath>
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "Tests/ImageUnitTest.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_OverworldGeometry.h"
 #include "PokemonFRLG_VsSeekerIconDetector.h"
@@ -77,25 +79,64 @@ KindMap classify_region(const ImageViewRGB32& game_screen, int left, int top, in
     return ret;
 }
 
+bool is_light_blue_white_edge(uint8_t a, uint8_t b){
+    return (a == LIGHT_BLUE && b == WHITE) || (a == WHITE && b == LIGHT_BLUE);
+}
+
 //  Whether the icon-sized window with top-left corner (x, y) looks like an
-//  icon, and which. A bubble has plenty of white; then the "!!" has navy
-//  marks (about 25 pixels), and the "X" a light blue fill (about 80 pixels;
-//  the "!!" only has a thin light blue rim). `score` ranks the windows.
+//  icon, and which. `score` ranks the windows.
+//
+//  A bubble has plenty of white. The "!!" marks are navy strokes 2 pixels
+//  wide with white on both sides (about 24 such pixels); navy next to white
+//  elsewhere (house windows, roof edges, rocks) isn't drawn that way. The "X"
+//  is a light blue fill crossed by white lines, so light blue and white meet
+//  many times both across and down (about 50 times each); water, ice floors
+//  and stripes meet white along one edge.
 VsSeekerIcon classify_window(const KindMap& map, int x, int y, int& score){
     int counts[4] = {0, 0, 0, 0};
+    int marks = 0;
+    int edges_across = 0;
+    int edges_down = 0;
     for (int dy = 0; dy < ICON_SIZE; dy++){
-        for (int dx = 0; dx < ICON_SIZE; dx++){
-            counts[map.at(x + dx, y + dy)]++;
+        int dx = 0;
+        while (dx < ICON_SIZE){
+            uint8_t kind = map.at(x + dx, y + dy);
+            if (kind != NAVY){
+                counts[kind]++;
+                dx++;
+                continue;
+            }
+            int start = dx;
+            while (dx < ICON_SIZE && map.at(x + dx, y + dy) == NAVY){
+                dx++;
+            }
+            int length = dx - start;
+            counts[NAVY] += length;
+            if (length <= 3 && start > 0 && dx < ICON_SIZE &&
+                map.at(x + start - 1, y + dy) == WHITE &&
+                map.at(x + dx, y + dy) == WHITE
+            ){
+                marks += length;
+            }
+        }
+        for (dx = 0; dx < ICON_SIZE; dx++){
+            uint8_t kind = map.at(x + dx, y + dy);
+            if (dx + 1 < ICON_SIZE && is_light_blue_white_edge(kind, map.at(x + dx + 1, y + dy))){
+                edges_across++;
+            }
+            if (dy + 1 < ICON_SIZE && is_light_blue_white_edge(kind, map.at(x + dx, y + dy + 1))){
+                edges_down++;
+            }
         }
     }
     if (counts[WHITE] < 30){
         return VsSeekerIcon::NONE;
     }
-    if (counts[NAVY] >= 12){
-        score = counts[NAVY] * 4;
+    if (marks >= 12){
+        score = marks * 4;
         return VsSeekerIcon::READY;
     }
-    if (counts[NAVY] < 4 && counts[LIGHT_BLUE] >= 45){
+    if (counts[NAVY] < 4 && counts[LIGHT_BLUE] >= 45 && edges_across >= 30 && edges_down >= 30){
         score = counts[LIGHT_BLUE];
         return VsSeekerIcon::NOT_READY;
     }
@@ -211,6 +252,68 @@ std::vector<VsSeekerIconSighting> find_vs_seeker_icons(const ImageViewRGB32& fra
     return ret;
 }
 
+
+//  Each image is an overworld screen. find_vs_seeker_icons() must find
+//  exactly the expected icons, each within 3 pixels of where it is drawn,
+//  and nothing in the scenery (house roofs and windows, rocks, water).
+class Test_VsSeekerIcons : public ImageUnitTest{
+public:
+    Test_VsSeekerIcons(const std::string& image, std::vector<VsSeekerIconSighting> expected)
+        : ImageUnitTest("PokemonFRLG::VsSeekerIcons - " + image, {image})
+        , m_expected(std::move(expected))
+    {}
+
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        std::vector<VsSeekerIconSighting> found = find_vs_seeker_icons(images[0]);
+        auto describe = [](const std::vector<VsSeekerIconSighting>& icons){
+            std::string ret;
+            for (const VsSeekerIconSighting& s : icons){
+                ret += std::string(s.icon == VsSeekerIcon::READY ? " !!" : " X");
+                ret += "(" + std::to_string(s.x) + ", " + std::to_string(s.y) + ")";
+            }
+            return ret.empty() ? std::string(" none") : ret;
+        };
+        std::string message = "Expected" + describe(m_expected) + ", found" + describe(found) + ".";
+        if (found.size() != m_expected.size()){
+            return message;
+        }
+        for (const VsSeekerIconSighting& e : m_expected){
+            bool matched = false;
+            for (const VsSeekerIconSighting& s : found){
+                if (s.icon == e.icon && std::abs(s.x - e.x) <= 3 && std::abs(s.y - e.y) <= 3){
+                    matched = true;
+                    break;
+                }
+            }
+            if (!matched){
+                return message;
+            }
+        }
+        return true;
+    }
+
+private:
+    std::vector<VsSeekerIconSighting> m_expected;
+};
+
+void add_tests_VsSeekerIcons(UnitTestDatabase& database){
+    using enum VsSeekerIcon;
+    database.add<Test_VsSeekerIcons>(
+        "PokemonFRLG/Overworld/SevaultCanyon-VsSeekerReady.png",
+        std::vector<VsSeekerIconSighting>{{READY, 55, 8}, {READY, 87, 119}}
+    );
+    database.add<Test_VsSeekerIcons>(
+        "PokemonFRLG/Overworld/KindleRoad-VsSeekerNotReady.png",
+        std::vector<VsSeekerIconSighting>{{NOT_READY, 120, 72}, {NOT_READY, 200, 72}, {NOT_READY, 72, 136}, {NOT_READY, 88, 136}}
+    );
+    database.add<Test_VsSeekerIcons>("PokemonFRLG/Overworld/SevaultCanyon-Cooltrainers.png", std::vector<VsSeekerIconSighting>{});
+    database.add<Test_VsSeekerIcons>("PokemonFRLG/Overworld/KindleRoad-Shore-Before.png", std::vector<VsSeekerIconSighting>{});
+    database.add<Test_VsSeekerIcons>("PokemonFRLG/Overworld/KindleRoad-Sand-Before.png", std::vector<VsSeekerIconSighting>{});
+    database.add<Test_VsSeekerIcons>("PokemonFRLG/Overworld/SevaultCanyon-ChanseyHouse.png", std::vector<VsSeekerIconSighting>{});
+}
 
 
 }

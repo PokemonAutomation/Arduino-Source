@@ -17,6 +17,7 @@
 
 #include <string>
 #include <vector>
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/Language.h"
 
 namespace PokemonAutomation{
@@ -46,6 +47,9 @@ bool text_contains_any(const std::string& text, const std::vector<std::string>& 
 //  The last number in `text`, e.g. 250 in "...for 250 steps.". -1 if there
 //  is none (or it is longer than 4 digits).
 int last_number_in(const std::string& text);
+
+
+void add_tests_DialogTextReader(UnitTestDatabase& database);
 
 
 

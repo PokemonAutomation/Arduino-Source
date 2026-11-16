@@ -5,7 +5,9 @@
  */
 
 #include <algorithm>
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "Tests/ImageUnitTest.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_OverworldSprites.h"
 
@@ -142,6 +144,62 @@ SpriteSighting find_sprite_feet(const ImageViewRGB32& frame, const std::vector<T
     return best;
 }
 
+
+//  Look for a sprite on a list of tiles (offsets from the player's tile).
+//  The expected tile, or none.
+enum class SpritePart{
+    PURPLE_HAIR,
+    FEET,
+};
+
+class Test_OverworldSprites : public ImageUnitTest{
+public:
+    Test_OverworldSprites(
+        const std::string& name, const std::string& image, SpritePart part,
+        std::vector<TileOffset> tiles, bool found, TileOffset expected = {}
+    )
+        : ImageUnitTest("PokemonFRLG::OverworldSprites - " + name + " - " + image, {image})
+        , m_part(part)
+        , m_tiles(std::move(tiles))
+        , m_found(found)
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        SpriteSighting sighting = m_part == SpritePart::PURPLE_HAIR
+            ? find_purple_hair(images[0], m_tiles)
+            : find_sprite_feet(images[0], m_tiles);
+        std::string seen = sighting.found
+            ? "found at (" + std::to_string(sighting.tile.dx) + ", " + std::to_string(sighting.tile.dy) + ")"
+            : "not found";
+        seen += " (score " + std::to_string(sighting.score) + ")";
+        if (sighting.found != m_found || (m_found && !(sighting.tile == m_expected))){
+            return "The sprite was " + seen + ".";
+        }
+        return true;
+    }
+
+private:
+    SpritePart m_part;
+    std::vector<TileOffset> m_tiles;
+    bool m_found;
+    TileOffset m_expected;
+};
+
+void add_tests_OverworldSprites(UnitTestDatabase& database){
+    //  Sevault Canyon: a Cooltrainer 5 tiles left and 3 up of the player,
+    //  another 1 left and 4 down; grass and sand on the other tiles.
+    const std::string IMAGE = "PokemonFRLG/Overworld/SevaultCanyon-Cooltrainers.png";
+    using enum SpritePart;
+    database.add<Test_OverworldSprites>("hair, top left", IMAGE, PURPLE_HAIR, std::vector<TileOffset>{{-5, -3}, {-4, 2}, {3, -2}}, true, TileOffset{-5, -3});
+    database.add<Test_OverworldSprites>("hair, bottom", IMAGE, PURPLE_HAIR, std::vector<TileOffset>{{-1, 4}, {1, 2}, {2, 1}}, true, TileOffset{-1, 4});
+    database.add<Test_OverworldSprites>("no hair", IMAGE, PURPLE_HAIR, std::vector<TileOffset>{{-4, 2}, {3, -2}, {2, 1}, {-6, 2}}, false);
+    database.add<Test_OverworldSprites>("feet, bottom", IMAGE, FEET, std::vector<TileOffset>{{-1, 4}, {-3, 1}, {-2, 0}}, true, TileOffset{-1, 4});
+    database.add<Test_OverworldSprites>("no feet", IMAGE, FEET, std::vector<TileOffset>{{-4, 2}, {1, 2}, {2, 1}}, false);
+}
 
 
 }

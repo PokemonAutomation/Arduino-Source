@@ -7,7 +7,11 @@
 #include <stdlib.h>
 #include <algorithm>
 #include <cmath>
+#include <sstream>
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "Tests/ImageUnitTest.h"
+#include "Tests/TestUtils.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_OverworldGeometry.h"
 #include "PokemonFRLG_OverworldPosition.h"
@@ -423,6 +427,179 @@ bool screen_scrolled_one_tile(
     return diff_moved < 0.6 * diff_still;
 }
 
+
+//  Two screens: the player standing still, then one step in the direction
+//  (dx, dy). Remembering the first at (0, 0), the second must be located at
+//  (dx, dy), and the first itself at (0, 0).
+class Test_ScreenOdometry : public ImageUnitTest{
+public:
+    Test_ScreenOdometry(const std::string& before, const std::string& after, int dx, int dy)
+        : ImageUnitTest("PokemonFRLG::ScreenOdometry - " + after, {before, after})
+        , m_dx(dx), m_dy(dy)
+    {
+        m_memory += MAX_TEST_IMAGE_RGB32_BYTES;
+    }
+
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        ScreenOdometry odometry;
+        odometry.remember(images[0], 0, 0);
+
+        int x = -99;
+        int y = -99;
+        std::string details;
+        if (!odometry.locate(images[0], 0, 0, 2, x, y, details) || x != 0 || y != 0){
+            return "The remembered screen itself: " + details;
+        }
+        if (!odometry.locate(images[1], 0, 0, 2, x, y, details) || x != m_dx || y != m_dy){
+            return "After the step: " + details + ", expected (" +
+                std::to_string(m_dx) + ", " + std::to_string(m_dy) + ").";
+        }
+        return true;
+    }
+
+private:
+    int m_dx;
+    int m_dy;
+};
+
+void add_tests_ScreenOdometry(UnitTestDatabase& database){
+    database.add<Test_ScreenOdometry>(
+        "PokemonFRLG/Overworld/KindleRoad-Shore-Before.png",
+        "PokemonFRLG/Overworld/KindleRoad-Shore-After.png",
+        0, 1
+    );
+    database.add<Test_ScreenOdometry>(
+        "PokemonFRLG/Overworld/KindleRoad-Sand-Before.png",
+        "PokemonFRLG/Overworld/KindleRoad-Sand-After.png",
+        0, 1
+    );
+}
+
+
+//  The same pairs: the step was down, so the screen scrolled one tile for
+//  (0, 1) and for no other direction, and comparing a screen with itself is
+//  no step.
+class Test_ScreenScrolledOneTile : public ImageUnitTest{
+public:
+    Test_ScreenScrolledOneTile(const std::string& before, const std::string& after, int dx, int dy)
+        : ImageUnitTest("PokemonFRLG::ScreenScrolledOneTile - " + after, {before, after})
+        , m_dx(dx), m_dy(dy)
+    {
+        m_memory += MAX_TEST_IMAGE_RGB32_BYTES;
+    }
+
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const int DIRECTIONS[4][2] = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+        for (const auto& d : DIRECTIONS){
+            bool expected = d[0] == m_dx && d[1] == m_dy;
+            if (screen_scrolled_one_tile(images[0], images[1], d[0], d[1]) != expected){
+                return "Direction (" + std::to_string(d[0]) + ", " + std::to_string(d[1]) +
+                    "): expected " + (expected ? "a step" : "no step") + ".";
+            }
+        }
+        if (screen_scrolled_one_tile(images[0], images[0], m_dx, m_dy)){
+            return "A screen compared with itself was taken for a step.";
+        }
+        return true;
+    }
+
+private:
+    int m_dx;
+    int m_dy;
+};
+
+void add_tests_ScreenScrolledOneTile(UnitTestDatabase& database){
+    database.add<Test_ScreenScrolledOneTile>(
+        "PokemonFRLG/Overworld/KindleRoad-Shore-Before.png",
+        "PokemonFRLG/Overworld/KindleRoad-Shore-After.png",
+        0, 1
+    );
+    database.add<Test_ScreenScrolledOneTile>(
+        "PokemonFRLG/Overworld/KindleRoad-Sand-Before.png",
+        "PokemonFRLG/Overworld/KindleRoad-Sand-After.png",
+        0, 1
+    );
+}
+
+
+//  Inside a house: the tile from the black margins.
+class Test_IndoorPosition : public ImageUnitTest{
+public:
+    Test_IndoorPosition(const std::string& image, int map_width, int floor_rows, int x, int y)
+        : ImageUnitTest("PokemonFRLG::IndoorPosition - " + image, {image})
+        , m_map_width(map_width), m_floor_rows(floor_rows), m_x(x), m_y(y)
+    {}
+
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        IndoorTile tile = read_indoor_position(images[0], m_map_width, m_floor_rows);
+        if (!tile.found){
+            return "No tile found.";
+        }
+        TEST_RESULT_COMPONENT_EQUAL_STR(tile.x, m_x, "x");
+        TEST_RESULT_COMPONENT_EQUAL_STR(tile.y, m_y, "y");
+        return true;
+    }
+
+private:
+    int m_map_width;
+    int m_floor_rows;
+    int m_x;
+    int m_y;
+};
+
+void add_tests_IndoorPosition(UnitTestDatabase& database){
+    //  The Sevault Canyon Chansey house: 11 tiles wide, 8 rows of floor.
+    database.add<Test_IndoorPosition>("PokemonFRLG/Overworld/SevaultCanyon-ChanseyHouse.png", 11, 8, 1, 7);
+}
+
+
+//  The Sevault Canyon house roof: where it is, or that it isn't there.
+class Test_HouseRoof : public ImageUnitTest{
+public:
+    Test_HouseRoof(const std::string& image, bool found, int left = 0, int top = 0, int bottom = 0)
+        : ImageUnitTest("PokemonFRLG::HouseRoof - " + image, {image})
+        , m_found(found), m_left(left), m_top(top), m_bottom(bottom)
+    {}
+
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        HouseRoof roof = find_house_roof(images[0]);
+        TEST_RESULT_COMPONENT_EQUAL_STR(roof.found, m_found, "found");
+        if (!m_found){
+            return true;
+        }
+        if (std::abs(roof.left - m_left) > 1 || std::abs(roof.top - m_top) > 1 || std::abs(roof.bottom - m_bottom) > 1){
+            return "Roof at left " + std::to_string(roof.left) + ", rows " + std::to_string(roof.top) +
+                " to " + std::to_string(roof.bottom) + "; expected left " + std::to_string(m_left) +
+                ", rows " + std::to_string(m_top) + " to " + std::to_string(m_bottom) + ".";
+        }
+        return true;
+    }
+
+private:
+    bool m_found;
+    int m_left;
+    int m_top;
+    int m_bottom;
+};
+
+void add_tests_HouseRoof(UnitTestDatabase& database){
+    database.add<Test_HouseRoof>("PokemonFRLG/Overworld/SevaultCanyon-Cooltrainers.png", true, 129, 72, 101);
+    database.add<Test_HouseRoof>("PokemonFRLG/Overworld/SevaultCanyon-VsSeekerReady.png", true, 129, 72, 101);
+    database.add<Test_HouseRoof>("PokemonFRLG/Overworld/KindleRoad-Shore-Before.png", false);
+    database.add<Test_HouseRoof>("PokemonFRLG/Overworld/KindleRoad-VsSeekerNotReady.png", false);
+}
 
 
 }
