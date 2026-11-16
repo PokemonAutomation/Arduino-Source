@@ -24,6 +24,17 @@ template class RegisterUiStateQtWidget<StringSelectCellWidget>;
 template class RegisterUiStateQtWidget<StringSelectOptionWidget>;
 
 
+//  Shows the selected entry's text in its own color. An entry with no color
+//  keeps the theme's text color: Color() is 0, which Qt draws as black.
+static void set_selected_text_color(Color color, QLineEdit& line_edit){
+    QPalette palette;
+    if (color){
+        palette.setColor(QPalette::Text, QColor((uint32_t)color));
+    }
+    line_edit.setPalette(palette);
+}
+
+
 
 
 StringSelectCellWidget::~StringSelectCellWidget(){
@@ -49,9 +60,7 @@ StringSelectCellWidget::StringSelectCellWidget(QWidget& parent, StringSelectCell
 
     StringSelectCellWidget::update_value();
 
-    QPalette palette;
-    palette.setColor(QPalette::Text, QColor((uint32_t)entry.text_color));
-    this->lineEdit()->setPalette(palette);
+    set_selected_text_color(entry.text_color, *this->lineEdit());
 
     connect(
         this, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
@@ -85,10 +94,7 @@ void StringSelectCellWidget::load_options(){
     size_t index = m_value.index();
     this->setCurrentIndex((int)index);
 
-    QPalette palette;
-    palette.setColor(QPalette::Text, QColor((uint32_t)cases[index].text_color));
-//    palette.setColor(QPalette::Text, Qt::red);
-    this->lineEdit()->setPalette(palette);
+    set_selected_text_color(cases[index].text_color, *this->lineEdit());
 
     update_size_cache();
 }
@@ -122,10 +128,7 @@ void StringSelectCellWidget::hide_options(){
     this->addItem(pixmap, QString::fromStdString(entry.display_name));
     this->setCurrentIndex(0);
 
-    QPalette palette;
-    palette.setColor(QPalette::Text, QColor((uint32_t)entry.text_color));
-//    palette.setColor(QPalette::Text, Qt::red);
-    this->lineEdit()->setPalette(palette);
+    set_selected_text_color(entry.text_color, *this->lineEdit());
 
 }
 QSize StringSelectCellWidget::sizeHint() const{
