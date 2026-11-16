@@ -188,9 +188,8 @@ void StubConnection2::mark_closed_by_peer(){
 
 class Test_ServerSocket2_StubApi : public UnitTest{
 public:
-    Test_ServerSocket2_StubApi(ThreadPool& thread_pool, std::string name)
+    Test_ServerSocket2_StubApi(ThreadPool&, std::string name)
         : UnitTest(std::move(name))
-        , m_thread_pool(thread_pool)
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
@@ -331,10 +330,6 @@ public:
 
         return UnitTestResult(true);
     }
-
-
-private:
-    ThreadPool& m_thread_pool;
 };
 
 
