@@ -5,12 +5,14 @@
  */
 
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "Tests/ImageUnitTest.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_MapDetector.h"
 
@@ -69,6 +71,39 @@ bool FlyMapDetector::detect(const ImageViewRGB32& screen){
         && is_white(extract_box_reference(game_screen, m_right_box));
 }
 
+
+//  The Fly map of each region is detected; other screens with white borders
+//  or a blue top (the bag, a sign's message, a battle) aren't.
+class Test_FlyMapDetector : public ImageUnitTest{
+public:
+    Test_FlyMapDetector(const std::string& image, bool expected)
+        : ImageUnitTest("PokemonFRLG::FlyMapDetector - " + image, {image})
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        FlyMapDetector detector(COLOR_RED);
+        if (detector.detect(images[0]) != m_expected){
+            return std::string(m_expected ? "The Fly map wasn't detected." : "Detected a Fly map that isn't there.");
+        }
+        return true;
+    }
+
+private:
+    bool m_expected;
+};
+
+void add_tests_FlyMapDetector(UnitTestDatabase& database){
+    database.add<Test_FlyMapDetector>("PokemonFRLG/FlyMapDetector/Kanto_True.jpg", true);
+    database.add<Test_FlyMapDetector>("PokemonFRLG/FlyMapDetector/Sevii123-CapeBrink_True.jpg", true);
+    database.add<Test_FlyMapDetector>("PokemonFRLG/FlyMapDetector/Sevii67-SixIsland_True.jpg", true);
+    database.add<Test_FlyMapDetector>("PokemonFRLG/FlyMapDetector/Bag_False.jpg", false);
+    database.add<Test_FlyMapDetector>("PokemonFRLG/FlyMapDetector/Sign_False.jpg", false);
+    database.add<Test_FlyMapDetector>("PokemonFRLG/FlyMapDetector/BattleMenu_False.jpg", false);
+}
 
 
 }
