@@ -64,18 +64,15 @@ public:
 };
 
 
-// Scans `scan_area` to dynamically locate the red selection outline, then
-// verifies the highlighted item name against the expected item_slug using OCR.
+// Reads the selected item name from the green shop description bar.
 // process_frame() requires three consecutive sampled matches.
 class ShopItemHoverDetector : public VisualInferenceCallback{
 public:
-    // scan_area: normalized screen region that covers the entire shop item list.
     // item_slug: identifies the expected item (e.g. "full-restore"). Must match
     //            a key in the item-name resources loaded by ShopItemNameReader.
     // language:  language used for OCR dictionary lookup.
     ShopItemHoverDetector(
         Logger& logger,
-        const ImageFloatBox& scan_area,
         const std::string& item_slug,
         Language language = Language::English,
         Color color = COLOR_CYAN
@@ -87,31 +84,15 @@ public:
     // Returns -1 for an unrecognized screen or unreadable/out-of-range count.
     int read_stock(const ImageViewRGB32& screen);
 
-    // Returns the last outline box confirmed by detect() / process_frame().
-    // Valid only after a successful detection; width == 0 if nothing detected yet.
-    const ImageFloatBox& detected_box() const { return m_detected_box; }
-
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
 private:
-    // Scans scan_area for a horizontal band of red edges (left + right) that
-    // indicate the selection outline. Fills out_box with the outline's screen-
-    // normalized bounds and returns true when found.
-    bool find_outline(const ImageViewRGB32& screen, ImageFloatBox& out_box) const;
-
-    // Runs OCR on the name region of outline_box.
-    // Returns true when the name matches the expected item slug.
-    bool match_ocr(const ImageViewRGB32& screen, const ImageFloatBox& outline_box) const;
-
     Logger& m_logger;
     Color m_color;
     Language m_language;
-    ImageFloatBox m_scan_area;
     std::string m_item_slug;
-    mutable ImageFloatBox m_detected_box{0, 0, 0, 0};
-    mutable ImageFloatBox m_last_name_box{0, 0, 0, 0};
-    mutable bool m_ocr_logged = false;
+    bool m_ocr_logged = false;
     size_t m_trigger_count = 0;
     size_t m_frame_count   = 0;
 };

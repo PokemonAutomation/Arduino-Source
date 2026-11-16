@@ -29,7 +29,6 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
-#include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_TownBannerDetector.h"
@@ -124,7 +123,7 @@ static void enter_oreburgh_gate_from_city(VideoStream& stream, ProControllerCont
                 ctx.wait_for_all_requests();
             }
             // Keep watching if the last pulse starts a delayed fade.
-            pbf_wait(ctx, 1500ms);
+            pbf_wait(ctx, 2500ms);
         },
         {{black}});
     if (result != 0){
@@ -134,7 +133,7 @@ static void enter_oreburgh_gate_from_city(VideoStream& stream, ProControllerCont
     }
     stream.log("[Oreburgh Gate entry] Black transition detected; movement stopped.");
     BlackScreenWatcher visible(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
-    if (wait_until(stream, context, 15s, {{visible}}) != 0){
+    if (wait_until(stream, context, 16s, {{visible}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Oreburgh Gate entry: Transition did not finish.",
             stream);
@@ -142,141 +141,6 @@ static void enter_oreburgh_gate_from_city(VideoStream& stream, ProControllerCont
     pbf_wait(context, 700ms);
     context.wait_for_all_requests();
     stream.log("[Oreburgh Gate entry] Cave visible; continuing the route.", COLOR_GREEN);
-}
-
-// Call at a safe walking point, away from trainer/NPC prompts.
-void force_repel_expiry(VideoStream& stream,
-    ProControllerContext& context,
-    RepelRenewalChoice choice,
-    bool north_south,
-    bool require_expiry){
-    context.wait_for_all_requests();
-    stream.log(std::string("[Repel expiry] Wiggling ") + (north_south ? "north/south" : "west/east") +
-        " until expiry; renewal response=" + (choice == RepelRenewalChoice::YES ? "Yes." : "No."));
-    const Button response = choice == RepelRenewalChoice::YES ? BUTTON_A : BUTTON_B;
-    ShortDialogWatcher expired(COLOR_CYAN);
-    StartBattleDetector starting(stream.overlay());
-    BattleMenuWatcher battle(BattleType::TRAINER);
-    // Repel expiry allowance is the mean 41.244682s plus sample SD 3.668059s, rounded up to the
-    // next millisecond. Use 500ms movement / 100ms rest pulses.
-    const auto movement_deadline = std::chrono::steady_clock::now() + 44913ms;
-    const int result = run_until<ProControllerContext>(stream,
-        context,
-        [north_south, movement_deadline](ProControllerContext& ctx){
-            while (std::chrono::steady_clock::now() + 1200ms <= movement_deadline){
-                // Complete steps before reversing so the Repel counter advances.
-                if (north_south){
-                    pbf_move_left_joystick(ctx, {0.0, 1.0}, 500ms, 100ms);
-                    pbf_move_left_joystick(ctx, {0.0, -1.0}, 500ms, 100ms);
-                }else{
-                    pbf_move_left_joystick(ctx, {-1.0, 0.0}, 500ms, 100ms);
-                    pbf_move_left_joystick(ctx, {1.0, 0.0}, 500ms, 100ms);
-                }
-                ctx.wait_for_all_requests();
-            }
-            // Finish the observation window without an unpaired move.
-            const auto remaining =
-                std::chrono::duration_cast<Milliseconds>(movement_deadline - std::chrono::steady_clock::now());
-            if (remaining > 0ms){
-                pbf_wait(ctx, remaining);
-            }
-        },
-        {{expired}, {starting}, {battle}});
-    if (result < 0){
-        if (require_expiry){
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Repel renewal: Required expiry prompt not observed within calibrated limit.",
-                stream);
-        }
-        stream.log(
-            "[Repel expiry] Calibrated 44.913s limit reached without an expiry prompt; checking clear overworld before continuing.",
-            COLOR_ORANGE);
-    }else if (result != 0){
-        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "Repel renewal: Unexpected battle; renewal choice not confirmed.",
-            stream);
-    }else{
-        // The expiry text must be advanced before the Yes/No menu appears.
-        // Check first so an already-visible choice is not answered prematurely.
-        // Allow the appearing cursor to accumulate its five required detections
-        // before another press can dismiss the choice. Stop on a battle.
-        ShortDialogPromptDetector renewal(stream.overlay(), {0.60, 0.55, 0.30, 0.25}, COLOR_CYAN);
-        int renewal_state = wait_until(stream, context, 3s, {{renewal}, {starting}, {battle}});
-        for (size_t advance = 0; renewal_state < 0 && advance < 3; advance++){
-            stream.log("[Repel expiry] Advancing initial text before renewal choice (" +
-                std::to_string(advance + 1) + "/3).");
-            pbf_press_button(context, BUTTON_A, 80ms, 100ms);
-            context.wait_for_all_requests();
-            renewal_state = wait_until(stream, context, 3s, {{renewal}, {starting}, {battle}});
-        }
-        if (renewal_state != 0){
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Repel renewal: Unexpected dialogue; renewal choice not confirmed.",
-                stream);
-        }
-        stream.log("[Repel expiry] Renewal choice confirmed.");
-    }
-    // Renewal has a gap before the final used-Repel message. A single
-    // overworld frame is insufficient: require three continuous clear seconds.
-    context.wait_for_all_requests();
-    ShortDialogDetector dialogue(COLOR_YELLOW);
-    BattleDialogDetector battle_dialogue(COLOR_RED);
-    BattleMenuDetector battle_menu(BattleType::TRAINER, COLOR_RED);
-    BlackScreenDetector black;
-    OverworldDetector overworld;
-    VideoOverlaySet overlays(stream.overlay());
-    dialogue.make_overlays(overlays);
-    battle_dialogue.make_overlays(overlays);
-    battle_menu.make_overlays(overlays);
-    black.make_overlays(overlays);
-    overworld.make_overlays(overlays);
-    const auto deadline = std::chrono::steady_clock::now() + 30s;
-    auto quiet_since = std::chrono::steady_clock::now();
-    bool quiet = false;
-    while (std::chrono::steady_clock::now() < deadline){
-        const auto frame = stream.video().snapshot();
-        if (!frame){
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Repel renewal: No video frame during cleanup.",
-                stream);
-        }
-        const auto now = std::chrono::steady_clock::now();
-        if (battle_dialogue.detect(*frame.frame) || battle_menu.detect(*frame.frame)){
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Repel renewal: Battle detected during cleanup; renewal not confirmed.",
-                stream);
-        }
-        if (dialogue.detect(*frame.frame)){
-            quiet = false;
-            pbf_mash_button(context, response, 100ms);
-        }else if (black.detect(*frame.frame) || !overworld.detect(*frame.frame)){
-            quiet = false;
-            pbf_wait(context, 100ms);
-        }else{
-            if (!quiet){
-                quiet = true;
-                quiet_since = now;
-            }
-            if (now - quiet_since >= 3s){
-                context.wait_for_all_requests();
-                if (result == 0){
-                    stream.log(std::string("[Repel expiry] Renewal ") +
-                        (choice == RepelRenewalChoice::YES ? "accepted" : "declined") +
-                        "; three continuous seconds of overworld confirmed.");
-                }else{
-                    stream.log(
-                        "[Repel expiry] No expiry observed within the calibrated limit; three continuous seconds of clear overworld confirmed. Continuing the route.");
-                }
-                return;
-            }
-            // Do not send confirmation/cancel buttons while the overworld is clear.
-            pbf_wait(context, 100ms);
-        }
-        context.wait_for_all_requests();
-    }
-    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-        "Repel renewal: Three clear seconds not confirmed after renewal.",
-        stream);
 }
 
 static void wait_for_trainer_battle_menu(VideoStream& stream, ProControllerContext& context){
@@ -325,7 +189,7 @@ static void exit_oreburgh_gate_to_route203(VideoStream& stream, ProControllerCon
     const int result = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& ctx){
-            pbf_move_left_joystick(ctx, {-1.0, 0.0}, 6000ms, 1000ms);
+            pbf_move_left_joystick(ctx, {-1.0, 0.0}, 6000ms, 2000ms);
         },
         {{white}});
     if (result != 0){
@@ -334,7 +198,7 @@ static void exit_oreburgh_gate_to_route203(VideoStream& stream, ProControllerCon
             stream);
     }
     WhiteScreenWatcher visible(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 500, 10, WhiteScreenWatcher::FinderType::GONE, 500ms);
-    if (wait_until(stream, context, 15s, {{visible}}) != 0){
+    if (wait_until(stream, context, 16s, {{visible}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Oreburgh Gate exit: White transition did not finish.",
             stream);
@@ -404,17 +268,6 @@ static bool watch_route204_trainer_event(VideoStream& stream,
     return detected;
 }
 
-static bool approach_route204_female_trainer(VideoStream& stream, ProControllerContext& context){
-    return watch_route204_trainer_event(
-        stream,
-        context,
-        [](ProControllerContext& ctx){
-            // Use one bounded dialogue-detection window for the settling period.
-            pbf_move_left_joystick(ctx, {0.0, 1.0}, 8000ms, 2500ms);
-        },
-        "Route 204 female trainer approach");
-}
-
 static void recover_route204_female_trainer(VideoStream& stream, ProControllerContext& context){
     stream.log("[Route 204 female trainer] Missed initial trigger; crossing her sight line down/up.");
     const bool recovered = watch_route204_trainer_event(
@@ -437,47 +290,6 @@ static void recover_route204_female_trainer(VideoStream& stream, ProControllerCo
     }
 }
 
-static void floaroma_center_transition(VideoStream& stream, ProControllerContext& context, double y){
-    context.wait_for_all_requests();
-    BlackScreenWatcher black;
-    const int result = run_until<ProControllerContext>(stream,
-        context,
-        [y](ProControllerContext& ctx){
-            pbf_move_left_joystick(ctx, {0, y}, 2500ms, 1000ms);
-        },
-        {{black}});
-    if (result != 0){
-        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "Floaroma Center: Door transition not detected.",
-            stream);
-    }
-    context.wait_for_all_requests();
-    BlackScreenDetector black_frame;
-    const auto deadline = std::chrono::steady_clock::now() + 15s;
-    auto clear_since = std::chrono::steady_clock::now();
-    while (std::chrono::steady_clock::now() < deadline){
-        const auto frame = stream.video().snapshot();
-        if (!frame){
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Floaroma Center: No video frame after transition.",
-                stream);
-        }
-        const auto now = std::chrono::steady_clock::now();
-        if (black_frame.detect(*frame.frame)){
-            clear_since = now;
-        }else if (now - clear_since >= 500ms){
-            pbf_wait(context, 700ms);
-            context.wait_for_all_requests();
-            return;
-        }
-        pbf_wait(context, 100ms);
-        context.wait_for_all_requests();
-    }
-    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-        "Floaroma Center: Door transition did not finish.",
-        stream);
-}
-
 static void establish_floaroma_center_exit(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     // The town-entry lane is west of the Center. Bring its emblem fully
     // into view before asking the existing matcher to align the doorway.
@@ -487,7 +299,10 @@ static void establish_floaroma_center_exit(VideoStream& stream, ProControllerCon
     repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 2);
     context.wait_for_all_requests();
     align_to_overworld_landmarks(stream, context, match_floaroma_center_entrance, "Floaroma Center alignment");
-    floaroma_center_transition(stream, context, 1);
+    watch_doorway_transition(stream, context, "Floaroma Center entrance",
+        [](ProControllerContext& ctx){
+            pbf_move_left_joystick(ctx, {0, 1}, 2500ms, 1000ms);
+        });
     // This helper heals and observes the exit transition itself.
     if (!heal_pokemon(stream, context, "Floaroma", &stats)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
@@ -688,6 +503,7 @@ static void enter_ravaged_path_from_route204(SingleSwitchProgramEnvironment& env
         }
         double x = 0, y = 0;
         Milliseconds duration = 250ms;
+        Milliseconds release = 500ms;
         if (initial_approach){
             // Continue north from the fence-aligned road beside the grass,
             // whether Tyler was bypassed or fought. The cave entrance retains
@@ -729,6 +545,7 @@ static void enter_ravaged_path_from_route204(SingleSwitchProgramEnvironment& env
                         COLOR_GREEN);
                     y = 1;
                     duration = 1200ms;
+                    release = 1500ms;
                 }
             }else if (arrival.wait_for_shadow(now)){
                 position_confirmations = 0;
@@ -805,9 +622,9 @@ static void enter_ravaged_path_from_route204(SingleSwitchProgramEnvironment& env
         }
         const int ret = run_until<ProControllerContext>(stream,
             context,
-            [x, y, duration](ProControllerContext& ctx){
+            [x, y, duration, release](ProControllerContext& ctx){
                 if (x != 0 || y != 0){
-                    pbf_move_left_joystick(ctx, {x, y}, duration, 500ms);
+                    pbf_move_left_joystick(ctx, {x, y}, duration, release);
                 }else{
                     pbf_wait(ctx, duration);
                 }
@@ -829,7 +646,7 @@ static void enter_ravaged_path_from_route204(SingleSwitchProgramEnvironment& env
         }
         // A trainer transition can also go black. Require a stable
         // cave scene, or route the detected battle through combat.
-        const auto deadline = std::chrono::steady_clock::now() + 15s;
+        const auto deadline = std::chrono::steady_clock::now() + 16s;
         size_t confirmed = 0;
         bool trainer_seen = false;
         while (std::chrono::steady_clock::now() < deadline){
@@ -889,7 +706,7 @@ static void exit_ravaged_path_to_route204(VideoStream& stream, ProControllerCont
                 pbf_move_left_joystick(ctx, {0, -1}, 120ms, 80ms);
                 ctx.wait_for_all_requests();
             }
-            pbf_wait(ctx, 1500ms);
+            pbf_wait(ctx, 2500ms);
         },
         {{white}});
     if (result != 0){
@@ -900,7 +717,7 @@ static void exit_ravaged_path_to_route204(VideoStream& stream, ProControllerCont
     context.wait_for_all_requests();
     stream.log("[Ravaged Path north exit] White transition detected; movement stopped.");
     WhiteScreenWatcher visible(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 500, 10, WhiteScreenWatcher::FinderType::GONE, 500ms);
-    if (wait_until(stream, context, 15s, {{visible}}) != 0){
+    if (wait_until(stream, context, 16s, {{visible}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Ravaged Path north exit: White transition did not finish.",
             stream);
@@ -915,10 +732,19 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 250ms, 1009ms);
     align_to_oreburgh_mart(stream, context);
     pbf_wait(context, 1009ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 1128ms, 2924ms);
+    watch_doorway_transition(stream, context, "Oreburgh Mart entrance",
+        [](ProControllerContext& ctx){
+            pbf_move_left_joystick(ctx, {0, 1}, 1128ms, 0ms);
+        });
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 885ms, 0ms);
-    buy_items(stream, context, {{ShopItem::Repel, BUY_MAX}}, language, DPAD_UP);
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1193ms, 2226ms);
+    if (!buy_items(stream, context, {{ShopItem::Repel, BUY_MAX}}, language, DPAD_UP)){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Oreburgh Mart: Repel purchase did not complete.", stream);
+    }
+    watch_doorway_transition(stream, context, "Oreburgh Mart exit",
+        [](ProControllerContext& ctx){
+            pbf_move_left_joystick(ctx, {0, -1}, 1193ms, 0ms);
+        });
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 2544ms, 753ms);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 464ms, 519ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1467ms, 2816ms);
@@ -1007,7 +833,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     align_to_overworld_landmarks(stream, context, match_jubilife_plaza_approach, "Jubilife plaza alignment", true);
     approach_galactic_dialogue(stream, context);
     wait_for_trainer_battle_menu(stream, context);
-    fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
+    fight_trainer_using_moves(stream, context, stats, "Jubilife Galactic grunts", false);
     clear_dialog(stream, context);
     pbf_wait(context, 2000ms);
     clear_dialog(stream, context);
@@ -1034,7 +860,14 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
 
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1440ms, 2259ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 765ms, 439ms);
-    const bool missed_trainer = !approach_route204_female_trainer(stream, context);
+    const bool missed_trainer = !watch_route204_trainer_event(
+        stream,
+        context,
+        [](ProControllerContext& ctx){
+            // Use one bounded dialogue-detection window for the settling period.
+            pbf_move_left_joystick(ctx, {0.0, 1.0}, 8000ms, 2500ms);
+        },
+        "Route 204 female trainer approach");
     stream.log("[Route 204 female trainer] missed_trainer=" + std::to_string(missed_trainer));
     if (missed_trainer){
         recover_route204_female_trainer(stream, context);
@@ -1164,7 +997,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
     // The expected town transition follows this known Route 204 lane.
     // The banner confirms a fresh location transition, not the town name.
     TownBannerWatcher no_banner(COLOR_CYAN, TownBannerWatcher::FinderType::GONE, 300ms);
-    if (wait_until(stream, context, 3s, {{no_banner}}) != 0){
+    if (wait_until(stream, context, 4s, {{no_banner}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Floaroma approach: Previous location banner did not clear.", stream);
     }
@@ -1178,7 +1011,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
         const auto approach_started = std::chrono::steady_clock::now();
         const int event = run_until<ProControllerContext>(stream, context,
             [remaining](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {0, 1}, remaining, 500ms);
+                pbf_move_left_joystick(ctx, {0, 1}, remaining, 1500ms);
             },
             {{banner}, {expired}, {unexpected_battle}});
         context.wait_for_all_requests();
@@ -1196,7 +1029,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
         // confirm its Yes/No prompt instead of entering the battle handler.
         // A banner can finish sliding in just as the expiry text stops us.
         // Latch it before cleanup consumes its short display window.
-        town_entered = wait_until(stream, context, 1s, {{banner}}) == 0;
+        town_entered = wait_until(stream, context, 2s, {{banner}}) == 0;
         force_repel_expiry(stream, context, RepelRenewalChoice::NO, true, true);
         repel_declined = true;
         if (town_entered){
@@ -1213,7 +1046,7 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
         force_repel_expiry(stream, context, RepelRenewalChoice::NO, true, true);
     }
     TownBannerWatcher cleared(COLOR_CYAN, TownBannerWatcher::FinderType::GONE, 300ms);
-    if (wait_until(stream, context, 6s, {{cleared}}) != 0){
+    if (wait_until(stream, context, 7s, {{cleared}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Floaroma approach: Town banner did not clear before Center alignment.", stream);
     }
@@ -1224,52 +1057,13 @@ void roark_to_floaroma(SingleSwitchProgramEnvironment& env, VideoStream& stream,
 
 static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     auto transition = [&](double x, double y, Milliseconds duration, const std::string& label){
-        context.wait_for_all_requests();
-        stream.log("[Route transition] " + label);
-        BlackScreenWatcher black;
-        WhiteScreenWatcher white;
-        const int ret = run_until<ProControllerContext>(stream,
-            context,
+        watch_doorway_transition(stream, context, label,
             [x, y, duration](ProControllerContext& ctx){
                 pbf_move_left_joystick(ctx, {x, y}, duration, 1500ms);
-                // Apply a bounded doorway correction if the approach stops short.
                 for (size_t pulse = 0; pulse < 10; pulse++){
                     pbf_move_left_joystick(ctx, {x, y}, 100ms, 100ms);
                 }
-            },
-            {{black}, {white}});
-        if (ret < 0){
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                label + ": Entrance/exit transition not detected.",
-                stream);
-        }
-        context.wait_for_all_requests();
-        BlackScreenDetector black_frame;
-        WhiteScreenDetector white_frame;
-        // Accept either fade type, then require a stable return before moving.
-        const auto deadline = std::chrono::steady_clock::now() + 15s;
-        auto clear_since = std::chrono::steady_clock::now();
-        while (std::chrono::steady_clock::now() < deadline){
-            const auto frame = stream.video().snapshot();
-            if (!frame){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    label + ": No video frame during transition.",
-                    stream);
-            }
-            const auto now = std::chrono::steady_clock::now();
-            if (black_frame.detect(*frame.frame) || white_frame.detect(*frame.frame)){
-                clear_since = now;
-            }else if (now - clear_since >= 500ms){
-                pbf_wait(context, 700ms);
-                context.wait_for_all_requests();
-                return;
-            }
-            pbf_wait(context, 100ms);
-            context.wait_for_all_requests();
-        }
-        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            label + ": Transition did not finish.",
-            stream);
+            });
     };
 
     // Checkpoint 0201 already healed and exited this Center.
@@ -1323,14 +1117,14 @@ static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& s
     for (size_t location_index = 0; location_index < 2; location_index++){
         const char* location = location_index == 0 ? "Route 205" : "Valley Windworks";
         TownBannerWatcher banner_cleared(COLOR_CYAN, TownBannerWatcher::FinderType::GONE, 300ms);
-        if (wait_until(stream, context, 7s, {{banner_cleared}}) != 0){
+        if (wait_until(stream, context, 8s, {{banner_cleared}}) != 0){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                 std::string(location) + ": Previous location banner did not clear.", stream);
         }
         TownBannerWatcher banner(COLOR_CYAN);
         const int entered = run_until<ProControllerContext>(stream, context,
             [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {1, 0}, 10000ms, 0ms);
+                pbf_move_left_joystick(ctx, {1, 0}, 10000ms, 1000ms);
             },
             {{banner}});
         context.wait_for_all_requests();
@@ -1387,22 +1181,9 @@ static void floaroma_to_mars(SingleSwitchProgramEnvironment& env, VideoStream& s
     clear_dialog(stream, context); // Entrance warning from the grunt.
     pbf_move_left_joystick(context, {-1, 0}, 2000ms, 250ms); // West wall, below the first grunt's sightline.
     context.wait_for_all_requests();
-    // Stop northward travel on the actual battle menu. The floor here can
-    // resemble a short dialogue box, so do not use the merged dialogue watcher.
-    BattleMenuWatcher grunt_menu(BattleType::TRAINER, COLOR_YELLOW);
-    const int grunt_event = run_until<ProControllerContext>(stream,
-        context,
-        [](ProControllerContext& ctx){
-            pbf_move_left_joystick(ctx, {0, 1}, 1250ms, 0ms);
-            pbf_mash_button(ctx, BUTTON_A, 30000ms);
-        },
-        {{grunt_menu}});
-    context.wait_for_all_requests();
-    if (grunt_event != 0){
-        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "Windworks interior: First grunt battle menu not confirmed.", stream);
-    }
+    pbf_move_left_joystick(context, {0, 1}, 1250ms, 0ms);
     stream.log("[Segment 02 battle] Valley Windworks interior Galactic grunt.");
+    wait_for_trainer_battle_menu(stream, context);
     fight_trainer_using_moves(stream, context, stats, "Route trainer", false);
     clear_dialog(stream, context);
 
@@ -1632,8 +1413,10 @@ void mars_to_eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& str
     context.wait_for_all_requests();
     pbf_move_left_joystick(context, {0, -1}, 1714ms, 456ms);
     context.wait_for_all_requests();
-    pbf_move_left_joystick(context, {1, -1}, 6809ms, 1862ms);
-    context.wait_for_all_requests();
+    watch_doorway_transition(stream, context, "Valley Windworks exit after Mars",
+        [](ProControllerContext& ctx){
+            pbf_move_left_joystick(ctx, {1, -1}, 6809ms, 0ms);
+        });
     pbf_move_left_joystick(context, {0, -1}, 922ms, 554ms);
     context.wait_for_all_requests();
     pbf_move_left_joystick(context, {-1, 0}, 813ms, 1370ms);
@@ -1696,7 +1479,7 @@ void mars_to_eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& str
                 // Battle intro uses a long dialogue box before the menu.
                 // Keep one uninterrupted watcher through the approach and
                 // this stationary window; no wiggle and no A press.
-                pbf_wait(ctx, 10000ms);
+                pbf_wait(ctx, 11000ms);
             },
             {{hiker_dialogue_watch}, {hiker_intro_watch}, {hiker_menu_watch}, {hiker_transition_watch}}) >= 0 ||
         hiker_started();
@@ -1759,9 +1542,27 @@ void mars_to_eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& str
 // selection and battle text.
 void eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
     (void)env;
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 1466ms, 1588ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 531ms, 3398ms);
-    wait_for_dialog(stream, context, "Cheryl introduction");
+    watch_doorway_transition(stream, context, "Eterna Forest entrance",
+        [](ProControllerContext& ctx){
+            pbf_move_left_joystick(ctx, {0, 1}, 1466ms, 0ms);
+        });
+    ShortDialogWatcher cheryl(COLOR_CYAN);
+    const int result = run_until<ProControllerContext>(stream, context,
+        [&](ProControllerContext& ctx){
+            pbf_move_left_joystick(ctx, {0, 1}, 531ms, 6000ms);
+            ctx.wait_for_all_requests();
+            stream.log("[Eterna Forest] Cheryl did not start talking; trying one tile west.");
+            DpadState dpad{DPAD_UP};
+            repeat_dpad(ctx, dpad, DPAD_LEFT, 80ms, 300ms, 1);
+            repeat_dpad(ctx, dpad, DPAD_UP, 80ms, 300ms, 2);
+            pbf_wait(ctx, 10000ms);
+        },
+        {{cheryl}});
+    if (result != 0){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Cheryl introduction: No dialogue after checking both entrance lanes.", stream);
+    }
+    stream.log("Cheryl introduction dialogue detected.");
     // Reuse the Galactic plaza cutscene cleanup, including a second
     // pass after the animation gap before route movement resumes.
     clear_dialog(stream, context);
@@ -1818,7 +1619,10 @@ void eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
     clear_dialog(stream, context);
     pbf_wait(context, 2000ms);
     clear_dialog(stream, context);
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 1238ms, 2157ms);
+    watch_doorway_transition(stream, context, "Eterna Forest exit to Route 205",
+        [](ProControllerContext& ctx){
+            pbf_move_left_joystick(ctx, {1, 0}, 1238ms, 0ms);
+        });
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 510ms, 544ms);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 864ms, 289ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 1694ms, 383ms);
@@ -1838,7 +1642,7 @@ void eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
     int entry = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& ctx){
-            pbf_move_left_joystick(ctx, {0, 1}, 4000ms, 3000ms);
+            pbf_move_left_joystick(ctx, {0, 1}, 4000ms, 4000ms);
         },
         {{center_entry}});
     if (entry != 0){
@@ -1855,7 +1659,7 @@ void eterna_forest(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
     // Exit fade completion does not guarantee the automatic doorway step is over.
     BlackScreenWatcher center_visible(COLOR_RED, {0.1, 0.1, 0.8, 0.8},
         100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
-    if (wait_until(stream, context, 30s, {{center_visible}}) != 0){
+    if (wait_until(stream, context, 31s, {{center_visible}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Eterna Center exit: Outdoor view did not settle.", stream);
     }
@@ -1874,39 +1678,25 @@ void eterna_forest_exit_to_gym(SingleSwitchProgramEnvironment& env,
     repeat_dpad(context, house_dpad, DPAD_RIGHT, 80ms, 300ms, 5);
     context.wait_for_all_requests();
 
-    bool entered_house = false;
-    for (size_t attempt = 0; attempt < 4; attempt++){
-        // A missed northward entry stops against the front wall. Correct one
-        // column east at a time; never sweep back across the Center doorway.
-        if (attempt > 0){
-            repeat_dpad(context, house_dpad, DPAD_RIGHT, 80ms, 300ms, 1);
-            context.wait_for_all_requests();
-        }
-        stream.log("[Underground Man house] Doorway attempt " + std::to_string(attempt + 1) + "/4.");
-        BlackScreenOverWatcher house_entry(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        const int entry_result = run_until<ProControllerContext>(stream,
-            context,
-            [&](ProControllerContext& ctx){
+    watch_doorway_transition(stream, context, "Underground Man house entrance",
+        [&](ProControllerContext& ctx){
+            for (size_t attempt = 0; attempt < 4; attempt++){
+                // A missed northward entry stops against the front wall. Correct one
+                // column east at a time; never sweep back across the Center doorway.
+                if (attempt > 0){
+                    repeat_dpad(ctx, house_dpad, DPAD_RIGHT, 80ms, 300ms, 1);
+                }
+                stream.log("[Underground Man house] Doorway attempt " + std::to_string(attempt + 1) + "/4.");
                 repeat_dpad(ctx, house_dpad, DPAD_UP, 80ms, 300ms, attempt == 0 ? 6 : 2);
                 pbf_wait(ctx, 3000ms);
-            },
-            {{house_entry}});
-        if (entry_result == 0){
-            entered_house = true;
-            break;
-        }
-    }
-    if (!entered_house){
-        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "Underground Man house: No entry transition after four D-pad approaches.", stream);
-    }
+                ctx.wait_for_all_requests();
+            }
+        });
 
     // Verify room identity at the doorway before moving toward the man.
     // A coarse furniture match is sufficient here, not for precise alignment.
-    pbf_wait(context, 1500ms);
-    context.wait_for_all_requests();
     size_t room_confirmations = 0;
-    for (size_t sample = 0; sample < 8 && room_confirmations < 3; sample++){
+    for (size_t sample = 0; sample < 10 && room_confirmations < 3; sample++){
         const auto frame = stream.video().snapshot();
         if (!frame){
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
@@ -1928,6 +1718,37 @@ void eterna_forest_exit_to_gym(SingleSwitchProgramEnvironment& env,
     house_dpad.last_dir = DPAD_UP;
     repeat_dpad(context, house_dpad, DPAD_RIGHT, 80ms, 300ms, 2);
     context.wait_for_all_requests();
+
+    // Furniture shifts left by about 0.073 of the frame width per tile walked east.
+    // At the man's column the horizontal offset is -0.013, measured on the entry row.
+    constexpr double man_column_dx = -0.013;
+    size_t column_confirmations = 0;
+    for (size_t sample = 0; sample < 8 && column_confirmations < 2; sample++){
+        const auto frame = stream.video().snapshot();
+        if (!frame){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Underground Man house: No frame while checking the man's column.", stream);
+        }
+        const auto room = match_eterna_underground_man(*frame.frame);
+        const double error = room.dx - man_column_dx;
+        if (room.located && std::abs(error) <= 0.02){
+            column_confirmations++;
+        }else{
+            column_confirmations = 0;
+            if (room.located){
+                const DpadPosition direction = error > 0 ? DPAD_RIGHT : DPAD_LEFT;
+                stream.log("[Underground Man house] Correcting one tile " +
+                    std::string(direction == DPAD_RIGHT ? "east." : "west."));
+                repeat_dpad(context, house_dpad, direction, 80ms, 300ms, 1);
+            }
+        }
+        pbf_wait(context, 150ms);
+        context.wait_for_all_requests();
+    }
+    if (column_confirmations < 2){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Underground Man house: Could not confirm the man's column before walking north.", stream);
+    }
     ShortDialogWatcher introduction(COLOR_CYAN);
     const int introduction_result = run_until<ProControllerContext>(stream,
         context,
@@ -1960,7 +1781,7 @@ void eterna_forest_exit_to_gym(SingleSwitchProgramEnvironment& env,
     // English OCR handles the language-independent digits.
     const ImageFloatBox underground_counter_box{0, .326, .085, .05};
     size_t arrival_confirmations = 0;
-    for (size_t sample = 0; sample < 12 && arrival_confirmations < 3; sample++){
+    for (size_t sample = 0; sample < 16 && arrival_confirmations < 3; sample++){
         const auto frame = stream.video().snapshot();
         std::string counter;
         if (frame){
@@ -1994,7 +1815,7 @@ void eterna_forest_exit_to_gym(SingleSwitchProgramEnvironment& env,
     // Keep the Y / Go up / Yes inputs above, then watch the
     // Underground Man's reward dialogue through the surface return.
     context.wait_for_all_requests();
-    wait_for_dialog(stream, context, "Underground Man return");
+    wait_for_dialog(stream, context, "Underground Man return", 61s);
     clear_dialog(stream, context, BUTTON_A, 3500ms);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 584ms, 85ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1448ms, 122ms);
@@ -2036,94 +1857,63 @@ void eterna_forest_exit_to_gym(SingleSwitchProgramEnvironment& env,
         nullptr,
         .03,
         .02);
-    // Start acquiring north of the fence collision, then use gym landmarks to correct the final
-    // row and eastward approach.
     pbf_move_left_joystick(context, {0, -1}, 4300ms, 642ms);
-    pbf_move_left_joystick(context, {1, 0}, 1125ms, 939ms);
-    pbf_move_left_joystick(context, {0, 1}, 56ms, 467ms);
-    pbf_move_left_joystick(context, {0, 1}, 39ms, 1255ms);
-    // Configurable only for a watched gym entry attempt. The normal
-    // three-landmark exterior arrival gates remain unchanged.
-    constexpr double GYM_MODERATE_ENTRY_CONFIDENCE = .88;
-    constexpr size_t GYM_ENTRY_ATTEMPTS = 3;
-    bool gym_confirmed = false, transition_seen = false;
-    for (size_t attempt = 1; attempt <= GYM_ENTRY_ATTEMPTS && !gym_confirmed; attempt++){
-        stream.log("[Eterna Gym entry] Attempt " + std::to_string(attempt) + "/" + std::to_string(GYM_ENTRY_ATTEMPTS));
-        if (!transition_seen){
-            bool already_inside = false;
-            // Watch throughout alignment, not just the final north
-            // hold: a correction can cross the doorway first.
-            BlackScreenWatcher entering(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-            const int outcome = run_until<ProControllerContext>(stream,
-                context,
-                [&](ProControllerContext& ctx){
-                    align_to_overworld_landmarks(stream,
-                        ctx,
-                        match_eterna_gym_entrance,
-                        "Eterna Gym doorway",
-                        false,
-                        true,
-                        false,
-                        match_eterna_gym_statues,
-                        &already_inside,
-                        0,
-                        0,
-                        GYM_MODERATE_ENTRY_CONFIDENCE);
-                    if (!already_inside){
-                        pbf_move_left_joystick(ctx, {0, 1}, 3000ms, 5000ms);
-                    }
-                },
-                {{entering}});
-            transition_seen = outcome == 0 || already_inside;
-            stream.log("[Eterna Gym entry] Black transition detected=" + std::to_string(outcome == 0) +
-                ", interior seen during alignment=" + std::to_string(already_inside));
+    watch_doorway_transition(stream, context, "Eterna Gym entrance",
+        [&](ProControllerContext& ctx){
+            pbf_move_left_joystick(ctx, {1, 0}, 1125ms, 939ms);
+            pbf_move_left_joystick(ctx, {0, 1}, 56ms, 467ms);
+            pbf_move_left_joystick(ctx, {0, 1}, 39ms, 1255ms);
+            DpadState gym_dpad;
+            gym_dpad.last_dir = DPAD_UP;
+            repeat_dpad(ctx, gym_dpad, DPAD_UP, 80ms, 300ms, 3);
+            pbf_wait(ctx, 700ms);
+            ctx.wait_for_all_requests();
+
+            // The fence bounds the lane south of the gym. Start at its east end
+            // and try each column westward, returning to the fence between probes.
+            stream.log("[Eterna Gym entry] Checking doorway columns from the east fence corner.");
+            repeat_dpad(ctx, gym_dpad, DPAD_DOWN, 80ms, 300ms, 3);
+            repeat_dpad(ctx, gym_dpad, DPAD_RIGHT, 80ms, 300ms, 14);
+            constexpr size_t columns = 8;
+            for (size_t column = 0; column < columns; column++){
+                if (column > 0){
+                    repeat_dpad(ctx, gym_dpad, DPAD_DOWN, 80ms, 300ms, 3);
+                    repeat_dpad(ctx, gym_dpad, DPAD_LEFT, 80ms, 300ms, 1);
+                }
+                ctx.wait_for_all_requests();
+                stream.log("[Eterna Gym entry] Doorway column " + std::to_string(column + 1) +
+                    "/" + std::to_string(columns) + " from the east.");
+                repeat_dpad(ctx, gym_dpad, DPAD_UP, 80ms, 300ms, 3);
+                pbf_wait(ctx, 700ms);
+                ctx.wait_for_all_requests();
+            }
+        });
+
+    size_t stable = 0;
+    for (size_t check = 0; check < 24 && stable < 3; check++){
+        context.wait_for_all_requests();
+        const auto frame = stream.video().snapshot();
+        if (!frame){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Eterna Gym: No interior verification frame.",
+                stream);
         }
-        if (transition_seen){
-            BlackScreenWatcher visible(COLOR_RED,
-                {0.1, 0.1, 0.8, 0.8},
-                100,
-                10,
-                BlackScreenWatcher::FinderType::GONE,
-                500ms);
-            if (wait_until(stream, context, 30s, {{visible}}) != 0){
-                stream.log("[Eterna Gym entry] Transition has not finished; retrying within limit.");
-                continue;
-            }
-            stream.log("[Eterna Gym entry] Transition finished; verifying both statues.");
+        const auto interior = match_eterna_gym_statues(*frame.frame);
+        for (const auto& statue : interior.landmarks){
+            stream.log("[Eterna Gym statues] " + statue.name + " score=" + std::to_string(statue.score) +
+                ", margin=" + std::to_string(statue.margin) + ", offset=(" + std::to_string(statue.dx) + "," +
+                std::to_string(statue.dy) + ")");
         }
-        // Black alone never proves entry. Stop navigation and retry
-        // verification if a transition occurred into an unknown room.
-        size_t stable = 0;
-        for (size_t check = 0; check < 8; check++){
-            context.wait_for_all_requests();
-            const auto frame = stream.video().snapshot();
-            if (!frame){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "Eterna Gym: No interior verification frame.",
-                    stream);
-            }
-            const auto interior = match_eterna_gym_statues(*frame.frame);
-            for (const auto& statue : interior.landmarks){
-                stream.log("[Eterna Gym statues] " + statue.name + " score=" + std::to_string(statue.score) +
-                    ", margin=" + std::to_string(statue.margin) + ", offset=(" + std::to_string(statue.dx) + "," +
-                    std::to_string(statue.dy) + ")");
-            }
-            stable = interior.located ? stable + 1 : 0;
-            stream.log("[Eterna Gym statues] Both in expected positions=" + std::to_string(interior.located) +
-                ", stable frames=" + std::to_string(stable) + "/3");
-            if (stable >= 3){
-                gym_confirmed = true;
-                break;
-            }
+        stable = interior.located ? stable + 1 : 0;
+        stream.log("[Eterna Gym statues] Both in expected positions=" + std::to_string(interior.located) +
+            ", stable frames=" + std::to_string(stable) + "/3");
+        if (stable < 3){
             pbf_wait(context, 250ms);
         }
-        if (!gym_confirmed){
-            stream.log("[Eterna Gym entry] Statues not verified; bounded retry.");
-        }
     }
-    if (!gym_confirmed){
+    if (stable < 3){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "Eterna Gym: Both entrance statues were not verified after three attempts.",
+            "Eterna Gym: Could not verify both entrance statues after the doorway transition.",
             stream);
     }
     stream.log("[Eterna City] Watched Explorer Kit/Cynthia events and verified gym entry complete.", COLOR_GREEN);
@@ -2219,9 +2009,8 @@ static void gym_Puzzle_02(SingleSwitchProgramEnvironment& env, VideoStream& stre
         {DPAD_DOWN, 2},
     };
 
-    for (int i = 0; i < 7; i++){
-        pbf_press_dpad(context, DPAD_UP, 80ms, 300ms);
-    }
+    DpadState dpad;
+    repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 7, false);
 
     // Reuse the Roark/Cynthia dialogue watcher so Gardenia's
     // introduction finishes before the doorway movement starts.
@@ -2230,16 +2019,15 @@ static void gym_Puzzle_02(SingleSwitchProgramEnvironment& env, VideoStream& stre
     wait_for_dialog(stream, context, "Gardenia introduction");
     clear_dialog(stream, context, BUTTON_A, 3500ms);
     stream.log("[Eterna Gym puzzle] Gardenia introduction dialogue cleared.");
-    // Allow 7.5 seconds for the door transition and gym camera introduction, plus 500ms for
-    // hardware variation.
-    stream.log(
-        "[Eterna Gym puzzle] Entering Gardenia's doorway; waiting 8000ms for transition/cutscene (includes 500ms buffer).");
-    pbf_press_dpad(context, DPAD_UP, 80ms, 8000ms);
+    watch_doorway_transition(stream, context, "Eterna Gym puzzle entrance",
+        [&dpad](ProControllerContext& ctx){
+            repeat_dpad(ctx, dpad, DPAD_UP, 80ms, 300ms, 1, false);
+        });
+    // The first-entry camera pans across the forest after the room appears.
+    pbf_wait(context, 7000ms);
 
     for (const auto& move : sequence1){
-        for (int i = 0; i < move.count; i++){
-            pbf_press_dpad(context, move.dir, 80ms, 300ms);
-        }
+        repeat_dpad(context, dpad, move.dir, 80ms, 300ms, move.count, false);
     }
 
     //Button presses to initiate Trainer battle 01 (Lass Caroline).
@@ -2251,9 +2039,7 @@ static void gym_Puzzle_02(SingleSwitchProgramEnvironment& env, VideoStream& stre
     pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue.
 
     for (const auto& move : sequence2){
-        for (int i = 0; i < move.count; i++){
-            pbf_press_dpad(context, move.dir, 80ms, 300ms);
-        }
+        repeat_dpad(context, dpad, move.dir, 80ms, 300ms, move.count, false);
     }
 
     //Button presses to initiate Trainer battle 02 (Aroma Lady Jenna).
@@ -2265,9 +2051,7 @@ static void gym_Puzzle_02(SingleSwitchProgramEnvironment& env, VideoStream& stre
     pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue.
 
     for (const auto& move : sequence3){
-        for (int i = 0; i < move.count; i++){
-            pbf_press_dpad(context, move.dir, 80ms, 300ms);
-        }
+        repeat_dpad(context, dpad, move.dir, 80ms, 300ms, move.count, false);
     }
 
     //Button presses to initiate Trainer battle 03 (Aroma Lady Angela).
@@ -2279,9 +2063,7 @@ static void gym_Puzzle_02(SingleSwitchProgramEnvironment& env, VideoStream& stre
     pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue
 
     for (const auto& move : sequence4){
-        for (int i = 0; i < move.count; i++){
-            pbf_press_dpad(context, move.dir, 80ms, 300ms);
-        }
+        repeat_dpad(context, dpad, move.dir, 80ms, 300ms, move.count, false);
     }
 
     //Button presses to initiate Trainer battle 04 (Beauty Lindsay).
@@ -2293,9 +2075,7 @@ static void gym_Puzzle_02(SingleSwitchProgramEnvironment& env, VideoStream& stre
     pbf_mash_button(context, BUTTON_B, 2500ms); //Battle exit dialogue
 
     for (const auto& move : sequence5){
-        for (int i = 0; i < move.count; i++){
-            pbf_press_dpad(context, move.dir, 80ms, 300ms);
-        }
+        repeat_dpad(context, dpad, move.dir, 80ms, 300ms, move.count, false);
     }
 
     //Button presses to initiate Gym battle.
@@ -2311,24 +2091,20 @@ static void gym_Puzzle_02(SingleSwitchProgramEnvironment& env, VideoStream& stre
     clear_dialog(stream, context, BUTTON_B, 6000ms);
     stream.log("[Eterna Gym puzzle] Gardenia post-battle dialogue cleared; starting exit path.");
 
-    for (const auto& move : sequence6){
-        for (int i = 0; i < move.count; i++){
-            pbf_press_dpad(context, move.dir, 80ms, 300ms);
-        }
-    }
-
-    pbf_wait(context, 2000ms);
-
-    for (int i = 0; i < 9; i++){
-        pbf_press_dpad(context, DPAD_DOWN, 80ms, 300ms);
-    }
-
-    //Exits Buiilding
-    pbf_wait(context, 1000ms);
+    watch_doorway_transition(stream, context, "Eterna Gym puzzle exit",
+        [&](ProControllerContext& ctx){
+            for (const auto& move : sequence6){
+                repeat_dpad(ctx, dpad, move.dir, 80ms, 300ms, move.count, false);
+            }
+        });
+    watch_doorway_transition(stream, context, "Eterna Gym street exit",
+        [&](ProControllerContext& ctx){
+            repeat_dpad(ctx, dpad, DPAD_DOWN, 80ms, 300ms, 9, false);
+        });
 }
 
 std::string AutoStory_Segment_02::name() const {
-    return "02: First Badge to Second Badge";
+    return "02: Oreburgh to Eterna";
 }
 std::string AutoStory_Segment_02::start_text() const {
     return AutoStory_checkpoint_0201().start_text();

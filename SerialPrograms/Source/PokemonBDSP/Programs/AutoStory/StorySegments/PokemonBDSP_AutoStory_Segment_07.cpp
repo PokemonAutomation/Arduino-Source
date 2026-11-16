@@ -29,7 +29,6 @@
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Battle.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Segment_00_tools.h"
 
-#include "PokemonBDSP_AutoStory_Segment_02.h"
 #include "PokemonBDSP_AutoStory_Segment_07.h"
 
 namespace PokemonAutomation {
@@ -48,7 +47,7 @@ move_back_after_unexpected_battle(VideoStream& stream, ProControllerContext& con
 
     if (trainerid == "route_216_ace_maria"){
         pbf_move_left_joystick(context, {-1, 0}, 1600ms, 100ms); // 8
-    }else if (trainerid == "route_215_skier_edward"){
+    }else if (trainerid == "route_216_skier_edward"){
         pbf_move_left_joystick(context, {-1, 0}, 8100ms, 100ms); // 27++ (snow)
     }else if (trainerid == "route_217_skier_lexie"){
         pbf_move_left_joystick(context, {0, +1}, 2100ms, 100ms); // 7++ (snow)
@@ -72,7 +71,7 @@ static bool leave_gym(VideoStream& stream, ProControllerContext& context){
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -118,7 +117,7 @@ static bool go_to_the_library(VideoStream& stream, ProControllerContext& context
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -144,7 +143,7 @@ static bool drama_at_the_library(VideoStream& stream, ProControllerContext& cont
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -165,7 +164,7 @@ static bool drama_at_the_library(VideoStream& stream, ProControllerContext& cont
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -203,7 +202,7 @@ static bool drama_at_the_library(VideoStream& stream, ProControllerContext& cont
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -226,7 +225,7 @@ static bool drama_at_the_library(VideoStream& stream, ProControllerContext& cont
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -244,7 +243,7 @@ static bool drama_at_the_library(VideoStream& stream, ProControllerContext& cont
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -301,7 +300,10 @@ static bool fly_and_enter_mount_coronet(VideoStream& stream, ProControllerContex
     repeat_dpad(context, dpad, DPAD_UP, 80ms, 300ms, 11);
     pbf_move_left_joystick(context, {-1, 0}, 3200ms, 100ms); // 16+
     context.wait_for_all_requests();
-    activate_repel(stream, context, language);
+    if (!activate_repel(stream, context, language)){
+        stream.log("07.02: Could not activate Repel before entering Mt. Coronet.", COLOR_RED);
+        return false;
+    }
     context.wait_for_all_requests();
 
     dpad.last_dir = DPAD_LEFT;
@@ -315,7 +317,7 @@ static bool fly_and_enter_mount_coronet(VideoStream& stream, ProControllerContex
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -353,7 +355,7 @@ static bool go_through_mount_coronet(VideoStream& stream, ProControllerContext& 
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -394,7 +396,7 @@ static bool go_through_mount_coronet(VideoStream& stream, ProControllerContext& 
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -415,7 +417,7 @@ static bool go_through_mount_coronet(VideoStream& stream, ProControllerContext& 
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 1100ms);
             },
             {{white_screen}});
         if (ret < 0){
@@ -476,6 +478,7 @@ static bool go_through_route_216(VideoStream& stream, ProControllerContext& cont
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -511,6 +514,7 @@ static bool go_through_route_216(VideoStream& stream, ProControllerContext& cont
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -534,7 +538,7 @@ static bool go_through_route_216(VideoStream& stream, ProControllerContext& cont
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -614,7 +618,7 @@ static bool leave_small_house_route_216(VideoStream& stream, ProControllerContex
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -685,6 +689,7 @@ static bool continue_through_route_216(VideoStream& stream, ProControllerContext
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -766,6 +771,7 @@ static bool continue_through_route_216(VideoStream& stream, ProControllerContext
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -809,6 +815,7 @@ static bool continue_through_route_216(VideoStream& stream, ProControllerContext
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -826,7 +833,10 @@ static bool continue_through_route_216(VideoStream& stream, ProControllerContext
     context.wait_for_all_requests();
     pbf_wait(context, 1000ms);
 
-    activate_repel(stream, context, language);
+    if (!activate_repel(stream, context, language)){
+        stream.log("07.03: Could not activate Repel on Route 217 before Ace Trainer Olivia.", COLOR_RED);
+        return false;
+    }
     context.wait_for_all_requests();
     pbf_wait(context, 1000ms);
 
@@ -848,6 +858,7 @@ static bool continue_through_route_216(VideoStream& stream, ProControllerContext
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -909,7 +920,7 @@ static bool restock_super_repels_snowpoint(VideoStream& stream,
             context,
             [](ProControllerContext& context){
                 pbf_move_left_joystick(context, {0.000000, 1.000000}, 768ms, 0ms);
-                pbf_move_left_joystick(context, {1.000000, 1.000000}, 1460ms, 3577ms);
+                pbf_move_left_joystick(context, {1.000000, 1.000000}, 1460ms, 4577ms);
             },
             {{entrance}});
         if (ret != 0){
@@ -932,7 +943,7 @@ static bool restock_super_repels_snowpoint(VideoStream& stream,
             context,
             [](ProControllerContext& context){
                 // Observe the doorway fade after movement ends.
-                pbf_move_left_joystick(context, {0.000000, -1.000000}, 1101ms, 5000ms);
+                pbf_move_left_joystick(context, {0.000000, -1.000000}, 1101ms, 6000ms);
             },
             {{exit}});
         if (ret != 0){
@@ -959,11 +970,11 @@ static bool heal_and_exit_veilstone_pokemon_center(VideoStream& stream, ProContr
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
-            stream.log("continue_through_route_216: black screen not detected!", COLOR_RED);
+            stream.log("Could not detect the Veilstone Pokemon Center entry fade.", COLOR_RED);
             return false;
         }
         stream.log("heal_and_exit_veilstone_pokemon_center: entered Veilstone Pokemon Center", COLOR_GREEN);
@@ -1022,7 +1033,7 @@ static bool go_to_house_south_veilstone(VideoStream& stream, ProControllerContex
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 1100ms);
             },
             {{black_screen_1}});
         if (ret < 0){
@@ -1045,7 +1056,7 @@ static bool go_through_house_south_veilstone(VideoStream& stream, ProControllerC
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {0, -1}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -1114,7 +1125,7 @@ static bool walk_through_route_214(VideoStream& stream, ProControllerContext& co
             context,
             [](ProControllerContext& context){
                 // Entry completes in under three seconds, including the fade.
-                pbf_move_left_joystick(context, {-1, 0}, 4000ms, 100ms);
+                pbf_move_left_joystick(context, {-1, 0}, 4000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -1197,6 +1208,7 @@ static bool go_through_lake_valor(VideoStream& stream,
                 // turn and walk over.
                 ssf_press_left_joystick(ctx, {-1, 0}, 0ms, 2000ms);
                 ssf_mash1_button(ctx, BUTTON_A, 30000ms);
+                pbf_wait(ctx, 1000ms);
             },
             {{battle_start}});
         if (result != 0){
@@ -1247,6 +1259,7 @@ static bool go_through_lake_valor(VideoStream& stream,
                 pbf_press_dpad(ctx, DPAD_UP, 187ms, 323ms);
                 // Observe a delayed fade without extending movement.
                 pbf_press_dpad(ctx, DPAD_UP, 193ms, 6741ms);
+                pbf_wait(ctx, 1000ms);
             },
             {{black}, {white}});
         if (result < 0){
@@ -1257,14 +1270,14 @@ static bool go_through_lake_valor(VideoStream& stream,
             {0.1, 0.1, 0.8, 0.8}, 100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
         WhiteScreenWatcher white_gone(COLOR_RED,
             {0.1, 0.1, 0.8, 0.8}, 500, 10, WhiteScreenWatcher::FinderType::GONE, 500ms);
-        const int finished = result == 1 ? wait_until(stream, context, 15s, {{white_gone}})
-            : wait_until(stream, context, 15s, {{black_gone}});
+        const int finished = result == 1 ? wait_until(stream, context, 16s, {{white_gone}})
+            : wait_until(stream, context, 16s, {{black_gone}});
         if (finished != 0){
             stream.log("Valor Cavern: Entrance transition did not finish.", COLOR_RED);
             return false;
         }
         OverworldWatcher overworld;
-        if (wait_until(stream, context, 10s, {{overworld}}) != 0){
+        if (wait_until(stream, context, 11s, {{overworld}}) != 0){
             stream.log("Valor Cavern: Indoor overworld not ready.", COLOR_RED);
             return false;
         }
@@ -1286,6 +1299,7 @@ static bool go_through_lake_valor(VideoStream& stream,
             context,
             [](ProControllerContext& ctx){
                 pbf_mash_button(ctx, BUTTON_A, 30000ms);
+                pbf_wait(ctx, 1000ms);
             },
             {{battle_start}});
         if (result != 0){
@@ -1303,7 +1317,7 @@ static bool go_through_lake_valor(VideoStream& stream,
         const int result = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 1834ms, 5000ms);
+                pbf_move_left_joystick(ctx, {0.000000, -1.000000}, 1834ms, 6000ms);
             },
             {{black}, {white}});
         if (result < 0){
@@ -1316,14 +1330,14 @@ static bool go_through_lake_valor(VideoStream& stream,
             {0.1, 0.1, 0.8, 0.8}, 100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
         WhiteScreenWatcher white_gone(COLOR_RED,
             {0.1, 0.1, 0.8, 0.8}, 500, 10, WhiteScreenWatcher::FinderType::GONE, 500ms);
-        const int finished = result == 1 ? wait_until(stream, context, 15s, {{white_gone}})
-            : wait_until(stream, context, 15s, {{black_gone}});
+        const int finished = result == 1 ? wait_until(stream, context, 16s, {{white_gone}})
+            : wait_until(stream, context, 16s, {{black_gone}});
         if (finished != 0){
             stream.log("Valor Cavern: Exit transition did not finish.", COLOR_RED);
             return false;
         }
         OverworldWatcher overworld;
-        if (wait_until(stream, context, 10s, {{overworld}}) != 0){
+        if (wait_until(stream, context, 11s, {{overworld}}) != 0){
             stream.log("Valor Cavern: Outdoor overworld not ready.", COLOR_RED);
             return false;
         }
@@ -1339,7 +1353,7 @@ static bool return_to_twinleaf_and_heal(VideoStream& stream, ProControllerContex
     }
     context.wait_for_all_requests();
     OverworldWatcher landed;
-    if (wait_until(stream, context, 10s, {{landed}}) != 0){
+    if (wait_until(stream, context, 11s, {{landed}}) != 0){
         stream.log("Twinleaf home: Fly landing overworld not ready.", COLOR_RED);
         return false;
     }
@@ -1352,7 +1366,7 @@ static bool return_to_twinleaf_and_heal(VideoStream& stream, ProControllerContex
         const int result = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {0, +1}, 10000ms, 100ms);
+                pbf_move_left_joystick(ctx, {0, +1}, 10000ms, 1100ms);
             },
             {{black}, {white}});
         if (result < 0){
@@ -1363,14 +1377,14 @@ static bool return_to_twinleaf_and_heal(VideoStream& stream, ProControllerContex
             {0.1, 0.1, 0.8, 0.8}, 100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
         WhiteScreenWatcher white_gone(COLOR_RED,
             {0.1, 0.1, 0.8, 0.8}, 500, 10, WhiteScreenWatcher::FinderType::GONE, 500ms);
-        const int finished = result == 1 ? wait_until(stream, context, 15s, {{white_gone}})
-            : wait_until(stream, context, 15s, {{black_gone}});
+        const int finished = result == 1 ? wait_until(stream, context, 16s, {{white_gone}})
+            : wait_until(stream, context, 16s, {{black_gone}});
         if (finished != 0){
             stream.log("Twinleaf home: Entrance transition did not finish.", COLOR_RED);
             return false;
         }
         OverworldWatcher inside;
-        if (wait_until(stream, context, 10s, {{inside}}) != 0){
+        if (wait_until(stream, context, 11s, {{inside}}) != 0){
             stream.log("Twinleaf home: Indoor overworld not ready.", COLOR_RED);
             return false;
         }
@@ -1418,7 +1432,7 @@ static bool return_to_twinleaf_and_heal(VideoStream& stream, ProControllerContex
         const int result = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {0, -1}, 10000ms, 100ms);
+                pbf_move_left_joystick(ctx, {0, -1}, 10000ms, 1100ms);
             },
             {{black}, {white}});
         if (result < 0){
@@ -1429,14 +1443,14 @@ static bool return_to_twinleaf_and_heal(VideoStream& stream, ProControllerContex
             {0.1, 0.1, 0.8, 0.8}, 100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
         WhiteScreenWatcher white_gone(COLOR_RED,
             {0.1, 0.1, 0.8, 0.8}, 500, 10, WhiteScreenWatcher::FinderType::GONE, 500ms);
-        const int finished = result == 1 ? wait_until(stream, context, 15s, {{white_gone}})
-            : wait_until(stream, context, 15s, {{black_gone}});
+        const int finished = result == 1 ? wait_until(stream, context, 16s, {{white_gone}})
+            : wait_until(stream, context, 16s, {{black_gone}});
         if (finished != 0){
             stream.log("Twinleaf home: Exit transition did not finish.", COLOR_RED);
             return false;
         }
         OverworldWatcher outside;
-        if (wait_until(stream, context, 10s, {{outside}}) != 0){
+        if (wait_until(stream, context, 11s, {{outside}}) != 0){
             stream.log("Twinleaf home: Outdoor overworld not ready.", COLOR_RED);
             return false;
         }
@@ -1468,7 +1482,7 @@ static bool go_to_lake_verity(VideoStream& stream, ProControllerContext& context
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -1489,7 +1503,7 @@ static bool commander_mars_at_verity(VideoStream& stream, ProControllerContext& 
 
     // Arrival starts Rowan's conversation before the trainer approach. Moving
     // while it is open loses the route inputs and leaves no battle to detect.
-    wait_for_dialog(stream, context, "Lake Verity Rowan arrival", 15s);
+    wait_for_dialog(stream, context, "Lake Verity Rowan arrival", 16s);
     clear_dialog(stream, context, BUTTON_B, 6000ms);
 
     pbf_move_left_joystick(context, {0, +1}, 600ms, 100ms); // 2+
@@ -1520,6 +1534,7 @@ static bool commander_mars_at_verity(VideoStream& stream, ProControllerContext& 
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 30000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -1572,6 +1587,7 @@ static bool commander_mars_at_verity(VideoStream& stream, ProControllerContext& 
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 30000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -1620,6 +1636,7 @@ static bool commander_mars_at_verity(VideoStream& stream, ProControllerContext& 
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 30000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -1653,7 +1670,7 @@ static bool commander_mars_at_verity(VideoStream& stream, ProControllerContext& 
     pbf_wait(context, 2000ms);
     context.wait_for_all_requests();
     OverworldWatcher snowpoint_landing;
-    if (wait_until(stream, context, 15s, {{snowpoint_landing}}) != 0){
+    if (wait_until(stream, context, 16s, {{snowpoint_landing}}) != 0){
         stream.log("Lake Verity return: Snowpoint landing was not ready.", COLOR_RED);
         return false;
     }
@@ -1682,7 +1699,7 @@ static bool restock_and_heal_snowpoint(VideoStream& stream,
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -1725,7 +1742,7 @@ static bool go_to_snowpoint_gym(VideoStream& stream, ProControllerContext& conte
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -1968,7 +1985,7 @@ static bool snowpoint_gym_puzzle_and_candice(VideoStream& stream,
                 repeat_dpad(ctx, dpad, move.dir, move.hold, 0ms, move.count, false);
                 pbf_wait(ctx, move.delay);
             }
-            pbf_wait(ctx, 5000ms);
+            pbf_wait(ctx, 6000ms);
         },
         {{exit_black}});
     if (exit_result != 0){
@@ -1977,12 +1994,12 @@ static bool snowpoint_gym_puzzle_and_candice(VideoStream& stream,
     }
     BlackScreenWatcher exit_gone(COLOR_RED,
         {0.1, 0.1, 0.8, 0.8}, 100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
-    if (wait_until(stream, context, 15s, {{exit_gone}}) != 0){
+    if (wait_until(stream, context, 16s, {{exit_gone}}) != 0){
         stream.log("Snowpoint Gym: Exit transition did not finish.", COLOR_RED);
         return false;
     }
     OverworldWatcher outside;
-    if (wait_until(stream, context, 10s, {{outside}}) != 0){
+    if (wait_until(stream, context, 11s, {{outside}}) != 0){
         stream.log("Snowpoint Gym: Outdoor overworld not ready.", COLOR_RED);
         return false;
     }

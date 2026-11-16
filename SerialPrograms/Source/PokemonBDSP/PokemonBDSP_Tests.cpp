@@ -24,6 +24,7 @@
 #include "Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "Inference/PokemonBDSP_MenuDetector.h"
 #include "Inference/PokemonBDSP_OptionsDetector.h"
+#include "Inference/PokemonBDSP_ShopDetectors.h"
 #include "Inference/PokemonBDSP_ShopItemNameReader.h"
 #include "Inference/PokemonBDSP_TownBannerDetector.h"
 #include "Tests/ImageUnitTest.h"
@@ -297,6 +298,37 @@ private:
     bool m_at_target;
 };
 
+class Test_ShopDescriptionName : public ImageUnitTest{
+public:
+    Test_ShopDescriptionName(const std::string& name, const std::string& selected)
+        : ImageUnitTest("PokemonBDSP::ShopDescriptionName/" + name,
+            {"PokemonBDSP/ShopDescriptionName/" + name})
+        , m_selected(selected)
+    {
+        m_memory += MAX_TEST_IMAGE_RGB32_BYTES;
+    }
+
+    UnitTestResult run_on_images(Logger& logger, CancellableScope&, const std::vector<ImageRGB32>& images) const override{
+        if (images.empty() || !images[0]){
+            return false;
+        }
+        for (size_t width : {size_t(1920), size_t(1280)}){
+            const ImageRGB32 frame = images[0].scale_to(width, width * 9 / 16);
+            for (const char* item : {"x-attack", "x-sp-def", "full-restore", "x-sp-atk", "x-defense"}){
+                ShopItemHoverDetector detector(logger, item, Language::English);
+                if (detector.detect(frame) != (m_selected == item)){
+                    return UnitTestResult(UnitTestResult::FAILED,
+                        std::string(item) + " at width " + std::to_string(width) + ", selected: " + m_selected);
+                }
+            }
+        }
+        return true;
+    }
+
+private:
+    std::string m_selected;
+};
+
 class Test_BagScreenshots : public UnitTest{
 public:
     Test_BagScreenshots() : UnitTest("PokemonBDSP::Bag screenshot tests"){}
@@ -368,6 +400,7 @@ bool run_bag_screenshot_tests(Logger& logger, const std::string& folder){
             {"eng", "Super Repel", "super-repel"},
             {"eng", "Rare Candy", "rare-candy"},
             {"spa", "Carburante", "carbos"},
+            {"eng", "Adamant Orb", "adamant-orb"},
             {"deu", "Wahlbrille", "choice-specs"},
             {"fra", "Super Repousse", "super-repel"},
             {"jpn", "きんのたま", "nugget"},
@@ -633,42 +666,41 @@ void add_tests(UnitTestDatabase& database){
     database.add<Test_Route215AceAlignment>("negative-stair-base.png", false, false);
     database.add<Test_Route215AceAlignment>("negative-stairs.png", false, false);
     database.add<Test_Route215AceAlignment>("negative-stair-top.png", false, false);
-    database.add<Test_OptionsOCR>("Spanish_20261112_17-40.png", "textspeed", "normal", Language::Spanish);
-    database.add<Test_OptionsOCR>("Spanish_20261112_18-20.png", "textspeed", "fast", Language::Spanish);
-    database.add<Test_OptionsOCR>("Spanish_20261112_18-50.png", "changewindow", "type1", Language::Spanish);
-    database.add<Test_OptionsOCR>("Spanish_20261112_19-05.png", "battleeffects", "on", Language::Spanish);
-    database.add<Test_OptionsOCR>("Spanish_20261112_19-45.png", "battleeffects", "off", Language::Spanish);
-    database.add<Test_OptionsOCR>("Spanish_20261112_19-90.png", "battlestyle", "switch", Language::Spanish);
-    database.add<Test_OptionsOCR>("Spanish_20261112_20-30.png", "battlestyle", "set", Language::Spanish);
-    database.add<Test_OptionsOCR>("Spanish_20261112_20-75.png", "sendtoboxes", "manual", Language::Spanish);
-    database.add<Test_OptionsOCR>("Spanish_20261112_21-20.png", "sendtoboxes", "automatic", Language::Spanish);
-    database.add<Test_OptionsOCR>("Spanish_20261112_21-65.png", "givenicknames", "give", Language::Spanish);
-    database.add<Test_OptionsOCR>("Spanish_20261112_22-10.png", "givenicknames", "dontgive", Language::Spanish);
+    database.add<Test_OptionsOCR>("Spanish_20261112_17-40.png", "text-speed", "normal", Language::Spanish);
+    database.add<Test_OptionsOCR>("Spanish_20261112_18-20.png", "text-speed", "fast", Language::Spanish);
+    database.add<Test_OptionsOCR>("Spanish_20261112_18-50.png", "change-window", "type-1", Language::Spanish);
+    database.add<Test_OptionsOCR>("Spanish_20261112_19-05.png", "battle-effects", "on", Language::Spanish);
+    database.add<Test_OptionsOCR>("Spanish_20261112_19-45.png", "battle-effects", "off", Language::Spanish);
+    database.add<Test_OptionsOCR>("Spanish_20261112_19-90.png", "battle-style", "switch", Language::Spanish);
+    database.add<Test_OptionsOCR>("Spanish_20261112_20-30.png", "battle-style", "set", Language::Spanish);
+    database.add<Test_OptionsOCR>("Spanish_20261112_20-75.png", "send-to-boxes", "manual", Language::Spanish);
+    database.add<Test_OptionsOCR>("Spanish_20261112_21-20.png", "send-to-boxes", "automatic", Language::Spanish);
+    database.add<Test_OptionsOCR>("Spanish_20261112_21-65.png", "give-nicknames", "give", Language::Spanish);
+    database.add<Test_OptionsOCR>("Spanish_20261112_22-10.png", "give-nicknames", "dont-give", Language::Spanish);
     database.add<Test_OptionsOCR>("Spanish_20261112_22-55.png", "gyroscope", "use", Language::Spanish);
     database.add<Test_OptionsOCR>("Spanish_20261112_22-95.png", "autosave", "on", Language::Spanish);
     database.add<Test_OptionsOCR>("Spanish_20261112_23-40.png", "autosave", "off", Language::Spanish);
-    database.add<Test_OptionsOCR>("Spanish_20261112_24-80.png", "shownicknames", "show", Language::Spanish);
-    database.add<Test_OptionsOCR>("Spanish_20261112_25-70.png", "backgroundmusic", "volume8", Language::Spanish);
-    database.add<Test_OptionsOCR>("Spanish_20261112_26-30.png", "soundeffects", "volume8", Language::Spanish);
+    database.add<Test_OptionsOCR>("Spanish_20261112_24-80.png", "show-nicknames", "show", Language::Spanish);
     database.add<Test_OptionsOCR>("Spanish_20261112_41-70.png", "autosave", "off", Language::Spanish);
     database.add<Test_OptionsOCR>("Spanish_20261112_27-05.png", "", "", Language::Spanish);
     database.add<Test_OptionsOCR>("Spanish_20261112_31-00.png", "", "", Language::Spanish);
     database.add<Test_OptionsOCR>("Spanish_20261112_48-60.png", "", "", Language::Spanish);
-    database.add<Test_OptionsOCR>("Synthetic_textspeed.png", "textspeed", "fast");
-    database.add<Test_OptionsOCR>("Synthetic_changewindow.png", "changewindow", "type1");
-    database.add<Test_OptionsOCR>("Synthetic_battleeffects.png", "battleeffects", "off");
-    database.add<Test_OptionsOCR>("Synthetic_battlestyle.png", "battlestyle", "set");
-    database.add<Test_OptionsOCR>("Synthetic_sendtoboxes.png", "sendtoboxes", "automatic");
-    database.add<Test_OptionsOCR>("Synthetic_givenicknames.png", "givenicknames", "dontgive");
+    database.add<Test_OptionsOCR>("Synthetic_textspeed.png", "text-speed", "fast");
+    database.add<Test_OptionsOCR>("Synthetic_changewindow.png", "change-window", "type-1");
+    database.add<Test_OptionsOCR>("Synthetic_battleeffects.png", "battle-effects", "off");
+    database.add<Test_OptionsOCR>("Synthetic_battlestyle.png", "battle-style", "set");
+    database.add<Test_OptionsOCR>("Synthetic_sendtoboxes.png", "send-to-boxes", "automatic");
+    database.add<Test_OptionsOCR>("Synthetic_givenicknames.png", "give-nicknames", "dont-give");
     database.add<Test_OptionsOCR>("Synthetic_gyroscope.png", "gyroscope", "use");
     database.add<Test_OptionsOCR>("Synthetic_autosave.png", "autosave", "off");
-    database.add<Test_OptionsOCR>("Synthetic_shownicknames.png", "shownicknames", "show");
-    database.add<Test_OptionsOCR>("Synthetic_backgroundmusic.png", "backgroundmusic", "volume8");
-    database.add<Test_OptionsOCR>("Synthetic_soundeffects.png", "soundeffects", "volume8");
+    database.add<Test_OptionsOCR>("Synthetic_shownicknames.png", "show-nicknames", "show");
     database.add<Test_OptionsOCR>("Synthetic_AutosaveOn.png", "autosave", "on");
+    database.add<Test_OptionsOCR>("Synthetic_DimEnglishTextSpeed.png", "text-speed", "fast");
+    database.add<Test_OptionsOCR>("Synthetic_GermanAutosave.png", "autosave", "on", Language::German);
+    database.add<Test_OptionsOCR>("Synthetic_TraditionalChineseTextSpeed.png", "text-speed", "normal", Language::ChineseTraditional);
     database.add<Test_OptionsOCR>("Synthetic_AmbiguousToggle.png", "autosave", "");
     database.add<Test_OptionsOCR>("Synthetic_MissingValue.png", "autosave", "");
-    database.add<Test_OptionsOCR>("Synthetic_DifferentRow.png", "battleeffects", "off");
+    database.add<Test_OptionsOCR>("Synthetic_DifferentRow.png", "battle-effects", "off");
     database.add<Test_OptionsOCR>("Synthetic_NoSelection.png", "", "");
     database.add<Test_TrainersSchoolSign>("ManualEast_2744.png", true, 614.0 / 1920, 144.0 / 1080, false);
     database.add<Test_TrainersSchoolSign>("ManualCentered_2746.png", true, 886.0 / 1920, 144.0 / 1080, true);
@@ -710,6 +742,14 @@ void add_tests(UnitTestDatabase& database){
     database.add<Test_TrainersSchoolSign>("Save_758.png", false);
     database.add<Test_TrainersSchoolSign>("Street_765.png", false);
     database.add<Test_TrainersSchoolSign>("Bag.png", false);
+    database.add<Test_ShopDescriptionName>("shop-control-x-defense.png", "x-defense");
+    database.add<Test_ShopDescriptionName>("shop-control-x-sp-atk.png", "x-sp-atk");
+    database.add<Test_ShopDescriptionName>("shop-full-restore-1.png", "full-restore");
+    database.add<Test_ShopDescriptionName>("shop-full-restore-2.png", "full-restore");
+    database.add<Test_ShopDescriptionName>("shop-x-attack-1.png", "x-attack");
+    database.add<Test_ShopDescriptionName>("shop-x-attack-2.png", "x-attack");
+    database.add<Test_ShopDescriptionName>("shop-x-sp-def-1.png", "x-sp-def");
+    database.add<Test_ShopDescriptionName>("shop-x-sp-def-2.png", "x-sp-def");
     database.add<Test_BagScreenshots>();
     database.add<Test_PlayerHPRatio>("Cynthia_3818_NoCommands.png", -1.0);
     database.add<Test_PlayerHPRatio>("Cynthia_3824_NoCommands.png", -1.0);

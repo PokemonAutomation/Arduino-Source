@@ -65,6 +65,7 @@ void run_battle_press_A(const ProgramInfo& /*info*/, VideoStream& stream, ProCon
         context,
         [](ProControllerContext& ctx){
             pbf_mash_button(ctx, BUTTON_A, 120000ms);
+            pbf_wait(ctx, 1000ms);
         },
         {{end_battle}});
 
@@ -73,6 +74,7 @@ void run_battle_press_A(const ProgramInfo& /*info*/, VideoStream& stream, ProCon
         context,
         [](ProControllerContext& ctx){
             pbf_mash_button(ctx, BUTTON_A, 120000ms);
+            pbf_wait(ctx, 1000ms);
         },
         {{overworld}});
 }
@@ -438,6 +440,7 @@ void handle_battle_with_outside_help(const ProgramInfo& /*info*/,
         context,
         [](ProControllerContext& ctx){
             pbf_mash_button(ctx, BUTTON_A, 120000ms);
+            pbf_wait(ctx, 1000ms);
         },
         {{overworld}});
 }
@@ -534,7 +537,21 @@ double read_player_hp_ratio(const ImageViewRGB32& frame,
 }
 
 //  Returns true if a coloured status badge is visible on the player's active pokemon.
-static bool detect_player_status(const ImageViewRGB32& frame){
+bool detect_player_status(const ImageViewRGB32& frame, bool poison_only){
+    if (!frame){
+        return false;
+    }
+    if (poison_only){
+        // The singles badge replaces the level. Sample its background on both
+        // sides of the lettering so the check also works with localized text.
+        for (double x : {0.167, 0.249}){
+            const auto color = image_average(extract_box_reference(frame, ImageFloatBox{x, 0.835, 0.005, 0.010}));
+            if (color.r < color.g + 35 || color.b < color.g + 50 || color.b < color.r + 15){
+                return false;
+            }
+        }
+        return true;
+    }
     return !is_white(extract_box_reference(frame, PLAYER_STATUS_BOX));
 }
 
@@ -797,7 +814,7 @@ void use_item_in_battle(VideoStream& stream,
                 pbf_mash_button(context, BUTTON_B, 2000ms);
                 context.wait_for_all_requests();
                 OverworldWatcher overworld;
-                if (wait_until(stream, context, 10s, {{overworld}}) != 0){
+                if (wait_until(stream, context, 11s, {{overworld}}) != 0){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         "League healing: overworld return not confirmed.", stream);
                 }
@@ -806,13 +823,14 @@ void use_item_in_battle(VideoStream& stream,
             stream.log("[League healing] Starter below full HP; using Full Restore.");
             use_item_in_open_bag(stream, context, language, "full-restore", 1, 1, true);
             OverworldWatcher overworld;
-            if (wait_until(stream, context, 10s, {{overworld}}) != 0){
+            if (wait_until(stream, context, 11s, {{overworld}}) != 0){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "League Full Restore: overworld return not confirmed.", stream);
             }
         }
     }
-    if (item_slug != "x-attack" && item_slug != "x-sp-def" && item_slug != "full-restore"){
+    if (item_slug != "x-attack" && item_slug != "x-sp-def" && item_slug != "x-sp-atk" &&
+        item_slug != "x-speed" && item_slug != "full-restore"){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Battle item: unsupported item " + item_slug + ".", stream);
     }
@@ -1375,6 +1393,7 @@ void handle_expert_battle(const ProgramInfo& /*info*/,
         context,
         [](ProControllerContext& ctx){
             pbf_mash_button(ctx, BUTTON_A, 120000ms);
+            pbf_wait(ctx, 1000ms);
         },
         {{overworld}});
 }

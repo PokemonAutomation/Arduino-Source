@@ -126,8 +126,6 @@ public:
         AutoStoryStats& stats) const override;
 };
 
-// start: second badge acquired
-// end:   third Gym Badge acquired (Hearthome City)
 void Checkpoint_0306(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -144,9 +142,23 @@ public:
         AutoStoryStats& stats) const override;
 };
 
-// start: second badge acquired
-// end:   third Gym Badge acquired (Hearthome City)
 void Checkpoint_0307(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats);
+
+class AutoStory_Checkpoint_0308 : public AutoStory_Checkpoint {
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context,
+        AutoStoryOptions options,
+        AutoStoryStats& stats) const override;
+};
+
+void Checkpoint_0308(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats);

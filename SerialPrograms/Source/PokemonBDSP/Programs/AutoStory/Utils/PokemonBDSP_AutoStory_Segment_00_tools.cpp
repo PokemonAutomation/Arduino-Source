@@ -70,22 +70,6 @@ BattleDialogWatcher::BattleDialogWatcher(Color color)
 // Poketech Clown dialog helper
 // ---------------------------------------------------------------------------
 
-int detect_clown_choice_arrow(VideoOverlay& overlay, VideoSnapshot snapshot){
-    SelectionArrowFinder top_arrow(overlay, {0.62, 0.37, 0.08, 0.10}, COLOR_RED);
-
-    SelectionArrowFinder bottom_arrow(overlay, {0.62, 0.48, 0.08, 0.10}, COLOR_RED);
-
-    if (top_arrow.detect(snapshot)){
-        return 0;
-    }
-
-    if (bottom_arrow.detect(snapshot)){
-        return 1;
-    }
-
-    return -1;
-}
-
 void clown_dialog_helper(VideoStream& stream, ProControllerContext& context, DpadPosition direction){
     stream.log("[AutoStory] Starting clown dialog helper...", COLOR_BLUE);
 
@@ -141,7 +125,7 @@ void clown_dialog_helper(VideoStream& stream, ProControllerContext& context, Dpa
 // Time helper
 // ---------------------------------------------------------------------------
 
-static void verify_tutorial_settings_once(VideoStream& stream, ProControllerContext& context, Language language){
+static void verify_tutorial_settings_once(VideoStream& stream, ProControllerContext& context, Language language, bool set_battle_style){
     context.wait_for_all_requests();
     DpadState dpad;
     MenuDetector menu;
@@ -197,23 +181,24 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
         const char* label;
         const char* value;
     };
+    // Keep menu order for navigation; null values leave player preferences untouched.
     const Setting settings[] = {
-        {"textspeed", "fast"},
-        {"changewindow", "type1"},
-        {"battleeffects", "off"},
-        {"battlestyle", "set"},
-        {"sendtoboxes", "automatic"},
-        {"givenicknames", "dontgive"},
-        {"gyroscope", "use"},
+        {"text-speed", "fast"},
+        {"change-window", "type-1"},
+        {"battle-effects", "off"},
+        {"battle-style", set_battle_style ? "set" : nullptr},
+        {"send-to-boxes", nullptr},
+        {"give-nicknames", "dont-give"},
+        {"gyroscope", nullptr},
         {"autosave", "off"},
-        {"shownicknames", "show"},
-        {"backgroundmusic", "volume8"},
-        {"soundeffects", "volume8"},
+        {"show-nicknames", nullptr},
     };
     for (size_t row = 0; row < sizeof(settings) / sizeof(settings[0]); row++){
+        if (settings[row].value == nullptr){
+            continue;
+        }
         // Detect the selected row afresh after every navigation/correction.
         double y = -1;
-        bool slider_reset = false;
         bool correct = false;
         for (size_t attempt = 0; attempt < 30; attempt++){
             context.wait_for_all_requests();
@@ -235,6 +220,10 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
                 }
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "Settings checkpoint: Unable to read selected row.", stream);
+            }
+            if (language == Language::Japanese && label == "characters"){
+                repeat_dpad(context, dpad, row < 4 ? DPAD_UP : DPAD_DOWN, 80ms, 300ms, 1, false);
+                continue;
             }
             if (label != settings[row].label){
                 size_t actual = 0;
@@ -285,16 +274,7 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
                 break;
             }
             stream.log("[Tutorial settings] Correcting " + std::string(settings[row].label));
-            if (row >= 9 && !slider_reset){
-                // Sliders clamp at zero. Establish a known endpoint,
-                // then increment; verify the selected number with OCR.
-                for (size_t step = 0; step < 12; step++){
-                    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 1, false);
-                }
-                slider_reset = true;
-            }else{
-                repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 1, false);
-            }
+            repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 1, false);
             context.wait_for_all_requests();
         }
         if (!correct){
@@ -302,7 +282,13 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
                 "Settings checkpoint: Could not apply " + std::string(settings[row].label),
                 stream);
         }
-        if (row + 1 < sizeof(settings) / sizeof(settings[0])){
+        size_t next = row + 1;
+        for (; next < std::size(settings); next++){
+            if (settings[next].value != nullptr){
+                break;
+            }
+        }
+        if (next < std::size(settings)){
             repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 1, false);
         }
     }
@@ -315,7 +301,7 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
     pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
     context.wait_for_all_requests();
     OverworldWatcher overworld;
-    if (wait_until(stream, context, 10s, {{overworld}}) != 0){
+    if (wait_until(stream, context, 11s, {{overworld}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Settings checkpoint: Did not return to the overworld after saving options.",
             stream);
@@ -370,7 +356,9 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
                 break;
             }
         }
-        if (actual < std::size(settings)){
+        if (language == Language::Japanese && label == "characters"){
+            repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 1, false);
+        }else if (actual < std::size(settings)){
             repeat_dpad(context, dpad, actual < 7 ? DPAD_DOWN : DPAD_UP, 80ms, 300ms, 1, false);
         }
     }
@@ -402,7 +390,7 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
     pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
     context.wait_for_all_requests();
     OverworldWatcher verified_exit;
-    if (wait_until(stream, context, 10s, {{verified_exit}}) != 0){
+    if (wait_until(stream, context, 11s, {{verified_exit}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Autosave verification: Could not return to the overworld.",
             stream);
@@ -410,21 +398,22 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
     // Report the values read back from the selected settings,
     // allowing the user to compare our conclusions with the screen.
     stream.log("[Tutorial settings] Completed. Values verified by OCR/selection before saving (Autosave rechecked after saving):");
-    stream.log(
-        "[Tutorial settings] Text Speed = Fast; Change Window = Type 1; Battle Effects = Off; Battle Style = Set.");
-    stream.log("[Tutorial settings] Send to Boxes = Automatic; Give Nicknames = Don't give; Gyroscope = Use.");
-    stream.log("[Tutorial settings] Autosave = Off; Show Nicknames = Show; Background Music = 8; Sound Effects = 8.");
+    stream.log("[Tutorial settings] Text Speed = Fast; Change Window = Type 1; Battle Effects = Off.");
+    stream.log("[Tutorial settings] Give Nicknames = Don't give; Autosave = Off.");
+    if (set_battle_style){
+        stream.log("[Tutorial settings] Assisted route: Battle Style = Set.");
+    }
 }
 
 
-void verify_tutorial_settings(VideoStream& stream, ProControllerContext& context, Language language){
+void verify_tutorial_settings(VideoStream& stream, ProControllerContext& context, Language language, bool set_battle_style){
     // Settings-only recovery: initial attempt plus three retries.
     // Never permit route movement unless the complete check succeeds.
     constexpr size_t MAX_RETRIES = 3;
     for (size_t attempt = 0; attempt <= MAX_RETRIES; attempt++){
         stream.log("[Tutorial settings] Attempt " + std::to_string(attempt + 1) + "/4.");
         try {
-            verify_tutorial_settings_once(stream, context, language);
+            verify_tutorial_settings_once(stream, context, language, set_battle_style);
             return;
         } catch (OperationFailedException& error){
             stream.log("[Tutorial settings] Attempt failed: " + error.message(), COLOR_ORANGE);
@@ -543,7 +532,7 @@ void set_time_fast(SingleSwitchProgramEnvironment& env,
 
 
 // ---------------------------------------------------------------------------
-// Natalie battle
+// Route 202 tutorial trainer battles
 // ---------------------------------------------------------------------------
 static size_t select_battle_move_slot(VideoStream& stream,
     ProControllerContext& context,
@@ -723,12 +712,10 @@ static size_t select_battle_move_slot(VideoStream& stream,
         stream);
 }
 
-static void select_natalie_move_three(VideoStream& stream, ProControllerContext& context){
-    select_battle_move_slot(stream, context, BattleType::TRAINER, 3, "Natalie");
-}
-
-void fight_Natalie(VideoStream& stream, ProControllerContext& context){
-    stream.log("[AutoStory] Starting Natalie battle...", COLOR_BLUE);
+void fight_tutorial_trainer(VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& trainer){
+    stream.log("[AutoStory] Starting " + trainer + " battle...", COLOR_BLUE);
 
     // Allow battle transition to finish.
     pbf_wait(context, 5000ms);
@@ -773,7 +760,7 @@ void fight_Natalie(VideoStream& stream, ProControllerContext& context){
 
             battle_menu_seen = true;
 
-            select_natalie_move_three(stream, context);
+            select_battle_move_slot(stream, context, BattleType::TRAINER, 3, trainer);
 
             break;
         }
@@ -782,7 +769,7 @@ void fight_Natalie(VideoStream& stream, ProControllerContext& context){
         // Battle finished.
         // -------------------------------------------------
         case 1: {
-            stream.log("[AutoStory] Natalie battle complete.", COLOR_GREEN);
+            stream.log("[AutoStory] " + trainer + " battle complete.", COLOR_GREEN);
 
             // The exit watcher may return after the final text has already closed.
             clear_dialog(stream, context, ClearDialogMode::STOP_QUIET, 60, BUTTON_B, 6000ms);
@@ -808,12 +795,12 @@ void fight_Natalie(VideoStream& stream, ProControllerContext& context){
         // Timeout.
         // -------------------------------------------------
         default: {
-            stream.log("[AutoStory] Natalie battle timed out.", COLOR_RED);
+            stream.log("[AutoStory] " + trainer + " battle timed out.", COLOR_RED);
 
             pbf_mash_button(context, BUTTON_B, 5000ms);
 
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "[AutoStory] Natalie battle timed out.",
+                "[AutoStory] " + trainer + " battle timed out.",
                 stream);
         }
         }
@@ -863,18 +850,7 @@ void fight_starly(VideoStream& stream, ProControllerContext& context){
             stream.log("[AutoStory] Starly battle complete.", COLOR_GREEN);
 
             // Mash through XP / level-up / dialog screens back to overworld.
-            OverworldWatcher overworld;
-            int cleanup_ret = run_until<ProControllerContext>(stream,
-                context,
-                [](ProControllerContext& ctx){
-                    pbf_mash_button(ctx, BUTTON_B, 120000ms);
-                },
-                {{overworld}});
-            if (cleanup_ret != 0){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "Starly battle: Overworld cleanup timed out.",
-                    stream);
-            }
+            mash_until_dialogue_ends(stream, context, BUTTON_B, 120s);
             return;
         }
         default:
@@ -1005,7 +981,7 @@ static void confirm_battle_overworld(VideoStream& stream, ProControllerContext& 
                 pbf_press_button(context, BUTTON_B, 80ms, 300ms);
                 context.wait_for_all_requests();
                 OverworldWatcher closed;
-                if (wait_until(stream, context, 5s, {{closed}}) != 0){
+                if (wait_until(stream, context, 6s, {{closed}}) != 0){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         label + ": Verified menu did not close after partner-battle cleanup.", stream);
                 }
@@ -1037,9 +1013,9 @@ static void confirm_battle_overworld(VideoStream& stream, ProControllerContext& 
 struct BattleSetupPlan {
     Language language = Language::None;
     std::string opponent;
-    size_t x_sp_defs = 0;
-    size_t x_attacks = 0;
+    std::vector<std::string> items;
     size_t max_full_restores = 0;
+    std::string cure_poison_opponent;
     std::map<std::string, size_t> moves;
 };
 
@@ -1069,8 +1045,7 @@ static void fight_using_move_list(VideoStream& stream,
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             label + ": Item setup requires a selected Game Language and a singles battle.", stream);
     }
-    size_t x_sp_defs_used = 0;
-    size_t x_attacks_used = 0;
+    size_t setup_items_used = 0;
     size_t full_restores_used = 0;
     double hp_before_restore = -1;
     size_t move_index = 0;
@@ -1189,6 +1164,35 @@ static void fight_using_move_list(VideoStream& stream,
                         label + ": Opponent not confirmed; no setup item or attack selected.", stream);
                 }
                 stream.log("[" + label + "] Confirmed opponent: " + opponent + ".");
+                if (full_restores_used == 0 && opponent == setup->cure_poison_opponent){
+                    // The poison badge alternates with the level. Sample across a full cycle.
+                    BattleMenuDetector commands(battle_type, COLOR_RED);
+                    WallClock previous = WallClock::min();
+                    size_t confirmed = 0, command_frames = 0;
+                    for (size_t check = 0; check < 16 && confirmed < 2; check++){
+                        context.wait_for_all_requests();
+                        const auto frame = stream.video().snapshot();
+                        if (frame && frame.timestamp > previous && commands.detect(frame)){
+                            previous = frame.timestamp;
+                            command_frames++;
+                            confirmed = detect_player_status(frame, true) ? confirmed + 1 : 0;
+                        }
+                        if (confirmed < 2){
+                            pbf_wait(context, 200ms);
+                        }
+                    }
+                    if (confirmed == 2){
+                        stream.log("[" + label + "] Poison confirmed against " + opponent + "; using one Full Restore.");
+                        use_item_in_battle(stream, context, setup->language, "full-restore");
+                        full_restores_used++;
+                        awaiting_experience = false;
+                        break;
+                    }
+                    if (command_frames < 8){
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                            label + ": Insufficient fresh command frames to check poison.", stream);
+                    }
+                }
                 if (setup->max_full_restores != 0){
                     double hp = -1;
                     BattleHPReading hp_reading;
@@ -1238,25 +1242,18 @@ static void fight_using_move_list(VideoStream& stream,
                         break;
                     }
                 }
-                if (opponent == setup->opponent &&
-                    (x_sp_defs_used < setup->x_sp_defs || x_attacks_used < setup->x_attacks)){
-                    // Finish special-defense setup before spending turns on Attack.
-                    const bool special_defense = x_sp_defs_used < setup->x_sp_defs;
-                    size_t& used = special_defense ? x_sp_defs_used : x_attacks_used;
-                    const size_t target = special_defense ? setup->x_sp_defs : setup->x_attacks;
-                    stream.log("[" + label + "] " + (special_defense ? "X Sp. Def " : "X Attack ") +
-                        std::to_string(used + 1) + "/" + std::to_string(target) +
-                        " against " + opponent + ".");
-                    use_item_in_battle(stream, context, setup->language,
-                        special_defense ? "x-sp-def" : "x-attack");
-                    used++;
+                if (setup_items_used < setup->items.size()){
+                    if (opponent != setup->opponent){
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                            label + ": Required setup opponent is no longer present; setup incomplete.", stream);
+                    }
+                    const std::string& item = setup->items[setup_items_used];
+                    stream.log("[" + label + "] Setup item " + std::to_string(setup_items_used + 1) + "/" +
+                        std::to_string(setup->items.size()) + ": " + item + " against " + opponent + ".");
+                    use_item_in_battle(stream, context, setup->language, item);
+                    setup_items_used++;
                     awaiting_experience = false;
-                    // An item consumes a battle turn, not a move or a PP.
                     break;
-                }
-                if (x_sp_defs_used < setup->x_sp_defs || x_attacks_used < setup->x_attacks){
-                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        label + ": Required setup opponent is no longer present; setup incomplete.", stream);
                 }
                 // Pressure applies to attacks into Spiritomb, never item turns.
                 pp_cost = opponent == "spiritomb" ? 2 : 1;
@@ -1344,7 +1341,10 @@ static void fight_using_move_list(VideoStream& stream,
                 OverworldWatcher outside;
                 const int finished = run_until<ProControllerContext>(stream,
                     context,
-                    advance_dialogue,
+                    [&](ProControllerContext& ctx){
+                        advance_dialogue(ctx);
+                        pbf_wait(ctx, 1000ms);
+                    },
                     {{ongoing}, {outside}});
                 if (finished == 0){
                     stream.log("[" + label + "] Battle continues after the transition.");
@@ -1366,7 +1366,7 @@ static void fight_using_move_list(VideoStream& stream,
                     " confirmed opponent defeats; victory not confirmed.",
                     stream);
             }
-            if (setup && (x_sp_defs_used != setup->x_sp_defs || x_attacks_used != setup->x_attacks)){
+            if (setup && setup_items_used != setup->items.size()){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     label + ": Battle ended without completing the required item setup.", stream);
             }
@@ -1386,6 +1386,7 @@ static void fight_using_move_list(VideoStream& stream,
                     context,
                     [](ProControllerContext& ctx){
                         pbf_mash_button(ctx, BUTTON_B, 120000ms);
+                        pbf_wait(ctx, 1000ms);
                     },
                     {{overworld}});
                 if (cleanup_ret != 0){
@@ -1490,7 +1491,7 @@ void align_to_overworld_landmarks(VideoStream& stream,
                     10,
                     BlackScreenWatcher::FinderType::GONE,
                     500ms);
-                if (wait_until(stream, context, 30s, {{visible}}) != 0){
+                if (wait_until(stream, context, 31s, {{visible}}) != 0){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         label + ": Building transition did not finish.",
                         stream);
@@ -1821,12 +1822,48 @@ void fight_trainer_using_moves(VideoStream& stream,
 
     switch (stats.starter_choice){
     case StarterChoice::TURTWIG:
-        if (label == "Fantina" || flying_battle){
-            priorities = {1, 2, 4};
-        }else if (rock_battle || water_battle){
-            priorities = {2, 4, 1, 3};
-        }else if (label == "Maylene"){
-            priorities = {3, 1, 2, 4};
+        if (!stats.outside_help){
+            if (label == "Fantina" || flying_battle){
+                priorities = {1, 2, 4};
+            }else if (rock_battle || water_battle){
+                priorities = {2, 4, 1, 3};
+            }else if (label == "Maylene"){
+                priorities = {3, 1, 2, 4};
+            }
+            break;
+        }
+        priorities = {1, 2, 4};
+        if (label == "Pastoria Gym trainer 3"){
+            // Sap Sipper Azurill is immune to both Grass slots.
+            priorities = {3, 1};
+        }else if (label == "spear_pillar_grunts" || label == "Maylene" || label == "galactic_hq_grunt_4" ||
+            label == "galactic_hq_grunt_5" || label == "route_214_collector_brady" ||
+            label == "Psychics Lindsey and Elijah" || label == "Bug Catchers Donald and Phillip" ||
+            label == "victory_road_veteran_edgar" ||
+            (label.find("Canalave Gym trainer ") == 0 && !water_battle)){
+            // These grounded parties allow Earthquake, including both Spear Pillar grunts.
+            priorities = {3, 2, 4};
+        }else if (label == "Jubilife Galactic grunts" || label == "Lass Briana and Bug Catcher Jack" ||
+            label == "veilstone_galactic_grunts_1"){
+            // Razor Leaf hits both opponents even when one is airborne.
+            priorities = {4, 2, 1};
+        }else if (label == "Commander Jupiter" || label == "route_210_breeder_amber" ||
+            label == "route_217_skier_lexie" || label == "Lost Tower biker" ||
+            label == "coronet_ascent_grunt_3" || label == "verity_lakefront_grunt_1" ||
+            label == "verity_lakefront_grunt_3" || label.find("Cycling Road encounter ") == 0){
+            // Keep every fallback noncontact against Aftermath or contact-status abilities.
+            priorities = {2, 4};
+        }else if (rock_battle || water_battle || grass_gym || label == "Route trainer" || label == "Byron" ||
+            label == "Candice" || label == "Barry in Hearthome" || label == "pastoria_clint" ||
+            label == "canalave_clint" || label == "galactic_hq_commander_saturn" ||
+            label == "lake_valor_commander_saturn" || label == "route_222_sailor_luther" ||
+            label == "Route 215 Ace Trainer Dennis" || label == "coronet_ascent_grunt_2" ||
+            label == "coronet_ascent_landing_grunt" || label == "victory_road_ace_sydney" ||
+            label == "victory_road_ace_mariah" || label == "victory_road_ace_omar" ||
+            label == "coronet_ascent_grunt_4" || label.find("blackbelt_") != std::string::npos ||
+            label == "coronet_ascent_grunt_6" || label == "victory_road_dragontamer_clinton"){
+            // Seed Bomb also works on the Flying members of these mixed parties.
+            priorities = {2, 4, 1};
         }
         break;
     case StarterChoice::CHIMCHAR:
@@ -1924,19 +1961,37 @@ void fight_trainer_using_moves(VideoStream& stream,
         }
         break;
     case StarterChoice::PIPLUP:
-        if (grass_gym || flying_battle || label.find("dragontamer_") != std::string::npos ||
+        if (label == "Commander Jupiter" ||
+            label == "verity_lakefront_grunt_1" || label == "verity_lakefront_grunt_3" ||
+            label == "galactic_hq_grunt_4" || label == "galactic_hq_grunt_5" ||
+            label == "spear_pillar_grunts" || label == "spear_pillar_mars_jupiter" ||
+            label == "route_210_breeder_amber" || label == "route_217_skier_lexie"){
+            // Both moves avoid Aftermath or Cute Charm; Surf also hits both summit opponents.
+            priorities = {3, 2};
+        }else if (label == "coronet_ascent_grunt_3"){
+            // Avoid Aftermath on Stunky and preserve Surf for the summit doubles.
+            priorities = {2, 3};
+        }else if (label == "lake_valor_commander_saturn" || label == "galactic_hq_commander_saturn"){
+            // Ice Beam covers Bronzor without giving Dry Skin Toxicroak a Water fallback.
+            priorities = {2, 1};
+        }else if (grass_gym || flying_battle || label.find("dragontamer_") != std::string::npos ||
             label == "victory_road_ace_sydney"){
-            priorities = {2, 1, 4, 3};
+            priorities = {2, 1, 3};
         }else if (rock_battle || label == "Maylene" || label == "Fantina" || label == "Byron" ||
             (label.find("Canalave Gym trainer") != std::string::npos && !water_battle) ||
-            label.find(" and ") != std::string::npos ||
-            label == "veilstone_galactic_grunts_1" || label == "Route 215 Ruin Maniac Calvin"){
-            priorities = {3, 2, 1, 4};
-        }else if (water_battle || fighting_battle){
-            priorities = {1, 4, 2, 3};
+            label.find(" and ") != std::string::npos || label == "Jubilife Galactic grunts" ||
+            label == "veilstone_galactic_grunts_1" || label == "Route 215 Ruin Maniac Calvin" ||
+            label == "victory_road_ace_omar" || label == "victory_road_veteran_clayton" ||
+            label == "route_216_ace_maria"){
+            priorities = {3, 2, 1};
+        }else{
+            // Mixed parties can have Sap Sipper or Water Absorb. Reserve Grass Knot for confirmed species.
+            priorities = {1, 2};
         }
         break;
     }
+    BattleSetupPlan setup;
+    setup.language = language;
     if (label == "elite_four_aaron"){
         switch (stats.starter_choice){
         case StarterChoice::CHIMCHAR:
@@ -1946,7 +2001,13 @@ void fight_trainer_using_moves(VideoStream& stream,
             priorities = {1};
             break;
         case StarterChoice::PIPLUP:
-            priorities = {1};
+            setup.moves = {
+                {"dustox", 1},
+                {"beautifly", 1},
+                {"vespiquen", 1},
+                {"heracross", 1},
+                {"drapion", 2},
+            };
             break;
         }
     }else if (label == "elite_four_bertha"){
@@ -1962,9 +2023,14 @@ void fight_trainer_using_moves(VideoStream& stream,
             priorities = {2, 4};
             break;
         case StarterChoice::PIPLUP:
-            // The lead's ability rules out the spread slot. Keep a usable
-            // list regardless of the order of the remaining opponents.
-            priorities = {1, 2};
+            // Whiscash is light and carries a Rindo Berry. Surf reliably knocks it out.
+            setup.moves = {
+                {"quagsire", 4},
+                {"sudowoodo", 4},
+                {"golem", 4},
+                {"whiscash", 3},
+                {"hippowdon", 4},
+            };
             break;
         }
     }else if (label == "elite_four_flint"){
@@ -1977,7 +2043,16 @@ void fight_trainer_using_moves(VideoStream& stream,
             priorities = {1};
             break;
         case StarterChoice::PIPLUP:
-            priorities = {3};
+            // Move before Infernape on ordinary attacks. Its Mach Punch still has priority.
+            setup.opponent = "rapidash";
+            setup.items = {"x-speed"};
+            setup.moves = {
+                {"rapidash", 3},
+                {"steelix", 4},
+                {"drifblim", 2},
+                {"lopunny", 3},
+                {"infernape", 1},
+            };
             break;
         }
     }else if (label == "elite_four_lucian"){
@@ -1989,9 +2064,28 @@ void fight_trainer_using_moves(VideoStream& stream,
             priorities = {1};
             break;
         case StarterChoice::PIPLUP:
-            priorities = {3, 1};
+            setup.moves = {
+                {"mr-mime", 3},
+                {"girafarig", 3},
+                {"medicham", 1},
+                {"alakazam", 1},
+                {"bronzong", 3},
+            };
             break;
         }
+    }else if (label == "champion_cynthia" && stats.starter_choice == StarterChoice::PIPLUP){
+        // One X Sp. Atk lets Grass Knot KO Milotic before Mirror Coat.
+        setup.opponent = "spiritomb";
+        setup.items = {"x-sp-atk", "x-speed"};
+        setup.max_full_restores = 4;
+        setup.moves = {
+            {"spiritomb", 3},
+            {"roserade", 2},
+            {"gastrodon", 4},
+            {"lucario", 3},
+            {"milotic", 4},
+            {"garchomp", 2},
+        };
     }
     if (label == "route_217_ace_dalton" || label == "route_217_ace_olivia" ||
         label == "galactic_hq_grunt_2"){
@@ -2003,6 +2097,22 @@ void fight_trainer_using_moves(VideoStream& stream,
         // Spend the spread slot's remaining budget, then the noncontact slot.
         // Avoid contact-status abilities without inventing PP after each fight.
         priorities = {3, 2};
+        if (stats.starter_choice == StarterChoice::PIPLUP){
+            // Save Surf for Volkner, especially Octillery. Avoid contact with Static users.
+            if (label == "Sunyshore Gym Poke Kid Meghan" || label == "Sunyshore Gym Guitarist Jerry" ||
+                label == "Sunyshore Gym Guitarist Lonnie"){
+                priorities = {2, 3};
+            }else if (label == "Sunyshore Gym School Kid Forrest"){
+                priorities = {1, 2, 3};
+            }
+        }else if (stats.starter_choice == StarterChoice::TURTWIG && stats.outside_help){
+            priorities = {3, 2, 4};
+            if (label == "Sunyshore Gym Poke Kid Meghan"){
+                priorities = {2, 3, 4};
+            }else if (label == "Sunyshore Gym School Kid Forrest" || label == "Sunyshore Gym Guitarist Preston"){
+                priorities = {1, 2, 3};
+            }
+        }
     }
     if (stats.starter_choice == StarterChoice::CHIMCHAR){
         // These parties have no contact-status ability. Preserve the shared
@@ -2013,8 +2123,6 @@ void fight_trainer_using_moves(VideoStream& stream,
             priorities = {4, 2};
         }
     }
-    BattleSetupPlan setup;
-    setup.language = language;
     if (stats.starter_choice == StarterChoice::CHIMCHAR){
         if (label == "pokemon_league_rival"){
             setup.moves = {
@@ -2050,7 +2158,8 @@ void fight_trainer_using_moves(VideoStream& stream,
             // One item turn replaces the unboosted extra hit on the lead.
             // Waiting for a later foe loses that benefit and takes another hit.
             setup.opponent = "quagsire";
-            setup.x_attacks = 1;
+            setup.items = {"x-attack"};
+            setup.cure_poison_opponent = "golem";
             setup.moves = {
                 {"quagsire", 4},
                 {"whiscash", 4},
@@ -2082,8 +2191,7 @@ void fight_trainer_using_moves(VideoStream& stream,
             // Raise Special Defense against Spiritomb before setting up Attack.
             // Later move choices follow confirmed species, not send-out order.
             setup.opponent = "spiritomb";
-            setup.x_sp_defs = 2;
-            setup.x_attacks = 2;
+            setup.items = {"x-sp-def", "x-sp-def", "x-attack", "x-attack"};
             setup.max_full_restores = 4;
             setup.moves = {
                 {"spiritomb", 1},
@@ -2092,6 +2200,102 @@ void fight_trainer_using_moves(VideoStream& stream,
                 {"lucario", 4},
                 {"milotic", 1},
                 {"garchomp", 3},
+            };
+        }
+    }else if (stats.starter_choice == StarterChoice::PIPLUP){
+        if (label == "spear_pillar_cyrus"){
+            setup.moves = {
+                {"honchkrow", 2},
+                {"gyarados", 4},
+                {"crobat", 2},
+                {"weavile", 3},
+            };
+        }else if (label == "victory_road_veteran_edgar"){
+            setup.moves = {
+                {"tentacruel", 1},
+                {"golem", 4},
+                {"empoleon", 4},
+            };
+        }else if (label == "pokemon_league_rival"){
+            // Staraptor has Intimidate and can set sun before its Focus Sash breaks.
+            setup.moves = {
+                {"staraptor", 2},
+                {"floatzel", 4},
+                {"heracross", 1},
+                {"rapidash", 3},
+                {"snorlax", 3},
+                {"torterra", 2},
+            };
+        }
+    }else if (stats.starter_choice == StarterChoice::TURTWIG && stats.outside_help){
+        if (label == "Fantina"){
+            // Gengar can disable Earthquake without disabling the move for either other foe.
+            setup.moves = {
+                {"drifblim", 2},
+                {"gengar", 3},
+                {"mismagius", 1},
+            };
+        }else if (label == "spear_pillar_cyrus"){
+            setup.moves = {
+                {"honchkrow", 2},
+                {"crobat", 1},
+                {"gyarados", 2},
+                {"weavile", 3},
+            };
+        }else if (label == "victory_road_veteran_clayton"){
+            setup.moves = {
+                {"staraptor", 1},
+                {"hippowdon", 2},
+            };
+        }else if (label == "pokemon_league_rival"){
+            setup.moves = {
+                {"staraptor", 1},
+                {"floatzel", 2},
+                {"heracross", 3},
+                {"roserade", 3},
+                {"snorlax", 3},
+                {"infernape", 3},
+            };
+        }else if (label == "elite_four_aaron"){
+            setup.opponent = "dustox";
+            setup.items = {"x-attack"};
+            setup.moves = {
+                {"dustox", 1},
+                {"beautifly", 1},
+                {"vespiquen", 1},
+                {"heracross", 2},
+                {"drapion", 3},
+            };
+        }else if (label == "elite_four_flint"){
+            setup.opponent = "rapidash";
+            setup.items = {"x-speed"};
+            setup.moves = {
+                {"rapidash", 3},
+                {"steelix", 3},
+                {"drifblim", 1},
+                {"lopunny", 2},
+                {"infernape", 3},
+            };
+        }else if (label == "elite_four_lucian"){
+            setup.moves = {
+                {"mr-mime", 3},
+                {"girafarig", 1},
+                {"medicham", 2},
+                {"alakazam", 1},
+                {"bronzong", 1},
+            };
+        }else if (label == "champion_cynthia"){
+            // Attack covers Marvel Scale Milotic; Speed gets Torterra ahead of Garchomp.
+            setup.opponent = "spiritomb";
+            setup.items = {"x-attack", "x-speed"};
+            setup.max_full_restores = 4;
+            setup.moves = {
+                {"spiritomb", 1},
+                {"roserade", 3},
+                {"gastrodon", 2},
+                {"lucario", 3},
+                {"milotic", 2},
+                {"garchomp", 2},
             };
         }
     }
@@ -2121,12 +2325,6 @@ void fight_trainer_using_move_slot(VideoStream& stream,
     size_t move_slot,
     const std::string& label){
     fight_using_move_slot(stream, context, BattleType::TRAINER, move_slot, label);
-}
-
-void fight_tristan(VideoStream& stream, ProControllerContext& context){
-    // All starters use move slot 3. Confirm its cursor position
-    // visually without reading the move name; fail if slot 3 is absent.
-    fight_trainer_using_move_slot(stream, context, 3, "Tristan (move slot 3)");
 }
 
 void battle_1_pokemon(VideoStream& stream, ProControllerContext& context, const AutoStoryOptions& options){
@@ -2224,6 +2422,7 @@ void catch_1_pokemon(VideoStream& stream, ProControllerContext& context){
             context,
             [](ProControllerContext& ctx){
                 pbf_mash_button(ctx, BUTTON_B, 120000ms);
+                pbf_wait(ctx, 1000ms);
             },
             {{battle_ended}});
         if (cleanup_ret != 0){
@@ -2449,51 +2648,20 @@ void catch_1_pokemon(VideoStream& stream, ProControllerContext& context){
 // Movement Helpers
 // ---------------------------------------------------------------------------
 
-bool detect_black_screen_after_movement(VideoStream& stream, ProControllerContext& context, Milliseconds timeout){
-    BlackScreenWatcher black_screen;
-    return wait_until(stream, context, timeout, {{black_screen}}) == 0;
-}
-
-bool try_right_down_exit_search(VideoStream& stream, ProControllerContext& context, size_t iterations){
-    for (size_t i = 0; i < iterations; i++){
-        pbf_move_left_joystick(context, {1.0, 0.0}, 80ms, 0ms);
-        pbf_move_left_joystick(context, {0.0, -1.0}, 220ms, 0ms);
-
-        if (detect_black_screen_after_movement(stream, context, 1000ms)){
-            return true;
-        }
-    }
-    return false;
-}
-
 void leave_pokemon_center_before_barry_1(VideoStream& stream, ProControllerContext& context){
-    // Original down movement to leave Pokemon Center.
-    pbf_move_left_joystick(context, {0.0, -1.0}, 814ms, 0ms);
-
-    if (detect_black_screen_after_movement(stream, context, 1200ms)){
-        pbf_wait(context, 2340ms);
-        return;
-    }
-
-    stream.log("[AutoStory] Pokemon Center exit black screen not detected. Searching with right/down movement.",
-        COLOR_ORANGE);
-
-    if (try_right_down_exit_search(stream, context, 20)){
-        pbf_wait(context, 2340ms);
-        return;
-    }
-
-    stream.log("[AutoStory] First exit search failed. Repositioning left and retrying.", COLOR_ORANGE);
-    pbf_move_left_joystick(context, {-1.0, 0.0}, 5000ms, 0ms);
-
-    if (try_right_down_exit_search(stream, context, 30)){
-        pbf_wait(context, 2340ms);
-        return;
-    }
-
-    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-        "Failed to find Pokemon Center exit black screen before Barry 1. Triggering checkpoint retry.",
-        stream);
+    watch_doorway_transition(stream, context, "Jubilife Center exit before Barry",
+        [](ProControllerContext& ctx){
+            pbf_move_left_joystick(ctx, {0, -1}, 814ms, 1200ms);
+            for (size_t attempts : {20, 30}){
+                if (attempts == 30){
+                    pbf_move_left_joystick(ctx, {-1, 0}, 5000ms, 0ms);
+                }
+                for (size_t i = 0; i < attempts; i++){
+                    pbf_move_left_joystick(ctx, {1, 0}, 80ms, 0ms);
+                    pbf_move_left_joystick(ctx, {0, -1}, 220ms, 1000ms);
+                }
+            }
+        });
 }
 
 // ---------------------------------------------------------------------------

@@ -31,20 +31,11 @@
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Battle.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Dialog.h"
 
-#include "PokemonBDSP_AutoStory_Segment_02.h"
 #include "PokemonBDSP_AutoStory_Segment_09.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
 namespace PokemonBDSP {
-
-// ---------------------------------------------------------------------------
-//  Helpers
-// ---------------------------------------------------------------------------
-
-static bool heal_and_exit(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats, const std::string& label){
-    return heal_pokemon(stream, context, label, &stats);
-}
 
 // ---------------------------------------------------------------------------
 //  Named route navigation blocks
@@ -70,7 +61,7 @@ enter_sunyshore_pokemon_center(VideoStream& stream, ProControllerContext& contex
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -432,7 +423,7 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
         BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
         int ret = run_until<ProControllerContext>(stream, context,
             [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {+1, +1}, 10000ms, 100ms);
+                pbf_move_left_joystick(ctx, {+1, +1}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -440,7 +431,6 @@ go_to_victory_road_pokemon_center(VideoStream& stream, ProControllerContext& con
             return false;
         }
     }
-    // The checkpoint's existing heal_and_exit establishes the next start.
     return true;
 }
 
@@ -459,7 +449,7 @@ static bool enter_victory_road_cave(VideoStream& stream, ProControllerContext& c
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -511,32 +501,30 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
     pbf_move_left_joystick(context, {0, +1}, 2600ms, 100ms); // 13+
 
     {
-        MarkDetector victory_road_ace_mariah_fight(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
-
-        int ret = run_until<ProControllerContext>(stream,
-            context,
-            [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {-1, 0}, 5800ms, 100ms); // 29+
+        BattleMenuWatcher menu(BattleType::TRAINER, COLOR_GREEN);
+        MarkDetector mark(stream.overlay(), {0.1, 0.0, 0.8, 0.9});
+        ShortDialogWatcher dialogue(COLOR_YELLOW);
+        const int encountered = run_until<ProControllerContext>(stream, context,
+            [](ProControllerContext& ctx){
+                pbf_move_left_joystick(ctx, {-1, 0}, 5800ms, 100ms);
             },
-            {{victory_road_ace_mariah_fight}});
-        if (ret == 0){
-            context.wait_for_all_requests();
-            pbf_wait(context, 2000ms);
-
-            BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-            ret = run_until<ProControllerContext>(stream,
-                context,
-                [](ProControllerContext& context){
-                    pbf_mash_button(context, BUTTON_A, 200000ms);
-                },
-                {{black_screen}});
-            if (ret < 0){
-                stream.log("go_through_victory_road_cave, victory_road_ace_mariah: black screen not detected!",
-                    COLOR_RED);
-                return false;
-            }else if (ret == 0){
-                fight_trainer_using_moves(stream, context, stats, "victory_road_ace_mariah", true);
+            {{menu}, {mark}, {dialogue}});
+        if (encountered >= 0){
+            if (encountered != 0){
+                context.wait_for_all_requests();
+                pbf_wait(context, 2000ms);
+                const int ready = run_until<ProControllerContext>(stream, context,
+                    [](ProControllerContext& ctx){
+                        pbf_mash_button(ctx, BUTTON_B, 60000ms);
+                    },
+                    {{menu}});
+                if (ready < 0){
+                    stream.log("Victory Road: Mariah engaged, but her battle menu did not appear.", COLOR_RED);
+                    return false;
+                }
             }
+            stream.log("Victory Road: Mariah's battle menu confirmed.", COLOR_GREEN);
+            fight_trainer_using_moves(stream, context, stats, "victory_road_ace_mariah", true);
         }
     }
 
@@ -556,7 +544,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -606,6 +594,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -670,6 +659,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -713,6 +703,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -746,7 +737,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -797,6 +788,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -817,7 +809,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -863,6 +855,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -918,6 +911,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -957,7 +951,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -996,6 +990,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -1003,7 +998,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                     COLOR_RED);
                 return false;
             }else if (ret == 0){
-                fight_trainer_using_moves(stream, context, stats, "victory_road_veteran_edgar", true);
+                fight_trainer_using_moves(stream, context, stats, "victory_road_veteran_edgar", true, false, options.language);
             }
         }
     }
@@ -1045,6 +1040,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -1071,7 +1067,7 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 1100ms);
             },
             {{white_screen}});
         if (ret < 0){
@@ -1113,7 +1109,7 @@ static bool enter_elite_4_pokemon_center(VideoStream& stream, ProControllerConte
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -1225,7 +1221,7 @@ static bool ready_in_front_of_elite_4(VideoStream& stream,
                 [](ProControllerContext& ctx){
                     // The timed east crossing can end just east of the door.
                     // Slide west along the south wall until the doorway fade.
-                    pbf_move_left_joystick(ctx, {-1, -1}, 2500ms, 10000ms);
+                    pbf_move_left_joystick(ctx, {-1, -1}, 2500ms, 11000ms);
                 },
                 {{black}});
             if (ret < 0){
@@ -1287,7 +1283,7 @@ static bool get_into_the_elite_4_entrance(VideoStream& stream,
         BlackScreenWatcher black(COLOR_RED);
         int ret = run_until<ProControllerContext>(stream, context,
             [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {0, +1}, 10000ms, 0ms);
+                pbf_move_left_joystick(ctx, {0, +1}, 10000ms, 1000ms);
             },
             {{black}});
         if (ret < 0){
@@ -1297,7 +1293,7 @@ static bool get_into_the_elite_4_entrance(VideoStream& stream,
         // Stop movement at the fade so it cannot carry into the destination room.
         BlackScreenWatcher visible(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 100, 10,
             BlackScreenWatcher::FinderType::GONE, 500ms);
-        if (wait_until(stream, context, 15s, {{visible}}) < 0){
+        if (wait_until(stream, context, 16s, {{visible}}) < 0){
             stream.log("League admission: transition did not finish.", COLOR_RED);
             return false;
         }
@@ -1336,7 +1332,7 @@ static bool approach_elite_four_member(VideoStream& stream,
         BlackScreenWatcher black(COLOR_RED);
         int ret = run_until<ProControllerContext>(stream, context,
             [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {0, +1}, 3000ms, 0ms);
+                pbf_move_left_joystick(ctx, {0, +1}, 3000ms, 1000ms);
             },
             {{black}});
         if (ret < 0){
@@ -1345,7 +1341,7 @@ static bool approach_elite_four_member(VideoStream& stream,
         }
         BlackScreenWatcher visible(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 100, 10,
             BlackScreenWatcher::FinderType::GONE, 500ms);
-        if (wait_until(stream, context, 15s, {{visible}}) < 0){
+        if (wait_until(stream, context, 16s, {{visible}}) < 0){
             stream.log("Elite Four: lift vestibule transition did not finish.", COLOR_RED);
             return false;
         }
@@ -1362,13 +1358,10 @@ static bool approach_elite_four_member(VideoStream& stream,
     {
         BlackScreenWatcher black(COLOR_RED);
         int ret = run_until<ProControllerContext>(stream, context,
-            [champion](ProControllerContext& ctx){
-                // Cynthia has a longer corridor above the lift. Cancel all
-                // remaining presses at the doorway fade in either layout.
-                for (size_t step = 0; step < (champion ? 24u : 8u); step++){
-                    pbf_press_dpad(ctx, DPAD_UP, 80ms, 300ms);
-                }
-                pbf_wait(ctx, 3000ms);
+            [champion, &dpad](ProControllerContext& ctx){
+                // Stop the remaining presses when the doorway fade begins.
+                repeat_dpad(ctx, dpad, DPAD_UP, 80ms, 300ms, champion ? 24 : 8, false);
+                pbf_wait(ctx, 4000ms);
             },
             {{black}});
         if (ret < 0){
@@ -1377,7 +1370,7 @@ static bool approach_elite_four_member(VideoStream& stream,
         }
         BlackScreenWatcher visible(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 100, 10,
             BlackScreenWatcher::FinderType::GONE, 500ms);
-        if (wait_until(stream, context, 15s, {{visible}}) < 0){
+        if (wait_until(stream, context, 16s, {{visible}}) < 0){
             stream.log("Elite Four: member room transition did not finish.", COLOR_RED);
             return false;
         }
@@ -1397,72 +1390,21 @@ static bool approach_elite_four_member(VideoStream& stream,
 }
 
 
-static bool deal_with_aaron_elite_4(VideoStream& stream,
+static bool fight_elite_four_member(VideoStream& stream,
     ProControllerContext& context,
     AutoStoryStats& stats,
-    Language language){
-    if (!approach_elite_four_member(stream, context, true)){
+    Language language,
+    const char* dialogue_label,
+    const char* trainer_id,
+    bool first_member = false){
+    if (!approach_elite_four_member(stream, context, first_member)){
         return false;
     }
     pbf_press_button(context, BUTTON_A, 80ms, 300ms);
-    wait_for_dialog(stream, context, "Elite Four Aaron", 15s);
+    wait_for_dialog(stream, context, dialogue_label, 15s);
     // The battle handler clears the introduction and camera cutscene with B,
     // stopping on the battle menu before choosing a move.
-    fight_trainer_using_moves(stream, context, stats, "elite_four_aaron", false, false, language);
-    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
-    context.wait_for_all_requests();
-    use_item_in_battle(stream, context, language, "full-restore", true);
-    return true;
-}
-
-static bool deal_with_bertha_elite_4(VideoStream& stream,
-    ProControllerContext& context,
-    AutoStoryStats& stats,
-    Language language){
-    if (!approach_elite_four_member(stream, context, false)){
-        return false;
-    }
-    pbf_press_button(context, BUTTON_A, 80ms, 300ms);
-    wait_for_dialog(stream, context, "Elite Four Bertha", 15s);
-    // The battle handler clears the introduction and camera cutscene with B,
-    // stopping on the battle menu before choosing a move.
-    fight_trainer_using_moves(stream, context, stats, "elite_four_bertha", false, false, language);
-    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
-    context.wait_for_all_requests();
-    use_item_in_battle(stream, context, language, "full-restore", true);
-    return true;
-}
-
-static bool deal_with_flint_elite_4(VideoStream& stream,
-    ProControllerContext& context,
-    AutoStoryStats& stats,
-    Language language){
-    if (!approach_elite_four_member(stream, context, false)){
-        return false;
-    }
-    pbf_press_button(context, BUTTON_A, 80ms, 300ms);
-    wait_for_dialog(stream, context, "Elite Four Flint", 15s);
-    // The battle handler clears the introduction and camera cutscene with B,
-    // stopping on the battle menu before choosing a move.
-    fight_trainer_using_moves(stream, context, stats, "elite_four_flint", false, false, language);
-    clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
-    context.wait_for_all_requests();
-    use_item_in_battle(stream, context, language, "full-restore", true);
-    return true;
-}
-
-static bool deal_with_lucian_elite_4(VideoStream& stream,
-    ProControllerContext& context,
-    AutoStoryStats& stats,
-    Language language){
-    if (!approach_elite_four_member(stream, context, false)){
-        return false;
-    }
-    pbf_press_button(context, BUTTON_A, 80ms, 300ms);
-    wait_for_dialog(stream, context, "Elite Four Lucian", 15s);
-    // The battle handler clears the introduction and camera cutscene with B,
-    // stopping on the battle menu before choosing a move.
-    fight_trainer_using_moves(stream, context, stats, "elite_four_lucian", false, false, language);
+    fight_trainer_using_moves(stream, context, stats, trainer_id, false, false, language);
     clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
     context.wait_for_all_requests();
     use_item_in_battle(stream, context, language, "full-restore", true);
@@ -1494,7 +1436,7 @@ static bool deal_with_cynthia_and_finish(SingleSwitchProgramEnvironment& env,
             throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
                 "Autostory ending: game reentry failed after the Hall of Fame save.", stream);
         }
-        if (!save_game(env, context)){
+        if (!save_game(env, context, 1)){
             throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
                 "Autostory ending: the final game save could not be verified.", stream);
         }
@@ -1502,8 +1444,8 @@ static bool deal_with_cynthia_and_finish(SingleSwitchProgramEnvironment& env,
         throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
             "Autostory ending stopped after the Hall of Fame save: " + e.message(), stream);
     }
-    throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
-        "Congratulations! Autostory Complete!", stream);
+    stats.hall_of_fame_save_verified = true;
+    return true;
 }
 
 // ---------------------------------------------------------------------------
@@ -1539,7 +1481,6 @@ void AutoStory_Segment_09::run_segment(SingleSwitchProgramEnvironment& env,
     AutoStory_Checkpoint_0907().run_checkpoint(env, context, options, stats);
     AutoStory_Checkpoint_0908().run_checkpoint(env, context, options, stats);
     AutoStory_Checkpoint_0909().run_checkpoint(env, context, options, stats);
-    context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 }
 
@@ -1584,9 +1525,9 @@ void checkpoint_0901(SingleSwitchProgramEnvironment& env,
                 }
             }
             {
-                if (!heal_and_exit(env.console, context, stats, "Sunyshore City")){
+                if (!heal_pokemon(env.console, context, "Sunyshore City", &stats)){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "heal_and_exit_1: transition not detected.",
+                        "09.01: Sunyshore City Pokemon Center healing and exit did not complete.",
                         env.console);
                 }
             }
@@ -1632,9 +1573,9 @@ void checkpoint_0902(SingleSwitchProgramEnvironment& env,
                 }
             }
             {
-                if (!heal_and_exit(env.console, context, stats, "Victory Road")){
+                if (!heal_pokemon(env.console, context, "Victory Road", &stats)){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "heal_and_exit_2: transition not detected.",
+                        "09.02: Victory Road Pokemon Center healing and exit did not complete.",
                         env.console);
                 }
             }
@@ -1776,9 +1717,10 @@ void checkpoint_0905(SingleSwitchProgramEnvironment& env,
         stats,
         [&](size_t /*attempt*/){
             {
-                if (!deal_with_aaron_elite_4(env.console, context, stats, options.language)){
+                if (!fight_elite_four_member(env.console, context, stats, options.language,
+                    "Elite Four Aaron", "elite_four_aaron", true)){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "deal_with_aaron_elite_4: transition not detected.",
+                        "09.05: Could not reach Elite Four Aaron.",
                         env.console);
                 }
             }
@@ -1817,9 +1759,10 @@ void checkpoint_0906(SingleSwitchProgramEnvironment& env,
         stats,
         [&](size_t /*attempt*/){
             {
-                if (!deal_with_bertha_elite_4(env.console, context, stats, options.language)){
+                if (!fight_elite_four_member(env.console, context, stats, options.language,
+                    "Elite Four Bertha", "elite_four_bertha")){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "deal_with_bertha_elite_4: transition not detected.",
+                        "09.06: Could not reach Elite Four Bertha.",
                         env.console);
                 }
             }
@@ -1858,9 +1801,10 @@ void checkpoint_0907(SingleSwitchProgramEnvironment& env,
         stats,
         [&](size_t /*attempt*/){
             {
-                if (!deal_with_flint_elite_4(env.console, context, stats, options.language)){
+                if (!fight_elite_four_member(env.console, context, stats, options.language,
+                    "Elite Four Flint", "elite_four_flint")){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "deal_with_flint_elite_4: transition not detected.",
+                        "09.07: Could not reach Elite Four Flint.",
                         env.console);
                 }
             }
@@ -1899,9 +1843,10 @@ void checkpoint_0908(SingleSwitchProgramEnvironment& env,
         stats,
         [&](size_t /*attempt*/){
             {
-                if (!deal_with_lucian_elite_4(env.console, context, stats, options.language)){
+                if (!fight_elite_four_member(env.console, context, stats, options.language,
+                    "Elite Four Lucian", "elite_four_lucian")){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "deal_with_lucian_elite_4: transition not detected.",
+                        "09.08: Could not reach Elite Four Lucian.",
                         env.console);
                 }
             }
@@ -1939,14 +1884,10 @@ void checkpoint_0909(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            {
-                if (!deal_with_cynthia_and_finish(env, context, options, stats)){
-                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "deal_with_cynthia_and_finish: transition not detected.",
-                        env.console);
-                }
+            if (!deal_with_cynthia_and_finish(env, context, options, stats)){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "09.09: Could not reach Cynthia.", env.console);
             }
-            context.wait_for_all_requests();
         },
         true);
 }

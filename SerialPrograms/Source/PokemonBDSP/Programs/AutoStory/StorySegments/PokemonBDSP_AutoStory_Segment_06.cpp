@@ -32,23 +32,6 @@ namespace NintendoSwitch {
 namespace PokemonBDSP {
 
 // ---------------------------------------------------------------------------
-//  Helpers
-// ---------------------------------------------------------------------------
-
-static void
-move_back_after_unexpected_battle(VideoStream& stream, ProControllerContext& context, const std::string& trainerid){
-    stream.log("Finishing battle with " + trainerid, COLOR_GREEN);
-    context.wait_for_all_requests();
-    pbf_wait(context, 2000ms);
-
-    if (trainerid == "route_218_sailor_skyler"){
-        pbf_move_left_joystick(context, {0, +1}, 400ms, 100ms);  // 1+
-        pbf_move_left_joystick(context, {-1, 0}, 400ms, 100ms);  // 1+
-        pbf_move_left_joystick(context, {0, -1}, 2800ms, 100ms); // 14+
-    }
-}
-
-// ---------------------------------------------------------------------------
 //  Named route navigation blocks
 // ---------------------------------------------------------------------------
 
@@ -63,7 +46,7 @@ static bool enter_jubilife_pokemon_center(VideoStream& stream, ProControllerCont
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -71,20 +54,6 @@ static bool enter_jubilife_pokemon_center(VideoStream& stream, ProControllerCont
             return false;
         }
     };
-    return true;
-}
-
-static bool heal_and_exit_jubilife_pokemon_center(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
-    context.wait_for_all_requests();
-    pbf_wait(context, 2000ms);
-    context.wait_for_all_requests();
-    stream.log("heal_and_exit_jubilife_pokemon_center: healing and exiting...");
-    if (!heal_pokemon(stream, context, "Jubilife city", &stats)){
-        return false;
-    }
-    context.wait_for_all_requests();
-    pbf_wait(context, 2000ms);
-    context.wait_for_all_requests();
     return true;
 }
 
@@ -101,7 +70,7 @@ static bool move_to_jubilife_west_exit(VideoStream& stream, ProControllerContext
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms); // 46
+                pbf_move_left_joystick(context, {-1, 0}, 100000ms, 1100ms); // 46
             },
             {{black_screen}});
         if (ret < 0){
@@ -126,7 +95,7 @@ static bool go_through_jubilife_west_exit(VideoStream& stream, ProControllerCont
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms);
+                pbf_move_left_joystick(context, {-1, 0}, 100000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -153,7 +122,10 @@ static bool go_through_route_218(VideoStream& stream, ProControllerContext& cont
     pbf_move_left_joystick(context, {-1, 0}, 1800ms, 100ms); // 9+
     pbf_move_left_joystick(context, {0, +1}, 1800ms, 100ms); // 9+
     context.wait_for_all_requests();
-    activate_repel(stream, context, language);
+    if (!activate_repel(stream, context, language)){
+        stream.log("Route 218: Could not activate Repel before surfing.", COLOR_RED);
+        return false;
+    }
     pbf_mash_button(context, BUTTON_A, 2000ms);
     context.wait_for_all_requests();
     pbf_wait(context, 6000ms);
@@ -180,6 +152,7 @@ static bool go_through_route_218(VideoStream& stream, ProControllerContext& cont
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -189,7 +162,12 @@ static bool go_through_route_218(VideoStream& stream, ProControllerContext& cont
                 fight_trainer_using_moves(stream, context, stats, "route_218_sailor_skyler", true);
                 context.wait_for_all_requests();
                 pbf_wait(context, 3000ms);
-                move_back_after_unexpected_battle(stream, context, "route_218_sailor_skyler");
+                stream.log("Restoring route position after Sailor Skyler.", COLOR_GREEN);
+                context.wait_for_all_requests();
+                pbf_wait(context, 2000ms);
+                pbf_move_left_joystick(context, {0, +1}, 400ms, 100ms);  // 1+
+                pbf_move_left_joystick(context, {-1, 0}, 400ms, 100ms);  // 1+
+                pbf_move_left_joystick(context, {0, -1}, 2800ms, 100ms); // 14+
             }
         }
     }
@@ -202,7 +180,7 @@ static bool go_through_route_218(VideoStream& stream, ProControllerContext& cont
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms);
+                pbf_move_left_joystick(context, {-1, 0}, 100000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -244,7 +222,7 @@ static bool go_through_building_route_218(VideoStream& stream, ProControllerCont
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms);
+                pbf_move_left_joystick(context, {-1, 0}, 100000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -317,6 +295,7 @@ static bool go_to_clint_and_pokemon_center(VideoStream& stream, ProControllerCon
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -344,7 +323,7 @@ static bool go_to_clint_and_pokemon_center(VideoStream& stream, ProControllerCon
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -353,20 +332,6 @@ static bool go_to_clint_and_pokemon_center(VideoStream& stream, ProControllerCon
         }
         stream.log("go_to_clint_and_pokemon_center: entered pokemon center", COLOR_GREEN);
     };
-    return true;
-}
-
-static bool heal_and_exit_canalave_pokemon_center(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
-    context.wait_for_all_requests();
-    pbf_wait(context, 2000ms);
-    context.wait_for_all_requests();
-    stream.log("heal_and_exit_canalave_pokemon_center: healing and exiting...");
-    if (!heal_pokemon(stream, context, "Canalave city", &stats)){
-        return false;
-    }
-    context.wait_for_all_requests();
-    pbf_wait(context, 2000ms);
-    context.wait_for_all_requests();
     return true;
 }
 
@@ -389,7 +354,7 @@ static bool go_to_canalave_gym(VideoStream& stream, ProControllerContext& contex
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {0, +1}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -678,11 +643,18 @@ void checkpoint_0601(SingleSwitchProgramEnvironment& env,
                     "06.01: Jubilife Center entry did not complete.",
                     env.console);
             }
-            if (!heal_and_exit_jubilife_pokemon_center(env.console, context, stats)){
+            context.wait_for_all_requests();
+            pbf_wait(context, 2000ms);
+            context.wait_for_all_requests();
+            env.console.log("Healing and exiting the Jubilife Pokemon Center.");
+            if (!heal_pokemon(env.console, context, "Jubilife city", &stats)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "06.01: Jubilife healing and exit did not complete.",
                     env.console);
             }
+            context.wait_for_all_requests();
+            pbf_wait(context, 2000ms);
+            context.wait_for_all_requests();
         },
         true);
 }
@@ -774,11 +746,18 @@ void checkpoint_0603(SingleSwitchProgramEnvironment& env,
                     "06.03: Canalave rival battle and Center entry did not complete.",
                     env.console);
             }
-            if (!heal_and_exit_canalave_pokemon_center(env.console, context, stats)){
+            context.wait_for_all_requests();
+            pbf_wait(context, 2000ms);
+            context.wait_for_all_requests();
+            env.console.log("Healing and exiting the Canalave Pokemon Center.");
+            if (!heal_pokemon(env.console, context, "Canalave city", &stats)){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "06.03: Canalave healing and exit did not complete.",
                     env.console);
             }
+            context.wait_for_all_requests();
+            pbf_wait(context, 2000ms);
+            context.wait_for_all_requests();
         },
         true);
 }

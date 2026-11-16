@@ -67,6 +67,7 @@ struct AutoStoryStats : public StatsTracker {
     std::atomic<uint64_t>& m_segment;
     std::atomic<uint64_t>& m_reset;
     bool m_first_run = true;
+    bool hall_of_fame_save_verified = false;
     // Transient run state: count confirmed HOME reloads independently of retry attempts.
     size_t game_reset_generation = 0;
     size_t coronet_attempt_reset_generation = 0;
@@ -74,6 +75,7 @@ struct AutoStoryStats : public StatsTracker {
     bool coronet_toggle_bike_gear = false;
     // Main-story slots: contact, non-contact, spread, high-PP backup.
     StarterChoice starter_choice = StarterChoice::CHIMCHAR;
+    bool outside_help = false;
     std::array<size_t, 4> move_pp_capacity{15, 15, 10, 15};
     std::array<size_t, 4> move_pp_remaining = move_pp_capacity;
 };
@@ -191,7 +193,7 @@ public:
 
 //  Save the game from the overworld with retries. Returns true if the save was
 //  verified via overworld detection, false if all feedback-based save attempts failed.
-bool save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+bool save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t max_attempts = 3);
 
 // Placeholder save helper; use save_game for verified saving.
 void checkpoint_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
@@ -305,6 +307,16 @@ void fight_trainer_using_moves(VideoStream& stream,
     bool control_second_pokemon = false,
     Language language = Language::None);
 
+// Watch the overworld approach and its trailing wait for dialogue or a trainer battle.
+// Fight on detection. A missed optional trainer is skipped. A missed required trainer throws.
+void fight_trainer_on_approach(VideoStream& stream,
+    ProControllerContext& context,
+    AutoStoryStats& stats,
+    const std::string& label,
+    const std::function<void(ProControllerContext&)>& approach,
+    Milliseconds encounter_wait = std::chrono::seconds(45),
+    bool require_encounter = true);
+
 // A full Bag screenshot with the desired item highlighted. Paths are relative
 // to RESOURCE_PATH(); quantities and selection borders are excluded.
 struct BagItemTemplate {
@@ -412,8 +424,36 @@ void align_and_enter_jubilife_center(VideoStream& stream, ProControllerContext& 
 //  repel_type: 0=Repel, 1=Super Repel, 2=Max Repel.
 bool activate_repel(VideoStream& stream, ProControllerContext& context, Language language, int num_icons = 8, int repel_type = 0);
 
+// Reused at safe walking points to synchronize Repel expiration and renewal.
+// A renewal requires the dialogue choice cursor, not just a dialogue box.
+// Unknown dialogue or a battle fails closed.
+enum class RepelRenewalChoice {
+    YES,
+    NO
+};
+void force_repel_expiry(VideoStream& stream,
+    ProControllerContext& context,
+    RepelRenewalChoice choice,
+    bool north_south = false,
+    bool require_expiry = false);
+
 //  Press A until the any HM selection arrow appears, confirm with A, then mash B for 3 s.
 void use_HM(VideoStream& stream, ProControllerContext& context, const std::string& label);
+
+//  Use after a fade has already been detected. Return once the visible destination has settled.
+void wait_for_transition_to_finish(VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& label,
+    Milliseconds timeout = std::chrono::seconds(31),
+    Milliseconds settle = std::chrono::milliseconds(500));
+
+//  Stop the approach on a black or white fade, then wait for a stable destination.
+void watch_doorway_transition(VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& label,
+    const std::function<void(ProControllerContext&)>& approach,
+    Milliseconds start_grace = std::chrono::seconds(6),
+    Milliseconds finish_timeout = std::chrono::seconds(16));
 
 //  Walk to the nurse, heal the party, and exit the Pokemon Center.
 //  `label` names the center for log messages (e.g. "Veilstone").

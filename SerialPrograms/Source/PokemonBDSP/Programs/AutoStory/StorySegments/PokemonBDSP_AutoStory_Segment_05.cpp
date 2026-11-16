@@ -5,6 +5,8 @@
  *
  */
 
+#include <span>
+
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Globals.h"
@@ -24,7 +26,6 @@
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Battle.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Segment_00_tools.h"
 
-#include "PokemonBDSP_AutoStory_Segment_02.h"
 
 #include "PokemonBDSP_AutoStory_Segment_05.h"
 
@@ -38,7 +39,7 @@ namespace PokemonBDSP {
 
 static void
 move_back_after_unexpected_battle(VideoStream& stream, ProControllerContext& context, const std::string& trainerid){
-    stream.log("Starting battle with " + trainerid, COLOR_GREEN);
+    stream.log("Restoring route position after " + trainerid + ".", COLOR_GREEN);
     context.wait_for_all_requests();
     pbf_wait(context, 2000ms);
 
@@ -49,10 +50,6 @@ move_back_after_unexpected_battle(VideoStream& stream, ProControllerContext& con
         pbf_move_left_joystick(context, {0, +1}, 1000ms, 100ms); // 4+
         dpad.last_dir = DPAD_UP;
         repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 6);
-    }else if (trainerid == "route_213_tuber_jared"){
-        // Just need to wait, nothing else
-    }else if (trainerid == "route_213_beauty_cindy"){
-        pbf_move_left_joystick(context, {0, -1}, 400ms, 100ms); // 1+
     }else if (trainerid == "route_210_ace_ernest"){
         pbf_move_left_joystick(context, {-1, 0}, 3800ms, 100ms); // 19+
     }
@@ -61,37 +58,6 @@ move_back_after_unexpected_battle(VideoStream& stream, ProControllerContext& con
 // ---------------------------------------------------------------------------
 //  Named route navigation blocks
 // ---------------------------------------------------------------------------
-
-static bool leave_gym(VideoStream& stream, ProControllerContext& context){
-    DpadState dpad;
-    context.wait_for_all_requests();
-    pbf_wait(context, 2000ms);
-    context.wait_for_all_requests();
-    stream.log("leave_gym: walking out of gym");
-
-    pbf_move_left_joystick(context, {0, +1}, 400ms, 100ms);  // 1+
-    pbf_move_left_joystick(context, {+1, 0}, 600ms, 100ms);  // 2+
-    pbf_move_left_joystick(context, {0, +1}, 600ms, 100ms);  // 2+
-    pbf_move_left_joystick(context, {+1, 0}, 2000ms, 100ms); // 10+
-    pbf_move_left_joystick(context, {0, -1}, 6000ms, 100ms); // 34+
-    pbf_move_left_joystick(context, {-1, 0}, 1800ms, 100ms); // 9+
-    pbf_move_left_joystick(context, {0, -1}, 1000ms, 100ms); // 5+
-    dpad.last_dir = DPAD_DOWN;
-    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 3, true);
-    BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-    int ret = run_until<ProControllerContext>(stream,
-        context,
-        [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {0, -1}, 100000ms, 100ms);
-        },
-        {{black_screen}});
-    if (ret < 0){
-        stream.log("leave_gym: Didn't enter building!", COLOR_RED);
-        return false;
-    }
-    stream.log("leave_gym: transition confirmed.");
-    return true;
-}
 
 // Starts at 04.18's completed Gym exit. Fly within Pastoria to use the
 // Pokemon Center's fixed arrival position instead of an unanchored city walk.
@@ -104,7 +70,7 @@ static bool go_to_pastoria_pokemon_center(VideoStream& stream, ProControllerCont
     }
 
     BlackScreenWatcher landed(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
-    if (wait_until(stream, context, 30s, {{landed}}) != 0){
+    if (wait_until(stream, context, 31s, {{landed}}) != 0){
         stream.log("[Pastoria Center] Flight transition did not finish.", COLOR_RED);
         return false;
     }
@@ -116,14 +82,14 @@ static bool go_to_pastoria_pokemon_center(VideoStream& stream, ProControllerCont
     if (run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& ctx){
-                pbf_move_left_joystick(ctx, {0, +1}, 5000ms, 1000ms);
+                pbf_move_left_joystick(ctx, {0, +1}, 5000ms, 2000ms);
             },
         {{entry_black}}) != 0){
         stream.log("[Pastoria Center] Entrance transition did not start.", COLOR_RED);
         return false;
     }
     BlackScreenWatcher inside(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
-    if (wait_until(stream, context, 30s, {{inside}}) != 0){
+    if (wait_until(stream, context, 31s, {{inside}}) != 0){
         stream.log("[Pastoria Center] Entrance transition did not finish.", COLOR_RED);
         return false;
     }
@@ -131,10 +97,6 @@ static bool go_to_pastoria_pokemon_center(VideoStream& stream, ProControllerCont
     context.wait_for_all_requests();
     stream.log("[Pastoria Center] Entered after the completed Gym return.", COLOR_GREEN);
     return true;
-}
-
-static bool heal_at_pastoria_pokemon_center(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
-    return heal_pokemon(stream, context, "Pastoria", &stats);
 }
 
 static bool
@@ -200,6 +162,7 @@ pastoria_city_drama(VideoStream& stream, ProControllerContext& context, AutoStor
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_B, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret1 < 0){
@@ -224,7 +187,7 @@ pastoria_city_drama(VideoStream& stream, ProControllerContext& context, AutoStor
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 100ms);
+                pbf_move_left_joystick(context, {+1, 0}, 10000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -243,7 +206,7 @@ static bool go_through_house_east_pastoria(VideoStream& stream, ProControllerCon
     int ret = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {+1, 0}, 100000ms, 100ms);
+            pbf_move_left_joystick(context, {+1, 0}, 100000ms, 1100ms);
         },
         {{black_screen}});
     if (ret < 0){
@@ -287,6 +250,7 @@ go_through_route_213_chasing(VideoStream& stream, ProControllerContext& context,
             context,
             [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 200000ms);
+                pbf_wait(context, 1000ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -384,6 +348,7 @@ go_through_route_213_chasing(VideoStream& stream, ProControllerContext& context,
             context,
             [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 200000ms);
+                pbf_wait(context, 1000ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -417,23 +382,23 @@ go_through_route_213_chasing(VideoStream& stream, ProControllerContext& context,
             context,
             [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 200000ms);
+                pbf_wait(context, 1000ms);
             },
             {{black_screen}});
         if (ret < 0){
-            stream.log("go_through_route_213_tuber_chelsea: Didn't detect battle starting!");
-        }else if (ret == 0){
-            stream.log("go_through_route_213_tuber_chelsea: Starting battle.");
-            fight_trainer_using_moves(stream, context, stats, "route_213_tuber_chelsea", true);
-            context.wait_for_all_requests();
-            pbf_wait(context, 3000ms);
+            stream.log("Route 213: Tuber Chelsea's encounter marker appeared, but the battle transition timed out.", COLOR_RED);
+            return false;
         }
+        stream.log("go_through_route_213_tuber_chelsea: Starting battle.");
+        fight_trainer_using_moves(stream, context, stats, "route_213_tuber_chelsea", true);
+        move_back_after_unexpected_battle(stream, context, "route_213_tuber_chelsea");
     }
 
     BlackScreenOverWatcher route_213_east_building(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
     ret = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {0, +1}, 20000ms, 100ms);
+            pbf_move_left_joystick(context, {0, +1}, 20000ms, 1100ms);
         },
         {{route_213_east_building}});
     if (ret < 0){
@@ -453,7 +418,7 @@ static bool go_through_building_route_213(VideoStream& stream, ProControllerCont
     int ret = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {0, +1}, 30000ms, 100ms);
+            pbf_move_left_joystick(context, {0, +1}, 30000ms, 1100ms);
         },
         {{black_screen}});
     if (ret < 0){
@@ -526,6 +491,7 @@ go_through_route_214(VideoStream& stream, ProControllerContext& context, AutoSto
             context,
             [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 200000ms);
+                pbf_wait(context, 1000ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -580,7 +546,7 @@ static bool go_inside_solaceon_pokemon_center(VideoStream& stream, ProController
     int ret = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {0, +1}, 200000ms, 100ms);
+            pbf_move_left_joystick(context, {0, +1}, 200000ms, 1100ms);
         },
         {{black_screen}});
     if (ret < 0){
@@ -591,12 +557,6 @@ static bool go_inside_solaceon_pokemon_center(VideoStream& stream, ProController
         return true;
     }
     return true;
-}
-
-static bool heal_at_solaceon_pokemon_center(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
-    stream.log("heal_at_solaceon_pokemon_center: healing pokemon");
-    context.wait_for_all_requests();
-    return heal_pokemon(stream, context, "Solaceon", &stats);
 }
 
 static bool
@@ -643,6 +603,7 @@ go_to_the_psyduck_route_210(VideoStream& stream, ProControllerContext& context, 
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -777,6 +738,7 @@ go_to_the_psyduck_route_210(VideoStream& stream, ProControllerContext& context, 
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -814,6 +776,7 @@ go_to_the_psyduck_route_210(VideoStream& stream, ProControllerContext& context, 
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -849,6 +812,7 @@ go_to_the_psyduck_route_210(VideoStream& stream, ProControllerContext& context, 
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -892,6 +856,7 @@ go_to_the_psyduck_route_210(VideoStream& stream, ProControllerContext& context, 
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -926,6 +891,7 @@ go_to_the_psyduck_route_210(VideoStream& stream, ProControllerContext& context, 
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -948,7 +914,7 @@ go_to_the_psyduck_route_210(VideoStream& stream, ProControllerContext& context, 
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, +1}, 20000ms, 100ms);
+                pbf_move_left_joystick(context, {0, +1}, 20000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -960,12 +926,6 @@ go_to_the_psyduck_route_210(VideoStream& stream, ProControllerContext& context, 
         }
     }
     return true;
-}
-
-static bool heal_at_celestic_pokemon_center(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
-    stream.log("heal_at_celestic_pokemon_center: healing pokemon");
-    context.wait_for_all_requests();
-    return heal_pokemon(stream, context, "Celestic", &stats);
 }
 
 static bool
@@ -1026,10 +986,11 @@ celestic_town_drama(VideoStream& stream, ProControllerContext& context, AutoStor
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret1 < 0){
-                stream.log("celestic_town_talk_to_the_grunt: Didn't detect start of battle with Clint!", COLOR_RED);
+                stream.log("Celestic Town: Galactic grunt battle transition not detected.", COLOR_RED);
                 return false;
             }
             stream.log("celestic_town_talk_to_the_grunt: starting the battle.");
@@ -1047,7 +1008,7 @@ celestic_town_drama(VideoStream& stream, ProControllerContext& context, AutoStor
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, +1}, 20000ms, 100ms);
+                pbf_move_left_joystick(context, {0, +1}, 20000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -1108,7 +1069,7 @@ static bool discover_the_paintings(VideoStream& stream, ProControllerContext& co
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, -1}, 20000ms, 100ms);
+                pbf_move_left_joystick(context, {0, -1}, 20000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -1141,7 +1102,7 @@ static bool talk_to_cyrus_and_fly_hearthome(VideoStream& stream, ProControllerCo
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, +1}, 20000ms, 100ms);
+                pbf_move_left_joystick(context, {0, +1}, 20000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -1151,12 +1112,6 @@ static bool talk_to_cyrus_and_fly_hearthome(VideoStream& stream, ProControllerCo
         }
     }
     return true;
-}
-
-static bool heal_at_hearthome_pokemon_center(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
-    stream.log("heal_at_hearthome_pokemon_center: healing pokemon");
-    context.wait_for_all_requests();
-    return heal_pokemon(stream, context, "Hearthome", &stats);
 }
 
 static bool get_into_hearthome_gym(VideoStream& stream, ProControllerContext& context){
@@ -1175,7 +1130,7 @@ static bool get_into_hearthome_gym(VideoStream& stream, ProControllerContext& co
         int ret = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, +1}, 20000ms, 100ms);
+                pbf_move_left_joystick(context, {0, +1}, 20000ms, 1100ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -1190,7 +1145,8 @@ static bool get_into_hearthome_gym(VideoStream& stream, ProControllerContext& co
 // Start inside Hearthome Gym at its entrance; finish outside with Cynthia dialogue cleared.
 static void hearthome_gym_puzzle_and_cynthia(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    AutoStoryStats& stats){
+    AutoStoryStats& stats,
+    Language language){
     VideoStream& stream = env.console;
     // Wait for the entry camera tour to finish before sending the eight northward presses for the
     // lift approach.
@@ -1199,169 +1155,120 @@ static void hearthome_gym_puzzle_and_cynthia(SingleSwitchProgramEnvironment& env
     pbf_wait(context, 8000ms);
     context.wait_for_all_requests();
 
+    enum class Arrival { WALK, DOOR, LIFT };
     struct Move {
         DpadPosition dir;
         int count;
-        Milliseconds delay;
+        Arrival arrival = Arrival::WALK;
     };
-
-    // These counts already include facing presses; do not add another.
+    // Counts include facing presses. Lifts move visibly; only doors fade.
     const Move sequence1[] = {
-        {DPAD_UP, 7, 0ms},
-        {DPAD_UP, 1, 5000ms},
-        {DPAD_RIGHT, 6, 0ms},
-        {DPAD_UP, 8, 0ms},
-        {DPAD_UP, 1, 3500ms},
-        {DPAD_RIGHT, 2, 0ms},
-        {DPAD_UP, 9, 0ms},
-        {DPAD_LEFT, 1, 0ms},
-        {DPAD_LEFT, 1, 5000ms},
-        {DPAD_RIGHT, 2, 0ms},
-        {DPAD_UP, 9, 0ms},
-        {DPAD_LEFT, 2, 0ms},
-        {DPAD_UP, 1, 0ms},
-        {DPAD_UP, 1, 3500ms},
-        {DPAD_RIGHT, 2, 0ms},
-        {DPAD_UP, 9, 0ms},
-        {DPAD_LEFT, 1, 0ms},
-        {DPAD_LEFT, 1, 5000ms},
-        {DPAD_LEFT, 6, 0ms},
-        {DPAD_UP, 8, 0ms},
-        {DPAD_UP, 1, 3500ms},
-        {DPAD_RIGHT, 2, 0ms},
-        {DPAD_UP, 9, 0ms},
-        {DPAD_LEFT, 1, 0ms},
-        {DPAD_LEFT, 1, 5000ms},
-        {DPAD_RIGHT, 6, 0ms},
-        {DPAD_UP, 8, 0ms},
-        {DPAD_UP, 1, 3500ms},
-        {DPAD_UP, 6, 0ms},
+        {DPAD_UP, 7},
+        {DPAD_UP, 1, Arrival::LIFT},
+        {DPAD_RIGHT, 6},
+        {DPAD_UP, 8},
+        {DPAD_UP, 1, Arrival::DOOR},
+        {DPAD_RIGHT, 2},
+        {DPAD_UP, 9},
+        {DPAD_LEFT, 1},
+        {DPAD_LEFT, 1, Arrival::LIFT},
+        {DPAD_RIGHT, 2},
+        {DPAD_UP, 9},
+        {DPAD_LEFT, 2},
+        {DPAD_UP, 1},
+        {DPAD_UP, 1, Arrival::DOOR},
+        {DPAD_RIGHT, 2},
+        {DPAD_UP, 9},
+        {DPAD_LEFT, 1},
+        {DPAD_LEFT, 1, Arrival::LIFT},
+        {DPAD_LEFT, 6},
+        {DPAD_UP, 8},
+        {DPAD_UP, 1, Arrival::DOOR},
+        {DPAD_RIGHT, 2},
+        {DPAD_UP, 9},
+        {DPAD_LEFT, 1},
+        {DPAD_LEFT, 1, Arrival::LIFT},
+        {DPAD_RIGHT, 6},
+        {DPAD_UP, 8},
+        {DPAD_UP, 1, Arrival::DOOR},
+        {DPAD_UP, 6},
     };
-
-    stream.log("[Hearthome Gym puzzle] Approaching Fantina.");
-    for (const auto& move : sequence1){
-        // repeat_dpad(context, dpad, move.dir, 80ms, 300ms, move.count, true);
-        for (int press = 0; press < move.count; press++){
-            pbf_press_dpad(context, move.dir, 80ms, 300ms);
-            if (move.delay > 0ms){
-                pbf_wait(context, move.delay);
-                context.wait_for_all_requests();
-                BlackScreenWatcher visible(COLOR_RED,
-                    {0.1, 0.1, 0.8, 0.8},
-                    100,
-                    10,
-                    BlackScreenWatcher::FinderType::GONE,
-                    500ms);
-                if (wait_until(stream, context, 15s, {{visible}}) != 0){
-                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "Hearthome Gym: Room/lift transition did not finish.",
-                        stream);
-                }
-                OverworldWatcher ready;
-                if (wait_until(stream, context, 15s, {{ready}}) != 0){
-                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "Hearthome Gym: Overworld not ready after the recorded room/lift wait.",
-                        stream);
-                }
-            }
-        }
-    }
-    context.wait_for_all_requests();
-    pbf_press_button(context, BUTTON_A, 150ms, 300ms);
-    fight_trainer_using_moves(stream, context, stats, "Fantina", true);
-    clear_dialog(stream, context, BUTTON_B, 6000ms);
 
     const Move sequence2[] = {
-        {DPAD_DOWN, 6, 0ms},
-        {DPAD_DOWN, 1, 3500ms},
-        {DPAD_DOWN, 8, 0ms},
-        {DPAD_LEFT, 6, 0ms},
-        {DPAD_DOWN, 1, 0ms},
-        {DPAD_DOWN, 1, 5000ms},
-        {DPAD_LEFT, 2, 0ms},
-        {DPAD_DOWN, 8, 0ms},
-        {DPAD_RIGHT, 2, 0ms},
-        {DPAD_DOWN, 1, 0ms},
-        {DPAD_DOWN, 1, 3500ms},
-        {DPAD_DOWN, 8, 0ms},
-        {DPAD_RIGHT, 6, 0ms},
-        {DPAD_DOWN, 1, 0ms},
-        {DPAD_DOWN, 1, 5000ms},
-        {DPAD_LEFT, 2, 0ms},
-        {DPAD_DOWN, 8, 0ms},
-        {DPAD_RIGHT, 2, 0ms},
-        {DPAD_DOWN, 1, 0ms},
-        {DPAD_DOWN, 1, 3500ms},
-        {DPAD_LEFT, 2, 0ms},
-        {DPAD_DOWN, 10, 0ms},
-        {DPAD_RIGHT, 1, 0ms},
-        {DPAD_RIGHT, 1, 5000ms},
-        {DPAD_LEFT, 2, 0ms},
-        {DPAD_DOWN, 8, 0ms},
-        {DPAD_RIGHT, 2, 0ms},
-        {DPAD_DOWN, 1, 0ms},
-        {DPAD_DOWN, 1, 3500ms},
-        {DPAD_DOWN, 8, 0ms},
-        {DPAD_LEFT, 6, 0ms},
-        {DPAD_DOWN, 1, 0ms},
-        {DPAD_DOWN, 1, 5000ms},
-        {DPAD_DOWN, 8, 0ms},
+        {DPAD_DOWN, 6},
+        {DPAD_DOWN, 1, Arrival::DOOR},
+        {DPAD_DOWN, 8},
+        {DPAD_LEFT, 6},
+        {DPAD_DOWN, 1},
+        {DPAD_DOWN, 1, Arrival::LIFT},
+        {DPAD_LEFT, 2},
+        {DPAD_DOWN, 8},
+        {DPAD_RIGHT, 2},
+        {DPAD_DOWN, 1},
+        {DPAD_DOWN, 1, Arrival::DOOR},
+        {DPAD_DOWN, 8},
+        {DPAD_RIGHT, 6},
+        {DPAD_DOWN, 1},
+        {DPAD_DOWN, 1, Arrival::LIFT},
+        {DPAD_LEFT, 2},
+        {DPAD_DOWN, 8},
+        {DPAD_RIGHT, 2},
+        {DPAD_DOWN, 1},
+        {DPAD_DOWN, 1, Arrival::DOOR},
+        {DPAD_LEFT, 2},
+        {DPAD_DOWN, 10},
+        {DPAD_RIGHT, 1},
+        {DPAD_RIGHT, 1, Arrival::LIFT},
+        {DPAD_LEFT, 2},
+        {DPAD_DOWN, 8},
+        {DPAD_RIGHT, 2},
+        {DPAD_DOWN, 1},
+        {DPAD_DOWN, 1, Arrival::DOOR},
+        {DPAD_DOWN, 8},
+        {DPAD_LEFT, 6},
+        {DPAD_DOWN, 1},
+        {DPAD_DOWN, 1, Arrival::LIFT},
+        {DPAD_DOWN, 8, Arrival::DOOR},
     };
 
-    stream.log("[Hearthome Gym puzzle] Returning from Fantina.");
-    for (size_t move_index = 0; move_index + 1 < sizeof(sequence2) / sizeof(sequence2[0]); move_index++){
-        const auto& move = sequence2[move_index];
-        for (int press = 0; press < move.count; press++){
-            pbf_press_dpad(context, move.dir, 80ms, 300ms);
-            if (move.delay > 0ms){
-                pbf_wait(context, move.delay);
-                context.wait_for_all_requests();
-                BlackScreenWatcher visible(COLOR_RED,
-                    {0.1, 0.1, 0.8, 0.8},
-                    100,
-                    10,
-                    BlackScreenWatcher::FinderType::GONE,
-                    500ms);
-                if (wait_until(stream, context, 15s, {{visible}}) != 0){
-                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "Hearthome Gym: Room/lift transition did not finish.",
-                        stream);
+    DpadState dpad;
+    for (bool returning : {false, true}){
+        const std::span<const Move> route = returning
+            ? std::span<const Move>(sequence2) : std::span<const Move>(sequence1);
+        stream.log(returning ? "[Hearthome Gym puzzle] Returning from Fantina."
+                             : "[Hearthome Gym puzzle] Approaching Fantina.");
+        for (size_t begin = 0; begin < route.size(); ){
+            size_t last = begin;
+            while (last + 1 < route.size() && route[last].arrival == Arrival::WALK){
+                last++;
+            }
+            const auto walk = [&](ProControllerContext& ctx){
+                for (size_t i = begin; i <= last; i++){
+                    repeat_dpad(ctx, dpad, route[i].dir, 80ms, 300ms, route[i].count, false);
                 }
-                OverworldWatcher ready;
-                if (wait_until(stream, context, 15s, {{ready}}) != 0){
-                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "Hearthome Gym return: Overworld not ready after the recorded room/lift wait.",
-                        stream);
+            };
+            if (route[last].arrival == Arrival::DOOR){
+                watch_doorway_transition(stream, context, "Hearthome Gym doorway", walk);
+            }else{
+                walk(context);
+                if (route[last].arrival == Arrival::LIFT){
+                    pbf_wait(context, 5000ms);
+                    context.wait_for_all_requests();
+                    OverworldWatcher ready;
+                    if (wait_until(stream, context, 16s, {{ready}}) != 0){
+                        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                            "Hearthome Gym: Overworld did not return after the lift.", stream);
+                    }
                 }
             }
+            begin = last + 1;
         }
-    }
-    context.wait_for_all_requests();
-    BlackScreenWatcher exit_black(COLOR_RED);
-    if (run_until<ProControllerContext>(stream,
-        context,
-        [&](ProControllerContext& ctx){
-                const auto& move = sequence2[sizeof(sequence2) / sizeof(sequence2[0]) - 1];
-                for (int press = 0; press < move.count; press++){
-                    pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
-                }
-                pbf_wait(ctx, 5000ms);
-            },
-        {{exit_black}}) != 0){
-        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "Hearthome Gym return: Exit transition did not start.",
-            stream);
-    }
-    BlackScreenWatcher outside(COLOR_RED,
-        {0.1, 0.1, 0.8, 0.8},
-        100,
-        10,
-        BlackScreenWatcher::FinderType::GONE,
-        500ms);
-    if (wait_until(stream, context, 30s, {{outside}}) != 0){
-        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "Hearthome Gym return: Exit transition did not finish.",
-            stream);
+        if (!returning){
+            context.wait_for_all_requests();
+            pbf_press_button(context, BUTTON_A, 150ms, 300ms);
+            fight_trainer_using_moves(stream, context, stats, "Fantina", true, false, language);
+            clear_dialog(stream, context, BUTTON_B, 6000ms);
+        }
     }
     context.wait_for_all_requests();
     wait_for_dialog(stream, context, "Cynthia after Hearthome Gym", 30000ms);
@@ -1446,9 +1353,9 @@ void checkpoint_0501(SingleSwitchProgramEnvironment& env,
                 }
             }
             {
-                if (!heal_at_pastoria_pokemon_center(env.console, context, stats)){
+                if (!heal_pokemon(env.console, context, "Pastoria", &stats)){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "heal_at_pastoria_pokemon_center: transition not detected.",
+                        "Pastoria Pokemon Center: Exit transition not detected after healing.",
                         env.console);
                 }
             }
@@ -1529,9 +1436,10 @@ void checkpoint_0502(SingleSwitchProgramEnvironment& env,
                 }
             }
             {
-                if (!heal_at_solaceon_pokemon_center(env.console, context, stats)){
+                env.console.log("Healing at the Solaceon Pokemon Center.");
+                if (!heal_pokemon(env.console, context, "Solaceon", &stats)){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "heal_at_solaceon_pokemon_center: transition not detected.",
+                        "Solaceon Pokemon Center: Exit transition not detected after healing.",
                         env.console);
                 }
             }
@@ -1577,9 +1485,10 @@ void checkpoint_0503(SingleSwitchProgramEnvironment& env,
                 }
             }
             {
-                if (!heal_at_celestic_pokemon_center(env.console, context, stats)){
+                env.console.log("Healing at the Celestic Pokemon Center.");
+                if (!heal_pokemon(env.console, context, "Celestic", &stats)){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "heal_at_celestic_pokemon_center: transition not detected.",
+                        "Celestic Pokemon Center: Exit transition not detected after healing.",
                         env.console);
                 }
             }
@@ -1639,9 +1548,10 @@ void checkpoint_0504(SingleSwitchProgramEnvironment& env,
                 }
             }
             {
-                if (!heal_at_hearthome_pokemon_center(env.console, context, stats)){
+                env.console.log("Healing at the Hearthome Pokemon Center.");
+                if (!heal_pokemon(env.console, context, "Hearthome", &stats)){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "heal_at_hearthome_pokemon_center: transition not detected.",
+                        "Hearthome Pokemon Center: Exit transition not detected after healing.",
                         env.console);
                 }
             }
@@ -1686,7 +1596,7 @@ void checkpoint_0505(SingleSwitchProgramEnvironment& env,
                         env.console);
                 }
             }
-            hearthome_gym_puzzle_and_cynthia(env, context, stats);
+            hearthome_gym_puzzle_and_cynthia(env, context, stats, options.language);
             context.wait_for_all_requests();
         },
         true);

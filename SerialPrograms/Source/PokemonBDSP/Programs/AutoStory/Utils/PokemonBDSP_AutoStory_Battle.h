@@ -66,6 +66,9 @@ double read_player_hp_ratio(const ImageViewRGB32& frame,
     size_t slot = 1,
     BattleHPReading* reading = nullptr);
 
+// On a confirmed singles command screen, poison_only checks for the purple badge.
+bool detect_player_status(const ImageViewRGB32& frame, bool poison_only = false);
+
 // Current PP by move slot; -1 means absent or unreadable. Caller confirms across frames.
 std::array<int, 4> read_all_pp(Logger& logger, const ImageViewRGB32& frame);
 

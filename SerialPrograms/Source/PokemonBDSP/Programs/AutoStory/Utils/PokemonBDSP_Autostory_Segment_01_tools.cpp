@@ -60,6 +60,7 @@ void enter_cave_with_down_right_search(VideoStream& stream,
                 if (north_fallback > 0ms){
                     pbf_move_left_joystick(ctx, {0, 1}, north_fallback, 0ms);
                 }
+                pbf_wait(ctx, 1000ms);
             },
             {{black_screen}});
         context.wait_for_all_requests();
@@ -90,7 +91,7 @@ static bool mine_confirm_escape_via_menu(VideoStream& stream, ProControllerConte
             detected = run_until<ProControllerContext>(stream,
                 context,
                 [](ProControllerContext& controller){
-                    pbf_press_button(controller, BUTTON_X, 160ms, 3840ms);
+                    pbf_press_button(controller, BUTTON_X, 160ms, 4840ms);
                     controller.wait_for_all_requests();
                 },
                 {game_menu, battle_menu});
@@ -107,7 +108,7 @@ static bool mine_confirm_escape_via_menu(VideoStream& stream, ProControllerConte
         for (size_t close = 0; close < 3; close++){
             pbf_press_button(context, BUTTON_B, 80ms, 500ms);
             context.wait_for_all_requests();
-            if (wait_until(stream, context, 1s, {{overworld}}) == 0){
+            if (wait_until(stream, context, 2s, {{overworld}}) == 0){
                 return true;
             }
             BlackScreenWatcher visible(COLOR_YELLOW,
@@ -116,7 +117,7 @@ static bool mine_confirm_escape_via_menu(VideoStream& stream, ProControllerConte
                 10,
                 BlackScreenWatcher::FinderType::GONE,
                 500ms);
-            if (wait_until(stream, context, 2s, {{visible}}) == 0){
+            if (wait_until(stream, context, 3s, {{visible}}) == 0){
                 const VideoSnapshot frame = stream.video().snapshot();
                 if (frame && !menu_visible.detect(frame)){
                     stream.log("[Mine escape] Confirmed game menu closed; returning to navigation.", COLOR_GREEN);
@@ -169,12 +170,12 @@ void escape_wild_battle(VideoStream& stream,
     std::chrono::seconds timeout){
     EndBattleWatcher battle_end;
     bool exit_transition = false;
-    const auto deadline = std::chrono::steady_clock::now() + timeout;
+    const auto deadline = std::chrono::steady_clock::now() + timeout + 1s;
     while (std::chrono::steady_clock::now() < deadline){
         pbf_press_button(context, BUTTON_B, 40ms, 200ms);
         context.wait_for_all_requests();
         BattleMenuWatcher menu_ready(battle_type, COLOR_YELLOW);
-        const int ready = wait_until(stream, context, 3s, {{battle_end}, {menu_ready}});
+        const int ready = wait_until(stream, context, 4s, {{battle_end}, {menu_ready}});
         if (ready == 0){
             exit_transition = true;
             break;
@@ -189,7 +190,7 @@ void escape_wild_battle(VideoStream& stream,
         const int result = run_until<ProControllerContext>(stream,
             context,
             [](ProControllerContext& controller){
-                pbf_press_button(controller, BUTTON_A, 60ms, 4000ms);
+                pbf_press_button(controller, BUTTON_A, 60ms, 5000ms);
                 controller.wait_for_all_requests();
             },
             {battle_end});
@@ -198,7 +199,7 @@ void escape_wild_battle(VideoStream& stream,
             break;
         }
     }
-    if (!exit_transition && wait_until(stream, context, 10s, {{battle_end}}) == 0){
+    if (!exit_transition && wait_until(stream, context, 11s, {{battle_end}}) == 0){
         exit_transition = true;
     }
     if (exit_transition){
@@ -216,46 +217,6 @@ void escape_wild_battle(VideoStream& stream,
     }
     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
         "escape_wild_battle: Exit transition and late main-menu fallback could not confirm escape.",
-        stream);
-}
-
-void Barry_1_fight(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
-    stream.log("Starting Barry 1 battle...");
-
-    // State machine: loop until EndBattleWatcher fires
-    for (size_t c = 0; c < 20; c++){
-        context.wait_for_all_requests();
-
-        BattleMenuWatcher battle_menu(BattleType::STANDARD);
-        EndBattleWatcher end_battle;
-        int ret = run_until<ProControllerContext>(stream,
-            context,
-            [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_ZL, 120000ms);
-            },
-            {
-                battle_menu,
-                end_battle,
-            });
-        switch (ret){
-        case 0:
-            stream.log("Battle menu detected - using first move.");
-            pbf_press_button(context, BUTTON_ZL, 160ms, 1000ms);
-            break;
-        case 1:
-            stream.log("Barry 1 battle complete.");
-            pbf_mash_button(context, BUTTON_B, 5000ms);
-            context.wait_for_all_requests();
-            return;
-        default:
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                "Barry_1_fight: Timed out waiting for battle menu or end.",
-                stream);
-        }
-    }
-
-    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-        "Barry_1_fight: Battle did not end after 20 turns.",
         stream);
 }
 
