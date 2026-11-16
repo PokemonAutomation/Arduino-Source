@@ -37,6 +37,8 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
@@ -108,10 +110,8 @@ bool fake_save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     return true;
 }
 
-bool save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    static constexpr size_t MAX_RETRIES = 3;
-
-    for (size_t attempt = 0; attempt < MAX_RETRIES; attempt++){
+bool save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t max_attempts){
+    for (size_t attempt = 0; attempt < max_attempts; attempt++){
         try {
             env.console.log("Checkpoint save attempt: " + std::to_string(attempt + 1));
 
@@ -130,7 +130,7 @@ bool save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& contex
                 10,
                 BlackScreenWatcher::FinderType::GONE,
                 1000ms);
-            if (wait_until(env.console, context, 15s, {{destination_visible}}) != 0){
+            if (wait_until(env.console, context, 16s, {{destination_visible}}) != 0){
                 throw OperationFailedExceptionWithScreenshot(ErrorReportMode::SEND_ERROR_REPORT,
                     "Checkpoint destination did not become visible before saving.",
                     env.console);
@@ -139,7 +139,7 @@ bool save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& contex
             context.wait_for_all_requests();
 
             OverworldWatcher ready_to_save;
-            if (wait_until(env.console, context, 15s, {{ready_to_save}}) != 0){
+            if (wait_until(env.console, context, 16s, {{ready_to_save}}) != 0){
                 throw OperationFailedExceptionWithScreenshot(ErrorReportMode::SEND_ERROR_REPORT,
                     "Checkpoint destination did not return to the overworld before saving.",
                     env.console);
@@ -158,7 +158,7 @@ bool save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& contex
 
             // Verify overworld. Generous timeout: save animation + fade can be slow.
             OverworldWatcher overworld;
-            int ret = wait_until(env.console, context, std::chrono::seconds(15), {overworld});
+            int ret = wait_until(env.console, context, std::chrono::seconds(16), {overworld});
             if (ret < 0){
                 throw OperationFailedExceptionWithScreenshot(ErrorReportMode::SEND_ERROR_REPORT,
                     "Failed to detect overworld after save.",
@@ -284,6 +284,7 @@ void mash_until_dialogue_ends(VideoStream& stream, ProControllerContext& context
         context,
         [button, timeout](ProControllerContext& context){
             pbf_mash_button(context, button, timeout);
+            pbf_wait(context, 1000ms);
         },
         {{overworld}});
     if (ret < 0){
@@ -308,6 +309,91 @@ void repeat_dpad(ProControllerContext& context,
     for (size_t i = 0; i < times; i++){
         pbf_press_dpad(context, dir, press, hold);
     }
+}
+
+void fight_trainer_on_approach(VideoStream& stream,
+    ProControllerContext& context,
+    AutoStoryStats& stats,
+    const std::string& label,
+    const std::function<void(ProControllerContext&)>& approach,
+    Milliseconds encounter_wait,
+    bool require_encounter){
+    context.wait_for_all_requests();
+    ShortDialogWatcher dialogue;
+    StartBattleDetector starting(stream.overlay());
+    BattleMenuWatcher menu(BattleType::TRAINER);
+    const int encountered = run_until<ProControllerContext>(stream,
+        context,
+        [&](ProControllerContext& ctx){
+            approach(ctx);
+            if (encounter_wait > 0ms){
+                pbf_wait(ctx, encounter_wait);
+            }
+        },
+        {{dialogue}, {starting}, {menu}});
+    if (encountered < 0){
+        if (!require_encounter){
+            stream.log("[" + label + "] No encounter during the watched approach; continuing.", COLOR_GREEN);
+            return;
+        }
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            label + ": Expected trainer encounter did not start.",
+            stream);
+    }
+    stream.log("[" + label + "] Encounter detected; route movement cancelled.");
+    fight_trainer_using_moves(stream, context, stats, label, false);
+}
+
+void wait_for_transition_to_finish(VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& label,
+    Milliseconds timeout,
+    Milliseconds settle){
+    BlackScreenDetector black_frame;
+    WhiteScreenDetector white_frame;
+    const auto deadline = std::chrono::steady_clock::now() + timeout;
+    auto clear_since = std::chrono::steady_clock::now();
+    while (std::chrono::steady_clock::now() < deadline){
+        const auto frame = stream.video().snapshot();
+        if (!frame){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                label + ": No video frame during transition.", stream);
+        }
+        const auto now = std::chrono::steady_clock::now();
+        if (black_frame.detect(*frame.frame) || white_frame.detect(*frame.frame)){
+            clear_since = now;
+        }else if (now - clear_since >= 500ms){
+            stream.log(label + ": Destination visible.");
+            pbf_wait(context, settle);
+            context.wait_for_all_requests();
+            return;
+        }
+        context.wait_for(100ms);
+    }
+    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+        label + ": Doorway fade did not finish.", stream);
+}
+
+void watch_doorway_transition(VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& label,
+    const std::function<void(ProControllerContext&)>& approach,
+    Milliseconds start_grace,
+    Milliseconds finish_timeout){
+    context.wait_for_all_requests();
+    BlackScreenWatcher black;
+    WhiteScreenWatcher white;
+    const int result = run_until<ProControllerContext>(stream, context,
+        [&](ProControllerContext& ctx){
+            approach(ctx);
+            pbf_wait(ctx, start_grace);
+        },
+        {{black}, {white}});
+    if (result < 0){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            label + ": Doorway fade did not start.", stream);
+    }
+    wait_for_transition_to_finish(stream, context, label, finish_timeout, 700ms);
 }
 
 bool heal_pokemon(VideoStream& stream,
@@ -343,7 +429,7 @@ bool heal_pokemon(VideoStream& stream,
     int ret = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {0, -1}, 15000ms, 100ms);
+            pbf_move_left_joystick(context, {0, -1}, 15000ms, 1100ms);
         },
         {{black_screen}});
     if (ret < 0){
@@ -439,6 +525,7 @@ bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place){
             context,
             [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 200000ms);
+                pbf_wait(context, 1000ms);
             },
             {{flying_black_screen}});
         if (fly_ret < 0){
@@ -620,6 +707,7 @@ bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place){
             context,
             [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 200000ms);
+                pbf_wait(context, 1000ms);
             },
             {{flying_white_screen}, {flying_black_screen}});
         if (ret < 0){
@@ -818,7 +906,7 @@ void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context
     pbf_mash_button(context, BUTTON_B, 2000ms);
     context.wait_for_all_requests();
     OverworldWatcher overworld;
-    if (wait_until(stream, context, 10s, {{overworld}}) != 0){
+    if (wait_until(stream, context, 11s, {{overworld}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Potion: Final overworld return not confirmed.", stream);
     }
@@ -1772,7 +1860,7 @@ bool use_escape_rope(VideoStream& stream, ProControllerContext& context, Languag
                 pbf_press_button(ctx, BUTTON_A, 80ms, 500ms);
             }
             ctx.wait_for_all_requests();
-            pbf_wait(ctx, 10s);
+            pbf_wait(ctx, 11s);
             ctx.wait_for_all_requests();
         },
         {transition, white_transition});
@@ -1789,14 +1877,14 @@ bool use_escape_rope(VideoStream& stream, ProControllerContext& context, Languag
         500ms);
     stream.log(std::string("[Escape Rope] ") + (result == 1 ? "White" : "Black") + " exit transition detected.");
     // if (wait_until(stream, context, 15s, {{finished}}) != 0){ return false; }
-    const int finish_result = result == 1 ? wait_until(stream, context, 15s, {{white_finished}})
-        : wait_until(stream, context, 15s, {{finished}});
+    const int finish_result = result == 1 ? wait_until(stream, context, 16s, {{white_finished}})
+        : wait_until(stream, context, 16s, {{finished}});
     if (finish_result != 0){
         stream.log("[Escape Rope] Exit transition did not finish.", COLOR_ORANGE);
         return false;
     }
     OverworldWatcher overworld;
-    if (wait_until(stream, context, 10s, {{overworld}}) != 0){
+    if (wait_until(stream, context, 11s, {{overworld}}) != 0){
         stream.log("[Escape Rope] Overworld not detected after transition.", COLOR_ORANGE);
         return false;
     }
@@ -1847,6 +1935,140 @@ bool activate_repel(VideoStream& stream, ProControllerContext& context, Language
     return true;
 }
 
+// Call at a safe walking point, away from trainer/NPC prompts.
+void force_repel_expiry(VideoStream& stream,
+    ProControllerContext& context,
+    RepelRenewalChoice choice,
+    bool north_south,
+    bool require_expiry){
+    context.wait_for_all_requests();
+    stream.log(std::string("[Repel expiry] Wiggling ") + (north_south ? "north/south" : "west/east") +
+        " until expiry; renewal response=" + (choice == RepelRenewalChoice::YES ? "Yes." : "No."));
+    const Button response = choice == RepelRenewalChoice::YES ? BUTTON_A : BUTTON_B;
+    ShortDialogWatcher expired(COLOR_CYAN);
+    StartBattleDetector starting(stream.overlay());
+    BattleMenuWatcher battle(BattleType::TRAINER);
+    // Repel expiry allowance is the mean 41.244682s plus sample SD 3.668059s, rounded up to the
+    // next millisecond. Use 500ms movement / 100ms rest pulses.
+    const auto movement_deadline = std::chrono::steady_clock::now() + 44913ms;
+    const int result = run_until<ProControllerContext>(stream,
+        context,
+        [north_south, movement_deadline](ProControllerContext& ctx){
+            while (std::chrono::steady_clock::now() + 1200ms <= movement_deadline){
+                // Complete steps before reversing so the Repel counter advances.
+                if (north_south){
+                    pbf_move_left_joystick(ctx, {0.0, 1.0}, 500ms, 100ms);
+                    pbf_move_left_joystick(ctx, {0.0, -1.0}, 500ms, 100ms);
+                }else{
+                    pbf_move_left_joystick(ctx, {-1.0, 0.0}, 500ms, 100ms);
+                    pbf_move_left_joystick(ctx, {1.0, 0.0}, 500ms, 100ms);
+                }
+                ctx.wait_for_all_requests();
+            }
+            // Finish the observation window without an unpaired move.
+            const auto remaining =
+                std::chrono::duration_cast<Milliseconds>(movement_deadline - std::chrono::steady_clock::now());
+            if (remaining > 0ms){
+                pbf_wait(ctx, remaining);
+            }
+        },
+        {{expired}, {starting}, {battle}});
+    if (result < 0){
+        if (require_expiry){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Repel renewal: Required expiry prompt not observed within calibrated limit.",
+                stream);
+        }
+        stream.log(
+            "[Repel expiry] Calibrated 44.913s limit reached without an expiry prompt; checking clear overworld before continuing.",
+            COLOR_ORANGE);
+    }else if (result != 0){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Repel renewal: Unexpected battle; renewal choice not confirmed.",
+            stream);
+    }else{
+        // The expiry text must be advanced before the Yes/No menu appears.
+        // Check first so an already-visible choice is not answered prematurely.
+        // Allow the appearing cursor to accumulate its five required detections
+        // before another press can dismiss the choice. Stop on a battle.
+        ShortDialogPromptDetector renewal(stream.overlay(), {0.60, 0.55, 0.30, 0.25}, COLOR_CYAN);
+        int renewal_state = wait_until(stream, context, 3s, {{renewal}, {starting}, {battle}});
+        for (size_t advance = 0; renewal_state < 0 && advance < 3; advance++){
+            stream.log("[Repel expiry] Advancing initial text before renewal choice (" +
+                std::to_string(advance + 1) + "/3).");
+            pbf_press_button(context, BUTTON_A, 80ms, 100ms);
+            context.wait_for_all_requests();
+            renewal_state = wait_until(stream, context, 3s, {{renewal}, {starting}, {battle}});
+        }
+        if (renewal_state != 0){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Repel renewal: Unexpected dialogue; renewal choice not confirmed.",
+                stream);
+        }
+        stream.log("[Repel expiry] Renewal choice confirmed.");
+    }
+    // Renewal has a gap before the final used-Repel message. A single
+    // overworld frame is insufficient: require three continuous clear seconds.
+    context.wait_for_all_requests();
+    ShortDialogDetector dialogue(COLOR_YELLOW);
+    BattleDialogDetector battle_dialogue(COLOR_RED);
+    BattleMenuDetector battle_menu(BattleType::TRAINER, COLOR_RED);
+    BlackScreenDetector black;
+    OverworldDetector overworld;
+    VideoOverlaySet overlays(stream.overlay());
+    dialogue.make_overlays(overlays);
+    battle_dialogue.make_overlays(overlays);
+    battle_menu.make_overlays(overlays);
+    black.make_overlays(overlays);
+    overworld.make_overlays(overlays);
+    const auto deadline = std::chrono::steady_clock::now() + 30s;
+    auto quiet_since = std::chrono::steady_clock::now();
+    bool quiet = false;
+    while (std::chrono::steady_clock::now() < deadline){
+        const auto frame = stream.video().snapshot();
+        if (!frame){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Repel renewal: No video frame during cleanup.",
+                stream);
+        }
+        const auto now = std::chrono::steady_clock::now();
+        if (battle_dialogue.detect(*frame.frame) || battle_menu.detect(*frame.frame)){
+            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                "Repel renewal: Battle detected during cleanup; renewal not confirmed.",
+                stream);
+        }
+        if (dialogue.detect(*frame.frame)){
+            quiet = false;
+            pbf_mash_button(context, response, 100ms);
+        }else if (black.detect(*frame.frame) || !overworld.detect(*frame.frame)){
+            quiet = false;
+            pbf_wait(context, 100ms);
+        }else{
+            if (!quiet){
+                quiet = true;
+                quiet_since = now;
+            }
+            if (now - quiet_since >= 3s){
+                context.wait_for_all_requests();
+                if (result == 0){
+                    stream.log(std::string("[Repel expiry] Renewal ") +
+                        (choice == RepelRenewalChoice::YES ? "accepted" : "declined") +
+                        "; three continuous seconds of overworld confirmed.");
+                }else{
+                    stream.log(
+                        "[Repel expiry] No expiry observed within the calibrated limit; three continuous seconds of clear overworld confirmed. Continuing the route.");
+                }
+                return;
+            }
+            // Do not send confirmation/cancel buttons while the overworld is clear.
+            pbf_wait(context, 100ms);
+        }
+        context.wait_for_all_requests();
+    }
+    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+        "Repel renewal: Three clear seconds not confirmed after renewal.",
+        stream);
+}
 
 void use_HM(VideoStream& stream, ProControllerContext& context, const std::string& label
 

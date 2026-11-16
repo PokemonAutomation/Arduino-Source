@@ -89,6 +89,7 @@ OverworldMatchResult match_route215_derek_stair_top_renewal(const ImageRGB32& fr
 OverworldMatchResult match_route208_hannah_departure(const ImageRGB32& frame);
 OverworldMatchResult match_eterna_gym_entrance(const ImageRGB32& frame);
 OverworldMatchResult match_galactic_hq_cut(const ImageRGB32& frame);
+OverworldMatchResult match_galactic_hq_lobby(const ImageRGB32& frame);
 OverworldMatchResult match_galactic_hq_jupiter(const ImageRGB32& frame);
 OverworldMatchResult match_eterna_cycle_shop_entrance(const ImageRGB32& frame);
 OverworldMatchResult match_eterna_cycle_shop_interior(const ImageRGB32& frame);

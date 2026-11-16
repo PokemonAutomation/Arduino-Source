@@ -8,11 +8,9 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonTools/OCR/OCR_Routines.h"
 #include "PokemonBDSP_ShopItemNameReader.h"
 #include "PokemonBDSP_ShopDetectors.h"
 
@@ -81,30 +79,12 @@ bool ShopQuantityWindowDetector::detect(const ImageViewRGB32& screen){
 //  ShopItemHoverDetector
 // ---------------------------------------------------------------------------
 
-// Color filter for the red hover rectangle.
-static constexpr uint32_t RED_MIN = 0xff800000;  // R≥128, G=0,   B=0
-static constexpr uint32_t RED_MAX = 0xffff6060;  // R≤255, G≤96,  B≤96
-
-// Minimum pixel area for a red blob to be considered (filters noise).
-static constexpr size_t RED_MIN_AREA = 200;
-
-// The hover rectangle must span at least this fraction of the scan area width.
-static constexpr double RED_MIN_WIDTH_RATIO = 0.80;
-
-// Minimum aspect ratio (width/height) — the row is much wider than tall.
-static constexpr double RED_MIN_ASPECT = 4.0;
-
-// Minimum consecutive frames that must confirm before the detector fires.
+// The green description bar repeats the selected item name in white, just after its icon.
+static const ImageFloatBox SHOP_DESCRIPTION_NAME_BOX{0.456, 0.754, 0.280, 0.042};
 static constexpr size_t HOVER_MIN_CONSECUTIVE = 3;
-
-// Item-name OCR region, relative to the selected row.
-static constexpr double NAME_X_OFFSET = 0.08;
-static constexpr double NAME_X_WIDTH = 0.65;
-static constexpr double OCR_ROW_HEIGHT = 0.06;
 
 ShopItemHoverDetector::ShopItemHoverDetector(
     Logger& logger,
-    const ImageFloatBox& scan_area,
     const std::string& item_slug,
     Language language,
     Color color
@@ -113,76 +93,22 @@ ShopItemHoverDetector::ShopItemHoverDetector(
     , m_logger(logger)
     , m_color(color)
     , m_language(language)
-    , m_scan_area(scan_area)
     , m_item_slug(item_slug)
 {}
 
-bool ShopItemHoverDetector::find_outline(const ImageViewRGB32& screen, ImageFloatBox& out_box) const{
-    using namespace Kernels::Waterfill;
-
-    const ImageViewRGB32 region = extract_box_reference(screen, m_scan_area);
-    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(region, RED_MIN, RED_MAX);
-
-    auto session = make_WaterfillSession(matrix);
-    auto iter    = session->make_iterator(RED_MIN_AREA);
-
-    WaterfillObject object;
-    while (iter->find_next(object, false)){
-        if (object.aspect_ratio() < RED_MIN_ASPECT) continue;
-        if ((double)object.width() / region.width() < RED_MIN_WIDTH_RATIO) continue;
-
-        out_box = ImageFloatBox{
-            m_scan_area.x + (double)object.min_x / region.width()  * m_scan_area.width,
-            m_scan_area.y + (double)object.min_y / region.height() * m_scan_area.height,
-            (double)object.width()  / region.width()  * m_scan_area.width,
-            (double)object.height() / region.height() * m_scan_area.height
-        };
-        return true;
-    }
-    return false;
-}
-
-bool ShopItemHoverDetector::match_ocr(const ImageViewRGB32& screen, const ImageFloatBox& outline_box) const{
-    m_last_name_box = ImageFloatBox{
-        outline_box.x + NAME_X_OFFSET * outline_box.width,
-        outline_box.y,
-        NAME_X_WIDTH * outline_box.width,
-        OCR_ROW_HEIGHT
-    };
-    const ImageFloatBox& name_box = m_last_name_box;
-
-    const ShopItemNameReader& name_reader = ShopItemNameReader::instance();
-    OCR::StringMatchResult name_result = name_reader.read_substring(
-        m_logger, m_language, extract_box_reference(screen, name_box)
-    );
-    name_result.clear_beyond_log10p(ShopItemNameReader::MAX_LOG10P);
-    if (name_result.results.empty()){
-        return false;
-    }
-    if (name_result.results.begin()->second.token != m_item_slug){
-        return false;
-    }
-
-    if (!m_ocr_logged){
-        m_ocr_logged = true;
-        name_result.log(m_logger, ShopItemNameReader::MAX_LOG10P, "want: " + m_item_slug);
-    }
-    return true;
-}
-
 bool ShopItemHoverDetector::detect(const ImageViewRGB32& screen){
-    ImageFloatBox outline_box;
-    if (!find_outline(screen, outline_box)){
-        m_detected_box   = ImageFloatBox{0, 0, 0, 0};
-        m_last_name_box  = ImageFloatBox{0, 0, 0, 0};
-        m_ocr_logged     = false;
+    const auto result = ShopItemNameReader::instance().match_substring_from_image_multifiltered(
+        nullptr, m_language, extract_box_reference(screen, SHOP_DESCRIPTION_NAME_BOX),
+        OCR::WHITE_TEXT_FILTERS(), ShopItemNameReader::MAX_LOG10P, ShopItemNameReader::MAX_LOG10P_SPREAD
+    );
+    if (result.results.empty() || result.results.begin()->second.token != m_item_slug){
+        m_ocr_logged = false;
         return false;
     }
-    if (!match_ocr(screen, outline_box)){
-        m_last_name_box  = ImageFloatBox{0, 0, 0, 0};
-        return false;
+    if (!m_ocr_logged){
+        result.log(m_logger, ShopItemNameReader::MAX_LOG10P, "want: " + m_item_slug);
+        m_ocr_logged = true;
     }
-    m_detected_box = outline_box;
     return true;
 }
 
@@ -197,13 +123,7 @@ int ShopItemHoverDetector::read_stock(const ImageViewRGB32& screen){
 }
 
 void ShopItemHoverDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(m_color, m_scan_area);
-    if (m_detected_box.width > 0){
-        items.add(m_color, m_detected_box);
-    }
-    if (m_last_name_box.width > 0){
-        items.add(COLOR_BLUE, m_last_name_box);
-    }
+    items.add(m_color, SHOP_DESCRIPTION_NAME_BOX);
 }
 
 bool ShopItemHoverDetector::process_frame(const ImageViewRGB32& frame, WallClock /*timestamp*/){

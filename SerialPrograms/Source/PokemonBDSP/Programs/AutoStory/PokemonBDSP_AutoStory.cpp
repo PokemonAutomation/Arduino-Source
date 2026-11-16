@@ -94,6 +94,7 @@ static std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_checkpoint_list()
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0305>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0306>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0307>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0308>());
 
     // Segment 04
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0401>());
@@ -200,8 +201,7 @@ static const std::vector<std::unique_ptr<AutoStory_Checkpoint>>& ALL_CHECKPOINTS
 //  Segment database
 // ---------------------------------------------------------------------------
 
-// Preserve Tutorial and Segments 01-03 numeric selections. Revised Segments
-// 04-09 use explicit slugs, and obsolete selections require reselection.
+// Keep the original numeric Main Story selections through 03.05. Later checkpoints use explicit slugs.
 // Keep Tutorial and Main Story separate for the manual HOME transfer.
 static constexpr size_t TUTORIAL_CHECKPOINT_COUNT = 7;
 // Keep existing Main Story option IDs stable after splitting the tutorial.
@@ -232,7 +232,7 @@ static const StringSelectDatabase& section_database(bool checkpoints, bool tutor
         size_t legacy_index = LEGACY_MAIN_CHECKPOINT_START;
         for (size_t i = TUTORIAL_CHECKPOINT_COUNT; i < ALL_CHECKPOINTS().size(); i++){
             const std::string name = ALL_CHECKPOINTS()[i]->name();
-            if (name.compare(0, 3, "04.") >= 0 && name.compare(0, 3, "09.") <= 0){
+            if (name.compare(0, 5, "03.06") >= 0 && name.compare(0, 3, "09.") <= 0){
                 db.add_entry(StringSelectEntry(name.substr(0, 5), name));
             }else{
                 db.add_entry(StringSelectEntry(std::to_string(legacy_index++), name));
@@ -461,6 +461,15 @@ void BDSPAutoStory::load_json(const JsonValue& json){
         if (!slug){
             continue;
         }
+        // Old 03.06 covered both the tower and the journey to Veilstone Gym.
+        if (*slug == "20"){
+            selections[selection]->set_by_slug(selection == 0 ? "03.06" : "03.07");
+            continue;
+        }
+        if (*slug == "21"){
+            selections[selection]->set_by_slug("03.08");
+            continue;
+        }
         if (*slug == "07.17" || *slug == "06-reselect" || *slug == "07-reselect"){
             selections[selection]->set_by_slug("checkpoint-reselect");
             continue;
@@ -580,6 +589,7 @@ void BDSPAutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     options.catch_box_legendary = CATCH_LEGENDARY;
 
     stats.starter_choice = options.starter_choice;
+    stats.outside_help = options.help_mode == HelpMode::OUTSIDE_HELP;
     switch (options.starter_choice){
     case StarterChoice::TURTWIG:
         stats.move_pp_capacity = {15, 15, 10, 25};
@@ -588,7 +598,7 @@ void BDSPAutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         stats.move_pp_capacity = {15, 15, 10, 15};
         break;
     case StarterChoice::PIPLUP:
-        stats.move_pp_capacity = {20, 10, 15, 35};
+        stats.move_pp_capacity = {20, 10, 15, 20};
         break;
     }
     // A direct main-story start requires full HP/PP, as described in the wiki.
@@ -623,7 +633,7 @@ void BDSPAutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 
             const auto& checkpoints = ALL_CHECKPOINTS();
 
-            for (size_t i = start; i <= end && i < checkpoints.size(); i++){
+            for (size_t i = start; i <= end && i < checkpoints.size() && !stats.hall_of_fame_save_verified; i++){
                 env.log("Running Checkpoint: " + std::to_string(i));
                 checkpoints[i]->run_checkpoint(env, context, options, stats);
                 if (tutorial && i + 1 == TUTORIAL_CHECKPOINT_COUNT){
@@ -635,7 +645,7 @@ void BDSPAutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             size_t start = std::stoul((tutorial ? START_SEGMENT : START_SEGMENT_MAINSTORY).slug());
             size_t end = std::stoul((tutorial ? END_SEGMENT : END_SEGMENT_MAINSTORY).slug());
 
-            for (size_t i = start; i <= end && i < segments.size(); i++){
+            for (size_t i = start; i <= end && i < segments.size() && !stats.hall_of_fame_save_verified; i++){
                 env.log("Running Segment: " + std::to_string(i));
                 segments[i]->run_segment(env, context, options, stats);
                 if (tutorial && i == 0){
@@ -667,6 +677,10 @@ void BDSPAutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             "close menus, and stand in front of the Jubilife PC facing north before starting Main Story at Segment 01.";
         MAINSTORY_NOTE.set_text(completion_message);
         MAINSTORY_NOTE.set_visibility(ConfigOptionState::ENABLED);
+    }else if (stats.hall_of_fame_save_verified){
+        completion_message = "Congratulations! Autostory Complete!";
+    }
+    if (!completion_message.empty()){
         env.log_to_ui(completion_message, COLOR_GREEN);
         env.console.log(completion_message, COLOR_GREEN);
     }

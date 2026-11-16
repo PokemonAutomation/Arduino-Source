@@ -42,7 +42,8 @@ void align_to_overworld_landmarks(VideoStream& stream,
     double moderate_entry_confidence = 0,
     bool* rock_acquisition_timed_out = nullptr);
 
-void verify_tutorial_settings(VideoStream& stream, ProControllerContext& context, Language language);
+// Assisted routes require Set; unassisted routes retain their current battle style.
+void verify_tutorial_settings(VideoStream& stream, ProControllerContext& context, Language language, bool set_battle_style);
 
 void set_time_fast(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -62,9 +63,10 @@ void fight_trainer_using_move_slot(VideoStream& stream,
     size_t move_slot,
     const std::string& label);
 
-void fight_tristan(VideoStream& stream, ProControllerContext& context);
-
-void fight_Natalie(VideoStream& stream, ProControllerContext& context);
+// Natalie and Logan use slot 3 and can prompt the starter to learn a move.
+void fight_tutorial_trainer(VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& trainer);
 
 // ---------------------------------------------------------------------------
 // Catching / healing
@@ -100,10 +102,6 @@ void walk_through_grass(VideoStream& stream,
     OverworldMatchResult (*destination)(const ImageRGB32&) = nullptr,
     bool fight_encounters = false,
     const AutoStoryOptions* training_options = nullptr);
-
-bool detect_black_screen_after_movement(VideoStream& stream, ProControllerContext& context, Milliseconds timeout);
-
-bool try_right_down_exit_search(VideoStream& stream, ProControllerContext& context, size_t iterations);
 
 void leave_pokemon_center_before_barry_1(VideoStream& stream, ProControllerContext& context);
 // ---------------------------------------------------------------------------

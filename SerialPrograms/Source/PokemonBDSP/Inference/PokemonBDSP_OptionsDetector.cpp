@@ -5,6 +5,7 @@
  */
 
 #include <algorithm>
+#include <array>
 #include <map>
 #include <vector>
 #include "Common/Cpp/Json/JsonArray.h"
@@ -14,7 +15,7 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonTools/OCR/OCR_NumberReader.h"
+#include "CommonTools/Images/ImageManip.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/OCR/OCR_StringNormalization.h"
 #include "PokemonBDSP_OptionsDetector.h"
@@ -25,11 +26,14 @@ namespace PokemonBDSP{
 
 bool TutorialOptionsDetector::detect(const ImageViewRGB32& screen) const{
     ImageViewRGB32 panel = extract_box_reference(screen, ImageFloatBox{0.04, 0.065, 0.93, 0.70});
-    size_t white = 0;
+    size_t white = 0, light_neutral = 0;
     for (size_t y = 0; y < panel.height(); y += 4){
         for (size_t x = 0; x < panel.width(); x += 4){
             uint32_t p = panel.pixel(x, y);
-            if (((p >> 16) & 255) > 225 && ((p >> 8) & 255) > 225 && (p & 255) > 225){
+            const int r = (p >> 16) & 255, g = (p >> 8) & 255, b = p & 255;
+            const int low = std::min({r, g, b});
+            light_neutral += low >= 145 && std::max({r, g, b}) - low < 35;
+            if (low > 225){
                 white++;
             }
         }
@@ -47,7 +51,11 @@ bool TutorialOptionsDetector::detect(const ImageViewRGB32& screen) const{
             total++;
         }
     }
-    return samples > 0 && white / samples > 0.70 && total > 0 && blue > total / 4;
+    if (samples == 0 || total == 0 || blue <= total / 4){
+        return false;
+    }
+    return white / samples > 0.70 || (light_neutral / samples > 0.70 &&
+        TutorialOptionPositionDetector().selected_row(screen) >= 0);
 }
 
 // Locate the two long red horizontal lines surrounding the
@@ -94,39 +102,42 @@ std::string TutorialOptionPositionDetector::read_text(Logger& logger, Language l
         return "";
     }
     static const std::map<std::string, std::vector<std::string>> choices{
-        {"textspeed", {"slow", "normal", "fast"}},
-        {"changewindow", {"type1", "type2", "type3", "type4", "type5", "type6", "type7", "type8", "type9", "type10", "type11", "type12", "type13", "type14", "type15", "type16", "type17", "type18", "type19", "type20", "type21", "type22", "type23", "type24"}},
-        {"battleeffects", {"on", "off"}},
-        {"battlestyle", {"switch", "set"}},
+        {"text-speed", {"slow", "normal", "fast"}},
+        {"change-window", {"type-1", "type-2", "type-3", "type-4", "type-5", "type-6", "type-7", "type-8", "type-9", "type-10", "type-11", "type-12", "type-13", "type-14", "type-15", "type-16", "type-17", "type-18", "type-19", "type-20", "type-21", "type-22", "type-23", "type-24"}},
+        {"battle-effects", {"on", "off"}},
+        {"battle-style", {"switch", "set"}},
         {"characters", {"hiragana", "kanji"}},
-        {"sendtoboxes", {"manual", "automatic"}},
-        {"givenicknames", {"give", "dontgive"}},
-        {"gyroscope", {"use", "dontuse"}},
+        {"send-to-boxes", {"manual", "automatic"}},
+        {"give-nicknames", {"give", "dont-give"}},
+        {"gyroscope", {"use", "dont-use"}},
         {"autosave", {"on", "off"}},
-        {"shownicknames", {"show", "dontshow"}},
-        {"backgroundmusic", {"volume0", "volume1", "volume2", "volume3", "volume4", "volume5", "volume6", "volume7", "volume8", "volume9", "volume10"}},
-        {"soundeffects", {"volume0", "volume1", "volume2", "volume3", "volume4", "volume5", "volume6", "volume7", "volume8", "volume9", "volume10"}},
-        {"pokemoncries", {"volume0", "volume1", "volume2", "volume3", "volume4", "volume5", "volume6", "volume7", "volume8", "volume9", "volume10"}},
-        {"verticalcamera", {"regular", "inverted"}},
-        {"horizontalcamera", {"regular", "inverted"}},
-        {"fossildiggingscreen", {"shake", "dontshake"}},
+        {"show-nicknames", {"show", "dont-show"}},
+        {"vertical-camera", {"regular", "inverted"}},
+        {"horizontal-camera", {"regular", "inverted"}},
+        {"fossil-digging-screen", {"shake", "dont-shake"}},
     };
     const auto setting = choices.find(row);
     if (!row.empty() && setting == choices.end()){
         return "";
     }
     const bool value = !row.empty();
-    const bool number = row == "backgroundmusic" || row == "soundeffects" || row == "pokemoncries";
-    // Retry unknown selected text with extra vertical padding for low-resolution glyphs.
-    for (size_t attempt = 0; attempt < (value && !number ? 2u : 1u); attempt++){
-        const double half_height = attempt == 0 ? 0.025 : 0.030;
-        const ImageFloatBox box = !value ? ImageFloatBox{0.08, y - 0.025, 0.24, 0.05}
-            : number ? ImageFloatBox{0.7728, y - 0.025, 0.0972, 0.05}
+    // Retry row labels with the original antialiased strokes. Window styles
+    // retain the wider second crop for the selected red text.
+    const size_t attempts = !value ? 3 : 2;
+    for (size_t attempt = 0; attempt < attempts; attempt++){
+        const double half_height = attempt + 1 == attempts ? 0.030 : 0.025;
+        const ImageFloatBox box = !value ? ImageFloatBox{0.08, y - half_height, 0.246, half_height * 2}
             : ImageFloatBox{0.33, y - half_height, 0.54, half_height * 2};
         const auto crop = extract_box_reference(screen, box);
         ImageRGB32 mask(crop.width(), crop.height());
         size_t ink_count = 0;
-        size_t on = 0, off = 0;
+        // Count ink near the beginning of each fixed choice; the positions
+        // are independent of the length of its translated label.
+        const size_t slots = value && setting->second.size() <= 3 ? setting->second.size() : 0;
+        const std::array<double, 3> starts{0.34, slots == 2 ? 0.635 : 0.525, 0.708};
+        std::array<size_t, 3> highlights{};
+        const auto background = crop.pixel(0, 0);
+        const int backdrop = ((background >> 16) & 255) + ((background >> 8) & 255) + (background & 255);
         size_t left = crop.width(), right = 0;
         std::vector<size_t> column_ink(crop.width(), 0);
         for (size_t py = 0; py < crop.height(); py++){
@@ -134,27 +145,28 @@ std::string TutorialOptionPositionDetector::read_text(Logger& logger, Language l
                 const uint32_t p = crop.pixel(px, py);
                 const int r = (p >> 16) & 255, g = (p >> 8) & 255, b = p & 255;
                 // Isolate the selected value; other choices are still visible in black.
-                const bool ink = value ? r > g + 30 && r > b + 30 : r + g + b < 500;
+                const bool ink = value ? r > g + 30 && r > b + 30 : r + g + b < std::min(500, backdrop - 120);
                 mask.pixel(px, py) = ink ? 0xff000000 : 0xffffffff;
                 if (ink){
                     ink_count++;
                     column_ink[px]++;
-                    if (value && !number){
+                    for (size_t i = 0; i < slots; i++){
                         const double x = 0.33 + 0.54 * px / crop.width();
-                        on += x >= 0.34 && x < 0.395;
-                        off += x >= 0.63 && x < 0.685;
+                        highlights[i] += x >= starts[i] && x < starts[i] + 0.045;
                     }
                 }
             }
         }
-        // Reuse the Autosave On/Off highlight positions. Short toggle labels are
-        // unreliable OCR inputs; require one clear selection and reject competition.
-        if (row == "autosave" || row == "battleeffects"){
+        if (slots != 0){
+            const auto best = std::max_element(highlights.begin(), highlights.end());
+            const size_t index = best - highlights.begin();
+            const size_t ink = *best;
+            *best = 0;
             const size_t minimum = std::max(size_t(3), screen.width() * screen.height() / 207360);
-            const std::string toggle = off >= minimum && on * 10 < off ? "off"
-                : on >= minimum && off * 10 < on ? "on" : "";
-            logger.log("[Options selection] " + row + ": " + (toggle.empty() ? "unknown" : toggle));
-            return toggle;
+            if (ink < minimum || *std::max_element(highlights.begin(), highlights.end()) * 10 >= ink){
+                return "";
+            }
+            return setting->second[index];
         }
         // Ignore isolated colored compression pixels when locating the text span.
         for (size_t px = 0; px < crop.width(); px++){
@@ -168,13 +180,14 @@ std::string TutorialOptionPositionDetector::read_text(Logger& logger, Language l
         }
         left = left > 8 ? left - 8 : 0;
         right = std::min(right + 8, crop.width());
-        const auto text_image = mask.sub_image(left, 0, right - left, mask.height()).scale_to(
-            std::max(size_t(1), (right - left) * 48 / mask.height()), 48);
-        const int numeric = number ? OCR::read_number(logger, text_image) : -1;
-        if (number && (numeric < 0 || numeric > 10)){
-            return "";
+        const bool original_label = !value && attempt == 1;
+        const auto region = original_label ? crop.sub_image(left, 0, right - left, crop.height())
+            : mask.sub_image(left, 0, right - left, mask.height());
+        auto text_image = region.scale_to(std::max(size_t(1), region.width() * 48 / region.height()), 48);
+        if (original_label){
+            text_image = pad_image(text_image, 8, 0xffffffff);
         }
-        const std::string text = number ? std::to_string(numeric) : OCR::ocr_read(language, text_image);
+        const std::string text = OCR::ocr_read(language, text_image);
         const auto normalized = OCR::normalize_utf32(text);
         if (normalized.empty()){
             continue;
@@ -190,8 +203,8 @@ std::string TutorialOptionPositionDetector::read_text(Logger& logger, Language l
         }
         std::string token;
         for (const auto& candidate : candidates){
-            const auto& translations = dictionary.to_object_throw().get_object_throw(candidate);
-            const auto& translation = translations.get_value_throw(language_data(language).code);
+            const auto& translations = dictionary.to_object_throw().get_object_throw(language_data(language).code);
+            const auto& translation = translations.get_value_throw(candidate);
             bool matched = false;
             if (translation.is_array()){
                 for (const auto& spelling : translation.to_array_throw()){

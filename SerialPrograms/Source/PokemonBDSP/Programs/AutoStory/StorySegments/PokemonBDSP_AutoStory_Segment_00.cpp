@@ -68,7 +68,7 @@ static void recorded_move_until_transition(VideoStream& stream,
                 pbf_move_left_joystick(ctx, {x, y}, duration, 0ms);
             }
             // Keep observing a delayed fade after the movement hold ends.
-            pbf_wait(ctx, 5000ms);
+            pbf_wait(ctx, 6000ms);
         },
         {{black}});
     if (ret != 0){
@@ -77,7 +77,7 @@ static void recorded_move_until_transition(VideoStream& stream,
             stream);
     }
     BlackScreenWatcher visible(COLOR_RED, {0.1, 0.1, 0.8, 0.8}, 100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
-    if (wait_until(stream, context, 15s, {{visible}}) != 0){
+    if (wait_until(stream, context, 16s, {{visible}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             label + ": Transition did not finish.",
             stream);
@@ -85,9 +85,14 @@ static void recorded_move_until_transition(VideoStream& stream,
     stream.log("[Tutorial transition] " + label + ": destination visible.");
 }
 
-static void select_turtwig(VideoStream& stream, ProControllerContext& context){
-    stream.log("[DEBUG] Turtwig Selection: Starting starter selection");
+static void select_starter(VideoStream& stream,
+    ProControllerContext& context,
+    const std::string& name,
+    size_t right_presses){
+    stream.log("[DEBUG] " + name + " Selection: Starting starter selection");
 
+    DpadState dpad;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 160ms, 840ms, right_presses, false);
     pbf_press_button(context, BUTTON_ZL, 160ms, 240ms);
     context.wait_for_all_requests();
 
@@ -107,81 +112,14 @@ static void select_turtwig(VideoStream& stream, ProControllerContext& context){
             },
             {watcher_red});
     }
-    stream.log(ret == 0 ? "[DEBUG] Turtwig Selection: Confirmation dialogue detected"
-        : "[WARNING] Turtwig Selection: Dialogue detection failed, proceeding anyway");
+    stream.log(ret == 0 ? "[DEBUG] " + name + " Selection: Confirmation dialogue detected"
+        : "[WARNING] " + name + " Selection: Dialogue detection failed, proceeding anyway");
 
     pbf_wait(context, 400ms);
     pbf_press_dpad(context, DPAD_UP, 80ms, 400ms);
     pbf_press_button(context, BUTTON_ZL, 80ms, 5000ms);
     context.wait_for_all_requests();
-    stream.log("[DEBUG] Turtwig Selection: Selection complete");
-}
-
-static void select_chimchar(VideoStream& stream, ProControllerContext& context){
-    stream.log("[DEBUG] Chimchar Selection: Starting starter selection");
-
-    pbf_press_dpad(context, DPAD_RIGHT, 160ms, 840ms);
-    pbf_press_button(context, BUTTON_ZL, 160ms, 240ms);
-    context.wait_for_all_requests();
-
-    ShortDialogWatcher watcher(COLOR_CYAN);
-    int ret = run_until<ProControllerContext>(stream,
-        context,
-        [](ProControllerContext& ctx){
-            ctx.wait_for(std::chrono::milliseconds(5000));
-        },
-        {watcher});
-    if (ret != 0){
-        ShortDialogWatcher watcher_red(COLOR_RED);
-        ret = run_until<ProControllerContext>(stream,
-            context,
-            [](ProControllerContext& ctx){
-                ctx.wait_for(std::chrono::milliseconds(5000));
-            },
-            {watcher_red});
-    }
-    stream.log(ret == 0 ? "[DEBUG] Chimchar Selection: Confirmation dialogue detected"
-        : "[WARNING] Chimchar Selection: Dialogue detection failed, proceeding anyway");
-
-    pbf_wait(context, 400ms);
-    pbf_press_dpad(context, DPAD_UP, 80ms, 400ms);
-    pbf_press_button(context, BUTTON_ZL, 80ms, 5000ms);
-    context.wait_for_all_requests();
-    stream.log("[DEBUG] Chimchar Selection: Selection complete");
-}
-
-static void select_piplup(VideoStream& stream, ProControllerContext& context){
-    stream.log("[DEBUG] Piplup Selection: Starting starter selection");
-
-    pbf_press_dpad(context, DPAD_RIGHT, 160ms, 840ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 160ms, 840ms);
-    pbf_press_button(context, BUTTON_ZL, 160ms, 240ms);
-    context.wait_for_all_requests();
-
-    ShortDialogWatcher watcher(COLOR_CYAN);
-    int ret = run_until<ProControllerContext>(stream,
-        context,
-        [](ProControllerContext& ctx){
-            ctx.wait_for(std::chrono::milliseconds(5000));
-        },
-        {watcher});
-    if (ret != 0){
-        ShortDialogWatcher watcher_red(COLOR_RED);
-        ret = run_until<ProControllerContext>(stream,
-            context,
-            [](ProControllerContext& ctx){
-                ctx.wait_for(std::chrono::milliseconds(5000));
-            },
-            {watcher_red});
-    }
-    stream.log(ret == 0 ? "[DEBUG] Piplup Selection: Confirmation dialogue detected"
-        : "[WARNING] Piplup Selection: Dialogue detection failed, proceeding anyway");
-
-    pbf_wait(context, 400ms);
-    pbf_press_dpad(context, DPAD_UP, 80ms, 400ms);
-    pbf_press_button(context, BUTTON_ZL, 80ms, 5000ms);
-    context.wait_for_all_requests();
-    stream.log("[DEBUG] Piplup Selection: Selection complete");
+    stream.log("[DEBUG] " + name + " Selection: Selection complete");
 }
 
 // Navigation functions for each part of the tutorial. These functions are meant to be used
@@ -219,13 +157,16 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_wait(context, 300ms);
     context.wait_for_all_requests();
 
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 680ms, 4000ms);
+    recorded_move_until_transition(stream, context, 0, -1, 680ms, "Twinleaf home first exit");
 
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1748ms, 0ms);
     pbf_move_left_joystick(context, {-1.000000, 1.000000}, 18ms, 0ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 2763ms, 0ms);
     pbf_move_left_joystick(context, {-1.000000, 1.000000}, 58ms, 0ms);
-    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1364ms, 4000ms);
+    pbf_move_left_joystick(context, {-1.000000, -0.000000}, 1364ms, 0ms);
+    DpadState dpad;
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 1);
+    pbf_wait(context, 4000ms);
     context.wait_for_all_requests();
 
     wait_for_dialog(stream, context, "Phase 3 (Barry 1st)");
@@ -240,7 +181,7 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     int entry_ret = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& ctx){
-            pbf_move_left_joystick(ctx, {0, 1}, 5000ms, 0ms);
+            pbf_move_left_joystick(ctx, {0, 1}, 5000ms, 1000ms);
         },
         {{entry_black}});
     if (entry_ret != 0){
@@ -256,7 +197,7 @@ tutorial_part_1_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
         10,
         BlackScreenWatcher::FinderType::GONE,
         500ms);
-    if (wait_until(stream, context, 15s, {{entry_visible}}) != 0){
+    if (wait_until(stream, context, 16s, {{entry_visible}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Barry house: Entry fade did not finish.",
             stream);
@@ -388,7 +329,7 @@ tutorial_part_2_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     recorded_move_until_transition(stream, context, 0, 0, 90000ms, "Returning home after meeting Rowan", true);
     wait_for_dialog(stream, context, "Mom and Running Shoes", 20s);
     clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 820ms, 4000ms);
+    recorded_move_until_transition(stream, context, 0, -1, 820ms, "Twinleaf home exit after Running Shoes");
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 800ms, 555ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 50ms, 23ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 5020ms, 169ms);
@@ -495,7 +436,7 @@ tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 220ms, 587ms);
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1375ms, 464ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 775ms, 1655ms);
-    pbf_move_left_joystick(context, {0.000000, 1.000000}, 640ms, 3128ms);
+    recorded_move_until_transition(stream, context, 0, 1, 640ms, "Twinleaf home entrance for parcel");
     pbf_press_dpad(context, DPAD_UP, 180ms, 472ms);
     pbf_press_dpad(context, DPAD_UP, 130ms, 1621ms);
     pbf_press_dpad(context, DPAD_RIGHT, 130ms, 0ms);
@@ -582,88 +523,6 @@ tutorial_part_3_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
     context.wait_for_all_requests();
 }
 
-// Align to a route reference before continuing navigation. Matcher offsets and thresholds are
-// fractions of screen width/height.
-static void align_to_tutorial_landmarks(VideoStream& stream,
-    ProControllerContext& context,
-    OverworldMatchResult (*matcher)(const ImageRGB32&),
-    const std::string& label){
-    context.wait_for_all_requests();
-    pbf_wait(context, 700ms);
-    context.wait_for_all_requests();
-    size_t confirmations = 0, coarse_confirmations = 0;
-    double previous_dx = 0, previous_dy = 0;
-    for (size_t attempt = 0; attempt < 60; attempt++){
-        const auto frame = stream.video().snapshot();
-        if (!frame){
-            OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                label + ": No video frame.",
-                stream);
-        }
-        const auto result = matcher(*frame.frame);
-        VideoOverlaySet overlays(stream.overlay());
-        for (const auto& landmark : result.landmarks){
-            overlays.add(COLOR_CYAN, landmark.search);
-            if (landmark.accepted){
-                overlays.add(COLOR_GREEN, landmark.found);
-            }
-            stream.log("[" + label + "] " + landmark.name + " score=" + std::to_string(landmark.score) +
-                " margin=" + std::to_string(landmark.margin) + " accepted=" + std::to_string(landmark.accepted) +
-                " screen-relative offset=(" + std::to_string(landmark.dx) + "," + std::to_string(landmark.dy) + ")");
-        }
-        stream.log("[" + label + "] located=" + std::to_string(result.located) +
-            " mode=" + (result.coarse ? "vertical acquisition" : "fine alignment") +
-            " reference screen-relative offset=(" + std::to_string(result.dx) + "," + std::to_string(result.dy) + ")");
-        if (result.coarse && result.located){
-            if (coarse_confirmations && std::abs(result.dx - previous_dx) <= 0.00625 &&
-                std::abs(result.dy - previous_dy) <= 1.0 / 90){
-                coarse_confirmations++;
-            }else{
-                coarse_confirmations = 1;
-            }
-            previous_dx = result.dx;
-            previous_dy = result.dy;
-        }else{
-            coarse_confirmations = 0;
-        }
-        if (!result.located){
-            confirmations = 0;
-            pbf_wait(context, 250ms);
-        }else if (result.coarse && coarse_confirmations < 3){
-            confirmations = 0;
-            stream.log("[" + label + "] Waiting for consistent vertical acquisition.");
-            pbf_wait(context, 250ms);
-        }else if (result.at_target){
-            if (++confirmations >= 3){
-                stream.log("[" + label + "] Reference position confirmed.");
-                return;
-            }
-            pbf_wait(context, 300ms);
-        }else{
-            confirmations = 0;
-            const bool horizontal = !result.coarse && std::abs(result.dx) >= std::abs(result.dy) * 9.0 / 16;
-            const double error = horizontal ? result.dx : result.dy * 9.0 / 16;
-            const auto duration = std::abs(error) > 1.0 / 24 ? 80ms : std::abs(error) > 0.015625 ? 40ms : 16ms;
-            stream.log("[" + label + "] Correcting " + std::string(horizontal ? "horizontal" : "vertical") + " axis " +
-                (horizontal ? (result.dx > 0 ? "right" : "left") : (result.dy < 0 ? "up" : "down")) + " for " +
-                std::to_string(duration.count()) + "ms.");
-            // Reuse confirmed-Run encounter handling if correction enters grass.
-            walk_through_grass(stream,
-                context,
-                horizontal ? (result.dx > 0 ? 1 : -1) : 0,
-                horizontal ? 0 : (result.dy < 0 ? 1 : -1),
-                1,
-                label,
-                BattleType::STANDARD,
-                duration);
-        }
-        context.wait_for_all_requests();
-    }
-    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-        label + ": Reference position not confirmed; route movement stopped.",
-        stream);
-}
-
 // Resumes from the save made after catching the second Pokemon.
 static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironment& env,
     VideoStream& stream,
@@ -684,7 +543,7 @@ static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironmen
     wait_for_dialog(stream, context, "Phase 18 (tristan encounter dialog)");
 
     // The battle helper advances the introduction while watching for commands.
-    fight_tristan(stream, context);
+    fight_trainer_using_move_slot(stream, context, 3, "Tristan (move slot 3)");
 
     use_potion_first_pokemon(stream, context, options.language);
     context.wait_for_all_requests();
@@ -697,7 +556,7 @@ static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironmen
     wait_for_dialog(stream, context, "Phase 19 (natalie encounter dialog)");
 
     // The battle helper advances the introduction while watching for commands.
-    fight_Natalie(stream, context);
+    fight_tutorial_trainer(stream, context, "Natalie");
     context.wait_for_all_requests();
     use_potion_first_pokemon(stream, context, options.language);
     context.wait_for_all_requests();
@@ -709,7 +568,7 @@ static void tutorial_part_3_after_catch_navigation(SingleSwitchProgramEnvironmen
 
     wait_for_dialog(stream, context, "Phase 20 (logan encounter dialog)");
 
-    fight_Natalie(stream, context);
+    fight_tutorial_trainer(stream, context, "Logan");
     context.wait_for_all_requests();
     use_potion_first_pokemon(stream, context, options.language);
     context.wait_for_all_requests();
@@ -1011,9 +870,9 @@ tutorial_part_4_navigation(SingleSwitchProgramEnvironment& env, VideoStream& str
 
     clear_dialog(stream, context, ClearDialogMode::STOP_OVERWORLD, 60, BUTTON_B, 6000ms);
     context.wait_for_all_requests();
-    pbf_move_left_joystick(context, {0.000000, -1.000000}, 1521ms, 602ms);
-    pbf_move_left_joystick(context, {1.000000, -0.000000}, 1100ms, 500ms);
-    pbf_press_dpad(context, DPAD_RIGHT, 138ms, 500ms);
+    recorded_move_until_transition(stream, context, 0, -1, 1521ms, "Jubilife Trainers School exit");
+    dpad.last_dir = DPAD_DOWN;
+    repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 5);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 1018ms, 500ms);
 
     wait_for_dialog(stream, context, "Phase 23 (poketech challenge dialog)");
@@ -1170,7 +1029,7 @@ void checkpoint_0000(SingleSwitchProgramEnvironment& env,
     AutoStoryStats& /*stats*/){
     // Before any route movement or checkpoint save: fail visibly if
     // options cannot be read, rather than navigate with unknown settings.
-    verify_tutorial_settings(env.console, context, options.language);
+    verify_tutorial_settings(env.console, context, options.language, options.help_mode == HelpMode::OUTSIDE_HELP);
     context.wait_for_all_requests();
 }
 
@@ -1237,13 +1096,13 @@ void checkpoint_0002(SingleSwitchProgramEnvironment& env,
             // Segment 00-00 starter selection
             switch (options.starter_choice){
             case StarterChoice::TURTWIG:
-                select_turtwig(env.console, context);
+                select_starter(env.console, context, "Turtwig", 0);
                 break;
             case StarterChoice::CHIMCHAR:
-                select_chimchar(env.console, context);
+                select_starter(env.console, context, "Chimchar", 1);
                 break;
             case StarterChoice::PIPLUP:
-                select_piplup(env.console, context);
+                select_starter(env.console, context, "Piplup", 2);
                 break;
             }
             fight_starly(env.console, context);

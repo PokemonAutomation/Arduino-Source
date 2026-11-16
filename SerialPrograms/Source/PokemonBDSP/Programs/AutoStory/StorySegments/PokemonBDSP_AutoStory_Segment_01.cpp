@@ -83,9 +83,8 @@ static bool try_detect_dialogue(VideoStream& stream,
     size_t attempts = 3,
     std::chrono::milliseconds window = 5000ms){
     for (size_t attempt = 0; attempt < attempts; attempt++){
-        ShortDialogWatcher watcher_cyan(COLOR_CYAN);
-        ShortDialogWatcher watcher_red(COLOR_RED);
-        if (wait_until(stream, context, window, {{watcher_cyan}, {watcher_red}}) >= 0){
+        ShortDialogWatcher dialogue(COLOR_CYAN);
+        if (wait_until(stream, context, window, {{dialogue}}) == 0){
             stream.log(label + " dialogue detected.");
             return true;
         }
@@ -103,7 +102,7 @@ struct DoorwayWalkOptions {
     //  Extra walking allowed beyond `travel_time` before giving up.
     std::chrono::milliseconds grace = 1600ms;
     //  How long to watch for a black screen after each step.
-    std::chrono::milliseconds black_screen_window = 1500ms;
+    std::chrono::milliseconds black_screen_window = 2500ms;
     //  Bound the wait for a command menu after recognizing a battle introduction.
     std::chrono::milliseconds battle_menu_window = 20000ms;
     size_t max_battles = 10;
@@ -181,6 +180,7 @@ static std::chrono::milliseconds walk_until_doorway(VideoStream& stream,
                     for (size_t attempt = 0; attempt < 6; attempt++){
                         pbf_press_button(controller, BUTTON_X, 80ms, 2920ms);
                     }
+                    pbf_wait(controller, 1000ms);
                     controller.wait_for_all_requests();
                 },
                 {battle_menu, battle_dialog, game_menu});
@@ -204,8 +204,8 @@ static std::chrono::milliseconds walk_until_doorway(VideoStream& stream,
                     BlackScreenWatcher visible(COLOR_YELLOW, {0.1, 0.1, 0.8, 0.8},
                         100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
                     OverworldWatcher overworld;
-                    closed = wait_until(stream, context, 2s, {{visible}}) == 0 &&
-                        wait_until(stream, context, 2s, {{overworld}}) == 0;
+                    closed = wait_until(stream, context, 3s, {{visible}}) == 0 &&
+                        wait_until(stream, context, 3s, {{overworld}}) == 0;
                 }
                 if (!closed){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
@@ -256,7 +256,6 @@ void jubilife_to_oreburgh_gate(SingleSwitchProgramEnvironment& env,
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 1465ms, 127ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 644ms, 698ms);
     leave_pokemon_center_before_barry_1(stream, context);
-    pbf_wait(context, 2340ms);
     pbf_move_left_joystick(context, {-1.000000, -0.000000}, 742ms, 348ms);
     pbf_move_left_joystick(context, {0.000000, 1.000000}, 2694ms, 482ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 3810ms, 0ms);
@@ -348,35 +347,12 @@ void oreburgh_gate_to_mine(SingleSwitchProgramEnvironment& env, VideoStream& str
     pbf_move_left_joystick(context, {0.000000, -1.000000}, 319ms, 0ms);
     pbf_move_left_joystick(context, {1.000000, -1.000000}, 332ms, 0ms);
     pbf_move_left_joystick(context, {1.000000, -0.000000}, 3124ms, 23ms);
-    bool black_screen_found = false;
-    for (size_t attempt = 0; attempt < 3 && !black_screen_found; attempt++){
-        BlackScreenWatcher black_screen;
-        int ret = run_until<ProControllerContext>(stream,
-            context,
-            [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0.000000, -1.000000}, 4740ms, 0ms);
-            },
-            {black_screen});
-        if (ret == 0){
-            stream.log("Black screen detected.");
-            black_screen_found = true;
-        }
-    }
-    context.wait_for_all_requests();
-
-    if (!black_screen_found){
-        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "oreburgh_gate_to_mine: No black screen after 3 attempts.",
-            stream);
-    }
-
-    //  Let the mine entrance transition fully finish so the next step's black screen
-    //  watcher can't pick up the tail of this one.
-    BlackScreenOverWatcher black_over;
-    wait_until(stream, context, 6000ms, {{black_over}});
-    context.wait_for_all_requests();
-    pbf_wait(context, 2000ms);
-    context.wait_for_all_requests();
+    watch_doorway_transition(stream, context, "Oreburgh Mine entrance",
+        [](ProControllerContext& ctx){
+            for (size_t attempt = 0; attempt < 3; attempt++){
+                pbf_move_left_joystick(ctx, {0, -1}, 4740ms, 0ms);
+            }
+        });
 }
 
 // Diagnostic only: identifies the entrance start without moving the player.
@@ -603,7 +579,7 @@ static bool mine_escape_and_settle(VideoStream& stream, ProControllerContext& co
         BlackScreenWatcher::FinderType::GONE,
         500ms);
 
-    if (wait_until(stream, context, 8s, {{visible}}) != 0){
+    if (wait_until(stream, context, 9s, {{visible}}) != 0){
         stream.log("[Mine encounter] Screen did not return. Stopping.", COLOR_ORANGE);
         return false;
     }
@@ -1567,13 +1543,6 @@ static bool mine_talk_to_roark(VideoStream& stream, ProControllerContext& contex
     return false;
 }
 
-// Retain the developer test entry point; both callers share the same route.
-bool oreburgh_mine_first_leg_test(VideoStream& stream,
-    ProControllerContext& context,
-    const MineRouteTestOptions& options){
-    return oreburgh_mine_route(stream, context, options);
-}
-
 // Shared final step for the live route and the entrance-start test.
 static bool mine_talk_and_escape(VideoStream& stream, ProControllerContext& context, Language language){
     if (!mine_talk_to_roark(stream, context)){
@@ -1590,7 +1559,7 @@ static bool mine_talk_and_escape(VideoStream& stream, ProControllerContext& cont
 bool oreburgh_mine_route_and_escape_test(VideoStream& stream, ProControllerContext& context, Language language){
     MineRouteTestOptions route;
     route.reset_on_failure = false;
-    if (!oreburgh_mine_first_leg_test(stream, context, route)){
+    if (!oreburgh_mine_route(stream, context, route)){
         return false;
     }
     try {
@@ -1658,7 +1627,7 @@ void oreburgh_mine_to_gym(SingleSwitchProgramEnvironment& env, VideoStream& stre
             // The watcher covers every entry attempt and correction, so a fade
             // cancels all remaining outdoor movement immediately.
             repeat_dpad(ctx, dpad, DPAD_UP, 80ms, 300ms, 2);
-            pbf_wait(ctx, 5000ms);
+            pbf_wait(ctx, 6000ms);
             ctx.wait_for_all_requests();
 
             // If the approach stops at the left pillar, slide northeast toward the door once. The
@@ -1668,7 +1637,7 @@ void oreburgh_mine_to_gym(SingleSwitchProgramEnvironment& env, VideoStream& stre
             // Diagonal input can leave either cardinal facing. Let repeat_dpad
             // establish facing again before any later landmark correction.
             dpad = DpadState{};
-            pbf_wait(ctx, 5000ms);
+            pbf_wait(ctx, 6000ms);
             ctx.wait_for_all_requests();
 
             stream.log("[Mine to gym] Entry still missing; acquiring gym sign and doorway emblem.");
@@ -1703,7 +1672,7 @@ void oreburgh_mine_to_gym(SingleSwitchProgramEnvironment& env, VideoStream& stre
                     if (++confirmations >= 3){
                         stream.log("[Mine to gym] Gym landmarks aligned; making final entry attempt.");
                         repeat_dpad(ctx, dpad, DPAD_UP, 80ms, 300ms, 2);
-                        pbf_wait(ctx, 5000ms);
+                        pbf_wait(ctx, 6000ms);
                         ctx.wait_for_all_requests();
                         return;
                     }
@@ -1738,7 +1707,7 @@ void oreburgh_mine_to_gym(SingleSwitchProgramEnvironment& env, VideoStream& stre
         10,
         BlackScreenWatcher::FinderType::GONE,
         500ms);
-    if (wait_until(stream, context, 15s, {{visible}}) != 0){
+    if (wait_until(stream, context, 16s, {{visible}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Oreburgh Gym entry: Transition did not finish.",
             stream);
@@ -1802,7 +1771,7 @@ void gym_Puzzle_01(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
             for (int i = 0; i < 21; i++){
                 pbf_press_dpad(ctx, DPAD_DOWN, 80ms, 300ms);
             }
-            pbf_wait(ctx, 5000ms);
+            pbf_wait(ctx, 6000ms);
         },
         {{leaving}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
@@ -1814,7 +1783,7 @@ void gym_Puzzle_01(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
         10,
         BlackScreenWatcher::FinderType::GONE,
         500ms);
-    if (wait_until(stream, context, 15s, {{visible}}) != 0){
+    if (wait_until(stream, context, 16s, {{visible}}) != 0){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Oreburgh Gym exit: Transition did not finish.", stream);
     }
@@ -1825,7 +1794,7 @@ void gym_Puzzle_01(SingleSwitchProgramEnvironment& env, VideoStream& stream, Pro
 
 
 std::string AutoStory_Segment_01::name() const {
-    return "01: Jubilife City to First Badge";
+    return "01: Jubilife to Oreburgh";
 }
 std::string AutoStory_Segment_01::start_text() const {
     return AutoStory_checkpoint_0101().start_text();
@@ -1921,8 +1890,7 @@ void checkpoint_0102(SingleSwitchProgramEnvironment& env,
         [&](size_t /*attempt*/){
             oreburgh_gate_to_mine(env, env.console, context);
             oreburgh_mine_nav(env.console, context, options.language);
-            // Standalone test entry points are not part of the checkpoint route.
-            // oreburgh_mine_first_leg_test(env.console, context);
+            // Standalone mine route and escape test:
             // oreburgh_mine_route_and_escape_test(env.console, context, options.language);
             oreburgh_mine_to_gym(env, env.console, context);
         },

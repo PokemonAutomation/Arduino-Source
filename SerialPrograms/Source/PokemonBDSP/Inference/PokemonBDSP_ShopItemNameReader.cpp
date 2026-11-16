@@ -4,6 +4,7 @@
  *
  */
 
+#include <set>
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonValue.h"
@@ -18,7 +19,10 @@ namespace PokemonBDSP{
 
 ShopItemNameReader::ShopItemNameReader()
     : SmallDictionaryMatcher([](){
-        // Reuse shared item categories and Ball/Berry names, plus BDSP TMs.
+        std::set<std::string> language_codes;
+        for (int i = (int)Language::English; i < (int)Language::EndOfList; i++){
+            language_codes.insert(language_data((Language)i).code);
+        }
         JsonObject dictionary;
         for (const char* resource : {
             "Pokemon/ItemNameDisplay.json",
@@ -32,23 +36,27 @@ ShopItemNameReader::ShopItemNameReader()
             "PokemonBDSP/BDSP_TM.json",
         }){
             const JsonValue names = load_json_file(RESOURCE_PATH() + resource);
-            for (const auto& item : names.to_object_throw()){
-                for (const auto& translation : item.second.to_object_throw()){
-                    JsonValue& language = dictionary[translation.first];
+            // Item categories are keyed by language. Display names, TMs and older
+            // category files are keyed by item. The matcher expects language first.
+            for (const auto& [group, entries] : names.to_object_throw()){
+                const bool language_first = language_codes.contains(group);
+                for (const auto& [key, translation] : entries.to_object_throw()){
+                    const std::string& slug = language_first ? key : group;
+                    JsonValue& language = dictionary[language_first ? group : key];
                     if (language.is_null()){
                         language = JsonObject();
                     }
-                    JsonValue& entry = language.to_object_throw()[item.first];
+                    JsonValue& entry = language.to_object_throw()[slug];
                     if (entry.is_null()){
                         entry = JsonArray();
                     }
                     JsonArray& candidates = entry.to_array_throw();
                     // TMs have both a numbered item label and a localized move name.
-                    const JsonArray* aliases = translation.second.to_array();
+                    const JsonArray* aliases = translation.to_array();
                     const size_t count = aliases ? aliases->size() : 1;
                     for (size_t i = 0; i < count; i++){
                         const std::string& name = aliases ? (*aliases)[i].to_string_throw() :
-                            translation.second.to_string_throw();
+                            translation.to_string_throw();
                         bool present = false;
                         for (const auto& candidate : candidates){
                             if (candidate.to_string_throw() == name){

@@ -54,7 +54,7 @@ move_back_after_unexpected_battle(VideoStream& stream, ProControllerContext& con
     }
 }
 
-static bool handle_battle(VideoStream& stream,
+static void handle_battle(VideoStream& stream,
     ProControllerContext& context,
     const std::string& trainerid,
     AutoStoryStats& stats){
@@ -63,7 +63,6 @@ static bool handle_battle(VideoStream& stream,
         trainerid == "route_213_beauty_cindy"){
         move_back_after_unexpected_battle(stream, context, trainerid);
     }
-    return true;
 }
 
 // ---------------------------------------------------------------------------
@@ -95,7 +94,7 @@ static bool leave_gym(VideoStream& stream, ProControllerContext& context){
     int ret = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {0, -1}, 10000ms, 0ms);
+            pbf_move_left_joystick(context, {0, -1}, 10000ms, 1000ms);
         },
         {{black_screen}});
     if (ret < 0){
@@ -132,7 +131,7 @@ static bool go_to_veilstone_pokemon_center(VideoStream& stream, ProControllerCon
     int ret = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            pbf_move_left_joystick(context, {0, +1}, 10000ms, 1100ms);
         },
         {{black_screen1}});
     if (ret < 0){
@@ -144,10 +143,6 @@ static bool go_to_veilstone_pokemon_center(VideoStream& stream, ProControllerCon
 
     stream.log("go_to_veilstone_pokemon_center: transition confirmed.");
     return true;
-}
-
-static bool heal_at_pokemon_center(VideoStream& stream, ProControllerContext& context, AutoStoryStats& stats){
-    return heal_pokemon(stream, context, "Veilstone", &stats);
 }
 
 static bool go_to_galactic_warehouse(VideoStream& stream, ProControllerContext& context){
@@ -169,6 +164,7 @@ static bool go_to_galactic_warehouse(VideoStream& stream, ProControllerContext& 
         context,
         [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_A, 12000ms);
+            pbf_wait(context, 1000ms);
         },
         {{battle_black_screen}});
     if (ret < 0){
@@ -197,7 +193,7 @@ static bool enter_galactic_warehouse(VideoStream& stream, ProControllerContext& 
     int ret = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {0, +1}, 10000ms, 100ms);
+            pbf_move_left_joystick(context, {0, +1}, 10000ms, 1100ms);
         },
         {{black_screen_1}});
     if (ret < 0){
@@ -233,7 +229,7 @@ static bool exit_galactic_warehouse(VideoStream& stream, ProControllerContext& c
         return false;
     }
     if (ret == 0){
-        stream.log("enter_galactic_warehouse_getting_fly_TM: getting TM Fly not detected!");
+        stream.log("Galactic warehouse: Fly TM pickup dialogue detected.");
         pbf_mash_button(context, BUTTON_A, 9000ms);
     };
 
@@ -249,7 +245,7 @@ static bool exit_galactic_warehouse(VideoStream& stream, ProControllerContext& c
     ret = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+            pbf_move_left_joystick(context, {0, -1}, 10000ms, 1100ms);
         },
         {{black_screen_2}});
     if (ret < 0){
@@ -286,7 +282,7 @@ static bool go_to_route_214(VideoStream& stream, ProControllerContext& context){
     int ret = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+            pbf_move_left_joystick(context, {0, -1}, 10000ms, 1100ms);
         },
         {{black_screen_1}});
     if (ret < 0){
@@ -302,7 +298,7 @@ static bool go_to_route_214(VideoStream& stream, ProControllerContext& context){
     ret = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {0, -1}, 10000ms, 100ms);
+            pbf_move_left_joystick(context, {0, -1}, 10000ms, 1100ms);
         },
         {{black_screen_2}});
     if (ret < 0){
@@ -319,6 +315,7 @@ static bool go_to_route_214(VideoStream& stream, ProControllerContext& context){
         context,
         [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_A, 200000ms);
+            pbf_wait(context, 1000ms);
         },
         {{black_screen}});
     if (ret < 0){
@@ -360,6 +357,7 @@ walk_through_route_214(VideoStream& stream, ProControllerContext& context, AutoS
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -398,6 +396,7 @@ walk_through_route_214(VideoStream& stream, ProControllerContext& context, AutoS
                 context,
                 [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_A, 200000ms);
+                    pbf_wait(context, 1000ms);
                 },
                 {{black_screen}});
             if (ret < 0){
@@ -467,7 +466,7 @@ static bool pass_by_valor_lakefront(VideoStream& stream, ProControllerContext& c
     int ret = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {0, -1}, 30000ms, 100ms);
+            pbf_move_left_joystick(context, {0, -1}, 30000ms, 1100ms);
         },
         {{black_screen}});
     if (ret < 0){
@@ -478,38 +477,23 @@ static bool pass_by_valor_lakefront(VideoStream& stream, ProControllerContext& c
     return true;
 }
 
-static bool go_through_building_route_213(VideoStream& stream, ProControllerContext& context){
-    stream.log("Going through building between routes 214 and 213");
-    context.wait_for_all_requests();
+static void go_through_building_route_213(VideoStream& stream, ProControllerContext& context){
+    stream.log("[Route 213 gatehouse] Crossing south toward Route 213.");
     pbf_wait(context, 2000ms);
-    ShortDialogWatcher repel_ran_out(COLOR_CYAN);
-    int ret = run_until<ProControllerContext>(stream,
-        context,
-        [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {0, -1}, 30000ms, 100ms);
-        },
-        {{repel_ran_out}});
-    if (ret == 0){
-        stream.log("go_through_building_route_214: Not reapplying repel.", COLOR_RED);
-        pbf_mash_button(context, BUTTON_B, 2000ms);
-    }
-
-    context.wait_for_all_requests();
-
-    BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-    ret = run_until<ProControllerContext>(stream,
-        context,
-        [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {0, -1}, 30000ms, 100ms);
-        },
-        {{black_screen}});
-    if (ret < 0){
-        stream.log("go_through_building_route_214: Didn't exit building!", COLOR_RED);
-        return false;
-    }
-    stream.log("go_through_building_route_214: transition confirmed.");
-
-    return true;
+    watch_doorway_transition(stream, context, "Route 213 south gatehouse exit",
+        [&stream](ProControllerContext& ctx){
+            ShortDialogWatcher repel_expired(COLOR_CYAN);
+            const int result = run_until<ProControllerContext>(stream, ctx,
+                [](ProControllerContext& walking){
+                    pbf_move_left_joystick(walking, {0, -1}, 30000ms, 100ms);
+                },
+                {{repel_expired}});
+            if (result == 0){
+                stream.log("[Route 213 gatehouse] Declining Repel renewal before exiting.");
+                pbf_mash_button(ctx, BUTTON_B, 2000ms);
+                pbf_move_left_joystick(ctx, {0, -1}, 30000ms, 100ms);
+            }
+        });
 }
 
 static bool
@@ -538,6 +522,7 @@ go_through_route_213(VideoStream& stream, ProControllerContext& context, AutoSto
             context,
             [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 200000ms);
+                pbf_wait(context, 1000ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -569,6 +554,7 @@ go_through_route_213(VideoStream& stream, ProControllerContext& context, AutoSto
             context,
             [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 200000ms);
+                pbf_wait(context, 1000ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -601,6 +587,7 @@ go_through_route_213(VideoStream& stream, ProControllerContext& context, AutoSto
             context,
             [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 200000ms);
+                pbf_wait(context, 1000ms);
             },
             {{black_screen}});
         if (ret < 0){
@@ -631,7 +618,7 @@ go_through_route_213(VideoStream& stream, ProControllerContext& context, AutoSto
     ret = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms);
+            pbf_move_left_joystick(context, {-1, 0}, 100000ms, 1100ms);
         },
         {{black_screen}});
     if (ret < 0){
@@ -649,7 +636,7 @@ static bool go_through_house_east_pastoria(VideoStream& stream, ProControllerCon
     int ret = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {-1, 0}, 100000ms, 100ms);
+            pbf_move_left_joystick(context, {-1, 0}, 100000ms, 1100ms);
         },
         {{black_screen}});
     if (ret < 0){
@@ -699,7 +686,7 @@ static bool go_through_pastoria(VideoStream& stream, ProControllerContext& conte
     ret = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {0, +1}, 100000ms, 100ms);
+            pbf_move_left_joystick(context, {0, +1}, 100000ms, 1100ms);
         },
         {{black_screen}});
     if (ret < 0){
@@ -728,7 +715,7 @@ static bool go_to_pastoria_gym(VideoStream& stream, ProControllerContext& contex
     int ret = run_until<ProControllerContext>(stream,
         context,
         [](ProControllerContext& context){
-            pbf_move_left_joystick(context, {0, +1}, 100000ms, 100ms);
+            pbf_move_left_joystick(context, {0, +1}, 100000ms, 1100ms);
         },
         {{black_screen}});
     if (ret < 0){
@@ -831,6 +818,7 @@ static void pastoria_gym_puzzle_and_wake(SingleSwitchProgramEnvironment& env,
         },
     };
 
+    DpadState dpad;
     for (size_t stage = 0; stage < 6; stage++){
         stream.log("[Pastoria Gym puzzle] Movement stage " + std::to_string(stage + 1) + ".");
         if (stage == 5){
@@ -839,17 +827,14 @@ static void pastoria_gym_puzzle_and_wake(SingleSwitchProgramEnvironment& env,
             if (run_until<ProControllerContext>(stream,
                 context,
                 [&](ProControllerContext& ctx){
-                        for (const auto& move : sequences[stage]){
-                            // repeat_dpad(ctx, dpad, move.dir, 80ms, 300ms, move.count, true);
-                            for (int press = 0; press < move.count; press++){
-                                pbf_press_dpad(ctx, move.dir, 80ms, 300ms);
-                                if (move.delay > 0ms){
-                                    pbf_wait(ctx, move.delay);
-                                }
-                            }
+                    for (const auto& move : sequences[stage]){
+                        repeat_dpad(ctx, dpad, move.dir, 80ms, 300ms, move.count, false);
+                        if (move.delay > 0ms){
+                            pbf_wait(ctx, move.delay);
                         }
-                        pbf_wait(ctx, 5000ms);
-                    },
+                    }
+                    pbf_wait(ctx, 6000ms);
+                },
                 {{exit_black}}) != 0){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "Pastoria Gym return: Exit transition did not start.",
@@ -861,7 +846,7 @@ static void pastoria_gym_puzzle_and_wake(SingleSwitchProgramEnvironment& env,
                 10,
                 BlackScreenWatcher::FinderType::GONE,
                 500ms);
-            if (wait_until(stream, context, 30s, {{outside}}) != 0){
+            if (wait_until(stream, context, 31s, {{outside}}) != 0){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "Pastoria Gym return: Exit transition did not finish.",
                     stream);
@@ -873,12 +858,9 @@ static void pastoria_gym_puzzle_and_wake(SingleSwitchProgramEnvironment& env,
             break;
         }
         for (const auto& move : sequences[stage]){
-            // repeat_dpad(context, dpad, move.dir, 80ms, 300ms, move.count, true);
-            for (int press = 0; press < move.count; press++){
-                pbf_press_dpad(context, move.dir, 80ms, 300ms);
-                if (move.delay > 0ms){
-                    pbf_wait(context, move.delay);
-                }
+            repeat_dpad(context, dpad, move.dir, 80ms, 300ms, move.count, false);
+            if (move.delay > 0ms){
+                pbf_wait(context, move.delay);
             }
         }
         context.wait_for_all_requests();
@@ -975,9 +957,9 @@ void checkpoint_0401(SingleSwitchProgramEnvironment& env,
                 }
             }
             {
-                if (!heal_at_pokemon_center(env.console, context, stats)){
+                if (!heal_pokemon(env.console, context, "Veilstone", &stats)){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "heal_at_pokemon_center: transition not detected.",
+                        "Veilstone Pokemon Center: Exit transition not detected after healing.",
                         env.console);
                 }
             }
@@ -1022,13 +1004,7 @@ void checkpoint_0402(SingleSwitchProgramEnvironment& env,
                         env.console);
                 }
             }
-            {
-                if (!handle_battle(env.console, context, "veilstone_galactic_grunts_1", stats)){
-                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "handle_battle_veilstone_galactic_grunts_1: transition not detected.",
-                        env.console);
-                }
-            }
+            handle_battle(env.console, context, "veilstone_galactic_grunts_1", stats);
             {
                 if (!enter_galactic_warehouse(env.console, context)){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
@@ -1084,13 +1060,7 @@ void checkpoint_0403(SingleSwitchProgramEnvironment& env,
                         env.console);
                 }
             }
-            {
-                if (!handle_battle(env.console, context, "route_214_psychic_abigail", stats)){
-                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "handle_battle_route_214_psychic_abigail: transition not detected.",
-                        env.console);
-                }
-            }
+            handle_battle(env.console, context, "route_214_psychic_abigail", stats);
             {
                 if (!walk_through_route_214(env.console, context, stats, options.language)){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
@@ -1105,13 +1075,7 @@ void checkpoint_0403(SingleSwitchProgramEnvironment& env,
                         env.console);
                 }
             }
-            {
-                if (!go_through_building_route_213(env.console, context)){
-                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "go_through_building_route_213: transition not detected.",
-                        env.console);
-                }
-            }
+            go_through_building_route_213(env.console, context);
             context.wait_for_all_requests();
         },
         true);
@@ -1168,9 +1132,9 @@ void checkpoint_0404(SingleSwitchProgramEnvironment& env,
                 }
             }
             {
-                if (!heal_at_pokemon_center(env.console, context, stats)){
+                if (!heal_pokemon(env.console, context, "Pastoria", &stats)){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "heal_at_pokemon_center: transition not detected.",
+                        "Pastoria Pokemon Center: Exit transition not detected after healing.",
                         env.console);
                 }
             }

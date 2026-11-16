@@ -21,8 +21,6 @@ void escape_wild_battle(VideoStream& stream,
     BattleType battle_type = BattleType::STANDARD,
     std::chrono::seconds timeout = std::chrono::seconds(30));
 
-// Shared legacy first-move battle routine; consolidation remains preliminary.
-void Barry_1_fight(SingleSwitchProgramEnvironment& env, VideoStream& stream, ProControllerContext& context);
 }
 }
 }

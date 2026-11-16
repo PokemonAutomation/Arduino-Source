@@ -60,10 +60,6 @@ bool oreburgh_mine_route_and_escape_test(VideoStream& stream, ProControllerConte
 // guarantee recognition after clipping, lost detail or arbitrary capture changes.
 bool oreburgh_mine_route(VideoStream& stream, ProControllerContext& context, const MineRouteTestOptions& options);
 
-bool oreburgh_mine_first_leg_test(VideoStream& stream,
-    ProControllerContext& context,
-    const MineRouteTestOptions& options = MineRouteTestOptions());
-
 class AutoStory_Segment_01 : public AutoStory_Segment {
 public:
     virtual std::string name() const override;

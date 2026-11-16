@@ -1512,6 +1512,14 @@ double overworld_entry_confidence(const OverworldMatchResult& result,
     }
     return confidence;
 }
+OverworldMatchResult match_galactic_hq_lobby(const ImageRGB32& frame){
+    // The bookshelf and planter left of the landing distinguish 1F from the office floors.
+    return match_landmarks(frame,
+        {{"Lobby bookshelf and planter", "PokemonBDSP/Autostory/GalacticHQ/LobbyStairBookshelf.png",
+            {0.025, 0.25, 0.175, 0.25}, {0.0, 0.10, 0.35, 0.65}, .85, .12}},
+        1, POSITION_TOLERANCE_X, POSITION_TOLERANCE_Y, true);
+}
+
 OverworldMatchResult match_galactic_hq_jupiter(const ImageRGB32& frame){
     // The supplied reference is the interaction pose directly north of Jupiter.
     // Confirm the table-facing chair sides, adjacent table edges, and stairs.
@@ -2080,6 +2088,9 @@ OverworldMatchResult match_eterna_underground_man(const ImageRGB32& frame){
         // Keep the precise four-anchor result above unchanged. Three unique,
         // agreeing furniture matches can identify the room across capture differences.
         auto room_configs = configs;
+        // The stool stays on the left from the doorway to the man. Exclude the
+        // similar patch on the right that competes with it at the doorway.
+        room_configs.front().search.width = .50;
         for (auto& config : room_configs){
             config.threshold = .85;
             config.margin = .15;
@@ -3073,6 +3084,20 @@ OverworldMatchResult match_route215_ace_renewal(const ImageRGB32& frame){
         "Upper road bend",
         "Lower road bend",
         1.0 / 128);
+    // The player can cover the upper bend west of the approach lane. The lower
+    // bend and fence remain visible on the same side of the road.
+    const auto& fence = result.landmarks[1];
+    const auto& lower_bend = approach.landmarks[1];
+    if (fence.accepted && lower_bend.accepted && std::abs(fence.dx - lower_bend.dx) <= AGREEMENT_X &&
+        std::abs(fence.dy - lower_bend.dy) <= AGREEMENT_Y){
+        approach.landmarks[0] = fence;
+        approach.dx = (fence.dx + lower_bend.dx) / 2;
+        approach.dy = (fence.dy + lower_bend.dy) / 2;
+        approach.located = true;
+        approach.coarse = true;
+        approach.at_target = false;
+        return approach;
+    }
     // At the eastern extreme, the original bends leave the screen. The two
     // corners of the same grass bed remain visible above the clear road.
     auto east = match_lighting_pair(filtered,
@@ -3148,7 +3173,10 @@ OverworldMatchResult match_route215_ace_renewal(const ImageRGB32& frame){
     const auto& corner = far_east.landmarks[0];
     const auto& sign = far_east.landmarks[1];
     const double far_nearest = std::min(std::abs(corner.dx), std::abs(sign.dx));
-    far_east.located = corner.accepted && sign.accepted && std::abs(corner.dy - sign.dy) <= AGREEMENT_Y &&
+    // The foreground sign shifts farther vertically than the grass when taking the jogger bypass.
+    const double sign_dy = sign.dy / 1.35;
+    far_east.dy = (corner.dy + sign_dy) / 2;
+    far_east.located = corner.accepted && sign.accepted && std::abs(corner.dy - sign_dy) <= AGREEMENT_Y &&
         corner.dx < -1.0 / 4 && sign.dx < -1.0 / 4 && far_nearest > 2 * std::abs(corner.dx - sign.dx) &&
         far_east.dy >= -1.0 / 27 && far_east.dy <= 1.0 / 9;
     if (far_east.located){
@@ -3845,6 +3873,7 @@ const std::vector<OverworldMatcher>& overworld_matchers(){
             match_route215_derek_stair_top_renewal},
         {"route208-hannah-departure", "Route 208 field after Hannah", match_route208_hannah_departure},
         {"eterna-gym", "Eterna Gym doorway", match_eterna_gym_entrance},
+        {"galactic-hq-lobby", "Eterna Galactic HQ lobby stair landing", match_galactic_hq_lobby},
         {"galactic-hq-jupiter", "Galactic HQ Jupiter interaction", match_galactic_hq_jupiter},
         {"eterna-gym-statues", "Eterna Gym interior statues", match_eterna_gym_statues},
         {"eterna-underground-house", "Eterna Underground Man house doorway", match_eterna_underground_house},

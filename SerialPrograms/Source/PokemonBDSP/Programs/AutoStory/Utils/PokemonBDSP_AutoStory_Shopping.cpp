@@ -55,8 +55,17 @@ const VeilstoneShoppingList ASSISTED_EMPOLEON_LEAGUE{
     {},
 };
 
-// The assisted Torterra plan needs medicine but no department-store purchases.
-const VeilstoneShoppingList ASSISTED_TORTERRA_LEAGUE{};
+// One X Attack for Aaron, one X Speed for Flint, and one of each for Cynthia.
+const VeilstoneShoppingList ASSISTED_TORTERRA_LEAGUE{
+    {},
+    {},
+    {
+        {ShopItem::XAttack, 2, ShopQuantityMode::TARGET_STOCK},
+        {ShopItem::XSpeed, 2, ShopQuantityMode::TARGET_STOCK},
+    },
+    {},
+    {},
+};
 }
 
 // ---------------------------------------------------------------------------
@@ -198,10 +207,6 @@ bool buy_items(VideoStream& stream,
     // Area where the selection arrow appears at the YES/NO confirmation dialog.
     static const ImageFloatBox CONFIRM_ARROW_BOX{0.700000, 0.620000, 0.070000, 0.120000};
 
-    // Full area containing all item rows in the shop list.
-    // The hover detector scans this region to dynamically locate the red outline.
-    static const ImageFloatBox ITEM_SCAN_AREA{0.417000, 0.100000, 0.540000, 0.625000};
-
     static constexpr size_t MAX_OUTER = 50;
     static constexpr size_t MAX_ITEM_SEARCH = 50; // max iterations per item before giving up
 
@@ -243,10 +248,7 @@ bool buy_items(VideoStream& stream,
                         break;
                     }
 
-                    // Confirm the selection outline and item name before opening
-                    // the quantity selector.
                     ShopItemHoverDetector hover(stream.logger(),
-                        ITEM_SCAN_AREA,
                         shop_item_slug(item.item),
                         language,
                         COLOR_CYAN);
@@ -467,7 +469,7 @@ bool shop_veilstone_department_store(VideoStream& stream,
         int ret = run_until<ProControllerContext>(stream, context,
             [&](ProControllerContext& ctx){
                 action(ctx);
-                pbf_wait(ctx, 10000ms);
+                pbf_wait(ctx, 11000ms);
             },
             {{black}});
         if (ret < 0){
@@ -478,7 +480,7 @@ bool shop_veilstone_department_store(VideoStream& stream,
         // so the remaining hold cannot carry into the next room.
         BlackScreenWatcher visible(COLOR_RED, {0.1, 0.1, 0.8, 0.8},
             100, 10, BlackScreenWatcher::FinderType::GONE, 500ms);
-        if (wait_until(stream, context, 15s, {{visible}}) < 0){
+        if (wait_until(stream, context, 16s, {{visible}}) < 0){
             stream.log(std::string("Veilstone shopping: ") + label + " transition did not finish.", COLOR_RED);
             return false;
         }
