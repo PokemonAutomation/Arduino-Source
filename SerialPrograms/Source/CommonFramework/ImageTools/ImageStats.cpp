@@ -96,31 +96,32 @@ ImageStats image_border_stats(const ImageViewRGB32& image){
 
     FloatPixel sum;
     FloatPixel sqr_sum;
+    size_t total = 0;
+    auto add_pixel = [&](size_t x, size_t y){
+        FloatPixel p(image.pixel(x, y));
+        sum += p;
+        sqr_sum += p * p;
+        total++;
+    };
 
+    //  Top and bottom rows, then the left and right columns without the corners.
+    //  The checks on h and w keep a one-pixel-tall or one-pixel-wide image from
+    //  counting the same pixels twice.
     for (size_t c = 0; c < w; c++){
-        FloatPixel p(image.pixel(c, 0));
-        sum += p;
-        sqr_sum += p * p;
+        add_pixel(c, 0);
+        if (h > 1){
+            add_pixel(c, h - 1);
+        }
     }
-    for (size_t c = 0; c < w; c++){
-        FloatPixel p(image.pixel(c, h - 1));
-        sum += p;
-        sqr_sum += p * p;
-    }
-    for (size_t r = 0; r < h; r++){
-        FloatPixel p(image.pixel(0, r));
-        sum += p;
-        sqr_sum += p * p;
-    }
-    for (size_t r = 0; r < h; r++){
-        FloatPixel p(image.pixel(0, h - 1));
-        sum += p;
-        sqr_sum += p * p;
+    for (size_t r = 1; r + 1 < h; r++){
+        add_pixel(0, r);
+        if (w > 1){
+            add_pixel(w - 1, r);
+        }
     }
 
-    size_t total = 2 * (w + h);
-    double totalf = (double)total;
-    FloatPixel variance = (sqr_sum - sum*sum / totalf) / (totalf - 1);
+    const double totalf = (double)total;
+    const FloatPixel variance = (sqr_sum - sum*sum / totalf) / (totalf - 1);
     return ImageStats{
         sum / totalf,
         FloatPixel(

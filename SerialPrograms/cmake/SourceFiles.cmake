@@ -609,6 +609,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/ImageTools/ImageDiff.h
     Source/CommonFramework/ImageTools/ImageStats.cpp
     Source/CommonFramework/ImageTools/ImageStats.h
+    Source/CommonFramework/ImageTools/ImageStats_Tests.cpp
+    Source/CommonFramework/ImageTools/ImageStats_Tests.h
     Source/CommonFramework/ImageTypes/BinaryImage.cpp
     Source/CommonFramework/ImageTypes/BinaryImage.h
     Source/CommonFramework/ImageTypes/ImageHSV32.cpp
