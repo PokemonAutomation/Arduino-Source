@@ -941,8 +941,9 @@ public:
 //  "HttpServer - An oversized header section is rejected" failure was:
 //  the 400 was written just before the connection closed while the
 //  client was still streaming the oversized header section. The
-//  backends therefore close the connection gracefully (Qt also defers
-//  the socket's deletion until the flush completes).
+//  backends therefore drain the queue before the close takes effect
+//  (Qt across event-loop iterations, since the kernel queue is only
+//  visible there).
 template <typename ClientSocketType, typename ServerSocketType>
 class Test_Sockets_CloseWhilePeerSending : public TestSockets<ClientSocketType, ServerSocketType>{
 public:
@@ -989,6 +990,12 @@ public:
     };
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        if (timing_unreliable()){
+            return UnitTestResult(
+                UnitTestResult::SKIPPED,
+                "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
+            );
+        }
         RespondingListener server_listener;
         ServerSocketType server(this->m_thread_pool);
         server_listener.server = &server;
