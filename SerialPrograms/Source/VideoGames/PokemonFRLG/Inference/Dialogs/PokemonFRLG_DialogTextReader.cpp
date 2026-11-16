@@ -25,10 +25,16 @@ namespace PokemonFRLG{
 
 namespace{
 
-//  Both dialog boxes (overworld and battle) put their two lines here.
+//  The two lines of the overworld dialog box.
 const ImageFloatBox DIALOG_LINE_BOXES[2] = {
     {0.055, 0.755, 0.885, 0.088},
     {0.055, 0.850, 0.885, 0.088},
+};
+//  The two lines of the battle message box. Its text starts further left
+//  (GBA x = 10, right after the box's white frame at x = 6 and 7).
+const ImageFloatBox BATTLE_LINE_BOXES[2] = {
+    {0.035, 0.755, 0.905, 0.088},
+    {0.035, 0.850, 0.905, 0.088},
 };
 
 //  The text of one line of a text window: `box` in the game screen, with the
@@ -74,17 +80,19 @@ std::string read_dialog_line(
     Logger& logger, Language language, const ImageViewRGB32& frame,
     DialogStyle style, int line
 ){
-    const ImageFloatBox& box = DIALOG_LINE_BOXES[line == 0 ? 0 : 1];
     std::string what = "Dialog line " + std::to_string(line == 0 ? 1 : 2);
     if (style == DialogStyle::BATTLE){
+        //  White text with a gray shadow on dark blue. The text's edges blur
+        //  toward the background in compressed captures, so the white range
+        //  is wide; the shadow stays well below it.
         return read_text_line(
-            logger, language, frame, box,
-            combine_rgb(200, 200, 200), combine_rgb(255, 255, 255),
+            logger, language, frame, BATTLE_LINE_BOXES[line == 0 ? 0 : 1],
+            combine_rgb(170, 170, 170), combine_rgb(255, 255, 255),
             what, "DebugDumps/ocr_dialog_line.png"
         );
     }else{
         return read_text_line(
-            logger, language, frame, box,
+            logger, language, frame, DIALOG_LINE_BOXES[line == 0 ? 0 : 1],
             combine_rgb(0, 0, 0), combine_rgb(150, 150, 255),
             what, "DebugDumps/ocr_dialog_line.png"
         );
@@ -191,7 +199,7 @@ void add_tests_DialogTextReader(UnitTestDatabase& database){
     );
     database.add<Test_DialogTextReader>(
         "PokemonFRLG/DialogTextReader/WildOddish-StunSpore.jpg", DialogStyle::BATTLE, 0,
-        std::vector<std::string>{"oddish", "used"}
+        std::vector<std::string>{"wild", "used"}
     );
     database.add<Test_DialogTextReader>(
         "PokemonFRLG/DialogTextReader/WildOddish-StunSpore.jpg", DialogStyle::BATTLE, 1,
