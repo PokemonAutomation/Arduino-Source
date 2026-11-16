@@ -13,6 +13,7 @@
 #include <array>
 #include <string>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Language.h"
 #include "CommonTools/OCR/OCR_SmallDictionaryMatcher.h"
@@ -60,7 +61,8 @@ public:
     //  if nothing could be read.
     std::string read_own_name_text(Logger& logger, const ImageViewRGB32& frame) const;
 
-    //  The level in the player's HP box. -1 if it can't be read.
+    //  The level in the player's HP box, in any language (the label before it,
+    //  "Lv" or "N." or ..., isn't read). -1 if it can't be read.
     int read_own_level(Logger& logger, const ImageViewRGB32& frame) const;
 
 private:
@@ -70,6 +72,9 @@ private:
     ImageFloatBox m_own_name_box;
     ImageFloatBox m_own_level_box;
 };
+
+
+void add_tests_BattleMoveReader(UnitTestDatabase& database);
 
 
 

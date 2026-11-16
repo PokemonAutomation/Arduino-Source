@@ -4,7 +4,7 @@
  *
  */
 
-#include <ctype.h>
+#include <sstream>
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
@@ -13,6 +13,8 @@
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "Tests/ImageUnitTest.h"
+#include "Tests/TestUtils.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_OcrPreprocessing.h"
 #include "PokemonFRLG_BattleMoveReader.h"
@@ -119,38 +121,204 @@ std::string BattleMoveReader::read_own_name_text(Logger& logger, const ImageView
     return text;
 }
 
+namespace{
+
+//  The digits of the small font (graphics/fonts/latin_small.png in the
+//  decomp), 4 x 7 pixels, the top row first, the leftmost pixel as the
+//  highest bit.
+const uint8_t LEVEL_DIGITS[10][7] = {
+    {0b0110, 0b1001, 0b1001, 0b1001, 0b1001, 0b1001, 0b0110},     //  0
+    {0b0010, 0b0110, 0b0010, 0b0010, 0b0010, 0b0010, 0b0111},     //  1
+    {0b0110, 0b1001, 0b0001, 0b0010, 0b0100, 0b1000, 0b1111},     //  2
+    {0b0110, 0b1001, 0b0001, 0b0110, 0b0001, 0b1001, 0b0110},     //  3
+    {0b0110, 0b1010, 0b1010, 0b1010, 0b1010, 0b1111, 0b0010},     //  4
+    {0b1111, 0b1000, 0b1000, 0b1110, 0b0001, 0b1001, 0b0110},     //  5
+    {0b0110, 0b1001, 0b1000, 0b1110, 0b1001, 0b1001, 0b0110},     //  6
+    {0b1111, 0b0001, 0b0001, 0b0010, 0b0010, 0b0100, 0b0100},     //  7
+    {0b0110, 0b1001, 0b1001, 0b0110, 0b1001, 0b1001, 0b0110},     //  8
+    {0b0110, 0b1001, 0b1001, 0b0111, 0b0001, 0b1001, 0b0110},     //  9
+};
+
+bool is_dark(uint32_t pixel){
+    return ((pixel >> 16) & 0xff) <= 130 && ((pixel >> 8) & 0xff) <= 130 && (pixel & 0xff) <= 130;
+}
+
+}
+
 int BattleMoveReader::read_own_level(Logger& logger, const ImageViewRGB32& frame) const{
+    //  The HP box shows a level label and then the level, right aligned: the
+    //  digits are 5 pixels apart and the last one always ends at the same
+    //  place. The label depends on the language ("Lv" in English, "N." in
+    //  French, ...), so it isn't read: each digit is matched against the
+    //  font's digits from the right, and the first character that isn't a
+    //  digit ends the number.
     ImageViewRGB32 game_screen = extract_box_reference(frame, GameSettings::instance().GAME_BOX);
-    ImageViewRGB32 box = extract_box_reference(game_screen, m_own_level_box);
+    if (game_screen.width() == 0 || game_screen.height() == 0){
+        return -1;
+    }
+    auto dark = [&](int x, int y){
+        size_t px = (size_t)((x + 0.5) * (double)game_screen.width() / 240);
+        size_t py = (size_t)((y + 0.5) * (double)game_screen.height() / 160);
+        return is_dark(game_screen.pixel(px, py));
+    };
 
-    //  "Lv" and digits, the same in every language: read as English.
-    std::string raw = ocr_dark_text(Language::English, box);
+    //  The level's area of the HP box, in GBA pixels, inside its border.
+    const int LEFT = 196;
+    const int RIGHT = 222;
+    const int TOP = 78;
+    const int BOTTOM = 89;
 
-    //  Only what comes after the "v" of "Lv", if it was read. An "o" there
-    //  is a misread 0.
-    size_t v = raw.find_last_of("vV");
-    std::string after = v == std::string::npos ? raw : raw.substr(v + 1);
-    std::string digits;
-    for (char ch : after){
-        if (ch == 'o' || ch == 'O'){
-            ch = '0';
-        }
-        if (isdigit((unsigned char)ch)){
-            digits += ch;
+    //  The last digit's right edge (every digit has a pixel in its last
+    //  column), then its top row (and in its first row).
+    int right = -1;
+    for (int x = RIGHT - 1; x >= LEFT && right < 0; x--){
+        for (int y = TOP; y < BOTTOM; y++){
+            if (dark(x, y)){
+                right = x;
+                break;
+            }
         }
     }
-    int level = digits.empty() || digits.size() > 3 ? -1 : std::stoi(digits);
-    if (level < 1 || level > 100){
-        logger.log("Could not read the battling Pokemon's level: \"" + raw + "\"", COLOR_ORANGE);
+    if (right < LEFT + 3){
+        logger.log("Could not find the battling Pokemon's level.", COLOR_ORANGE);
+        return -1;
+    }
+    int top = -1;
+    for (int y = TOP; y < BOTTOM && top < 0; y++){
+        for (int x = right - 3; x <= right; x++){
+            if (dark(x, y)){
+                top = y;
+                break;
+            }
+        }
+    }
+    if (top < 0 || top + 7 > BOTTOM){
+        logger.log("Could not find the battling Pokemon's level.", COLOR_ORANGE);
+        return -1;
+    }
+
+    //  Up to 3 digits, from the right.
+    int level = 0;
+    int scale = 1;
+    int digits = 0;
+    std::string distances;
+    for (int k = 0; k < 3; k++){
+        int left = right - 3 - 5 * k;
+        if (left < LEFT){
+            break;
+        }
+        int best_digit = -1;
+        int best_distance = 99;
+        for (int d = 0; d < 10; d++){
+            int distance = 0;
+            for (int row = 0; row < 7; row++){
+                for (int col = 0; col < 4; col++){
+                    bool expected = ((LEVEL_DIGITS[d][row] >> (3 - col)) & 1) != 0;
+                    if (dark(left + col, top + row) != expected){
+                        distance++;
+                    }
+                }
+            }
+            if (distance < best_distance){
+                best_distance = distance;
+                best_digit = d;
+            }
+        }
+        //  A few pixels off at most; the label's characters are far off.
+        if (best_distance > 3){
+            break;
+        }
+        level += best_digit * scale;
+        scale *= 10;
+        digits++;
+        distances += (distances.empty() ? "" : ", ") + std::to_string(best_distance);
+    }
+
+    if (digits == 0 || level < 1 || level > 100){
+        logger.log("Could not read the battling Pokemon's level.", COLOR_ORANGE);
         if (GlobalSettings::instance().SAVE_DEBUG_IMAGES){
-            box.save("DebugDumps/ocr_own_level_box.png");
+            extract_box_reference(game_screen, m_own_level_box).save("DebugDumps/own_level_box.png");
         }
         return -1;
     }
-    logger.log("Battling Pokemon's level: " + std::to_string(level));
+    logger.log("Battling Pokemon's level: " + std::to_string(level) + " (pixels off per digit: " + distances + ")");
     return level;
 }
 
+
+//  A battle screen (the battle menu, the move list or a message) with the
+//  player's Pokemon's HP box: its level, and, if given, its species and the
+//  four moves of the move list (a "" move is an empty slot).
+struct BattleMoveReaderCase{
+    std::string image;
+    int level;
+    std::string species = "";
+    bool move_list = false;
+    std::array<std::string, 4> moves = {};
+};
+
+class Test_BattleMoveReader : public ImageUnitTest{
+public:
+    Test_BattleMoveReader(BattleMoveReaderCase test)
+        : ImageUnitTest("PokemonFRLG::BattleMoveReader - " + test.image, {test.image})
+        , m_case(std::move(test))
+    {
+        //  Plus the PaddleOCR (ONNX) recognition session and its working set.
+        m_memory += PADDLE_OCR_SINGLE_LINE_MEMORY_ESTIMATE;
+    }
+
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        BattleMoveReader reader(Language::English);
+        TEST_RESULT_COMPONENT_EQUAL_STR(reader.read_own_level(logger, images[0]), m_case.level, "level");
+        if (!m_case.species.empty()){
+            TEST_RESULT_COMPONENT_EQUAL_STR(reader.read_own_species(logger, images[0]), m_case.species, "species");
+        }
+        if (m_case.move_list){
+            std::array<std::string, 4> moves = reader.read_moves(logger, images[0]);
+            for (size_t i = 0; i < 4; i++){
+                TEST_RESULT_COMPONENT_EQUAL_STR(
+                    "\"" + moves[i] + "\"", "\"" + m_case.moves[i] + "\"",
+                    "move " + std::to_string(i + 1)
+                );
+            }
+        }
+        return true;
+    }
+
+private:
+    BattleMoveReaderCase m_case;
+};
+
+void add_tests_BattleMoveReader(UnitTestDatabase& database){
+    const std::string FOLDER = "PokemonFRLG/BattleMoveReader/";
+    const BattleMoveReaderCase CASES[] = {
+        {
+            .image = FOLDER + "Nickname-Lv5-Moves.jpg", .level = 5,
+            .move_list = true, .moves = {"barrier", "confusion", "", ""},
+        },
+        {.image = FOLDER + "Nickname-Lv5-Menu.jpg", .level = 5},
+        {
+            .image = FOLDER + "Pidgeot-Lv78-Moves.jpg", .level = 78, .species = "pidgeot",
+            .move_list = true, .moves = {"wing-attack", "agility", "fly", "quick-attack"},
+        },
+        {
+            .image = FOLDER + "Lapras-Lv81-Moves.jpg", .level = 81, .species = "lapras",
+            .move_list = true, .moves = {"surf", "ice-beam", "psychic", "thunderbolt"},
+        },
+        {.image = FOLDER + "Lapras-Lv81-Menu.jpg", .level = 81, .species = "lapras"},
+        {.image = FOLDER + "Mewtwo-Lv100-Message.jpg", .level = 100, .species = "mewtwo"},
+        {
+            .image = FOLDER + "Charizard-Lv100-Moves.jpg", .level = 100, .species = "charizard",
+            .move_list = true, .moves = {"fire-blast", "hidden-power", "blast-burn", "substitute"},
+        },
+    };
+    for (const BattleMoveReaderCase& test : CASES){
+        database.add<Test_BattleMoveReader>(test);
+    }
+}
 
 
 }
