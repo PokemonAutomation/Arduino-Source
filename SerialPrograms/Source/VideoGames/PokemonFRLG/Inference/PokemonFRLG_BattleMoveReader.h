@@ -11,6 +11,7 @@
 #define PokemonAutomation_PokemonFRLG_BattleMoveReader_H
 
 #include <array>
+#include <set>
 #include <string>
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
@@ -55,7 +56,14 @@ public:
     //  From the battle menu or move list: the species of the player's
     //  Pokemon, read from the name in its HP box. Empty if it can't be read,
     //  e.g. if the Pokemon has a nickname.
-    std::string read_own_species(Logger& logger, const ImageViewRGB32& frame) const;
+    //
+    //  If the species can only be one of a few, pass them as `subset`: some
+    //  names are close in this font (MEWTWO is read as MEOWTH among all
+    //  species, but not among {mewtwo, lapras}).
+    std::string read_own_species(
+        Logger& logger, const ImageViewRGB32& frame,
+        const std::set<std::string>& subset = {}
+    ) const;
 
     //  The name in the player's HP box (e.g. a nickname) as raw text. Empty
     //  if nothing could be read.

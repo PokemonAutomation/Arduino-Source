@@ -83,13 +83,16 @@ std::array<std::string, 4> BattleMoveReader::read_moves(Logger& logger, const Im
     return ret;
 }
 
-std::string BattleMoveReader::read_own_species(Logger& logger, const ImageViewRGB32& frame) const{
+std::string BattleMoveReader::read_own_species(
+    Logger& logger, const ImageViewRGB32& frame,
+    const std::set<std::string>& subset
+) const{
     ImageViewRGB32 game_screen = extract_box_reference(frame, GameSettings::instance().GAME_BOX);
     ImageViewRGB32 box = extract_box_reference(game_screen, m_own_name_box);
     ImageRGB32 ready = preprocess_for_ocr(box);
-    OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(
-        logger, m_language, ready, DARK_TEXT_FILTERS()
-    );
+    OCR::StringMatchResult result = subset.empty()
+        ? Pokemon::PokemonNameReader::instance().read_substring(logger, m_language, ready, DARK_TEXT_FILTERS())
+        : Pokemon::PokemonNameReader(subset).read_substring(logger, m_language, ready, DARK_TEXT_FILTERS());
     if (result.results.empty()){
         logger.log("Could not read the species of the battling Pokemon.", COLOR_ORANGE);
         if (GlobalSettings::instance().SAVE_DEBUG_IMAGES){
@@ -253,6 +256,7 @@ struct BattleMoveReaderCase{
     std::string image;
     int level;
     std::string species = "";
+    std::set<std::string> species_subset = {};
     bool move_list = false;
     std::array<std::string, 4> moves = {};
 };
@@ -274,7 +278,10 @@ public:
         BattleMoveReader reader(Language::English);
         TEST_RESULT_COMPONENT_EQUAL_STR(reader.read_own_level(logger, images[0]), m_case.level, "level");
         if (!m_case.species.empty()){
-            TEST_RESULT_COMPONENT_EQUAL_STR(reader.read_own_species(logger, images[0]), m_case.species, "species");
+            TEST_RESULT_COMPONENT_EQUAL_STR(
+                reader.read_own_species(logger, images[0], m_case.species_subset),
+                m_case.species, "species"
+            );
         }
         if (m_case.move_list){
             std::array<std::string, 4> moves = reader.read_moves(logger, images[0]);
@@ -309,7 +316,12 @@ void add_tests_BattleMoveReader(UnitTestDatabase& database){
             .move_list = true, .moves = {"surf", "ice-beam", "psychic", "thunderbolt"},
         },
         {.image = FOLDER + "Lapras-Lv81-Menu.jpg", .level = 81, .species = "lapras"},
-        {.image = FOLDER + "Mewtwo-Lv100-Message.jpg", .level = 100, .species = "mewtwo"},
+        //  Among all species, this MEWTWO is read as MEOWTH; the EXP Farmer
+        //  only expects Mewtwo or Lapras.
+        {
+            .image = FOLDER + "Mewtwo-Lv100-Message.jpg", .level = 100, .species = "mewtwo",
+            .species_subset = {"mewtwo", "lapras"},
+        },
         {
             .image = FOLDER + "Charizard-Lv100-Moves.jpg", .level = 100, .species = "charizard",
             .move_list = true, .moves = {"fire-blast", "hidden-power", "blast-burn", "substitute"},
