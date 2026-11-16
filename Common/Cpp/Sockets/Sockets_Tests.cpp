@@ -933,6 +933,144 @@ public:
 };
 
 
+//  Closing a connection while the peer is still sending must not lose
+//  the bytes we already sent to the peer: Windows sends an RST instead
+//  of a FIN when a socket is closed with unread data in the receive
+//  queue, and the reset makes the peer discard its own receive queue -
+//  including our response. This is exactly what the flaky
+//  "HttpServer - An oversized header section is rejected" failure was:
+//  the 400 was written just before the connection closed while the
+//  client was still streaming the oversized header section. The
+//  backends therefore close the connection gracefully (Qt also defers
+//  the socket's deletion until the flush completes).
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_Sockets_CloseWhilePeerSending : public TestSockets<ClientSocketType, ServerSocketType>{
+public:
+    using TestSockets<ClientSocketType, ServerSocketType>::TestSockets;
+
+    //  Sends "bye" and closes the connection the first time data
+    //  arrives.
+    struct RespondingListener : ServerListener{
+        std::atomic<int> responded{0};
+
+        virtual void on_receive_data(const void*, size_t) override{
+            if (responded.fetch_add(1, std::memory_order_relaxed) == 0
+                && server != nullptr
+            ){
+                server->send("bye", 3);
+                server->close_connection();
+                waiter.notify();
+            }
+        }
+    };
+
+    //  A client listener that keeps "received" under a lock: the
+    //  receive thread appends to it while the test thread reads it
+    //  after the wait.
+    struct CapturingClientListener : AbstractClientSocket::Listener{
+        Waiter waiter;
+        std::atomic<int> connect_finished{0};
+        Mutex lock;
+        std::vector<uint8_t> received;
+
+        virtual void on_connect_finished(const std::string&) override{
+            connect_finished++;
+            waiter.notify();
+        }
+
+        virtual void on_receive_data(const void* data, size_t bytes) override{
+            const uint8_t* ptr = (const uint8_t*)data;
+            {
+                std::lock_guard<Mutex> lg(lock);
+                received.insert(received.end(), ptr, ptr + bytes);
+            }
+            waiter.notify();
+        }
+    };
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        RespondingListener server_listener;
+        ServerSocketType server(this->m_thread_pool);
+        server_listener.server = &server;
+        server.add_listener(server_listener);
+
+        uint16_t port;
+        if (!this->start_server(server, server_listener, port)){
+            return "Failed to start the server";
+        }
+
+        std::string error;
+        {
+            CapturingClientListener client_listener;
+            ClientSocketType client(this->m_thread_pool);
+            client.add_listener(client_listener);
+
+            client.connect("127.0.0.1", port);
+            if (!client_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&client_listener]{ return client_listener.connect_finished.load() >= 1; }
+            )){
+                error = "The client did not finish connecting";
+            }else if (!server_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&server_listener]{ return server_listener.connected.load() >= 1; }
+            )){
+                error = "The server did not call on_connect";
+            }else{
+                //  Far larger than kernel buffering: when the server
+                //  closes the connection, most of it is still sitting
+                //  unread in the server's receive queue - the case where
+                //  Windows resets the connection instead of closing it
+                //  cleanly.
+                constexpr size_t SIZE = 1u << 20;   //  1 MiB
+                std::vector<uint8_t> payload(SIZE, 0x5A);
+
+                //  Best effort: the server closes the connection while
+                //  this is in flight, so a short/partial send is
+                //  expected, not an error.
+                size_t sent = 0;
+                while (sent < SIZE){
+                    const size_t current = client.send(payload.data() + sent, SIZE - sent);
+                    if (current == 0){
+                        break;
+                    }
+                    sent += current;
+                }
+
+                //  The response written before the close must still
+                //  reach the client.
+                if (!client_listener.waiter.wait_for(
+                    SOCKET_TEST_WAIT,
+                    [&client_listener]{
+                        std::lock_guard<Mutex> lg(client_listener.lock);
+                        return client_listener.received.size() >= 3;
+                    }
+                )){
+                    error = "The client did not receive the pre-close response";
+                }else{
+                    std::array<uint8_t, 3> head{};
+                    {
+                        std::lock_guard<Mutex> lg(client_listener.lock);
+                        for (size_t i = 0; i < 3; i++){
+                            head[i] = client_listener.received[i];
+                        }
+                    }
+                    if (std::memcmp(head.data(), "bye", 3) != 0){
+                        error = "The client received the wrong pre-close response";
+                    }
+                }
+            }
+            client.close();
+        }
+
+        if (!error.empty()){
+            return error;
+        }
+        return true;
+    }
+};
+
+
 //  Starting a second server on an already-bound port must fail through
 //  on_listen_finished and leave the server not running.
 template <typename ClientSocketType, typename ServerSocketType>
@@ -2789,6 +2927,9 @@ void add_socket_tests(UnitTestDatabase& database, ThreadPool& thread_pool, const
     );
     database.add<Test_Sockets_StaleSend<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "A send for a replaced connection is refused"
+    );
+    database.add<Test_Sockets_CloseWhilePeerSending<ClientSocketType, ServerSocketType>>(
+        thread_pool, prefix + "Closing while the peer is sending does not lose the response"
     );
     database.add<Test_Sockets_PortInUse<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "Port in use"

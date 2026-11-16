@@ -424,13 +424,45 @@ void ServerSocket_Qt::on_close_connection(QSharedPointer<CloseCompletion> comple
         }
     }
     if (sock != nullptr){
-        sock->abort();
+        //  Drain the unread receive queue before closing: on Windows,
+        //  closing a socket that still has unread data sends an RST
+        //  instead of a FIN, and the reset makes the peer discard its
+        //  own receive queue - including whatever we already wrote to
+        //  it. Only already-delivered bytes are drained, so this is
+        //  non-blocking on the event thread.
+        constexpr qptrdiff DRAIN_CAP_BYTES = 1 << 20;
+        qptrdiff drained = 0;
+        while (drained < DRAIN_CAP_BYTES && sock->bytesAvailable() > 0){
+            const QByteArray d = sock->readAll();
+            if (d.isEmpty()){
+                break;
+            }
+            drained += d.size();
+        }
+        //  A graceful close, not abort(): abort() discards the socket's
+        //  pending write buffer - any response written just before this
+        //  close (for example, the 4xx for an oversized request the
+        //  peer is still streaming) would never reach the peer. The
+        //  in-flight "send()" calls were already cancelled above, so
+        //  only completed writes are flushed.
+        sock->disconnectFromHost();
         //  The socket is no longer tracked (m_socket was nulled above):
-        //  schedule its deletion on the event thread. The
-        //  disconnected/errorOccurred signals that abort() may still emit
-        //  go through connection_lost(), which returns early because
-        //  m_socket is already null, so the socket is not scheduled twice.
-        sock->deleteLater();
+        //  delete it once the disconnection completes. deleteLater() must
+        //  not run before that - its deferred event is inserted at the
+        //  front of the socket's event queue, ahead of the socket events
+        //  that flush the pending write buffer, so an immediate
+        //  deleteLater() would destroy the socket and discard the
+        //  response above. (The already-connected connection_lost()
+        //  returns early for this socket, so only these schedule the
+        //  deletion; deleteLater() is idempotent either way.)
+        QObject::connect(
+            sock, &QAbstractSocket::disconnected,
+            sock, [sock]{ sock->deleteLater(); }
+        );
+        QObject::connect(
+            sock, &QAbstractSocket::errorOccurred,
+            sock, [sock]{ sock->deleteLater(); }
+        );
     }
 
     {

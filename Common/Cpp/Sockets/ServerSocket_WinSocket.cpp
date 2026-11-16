@@ -523,6 +523,38 @@ void ServerSocket_WinSocket::connection_thread_loop(){
             }
         }
     }
+    //  Drain unread data before closing: Windows sends an RST instead of
+    //  a FIN when a socket is closed with data still in the receive queue,
+    //  and a reset makes the peer discard whatever we already sent to it -
+    //  for example, the 4xx just written in response to an oversized
+    //  request the peer is still streaming. Each recv is non-blocking and
+    //  the queue is kernel-bounded, so this is fast; the byte and time
+    //  bounds are there for a peer that keeps sending.
+    {
+        constexpr size_t DRAIN_CAP_BYTES = 1u << 20;
+        const auto drain_deadline =
+            std::chrono::steady_clock::now() + std::chrono::milliseconds(50);
+        size_t drained = 0;
+        while (drained < DRAIN_CAP_BYTES
+            && std::chrono::steady_clock::now() < drain_deadline
+        ){
+            const int r = ::recv(socket, buffer, (int)BUFFER_SIZE, 0);
+            if (r > 0){
+                drained += (size_t)r;
+                continue;
+            }
+            const int err = WSAGetLastError();
+            if (r == SOCKET_ERROR
+                && (err == WSAEWOULDBLOCK || err == WSAEINPROGRESS)
+            ){
+                //  Nothing queued right now; the peer may still be
+                //  sending - give it a moment, then stop.
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                continue;
+            }
+            break;   //  0 (the peer finished) or an error: nothing more.
+        }
+    }
     ::closesocket(socket);
     if (report_disconnect){
         m_listeners.run_method(&Listener::on_disconnect, error);
