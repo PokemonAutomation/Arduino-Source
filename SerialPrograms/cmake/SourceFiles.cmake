@@ -410,6 +410,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/SIMDDebuggers.h
     ../Common/Cpp/Sockets/AbstractClientSocket.h
     ../Common/Cpp/Sockets/AbstractServerSocket.h
+    ../Common/Cpp/Sockets/AbstractServerSocket2.h
+    ../Common/Cpp/Sockets/AbstractServerSocketConnection.h
     ../Common/Cpp/Sockets/ClientSocket.cpp
     ../Common/Cpp/Sockets/ClientSocket.h
     ../Common/Cpp/Sockets/ClientSocket_POSIX.cpp
@@ -425,6 +427,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Sockets/ServerSocket_WinSocket.h
     ../Common/Cpp/Sockets/ServerSocket_Qt.h
     ../Common/Cpp/Sockets/ServerSocket.h
+    ../Common/Cpp/Sockets/ServerSocket2_Tests.cpp
+    ../Common/Cpp/Sockets/ServerSocket2_Tests.h
     ../Common/Cpp/Sockets/Sockets_Tests.cpp
     ../Common/Cpp/Sockets/Sockets_Tests.h
     ../Common/Cpp/StreamConnections/MockDevice.cpp
