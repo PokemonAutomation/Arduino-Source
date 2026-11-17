@@ -53,7 +53,12 @@ public:
         return *this;
     }
     virtual void on_serial_ports_changed(const QList<QSerialPortInfo>& ports) override{
-        refresh_devices(ports);
+        //  SerialPortPoller invokes this from its background thread, but
+        //  refresh_devices() updates this widget and the controller session,
+        //  so it must run on the GUI thread.
+        QMetaObject::invokeMethod(this, [this, ports]{
+            refresh_devices(ports);
+        }, Qt::QueuedConnection);
     }
 
 
