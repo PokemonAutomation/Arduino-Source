@@ -16,6 +16,7 @@
 #include "CommonTools/Options/StringSelectOption.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
+#include "Pokemon/AutoStory/Options/Pokemon_StoryRangeOptions.h"
 #include "PokemonSV_AutoStoryTools.h"
 
 namespace PokemonAutomation{
@@ -69,6 +70,8 @@ private:
     std::string start_checkpoint_description();
     std::string end_checkpoint_description();
 
+    const Pokemon::StoryRangeOptions& checkpoint_range() const;
+
 private:
     OCR::LanguageOCROption LANGUAGE;
     
@@ -85,11 +88,8 @@ private:
     StringSelectOption STARTPOINT_MAINSTORY;
     StringSelectOption ENDPOINT_MAINSTORY;
 
-    StringSelectOption START_CHECKPOINT_TUTORIAL;
-    StringSelectOption END_CHECKPOINT_TUTORIAL;
-
-    StringSelectOption START_CHECKPOINT_MAINSTORY;
-    StringSelectOption END_CHECKPOINT_MAINSTORY;
+    Pokemon::StoryRangeOptions TUTORIAL_CHECKPOINTS;
+    Pokemon::StoryRangeOptions MAINSTORY_CHECKPOINTS;
 
     StaticTextOption SETUP_NOTE;
     StaticTextOption MAINSTORY_NOTE;

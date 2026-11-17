@@ -395,30 +395,19 @@ AutoStory::AutoStory()
         LockMode::UNLOCK_WHILE_RUNNING,
         std::to_string(ALL_SEGMENTS_SELECT_DATABASE().case_list().size()-1)
     )       
-    , START_CHECKPOINT_TUTORIAL(
-        "<b>Start Checkpoint:</b>", //<br>Program will start with this checkpoint.
-        TUTORIAL_CHECKPOINTS_SELECT_DATABASE(),
-        LockMode::LOCK_WHILE_RUNNING,
-        "0"
-    )
-    , END_CHECKPOINT_TUTORIAL(
-        "<b>End Checkpoint:</b>", //<br>Program will stop after completing this checkpoint.
+    //  The end is read after each checkpoint, so it stays unlocked.
+    , TUTORIAL_CHECKPOINTS(
+        "Tutorial Checkpoints",
         TUTORIAL_CHECKPOINTS_SELECT_DATABASE(),
         LockMode::UNLOCK_WHILE_RUNNING,
-        std::to_string(INDEX_OF_LAST_TUTORIAL_CHECKPOINT)
-    ) 
-    , START_CHECKPOINT_MAINSTORY(
-        "<b>Start Checkpoint:</b>", //<br>Program will start with this checkpoint.
-        MAINSTORY_CHECKPOINTS_SELECT_DATABASE(),
-        LockMode::LOCK_WHILE_RUNNING,
-        std::to_string(INDEX_OF_LAST_TUTORIAL_CHECKPOINT+1)
+        {.start = "<b>Start Checkpoint:</b>", .end = "<b>End Checkpoint:</b>"}
     )
-    , END_CHECKPOINT_MAINSTORY(
-        "<b>End Checkpoint:</b>", //<br>Program will stop after completing this checkpoint.
+    , MAINSTORY_CHECKPOINTS(
+        "Main Story Checkpoints",
         MAINSTORY_CHECKPOINTS_SELECT_DATABASE(),
         LockMode::UNLOCK_WHILE_RUNNING,
-        std::to_string(ALL_CHECKPOINTS_SELECT_DATABASE().case_list().size()-1)
-    ) 
+        {.start = "<b>Start Checkpoint:</b>", .end = "<b>End Checkpoint:</b>"}
+    )
     , SETUP_NOTE{
         "NOTE: Make sure you have selected the correct Start Point. "
         "Make sure your player character is in the exact correct start position for that Start Point, "
@@ -710,11 +699,11 @@ AutoStory::AutoStory()
     PA_ADD_OPTION(ENDPOINT_MAINSTORY);
     PA_ADD_OPTION(END_DESCRIPTION);    
 
-    PA_ADD_OPTION(START_CHECKPOINT_TUTORIAL);
-    PA_ADD_OPTION(START_CHECKPOINT_MAINSTORY);
+    add_option(TUTORIAL_CHECKPOINTS.START_CHECKPOINT, "START_CHECKPOINT_TUTORIAL");
+    add_option(MAINSTORY_CHECKPOINTS.START_CHECKPOINT, "START_CHECKPOINT_MAINSTORY");
     PA_ADD_OPTION(START_CHECKPOINT_DESCRIPTION);
-    PA_ADD_OPTION(END_CHECKPOINT_TUTORIAL);
-    PA_ADD_OPTION(END_CHECKPOINT_MAINSTORY);
+    add_option(TUTORIAL_CHECKPOINTS.END_CHECKPOINT, "END_CHECKPOINT_TUTORIAL");
+    add_option(MAINSTORY_CHECKPOINTS.END_CHECKPOINT, "END_CHECKPOINT_MAINSTORY");
     PA_ADD_OPTION(END_CHECKPOINT_DESCRIPTION);
 
     PA_ADD_OPTION(STARTERCHOICE);
@@ -738,10 +727,10 @@ AutoStory::AutoStory()
     STARTPOINT_MAINSTORY.add_listener(*this);
     ENDPOINT_MAINSTORY.add_listener(*this);    
 
-    START_CHECKPOINT_TUTORIAL.add_listener(*this);
-    END_CHECKPOINT_TUTORIAL.add_listener(*this);
-    START_CHECKPOINT_MAINSTORY.add_listener(*this);
-    END_CHECKPOINT_MAINSTORY.add_listener(*this);  
+    TUTORIAL_CHECKPOINTS.START_CHECKPOINT.add_listener(*this);
+    TUTORIAL_CHECKPOINTS.END_CHECKPOINT.add_listener(*this);
+    MAINSTORY_CHECKPOINTS.START_CHECKPOINT.add_listener(*this);
+    MAINSTORY_CHECKPOINTS.END_CHECKPOINT.add_listener(*this);  
 
     ENABLE_ADVANCED_MODE.add_listener(*this); 
 
@@ -769,10 +758,10 @@ void AutoStory::on_config_value_changed(void* object){
     STARTPOINT_MAINSTORY.set_visibility(mainstory_segments ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
     ENDPOINT_MAINSTORY.set_visibility(mainstory_segments ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 
-    START_CHECKPOINT_TUTORIAL.set_visibility(tutorial_checkpoints ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
-    END_CHECKPOINT_TUTORIAL.set_visibility(tutorial_checkpoints ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
-    START_CHECKPOINT_MAINSTORY.set_visibility(mainstory_checkpoints ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
-    END_CHECKPOINT_MAINSTORY.set_visibility(mainstory_checkpoints ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    TUTORIAL_CHECKPOINTS.START_CHECKPOINT.set_visibility(tutorial_checkpoints ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    TUTORIAL_CHECKPOINTS.END_CHECKPOINT.set_visibility(tutorial_checkpoints ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    MAINSTORY_CHECKPOINTS.START_CHECKPOINT.set_visibility(mainstory_checkpoints ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    MAINSTORY_CHECKPOINTS.END_CHECKPOINT.set_visibility(mainstory_checkpoints ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 
     MAINSTORY_NOTE.set_visibility(STORY_SECTION == StorySection::TUTORIAL ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED);
     START_DESCRIPTION.set_text(start_segment_description());
@@ -1063,21 +1052,23 @@ std::string AutoStory::end_checkpoint_description(){
     return "    End: " + ALL_AUTO_STORY_CHECKPOINT_LIST()[checkpoint_index]->end_text();
 }
 
+const Pokemon::StoryRangeOptions& AutoStory::checkpoint_range() const{
+    return STORY_SECTION == StorySection::MAIN_STORY ? MAINSTORY_CHECKPOINTS : TUTORIAL_CHECKPOINTS;
+}
+
 size_t AutoStory::get_start_checkpoint_index(){
-    const bool main_story = STORY_SECTION == StorySection::MAIN_STORY;
     return story_index(
-        main_story,
-        main_story ? START_CHECKPOINT_MAINSTORY.index() : START_CHECKPOINT_TUTORIAL.index(),
-        INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1
+        /*main_story=*/STORY_SECTION == StorySection::MAIN_STORY,
+        /*index_in_section=*/checkpoint_range().start_index(),
+        /*first_main_story_index=*/INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1
     );
 }
 
 size_t AutoStory::get_end_checkpoint_index(){
-    const bool main_story = STORY_SECTION == StorySection::MAIN_STORY;
     return story_index(
-        main_story,
-        main_story ? END_CHECKPOINT_MAINSTORY.index() : END_CHECKPOINT_TUTORIAL.index(),
-        INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1
+        /*main_story=*/STORY_SECTION == StorySection::MAIN_STORY,
+        /*index_in_section=*/checkpoint_range().end_index(),
+        /*first_main_story_index=*/INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1
     );
 }
 
