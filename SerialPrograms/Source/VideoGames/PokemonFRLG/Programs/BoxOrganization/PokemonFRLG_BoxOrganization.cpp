@@ -163,11 +163,71 @@ void open_summary_screen(SingleSwitchProgramEnvironment& env, ProControllerConte
     wait_for_summary_animation(env, context);
 }
 
-// Scroll through the detected Pokemon and read their shininess and ball type.
+PokemonFRLG_Stats get_summary_stats(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+    const Language& language, bool read_page2
+){
+    StatsReader reader(COLOR_RED);
+    PokemonFRLG_Stats stats;
+    SummaryWatcher page_one(COLOR_RED);
+
+    int ret = wait_until(env.console, context, 5s, { page_one });
+
+    if (ret < 0){
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT,
+            "Box Sorter: Unable to detect the first summary page.", env.console
+        );
+    }
+
+    reader.read_page1(env.logger(), language, env.console.video().snapshot(), stats);
+
+    if (read_page2){
+        SummaryPage2Watcher page_two(COLOR_RED);
+
+        ret = run_until<ProControllerContext>(
+            env.console, context,
+            [](ProControllerContext& context){
+                for (int i = 0; i < 5; i++){
+                    pbf_press_dpad(context, DPAD_RIGHT, 200ms, 1800ms);
+                }
+            },
+            { page_two }
+        );
+
+        if (ret < 0){
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
+                "Box Sorter: Unable to detect the second summary page.", env.console
+            );
+        }
+        
+        reader.read_page2(env.logger(), language, env.console.video().snapshot(), stats);
+       
+        ret = run_until<ProControllerContext>(
+            env.console, context,
+            [](ProControllerContext& context){
+                for (int i = 0; i < 5; i++){
+                    pbf_press_dpad(context, DPAD_LEFT, 200ms, 1800ms);
+                }
+            },
+            { page_one }
+        );
+
+        if (ret < 0){
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
+                "Box Sorter: Unable to return to the first summary page.", env.console
+            );
+        }
+    }
+    return stats;
+}
+
 void scan_box_summaries(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     Language language, const BoxSelectionModeDetector& selection_detector, BoxCursor& cursor,
-    std::vector<std::optional<CollectedPokemonInfo>>& boxes_data
+    std::vector<std::optional<CollectedPokemonInfo>>& boxes_data, bool read_page2
 ){
     const size_t box_start = cursor.box * BOX_ROWS * BOX_COLS;
     std::vector<size_t> occupied;
@@ -195,8 +255,8 @@ void scan_box_summaries(
         const size_t index = occupied[remaining - 1];
         auto& pokemon = *boxes_data[index];
         const VideoSnapshot screen = env.console.video().snapshot();
-        PokemonFRLG_Stats current_stats;
-        reader.read_page1(env.logger(), language, screen, current_stats);
+
+        PokemonFRLG_Stats current_stats = get_summary_stats(env, context, language, read_page2);
         if (current_stats.name != pokemon.name_slug || current_stats.level != pokemon.level){
             std::ostringstream ss;
             ss << "Box Sorter: Summary species mismatch at " << BoxCursor(index)
@@ -204,8 +264,11 @@ void scan_box_summaries(
                               << "), read: " << current_stats.name << " (level " << level_str(current_stats.level) << ")).";
             OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT, ss.str(), env.console);
         }
+
         pokemon.shiny = shiny_detector.read(env.logger(), screen);
         pokemon.ball_slug = ball_reader.read_ball(screen);
+        pokemon.nature = std::move(current_stats.nature);
+        
         if (pokemon.ball_slug.empty()){
             std::ostringstream ss;
             ss << "Box Sorter: Unable to read the ball type at " << BoxCursor(index) << ".";
@@ -217,7 +280,13 @@ void scan_box_summaries(
                  << ", name:" << pokemon.name_slug
                  << ", lvl:" << level_str(pokemon.level)
                  << ", shiny:" << (pokemon.shiny ? "True" : "False")
-                 << ", ball:" << pokemon.ball_slug;
+                 << ", ball:" << pokemon.ball_slug
+                 << ", nature:" << pokemon.nature;
+
+        if (read_page2){
+            pokemon.ability = std::move(current_stats.ability);
+            overview << ", ability:" << pokemon.ability;
+        }
         env.log(overview.str());
 
         pbf_press_dpad(context, DPAD_UP, 80ms, 300ms);
@@ -440,15 +509,17 @@ BoxOrganizationScan scan_box_data(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     Language language, const std::vector<SortingRule>& preferences, size_t num_boxes, bool force_summary_scan
 ){
-    const bool read_summary = force_summary_scan || std::any_of(preferences.begin(), preferences.end(), [](const SortingRule& rule){
-        switch (rule.sort_type){
-        case SortingRuleType::Shiny:
-        case SortingRuleType::Ball_Slug:
-            return true;
-        default:
-            return false;
-        }
+    const bool read_page2 = std::any_of(preferences.begin(), preferences.end(), [](const SortingRule& rule){
+        return rule.sort_type == SortingRuleType::Ability;
     });
+    const bool read_summary = force_summary_scan || read_page2 || std::any_of(
+        preferences.begin(), preferences.end(), [](const SortingRule& rule){
+            return rule.sort_type == SortingRuleType::Nature
+                || rule.sort_type == SortingRuleType::Shiny
+                || rule.sort_type == SortingRuleType::Ball_Slug;
+        }
+    );
+
     auto& stats = env.current_stats<BoxOrganizationStats>();
     const size_t slot_count = num_boxes * BOX_ROWS * BOX_COLS;
     BoxSelectionModeDetector selection_detector;
@@ -544,7 +615,7 @@ BoxOrganizationScan scan_box_data(
             env.update_stats();
         }
         if (read_summary){
-            scan_box_summaries(env, context, language, selection_detector, cursor, boxes_data);
+            scan_box_summaries(env, context, language, selection_detector, cursor, boxes_data, read_page2);
         }
     }
     return {std::move(boxes_data), cursor, scan_mode};
