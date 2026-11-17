@@ -8,7 +8,6 @@
 #include <algorithm>
 #include <QTcpServer>
 #include <QTcpSocket>
-#include <QThread>
 #include "Common/Qt/QtThreadPool.h"
 #include "Common/Qt/GlobalThreadPoolsQt.h"
 #include "ServerSocket2_Qt.h"
@@ -40,26 +39,25 @@ size_t ServerSocket2Connection_Qt::send(
     //  Register the send atomically with respect to
     //  "close()"/"close_for_teardown()": they flip "m_open" under this
     //  same lock before they drain "m_inflight". The packet copy above
-    //  can take a while for large payloads, so without this re-check a
-    //  send could register *after* the close already drained the (empty)
-    //  list: it would then queue a write that is never cancelled, and
-    //  the wait below (unbounded for the infinite default timeout)
-    //  would never end. With the re-check, a send either registers
-    //  before the drain (and gets cancelled, waking the wait below) or
-    //  sees the closed connection and returns without queueing anything.
+    //  can take a while for large payloads, so the m_open check happens
+    //  under the lock, not before it. Holding the lock through the emit
+    //  as well is what makes the server alive for it: the teardown that
+    //  would destroy the server takes this lock first, and any drain
+    //  that runs later still finds this send in the list and cancels it
+    //  (waking the wait below), even if the queued write is then
+    //  discarded with the server.
     bool registered;
     {
-        std::lock_guard<Mutex> lg(m_lock);
+        std::lock_guard<RecursiveMutex> lg(m_lock);
         registered = m_open.load(std::memory_order_relaxed);
         if (registered){
             m_inflight.push_back(send_data);
+            m_server->queue_send(send_data);
         }
     }
     if (!registered){
         return 0;
     }
-
-    m_server->queue_send(send_data);
 
     //  Wait for the server's event thread to finish writing the packet,
     //  or for "close()"/"close_for_teardown()" to cancel the send. A
@@ -97,14 +95,28 @@ size_t ServerSocket2Connection_Qt::send(
 }
 
 void ServerSocket2Connection_Qt::close(){
+    //  "m_lock" spans the whole close: "close_for_teardown()" takes it
+    //  before the server is destroyed, so if we claim the close the
+    //  server is alive for the queued call below - and if we do not
+    //  claim it, someone already did.
+    std::lock_guard<RecursiveMutex> lg(m_lock);
     if (m_close_requested.exchange(true)){
         return;
     }
+    m_open.store(false, std::memory_order_release);
     //  Cancel the in-flight "send()" calls so their callers return
-    //  promptly with the best-effort byte count. (The connection itself
-    //  is closed by the queued call below.)
-    cancel_inflight_sends();
+    //  promptly with the best-effort byte count. The connection itself
+    //  is closed by the queued call below, which "close()" does not
+    //  wait for (the state updates when it runs on the event thread).
+    drain_inflight_sends();
     m_server->close_connection_on();
+}
+
+void ServerSocket2Connection_Qt::close_for_teardown(){
+    std::lock_guard<RecursiveMutex> lg(m_lock);
+    m_close_requested.store(true, std::memory_order_release);
+    m_open.store(false, std::memory_order_release);
+    drain_inflight_sends();
 }
 
 
@@ -186,36 +198,9 @@ void ServerSocket2_Qt::start(const std::string& address, uint16_t port){
 }
 
 void ServerSocket2_Qt::close_connection_on(){
-    QThread* event_thread;
-    {
-        std::lock_guard<Mutex> lg(m_lock);
-        event_thread = m_event_thread;
-        if (m_server == nullptr){
-            //  Not running: "close_and_wait()" already closed the
-            //  connection (or there was none).
-            return;
-        }
-    }
-
-    QSharedPointer<CloseCompletion> completion = QSharedPointer<CloseCompletion>::create();
-    emit internal_close_connection(completion);
-
-    //  If called from a thread other than the server's event thread, the
-    //  call is queued: wait until it has run, so the state is up to date
-    //  when this returns (same as the POSIX backend). If called from the
-    //  event thread (e.g. a listener callback), the call ran directly and
-    //  this does not block.
-    //
-    //  The shared ownership makes the timeout safe: if it expires, the
-    //  queued call's own copy keeps the completion alive until it runs.
-    if (QThread::currentThread() != event_thread){
-        std::unique_lock<Mutex> lg(completion->lock);
-        completion->cv.wait_for(
-            lg,
-            std::chrono::seconds(5),
-            [&completion]{ return completion->done; }
-        );
-    }
+    //  Called from the shell's "close()" with the shell's lock held:
+    //  only enqueue the abort; the shell does not wait for it.
+    emit internal_close_connection();
 }
 
 void ServerSocket2_Qt::close_and_wait() noexcept{
@@ -411,7 +396,7 @@ void ServerSocket2_Qt::connection_lost(QTcpSocket* sock, const std::string& erro
     sock->deleteLater();
 }
 
-void ServerSocket2_Qt::on_close_connection(QSharedPointer<CloseCompletion> completion){
+void ServerSocket2_Qt::on_close_connection(){
     QTcpSocket* sock;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -440,12 +425,6 @@ void ServerSocket2_Qt::on_close_connection(QSharedPointer<CloseCompletion> compl
         //  twice.
         sock->deleteLater();
     }
-
-    {
-        std::lock_guard<Mutex> lg(completion->lock);
-        completion->done = true;
-    }
-    completion->cv.notify_all();
 }
 
 void ServerSocket2_Qt::on_send(QSharedPointer<ServerSocket2Connection_Qt::SendData> send_data){
@@ -525,11 +504,15 @@ std::unique_ptr<QTcpServer> ServerSocket2_Qt::make_server(const std::string& add
         m_listen_error = server->errorString().toStdString();
     }
 
-    {
-        std::lock_guard<Mutex> lg(m_lock);
-        m_event_thread = QThread::currentThread();
-    }
-
+    //  Auto-connection, on purpose: when the caller is the event thread
+    //  (a listener callback calling "send()"/"close()"), the handler runs
+    //  inline inside the emit, so the call cannot deadlock waiting for
+    //  its own queued event; the shell's lock is recursive for that
+    //  re-entry. From another thread the call is queued. "send()" and
+    //  "close()" hold the shell's lock through the emit: the teardown
+    //  takes that same lock before it destroys the server, so the server
+    //  is alive for the emit, and any drain that runs later still finds
+    //  the send in the list and wakes its wait.
     QObject::connect(
         this, &ServerSocket2_Qt::internal_send,
         server.get(), [this](QSharedPointer<ServerSocket2Connection_Qt::SendData> send_data){
@@ -538,8 +521,8 @@ std::unique_ptr<QTcpServer> ServerSocket2_Qt::make_server(const std::string& add
     );
     QObject::connect(
         this, &ServerSocket2_Qt::internal_close_connection,
-        server.get(), [this](QSharedPointer<CloseCompletion> completion){
-            on_close_connection(completion);
+        server.get(), [this]{
+            on_close_connection();
         }
     );
     QObject::connect(

@@ -8,10 +8,10 @@
  *  The QTcpServer (and its connection sockets) live on the global Qt
  *  event thread. The server hands each accepted client out as a
  *  ServerSocket2Connection_Qt object: a plain C++ shell whose send()/
- *  close() calls are posted to the event thread. The shell never owns a
- *  QObject, so its destructor is safe from any thread even after the
- *  server (and the event-thread objects) are gone - the connection only
- *  becomes inert.
+ *  close() calls run on the event thread (inline when already on it,
+ *  queued otherwise). The shell never owns a QObject, so its destructor
+ *  is safe from any thread even after the server (and the event-thread
+ *  objects) are gone - the connection only becomes inert.
  *
  */
 
@@ -30,7 +30,6 @@
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "AbstractServerSocket2.h"
 
-class QThread;
 class QTcpServer;
 class QTcpSocket;
 
@@ -115,17 +114,15 @@ public:
     void mark_closed(){
         m_open.store(false, std::memory_order_release);
     }
-    //  Flips the connection closed (under m_lock, so a concurrent
-    //  "send()" registration sees it) and cancels the in-flight sends,
-    //  so their callers return promptly with the bytes written so far
-    //  (best effort). The queued write loops finish without writing.
-    void cancel_inflight_sends(){
-        std::vector<QSharedPointer<SendData>> cancelled;
-        {
-            std::lock_guard<Mutex> lg(m_lock);
-            m_open.store(false, std::memory_order_release);
-            cancelled = std::move(m_inflight);
-        }
+    //  Flips the connection closed and drains the in-flight sends,
+    //  waking their callers with the bytes written so far (best
+    //  effort). "m_lock" must already be held: it is what keeps a
+    //  concurrent "send()" from registering after the drain, and it is
+    //  what the server's teardown takes before it can destroy the
+    //  server - so a "send()"/"close()" that got past its m_open check
+    //  can never reach a freed server.
+    void drain_inflight_sends(){
+        const std::vector<QSharedPointer<SendData>> cancelled = std::move(m_inflight);
         for (const auto& send_data : cancelled){
             {
                 std::lock_guard<Mutex> lg(send_data->lock);
@@ -137,16 +134,14 @@ public:
     }
     //  Destructor path: the server is going away, so mark the connection
     //  closed as application-initiated (a later "close()" is a no-op and
-    //  never touches the dead server) and cancel the in-flight sends.
-    void close_for_teardown(){
-        m_close_requested.store(true, std::memory_order_release);
-        cancel_inflight_sends();
-    }
+    //  never touches the dead server) and cancel the in-flight sends. The
+    //  socket itself is destroyed with the QTcpServer.
+    void close_for_teardown();
     //  Runs on the event thread (from the server's write loop): the send
     //  finished; remove it from the in-flight list and wake its caller.
     void finish_send(QSharedPointer<SendData> send_data, size_t bytes_sent){
         {
-            std::lock_guard<Mutex> lg(m_lock);
+            std::lock_guard<RecursiveMutex> lg(m_lock);
             //  "close_for_teardown()"/"close()" may already have claimed
             //  this send; only remove it if it still owns its slot.
             m_inflight.erase(
@@ -170,18 +165,28 @@ public:
 private:
     friend class ServerSocket2_Qt;
 
+    //  Raw pointer to the server, dereferenced only while holding
+    //  "m_lock": the server's teardown takes that same lock before it
+    //  destroys the server, so "send()"/"close()" can never reach a
+    //  freed server, and after teardown "m_open"/"m_close_requested"
+    //  make them return before they would.
     ServerSocket2_Qt* m_server;
     //  Owned by Qt (a child of the QTcpServer); destroyed on the event
     //  thread. Never dereferenced after the connection closed.
     QTcpSocket* m_sock;
     std::atomic<bool> m_open{true};
     std::atomic<bool> m_close_requested{false};
-    //  Guards "m_inflight" only (never "m_sock": that is event-thread
-    //  state). "close()"/"close_for_teardown()" flip "m_open" under this
-    //  same lock before they drain the list, so a "send()" either
-    //  registers before the drain (and gets cancelled) or sees the
-    //  closed connection and returns without queueing.
-    Mutex m_lock;
+    //  Guards the "m_inflight" list, the "m_open" flips, and the
+    //  "m_close_requested" claim. "send()" holds it from its m_open check
+    //  through the queued emit, and "close()"/"close_for_teardown()" hold
+    //  it for their whole close, so a send either registers before the
+    //  close's drain (and gets cancelled, waking its wait) or sees the
+    //  closed connection and returns without queueing anything - and
+    //  neither one can queue into a server the close already freed.
+    //  It is recursive because the emit runs the handler inline when the
+    //  caller is the event thread (AutoConnection), and "on_send"/"on_
+    //  close_connection" re-take it on that path.
+    RecursiveMutex m_lock;
     std::vector<QSharedPointer<SendData>> m_inflight;
 };
 
@@ -189,14 +194,6 @@ private:
 
 class ServerSocket2_Qt final : public QObject, public AbstractServerSocket2{
     Q_OBJECT
-
-    //  Synchronizes "close()" with the QTcpServer's event thread when
-    //  called from another thread. Lifetime as SendData.
-    struct CloseCompletion{
-        Mutex lock;
-        ConditionVariable cv;
-        bool done = false;
-    };
 
 public:
     ServerSocket2_Qt(ThreadPool&){}
@@ -217,22 +214,26 @@ public:
 
 signals:
     void internal_send(QSharedPointer<ServerSocket2Connection_Qt::SendData> send_data);
-    void internal_close_connection(QSharedPointer<CloseCompletion> completion);
+    void internal_close_connection();
 
 
 private:
     friend class ServerSocket2Connection_Qt;
 
-    //  Queues a connection's send on the event thread (the shell's
-    //  "send()" does not wait; the wait happens on the shell's side).
+    //  Queues a connection's send on the event thread (or runs it inline
+    //  when called from that thread). Called from the shell's "send()"
+    //  with the shell's lock held, which the write loop's
+    //  "finish_send()" re-takes on that inline path - hence the
+    //  recursive shell lock.
     void queue_send(QSharedPointer<ServerSocket2Connection_Qt::SendData> send_data){
         emit internal_send(send_data);
     }
 
-    //  Queues the active connection's close on the event thread and, when
-    //  called from another thread, waits (up to 5 s) for it to run, so
-    //  the state is up to date when this returns. Called from the shell's
-    //  "close()".
+    //  Queues the active connection's close on the event thread (or runs
+    //  it inline when called from that thread). Called from the shell's
+    //  "close()" with the shell's lock held. "close()" does not wait for
+    //  the abort: "state()"/"active_connection()" update when the call
+    //  runs.
     void close_connection_on();
 
     //  Runs on the QTcpServer's event thread.
@@ -246,7 +247,7 @@ private:
     void connection_lost(QTcpSocket* sock, const std::string& error_message);
 
     //  Runs on the QTcpServer's event thread.
-    void on_close_connection(QSharedPointer<CloseCompletion> completion);
+    void on_close_connection();
 
     //  Runs on the QTcpServer's event thread. The context object is the
     //  server, so the call still runs if the connection socket has
@@ -263,12 +264,10 @@ private:
 
     std::unique_ptr<QTcpServer> make_server(const std::string& address, uint16_t port);
 
-private:
     Mutex m_lock;
     ConditionVariable m_cv;
 
     QTcpServer* m_server = nullptr;
-    QThread* m_event_thread = nullptr;
     bool m_starting = false;
 
     //  The connection currently being served, or empty. The server keeps

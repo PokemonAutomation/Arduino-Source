@@ -181,6 +181,29 @@ struct Server2Listener : AbstractServerSocket2::Listener{
 };
 
 
+//  Stalls the client's reading for 70 s on the first data (or until
+//  "stop" is set), keeping a large server-side send in flight.
+struct StallingClientListener : ClientListener{
+    std::atomic<bool> stalled{false};
+    std::atomic<bool> stop{false};
+
+    ~StallingClientListener(){
+        stop.store(true, std::memory_order_release);
+    }
+
+    virtual void on_receive_data(const void* data, size_t bytes) override{
+        if (!stalled.exchange(true)){
+            const auto end = std::chrono::steady_clock::now() + std::chrono::seconds(70);
+            while (std::chrono::steady_clock::now() < end
+                && !stop.load(std::memory_order_acquire)){
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
+        }
+        ClientListener::on_receive_data(data, bytes);
+    }
+};
+
+
 template <typename ClientSocketType, typename ServerSocket2Type>
 class TestServerSocket2 : public UnitTest{
 public:
@@ -280,7 +303,6 @@ public:
             return "Failed to start the server";
         }
 
-        bool ok = false;
         std::string error;
         {
             ClientListener client_listener;
@@ -310,23 +332,19 @@ public:
                 error = "The client did not receive the echo";
             }else if (std::memcmp(client_listener.received.data(), "hello world", 11) != 0){
                 error = "The echo data was corrupted";
-            }else{
-                ok = true;
             }
 
             client.close();
         }
 
-        if (!error.empty() || !server_listener.waiter.wait_for(
+        if (error.empty() && !server_listener.waiter.wait_for(
             SOCKET_TEST_WAIT,
             [&server_listener]{ return server_listener.disconnected.load() >= 1; }
         )){
-            if (error.empty()){
-                error = "The server did not call on_disconnect";
-            }
+            error = "The server did not call on_disconnect";
         }
 
-        if (!ok && !error.empty()){
+        if (!error.empty()){
             return error;
         }
         return true;
@@ -363,7 +381,6 @@ public:
             return "Failed to start the server";
         }
 
-        bool ok = false;
         std::string error;
         {
             ClientListener client_listener;
@@ -395,15 +412,13 @@ public:
                     [&client_listener]{ return client_listener.received.size() >= 1; }
                 )){
                     error = "The client did not receive the echo";
-                }else{
-                    ok = true;
                 }
             }
 
             client.close();
         }
 
-        if (!ok && !error.empty()){
+        if (!error.empty()){
             return error;
         }
         return true;
@@ -444,7 +459,6 @@ public:
             return "Failed to start the server";
         }
 
-        bool ok = false;
         std::string error;
         std::atomic<size_t> bytes_sent{0};
         {
@@ -474,15 +488,13 @@ public:
                 send_task.wait_and_ignore_exceptions();
                 if (error.empty() && bytes_sent.load() != SIZE){
                     error = "The client reported sending " + std::to_string(bytes_sent.load()) + " of " + std::to_string(SIZE) + " bytes";
-                }else if (error.empty()){
-                    ok = true;
                 }
             }
 
             client.close();
         }
 
-        if (!ok && !error.empty()){
+        if (!error.empty()){
             return error;
         }
         return true;
@@ -490,8 +502,9 @@ public:
 };
 
 
-//  Rapidly open and close a connection several times in a row, and
-//  verify that the server keeps accepting new clients and echoing.
+//  Rapidly open and close a connection twenty times in a row, with
+//  exact bookkeeping, and verify that the server keeps accepting new
+//  clients and echoing.
 template <typename ClientSocketType, typename ServerSocket2Type>
 class Test_ServerSocket2_RapidReconnect : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
 public:
@@ -504,7 +517,7 @@ public:
                 "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
             );
         }
-        constexpr int CYCLES = 5;
+        constexpr int CYCLES = 20;
 
         Server2Listener server_listener;
         ServerSocket2Type server(this->m_thread_pool);
@@ -521,46 +534,50 @@ public:
             return "Failed to start the server";
         }
 
-        bool ok = false;
         std::string error;
+        size_t expected_echo = 0;
         {
             ClientListener client_listener;
             ClientSocketType client(this->m_thread_pool);
             client.add_listener(client_listener);
 
-            for (int cycle = 1; ok == false && error.empty() && cycle <= CYCLES; cycle++){
+            for (int cycle = 1; error.empty() && cycle <= CYCLES; cycle++){
                 if (!this->connect_client(client, client_listener, port, cycle)){
                     error = "The client did not reconnect (cycle " + std::to_string(cycle) + ")";
                 }else if (!client_listener.last_connect_error.empty()){
                     error = "The client failed to reconnect: " + client_listener.last_connect_error;
                 }else if (!server_listener.waiter.wait_for(
                     SOCKET_TEST_WAIT,
-                    [&server_listener, cycle]{ return server_listener.connected.load() >= cycle; }
+                    [&server_listener, cycle]{ return server_listener.connected.load() == cycle; }
                 )){
                     error = "The server did not accept the reconnection (cycle " + std::to_string(cycle) + ")";
-                }else if (client.send("p", 1) != 1){
-                    error = "The client did not send its byte (cycle " + std::to_string(cycle) + ")";
-                }else if (!client_listener.waiter.wait_for(
-                    SOCKET_TEST_WAIT,
-                    [&client_listener, cycle]{ return client_listener.received.size() >= (size_t)cycle; }
-                )){
-                    error = "The client did not receive the echo (cycle " + std::to_string(cycle) + ")";
+                }else if (client.send("ping", 4) != 4){
+                    error = "The client did not send the packet (cycle " + std::to_string(cycle) + ")";
                 }else{
-                    client.close();
-                    if (!server_listener.waiter.wait_for(
+                    expected_echo += 4;
+                    if (!client_listener.waiter.wait_for(
                         SOCKET_TEST_WAIT,
-                        [&server_listener, cycle]{ return server_listener.disconnected.load() >= cycle; }
+                        [&client_listener, expected_echo]{
+                            return client_listener.received.size() == expected_echo;
+                        }
                     )){
-                        error = "The server did not observe the disconnect (cycle " + std::to_string(cycle) + ")";
+                        error = "The client did not receive the echo (cycle " + std::to_string(cycle) + ")";
+                    }else{
+                        client.close();
+                        if (!server_listener.waiter.wait_for(
+                            SOCKET_TEST_WAIT,
+                            [&server_listener, cycle]{
+                                return server_listener.disconnected.load() == cycle;
+                            }
+                        )){
+                            error = "The server did not observe the disconnect (cycle " + std::to_string(cycle) + ")";
+                        }
                     }
                 }
             }
-            if (error.empty()){
-                ok = true;
-            }
         }
 
-        if (!ok && !error.empty()){
+        if (!error.empty()){
             return error;
         }
         return true;
@@ -571,6 +588,8 @@ public:
 //  Start a large send on the connection, then close the connection from
 //  the server side mid-send. The send must return promptly with a
 //  best-effort byte count, and the server must keep accepting clients.
+//  (The stalled-peer variant that pins the cancellation itself is
+//  CloseCancelsSend below.)
 template <typename ClientSocketType, typename ServerSocket2Type>
 class Test_ServerSocket2_SendCloseRace : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
 public:
@@ -602,7 +621,6 @@ public:
             return "Failed to start the server";
         }
 
-        bool ok = false;
         std::string error;
         {
             ClientListener client_listener;
@@ -661,27 +679,26 @@ public:
                     [&client_listener]{ return client_listener.disconnected.load() >= 1; }
                 )){
                     error = "The client did not observe the disconnect";
-                }else{
-                    //  The server must accept a new connection.
-                    if (!this->connect_client(client, client_listener, port, 2)){
-                        error = "The client did not reconnect";
-                    }else if (!server_listener.waiter.wait_for(
+                }
+
+                //  The server must accept a new connection.
+                if (error.empty() && !this->connect_client(client, client_listener, port, 2)){
+                    error = "The client did not reconnect";
+                }else if (error.empty()
+                    && !server_listener.waiter.wait_for(
                         SOCKET_TEST_WAIT,
                         [&server_listener]{ return server_listener.connected.load() >= 2; }
-                    )){
-                        error = "The server did not accept the new connection";
-                    }else if (client.send("x", 1) != 1){
-                        error = "The new connection does not work";
-                    }else{
-                        ok = true;
-                    }
+                )){
+                    error = "The server did not accept the new connection";
+                }else if (error.empty() && client.send("x", 1) != 1){
+                    error = "The new connection does not work";
                 }
             }
 
             client.close();
         }
 
-        if (!ok && !error.empty()){
+        if (!error.empty()){
             return error;
         }
         return true;
@@ -689,8 +706,167 @@ public:
 };
 
 
-//  While a client is connected, a second client must be rejected, and
-//  the first client must keep working.
+//  A 256 MiB send against a peer that stops reading stays in flight
+//  when close() lands: the sender must be woken promptly with a
+//  best-effort count, and the server must keep accepting clients.
+template <typename ClientSocketType, typename ServerSocket2Type>
+class Test_ServerSocket2_CloseCancelsSend : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
+public:
+    Test_ServerSocket2_CloseCancelsSend(ThreadPool& thread_pool, std::string name)
+        : TestServerSocket2<ClientSocketType, ServerSocket2Type>(thread_pool, std::move(name))
+    {
+        //  The 256 MiB payload below, plus a transient 256 MiB copy in
+        //  the Qt backend's in-flight send data (overreported on the
+        //  other backends, which don't copy the payload).
+        this->m_memory = 2ull * (1ull << 28);
+    }
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        if (timing_unreliable()){
+            return UnitTestResult(
+                UnitTestResult::SKIPPED,
+                "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
+            );
+        }
+        Server2Listener server_listener;
+        server_listener.echo = false;
+        ServerSocket2Type server(this->m_thread_pool);
+        server.add_listener(server_listener);
+
+        uint16_t port;
+        if (!this->start_server(server, server_listener, port)){
+            //  A listen-phase failure on a starved machine is the
+            //  machine's fault, not the socket's.
+            if (timing_unreliable()){
+                return UnitTestResult(
+                    UnitTestResult::SKIPPED,
+                    "The server did not start listening on a starved machine."
+                );
+            }
+            return "Failed to start the server";
+        }
+
+        std::string error;
+        {
+            StallingClientListener client_listener;
+            ClientSocketType client(this->m_thread_pool);
+            client.add_listener(client_listener);
+
+            if (!this->connect_client(client, client_listener, port, 1)){
+                //  A connect-phase failure on a starved machine is the
+                //  machine's fault, not the socket's.
+                if (timing_unreliable()){
+                    return UnitTestResult(
+                        UnitTestResult::SKIPPED,
+                        "The client did not finish connecting on a starved machine."
+                    );
+                }
+                error = "The client did not finish connecting";
+            }else if (!server_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&server_listener]{ return server_listener.connected.load() >= 1; }
+            )){
+                if (timing_unreliable()){
+                    return UnitTestResult(
+                        UnitTestResult::SKIPPED,
+                        "The server did not call on_connect on a starved machine."
+                    );
+                }
+                error = "The server did not call on_connect";
+            }else{
+                //  Far larger than the kernel send/receive buffering, so
+                //  the send stays in flight against the stalled reader.
+                //  (On an OS that buffered the whole payload anyway, the
+                //  send completes before close() and the test still
+                //  passes, just without exercising the cancel.)
+                constexpr size_t SIZE = 1 << 28;
+                std::vector<uint8_t> payload(SIZE, 0xAB);
+
+                auto conn = server_listener.connection;
+                std::atomic<size_t> sent{0};
+                auto send_start = std::chrono::steady_clock::now();
+                AsyncTask send_task = this->m_thread_pool.dispatch(
+                    [&conn, &payload, &sent]{
+                        sent = conn->send(payload.data(), payload.size());
+                    }
+                );
+
+                //  Give the send a head start so it is in flight when
+                //  close() runs, then cancel it.
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+                auto close_start = std::chrono::steady_clock::now();
+                conn->close();
+                const long long close_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::steady_clock::now() - close_start
+                ).count();
+
+                send_task.wait_and_ignore_exceptions();
+                const long long send_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::steady_clock::now() - send_start
+                ).count();
+
+                if (send_ms > 60000){
+                    //  A send that is not ended by close() on a starved
+                    //  machine is the machine's fault, not the
+                    //  cancellation's.
+                    if (timing_unreliable()){
+                        return UnitTestResult(
+                            UnitTestResult::SKIPPED,
+                            "send() did not return within 60 s of close() on a starved machine."
+                        );
+                    }
+                    error = "send() did not return within 60 s of close() (" + std::to_string(send_ms) + " ms)";
+                }else if (close_ms > 60000){
+                    if (timing_unreliable()){
+                        return UnitTestResult(
+                            UnitTestResult::SKIPPED,
+                            "close() did not finish within 60 s on a starved machine."
+                        );
+                    }
+                    error = "close() did not finish within 60 s (" + std::to_string(close_ms) + " ms)";
+                }else if (sent.load() > SIZE){
+                    error = "send() reported more bytes (" + std::to_string(sent.load()) + ") than the payload size";
+                }else{
+                    //  close() may return with the close still pending on
+                    //  a starved event thread (Qt backend), so poll for
+                    //  the resulting LISTENING state within the shared
+                    //  budget before judging it.
+                    const auto s0 = std::chrono::steady_clock::now();
+                    while (server.state() != AbstractServerSocket2::State::LISTENING
+                        && std::chrono::steady_clock::now() - s0 < SOCKET_TEST_WAIT){
+                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                    }
+                    if (server.state() != AbstractServerSocket2::State::LISTENING){
+                        if (timing_unreliable()){
+                            return UnitTestResult(
+                                UnitTestResult::SKIPPED,
+                                "The server is not LISTENING after close() on a starved machine."
+                            );
+                        }
+                        error = "The server is not LISTENING after close()";
+                    }
+                }
+            }
+
+            //  Release the stalled reader so the client's close() (which
+            //  joins its receive thread, currently inside the stall) does
+            //  not wait for it.
+            client_listener.stop.store(true, std::memory_order_release);
+            client.close();
+        }
+
+        if (!error.empty()){
+            return error;
+        }
+        return true;
+    }
+};
+
+
+//  While a client is connected, every new client must be rejected -
+//  hammered a few times in a row to exercise the rejection path in
+//  churn - and the first client must keep working.
 template <typename ClientSocketType, typename ServerSocket2Type>
 class Test_ServerSocket2_RejectSecondClient : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
 public:
@@ -703,6 +879,8 @@ public:
                 "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
             );
         }
+        constexpr int REJECTIONS = 10;
+
         Server2Listener server_listener;
         ServerSocket2Type server(this->m_thread_pool);
         server.add_listener(server_listener);
@@ -718,7 +896,6 @@ public:
             return "Failed to start the server";
         }
 
-        bool ok = false;
         std::string error;
         {
             ClientListener client_listener;
@@ -733,43 +910,41 @@ public:
             )){
                 error = "The server did not call on_connect for the first client";
             }else{
-                //  The second client must be rejected.
-                ClientListener second_listener;
-                ClientSocketType second_client(this->m_thread_pool);
-                second_client.add_listener(second_listener);
-                second_client.connect("127.0.0.1", port);
-
                 //  The reject is not reported to the second client in a
                 //  backend-stable way (its connect may report success and
                 //  disconnect later, or fail outright), so wait for the
                 //  server-side report only.
-                if (!server_listener.waiter.wait_for(
-                    SOCKET_TEST_WAIT,
-                    [&server_listener]{ return server_listener.rejected.load() >= 1; }
-                )){
-                    error = "The server did not reject the second client";
-                }else if (!client_listener.waiter.wait_for(
-                    SOCKET_TEST_WAIT,
-                    [&client_listener]{ return client_listener.connect_finished.load() >= 1; }
-                )){
-                    error = "The first client lost its connection";
-                }else if (client.send("x", 1) != 1){
+                for (int attempt = 1; error.empty() && attempt <= REJECTIONS; attempt++){
+                    ClientListener second_listener;
+                    ClientSocketType second_client(this->m_thread_pool);
+                    second_client.add_listener(second_listener);
+                    second_client.connect("127.0.0.1", port);
+
+                    if (!server_listener.waiter.wait_for(
+                        SOCKET_TEST_WAIT,
+                        [&server_listener, attempt]{
+                            return server_listener.rejected.load() == attempt;
+                        }
+                    )){
+                        error = "The server did not reject the second client (attempt " + std::to_string(attempt) + ")";
+                    }
+                }
+
+                //  The first client must still work.
+                if (error.empty() && client.send("x", 1) != 1){
                     error = "The first client stopped working";
-                }else if (!client_listener.waiter.wait_for(
+                }else if (error.empty() && !client_listener.waiter.wait_for(
                     SOCKET_TEST_WAIT,
                     [&client_listener]{ return client_listener.received.size() >= 1; }
                 )){
                     error = "The first client did not receive the echo";
-                }else{
-                    ok = true;
                 }
-                second_client.close();
             }
 
             client.close();
         }
 
-        if (!ok && !error.empty()){
+        if (!error.empty()){
             return error;
         }
         return true;
@@ -883,7 +1058,6 @@ public:
             return "Failed to start the server";
         }
 
-        bool ok = false;
         std::string error;
         {
             ClientListener client_listener;
@@ -921,12 +1095,10 @@ public:
                 error = "The active connection was not cleared after the peer close";
             }else if (server.state() != AbstractServerSocket2::State::LISTENING){
                 error = "The server is not LISTENING after the peer close";
-            }else{
-                ok = true;
             }
         }
 
-        if (!ok && !error.empty()){
+        if (!error.empty()){
             return error;
         }
         return true;
@@ -964,7 +1136,6 @@ public:
             return "Failed to start the server";
         }
 
-        bool ok = false;
         std::string error;
         {
             ClientListener client_listener;
@@ -1001,7 +1172,14 @@ public:
                     }
                 }
 
-                //  The server must accept a new client.
+                //  An application-side close must not have reported a
+                //  disconnect: the only on_disconnect() this test may see
+                //  is the peer close of connection #2, at the very end.
+                if (error.empty() && server_listener.disconnected.load() != 0){
+                    error = "on_disconnect() fired for an application-side close()";
+                }
+
+                //  The server must accept a new client and echo on it.
                 if (error.empty() && !this->connect_client(client, client_listener, port, 2)){
                     error = "The client did not reconnect";
                 }else if (error.empty()
@@ -1010,21 +1188,122 @@ public:
                         [&server_listener]{ return server_listener.connected.load() >= 2; }
                 )){
                     error = "The server did not accept the new connection";
-                }else if (error.empty() && client.send("x", 1) != 1){
+                }else if (error.empty() && client.send("ok", 2) != 2){
                     error = "The new connection does not work";
-                }else if (error.empty()){
-                    ok = true;
+                }else if (error.empty() && !client_listener.waiter.wait_for(
+                    SOCKET_TEST_WAIT,
+                    [&client_listener]{ return client_listener.received.size() >= 2; }
+                )){
+                    error = "The new connection did not receive the echo";
                 }
             }
 
             client.close();
         }
 
-        if (error.empty() && server_listener.disconnected.load() != 0){
-            error = "on_disconnect() fired for an application-side close()";
+        //  Connection #2's peer close is the one disconnect this test
+        //  expects.
+        if (error.empty() && !server_listener.waiter.wait_for(
+            SOCKET_TEST_WAIT,
+            [&server_listener]{ return server_listener.disconnected.load() >= 1; }
+        )){
+            error = "The server did not call on_disconnect for the peer close";
         }
 
-        if (!ok && !error.empty()){
+        if (!error.empty()){
+            return error;
+        }
+        return true;
+    }
+};
+
+
+//  A send on a connection that has been replaced must be refused, and
+//  the replacement client must not receive the stale bytes.
+template <typename ClientSocketType, typename ServerSocket2Type>
+class Test_ServerSocket2_StaleSend : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
+public:
+    using TestServerSocket2<ClientSocketType, ServerSocket2Type>::TestServerSocket2;
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        if (timing_unreliable()){
+            return UnitTestResult(
+                UnitTestResult::SKIPPED,
+                "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
+            );
+        }
+        Server2Listener server_listener;
+        ServerSocket2Type server(this->m_thread_pool);
+        server.add_listener(server_listener);
+
+        uint16_t port;
+        if (!this->start_server(server, server_listener, port)){
+            return "Failed to start the server";
+        }
+
+        std::string error;
+        AbstractServerSocket2::ConnectionPtr first;
+        {
+            ClientListener client_listener;
+            ClientSocketType client(this->m_thread_pool);
+            client.add_listener(client_listener);
+
+            if (!this->connect_client(client, client_listener, port, 1)){
+                error = "The first client did not finish connecting";
+            }else if (!server_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&server_listener]{ return server_listener.connected.load() >= 1; }
+            )){
+                error = "The server did not call on_connect";
+            }else{
+                first = server_listener.connection;
+                client.close();
+            }
+        }
+
+        if (error.empty() && !server_listener.waiter.wait_for(
+            SOCKET_TEST_WAIT,
+            [&server_listener]{ return server_listener.disconnected.load() >= 1; }
+        )){
+            error = "The server did not call on_disconnect for the first connection";
+        }
+
+        {
+            ClientListener client_listener;
+            ClientSocketType client(this->m_thread_pool);
+            client.add_listener(client_listener);
+
+            if (!this->connect_client(client, client_listener, port, 1)){
+                error = "The second client did not finish connecting";
+            }else if (!server_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&server_listener]{ return server_listener.connected.load() >= 2; }
+            )){
+                error = "The server did not call on_connect for the second client";
+            }else{
+                //  A send for the replaced connection must be refused,
+                //  not delivered into the new client's socket.
+                std::string stale = "stale";
+                if (first->send(stale.data(), stale.size()) != 0){
+                    error = "A send for a replaced connection was not refused";
+                }else if (client.send("hello", 5) != 5){
+                    error = "The send for the current connection was not delivered";
+                }else if (!client_listener.waiter.wait_for(
+                    SOCKET_TEST_WAIT,
+                    [&client_listener]{ return client_listener.received.size() >= 5; }
+                )){
+                    error = "The second client did not receive the data";
+                }else if (client_listener.received.size() != 5
+                    || std::memcmp(client_listener.received.data(), "hello", 5) != 0
+                ){
+                    error = "The second client received the wrong (stale?) data";
+                }
+            }
+
+            client.close();
+        }
+
+        if (!error.empty()){
             return error;
         }
         return true;
@@ -1046,7 +1325,6 @@ public:
                 "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
             );
         }
-        bool ok = false;
         std::string error;
         AbstractServerSocket2::ConnectionPtr held;
         {
@@ -1092,7 +1370,6 @@ public:
                     error = "send() on a connection whose server is gone should return 0";
                 }else{
                     held->close();  //  No-op, must not crash.
-                    ok = true;
                 }
             }
 
@@ -1108,7 +1385,7 @@ public:
             client.close();
         }
 
-        if (!ok && !error.empty()){
+        if (!error.empty()){
             return error;
         }
         return true;
@@ -1148,7 +1425,6 @@ public:
             return "Failed to start the server";
         }
 
-        bool ok = false;
         std::string error;
         {
             ClientListener client_listener;
@@ -1196,8 +1472,6 @@ public:
                         [&server_listener]{ return server_listener.connected.load() >= 2; }
                     )){
                         error = "The server did not accept the new connection";
-                    }else{
-                        ok = true;
                     }
                 }
             }
@@ -1205,7 +1479,7 @@ public:
             client.close();
         }
 
-        if (!ok && !error.empty()){
+        if (!error.empty()){
             return error;
         }
         return true;
@@ -1218,7 +1492,13 @@ public:
 template <typename ClientSocketType, typename ServerSocket2Type>
 class Test_ServerSocket2_SendTimeout : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
 public:
-    using TestServerSocket2<ClientSocketType, ServerSocket2Type>::TestServerSocket2;
+    Test_ServerSocket2_SendTimeout(ThreadPool& thread_pool, std::string name)
+        : TestServerSocket2<ClientSocketType, ServerSocket2Type>(thread_pool, std::move(name))
+    {
+        //  The 64 MiB payload below, plus a transient 64 MiB copy in
+        //  the Qt backend's in-flight send data.
+        this->m_memory = 1ull << 28;  // 256 MiB
+    }
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (timing_unreliable()){
@@ -1228,29 +1508,6 @@ public:
             );
         }
         constexpr bool QT = std::is_same_v<ServerSocket2Type, ServerSocket2_Qt>;
-
-        //  Stalls the client's reading for 12 s on the first data (or
-        //  until "stop" is set), keeping the server's send buffer full
-        //  for the duration of the send test.
-        struct StallingClientListener : ClientListener{
-            std::atomic<bool> stalled{false};
-            std::atomic<bool> stop{false};
-
-            ~StallingClientListener(){
-                stop.store(true, std::memory_order_release);
-            }
-
-            virtual void on_receive_data(const void* data, size_t bytes) override{
-                if (!stalled.exchange(true)){
-                    const auto end = std::chrono::steady_clock::now() + std::chrono::seconds(70);
-                    while (std::chrono::steady_clock::now() < end
-                        && !stop.load(std::memory_order_acquire)){
-                        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-                    }
-                }
-                ClientListener::on_receive_data(data, bytes);
-            }
-        };
 
         Server2Listener server_listener;
         server_listener.echo = false;
@@ -1364,6 +1621,238 @@ public:
 };
 
 
+//  The Qt server's event thread is blocked in a listener callback when
+//  this test queues a send and a close: the close's cancel must wake the
+//  sender promptly (without the event thread's help), and the close must
+//  still land once the stall ends.
+class Test_ServerSocket2_Qt_CloseUnderStall : public UnitTest{
+public:
+    Test_ServerSocket2_Qt_CloseUnderStall(ThreadPool& thread_pool, std::string name)
+        : UnitTest(std::move(name))
+        , m_thread_pool(thread_pool)
+    {
+        m_threads = 2;
+    }
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        if (timing_unreliable()){
+            return UnitTestResult(
+                UnitTestResult::SKIPPED,
+                "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
+            );
+        }
+
+        //  Blocks the server's event thread for 6 s on the first data,
+        //  and flags it when the block starts. Only the first burst
+        //  stalls: the Qt server delivers the rest of the trigger 4096
+        //  bytes at a time, and every other burst stalling the event
+        //  thread for 6 s would queue the close behind minutes of stalls.
+        struct StallingServerListener : AbstractServerSocket2::Listener{
+            Waiter waiter;
+            std::atomic<bool> stall_started{false};
+
+            virtual void on_receive_data(
+                AbstractServerSocket2::ConnectionPtr,
+                const void*,
+                size_t
+            ) override{
+                if (!stall_started.exchange(true, std::memory_order_acq_rel)){
+                    waiter.notify();
+                    std::this_thread::sleep_for(std::chrono::seconds(6));
+                }
+            }
+        };
+
+        Server2Listener server_listener;
+        StallingServerListener stall_listener;
+        ServerSocket2_Qt server(m_thread_pool);
+        server.add_listener(server_listener);
+        server.add_listener(stall_listener);
+
+        uint16_t port = 0;
+        {
+            std::mt19937 rng{std::random_device{}()};
+            for (int attempt = 0; port == 0 && attempt < 8; attempt++){
+                uint16_t candidate = (uint16_t)(40000 + rng() % 20000);
+                const int finished_before = server_listener.listen_finished.load();
+                server.start("127.0.0.1", candidate);
+                if (server_listener.waiter.wait_for(
+                    SOCKET_TEST_WAIT,
+                    [finished_before, &server_listener]{
+                        return server_listener.listen_finished.load() > finished_before;
+                    }
+                ) && server_listener.last_listen_error.empty()){
+                    port = candidate;
+                }
+            }
+        }
+        if (port == 0){
+            if (timing_unreliable()){
+                return UnitTestResult(
+                    UnitTestResult::SKIPPED,
+                    "The server did not start listening on a starved machine."
+                );
+            }
+            return "Failed to start the server";
+        }
+
+        std::string error;
+        {
+            ClientListener client_listener;
+            ClientSocket_Qt client(m_thread_pool);
+            client.add_listener(client_listener);
+
+            client.connect("127.0.0.1", port);
+            if (!client_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&client_listener]{ return client_listener.connect_finished.load() >= 1; }
+            )){
+                if (timing_unreliable()){
+                    return UnitTestResult(
+                        UnitTestResult::SKIPPED,
+                        "The client did not finish connecting on a starved machine."
+                    );
+                }
+                error = "The client did not finish connecting";
+            }else if (!client_listener.last_connect_error.empty()){
+                error = "The client failed to connect: " + client_listener.last_connect_error;
+            }else if (!server_listener.waiter.wait_for(
+                SOCKET_TEST_WAIT,
+                [&server_listener]{ return server_listener.connected.load() >= 1; }
+            )){
+                if (timing_unreliable()){
+                    return UnitTestResult(
+                        UnitTestResult::SKIPPED,
+                        "The server did not call on_connect on a starved machine."
+                    );
+                }
+                error = "The server did not call on_connect";
+            }else{
+                //  One burst in: the server's on_receive_data blocks its
+                //  event thread for 6 s.
+                constexpr size_t TRIGGER_SIZE = 1 << 18;
+                std::vector<uint8_t> trigger(TRIGGER_SIZE, 0xCD);
+                if (client.send(trigger.data(), trigger.size()) != TRIGGER_SIZE){
+                    error = "The client did not send the trigger";
+                }else if (!stall_listener.waiter.wait_for(
+                    SOCKET_TEST_WAIT,
+                    [&stall_listener]{ return stall_listener.stall_started.load(); }
+                )){
+                    error = "The server's event thread did not reach the stall";
+                }else{
+                    auto conn = server_listener.connection;
+
+                    //  The event thread is now blocked for 6 s; anything
+                    //  queued to it waits behind the stall. This send
+                    //  (on the test thread) queues behind the stall, and
+                    //  the close from the worker thread is what must wake
+                    //  it.
+                    constexpr size_t SIZE = 1 << 20;
+                    std::vector<uint8_t> payload(SIZE, 0xAB);
+
+                    auto close_start = std::chrono::steady_clock::time_point::max();
+                    long long close_ms = 0;
+                    AsyncTask close_task = m_thread_pool.dispatch(
+                        [&conn, &close_start, &close_ms]{
+                            //  Give the send a head start so it is in
+                            //  flight when close() runs.
+                            std::this_thread::sleep_for(std::chrono::milliseconds(300));
+                            auto t0 = std::chrono::steady_clock::now();
+                            close_start = t0;
+                            conn->close();
+                            close_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                                std::chrono::steady_clock::now() - t0
+                            ).count();
+                        }
+                    );
+
+                    size_t sent = conn->send(payload.data(), payload.size());
+                    const auto send_end = std::chrono::steady_clock::now();
+
+                    close_task.wait_and_ignore_exceptions();
+
+                    //  The send must have been woken by the cancel: it
+                    //  returns within a few milliseconds of close()
+                    //  starting, no matter when the (stalled) event
+                    //  thread gets to run the queued write. (Without
+                    //  cancellation it would only wake when the 6 s
+                    //  stall ends.)
+                    const long long cancel_lag = std::chrono::duration_cast<std::chrono::milliseconds>(
+                        send_end - close_start
+                    ).count();
+
+                    if (sent == payload.size()){
+                        //  The event thread caught up before the close
+                        //  and the send completed on its own: the
+                        //  cancellation was not exercised, so there is
+                        //  nothing to assert on the send's timing.
+                        if (close_ms > 60000){
+                            if (timing_unreliable()){
+                                return UnitTestResult(
+                                    UnitTestResult::SKIPPED,
+                                    "close() did not finish within 60 s on a starved machine."
+                                );
+                            }
+                            error = "close() did not finish within 60 s (" + std::to_string(close_ms) + " ms)";
+                        }
+                    }else if (cancel_lag < 0){
+                        //  The send returned before close() even started:
+                        //  it was never in flight, so the test's premise
+                        //  did not hold.
+                        error = "The send returned (" + std::to_string(sent) + " bytes) before close() even started";
+                    }else if (cancel_lag > 2000){
+                        if (timing_unreliable()){
+                            return UnitTestResult(
+                                UnitTestResult::SKIPPED,
+                                "send() was not woken promptly by close() on a starved machine."
+                            );
+                        }
+                        error = "send() did not return promptly after close() cancelled it (lag " + std::to_string(cancel_lag) + " ms)";
+                    }else if (close_ms > 60000){
+                        if (timing_unreliable()){
+                            return UnitTestResult(
+                                UnitTestResult::SKIPPED,
+                                "close() did not finish within 60 s on a starved machine."
+                            );
+                        }
+                        error = "close() did not finish within 60 s (" + std::to_string(close_ms) + " ms)";
+                    }else{
+                        //  close() returns with the abort still queued
+                        //  behind the (stalled) event thread, so poll
+                        //  for the resulting LISTENING state within the
+                        //  shared budget before judging it.
+                        const auto s0 = std::chrono::steady_clock::now();
+                        while (server.state() != AbstractServerSocket2::State::LISTENING
+                            && std::chrono::steady_clock::now() - s0 < SOCKET_TEST_WAIT){
+                            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                        }
+                        if (server.state() != AbstractServerSocket2::State::LISTENING){
+                            if (timing_unreliable()){
+                                return UnitTestResult(
+                                    UnitTestResult::SKIPPED,
+                                    "The server is not LISTENING after close() on a starved machine."
+                                );
+                            }
+                            error = "The server is not LISTENING after close()";
+                        }
+                    }
+                }
+            }
+
+            client.close();
+        }
+
+        if (!error.empty()){
+            return error;
+        }
+        return true;
+    }
+
+private:
+    ThreadPool& m_thread_pool;
+};
+
+
 template <typename ClientSocketType, typename ServerSocket2Type>
 void add_server_socket2_tests(UnitTestDatabase& database, ThreadPool& thread_pool, const char* backend_name){
     const std::string prefix = "ServerSocket2 (" + std::string(backend_name) + ") - ";
@@ -1383,6 +1872,9 @@ void add_server_socket2_tests(UnitTestDatabase& database, ThreadPool& thread_poo
     database.add<Test_ServerSocket2_SendCloseRace<ClientSocketType, ServerSocket2Type>>(
         thread_pool, prefix + "Send/close race"
     );
+    database.add<Test_ServerSocket2_CloseCancelsSend<ClientSocketType, ServerSocket2Type>>(
+        thread_pool, prefix + "close() cancels an in-flight send"
+    );
     database.add<Test_ServerSocket2_RejectSecondClient<ClientSocketType, ServerSocket2Type>>(
         thread_pool, prefix + "Reject a second client"
     );
@@ -1394,6 +1886,9 @@ void add_server_socket2_tests(UnitTestDatabase& database, ThreadPool& thread_poo
     );
     database.add<Test_ServerSocket2_InertAfterClose<ClientSocketType, ServerSocket2Type>>(
         thread_pool, prefix + "An application close leaves an inert connection"
+    );
+    database.add<Test_ServerSocket2_StaleSend<ClientSocketType, ServerSocket2Type>>(
+        thread_pool, prefix + "A send for a replaced connection is refused"
     );
     database.add<Test_ServerSocket2_OutlivesServer<ClientSocketType, ServerSocket2Type>>(
         thread_pool, prefix + "The connection outlives the server"
@@ -1428,9 +1923,6 @@ public:
     virtual void close() override;
 
     //  Stub hooks.
-    const std::string& sent_bytes() const{
-        return m_sent;
-    }
     void mark_closed_by_peer();
 
 
@@ -1724,6 +2216,10 @@ void add_tests_ServerSocket2(UnitTestDatabase& database, ThreadPool& thread_pool
     );
 
     add_server_socket2_tests<ClientSocket_Qt, ServerSocket2_Qt>(database, thread_pool, "Qt");
+    database.add<Test_ServerSocket2_Qt_CloseUnderStall>(
+        thread_pool,
+        "ServerSocket2 (Qt) - close() under a stalled event thread"
+    );
 #ifndef _WIN32
     add_server_socket2_tests<ClientSocket_POSIX, ServerSocket2_POSIX>(database, thread_pool, "POSIX");
 #endif
