@@ -99,7 +99,12 @@ public:
 
     virtual void close() override;
 
-    //  Backend internals (the server only).
+
+private:
+    friend class ServerSocket2_Qt;
+
+    //  Backend internals: the server's event thread and the shell's own
+    //  send()/close() only.
 
     //  The accepted socket. Only the event thread reads/writes it.
     QTcpSocket* socket() const{
@@ -160,10 +165,6 @@ public:
         }
         send_data->cv.notify_all();
     }
-
-
-private:
-    friend class ServerSocket2_Qt;
 
     //  Raw pointer to the server, dereferenced only while holding
     //  "m_lock": the server's teardown takes that same lock before it

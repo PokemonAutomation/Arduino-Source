@@ -49,7 +49,11 @@ public:
 
     virtual void close() override;
 
-    //  Backend internals (the server and its connection thread only).
+
+private:
+    friend class ServerSocket2_POSIX;
+
+    //  Backend internals: the server's accept/connection threads only.
 
     int socket() const{
         return m_client;
@@ -64,8 +68,6 @@ public:
         m_open.store(false, std::memory_order_release);
     }
 
-
-private:
     int m_client;
     std::atomic<bool> m_open{true};
     std::atomic<bool> m_close_requested{false};
