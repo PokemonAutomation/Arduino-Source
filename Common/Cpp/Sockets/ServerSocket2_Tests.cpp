@@ -479,7 +479,7 @@ public:
                 });
                 if (!server_listener.waiter.wait_for(
                     SOCKET_TEST_WAIT,
-                    [&server_listener, SIZE]{
+                    [&server_listener]{
                         return server_listener.bytes_received.load() >= SIZE;
                     }
                 )){
