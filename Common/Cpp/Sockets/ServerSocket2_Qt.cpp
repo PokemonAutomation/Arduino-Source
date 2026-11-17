@@ -271,7 +271,11 @@ void ServerSocket2_Qt::on_new_connection(){
         //  "close_and_wait()" destroys it on the event thread.
         sock->setParent(server);
 
-        auto typed_conn = std::make_shared<ServerSocket2Connection_Qt>(*this, sock);
+        //  Plain "new" + wrap, not make_shared: the constructor is
+        //  private, and this call site is in the friend.
+        auto typed_conn = std::shared_ptr<ServerSocket2Connection_Qt>(
+            new ServerSocket2Connection_Qt(*this, sock)
+        );
         ConnectionPtr conn;
         bool rejected;
         {

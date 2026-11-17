@@ -34,11 +34,6 @@ class ThreadPool;
 
 class ServerSocket2Connection_WinSocket final : public AbstractServerSocketConnection{
 public:
-    //  Constructed by the server on accept, with the accepted socket.
-    explicit ServerSocket2Connection_WinSocket(SOCKET client_socket)
-        : m_client(client_socket)
-    {}
-
     virtual bool is_open() const override{
         return m_open.load(std::memory_order_relaxed);
     }
@@ -56,6 +51,11 @@ private:
     friend class ServerSocket2_WinSocket;
 
     //  Backend internals: the server's accept/connection threads only.
+
+    //  Constructed by the server on accept, with the accepted socket.
+    explicit ServerSocket2Connection_WinSocket(SOCKET client_socket)
+        : m_client(client_socket)
+    {}
 
     SOCKET socket() const{
         return m_client;

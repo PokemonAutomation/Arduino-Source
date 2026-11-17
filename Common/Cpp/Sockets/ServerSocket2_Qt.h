@@ -80,13 +80,6 @@ public:
         ConditionVariable cv;
     };
 
-    //  Constructed on the server's event thread (in
-    //  "on_new_connection()"), with the accepted socket.
-    ServerSocket2Connection_Qt(ServerSocket2_Qt& server, QTcpSocket* sock)
-        : m_server(&server)
-        , m_sock(sock)
-    {}
-
     virtual bool is_open() const override{
         return m_open.load(std::memory_order_relaxed);
     }
@@ -105,6 +98,13 @@ private:
 
     //  Backend internals: the server's event thread and the shell's own
     //  send()/close() only.
+
+    //  Constructed on the server's event thread (in
+    //  "on_new_connection()"), with the accepted socket.
+    ServerSocket2Connection_Qt(ServerSocket2_Qt& server, QTcpSocket* sock)
+        : m_server(&server)
+        , m_sock(sock)
+    {}
 
     //  The accepted socket. Only the event thread reads/writes it.
     QTcpSocket* socket() const{

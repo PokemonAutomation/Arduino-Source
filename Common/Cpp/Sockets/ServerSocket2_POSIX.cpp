@@ -365,7 +365,11 @@ void ServerSocket2_POSIX::accept_thread_loop(std::string address, uint16_t port,
                 rejected = true;
             }else{
                 fcntl(client_socket, F_SETFL, O_NONBLOCK);
-                conn = std::make_shared<ServerSocket2Connection_POSIX>(client_socket);
+                //  Plain "new" + wrap, not make_shared: the constructor
+                //  is private, and this call site is in the friend.
+                conn = std::shared_ptr<ServerSocket2Connection_POSIX>(
+                    new ServerSocket2Connection_POSIX(client_socket)
+                );
                 m_active = conn;
                 m_state.store(State::CONNECTED, std::memory_order_release);
                 accepted = true;

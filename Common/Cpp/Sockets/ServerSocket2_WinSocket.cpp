@@ -390,7 +390,11 @@ void ServerSocket2_WinSocket::accept_thread_loop(std::string address, uint16_t p
             }else{
                 u_long client_non_blocking = 1;
                 ioctlsocket(client_socket, FIONBIO, &client_non_blocking);
-                conn = std::make_shared<ServerSocket2Connection_WinSocket>(client_socket);
+                //  Plain "new" + wrap, not make_shared: the constructor
+                //  is private, and this call site is in the friend.
+                conn = std::shared_ptr<ServerSocket2Connection_WinSocket>(
+                    new ServerSocket2Connection_WinSocket(client_socket)
+                );
                 m_active = conn;
                 m_state.store(State::CONNECTED, std::memory_order_release);
                 accepted = true;
