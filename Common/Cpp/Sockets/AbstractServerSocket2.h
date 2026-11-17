@@ -14,6 +14,12 @@
  *  Like AbstractServerSocket, it handles one connection at a time: a
  *  client that connects while one is active is rejected.
  *
+ *  Lifecycle: destroying the server stops it and closes every live
+ *  connection. The shared ownership only guarantees the connection
+ *  object's validity: after the server is gone, any use of the object
+ *  reports the closed connection (is_open() is false, send() returns
+ *  0, close() is a no-op).
+ *
  *  This class coexists with AbstractServerSocket while the new shape
  *  is proven out; the two are not interchangeable yet.
  *
