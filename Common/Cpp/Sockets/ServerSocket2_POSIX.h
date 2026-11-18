@@ -160,6 +160,16 @@ private:
 private:
     friend class ServerSocket2Connection_POSIX;
 
+    //  The backend's internal state machine; not part of the application
+    //  API (the listeners and active_connection() are the observables).
+    enum class State{
+        NOT_RUNNING,
+        LISTENING,
+        CONNECTED,
+        DESTRUCTING,
+    };
+    std::atomic<State> m_state{State::NOT_RUNNING};
+
     ThreadPool& m_thread_pool;
     Mutex m_lock;
     ConditionVariable m_cv;

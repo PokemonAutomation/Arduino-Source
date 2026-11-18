@@ -37,7 +37,6 @@
 #ifndef PokemonAutomation_Sockets_AbstractServerSocket2_H
 #define PokemonAutomation_Sockets_AbstractServerSocket2_H
 
-#include <atomic>
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -88,9 +87,7 @@ public:
 
 
 public:
-    AbstractServerSocket2()
-        : m_state(State::NOT_RUNNING)
-    {}
+    AbstractServerSocket2() = default;
     virtual ~AbstractServerSocket2() = default;
 
     //  Binds to "address" and listens on "port".
@@ -109,16 +106,6 @@ public:
 
 
 protected:
-    //  The backend's internal state machine; not part of the application
-    //  API (listeners and active_connection() are the observables).
-    enum class State{
-        NOT_RUNNING,
-        LISTENING,
-        CONNECTED,
-        DESTRUCTING,
-    };
-
-    std::atomic<State> m_state;
     ListenerSet<Listener> m_listeners;
 };
 

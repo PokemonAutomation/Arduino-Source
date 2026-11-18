@@ -2051,6 +2051,16 @@ private:
         }
     }
 
+    //  The stub's own state machine (the backends' is theirs to keep
+    //  and no longer part of the abstract class).
+    enum class State{
+        NOT_RUNNING,
+        LISTENING,
+        CONNECTED,
+        DESTRUCTING,
+    };
+    std::atomic<State> m_state{State::NOT_RUNNING};
+
     ConnectionPtr m_active;
 };
 
