@@ -36,13 +36,29 @@ RngStatsDatabase::RngStatsDatabase(const char* json_path){
 
         int16_t gender_threshold = int16_t(obj.get_integer_throw("genderThreshold", path));
 
-        RngStats rng_stats = { base_stats, gender_threshold };
+        std::vector<std::string> abilities;
+        const JsonArray* abilities_arr = obj.get_array("abilities");
+        if (abilities_arr != nullptr){
+            for (const auto& ability : *abilities_arr){
+                abilities.emplace_back(ability.to_string_throw(path));
+            }
+            if (abilities.size() > 2){
+                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Too many abilities for " + slug + ".", path);
+            }
+        }
+
+        RngStats rng_stats = { base_stats, gender_threshold, std::move(abilities) };
 
         m_database.emplace(
             slug,
             rng_stats
         );
     }
+}
+
+const RngStatsDatabase& RngStatsDatabase::instance(){
+    static const RngStatsDatabase database("PokemonFRLG/BaseStats.json");
+    return database;
 }
 
 const RngStats& RngStatsDatabase::get_throw(const std::string& slug) const{

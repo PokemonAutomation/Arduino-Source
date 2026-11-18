@@ -214,6 +214,13 @@ std::string gender_to_string(const AdvGender& gender);
 
 AdvGender gender_from_gender_value(uint8_t gender_value, int16_t threshold);
 
+// Returns the ability slot of an observed ability, based on the species
+// Returns AdvAbility::Any if the slot can't be determined
+AdvAbility ability_slot_from_ability(
+    const std::string& observed_ability,
+    const std::vector<std::string>& species_abilities
+);
+
 // returns search filters that correspond with observed stats
 AdvRngFilters observation_to_filters(const AdvObservedPokemon& observation, const BaseStats& basestats, AdvRngMethod method = AdvRngMethod::Method1);
 

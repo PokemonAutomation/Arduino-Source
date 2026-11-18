@@ -286,7 +286,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     RNG_CALIBRATION.reset_hits();
 
     // prepare database of base stats and gender thresholds
-    RngStatsDatabase STATS_DATA("PokemonFRLG/BaseStats.json");
+    const RngStatsDatabase& STATS_DATA = RngStatsDatabase::instance();
 
     // get the relevant encounter slots
     EncountersDatabase encounters_data(GAME_VERSION == GameVersion::firered ? "PokemonFRLG/EncounterSlotsFR.json" : "PokemonFRLG/EncounterSlotsLG.json");

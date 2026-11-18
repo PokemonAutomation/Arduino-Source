@@ -19,12 +19,15 @@ using namespace Pokemon;
 struct RngStats{
     BaseStats base_stats;
     int16_t gender_threshold;
-    // std::vector<string> abilities;
+    std::vector<std::string> abilities;
 };
 
 class RngStatsDatabase{
 public:
     RngStatsDatabase(const char* json_path);
+
+    static const RngStatsDatabase& instance();
+
     const RngStats& get_throw(const std::string& slug) const;
     const RngStats* get_nothrow(const std::string& slug) const;
 

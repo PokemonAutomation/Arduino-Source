@@ -728,7 +728,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     home_black_border_check(env.console, context);
 
     // prepare database of base stats and gender thresholds
-    RngStatsDatabase STATS_DATA("PokemonFRLG/BaseStats.json");
+    const RngStatsDatabase& STATS_DATA = RngStatsDatabase::instance();
 
     RngStats EGG_STATS;
     try{

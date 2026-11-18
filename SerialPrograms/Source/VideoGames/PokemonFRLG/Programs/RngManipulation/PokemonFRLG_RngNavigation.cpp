@@ -24,6 +24,7 @@
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_BlindNavigation.h"
 #include "PokemonFRLG_RngCalibration.h"
+#include "PokemonFRLG_RngStatsDatabase.h"
 #include "PokemonFRLG_RngNavigation.h"
 
 namespace PokemonAutomation{
@@ -100,9 +101,30 @@ AdvObservedPokemon read_summary(
         ); 
     }
 
-    console.log("Reading Page 2 (Stats)...");
+    console.log("Reading Page 2 (Stats, Ability)...");
     VideoSnapshot screen2 = console.video().snapshot();
     reader.read_page2(console.logger(), language, screen2, stats);
+
+    // Match the ability read against the species' abilities to get its slot.
+    std::vector<std::string> species_abilities;
+    if (!stats.name.empty()){
+        const RngStats* species_stats = RngStatsDatabase::instance().get_nothrow(stats.name);
+        if (species_stats != nullptr){
+            species_abilities = species_stats->abilities;
+        }
+    }
+    AdvAbility ability = ability_slot_from_ability(stats.ability, species_abilities);
+    switch (ability){
+    case AdvAbility::Zero:
+        console.log("Ability slot: 0 (" + stats.ability + ")");
+        break;
+    case AdvAbility::One:
+        console.log("Ability slot: 1 (" + stats.ability + ")");
+        break;
+    default:
+        console.log("Ability slot: unknown");
+        break;
+    }
 
     StatReads statreads = {
         static_cast<int16_t>(stats.hp.value_or(0)),
@@ -151,7 +173,7 @@ AdvObservedPokemon read_summary(
         stats.name,
         gender,
         string_to_nature(stats.nature),
-        AdvAbility::Any,
+        ability,
         { uint8_t(stats.level.value_or(5)) },
         { statreads },
         { {0,0,0,0,0,0} },
