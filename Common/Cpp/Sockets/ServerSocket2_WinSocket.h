@@ -69,7 +69,7 @@ private:
     //  already track. "self" is the caller's owning reference (the
     //  dispatcher's capture); it is what the server's report methods
     //  keep during the listener callbacks.
-    void run(std::shared_ptr<ServerSocket2Connection_WinSocket> self);
+    void thread_loop(std::shared_ptr<ServerSocket2Connection_WinSocket> self);
 
     //  Marks the connection closed without touching the socket. The
     //  server calls this when the connection thread could not be
@@ -112,7 +112,6 @@ public:
 
 
 private:
-
     static void ensure_wsa_started();
 
     //  Stops the server: it stops accepting new connections, closes the

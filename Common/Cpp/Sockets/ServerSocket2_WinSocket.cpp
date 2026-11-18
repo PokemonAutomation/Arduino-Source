@@ -82,7 +82,6 @@ size_t ServerSocket2Connection_WinSocket::send(
 
     return sent;
 }
-
 void ServerSocket2Connection_WinSocket::close(){
     if (m_close_requested.exchange(true)){
         return;
@@ -93,6 +92,77 @@ void ServerSocket2Connection_WinSocket::close(){
     //  socket is already gone, ::shutdown just fails harmlessly.)
     ::shutdown(m_client, SD_BOTH);
 }
+void ServerSocket2Connection_WinSocket::thread_loop(std::shared_ptr<ServerSocket2Connection_WinSocket> self){
+    SOCKET socket = m_client;
+
+    if (!m_open.load(std::memory_order_relaxed)){
+        //  Closed before this thread started (teardown, or the
+        //  application via active_connection()): hand the slot back and
+        //  drop the socket; there is nothing to report.
+        m_server->release_connection(self);
+        ::closesocket(socket);
+        return;
+    }
+
+    m_server->report_connect(self);
+
+    constexpr size_t BUFFER_SIZE = 4096;
+    char buffer[BUFFER_SIZE];
+    std::string error;
+
+    while (m_open.load(std::memory_order_relaxed)){
+        //  The socket is non-blocking, so this returns immediately. It is
+        //  deliberately called without holding any lock: the liveness
+        //  check above and the result handling below are the only parts
+        //  that need one, and no socket call should stretch it.
+        int bytes = ::recv(socket, buffer, (int)BUFFER_SIZE, 0);
+
+        if (bytes > 0){
+            //  The application may have closed the connection while we
+            //  were reading: only dispatch the data if it is still open.
+            if (m_open.load(std::memory_order_relaxed)){
+                m_server->report_receive(self, buffer, (size_t)bytes);
+            }
+            continue;
+        }
+
+        if (bytes == SOCKET_ERROR){
+            int error_no = WSAGetLastError();
+            if (error_no == WSAEWOULDBLOCK || error_no == WSAEINPROGRESS){
+                //  No data yet.
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                continue;
+            }
+            if (error_no == WSAEINTR){
+                continue;
+            }
+            //  WSAECONNRESET, or any other error: the connection is
+            //  gone. (An application-side close() also lands here, via
+            //  ::shutdown: it makes recv fail or return 0, and the
+            //  close_requested() check below suppresses the report.)
+            error = "Receive error (WSA Error Code " + std::to_string(error_no) + ")";
+        }else{
+            //  The peer closed the connection.
+            error = "Connection closed by client.";
+        }
+        break;
+    }
+
+    //  Hand the slot (and the CONNECTED state) back to the server, then
+    //  make the connection inert. Either way, the object outlives the
+    //  server.
+    m_server->release_connection(self);
+    const bool app_close = m_close_requested.load(std::memory_order_relaxed);
+    m_open.store(false, std::memory_order_release);
+    ::closesocket(socket);
+    if (!app_close){
+        m_server->report_disconnect(self, error);
+    }
+}
+
+
+
+
 
 
 void ServerSocket2_WinSocket::ensure_wsa_started(){
@@ -110,8 +180,7 @@ void ServerSocket2_WinSocket::ensure_wsa_started(){
 
 ServerSocket2_WinSocket::ServerSocket2_WinSocket(ThreadPool& thread_pool)
     : m_thread_pool(thread_pool)
-{
-}
+{}
 
 void ServerSocket2_WinSocket::start(const std::string& address, uint16_t port){
     //  Winsock has to be started before any of its functions can be
@@ -442,74 +511,7 @@ void ServerSocket2_WinSocket::release_connection(ConnectionPtr conn){
     }
 }
 
-void ServerSocket2Connection_WinSocket::run(std::shared_ptr<ServerSocket2Connection_WinSocket> self){
-    SOCKET socket = m_client;
 
-    if (!m_open.load(std::memory_order_relaxed)){
-        //  Closed before this thread started (teardown, or the
-        //  application via active_connection()): hand the slot back and
-        //  drop the socket; there is nothing to report.
-        m_server->release_connection(self);
-        ::closesocket(socket);
-        return;
-    }
-
-    m_server->report_connect(self);
-
-    constexpr size_t BUFFER_SIZE = 4096;
-    char buffer[BUFFER_SIZE];
-    std::string error;
-
-    while (m_open.load(std::memory_order_relaxed)){
-        //  The socket is non-blocking, so this returns immediately. It is
-        //  deliberately called without holding any lock: the liveness
-        //  check above and the result handling below are the only parts
-        //  that need one, and no socket call should stretch it.
-        int bytes = ::recv(socket, buffer, (int)BUFFER_SIZE, 0);
-
-        if (bytes > 0){
-            //  The application may have closed the connection while we
-            //  were reading: only dispatch the data if it is still open.
-            if (m_open.load(std::memory_order_relaxed)){
-                m_server->report_receive(self, buffer, (size_t)bytes);
-            }
-            continue;
-        }
-
-        if (bytes == SOCKET_ERROR){
-            int error_no = WSAGetLastError();
-            if (error_no == WSAEWOULDBLOCK || error_no == WSAEINPROGRESS){
-                //  No data yet.
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                continue;
-            }
-            if (error_no == WSAEINTR){
-                continue;
-            }
-            //  WSAECONNRESET, or any other error: the connection is
-            //  gone. (An application-side close() also lands here, via
-            //  ::shutdown: it makes recv fail or return 0, and the
-            //  close_requested() check below suppresses the report.)
-            error = "Receive error (WSA Error Code " + std::to_string(error_no) + ")";
-        }else{
-            //  The peer closed the connection.
-            error = "Connection closed by client.";
-        }
-        break;
-    }
-
-    //  Hand the slot (and the CONNECTED state) back to the server, then
-    //  make the connection inert. Either way, the object outlives the
-    //  server.
-    m_server->release_connection(self);
-    const bool app_close = m_close_requested.load(std::memory_order_relaxed);
-    m_open.store(false, std::memory_order_release);
-    ::closesocket(socket);
-    if (!app_close){
-        m_server->report_disconnect(self, error);
-    }
-}
 
 }
-
 #endif
