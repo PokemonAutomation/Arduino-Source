@@ -1971,11 +1971,18 @@ public:
         return m_active;
     }
 
-    //  Test-only exposure of the base's internal state: the
-    //  application-facing API has no state() accessor.
-    using AbstractServerSocket2::State;
-    State state() const{
-        return m_state.load(std::memory_order_relaxed);
+    //  Test-only observables of the base's internal state machine: the
+    //  application-facing API has no state() accessor, and the State
+    //  enum is protected (MSVC will not let the tests name it through a
+    //  using-declaration).
+    bool is_not_running() const{
+        return m_state.load(std::memory_order_relaxed) == State::NOT_RUNNING;
+    }
+    bool is_listening() const{
+        return m_state.load(std::memory_order_relaxed) == State::LISTENING;
+    }
+    bool is_connected() const{
+        return m_state.load(std::memory_order_relaxed) == State::CONNECTED;
     }
 
     //  Stub hooks: simulate the backend's event delivery.
@@ -2145,7 +2152,7 @@ public:
             }
 
             server.start("127.0.0.1", 0);
-            if (server.state() != StubServer2::State::LISTENING){
+            if (!server.is_listening()){
                 return UnitTestResult("start() should leave the server LISTENING");
             }
 
@@ -2155,7 +2162,7 @@ public:
             }
             first = probe.connection;
             if (server.active_connection() != first
-                || server.state() != StubServer2::State::CONNECTED
+                || !server.is_connected()
             ){
                 return UnitTestResult("active_connection()/state() disagree with on_connect()");
             }
@@ -2189,7 +2196,7 @@ public:
                 return UnitTestResult("send() on a closed connection should return 0");
             }
             if (server.active_connection() != nullptr
-                || server.state() != StubServer2::State::LISTENING
+                || !server.is_listening()
             ){
                 return UnitTestResult("after the close, the server should be LISTENING with no active connection");
             }
@@ -2206,7 +2213,7 @@ public:
                 return UnitTestResult("a clean peer close should fire on_disconnect() once, with no error");
             }
             if (second->is_open() || server.active_connection() != nullptr
-                || server.state() != StubServer2::State::LISTENING
+                || !server.is_listening()
             ){
                 return UnitTestResult("after the peer close, the server should be LISTENING with no active connection");
             }
