@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/HttpServer/HttpServer_Tests.h"
+#include "Common/Cpp/HttpServer/HttpServer2_Tests.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/MoveOnlyFunction_Tests.h"
 #include "Common/Cpp/ScopeExit.h"
@@ -61,6 +62,7 @@ UnitTestDatabase make_UNIT_TESTS_ALL(){
     add_tests_Sockets(ret, GlobalThreadPools::unlimited_normal());
     add_tests_ServerSocket2(ret, GlobalThreadPools::unlimited_normal());
     add_tests_HttpServer(ret, GlobalThreadPools::unlimited_normal());
+    add_tests_HttpServer2(ret, GlobalThreadPools::unlimited_normal());
     add_tests_BlackBorderDetector(ret);
     add_tests_ListenerSet(ret);
     add_tests_MoveOnlyFunction(ret);

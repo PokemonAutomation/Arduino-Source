@@ -101,6 +101,10 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../Common/Cpp/HttpServer/HttpServer.h
     ../Common/Cpp/HttpServer/HttpServer_Tests.cpp
     ../Common/Cpp/HttpServer/HttpServer_Tests.h
+    ../Common/Cpp/HttpServer/HttpServer2.cpp
+    ../Common/Cpp/HttpServer/HttpServer2.h
+    ../Common/Cpp/HttpServer/HttpServer2_Tests.cpp
+    ../Common/Cpp/HttpServer/HttpServer2_Tests.h
     ../Common/Cpp/ImageResolution.cpp
     ../Common/Cpp/ImageResolution.h
     ../Common/Cpp/Json/JsonArray.cpp
