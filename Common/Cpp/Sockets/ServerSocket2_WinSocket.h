@@ -19,7 +19,6 @@
 #include <memory>
 #include <mutex>
 #include <string>
-#include <vector>
 #include <winsock2.h>
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
@@ -167,25 +166,19 @@ private:
     Mutex m_lock;
     ConditionVariable m_cv;
     //  "m_starting" covers the window between start() claiming the start
-    //  and the task being published in m_accept_threads; "m_task_alive"
+    //  and the task being published in m_accept_thread; "m_task_alive"
     //  covers the task's whole life (until it fails, or
     //  "close_and_wait()" joins it). While either is set, start() is a
     //  no-op - so there is never more than one live start task, and a
     //  task that is finally scheduled can only be stale in the sense
     //  that "close_and_wait()" won the race (checked against the state
     //  when it publishes).
+    //  m_starting also serializes the writers of m_accept_thread: start()
+    //  touches it only inside its m_starting window, and
+    //  close_and_wait() waits for "!m_starting" before moving it out.
     bool m_starting = false;
     bool m_task_alive = false;
     int m_closing = 0;
-
-    //  Protects m_accept_threads. Kept separate from m_lock because the
-    //  task's lifetime interacts with it: joining a task waits for it to
-    //  exit, and exiting requires m_lock. Holding m_lock while a task
-    //  slot is destroyed would deadlock, so slot operations happen under
-    //  m_task_lock with m_lock released. (The connection threads' tasks
-    //  live in the connections themselves; close_and_wait() joins them
-    //  through the connection.)
-    Mutex m_task_lock;
 
     SOCKET m_listen = INVALID_SOCKET;
 
@@ -194,13 +187,12 @@ private:
     //  so the connection object outlives the server (inert).
     ConnectionPtr m_active;
 
-    //  One task per start() call that actually dispatched (start() is a
-    //  no-op while a previous task is still alive), so the list holds
-    //  the failed attempts' tasks plus the one live task. start() must
-    //  never destroy a previous task's AsyncTask here: its destructor
-    //  blocks until that task has finished. close_and_wait() joins the
-    //  whole list (the finished ones return immediately).
-    std::vector<AsyncTask> m_accept_threads;
+    //  The start() task: the one live task plus, after a failed attempt,
+    //  that attempt's finished task until the next start() replaces it.
+    //  start() is a no-op while a task is alive, so a replaced task has
+    //  already exited (its join at replacement is instant); the live one
+    //  is joined by close_and_wait().
+    AsyncTask m_accept_thread;
 };
 
 

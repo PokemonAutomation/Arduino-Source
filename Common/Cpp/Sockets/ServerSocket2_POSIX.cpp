@@ -201,16 +201,11 @@ void ServerSocket2_POSIX::start(const std::string& address, uint16_t port){
         AsyncTask task = m_thread_pool.dispatch([=, this]{
             accept_thread_loop(address, port);
         });
-        {
-            //  Append, never replace: replacing the slot would destroy
-            //  the previous task's AsyncTask, and its destructor blocks
-            //  until that task has finished. The previous tasks here are
-            //  all failed attempts (start() is a no-op while one is
-            //  alive), so theirs return immediately; the live one is
-            //  joined by close_and_wait().
-            std::lock_guard<Mutex> lg(m_task_lock);
-            m_accept_threads.push_back(std::move(task));
-        }
+        //  The slot's previous occupant (if any) is a failed attempt:
+        //  start() is a no-op while a task is alive, so it has already
+        //  exited and its join at replacement is instant. The live task
+        //  is joined by close_and_wait().
+        m_accept_thread = std::move(task);
     }catch (...){
         {
             std::lock_guard<Mutex> lg(m_lock);
@@ -273,21 +268,12 @@ void ServerSocket2_POSIX::close_and_wait() noexcept{
         active->close();
     }
 
-    std::vector<AsyncTask> accept_threads;
-    {
-        //  m_task_lock, not m_lock: moving the tasks out destroys the
-        //  old AsyncTask objects, and their destructors wait for the
-        //  tasks to finish - which they can only do if they can acquire
-        //  m_lock.
-        std::lock_guard<Mutex> lg(m_task_lock);
-        accept_threads.swap(m_accept_threads);
-    }
+    AsyncTask accept_thread;
+    accept_thread = std::move(m_accept_thread);
 
     //  The threads notice the new state within a few milliseconds and
     //  close their own sockets.
-    for (auto& task : accept_threads){
-        task.wait_and_ignore_exceptions();
-    }
+    accept_thread.wait_and_ignore_exceptions();
     if (active){
         //  Join the connection thread before dropping m_active: the slot
         //  is what keeps the connection alive while its thread runs.
