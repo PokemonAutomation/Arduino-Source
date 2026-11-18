@@ -653,20 +653,20 @@ public:
 
                 //  close() may return with the close still pending on a
                 //  starved event thread (Qt backend), so poll for the
-                //  resulting LISTENING state within the shared budget
-                //  before judging it.
+                //  active slot to clear within the shared budget before
+                //  judging it.
                 {
                     const auto s0 = std::chrono::steady_clock::now();
-                    while (server.state() != AbstractServerSocket2::State::LISTENING
+                    while (server.active_connection() != nullptr
                         && std::chrono::steady_clock::now() - s0 < SOCKET_TEST_WAIT){
                         std::this_thread::sleep_for(std::chrono::milliseconds(10));
                     }
                 }
-                if (server.state() != AbstractServerSocket2::State::LISTENING){
+                if (server.active_connection() != nullptr){
                     if (timing_unreliable()){
                         return UnitTestResult(
                             UnitTestResult::SKIPPED,
-                            "The server is not LISTENING after close() on a starved machine."
+                            "The active connection was not cleared after close() on a starved machine."
                         );
                     }
                     error = "The server is not listening after close()";
@@ -830,21 +830,21 @@ public:
                 }else{
                     //  close() may return with the close still pending on
                     //  a starved event thread (Qt backend), so poll for
-                    //  the resulting LISTENING state within the shared
-                    //  budget before judging it.
+                    //  the active slot to clear within the shared budget
+                    //  before judging it.
                     const auto s0 = std::chrono::steady_clock::now();
-                    while (server.state() != AbstractServerSocket2::State::LISTENING
+                    while (server.active_connection() != nullptr
                         && std::chrono::steady_clock::now() - s0 < SOCKET_TEST_WAIT){
                         std::this_thread::sleep_for(std::chrono::milliseconds(10));
                     }
-                    if (server.state() != AbstractServerSocket2::State::LISTENING){
+                    if (server.active_connection() != nullptr){
                         if (timing_unreliable()){
                             return UnitTestResult(
                                 UnitTestResult::SKIPPED,
-                                "The server is not LISTENING after close() on a starved machine."
+                                "The active connection was not cleared after close() on a starved machine."
                             );
                         }
-                        error = "The server is not LISTENING after close()";
+                        error = "The active connection was not cleared after close()";
                     }
                 }
             }
@@ -994,8 +994,22 @@ public:
         if (second_listener.last_listen_error.empty()){
             return "The second server succeeded on a port that is already in use";
         }
-        if (second_server.state() != AbstractServerSocket2::State::NOT_RUNNING){
-            return "The second server is not NOT_RUNNING after a failed start";
+
+        //  A failed start leaves the server retryable: start() must act
+        //  again and report again (a half-started server would no-op it
+        //  and never report a second result).
+        const int finished_before = second_listener.listen_finished.load();
+        second_server.start("127.0.0.1", port);
+        if (!second_listener.waiter.wait_for(
+            SOCKET_TEST_WAIT,
+            [finished_before, &second_listener]{
+                return second_listener.listen_finished.load() > finished_before;
+            }
+        )){
+            return "A failed start left the server un-retryable";
+        }
+        if (second_listener.last_listen_error.empty()){
+            return "The retried start succeeded on a port that is still in use";
         }
 
         //  The original server must still work.
@@ -1093,8 +1107,6 @@ public:
             }
             if (server.active_connection() != nullptr){
                 error = "The active connection was not cleared after the peer close";
-            }else if (server.state() != AbstractServerSocket2::State::LISTENING){
-                error = "The server is not LISTENING after the peer close";
             }
         }
 
@@ -1160,15 +1172,17 @@ public:
                     conn->close();  //  Idempotent.
                 }
 
-                //  The server goes back to LISTENING (eventually).
+                //  The active slot clears (eventually; the close lands
+                //  within a few milliseconds on the thread backends and
+                //  as a queued call on the Qt backend).
                 if (error.empty()){
                     const auto s0 = std::chrono::steady_clock::now();
-                    while (server.state() != AbstractServerSocket2::State::LISTENING
+                    while (server.active_connection() != nullptr
                         && std::chrono::steady_clock::now() - s0 < SOCKET_TEST_WAIT){
                         std::this_thread::sleep_for(std::chrono::milliseconds(10));
                     }
-                    if (server.state() != AbstractServerSocket2::State::LISTENING){
-                        error = "The server is not LISTENING after the app close";
+                    if (server.active_connection() != nullptr){
+                        error = "The active connection was not cleared after the app close";
                     }
                 }
 
@@ -1819,21 +1833,21 @@ public:
                     }else{
                         //  close() returns with the abort still queued
                         //  behind the (stalled) event thread, so poll
-                        //  for the resulting LISTENING state within the
+                        //  for the active slot to clear within the
                         //  shared budget before judging it.
                         const auto s0 = std::chrono::steady_clock::now();
-                        while (server.state() != AbstractServerSocket2::State::LISTENING
+                        while (server.active_connection() != nullptr
                             && std::chrono::steady_clock::now() - s0 < SOCKET_TEST_WAIT){
                             std::this_thread::sleep_for(std::chrono::milliseconds(10));
                         }
-                        if (server.state() != AbstractServerSocket2::State::LISTENING){
+                        if (server.active_connection() != nullptr){
                             if (timing_unreliable()){
                                 return UnitTestResult(
                                     UnitTestResult::SKIPPED,
-                                    "The server is not LISTENING after close() on a starved machine."
+                                    "The active connection was not cleared after close() on a starved machine."
                                 );
                             }
-                            error = "The server is not LISTENING after close()";
+                            error = "The active connection was not cleared after close()";
                         }
                     }
                 }
@@ -1955,6 +1969,13 @@ public:
 
     virtual ConnectionPtr active_connection() override{
         return m_active;
+    }
+
+    //  Test-only exposure of the base's internal state: the
+    //  application-facing API has no state() accessor.
+    using AbstractServerSocket2::State;
+    State state() const{
+        return m_state.load(std::memory_order_relaxed);
     }
 
     //  Stub hooks: simulate the backend's event delivery.
@@ -2124,7 +2145,7 @@ public:
             }
 
             server.start("127.0.0.1", 0);
-            if (server.state() != AbstractServerSocket2::State::LISTENING){
+            if (server.state() != StubServer2::State::LISTENING){
                 return UnitTestResult("start() should leave the server LISTENING");
             }
 
@@ -2134,7 +2155,7 @@ public:
             }
             first = probe.connection;
             if (server.active_connection() != first
-                || server.state() != AbstractServerSocket2::State::CONNECTED
+                || server.state() != StubServer2::State::CONNECTED
             ){
                 return UnitTestResult("active_connection()/state() disagree with on_connect()");
             }
@@ -2168,7 +2189,7 @@ public:
                 return UnitTestResult("send() on a closed connection should return 0");
             }
             if (server.active_connection() != nullptr
-                || server.state() != AbstractServerSocket2::State::LISTENING
+                || server.state() != StubServer2::State::LISTENING
             ){
                 return UnitTestResult("after the close, the server should be LISTENING with no active connection");
             }
@@ -2185,7 +2206,7 @@ public:
                 return UnitTestResult("a clean peer close should fire on_disconnect() once, with no error");
             }
             if (second->is_open() || server.active_connection() != nullptr
-                || server.state() != AbstractServerSocket2::State::LISTENING
+                || server.state() != StubServer2::State::LISTENING
             ){
                 return UnitTestResult("after the peer close, the server should be LISTENING with no active connection");
             }

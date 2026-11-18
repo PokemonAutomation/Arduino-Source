@@ -23,7 +23,7 @@
  *  This class coexists with AbstractServerSocket while the new shape
  *  is proven out; the two are not interchangeable yet.
  *
- *  Thread safety: "start()", "active_connection()", "state()",
+ *  Thread safety: "start()", "active_connection()",
  *  "add_listener()" and "remove_listener()" are safe to call from any
  *  thread. Listener callbacks may be called from any of the backend's
  *  worker threads and may overlap in time; it is always safe to call
@@ -51,13 +51,6 @@ namespace PokemonAutomation{
 class AbstractServerSocket2{
 public:
     using ConnectionPtr = std::shared_ptr<AbstractServerSocketConnection>;
-
-    enum class State{
-        NOT_RUNNING,
-        LISTENING,
-        CONNECTED,
-        DESTRUCTING,
-    };
 
     struct Listener{
         //  Called when "start()" finishes.
@@ -100,15 +93,11 @@ public:
     {}
     virtual ~AbstractServerSocket2() = default;
 
-    State state() const{
-        return m_state.load(std::memory_order_relaxed);
-    }
-
     //  Binds to "address" and listens on "port".
     //  Use "0.0.0.0" to accept connections on all interfaces.
-    //  Only acts while "state()" is NOT_RUNNING and no start attempt is
+    //  Only acts while the server is not running and no start attempt is
     //  still in flight; otherwise it is a no-op. A start that fails (for
-    //  example, the port is busy) leaves the server NOT_RUNNING, so it
+    //  example, the port is busy) leaves the server not running, so it
     //  may be retried. The server stops only when it is destroyed.
     virtual void start(const std::string& address, uint16_t port) = 0;
 
@@ -120,6 +109,15 @@ public:
 
 
 protected:
+    //  The backend's internal state machine; not part of the application
+    //  API (listeners and active_connection() are the observables).
+    enum class State{
+        NOT_RUNNING,
+        LISTENING,
+        CONNECTED,
+        DESTRUCTING,
+    };
+
     std::atomic<State> m_state;
     ListenerSet<Listener> m_listeners;
 };
