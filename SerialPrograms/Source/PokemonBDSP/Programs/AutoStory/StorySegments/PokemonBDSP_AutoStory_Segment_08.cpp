@@ -2208,7 +2208,8 @@ static bool go_through_mount_coronet(VideoStream& stream,
     {
         // A single small Pokemon may not satisfy the full-row variation check.
         BoxWatcher boxes(COLOR_RED, true);
-        if (wait_until(stream, context, 10s, {{boxes}}) != 0){
+        if (!wait_for_menu_screen(stream, context,
+            [&](const ImageViewRGB32& frame){ return boxes.detect(frame); }, "summit-box-screen", 10s)){
             stream.log("[08.06] Box screen not detected before withdrawing the second Pokemon.", COLOR_RED);
             return false;
         }
@@ -2257,7 +2258,8 @@ static bool go_through_mount_coronet(VideoStream& stream,
         context.wait_for_all_requests();
         // With the extra Pokemon in the party, Box 1 can now be empty.
         BoxWatcher boxes(COLOR_RED, true);
-        if (wait_until(stream, context, 10s, {{boxes}}) != 0){
+        if (!wait_for_menu_screen(stream, context,
+            [&](const ImageViewRGB32& frame){ return boxes.detect(frame); }, "summit-box-screen", 10s)){
             stream.log("[08.06] Box screen not detected before depositing the second Pokemon.", COLOR_RED);
             return false;
         }
@@ -2373,7 +2375,8 @@ static bool go_through_mount_coronet(VideoStream& stream,
         pbf_press_button(context, BUTTON_R, 160ms, GameSettings::instance().POKEMON_TO_BOX_DELAY1);
         context.wait_for_all_requests();
         BoxWatcher boxes(COLOR_RED, true);
-        if (wait_until(stream, context, 10s, {{boxes}}) != 0){
+        if (!wait_for_menu_screen(stream, context,
+            [&](const ImageViewRGB32& frame){ return boxes.detect(frame); }, "summit-box-screen", 10s)){
             stream.log("[08.06] Box screen not detected before depositing the box legendary.", COLOR_RED);
             return false;
         }

@@ -81,10 +81,6 @@ public:
         AutoStoryOptions options,
         AutoStoryStats& stats) const override;
 };
-void checkpoint_0904(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats);
 
 class AutoStory_Checkpoint_0905 : public AutoStory_Checkpoint {
 public:
@@ -161,7 +157,6 @@ void checkpoint_0909(SingleSwitchProgramEnvironment& env,
     AutoStoryOptions options,
     AutoStoryStats& stats);
 
-
 class AutoStory_Checkpoint_0910 : public AutoStory_Checkpoint {
 public:
     virtual std::string name() const override;
@@ -173,6 +168,22 @@ public:
         AutoStoryStats& stats) const override;
 };
 void checkpoint_0910(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats);
+
+
+class AutoStory_Checkpoint_0911 : public AutoStory_Checkpoint {
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context,
+        AutoStoryOptions options,
+        AutoStoryStats& stats) const override;
+};
+void checkpoint_0911(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats);

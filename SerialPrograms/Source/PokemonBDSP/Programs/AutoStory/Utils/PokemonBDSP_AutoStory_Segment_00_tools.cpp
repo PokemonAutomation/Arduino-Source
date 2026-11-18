@@ -14,10 +14,12 @@
 #include <map>
 #include <memory>
 
+#include "Common/Cpp/Time.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -140,7 +142,8 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
         context.wait_for_all_requests();
     }
     MenuWatcher menu_open;
-    if (wait_until(stream, context, 5s, {{menu_open}}) != 0){
+    if (!wait_for_menu_screen(stream, context,
+        [&](const ImageViewRGB32& frame){ return menu_open.detect(frame); }, "settings-main-menu", 5s)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Settings checkpoint: Main menu not detected.",
             stream);
@@ -153,26 +156,56 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
     // Only two icons are available at this initial checkpoint.
     // Verify the main menu before navigating to the neighboring icon.
     bool options_open = false;
+    VideoSnapshot last_options_frame;
     for (size_t attempt = 0; attempt < 2; attempt++){
         repeat_dpad(context, dpad, attempt == 0 ? DPAD_RIGHT : DPAD_LEFT, 80ms, 300ms, 1, false);
         pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
         context.wait_for_all_requests();
-        auto frame = stream.video().snapshot();
-        if (frame && options_screen.detect(frame)){
-            options_open = true;
+        // A transition or a cached snapshot must not trigger an immediate backout.
+        WallClock last_timestamp = current_time();
+        const WallClock deadline = last_timestamp + 5s;
+        size_t confirmations = 0;
+        size_t fresh_frames = 0;
+        last_options_frame.clear();
+        while (current_time() < deadline){
+            const auto frame = stream.video().snapshot();
+            if (frame && frame.timestamp > last_timestamp){
+                last_timestamp = frame.timestamp;
+                last_options_frame = frame;
+                fresh_frames++;
+                confirmations = options_screen.detect(frame) ? confirmations + 1 : 0;
+                if (confirmations >= 3){
+                    options_open = true;
+                    break;
+                }
+            }
+            pbf_wait(context, 150ms);
+            context.wait_for_all_requests();
+        }
+        if (options_open){
             break;
+        }
+        stream.log("[Tutorial settings] Options not confirmed within 5s: " +
+            std::to_string(fresh_frames) + " fresh frames, " + std::to_string(confirmations) +
+            "/3 consecutive matches. Saving the last checked frame before backing out.", COLOR_ORANGE);
+        if (last_options_frame){
+            dump_debug_image(stream.logger(), "PokemonBDSP/TutorialSettings",
+                "options-not-detected-attempt-" + std::to_string(attempt + 1), last_options_frame);
+        }else{
+            stream.log("[Tutorial settings] No fresh video frame was available to save.", COLOR_ORANGE);
         }
         pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
         context.wait_for_all_requests();
         MenuWatcher back_to_menu;
-        if (wait_until(stream, context, 5s, {{back_to_menu}}) != 0){
+        if (!wait_for_menu_screen(stream, context,
+            [&](const ImageViewRGB32& frame){ return back_to_menu.detect(frame); }, "settings-return-main-menu", 5s)){
             break;
         }
     }
     if (!options_open){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "Settings checkpoint: Options screen not detected.",
-            stream);
+            "Settings checkpoint: Options screen not detected across three fresh frames.",
+            stream, last_options_frame.frame);
     }
     stream.log("[Tutorial settings] Options screen detected.");
     pbf_wait(context, 500ms);
@@ -311,24 +344,28 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
     pbf_press_button(context, BUTTON_X, 80ms, 1000ms);
     context.wait_for_all_requests();
     MenuWatcher verify_menu;
-    if (wait_until(stream, context, 5s, {{verify_menu}}) != 0){
+    if (!wait_for_menu_screen(stream, context,
+        [&](const ImageViewRGB32& frame){ return verify_menu.detect(frame); }, "autosave-main-menu", 5s)){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Autosave verification: Main menu not detected.",
             stream);
     }
     bool reopened = false;
+    VideoSnapshot rejected_saved_options;
     for (size_t attempt = 0; attempt < 2; attempt++){
         pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
         context.wait_for_all_requests();
-        auto check = stream.video().snapshot();
-        if (check && options_screen.detect(check)){
+        if (wait_for_menu_screen(stream, context,
+            [&](const ImageViewRGB32& frame){ return options_screen.detect(frame); },
+            "saved-options", 5s, &rejected_saved_options)){
             reopened = true;
             break;
         }
         pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
         context.wait_for_all_requests();
         MenuWatcher return_menu;
-        if (wait_until(stream, context, 5s, {{return_menu}}) != 0){
+        if (!wait_for_menu_screen(stream, context,
+            [&](const ImageViewRGB32& frame){ return return_menu.detect(frame); }, "autosave-return-main-menu", 5s)){
             break;
         }
         repeat_dpad(context, dpad, DPAD_RIGHT, 80ms, 300ms, 1, false);
@@ -336,7 +373,7 @@ static void verify_tutorial_settings_once(VideoStream& stream, ProControllerCont
     if (!reopened){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Autosave verification: Could not reopen saved Options.",
-            stream);
+            stream, rejected_saved_options.frame);
     }
     bool autosave_found = false;
     for (size_t step = 0; step < 20; step++){
@@ -974,7 +1011,8 @@ static void confirm_battle_overworld(VideoStream& stream, ProControllerContext& 
                 pbf_press_button(context, BUTTON_X, 80ms, 300ms);
                 context.wait_for_all_requests();
                 MenuWatcher menu;
-                if (wait_until(stream, context, 2s, {{menu}}) != 0){
+                if (!wait_for_menu_screen(stream, context,
+                    [&](const ImageViewRGB32& frame){ return menu.detect(frame); }, "partner-cleanup-main-menu", 2s)){
                     quiet_since = std::chrono::steady_clock::now();
                     continue;
                 }
@@ -1474,6 +1512,7 @@ void align_to_overworld_landmarks(VideoStream& stream,
     const bool lighthouse_exit = matcher == match_sunyshore_lighthouse_elevator;
     const bool route215_renewal = matcher == match_route215_bridge_renewal || matcher == match_route215_ace_renewal ||
         matcher == match_route215_derek_stairs_renewal || matcher == match_route215_derek_stair_top_renewal;
+    const bool bounded_alignment = route215_renewal || lighthouse_exit || matcher == match_league_waterfall_statues;
     Milliseconds correction_movement = 0ms;
     for (size_t attempt = 0; attempt < 80; attempt++){
         const auto frame = stream.video().snapshot();
@@ -1588,8 +1627,12 @@ void align_to_overworld_landmarks(VideoStream& stream,
                 const auto& a = result.landmarks[0];
                 const auto& b = result.landmarks[1];
                 const double nearest = std::min(std::abs(a.dx), std::abs(b.dx));
-                coarse_horizontal = a.accepted && b.accepted && a.dx * b.dx > 0 && nearest > 1.0 / 64 &&
-                    nearest > 2 * std::abs(a.dx - b.dx);
+                // On the waterfall bank, perspective narrows the statue spacing. When both offsets
+                // point the same way, center on the isthmus before trying to walk north onto it.
+                const bool lateral_offset = matcher == match_league_waterfall_statues
+                    ? std::abs(result.dx) > 1.0 / 96
+                    : nearest > 1.0 / 64 && nearest > 2 * std::abs(a.dx - b.dx);
+                coarse_horizontal = a.accepted && b.accepted && a.dx * b.dx > 0 && lateral_offset;
             }
             // From the west, recover the Center doorway row before crossing
             // its column. A perspective match may guide travel, not arrival.
@@ -1666,7 +1709,7 @@ void align_to_overworld_landmarks(VideoStream& stream,
                     }
                 }
             }
-            if (route215_renewal || lighthouse_exit){
+            if (bounded_alignment){
                 if (correction_movement + duration > 1500ms){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                         label + ": Alignment movement budget exhausted.",
@@ -1683,7 +1726,7 @@ void align_to_overworld_landmarks(VideoStream& stream,
             if (plaza_located || matcher == match_floaroma_center_entrance ||
                 matcher == match_hearthome_center_entrance || matcher == match_hearthome_contest_fantina ||
                 matcher == match_veilstone_city_passage || matcher == match_veilstone_dawn_stairs ||
-                route215_renewal || lighthouse_exit){
+                bounded_alignment){
                 // Once the plaza is acquired, wait out passing cloud shadows
                 // instead of abandoning a near-target pose for a blind sweep.
                 // Do not sweep into a different doorway or around the Hall's

@@ -30,6 +30,8 @@
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Shopping.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Battle.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Dialog.h"
+#include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Segment_00_tools.h"
+#include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_OverworldMatchers.h"
 
 #include "PokemonBDSP_AutoStory_Segment_09.h"
 
@@ -1062,65 +1064,19 @@ static bool go_through_victory_road_cave(VideoStream& stream, ProControllerConte
     dpad.last_dir = DPAD_UP;
     repeat_dpad(context, dpad, DPAD_DOWN, 80ms, 300ms, 1);
 
-    {
-        WhiteScreenOverWatcher white_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream,
-            context,
-            [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {-1, 0}, 10000ms, 1100ms);
-            },
-            {{white_screen}});
-        if (ret < 0){
-            stream.log("go_through_victory_road_cave: white screen not detected!", COLOR_RED);
-            return false;
-        }
-        stream.log("go_through_victory_road_cave: exited Victory Road's cave.", COLOR_GREEN);
-    }
+    watch_doorway_transition(stream, context, "Victory Road exit to the Pokemon League", [](ProControllerContext& ctx){
+        pbf_move_left_joystick(ctx, {-1, 0}, 10000ms, 100ms);
+    });
 
-    return true;
-}
+    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 9, false);
+    force_repel_expiry(stream, context, RepelRenewalChoice::NO, false, true);
 
-static bool enter_elite_4_pokemon_center(VideoStream& stream, ProControllerContext& context, AutoStoryOptions options){
-    DpadState dpad;
-    context.wait_for_all_requests();
-    //pbf_wait(context, 2000ms);
-    context.wait_for_all_requests();
-    stream.log("enter_elite_4_pokemon_center: Entering the Elite 4 building...");
-
-    dpad.last_dir = DPAD_LEFT;
-    repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 7);
-    // Expire on the dry approach; reversing above the waterfall can carry us back down.
-    force_repel_expiry(stream, context, RepelRenewalChoice::NO, true, true);
-    pbf_move_left_joystick(context, {0, +1}, 2000ms, 100ms); // 10+
-
-    context.wait_for_all_requests();
-    use_HM(stream, context, "Surf");
-
-    context.wait_for_all_requests();
-    pbf_move_left_joystick(context, {0, +1}, 600ms, 100ms); // 2+
-    context.wait_for_all_requests();
-    use_HM(stream, context, "Waterfall");
-
-    context.wait_for_all_requests();
-    pbf_wait(context, 3000ms);
-
-    {
-        BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.8});
-        int ret = run_until<ProControllerContext>(stream,
-            context,
-            [](ProControllerContext& context){
-                pbf_move_left_joystick(context, {0, +1}, 10000ms, 1100ms);
-            },
-            {{black_screen}});
-        if (ret < 0){
-            stream.log("enter_elite_4_pokemon_center: black screen not detected!", COLOR_RED);
-            return false;
-        }
-        stream.log("enter_elite_4_pokemon_center: entered the Elite 4 building.", COLOR_GREEN);
-        // Let the entrance fade settle before the next checkpoint opens the save menu.
-        pbf_wait(context, 1000ms);
-    }
-
+    watch_doorway_transition(stream, context, "Re-enter Victory Road from the League side", [](ProControllerContext& ctx){
+        pbf_move_left_joystick(ctx, {+1, 0}, 5000ms, 100ms);
+    });
+    watch_doorway_transition(stream, context, "Exit Victory Road to the waterfall approach", [](ProControllerContext& ctx){
+        pbf_move_left_joystick(ctx, {-1, 0}, 2000ms, 100ms);
+    });
     return true;
 }
 
@@ -1130,7 +1086,7 @@ static bool ready_in_front_of_elite_4(VideoStream& stream,
     AutoStoryStats& stats){
     if (options.help_mode != HelpMode::OUTSIDE_HELP){
         throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
-            "09.04 unassisted League preparation is not implemented yet.", stream);
+            "09.05 unassisted League preparation is not implemented yet.", stream);
     }
 
     const VeilstoneShoppingList* shopping = nullptr;
@@ -1146,7 +1102,7 @@ static bool ready_in_front_of_elite_4(VideoStream& stream,
         break;
     default:
         throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
-            "09.04 has no shopping plan for the selected starter.", stream);
+            "09.05 has no shopping plan for the selected starter.", stream);
     }
     const bool visit_store = !shopping->floor3_top.empty() || !shopping->floor3_bottom.empty() ||
         !shopping->floor2_top.empty() || !shopping->floor2_middle.empty() || !shopping->floor2_bottom.empty();
@@ -1461,7 +1417,7 @@ std::string AutoStory_Segment_09::start_text() const {
 }
 
 std::string AutoStory_Segment_09::end_text() const {
-    return AutoStory_Checkpoint_0909().end_text();
+    return AutoStory_Checkpoint_0910().end_text();
 }
 
 void AutoStory_Segment_09::run_segment(SingleSwitchProgramEnvironment& env,
@@ -1481,6 +1437,7 @@ void AutoStory_Segment_09::run_segment(SingleSwitchProgramEnvironment& env,
     AutoStory_Checkpoint_0907().run_checkpoint(env, context, options, stats);
     AutoStory_Checkpoint_0908().run_checkpoint(env, context, options, stats);
     AutoStory_Checkpoint_0909().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_0910().run_checkpoint(env, context, options, stats);
     env.console.log("End Segment " + name(), COLOR_GREEN);
 }
 
@@ -1593,7 +1550,7 @@ std::string AutoStory_Checkpoint_0903::start_text() const {
 }
 
 std::string AutoStory_Checkpoint_0903::end_text() const {
-    return "Inside the Pokemon League building at its arrival position, Repel inactive.";
+    return AutoStory_Checkpoint_0904().start_text();
 }
 
 void AutoStory_Checkpoint_0903::run_checkpoint(SingleSwitchProgramEnvironment& env,
@@ -1627,38 +1584,71 @@ void checkpoint_0903(SingleSwitchProgramEnvironment& env,
                         env.console);
                 }
             }
-            {
-                if (!enter_elite_4_pokemon_center(env.console, context, options)){
-                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "enter_elite_4_pokemon_center: transition not detected.",
-                        env.console);
-                }
-            }
             context.wait_for_all_requests();
         },
         true);
 }
 
 std::string AutoStory_Checkpoint_0904::name() const {
-    return "09.04 - League preparation and admission";
+    return "09.04 - Pokemon League waterfall";
 }
 
 std::string AutoStory_Checkpoint_0904::start_text() const {
-    return "Inside the Pokemon League building at its arrival position, Repel inactive.";
+    return "Just outside the League-side exit of Victory Road, facing west on the cave doorway tile, Repel inactive.";
 }
 
 std::string AutoStory_Checkpoint_0904::end_text() const {
-    return "Assisted route: rival defeated, healed, starter shopping completed, inside the first lift vestibule. Unassisted preparation is pending.";
+    return AutoStory_Checkpoint_0905().start_text();
 }
 
 void AutoStory_Checkpoint_0904::run_checkpoint(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats) const {
-    checkpoint_0904(env, context, options, stats);
+    checkpoint_reattempt_loop(env, context, options, stats, [&](size_t /*attempt*/){
+        VideoStream& stream = env.console;
+        stream.log("09.04: Crossing from Victory Road to the Pokemon League.");
+        DpadState dpad;
+        repeat_dpad(context, dpad, DPAD_LEFT, 80ms, 300ms, 6, false);
+        pbf_move_left_joystick(context, {0, +1}, 2000ms, 100ms);
+        context.wait_for_all_requests();
+        align_to_overworld_landmarks(stream, context, match_league_waterfall_statues,
+            "Pokemon League waterfall isthmus", false, true);
+        pbf_move_left_joystick(context, {0, +1}, 180ms, 100ms);
+        context.wait_for_all_requests();
+        use_HM(stream, context, "Surf");
+
+        pbf_move_left_joystick(context, {0, +1}, 600ms, 100ms);
+        context.wait_for_all_requests();
+        use_HM(stream, context, "Waterfall");
+        pbf_wait(context, 3000ms);
+
+        watch_doorway_transition(stream, context, "Enter the Pokemon League building", [](ProControllerContext& ctx){
+            pbf_move_left_joystick(ctx, {0, +1}, 10000ms, 100ms);
+        });
+    }, true);
 }
 
-void checkpoint_0904(SingleSwitchProgramEnvironment& env,
+std::string AutoStory_Checkpoint_0905::name() const {
+    return "09.05 - League preparation and admission";
+}
+
+std::string AutoStory_Checkpoint_0905::start_text() const {
+    return "Inside the Pokemon League building at its arrival position, Repel inactive.";
+}
+
+std::string AutoStory_Checkpoint_0905::end_text() const {
+    return "Assisted route: rival defeated, healed, starter shopping completed, inside the first lift vestibule. Unassisted preparation is pending.";
+}
+
+void AutoStory_Checkpoint_0905::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0905(env, context, options, stats);
+}
+
+void checkpoint_0905(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
     AutoStoryStats& stats){
@@ -1687,58 +1677,16 @@ void checkpoint_0904(SingleSwitchProgramEnvironment& env,
         true);
 }
 
-std::string AutoStory_Checkpoint_0905::name() const {
-    return "09.05 - Aaron";
-}
-
-std::string AutoStory_Checkpoint_0905::start_text() const {
-    return "Inside the first lift vestibule after League admission, facing north.";
-}
-
-std::string AutoStory_Checkpoint_0905::end_text() const {
-    return "Aaron defeated, facing north in front of him, with dialogue and the door-opening cutscene finished.";
-}
-
-void AutoStory_Checkpoint_0905::run_checkpoint(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats) const {
-    checkpoint_0905(env, context, options, stats);
-}
-
-void checkpoint_0905(SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    AutoStoryOptions options,
-    AutoStoryStats& stats){
-    checkpoint_reattempt_loop(
-        env,
-        context,
-        options,
-        stats,
-        [&](size_t /*attempt*/){
-            {
-                if (!fight_elite_four_member(env.console, context, stats, options.language,
-                    "Elite Four Aaron", "elite_four_aaron", true)){
-                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "09.05: Could not reach Elite Four Aaron.",
-                        env.console);
-                }
-            }
-            context.wait_for_all_requests();
-        },
-        true);
-}
-
 std::string AutoStory_Checkpoint_0906::name() const {
-    return "09.06 - Bertha";
+    return "09.06 - Aaron";
 }
 
 std::string AutoStory_Checkpoint_0906::start_text() const {
-    return "Facing north in front of Aaron after his battle and dialogue.";
+    return "Inside the first lift vestibule after League admission, facing north.";
 }
 
 std::string AutoStory_Checkpoint_0906::end_text() const {
-    return "Bertha defeated, facing north in front of her, with dialogue and the door-opening cutscene finished.";
+    return "Aaron defeated, facing north in front of him, with dialogue and the door-opening cutscene finished.";
 }
 
 void AutoStory_Checkpoint_0906::run_checkpoint(SingleSwitchProgramEnvironment& env,
@@ -1760,9 +1708,9 @@ void checkpoint_0906(SingleSwitchProgramEnvironment& env,
         [&](size_t /*attempt*/){
             {
                 if (!fight_elite_four_member(env.console, context, stats, options.language,
-                    "Elite Four Bertha", "elite_four_bertha")){
+                    "Elite Four Aaron", "elite_four_aaron", true)){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "09.06: Could not reach Elite Four Bertha.",
+                        "09.06: Could not reach Elite Four Aaron.",
                         env.console);
                 }
             }
@@ -1772,15 +1720,15 @@ void checkpoint_0906(SingleSwitchProgramEnvironment& env,
 }
 
 std::string AutoStory_Checkpoint_0907::name() const {
-    return "09.07 - Flint";
+    return "09.07 - Bertha";
 }
 
 std::string AutoStory_Checkpoint_0907::start_text() const {
-    return "Facing north in front of Bertha after her battle and dialogue.";
+    return "Facing north in front of Aaron after his battle and dialogue.";
 }
 
 std::string AutoStory_Checkpoint_0907::end_text() const {
-    return "Flint defeated, facing north in front of him, with dialogue and the door-opening cutscene finished.";
+    return "Bertha defeated, facing north in front of her, with dialogue and the door-opening cutscene finished.";
 }
 
 void AutoStory_Checkpoint_0907::run_checkpoint(SingleSwitchProgramEnvironment& env,
@@ -1802,9 +1750,9 @@ void checkpoint_0907(SingleSwitchProgramEnvironment& env,
         [&](size_t /*attempt*/){
             {
                 if (!fight_elite_four_member(env.console, context, stats, options.language,
-                    "Elite Four Flint", "elite_four_flint")){
+                    "Elite Four Bertha", "elite_four_bertha")){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "09.07: Could not reach Elite Four Flint.",
+                        "09.07: Could not reach Elite Four Bertha.",
                         env.console);
                 }
             }
@@ -1814,15 +1762,15 @@ void checkpoint_0907(SingleSwitchProgramEnvironment& env,
 }
 
 std::string AutoStory_Checkpoint_0908::name() const {
-    return "09.08 - Lucian";
+    return "09.08 - Flint";
 }
 
 std::string AutoStory_Checkpoint_0908::start_text() const {
-    return "Facing north in front of Flint after his battle and dialogue.";
+    return "Facing north in front of Bertha after her battle and dialogue.";
 }
 
 std::string AutoStory_Checkpoint_0908::end_text() const {
-    return "Lucian defeated, facing north in front of him, with dialogue and the door-opening cutscene finished.";
+    return "Flint defeated, facing north in front of him, with dialogue and the door-opening cutscene finished.";
 }
 
 void AutoStory_Checkpoint_0908::run_checkpoint(SingleSwitchProgramEnvironment& env,
@@ -1844,9 +1792,9 @@ void checkpoint_0908(SingleSwitchProgramEnvironment& env,
         [&](size_t /*attempt*/){
             {
                 if (!fight_elite_four_member(env.console, context, stats, options.language,
-                    "Elite Four Lucian", "elite_four_lucian")){
+                    "Elite Four Flint", "elite_four_flint")){
                     OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                        "09.08: Could not reach Elite Four Lucian.",
+                        "09.08: Could not reach Elite Four Flint.",
                         env.console);
                 }
             }
@@ -1856,15 +1804,15 @@ void checkpoint_0908(SingleSwitchProgramEnvironment& env,
 }
 
 std::string AutoStory_Checkpoint_0909::name() const {
-    return "09.09 - Cynthia and Hall of Fame";
+    return "09.09 - Lucian";
 }
 
 std::string AutoStory_Checkpoint_0909::start_text() const {
-    return "Facing north in front of Lucian after his battle and dialogue.";
+    return "Facing north in front of Flint after his battle and dialogue.";
 }
 
 std::string AutoStory_Checkpoint_0909::end_text() const {
-    return "Cynthia defeated, Hall of Fame sequence advanced into credits, game restarted, and final save verified.";
+    return "Lucian defeated, facing north in front of him, with dialogue and the door-opening cutscene finished.";
 }
 
 void AutoStory_Checkpoint_0909::run_checkpoint(SingleSwitchProgramEnvironment& env,
@@ -1884,25 +1832,29 @@ void checkpoint_0909(SingleSwitchProgramEnvironment& env,
         options,
         stats,
         [&](size_t /*attempt*/){
-            if (!deal_with_cynthia_and_finish(env, context, options, stats)){
-                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    "09.09: Could not reach Cynthia.", env.console);
+            {
+                if (!fight_elite_four_member(env.console, context, stats, options.language,
+                    "Elite Four Lucian", "elite_four_lucian")){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "09.09: Could not reach Elite Four Lucian.",
+                        env.console);
+                }
             }
+            context.wait_for_all_requests();
         },
         true);
 }
 
-
 std::string AutoStory_Checkpoint_0910::name() const {
-    return "09.10 - Fly destination test";
+    return "09.10 - Cynthia and Hall of Fame";
 }
 
 std::string AutoStory_Checkpoint_0910::start_text() const {
-    return "Outdoors with Fly and all 16 tested destinations unlocked. Select only 09.10; Route 221 is skipped.";
+    return "Facing north in front of Lucian after his battle and dialogue.";
 }
 
 std::string AutoStory_Checkpoint_0910::end_text() const {
-    return "Outside the upper Pokemon League entrance after all 16 flights. No checkpoint save or automatic retry.";
+    return "Cynthia defeated, Hall of Fame sequence advanced into credits, game restarted, and final save verified.";
 }
 
 void AutoStory_Checkpoint_0910::run_checkpoint(SingleSwitchProgramEnvironment& env,
@@ -1914,12 +1866,50 @@ void AutoStory_Checkpoint_0910::run_checkpoint(SingleSwitchProgramEnvironment& e
 
 void checkpoint_0910(SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats){
+    checkpoint_reattempt_loop(
+        env,
+        context,
+        options,
+        stats,
+        [&](size_t /*attempt*/){
+            if (!deal_with_cynthia_and_finish(env, context, options, stats)){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "09.10: Could not reach Cynthia.", env.console);
+            }
+        },
+        true);
+}
+
+
+std::string AutoStory_Checkpoint_0911::name() const {
+    return "09.11 - Fly destination test";
+}
+
+std::string AutoStory_Checkpoint_0911::start_text() const {
+    return "Outdoors with Fly and all 16 tested destinations unlocked. Select only 09.11; Route 221 is skipped.";
+}
+
+std::string AutoStory_Checkpoint_0911::end_text() const {
+    return "Outside the upper Pokemon League entrance after all 16 flights. No checkpoint save or automatic retry.";
+}
+
+void AutoStory_Checkpoint_0911::run_checkpoint(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    AutoStoryOptions options,
+    AutoStoryStats& stats) const {
+    checkpoint_0911(env, context, options, stats);
+}
+
+void checkpoint_0911(SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
     AutoStoryOptions /*options*/,
     AutoStoryStats& stats){
     // Manual diagnostic: preserve the failed flight for inspection instead of resetting.
     if (!test_fly_locations(env.console, context)){
         throw FatalProgramException(ErrorReportMode::NO_ERROR_REPORT,
-            "09.10: Fly destination test failed; see the destination in the log.", env.console);
+            "09.11: Fly destination test failed; see the destination in the log.", env.console);
     }
     context.wait_for_all_requests();
     stats.m_checkpoint++;

@@ -46,7 +46,7 @@ static const StringSelectDatabase& lighting_matcher_database(size_t segment){
                 "veilstone-city-passage","veilstone-dawn-stairs"},
             {},
             {"hearthome-gym"},
-            {}, {}, {}, {}
+            {}, {}, {}, {"league-waterfall-statues"}
         }};
         std::array<StringSelectDatabase,10> result;
         for(size_t i=0;i<result.size();i++){

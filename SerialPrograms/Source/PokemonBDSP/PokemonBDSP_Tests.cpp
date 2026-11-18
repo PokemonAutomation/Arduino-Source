@@ -23,6 +23,7 @@
 #include "PokemonBDSP_Tests.h"
 #include "Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "Inference/PokemonBDSP_MenuDetector.h"
+#include "Inference/PokemonBDSP_ButtonDetector.h"
 #include "Inference/PokemonBDSP_OptionsDetector.h"
 #include "Inference/PokemonBDSP_ShopDetectors.h"
 #include "Inference/PokemonBDSP_ShopItemNameReader.h"
@@ -257,6 +258,50 @@ private:
     std::string m_row;
     std::string m_value;
     Language m_language;
+};
+
+class Test_OptionsButtonFallback : public ImageUnitTest{
+public:
+    Test_OptionsButtonFallback(const std::string& name)
+        : ImageUnitTest("PokemonBDSP::OptionsButtonFallback/" + name, {"PokemonBDSP/OptionsOCR/" + name})
+    {}
+    UnitTestResult run_on_images(Logger&, CancellableScope&, const std::vector<ImageRGB32>& images) const override{
+        if (images.empty() || !images[0]){
+            return false;
+        }
+        TutorialOptionsDetector detector;
+        const ImageFloatBox footer{0.40, 0.955, 0.60, 0.045};
+        for (size_t width : {size_t(1920), size_t(1280), size_t(960)}){
+            auto frame = images[0].scale_to(width, width * 9 / 16);
+            for (ButtonType type : {ButtonType::A, ButtonType::Y, ButtonType::B}){
+                if (!ButtonDetector(type, footer).detect(frame)){
+                    return false;
+                }
+            }
+            if (ButtonDetector(ButtonType::X, footer).detect(frame)){
+                return false;
+            }
+            // Force the alternative path by removing only the blue-heading cue.
+            for (size_t y = 0; y < frame.height() * 0.035; y++){
+                for (size_t x = 0; x < frame.width() * 0.23; x++){
+                    frame.pixel(x, y) = 0xff808080;
+                }
+            }
+            if (!detector.detect(frame)){
+                return false;
+            }
+            // The panel alone must not satisfy the alternative path.
+            for (size_t y = (size_t)(frame.height() * 0.95); y < frame.height(); y++){
+                for (size_t x = 0; x < frame.width(); x++){
+                    frame.pixel(x, y) = 0xff508fe0;
+                }
+            }
+            if (detector.detect(frame)){
+                return false;
+            }
+        }
+        return true;
+    }
 };
 
 class Test_TrainersSchoolSign : public ImageUnitTest{
@@ -666,6 +711,9 @@ void add_tests(UnitTestDatabase& database){
     database.add<Test_Route215AceAlignment>("negative-stair-base.png", false, false);
     database.add<Test_Route215AceAlignment>("negative-stairs.png", false, false);
     database.add<Test_Route215AceAlignment>("negative-stair-top.png", false, false);
+    database.add<Test_OptionsButtonFallback>("Spanish_20261112_17-40.png");
+    database.add<Test_OptionsButtonFallback>("Spanish_20261112_41-70.png");
+    database.add<Test_OptionsButtonFallback>("Tester_English_Options.png");
     database.add<Test_OptionsOCR>("Spanish_20261112_17-40.png", "text-speed", "normal", Language::Spanish);
     database.add<Test_OptionsOCR>("Spanish_20261112_18-20.png", "text-speed", "fast", Language::Spanish);
     database.add<Test_OptionsOCR>("Spanish_20261112_18-50.png", "change-window", "type-1", Language::Spanish);

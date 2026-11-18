@@ -1579,6 +1579,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Inference/PokemonBDSP_TransitionWatchers.h
     Source/PokemonBDSP/Inference/PokemonBDSP_MenuDetector.cpp
     Source/PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h
+    Source/PokemonBDSP/Inference/PokemonBDSP_ButtonDetector.cpp
+    Source/PokemonBDSP/Inference/PokemonBDSP_ButtonDetector.h
     Source/PokemonBDSP/Inference/PokemonBDSP_OptionsDetector.cpp
     Source/PokemonBDSP/Inference/PokemonBDSP_OptionsDetector.h
     Source/PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.cpp
