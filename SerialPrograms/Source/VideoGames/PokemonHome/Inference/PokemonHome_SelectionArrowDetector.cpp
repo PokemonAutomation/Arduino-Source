@@ -13,7 +13,7 @@
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
 #include "Tests/ImageUnitTest.h"
-#include "PokemonHome_PageViewDetector.h"
+#include "PokemonHome_StorageView.h"
 #include "PokemonHome_SelectionArrowDetector.h"
 
 namespace PokemonAutomation{
@@ -240,7 +240,8 @@ std::optional<BoxSelection> SelectionArrowDetector::detect(const ImageViewRGB32&
             }
         );
     }
-    if (best && best->location == BoxSelectionLocation::BoxSpaces && PageViewDetector().detect(screen)){
+    if (best && best->location == BoxSelectionLocation::BoxSpaces
+        && classify_storage_header(screen) == StorageViewHeader::PageView){
         best->location = BoxSelectionLocation::Back;
     }
     return best;
@@ -287,91 +288,6 @@ private:
 };
 
 void add_tests_SelectionArrowDetector(UnitTestDatabase& database){
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page04_Box118_Normal_Grid_R4C3_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 4, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page04_Box117_Normal_Grid_R4C2_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 4, 2});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page04_Box105_Normal_Grid_R2C2_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 2, 2});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page03_Box069_Normal_Grid_R1C2_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 1, 2});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page03_Box071_Normal_Grid_R1C4_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 1, 4});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page02_Box041_Normal_Grid_R1C4_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 1, 4});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page02_Box059_Normal_Grid_R4C4_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 4, 4});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page02_Box059_Normal_Grid_R4C4_Frame02.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 4, 4});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page01_Box029_Normal_Grid_R4C4_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 4, 4});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page01_Box028_Normal_Grid_R4C3_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 4, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page01_Normal_Back_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Back});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page01_Box027_Normal_Grid_R4C2_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 4, 2});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page10_Box285_Normal_Grid_R2C2_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 2, 2});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page10_Box285_Normal_Grid_R2C2_Frame02.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 2, 2});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page10_Box285_Normal_Grid_R2C2_Frame03.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 2, 2});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page10_Box285_Normal_Grid_R2C2_Frame04.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 2, 2});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page10_Box285_Relocate_Grid_R2C2_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 2, 2});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page10_Box287_Relocate_Grid_R2C4_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 2, 4});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page10_Box281_Relocate_Grid_R1C4_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 1, 4});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page01_Box011_Relocate_Grid_R1C4_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 1, 4});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page01_Box011_Relocate_Grid_R1C4_Frame02.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 1, 4});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page02_Box047_Relocate_Grid_R2C4_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 2, 4});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page02_Box059_Relocate_Grid_R4C4_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 4, 4});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page02_Box059_Relocate_Grid_R4C4_Frame02.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 4, 4});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page03_Box086_Relocate_Grid_R4C1_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 4, 1});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page03_Relocate_Back_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Back});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page03_Relocate_Back_Frame02.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Back});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page03_Relocate_Back_Frame03.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Back});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page03_Multi_Back_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Back});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page04_Box109_Multi_Grid_R3C0_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 3, 0});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page04_Box097_Multi_Grid_R1C0_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 1, 0});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page05_Box128_Multi_Grid_R1C1_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 1, 1});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page05_Box129_Multi_Grid_R1C2_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 1, 2});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page05_Box129_Multi_Grid_R1C2_Frame02.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 1, 2});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page05_Box130_Multi_Grid_R1C3_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 1, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page05_Box136_Multi_Grid_R2C3_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 2, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page05_Box136_Multi_Grid_R2C3_Frame02.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 2, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page06_Box166_Multi_Grid_R2C3_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 2, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page06_Box172_Multi_Grid_R3C3_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 3, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page06_Box178_Multi_Grid_R4C3_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 4, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page06_Box179_Multi_Grid_R4C4_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 4, 4});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page07_Box209_Multi_Grid_R4C4_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 4, 4});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page07_Multi_Back_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Back});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page07_Box196_Multi_Grid_R2C3_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 2, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page07_Box195_Multi_Grid_R2C2_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 2, 2});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page08_Box226_Multi_Grid_R2C3_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 2, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page09_Box256_Multi_Grid_R2C3_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 2, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page09_Box262_Multi_Grid_R3C3_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 3, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page09_Box262_Multi_Grid_R3C3_Frame02.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 3, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page09_Box262_Multi_Grid_R3C3_Frame03.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 3, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page09_Box262_Normal_Grid_R3C3_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 3, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page09_Box262_Multi_Grid_R3C3_Frame04.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 3, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page09_Box260_Normal_Grid_R3C1_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 3, 1});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page09_Box254_Normal_Grid_R2C1_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 2, 1});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page09_Box247_Normal_Grid_R1C0_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 1, 0});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page08_Box223_Normal_Grid_R2C0_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 2, 0});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page07_Box193_Normal_Grid_R2C0_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 2, 0});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page07_Box199_Normal_Grid_R3C0_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 3, 0});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page08_Box235_Relocate_Grid_R4C0_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 4, 0});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page08_Box235_Relocate_Grid_R4C0_Frame02.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 4, 0});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page08_Box235_Relocate_Grid_R4C0_Frame03.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 4, 0});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page08_Box235_Relocate_Grid_R4C0_Frame04.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 4, 0});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page08_Box235_Relocate_Grid_R4C0_Frame05.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 4, 0});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page08_Box236_Relocate_Grid_R4C1_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 4, 1});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page08_Box238_Relocate_Grid_R4C3_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 4, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page08_Relocate_Back_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Back});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page08_Relocate_Back_Frame02.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Back});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page07_Box208_Relocate_Grid_R4C3_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 4, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page07_Box195_Relocate_Grid_R2C2_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 2, 2});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page07_Box189_Relocate_Grid_R1C2_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 1, 2});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page07_Box187_Relocate_Grid_R1C0_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 1, 0});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page06_Box163_Relocate_Grid_R2C0_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 2, 0});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page06_Relocate_Back_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Back});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page06_Box175_Relocate_Grid_R4C0_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 4, 0});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page06_Box178_Relocate_Grid_R4C3_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 4, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page05_Box148_Multi_Grid_R4C3_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 4, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page05_Box142_Multi_Grid_R3C3_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 3, 3});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page05_Box134_Multi_Grid_R2C1_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 2, 1});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page05_Box134_Multi_Grid_R2C1_Frame02.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 2, 1});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page04_Box119_Multi_Grid_R4C4_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 4, 4});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page05_Box150_Normal_Grid_R4C5_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 4, 5});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page05_Box138_Normal_Grid_R2C5_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 2, 5});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page05_Box132_Normal_Grid_R1C5_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 1, 5});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page06_Box162_Normal_Grid_R1C5_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 1, 5});
-    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page07_Box192_Normal_Grid_R1C5_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 1, 5});
     database.add<Test_SelectionArrowDetector>("PokemonHome/BoxView/BoxView-1.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 0, 3});
     database.add<Test_SelectionArrowDetector>("PokemonHome/BoxView/SelectionArrow_Multi_BoxName_01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::BoxName, 0, 0});
     database.add<Test_SelectionArrowDetector>("PokemonHome/BoxView/SelectionArrow_Multi_BoxSpaces_01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::BoxSpaces, 0, 0});
@@ -447,6 +363,7 @@ void add_tests_SelectionArrowDetector(UnitTestDatabase& database){
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page04_Box113_Relocate_Grid_R3C4_Frame02.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 3, 4});
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page04_Box115_Multi_Grid_R4C0_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Grid, 4, 0});
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page05_Box126_Relocate_Grid_R0C5_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 0, 5});
+    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page05_Multi_Back_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Back});
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page05_Relocate_BoxName_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::BoxName, 0, 0});
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page06_Box156_Relocate_Grid_R0C5_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 0, 5});
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page06_Box157_Relocate_Grid_R1C0_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 1, 0});
@@ -454,6 +371,8 @@ void add_tests_SelectionArrowDetector(UnitTestDatabase& database){
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page06_Box162_Normal_Grid_R1C5_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 1, 5});
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page06_Box165_Relocate_Grid_R2C2_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 2, 2});
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page06_Box172_Relocate_Grid_R3C3_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 3, 3});
+    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page06_Multi_Back_Frame01.png", BoxSelection{BoxSelectionMode::Multi, BoxSelectionLocation::Back});
+    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page06_Relocate_Back_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Back});
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page06_Relocate_BoxName_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::BoxName, 0, 0});
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page07_Box192_Normal_Grid_R1C5_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 1, 5});
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page07_Box198_Normal_Grid_R2C5_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 2, 5});
@@ -467,6 +386,8 @@ void add_tests_SelectionArrowDetector(UnitTestDatabase& database){
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page09_Box251_Normal_Grid_R1C4_Frame02.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 1, 4});
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page09_Box257_Normal_Grid_R2C4_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 2, 4});
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page09_Box269_Normal_Grid_R4C4_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 4, 4});
+    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page09_Normal_Back_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Back});
+    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page09_Normal_Back_Frame02.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Back});
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page09_Normal_BoxName_Frame01.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::BoxName, 0, 0});
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page10_Box274_Relocate_Grid_R0C3_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 0, 3});
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page10_Box274_Relocate_Grid_R0C3_Frame02.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 0, 3});
@@ -479,6 +400,7 @@ void add_tests_SelectionArrowDetector(UnitTestDatabase& database){
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page10_Box293_Normal_Grid_R3C4_Frame02.png", BoxSelection{BoxSelectionMode::Normal, BoxSelectionLocation::Grid, 3, 4});
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page10_Box297_Relocate_Grid_R4C2_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 4, 2});
     database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page10_Box298_Relocate_Grid_R4C3_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Grid, 4, 3});
+    database.add<Test_SelectionArrowDetector>("PokemonHome/PageView/Page10_Relocate_Back_Frame01.png", BoxSelection{BoxSelectionMode::Relocate, BoxSelectionLocation::Back});
     database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/annihilape_Regular.png", std::nullopt);
     database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/bidoof_Regular.png", std::nullopt);
     database.add<Test_SelectionArrowDetector>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", std::nullopt);
