@@ -121,17 +121,16 @@ void ServerSocket2_WinSocket::start(const std::string& address, uint16_t port){
     //  run).
     ensure_wsa_started();
 
-    uint64_t generation = 0;
     {
         std::lock_guard<Mutex> lg(m_lock);
         if (m_starting ||
+            m_task_alive ||
             m_state.load(std::memory_order_relaxed) != State::NOT_RUNNING
         ){
             return;
         }
         m_starting = true;
-        m_generation++;
-        generation = m_generation;
+        m_task_alive = true;
     }
 
     //  Use the plain dispatch() rather than dispatch_now_blocking():
@@ -140,17 +139,15 @@ void ServerSocket2_WinSocket::start(const std::string& address, uint16_t port){
     //  deadlock a capped pool.
     try{
         AsyncTask task = m_thread_pool.dispatch([=, this]{
-            accept_thread_loop(address, port, generation);
+            accept_thread_loop(address, port);
         });
         {
             //  Append, never replace: replacing the slot would destroy
             //  the previous task's AsyncTask, and its destructor blocks
-            //  until that task has finished. A task from an earlier
-            //  start() may still be running when this start() runs (the
-            //  caller's wait timed out while the pool was starved). It
-            //  notices its stale generation when it gets scheduled and
-            //  exits without listening, so it only has to outlive this
-            //  call; close_and_wait() joins the whole list.
+            //  until that task has finished. The previous tasks here are
+            //  all failed attempts (start() is a no-op while one is
+            //  alive), so theirs return immediately; the live one is
+            //  joined by close_and_wait().
             std::lock_guard<Mutex> lg(m_task_lock);
             m_accept_threads.push_back(std::move(task));
         }
@@ -158,6 +155,7 @@ void ServerSocket2_WinSocket::start(const std::string& address, uint16_t port){
         {
             std::lock_guard<Mutex> lg(m_lock);
             m_starting = false;
+            m_task_alive = false;
             m_cv.notify_all();
         }
         m_listeners.run_method(
@@ -239,29 +237,24 @@ void ServerSocket2_WinSocket::close_and_wait() noexcept{
         std::lock_guard<Mutex> lg(m_lock);
         m_active = ConnectionPtr();
         m_state.store(State::NOT_RUNNING, std::memory_order_release);
+        m_task_alive = false;
         m_closing = 0;
         m_cv.notify_all();
     }
 }
 
-void ServerSocket2_WinSocket::report_listen_finished(uint64_t generation, const std::string& error){
-    bool current;
+void ServerSocket2_WinSocket::listen_failed(const std::string& error){
     {
         std::lock_guard<Mutex> lg(m_lock);
-        current = (m_generation == generation);
+        m_task_alive = false;
     }
-    if (current){
-        m_listeners.run_method(&Listener::on_listen_finished, error);
-    }
+    m_listeners.run_method(&Listener::on_listen_finished, error);
 }
 
-void ServerSocket2_WinSocket::accept_thread_loop(std::string address, uint16_t port, uint64_t generation){
+void ServerSocket2_WinSocket::accept_thread_loop(std::string address, uint16_t port){
     SOCKET listen_socket = ::socket(AF_INET, SOCK_STREAM, 0);
     if (listen_socket == INVALID_SOCKET){
-        report_listen_finished(
-            generation,
-            "socket() failed: WSA Error Code: " + std::to_string(WSAGetLastError())
-        );
+        listen_failed("socket() failed: WSA Error Code: " + std::to_string(WSAGetLastError()));
         return;
     }
 
@@ -280,33 +273,24 @@ void ServerSocket2_WinSocket::accept_thread_loop(std::string address, uint16_t p
     if (bind(listen_socket, (struct sockaddr*)&server, sizeof(server)) == SOCKET_ERROR){
         int error = WSAGetLastError();
         ::closesocket(listen_socket);
-        report_listen_finished(
-            generation,
-            "bind() failed: WSA Error Code: " + std::to_string(error)
-        );
+        listen_failed("bind() failed: WSA Error Code: " + std::to_string(error));
         return;
     }
 
     if (::listen(listen_socket, 16) == SOCKET_ERROR){
         int error = WSAGetLastError();
         ::closesocket(listen_socket);
-        report_listen_finished(
-            generation,
-            "listen() failed: WSA Error Code: " + std::to_string(error)
-        );
+        listen_failed("listen() failed: WSA Error Code: " + std::to_string(error));
         return;
     }
 
     std::string start_error;
-    bool superseded = false;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        superseded = m_generation != generation;
-        if (superseded ||
-            m_state.load(std::memory_order_relaxed) == State::DESTRUCTING
-        ){
-            //  A newer start() or close_and_wait() won the race.
-            start_error = "The server was replaced or closed before it could start listening.";
+        if (m_state.load(std::memory_order_relaxed) == State::DESTRUCTING){
+            //  close_and_wait() won the race: the task was still
+            //  starting up when the server was destroyed.
+            start_error = "The server was closed before it could start listening.";
         }else{
             m_listen = listen_socket;
             listen_socket = INVALID_SOCKET;
@@ -317,18 +301,12 @@ void ServerSocket2_WinSocket::accept_thread_loop(std::string address, uint16_t p
         ::closesocket(listen_socket);
     }
 
-    if (superseded){
-        //  The attempt that started this task gave up on it while it was
-        //  still starting up (its wait timed out). A newer attempt owns
-        //  the listeners now; reporting this result would only confuse
-        //  that attempt, so exit without touching them.
+    if (!start_error.empty()){
+        listen_failed(start_error);
         return;
     }
 
-    m_listeners.run_method(&Listener::on_listen_finished, start_error);
-    if (!start_error.empty()){
-        return;
-    }
+    m_listeners.run_method(&Listener::on_listen_finished, "");
 
     //  Accept loop. Runs for the whole lifetime of the server: it keeps
     //  polling while a connection is active, and rejects new clients in
@@ -339,8 +317,7 @@ void ServerSocket2_WinSocket::accept_thread_loop(std::string address, uint16_t p
             std::lock_guard<Mutex> lg(m_lock);
             State state = m_state.load(std::memory_order_relaxed);
             if (state == State::DESTRUCTING ||
-                state == State::NOT_RUNNING ||
-                m_generation != generation
+                state == State::NOT_RUNNING
             ){
                 break;
             }

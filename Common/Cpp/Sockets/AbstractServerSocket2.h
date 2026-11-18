@@ -106,7 +106,10 @@ public:
 
     //  Binds to "address" and listens on "port".
     //  Use "0.0.0.0" to accept connections on all interfaces.
-    //  The server can be started again once it has fully stopped.
+    //  Only acts while "state()" is NOT_RUNNING and no start attempt is
+    //  still in flight; otherwise it is a no-op. A start that fails (for
+    //  example, the port is busy) leaves the server NOT_RUNNING, so it
+    //  may be retried. The server stops only when it is destroyed.
     virtual void start(const std::string& address, uint16_t port) = 0;
 
     //  The connection currently being served, or nullptr when none is

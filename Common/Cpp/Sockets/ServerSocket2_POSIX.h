@@ -104,27 +104,31 @@ private:
     //  have exited, so it is private and only called by the destructor.
     void close_and_wait() noexcept;
 
-    void accept_thread_loop(std::string address, uint16_t port, uint64_t generation);
+    void accept_thread_loop(std::string address, uint16_t port);
     void connection_thread_loop(std::shared_ptr<ServerSocket2Connection_POSIX> conn);
 
-    //  "on_listen_finished" callback, but only for a task that still owns
-    //  the server. A task whose generation is stale (a newer start() ran
-    //  while it was still starting up) must stay silent, or its result
-    //  would corrupt the attempt that replaced it.
-    void report_listen_finished(uint64_t generation, const std::string& error);
+    //  A start attempt failed (or the server was torn down while the task
+    //  was still starting up): mark the task dead so that a retrying
+    //  start() may dispatch a new one, and report the result to the
+    //  listeners.
+    void listen_failed(const std::string& error);
 
 
 private:
     ThreadPool& m_thread_pool;
     Mutex m_lock;
     ConditionVariable m_cv;
+    //  "m_starting" covers the window between start() claiming the start
+    //  and the task being published in m_accept_threads; "m_task_alive"
+    //  covers the task's whole life (until it fails, or
+    //  "close_and_wait()" joins it). While either is set, start() is a
+    //  no-op - so there is never more than one live start task, and a
+    //  task that is finally scheduled can only be stale in the sense
+    //  that "close_and_wait()" won the race (checked against the state
+    //  when it publishes).
     bool m_starting = false;
+    bool m_task_alive = false;
     int m_closing = 0;
-
-    //  Increments on every start(). The accept task captures its own
-    //  generation so that a task left behind by a timed-out attempt can
-    //  tell it was replaced when it finally gets scheduled.
-    uint64_t m_generation = 0;
 
     //  Protects m_accept_threads and m_client_thread. Kept separate from
     //  m_lock because the task's lifetime interacts with it: joining a
@@ -140,11 +144,12 @@ private:
     //  so the connection object outlives the server (inert).
     ConnectionPtr m_active;
 
-    //  One task per start() call. start() must never destroy the previous
-    //  task's AsyncTask here: its destructor blocks until the task has
-    //  finished, and a task from an earlier attempt may still be running
-    //  (the caller's wait timed out while the pool was starved).
-    //  close_and_wait() joins the whole list.
+    //  One task per start() call that actually dispatched (start() is a
+    //  no-op while a previous task is still alive), so the list holds
+    //  the failed attempts' tasks plus the one live task. start() must
+    //  never destroy a previous task's AsyncTask here: its destructor
+    //  blocks until that task has finished. close_and_wait() joins the
+    //  whole list (the finished ones return immediately).
     std::vector<AsyncTask> m_accept_threads;
     AsyncTask m_client_thread;
 };
