@@ -14,6 +14,12 @@
  *  Like AbstractServerSocket, it handles one connection at a time: a
  *  client that connects while one is active is rejected.
  *
+ *  Lifecycle: destroying the server stops it and closes every live
+ *  connection. The shared ownership only guarantees the connection
+ *  object's validity: after the server is gone, any use of the object
+ *  reports the closed connection (is_open() is false, send() returns
+ *  0, close() is a no-op).
+ *
  *  This class coexists with AbstractServerSocket while the new shape
  *  is proven out; the two are not interchangeable yet.
  *
@@ -100,7 +106,10 @@ public:
 
     //  Binds to "address" and listens on "port".
     //  Use "0.0.0.0" to accept connections on all interfaces.
-    //  The server can be started again once it has fully stopped.
+    //  Only acts while "state()" is NOT_RUNNING and no start attempt is
+    //  still in flight; otherwise it is a no-op. A start that fails (for
+    //  example, the port is busy) leaves the server NOT_RUNNING, so it
+    //  may be retried. The server stops only when it is destroyed.
     virtual void start(const std::string& address, uint16_t port) = 0;
 
     //  The connection currently being served, or nullptr when none is
