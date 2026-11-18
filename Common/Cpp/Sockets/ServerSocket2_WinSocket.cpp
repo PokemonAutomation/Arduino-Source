@@ -457,7 +457,7 @@ void ServerSocket2_WinSocket::accept_thread_loop(std::string address, uint16_t p
             //  server's reference keeps it alive while the thread runs).
             try{
                 AsyncTask task = m_thread_pool.dispatch([conn]{
-                    conn->run(conn);
+                    conn->thread_loop(conn);
                 });
                 std::lock_guard<Mutex> lg(m_task_lock);
                 m_client_thread = std::move(task);
