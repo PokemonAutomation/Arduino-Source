@@ -90,6 +90,11 @@ void ServerSocket2Connection_POSIX::close(){
         return;
     }
     m_open.store(false, std::memory_order_release);
+    //  Hand the CONNECTED state back before the close becomes visible
+    //  to the peer: a client reconnecting after it observes this close
+    //  must be accepted, not rejected by a state that is still winding
+    //  down. (A no-op unless this connection is still the active one.)
+    m_server->release_connection(this);
     //  Tells the connection thread to stop; it closes the socket
     //  itself. Safe to call from within a listener callback. (If the
     //  socket is already gone, ::shutdown just fails harmlessly.)
@@ -102,7 +107,7 @@ void ServerSocket2Connection_POSIX::thread_loop(){
         //  Closed before this thread started (teardown, or the
         //  application via active_connection()): hand the state back and
         //  drop the socket; there is nothing to report.
-        m_server->release_connection();
+        m_server->release_connection(this);
         ::close(socket);
         return;
     }
@@ -159,7 +164,7 @@ void ServerSocket2Connection_POSIX::thread_loop(){
 
     //  Hand the state back to the server, then make the connection
     //  inert. Either way, the object outlives the server.
-    m_server->release_connection();
+    m_server->release_connection(this);
     const bool app_close = m_close_requested.load(std::memory_order_relaxed);
     m_open.store(false, std::memory_order_release);
     ::close(socket);
@@ -500,9 +505,11 @@ void ServerSocket2_POSIX::report_disconnect(const std::string& error){
     }
 }
 
-void ServerSocket2_POSIX::release_connection(){
+void ServerSocket2_POSIX::release_connection(ServerSocket2Connection_POSIX* self){
     std::lock_guard<Mutex> lg(m_lock);
-    if (m_state.load(std::memory_order_relaxed) == State::CONNECTED){
+    if (m_state.load(std::memory_order_relaxed) == State::CONNECTED
+        && m_active.get() == self
+    ){
         m_state.store(State::LISTENING, std::memory_order_release);
     }
     //  The m_active slot stays: it anchors the connection's lifetime

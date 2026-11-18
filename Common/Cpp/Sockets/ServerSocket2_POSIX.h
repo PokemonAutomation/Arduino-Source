@@ -142,10 +142,16 @@ private:
     void report_connect();
     void report_receive(const void* data, size_t bytes);
     void report_disconnect(const std::string& error);
-    //  Hands the CONNECTED state back to the server so it can accept the
-    //  next client. The m_active slot is kept: it anchors the connection's
-    //  lifetime while its thread runs.
-    void release_connection();
+    //  If "self" is still the active connection, hand its CONNECTED
+    //  state back to the server. Called by the connection thread at
+    //  exit, and by close() before the close becomes visible to the
+    //  peer - a client reconnecting after it observes the close must
+    //  not be rejected by a state that is still winding down. No-op
+    //  otherwise (including for a connection that has already been
+    //  replaced). The m_active slot is kept either way: it anchors the
+    //  connection's lifetime while its thread runs, and the server drops
+    //  the slot only after it has joined that thread.
+    void release_connection(ServerSocket2Connection_POSIX* self);
 
     //  A start attempt failed (or the server was torn down while the task
     //  was still starting up): mark the task dead so that a retrying
