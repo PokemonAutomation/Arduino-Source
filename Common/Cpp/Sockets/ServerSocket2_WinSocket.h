@@ -152,6 +152,15 @@ private:
     //  lifetime while its thread runs.
     void release_connection();
 
+    //  Called from a connection's close(): hands the CONNECTED state back
+    //  to the server at once, so the accept loop can serve the next client
+    //  as soon as its housekeeping joins this connection's thread - the
+    //  moment v1's close_connection() did - instead of rejecting clients
+    //  until this thread notices the shutdown on its own. A no-op unless
+    //  "connection" is still the one the server is serving (and the server
+    //  is still running).
+    void close_connection_on(const ServerSocket2Connection_WinSocket& connection);
+
     //  A start attempt failed (or the server was torn down while the task
     //  was still starting up): mark the task dead so that a retrying
     //  start() may dispatch a new one, and report the result to the

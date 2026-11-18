@@ -86,7 +86,19 @@ void ServerSocket2Connection_WinSocket::close(){
     if (m_close_requested.exchange(true)){
         return;
     }
-    m_open.store(false, std::memory_order_release);
+    //  Hand the CONNECTED state back to the server now (v1's
+    //  close_connection() did this atomically with the close): the
+    //  accept loop may then serve the next client as soon as its
+    //  housekeeping joins this thread, instead of rejecting clients
+    //  until this thread notices the shutdown on its own. Only a close
+    //  of a live connection hands the state back: a destroyed server
+    //  has already closed every one of its connections, so "m_open"
+    //  being true here guarantees the server (and "m_server") is still
+    //  alive, while a close of an already-inert shell must not touch
+    //  the (possibly dangling) server pointer.
+    if (m_open.exchange(false, std::memory_order_acq_rel)){
+        m_server->close_connection_on(*this);
+    }
     //  Tells the connection thread to stop; it closes the socket
     //  itself. Safe to call from within a listener callback. (If the
     //  socket is already gone, ::shutdown just fails harmlessly.)
@@ -158,10 +170,6 @@ void ServerSocket2Connection_WinSocket::thread_loop(){
         m_server->report_disconnect(error);
     }
 }
-
-
-
-
 
 
 void ServerSocket2_WinSocket::ensure_wsa_started(){
@@ -528,6 +536,23 @@ void ServerSocket2_WinSocket::release_connection(){
     //  joined the thread (a replacement or a teardown).
 }
 
+
+void ServerSocket2_WinSocket::close_connection_on(
+    const ServerSocket2Connection_WinSocket& connection
+){
+    std::lock_guard<Mutex> lg(m_lock);
+    //  Only the connection the server is still serving may hand the
+    //  state back: a close on an older connection (whose thread already
+    //  released it, and the server may already serve the next client)
+    //  must not yank the state out from under the new one. The check
+    //  against DESTRUCTING makes close_and_wait() a no-op here: it sets
+    //  the state before it closes the active connection.
+    if (m_state.load(std::memory_order_relaxed) == State::CONNECTED &&
+        m_active.get() == static_cast<const AbstractServerSocketConnection*>(&connection)
+    ){
+        m_state.store(State::LISTENING, std::memory_order_release);
+    }
+}
 
 
 }
