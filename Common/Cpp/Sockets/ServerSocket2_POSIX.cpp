@@ -100,6 +100,12 @@ void ServerSocket2Connection_POSIX::close(){
     //  socket is already gone, ::shutdown just fails harmlessly.)
     ::shutdown(m_client, SHUT_RDWR);
 }
+void ServerSocket2Connection_POSIX::start_thread(ThreadPool& thread_pool){
+    m_thread = thread_pool.dispatch([this]{
+        thread_loop();
+    });
+}
+
 void ServerSocket2Connection_POSIX::thread_loop(){
     int socket = m_client;
 

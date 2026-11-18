@@ -71,12 +71,9 @@ private:
 
     //  Dispatches the thread. The server calls this exactly once, right
     //  after it has published the connection in m_active (which is what
-    //  keeps the object alive while thread_loop() runs).
-    void start_thread(ThreadPool& thread_pool){
-        m_thread = thread_pool.dispatch([this]{
-            thread_loop();
-        });
-    }
+    //  keeps the object alive while thread_loop() runs). Defined in the
+    //  .cpp: it needs the complete ThreadPool type.
+    void start_thread(ThreadPool& thread_pool);
     //  Joins the thread. The server calls this before it drops its
     //  m_active reference - to replace the slot or to tear down - because
     //  m_active is what keeps the object alive while thread_loop() runs.

@@ -97,6 +97,12 @@ void ServerSocket2Connection_WinSocket::close(){
     //  socket is already gone, ::shutdown just fails harmlessly.)
     ::shutdown(m_client, SD_BOTH);
 }
+void ServerSocket2Connection_WinSocket::start_thread(ThreadPool& thread_pool){
+    m_thread = thread_pool.dispatch([this]{
+        thread_loop();
+    });
+}
+
 void ServerSocket2Connection_WinSocket::thread_loop(){
     SOCKET socket = m_client;
 
