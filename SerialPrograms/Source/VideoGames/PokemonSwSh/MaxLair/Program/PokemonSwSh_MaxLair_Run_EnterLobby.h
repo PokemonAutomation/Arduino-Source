@@ -12,6 +12,7 @@
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "VideoGames/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.h"
+#include "Common/Cpp/TestRunners/UnitTest.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -25,6 +26,10 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
     size_t boss_slot, bool connect_to_internet,
     ReadableQuantity999& ore
 );
+
+
+
+void add_tests_MaxLairEnterLobbyOrePrompt(UnitTestDatabase& database);
 
 
 
