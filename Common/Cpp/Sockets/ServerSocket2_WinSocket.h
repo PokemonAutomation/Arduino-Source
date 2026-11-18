@@ -61,15 +61,29 @@ private:
     {}
 
     //  The connection's own thread (dispatched by the server's accept
-    //  loop): reports the connection to the listeners, reads until the
-    //  peer or the application closes it, and hands the slot back. The
-    //  server's bookkeeping (m_active/m_state) is reached through the
-    //  server's report_*()/release_connection() methods; everything else
-    //  is decided by this object's own m_open, which send()/is_open()
-    //  already track. "self" is the caller's owning reference (the
-    //  dispatcher's capture); it is what the server's report methods
-    //  keep during the listener callbacks.
-    void thread_loop(std::shared_ptr<ServerSocket2Connection_WinSocket> self);
+    //  loop via start_thread()): reports the connection to the listeners,
+    //  reads until the peer or the application closes it, and hands the
+    //  state back. The server's bookkeeping (m_active/m_state) is reached
+    //  through the server's report_*()/release_connection() methods; the
+    //  report methods read m_active themselves, so this method only ever
+    //  references "this" - which is safe, because the server drops its
+    //  m_active reference only after it has joined this thread.
+    void thread_loop();
+
+    //  Dispatches the thread. The server calls this exactly once, right
+    //  after it has published the connection in m_active (which is what
+    //  keeps the object alive while thread_loop() runs).
+    void start_thread(ThreadPool& thread_pool){
+        m_thread = thread_pool.dispatch([this]{
+            thread_loop();
+        });
+    }
+    //  Joins the thread. The server calls this before it drops its
+    //  m_active reference - to replace the slot or to tear down - because
+    //  m_active is what keeps the object alive while thread_loop() runs.
+    void wait_thread(){
+        m_thread.wait_and_ignore_exceptions();
+    }
 
     //  Marks the connection closed without touching the socket. The
     //  server calls this when the connection thread could not be
@@ -78,12 +92,16 @@ private:
         m_open.store(false, std::memory_order_release);
     }
 
-    //  The owning server. Dereferenced only from run(), which the
+    //  The owning server. Dereferenced only from thread_loop(), which the
     //  server's close_and_wait() has joined before the server is
     //  destroyed, so it can never be used after the server's death.
     ServerSocket2_WinSocket* m_server;
 
     SOCKET m_client;
+    //  The task running thread_loop() (empty if the dispatch failed). It
+    //  lives in the connection rather than the server, so the server's
+    //  only handle to the connection is m_active.
+    AsyncTask m_thread;
     std::atomic<bool> m_open{true};
     std::atomic<bool> m_close_requested{false};
     //  Serializes logical sends: two concurrent send() calls must not
@@ -122,15 +140,18 @@ private:
 
     void accept_thread_loop(std::string address, uint16_t port);
 
-    //  Called from a connection's thread (its run()); the connection does
-    //  the I/O, the server does the listener dispatch and the slot
-    //  bookkeeping.
-    void report_connect(ConnectionPtr conn);
-    void report_receive(ConnectionPtr conn, const void* data, size_t bytes);
-    void report_disconnect(ConnectionPtr conn, const std::string& error);
-    //  Hands the slot (and the CONNECTED state) back to the server. No-op
-    //  when the slot no longer holds "conn" (teardown already cleared it).
-    void release_connection(ConnectionPtr conn);
+    //  Called from a connection's thread (its thread_loop()); the
+    //  connection does the I/O, the server does the listener dispatch
+    //  and the state bookkeeping. They read the connection from m_active
+    //  (which is still the calling connection for the whole life of the
+    //  thread).
+    void report_connect();
+    void report_receive(const void* data, size_t bytes);
+    void report_disconnect(const std::string& error);
+    //  Hands the CONNECTED state back to the server so it can accept the
+    //  next client. The m_active slot is kept: it anchors the connection's
+    //  lifetime while its thread runs.
+    void release_connection();
 
     //  A start attempt failed (or the server was torn down while the task
     //  was still starting up): mark the task dead so that a retrying
@@ -157,11 +178,13 @@ private:
     bool m_task_alive = false;
     int m_closing = 0;
 
-    //  Protects m_accept_threads and m_client_thread. Kept separate from
-    //  m_lock because the task's lifetime interacts with it: joining a
-    //  task waits for it to exit, and exiting requires m_lock. Holding
-    //  m_lock while a task slot is destroyed would deadlock, so slot
-    //  operations happen under m_task_lock with m_lock released.
+    //  Protects m_accept_threads. Kept separate from m_lock because the
+    //  task's lifetime interacts with it: joining a task waits for it to
+    //  exit, and exiting requires m_lock. Holding m_lock while a task
+    //  slot is destroyed would deadlock, so slot operations happen under
+    //  m_task_lock with m_lock released. (The connection threads' tasks
+    //  live in the connections themselves; close_and_wait() joins them
+    //  through the connection.)
     Mutex m_task_lock;
 
     SOCKET m_listen = INVALID_SOCKET;
@@ -178,7 +201,6 @@ private:
     //  blocks until that task has finished. close_and_wait() joins the
     //  whole list (the finished ones return immediately).
     std::vector<AsyncTask> m_accept_threads;
-    AsyncTask m_client_thread;
 };
 
 
