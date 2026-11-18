@@ -427,6 +427,13 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Sockets/ServerSocket_WinSocket.h
     ../Common/Cpp/Sockets/ServerSocket_Qt.h
     ../Common/Cpp/Sockets/ServerSocket.h
+    ../Common/Cpp/Sockets/ServerSocket2.h
+    ../Common/Cpp/Sockets/ServerSocket2_POSIX.cpp
+    ../Common/Cpp/Sockets/ServerSocket2_POSIX.h
+    ../Common/Cpp/Sockets/ServerSocket2_Qt.cpp
+    ../Common/Cpp/Sockets/ServerSocket2_Qt.h
+    ../Common/Cpp/Sockets/ServerSocket2_WinSocket.cpp
+    ../Common/Cpp/Sockets/ServerSocket2_WinSocket.h
     ../Common/Cpp/Sockets/ServerSocket2_Tests.cpp
     ../Common/Cpp/Sockets/ServerSocket2_Tests.h
     ../Common/Cpp/Sockets/Sockets_Tests.cpp
