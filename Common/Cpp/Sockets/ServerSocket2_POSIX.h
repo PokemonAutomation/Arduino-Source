@@ -28,9 +28,10 @@ namespace PokemonAutomation{
 
 
 class ThreadPool;
+class ServerSocket2_POSIX;
 
 
-class ServerSocket2Connection_POSIX final : public AbstractServerSocketConnection{
+class ServerSocket2Connection_POSIX final : public AbstractServerSocketConnection, public std::enable_shared_from_this<ServerSocket2Connection_POSIX>{
 public:
     virtual bool is_open() const override{
         return m_open.load(std::memory_order_relaxed);
@@ -48,25 +49,35 @@ public:
 private:
     friend class ServerSocket2_POSIX;
 
-    //  Backend internals: the server's accept/connection threads only.
+    //  Backend internals: the server and this connection's own thread
+    //  only.
 
     //  Constructed by the server on accept, with the accepted socket.
-    explicit ServerSocket2Connection_POSIX(int client_socket)
-        : m_client(client_socket)
+    ServerSocket2Connection_POSIX(ServerSocket2_POSIX& server, int client_socket)
+        : m_server(&server)
+        , m_client(client_socket)
     {}
 
-    int socket() const{
-        return m_client;
-    }
-    bool close_requested() const{
-        return m_close_requested.load(std::memory_order_relaxed);
-    }
+    //  The connection's own thread (dispatched by the server's accept
+    //  loop): reports the connection to the listeners, reads until the
+    //  peer or the application closes it, and hands the slot back. The
+    //  server's bookkeeping (m_active/m_state) is reached through the
+    //  server's report_*()/release_connection() methods; everything else
+    //  is decided by this object's own m_open, which send()/is_open()
+    //  already track.
+    void run();
+
     //  Marks the connection closed without touching the socket. The
-    //  connection thread calls this when the peer goes away, so
-    //  is_open()/send() report the death.
+    //  server calls this when the connection thread could not be
+    //  started, so is_open()/send() report the death.
     void mark_closed(){
         m_open.store(false, std::memory_order_release);
     }
+
+    //  The owning server. Dereferenced only from run(), which the
+    //  server's close_and_wait() has joined before the server is
+    //  destroyed, so it can never be used after the server's death.
+    ServerSocket2_POSIX* m_server;
 
     int m_client;
     std::atomic<bool> m_open{true};
@@ -105,7 +116,16 @@ private:
     void close_and_wait() noexcept;
 
     void accept_thread_loop(std::string address, uint16_t port);
-    void connection_thread_loop(std::shared_ptr<ServerSocket2Connection_POSIX> conn);
+
+    //  Called from a connection's thread (its run()); the connection does
+    //  the I/O, the server does the listener dispatch and the slot
+    //  bookkeeping.
+    void report_connect(ConnectionPtr conn);
+    void report_receive(ConnectionPtr conn, const void* data, size_t bytes);
+    void report_disconnect(ConnectionPtr conn, const std::string& error);
+    //  Hands the slot (and the CONNECTED state) back to the server. No-op
+    //  when the slot no longer holds "conn" (teardown already cleared it).
+    void release_connection(ConnectionPtr conn);
 
     //  A start attempt failed (or the server was torn down while the task
     //  was still starting up): mark the task dead so that a retrying
@@ -115,6 +135,8 @@ private:
 
 
 private:
+    friend class ServerSocket2Connection_POSIX;
+
     ThreadPool& m_thread_pool;
     Mutex m_lock;
     ConditionVariable m_cv;

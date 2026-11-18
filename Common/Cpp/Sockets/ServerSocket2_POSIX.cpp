@@ -345,7 +345,7 @@ void ServerSocket2_POSIX::accept_thread_loop(std::string address, uint16_t port)
                 //  Plain "new" + wrap, not make_shared: the constructor
                 //  is private, and this call site is in the friend.
                 conn = std::shared_ptr<ServerSocket2Connection_POSIX>(
-                    new ServerSocket2Connection_POSIX(client_socket)
+                    new ServerSocket2Connection_POSIX(*this, client_socket)
                 );
                 m_active = conn;
                 m_state.store(State::CONNECTED, std::memory_order_release);
@@ -362,8 +362,8 @@ void ServerSocket2_POSIX::accept_thread_loop(std::string address, uint16_t port)
             //  pointer, so the connection outlives this block (and the
             //  server's reference keeps it alive while the thread runs).
             try{
-                AsyncTask task = m_thread_pool.dispatch([this, conn]{
-                    connection_thread_loop(conn);
+                AsyncTask task = m_thread_pool.dispatch([conn]{
+                    conn->run();
                 });
                 std::lock_guard<Mutex> lg(m_task_lock);
                 m_client_thread = std::move(task);
@@ -394,61 +394,61 @@ void ServerSocket2_POSIX::accept_thread_loop(std::string address, uint16_t port)
     }
 }
 
-void ServerSocket2_POSIX::connection_thread_loop(std::shared_ptr<ServerSocket2Connection_POSIX> conn){
-    int socket = conn->socket();
-    bool started_active;
-    {
-        std::lock_guard<Mutex> lg(m_lock);
-        started_active =
-            (m_state.load(std::memory_order_relaxed) == State::CONNECTED)
-            && (m_active.get() == conn.get());
-        if (!started_active && m_active.get() == conn.get()){
-            //  The connection was closed before this thread started:
-            //  clear the slot we still own.
-            m_active = ConnectionPtr();
-        }
+void ServerSocket2_POSIX::report_connect(ConnectionPtr conn){
+    m_listeners.run_method(&Listener::on_connect, conn);
+}
+
+void ServerSocket2_POSIX::report_receive(ConnectionPtr conn, const void* data, size_t bytes){
+    m_listeners.run_method(&Listener::on_receive_data, conn, data, bytes);
+}
+
+void ServerSocket2_POSIX::report_disconnect(ConnectionPtr conn, const std::string& error){
+    m_listeners.run_method(&Listener::on_disconnect, conn, error);
+}
+
+void ServerSocket2_POSIX::release_connection(ConnectionPtr conn){
+    std::lock_guard<Mutex> lg(m_lock);
+    if (m_active.get() != conn.get()){
+        return;
     }
-    if (!started_active){
-        conn->mark_closed();
+    m_active = ConnectionPtr();
+    if (m_state.load(std::memory_order_relaxed) == State::CONNECTED){
+        m_state.store(State::LISTENING, std::memory_order_release);
+    }
+}
+
+void ServerSocket2Connection_POSIX::run(){
+    std::shared_ptr<ServerSocket2Connection_POSIX> self = shared_from_this();
+    int socket = m_client;
+
+    if (!m_open.load(std::memory_order_relaxed)){
+        //  Closed before this thread started (teardown, or the
+        //  application via active_connection()): hand the slot back and
+        //  drop the socket; there is nothing to report.
+        m_server->release_connection(self);
         ::close(socket);
         return;
     }
 
-    m_listeners.run_method(&Listener::on_connect, conn);
+    m_server->report_connect(self);
 
     constexpr size_t BUFFER_SIZE = 4096;
     char buffer[BUFFER_SIZE];
     std::string error;
 
-    while (true){
-        {
-            std::lock_guard<Mutex> lg(m_lock);
-            if (m_state.load(std::memory_order_relaxed) != State::CONNECTED
-                || m_active.get() != conn.get()
-            ){
-                break;
-            }
-        }
-
+    while (m_open.load(std::memory_order_relaxed)){
         //  The socket is non-blocking, so this returns immediately. It is
-        //  deliberately called without holding m_lock: the state check
-        //  above and the result handling below are the only parts that
-        //  need the lock, and no socket call should stretch it.
+        //  deliberately called without holding any lock: the liveness
+        //  check above and the result handling below are the only parts
+        //  that need one, and no socket call should stretch it.
         ssize_t bytes = ::recv(socket, buffer, BUFFER_SIZE, 0);
 
         if (bytes > 0){
-            //  The connection may have been replaced while we were
-            //  reading: only dispatch the data if we still are the
-            //  active connection.
-            bool still_active;
-            {
-                std::lock_guard<Mutex> lg(m_lock);
-                still_active = (m_active.get() == conn.get());
+            //  The application may have closed the connection while we
+            //  were reading: only dispatch the data if it is still open.
+            if (m_open.load(std::memory_order_relaxed)){
+                m_server->report_receive(self, buffer, bytes);
             }
-            if (!still_active){
-                break;
-            }
-            m_listeners.run_method(&Listener::on_receive_data, conn, buffer, bytes);
             continue;
         }
 
@@ -473,32 +473,22 @@ void ServerSocket2_POSIX::connection_thread_loop(std::shared_ptr<ServerSocket2Co
             //  ::shutdown: it makes recv return 0 or fail, and the
             //  close_requested() check below suppresses the report.)
             error = "Receive error (errno " + std::to_string(error_no) + "): " + std::string(strerror(error_no));
-        }else if (bytes == 0){
+        }else{
+            //  The peer closed the connection.
             error = "Connection closed by client.";
         }
         break;
     }
 
-    {
-        std::lock_guard<Mutex> lg(m_lock);
-        if (m_active.get() == conn.get()){
-            //  Still the active connection (or it was closed before a
-            //  new one took over): we own the slot and the state.
-            m_active = ConnectionPtr();
-            if (m_state.load(std::memory_order_relaxed) == State::CONNECTED){
-                m_state.store(State::LISTENING, std::memory_order_release);
-            }
-        }
-    }
-
-    //  An application-side close() already marked the connection closed;
-    //  a peer-side death needs marking now. Either way, the connection
-    //  is inert from here on (its object outlives the server).
-    const bool app_close = conn->close_requested();
-    conn->mark_closed();
+    //  Hand the slot (and the CONNECTED state) back to the server, then
+    //  make the connection inert. Either way, the object outlives the
+    //  server.
+    m_server->release_connection(self);
+    const bool app_close = m_close_requested.load(std::memory_order_relaxed);
+    m_open.store(false, std::memory_order_release);
     ::close(socket);
     if (!app_close){
-        m_listeners.run_method(&Listener::on_disconnect, conn, error);
+        m_server->report_disconnect(self, error);
     }
 }
 
