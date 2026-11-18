@@ -56,9 +56,19 @@ public:
         if (slots != std::vector<std::optional<CollectedPokemonInfo>>{genderless, female, high, low, next_dex, std::nullopt}){
             return "Reversed level/gender sorting failed.";
         }
-        BoxSortingTable table("Sort rules", {SortingRuleType::DexNo, SortingRuleType::Level, SortingRuleType::Gender, SortingRuleType::Shiny});
-        if (!table.database().find(SortingRuleType::Level) || !table.database().find(SortingRuleType::Shiny)){
-            return "FRLG sorting table must offer level and shiny sorting.";
+        BoxSorter sorter;
+        const JsonValue settings = parse_json(R"({
+            "SORT_TABLE": [
+                {"sort_type": "level", "reverse": false},
+                {"sort_type": "shiny", "reverse": false},
+                {"sort_type": "nature", "reverse": false},
+                {"sort_type": "ability", "reverse": true}
+            ]
+        })");
+        sorter.load_json(settings);
+        const JsonValue saved = sorter.to_json();
+        if (saved.to_object_throw().get_array_throw("SORT_TABLE") != settings.to_object_throw().get_array_throw("SORT_TABLE")){
+            return "The FRLG sorting table must preserve Level, Shiny, Nature, and Ability rules.";
         }
         auto shiny = high;
         shiny->shiny = true;
@@ -98,6 +108,24 @@ public:
         std::stable_sort(slots.begin(), slots.end());
         if (slots != std::vector<std::optional<CollectedPokemonInfo>>{poke_ball, high_poke_ball, master_ball, std::nullopt}){
             return "Reversing Ball Type must leave the level tie-breaker and empty slots in order.";
+        }
+        auto modest = low;
+        modest->nature = "Modest";
+        modest->ability = "Run Away";
+        auto timid = modest;
+        timid->nature = "Timid";
+        auto synchronize = modest;
+        synchronize->ability = "Synchronize";
+        rules = {{SortingRuleType::Nature, false}, {SortingRuleType::Ability, false}};
+        slots = {timid, synchronize, std::nullopt, modest};
+        std::stable_sort(slots.begin(), slots.end());
+        if (slots != std::vector<std::optional<CollectedPokemonInfo>>{modest, synchronize, timid, std::nullopt}){
+            return "Nature sorting must use Ability to break ties.";
+        }
+        rules = {{SortingRuleType::Ability, true}, {SortingRuleType::Nature, true}};
+        std::stable_sort(slots.begin(), slots.end());
+        if (slots != std::vector<std::optional<CollectedPokemonInfo>>{synchronize, timid, modest, std::nullopt}){
+            return "Reversed Ability sorting must break ties by reversed Nature and keep empty slots last.";
         }
         if (SLUGS_TO_NATIONAL_DEX().at("bulbasaur") != 1 || SLUGS_TO_NATIONAL_DEX().at("deoxys") != 386){
             return "Species conversion must use National Dex numbers.";
