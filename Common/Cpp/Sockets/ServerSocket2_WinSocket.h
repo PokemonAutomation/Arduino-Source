@@ -33,7 +33,7 @@ class ThreadPool;
 class ServerSocket2_WinSocket;
 
 
-class ServerSocket2Connection_WinSocket final : public AbstractServerSocketConnection, public std::enable_shared_from_this<ServerSocket2Connection_WinSocket>{
+class ServerSocket2Connection_WinSocket final : public AbstractServerSocketConnection{
 public:
     virtual bool is_open() const override{
         return m_open.load(std::memory_order_relaxed);
@@ -66,8 +66,10 @@ private:
     //  server's bookkeeping (m_active/m_state) is reached through the
     //  server's report_*()/release_connection() methods; everything else
     //  is decided by this object's own m_open, which send()/is_open()
-    //  already track.
-    void run();
+    //  already track. "self" is the caller's owning reference (the
+    //  dispatcher's capture); it is what the server's report methods
+    //  keep during the listener callbacks.
+    void run(std::shared_ptr<ServerSocket2Connection_WinSocket> self);
 
     //  Marks the connection closed without touching the socket. The
     //  server calls this when the connection thread could not be

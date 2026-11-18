@@ -388,7 +388,7 @@ void ServerSocket2_WinSocket::accept_thread_loop(std::string address, uint16_t p
             //  server's reference keeps it alive while the thread runs).
             try{
                 AsyncTask task = m_thread_pool.dispatch([conn]{
-                    conn->run();
+                    conn->run(conn);
                 });
                 std::lock_guard<Mutex> lg(m_task_lock);
                 m_client_thread = std::move(task);
@@ -442,8 +442,7 @@ void ServerSocket2_WinSocket::release_connection(ConnectionPtr conn){
     }
 }
 
-void ServerSocket2Connection_WinSocket::run(){
-    std::shared_ptr<ServerSocket2Connection_WinSocket> self = shared_from_this();
+void ServerSocket2Connection_WinSocket::run(std::shared_ptr<ServerSocket2Connection_WinSocket> self){
     SOCKET socket = m_client;
 
     if (!m_open.load(std::memory_order_relaxed)){

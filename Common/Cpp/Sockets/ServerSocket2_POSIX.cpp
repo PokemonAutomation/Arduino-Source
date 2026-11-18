@@ -363,7 +363,7 @@ void ServerSocket2_POSIX::accept_thread_loop(std::string address, uint16_t port)
             //  server's reference keeps it alive while the thread runs).
             try{
                 AsyncTask task = m_thread_pool.dispatch([conn]{
-                    conn->run();
+                    conn->run(conn);
                 });
                 std::lock_guard<Mutex> lg(m_task_lock);
                 m_client_thread = std::move(task);
@@ -417,8 +417,7 @@ void ServerSocket2_POSIX::release_connection(ConnectionPtr conn){
     }
 }
 
-void ServerSocket2Connection_POSIX::run(){
-    std::shared_ptr<ServerSocket2Connection_POSIX> self = shared_from_this();
+void ServerSocket2Connection_POSIX::run(std::shared_ptr<ServerSocket2Connection_POSIX> self){
     int socket = m_client;
 
     if (!m_open.load(std::memory_order_relaxed)){
