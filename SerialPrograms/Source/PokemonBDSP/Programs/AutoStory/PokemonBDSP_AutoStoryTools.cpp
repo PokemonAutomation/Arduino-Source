@@ -515,7 +515,9 @@ bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place){
             }
         };
         FlyAButtonDetector watcher(button_a_box);
-        int ret = wait_until(stream, context, 3000ms, {{watcher}});
+        int ret = wait_for_menu_screen(stream, context,
+            [&](const ImageViewRGB32& frame){ return watcher.process_frame(frame, current_time()); },
+            "map-current-city", 3000ms) ? 0 : -1;
         if (ret < 0){
             stream.log("CurrentCity: A button not found.", COLOR_RED);
             return false;
@@ -691,8 +693,12 @@ bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place){
     CityIconDetector watcher_2(city_icon_box);
 
     const std::string name = fly_point_name(place);
-    int ret_1 = wait_until(stream, context, 3000ms, {{watcher_1}});
-    int ret_2 = wait_until(stream, context, 4000ms, {{watcher_2}});
+    int ret_1 = wait_for_menu_screen(stream, context,
+        [&](const ImageViewRGB32& frame){ return watcher_1.process_frame(frame, current_time()); },
+        "map-fly-prompt", 3000ms) ? 0 : -1;
+    int ret_2 = wait_for_menu_screen(stream, context,
+        [&](const ImageViewRGB32& frame){ return watcher_2.process_frame(frame, current_time()); },
+        "map-city-selection", 4000ms) ? 0 : -1;
     if (ret_1 < 0){
         stream.log("A button not found, retrying...", COLOR_RED);
     };
@@ -811,6 +817,13 @@ void use_potion_first_pokemon(VideoStream& stream, ProControllerContext& context
     potion.reference_row = 1;
     open_menu(stream, context, MenuCursorPosition::BAG, 5);
     pbf_wait(context, 1000ms);
+    VideoSnapshot last_bag_frame;
+    if (!wait_for_menu_screen(stream, context,
+        [&](const ImageViewRGB32& frame){ return bag_pocket_position(frame) != 0; },
+        "potion-bag-menu", 3s, &last_bag_frame)){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Potion: Bag menu not detected.", stream, last_bag_frame.frame);
+    }
     double hp = confirmed_potion_hp(stream, context);
     for (size_t dose = 0; hp < 0.98 && dose < 3; dose++){
         if (hp <= 0.005){
@@ -999,6 +1012,7 @@ void open_menu(VideoStream& stream, ProControllerContext& context, MenuCursorPos
 
     MenuCursorPosition cur = MenuCursorPosition::UNKNOWN;
     bool menu_confirmed_open = false;
+    VideoSnapshot last_cursor_frame;
     for (size_t attempt = 1; attempt <= 3; attempt++){
         stream.log("[Open menu] Open and detect attempt " + std::to_string(attempt) + "/3.");
         try {
@@ -1019,13 +1033,19 @@ void open_menu(VideoStream& stream, ProControllerContext& context, MenuCursorPos
             }
             pbf_wait(context, 1000ms);
             context.wait_for_all_requests();
-            for (int frame = 0; frame < 10 && cur == MenuCursorPosition::UNKNOWN; frame++){
-                context.wait_for(50ms);
-                const VideoSnapshot snapshot = stream.video().snapshot();
-                if (snapshot){
-                    cur = detector.detect(snapshot);
-                }
-            }
+            MenuCursorPosition candidate = MenuCursorPosition::UNKNOWN;
+            const bool cursor_ready = wait_for_menu_screen(stream, context,
+                [&](const ImageViewRGB32& frame){
+                    const MenuCursorPosition observed = detector.detect(frame);
+                    if (observed == MenuCursorPosition::UNKNOWN){
+                        candidate = observed;
+                        return false;
+                    }
+                    const bool changed = candidate != MenuCursorPosition::UNKNOWN && candidate != observed;
+                    candidate = observed;
+                    return !changed;
+                }, "main-menu-cursor", 5s, &last_cursor_frame);
+            cur = cursor_ready ? candidate : MenuCursorPosition::UNKNOWN;
             if (cur != MenuCursorPosition::UNKNOWN){
                 stream.log("[Open menu] Menu and cursor detected on attempt " + std::to_string(attempt) + ".",
                     COLOR_GREEN);
@@ -1040,7 +1060,7 @@ void open_menu(VideoStream& stream, ProControllerContext& context, MenuCursorPos
     if (cur == MenuCursorPosition::UNKNOWN){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
             "Menu or cursor detection failed after 3 opening attempts.",
-            stream);
+            stream, last_cursor_frame.frame);
     }
 
     IconGrid cur_g = icon_to_grid(cur, num_icons);
@@ -1333,11 +1353,16 @@ size_t bag_clear_tab_count(const ImageViewRGB32& frame, int pocket){
     return clear;
 }
 
+static int bag_confirm_pocket(VideoStream& stream, ProControllerContext& context);
+
 bool clear_new_item_flags(VideoStream& stream, ProControllerContext& context, int num_icons,
     const std::array<std::chrono::milliseconds, 8>& scroll_durations){
     stream.log("[Bag NEW flags] Opening bag to verify all eight tabs.");
     open_menu(stream, context, MenuCursorPosition::BAG, num_icons);
     pbf_wait(context, 1000ms);
+    if (bag_confirm_pocket(stream, context) == 0){
+        return false;
+    }
     auto all_clear = [&](){
         context.wait_for_all_requests();
         size_t confirmed = 0;
@@ -1362,9 +1387,9 @@ bool clear_new_item_flags(VideoStream& stream, ProControllerContext& context, in
         // Let the tab settle and its initial selection clear before inspecting it.
         pbf_wait(context, 1000ms);
         context.wait_for_all_requests();
+        const int selected = bag_confirm_pocket(stream, context);
         auto frame = stream.video().snapshot();
-        const int selected = frame ? bag_pocket_position(*frame.frame) : 0;
-        if (selected == 0){
+        if (selected == 0 || !frame){
             stream.log("[Bag NEW flags] Selected tab uncertain; stopping.", COLOR_ORANGE);
             break;
         }
@@ -1476,20 +1501,19 @@ BagMovePlan plan_bag_item_move(int cursor_row, int item_row){
 
 
 static int bag_confirm_pocket(VideoStream& stream, ProControllerContext& context){
-    int previous = 0;
-    size_t matches = 0;
-    for (size_t check = 0; check < 10; check++){
-        context.wait_for_all_requests();
-        const auto frame = stream.video().snapshot();
-        const int pocket = frame ? bag_pocket_position(frame) : 0;
-        matches = pocket != 0 && pocket == previous ? matches + 1 : pocket != 0 ? 1 : 0;
-        previous = pocket;
-        if (matches >= 3){
-            return pocket;
-        }
-        pbf_wait(context, 100ms);
-    }
-    return 0;
+    int candidate = 0;
+    const bool ready = wait_for_menu_screen(stream, context,
+        [&](const ImageViewRGB32& frame){
+            const int pocket = bag_pocket_position(frame);
+            if (pocket == 0){
+                candidate = 0;
+                return false;
+            }
+            const bool changed = candidate != 0 && candidate != pocket;
+            candidate = pocket;
+            return !changed;
+        }, "bag-pocket", 3s);
+    return ready ? candidate : 0;
 }
 
 // static bool bag_advance_pocket(VideoStream& stream, ProControllerContext& context, int current){
@@ -1843,7 +1867,8 @@ bool use_escape_rope(VideoStream& stream, ProControllerContext& context, Languag
     pbf_press_button(context, BUTTON_A, 80ms, 350ms);
     context.wait_for_all_requests();
     SelectionArrowFinder use_menu(stream.overlay(), ImageFloatBox(0.660, 0.100, 0.310, 0.430), COLOR_GREEN);
-    if (wait_until(stream, context, 3s, {{use_menu}}) != 0){
+    if (!wait_for_menu_screen(stream, context,
+        [&](const ImageViewRGB32& frame){ return use_menu.detect(frame); }, "bag-item-action-menu", 3s)){
         stream.log("[Escape Rope] Item action menu not detected.", COLOR_ORANGE);
         return false;
     }
@@ -1924,7 +1949,9 @@ bool activate_repel(VideoStream& stream, ProControllerContext& context, Language
     // in a later save's list. Exclude the Bag list cursor on the left.
     const ImageFloatBox repel_item_box{0.700000, 0.100000, 0.280000, 0.650000};
     SelectionArrowFinder arrow_finder(stream.overlay(), repel_item_box, COLOR_GREEN);
-    int arrow_ret = wait_until(stream, context, 2000ms, {{arrow_finder}});
+    int arrow_ret = wait_for_menu_screen(stream, context,
+        [&](const ImageViewRGB32& frame){ return arrow_finder.detect(frame); },
+        "repel-item-action-menu", 2000ms) ? 0 : -1;
     if (arrow_ret != 0){
         stream.log("[AutoStory] activate_repel: selection arrow not found after pressing A.", COLOR_RED);
         return false;

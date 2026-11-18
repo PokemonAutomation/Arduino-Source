@@ -6,6 +6,7 @@
 
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Tools/VideoStream.h"
+#include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -66,17 +67,57 @@ void box_to_overworld(ProControllerContext& context){
 
 //  Feedback
 
+bool wait_for_menu_screen(VideoStream& stream, ProControllerContext& context,
+    const std::function<bool(const ImageViewRGB32&)>& detect, const std::string& label,
+    Milliseconds timeout, VideoSnapshot* last_checked){
+    context.wait_for_all_requests();
+    WallClock last_timestamp = current_time();
+    const WallClock deadline = last_timestamp + timeout;
+    VideoSnapshot checked;
+    size_t fresh_frames = 0;
+    size_t confirmations = 0;
+    while (current_time() < deadline){
+        const auto frame = stream.video().snapshot();
+        if (frame && frame.timestamp > last_timestamp){
+            last_timestamp = frame.timestamp;
+            checked = frame;
+            fresh_frames++;
+            confirmations = detect(frame) ? confirmations + 1 : 0;
+            if (confirmations >= 3){
+                if (last_checked){
+                    *last_checked = checked;
+                }
+                return true;
+            }
+        }
+        pbf_wait(context, std::chrono::milliseconds(150));
+        context.wait_for_all_requests();
+    }
+    if (last_checked){
+        *last_checked = checked;
+    }
+    stream.log("[Menu wait] " + label + " not detected after " + std::to_string(timeout.count()) +
+        "ms: " + std::to_string(fresh_frames) + " fresh frames, " + std::to_string(confirmations) +
+        "/3 consecutive matches. Recording failure before recovery.", COLOR_ORANGE);
+    if (checked){
+        dump_debug_image(stream.logger(), "PokemonBDSP/MenuDetection", label + "-not-detected", checked);
+    }else{
+        stream.log("[Menu wait] " + label + ": no fresh frame available to save.", COLOR_ORANGE);
+    }
+    return false;
+}
+
 void overworld_to_menu(VideoStream& stream, ProControllerContext& context){
     pbf_press_button(context, BUTTON_X, 160ms, 840ms);
     context.wait_for_all_requests();
     {
         MenuWatcher detector;
-        int ret = wait_until(
-            stream, context, std::chrono::seconds(10),
-            {{detector}}
-        );
-        if (ret < 0){
-            const VideoSnapshot snapshot = stream.video().snapshot();
+        VideoSnapshot last_menu_frame;
+        const bool detected = wait_for_menu_screen(stream, context,
+            [&](const ImageViewRGB32& frame){ return detector.detect(frame); },
+            "main-menu", std::chrono::seconds(10), &last_menu_frame);
+        if (!detected){
+            const VideoSnapshot snapshot = last_menu_frame;
             if (snapshot){
                 stream.log(detector.debug_report(snapshot), COLOR_ORANGE);
             }else{
@@ -85,7 +126,7 @@ void overworld_to_menu(VideoStream& stream, ProControllerContext& context){
             OperationFailedExceptionWithScreenshot::fire(
                 ErrorReportMode::SEND_ERROR_REPORT,
                 "Menu not detected after 10 seconds.",
-                stream
+                stream, last_menu_frame.frame
             );
         }
         stream.log("Detected menu.");
@@ -112,15 +153,15 @@ void overworld_to_box(VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     {
         BoxWatcher detector;
-        int ret = wait_until(
-            stream, context, std::chrono::seconds(10),
-            {{detector}}
-        );
-        if (ret < 0){
+        VideoSnapshot last_menu_frame;
+        const bool detected = wait_for_menu_screen(stream, context,
+            [&](const ImageViewRGB32& frame){ return detector.detect(frame); },
+            "box-system", std::chrono::seconds(10), &last_menu_frame);
+        if (!detected){
             OperationFailedExceptionWithScreenshot::fire(
                 ErrorReportMode::SEND_ERROR_REPORT,
                 "Box system not detected after 10 seconds.",
-                stream
+                stream, last_menu_frame.frame
             );
         }
         stream.log("Detected box system.");
@@ -147,15 +188,15 @@ void box_to_overworld(VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     {
         MenuWatcher detector;
-        int ret = wait_until(
-            stream, context, std::chrono::seconds(10),
-            {{detector}}
-        );
-        if (ret < 0){
+        VideoSnapshot last_menu_frame;
+        const bool detected = wait_for_menu_screen(stream, context,
+            [&](const ImageViewRGB32& frame){ return detector.detect(frame); },
+            "main-menu", std::chrono::seconds(10), &last_menu_frame);
+        if (!detected){
             OperationFailedExceptionWithScreenshot::fire(
                 ErrorReportMode::SEND_ERROR_REPORT,
                 "Menu not detected after 10 seconds.",
-                stream
+                stream, last_menu_frame.frame
             );
         }
         stream.log("Detected menu.");

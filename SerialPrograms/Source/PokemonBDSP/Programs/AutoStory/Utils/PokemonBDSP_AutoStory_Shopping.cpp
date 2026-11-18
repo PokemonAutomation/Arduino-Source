@@ -15,6 +15,7 @@
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_ShopDetectors.h"
 #include "PokemonBDSP/Programs/AutoStory/PokemonBDSP_AutoStoryTools.h"
+#include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
 
 #include "PokemonBDSP_AutoStory_Dialog.h"
 #include "PokemonBDSP_AutoStory_Shopping.h"
@@ -229,6 +230,22 @@ bool buy_items(VideoStream& stream,
 
         context.wait_for_all_requests();
         pbf_wait(context, 500ms);
+        if (state < 0){
+            int candidate = -1;
+            const bool ready = wait_for_menu_screen(stream, context,
+                [&](const ImageViewRGB32& frame){
+                    const int observed = arrow_vendor.detect(frame) ? 0 :
+                        buying_window.detect(frame) ? 1 : dialog.detect(frame) ? 2 : -1;
+                    if (observed < 0){
+                        candidate = -1;
+                        return false;
+                    }
+                    const bool changed = candidate >= 0 && candidate != observed;
+                    candidate = observed;
+                    return !changed;
+                }, "shop-vendor-menu", 3s);
+            state = ready ? candidate : -1;
+        }
 
         switch (state){
 
@@ -288,11 +305,15 @@ bool buy_items(VideoStream& stream,
                         }else if (!quantity_selected){
                             // The selected name remains visible behind the quantity
                             // window. Do not let it trigger another A press here.
-                            sub = wait_until(stream, context, 3000ms, {{qty_window}}) == 0 ? 1 : -1;
+                            sub = wait_for_menu_screen(stream, context,
+                                [&](const ImageViewRGB32& frame){ return qty_window.detect(frame); },
+                                "shop-quantity", 3000ms) ? 1 : -1;
                         }else{
                             // Once the count is set, only the purchase confirmation
                             // may advance the transaction.
-                            sub = wait_until(stream, context, 3000ms, {{confirm_arrow}}) == 0 ? 0 : -1;
+                            sub = wait_for_menu_screen(stream, context,
+                                [&](const ImageViewRGB32& frame){ return confirm_arrow.detect(frame); },
+                                "shop-purchase-confirmation", 3000ms) ? 0 : -1;
                         }
 
                         context.wait_for_all_requests();
@@ -314,14 +335,19 @@ bool buy_items(VideoStream& stream,
                                 pbf_press_button(context, BUTTON_A, 80ms, 800ms);
                                 context.wait_for_all_requests();
                                 ShopBuyingWindowWatcher back_in_shop;
-                                int purchase = run_until<ProControllerContext>(stream,
-                                    context,
-                                    [](ProControllerContext& ctx){
-                                        for (int i = 0; i < 10; i++){
-                                            pbf_press_button(ctx, BUTTON_B, 80ms, 800ms);
-                                        }
-                                    },
-                                    {{back_in_shop}});
+                                int purchase = wait_for_menu_screen(stream, context,
+                                    [&](const ImageViewRGB32& frame){ return back_in_shop.detect(frame); },
+                                    "shop-after-purchase", 3s) ? 0 : -1;
+                                if (purchase < 0){
+                                    purchase = run_until<ProControllerContext>(stream,
+                                        context,
+                                        [](ProControllerContext& ctx){
+                                            for (int i = 0; i < 10; i++){
+                                                pbf_press_button(ctx, BUTTON_B, 80ms, 800ms);
+                                            }
+                                        },
+                                        {{back_in_shop}});
+                                }
                                 if (purchase < 0){
                                     stream.log(label + ": purchase did not return to the item list.", COLOR_RED);
                                     return false;
@@ -393,6 +419,12 @@ bool buy_items(VideoStream& stream,
                                     : ": quantity selector did not appear."), COLOR_RED);
                                 return false;
                             }
+                            // Do not page a different or still-transitioning menu.
+                            if (!wait_for_menu_screen(stream, context,
+                                [&](const ImageViewRGB32& frame){ return buying_window.detect(frame); },
+                                "shop-item-list", 3s)){
+                                return false;
+                            }
                             // Only move between rows while searching the item list.
                             stream.log(search_direction == DPAD_UP
                                 ? "Not on the right item, searching upward..."
@@ -432,7 +464,9 @@ bool buy_items(VideoStream& stream,
                     }
                 },
                 {{greeting_menu}, {back_in_shop}});
-            if (greeting < 0){
+            if (greeting < 0 && !wait_for_menu_screen(stream, context,
+                [&](const ImageViewRGB32& frame){ return greeting_menu.detect(frame) || back_in_shop.detect(frame); },
+                "shop-greeting-menu", 3s)){
                 stream.log(label + ": dialogue did not lead to a shop menu; check the vendor approach.", COLOR_RED);
                 return false;
             }
@@ -535,7 +569,8 @@ bool shop_veilstone_department_store(VideoStream& stream,
     SelectionArrowFinder floor_menu(stream.overlay(), {0.71, 0.425, 0.03, 0.055}, COLOR_GREEN);
     bool floor_menu_ready = false;
     for (size_t press = 0; press < 10; press++){
-        if (wait_until(stream, context, 1500ms, {{floor_menu}}) == 0){
+        if (wait_for_menu_screen(stream, context,
+            [&](const ImageViewRGB32& frame){ return floor_menu.detect(frame); }, "shop-elevator-menu", 1500ms)){
             floor_menu_ready = true;
             break;
         }
@@ -550,7 +585,8 @@ bool shop_veilstone_department_store(VideoStream& stream,
     move(DPAD_DOWN, 2);
     context.wait_for_all_requests();
     SelectionArrowFinder third_floor(stream.overlay(), {0.71, 0.54, 0.03, 0.055}, COLOR_GREEN);
-    if (wait_until(stream, context, 3000ms, {{third_floor}}) < 0){
+    if (!wait_for_menu_screen(stream, context,
+        [&](const ImageViewRGB32& frame){ return third_floor.detect(frame); }, "shop-third-floor", 3000ms)){
         stream.log("Veilstone shopping: third floor selection not confirmed.", COLOR_RED);
         return false;
     }

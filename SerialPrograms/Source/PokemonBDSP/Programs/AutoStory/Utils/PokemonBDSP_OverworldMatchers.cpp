@@ -3826,8 +3826,23 @@ OverworldMatchResult match_sunyshore_lighthouse_elevator(const ImageRGB32& frame
     result.at_target = result.located && std::abs(result.dx) <= 7.0 / 960;
     return result;
 }
+OverworldMatchResult match_league_waterfall_statues(const ImageRGB32& frame){
+    // The statue pair fixes the Surf column. Its vertical offset distinguishes the dry tip from the lower bank.
+    const ImageFloatBox left{145.0 / 960, 399.0 / 540, 83.0 / 960, 93.0 / 540};
+    const ImageFloatBox right{735.0 / 960, 399.0 / 540, 83.0 / 960, 93.0 / 540};
+    const ImageFloatBox west{0, .12, .50, .88}, east{.50, .12, .50, .88};
+    static const std::vector<LandmarkConfig> statues = {
+        {"West statue", "PokemonBDSP/Autostory/LeagueWaterfall/West.png", left, west, .80, .12},
+        {"East statue", "PokemonBDSP/Autostory/LeagueWaterfall/East.png", right, east, .80, .12},
+        {"West statue", "PokemonBDSP/Autostory/LeagueWaterfall/WestDay.png", left, west, .80, .12},
+        {"East statue", "PokemonBDSP/Autostory/LeagueWaterfall/EastDay.png", right, east, .80, .12},
+    };
+    return match_lighting_pair(frame, statues, "West statue", "East statue", 1.0 / 96, true);
+}
+
 const std::vector<OverworldMatcher>& overworld_matchers(){
     static const std::vector<OverworldMatcher> matchers = {
+        {"league-waterfall-statues", "Pokemon League waterfall - Pokeball statues (center of the isthmus)", match_league_waterfall_statues},
         {"sunyshore-lighthouse-elevator", "Sunyshore lighthouse elevator exit (door column)", match_sunyshore_lighthouse_elevator},
         {"oreburgh-gym", "Oreburgh Gym doorway (sign + emblem)", match_oreburgh_gym_entrance},
         {"route204-floaroma-turn", "Route 204 north turn toward Floaroma", match_route204_floaroma_turn},

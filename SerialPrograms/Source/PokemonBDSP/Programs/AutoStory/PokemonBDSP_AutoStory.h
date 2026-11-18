@@ -40,6 +40,7 @@ public:
     BDSPAutoStory();
 
     virtual std::string check_validity() const override;
+    virtual JsonValue to_json() const override;
     virtual void load_json(const JsonValue& json) override;
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 

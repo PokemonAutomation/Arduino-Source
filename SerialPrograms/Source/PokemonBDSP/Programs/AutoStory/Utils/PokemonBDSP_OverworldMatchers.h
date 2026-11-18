@@ -40,6 +40,8 @@ const std::vector<OverworldMatcher>& overworld_matchers();
 // Interior exit: grayscale indicator/button features. Horizontal alignment only;
 // start on the clear row south of the lift, then watch the northward entry fade.
 OverworldMatchResult match_sunyshore_lighthouse_elevator(const ImageRGB32& frame);
+// Grayscale statue pair, calibrated at the center of the dry tip before Surf.
+OverworldMatchResult match_league_waterfall_statues(const ImageRGB32& frame);
 OverworldMatchResult match_route204_north_approach(const ImageRGB32& frame);
 OverworldMatchResult match_teighler_alcove_corner(const ImageRGB32& frame);
 OverworldMatchResult match_route204_north_stairs(const ImageRGB32& frame);

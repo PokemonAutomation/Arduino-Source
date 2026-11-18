@@ -146,10 +146,11 @@ static std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_checkpoint_list()
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0907>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0908>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0909>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0910>());
     // Manual flight regression test: visits all 16 destinations except Route 221
     // to check map navigation and icon boxes. All destinations live-verified.
     // Re-enable this registration only when testing flight changes.
-    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0910>());
+    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_0911>());
 
 
     //checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_021>());
@@ -233,7 +234,7 @@ static const StringSelectDatabase& section_database(bool checkpoints, bool tutor
         for (size_t i = TUTORIAL_CHECKPOINT_COUNT; i < ALL_CHECKPOINTS().size(); i++){
             const std::string name = ALL_CHECKPOINTS()[i]->name();
             if (name.compare(0, 5, "03.06") >= 0 && name.compare(0, 3, "09.") <= 0){
-                db.add_entry(StringSelectEntry(name.substr(0, 5), name));
+                db.add_entry(StringSelectEntry(name.substr(0, name.find(' ')), name));
             }else{
                 db.add_entry(StringSelectEntry(std::to_string(legacy_index++), name));
             }
@@ -345,7 +346,7 @@ BDSPAutoStory::BDSPAutoStory()
     , END_CHECKPOINT_MAINSTORY("<b>End Checkpoint:</b>",
         section_database(true, false),
         LockMode::UNLOCK_WHILE_RUNNING,
-        "09.09")
+        "09.10")
 
     , START_SEGMENT("<b>Start Segment:</b>", section_database(false, true), LockMode::LOCK_WHILE_RUNNING, "0")
 
@@ -448,6 +449,12 @@ std::string BDSPAutoStory::check_validity() const {
     return {};
 }
 
+JsonValue BDSPAutoStory::to_json() const{
+    JsonValue json = SingleSwitchProgramInstance::to_json();
+    json.to_object_throw()["CHECKPOINT_NUMBERING_VERSION"] = 2;
+    return json;
+}
+
 void BDSPAutoStory::load_json(const JsonValue& json){
     SingleSwitchProgramInstance::load_json(json);
     const JsonObject* object = json.to_object();
@@ -459,6 +466,28 @@ void BDSPAutoStory::load_json(const JsonValue& json){
     for (size_t selection = 0; selection < 2; selection++){
         const std::string* slug = object->get_string(keys[selection]);
         if (!slug){
+            continue;
+        }
+        if (object->get_integer_default("CHECKPOINT_NUMBERING_VERSION") < 2 && slug->starts_with("09.")){
+            // Before the split, 09.03 included both Victory Road and the waterfall.
+            if (*slug == "09.03"){
+                selections[selection]->set_by_slug(selection == 0 ? "09.03" : "09.04");
+                continue;
+            }
+            static constexpr const char* renumbered[][2] = {
+                {"09.03a", "09.03"}, {"09.03b", "09.04"}, {"09.04", "09.05"}, {"09.05", "09.06"},
+                {"09.06", "09.07"}, {"09.07", "09.08"}, {"09.08", "09.09"}, {"09.09", "09.10"},
+                {"09.10", "09.11"},
+            };
+            for (const auto& [previous, current] : renumbered){
+                if (*slug == previous){
+                    // The manual Fly test is normally absent from the checkpoint list.
+                    if (!selections[selection]->set_by_slug(current).empty()){
+                        selections[selection]->set_by_slug("checkpoint-reselect");
+                    }
+                    break;
+                }
+            }
             continue;
         }
         // Old 03.06 covered both the tower and the journey to Veilstone Gym.

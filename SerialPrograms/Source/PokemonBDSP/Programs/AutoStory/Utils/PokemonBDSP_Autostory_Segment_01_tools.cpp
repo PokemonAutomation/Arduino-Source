@@ -28,6 +28,7 @@
 #include "PokemonBDSP/Inference/PokemonBDSP_TransitionWatchers.h"
 #include "PokemonBDSP/Programs/AutoStory/Detect/PokemonBDSP_AutoStory_OverworldDetector.h"
 #include "PokemonBDSP/Programs/AutoStory/PokemonBDSP_AutoStoryTools.h"
+#include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
 
 #include "PokemonBDSP_AutoStory_Segment_00_tools.h"
 
@@ -108,21 +109,11 @@ static bool mine_confirm_escape_via_menu(VideoStream& stream, ProControllerConte
         for (size_t close = 0; close < 3; close++){
             pbf_press_button(context, BUTTON_B, 80ms, 500ms);
             context.wait_for_all_requests();
-            if (wait_until(stream, context, 2s, {{overworld}}) == 0){
+            if (wait_for_menu_screen(stream, context,
+                [&](const ImageViewRGB32& frame){ return !menu_visible.detect(frame) && overworld.detect(frame); },
+                "mine-menu-return-overworld", 5s)){
+                stream.log("[Mine escape] Confirmed game menu closed; returning to navigation.", COLOR_GREEN);
                 return true;
-            }
-            BlackScreenWatcher visible(COLOR_YELLOW,
-                {0.1, 0.1, 0.8, 0.8},
-                100,
-                10,
-                BlackScreenWatcher::FinderType::GONE,
-                500ms);
-            if (wait_until(stream, context, 3s, {{visible}}) == 0){
-                const VideoSnapshot frame = stream.video().snapshot();
-                if (frame && !menu_visible.detect(frame)){
-                    stream.log("[Mine escape] Confirmed game menu closed; returning to navigation.", COLOR_GREEN);
-                    return true;
-                }
             }
         }
         stream.log("[Mine escape] Main menu detected but could not confirm it closed.", COLOR_ORANGE);

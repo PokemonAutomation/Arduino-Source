@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cmath>
 #include <map>
 #include <vector>
 #include "Common/Cpp/Json/JsonArray.h"
@@ -18,6 +19,7 @@
 #include "CommonTools/Images/ImageManip.h"
 #include "CommonTools/OCR/OCR_Routines.h"
 #include "CommonTools/OCR/OCR_StringNormalization.h"
+#include "PokemonBDSP_ButtonDetector.h"
 #include "PokemonBDSP_OptionsDetector.h"
 
 namespace PokemonAutomation{
@@ -25,6 +27,9 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 bool TutorialOptionsDetector::detect(const ImageViewRGB32& screen) const{
+    if (!screen){
+        return false;
+    }
     ImageViewRGB32 panel = extract_box_reference(screen, ImageFloatBox{0.04, 0.065, 0.93, 0.70});
     size_t white = 0, light_neutral = 0;
     for (size_t y = 0; y < panel.height(); y += 4){
@@ -51,11 +56,31 @@ bool TutorialOptionsDetector::detect(const ImageViewRGB32& screen) const{
             total++;
         }
     }
-    if (samples == 0 || total == 0 || blue <= total / 4){
+    if (samples == 0 || total == 0){
         return false;
     }
-    return white / samples > 0.70 || (light_neutral / samples > 0.70 &&
-        TutorialOptionPositionDetector().selected_row(screen) >= 0);
+    if (blue > total / 4 && (white / samples > 0.70 || (light_neutral / samples > 0.70 &&
+        TutorialOptionPositionDetector().selected_row(screen) >= 0))){
+        return true;
+    }
+    // Like PLZA's map detector, combine several button letters with screen-specific
+    // structure. Footer labels vary by language, so search for ordered A/Y/B icons.
+    if (light_neutral / samples <= 0.60 || TutorialOptionPositionDetector().selected_row(screen) < 0){
+        return false;
+    }
+    static const ImageFloatBox footer{0.40, 0.955, 0.60, 0.045};
+    static const ButtonDetector confirm(ButtonType::A, footer);
+    static const ButtonDetector reset(ButtonType::Y, footer);
+    static const ButtonDetector exit(ButtonType::B, footer);
+    ImageFloatBox a, y, b;
+    if (!confirm.detect(screen, &a) || !reset.detect(screen, &y) || !exit.detect(screen, &b)){
+        return false;
+    }
+    const double ay = a.y + a.height * 0.5;
+    const double yy = y.y + y.height * 0.5;
+    const double by = b.y + b.height * 0.5;
+    return a.x + a.width < y.x && y.x + y.width < b.x &&
+        std::abs(ay - yy) < 0.01 && std::abs(yy - by) < 0.01;
 }
 
 // Locate the two long red horizontal lines surrounding the
