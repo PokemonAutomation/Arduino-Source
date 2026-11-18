@@ -2,11 +2,12 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  The "AbstractServerSocket" implementation of "AbstractHttpServer": a
- *  minimal HTTP/1.1 server on the platform's default server socket, for a
- *  single local client that issues one request at a time. The request/
- *  response types, the handler contract, and the threading rules are in
- *  "AbstractHttpServer.h"; this file documents the implementation.
+ *  The "AbstractServerSocket2" implementation of "AbstractHttpServer":
+ *  a minimal HTTP/1.1 server on the platform's default server socket,
+ *  for a single local client that issues one request at a time. The
+ *  request/response types, the handler contract, and the threading
+ *  rules are in "AbstractHttpServer.h"; this file documents the
+ *  implementation.
  *
  */
 
@@ -24,7 +25,7 @@
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/HttpServer/AbstractHttpServer.h"
-#include "Common/Cpp/Sockets/AbstractServerSocket.h"
+#include "Common/Cpp/Sockets/AbstractServerSocket2.h"
 
 namespace PokemonAutomation{
 
@@ -32,7 +33,7 @@ class ThreadPool;
 
 
 
-class HttpServer : public AbstractHttpServer, private AbstractServerSocket::Listener{
+class HttpServer : public AbstractHttpServer, private AbstractServerSocket2::Listener{
 public:
     //  The interface's types, re-exported under this class's name.
     using AbstractHttpServer::Request;
@@ -40,6 +41,7 @@ public:
     using AbstractHttpServer::HandlerContext;
     using AbstractHttpServer::Handler;
     using AbstractHttpServer::Listener;
+    using ConnectionPtr = AbstractServerSocket2::ConnectionPtr;
 
 
 public:
@@ -52,12 +54,12 @@ public:
 
 
 private:
-    //  AbstractServerSocket::Listener.
+    //  AbstractServerSocket2::Listener.
     virtual void on_listen_finished(const std::string& error_message) override;
-    virtual void on_connect() override;
+    virtual void on_connect(ConnectionPtr connection) override;
     virtual void on_connect_rejected() override;
-    virtual void on_receive_data(const void* data, size_t bytes) override;
-    virtual void on_disconnect(const std::string& error_message) override;
+    virtual void on_receive_data(ConnectionPtr connection, const void* data, size_t bytes) override;
+    virtual void on_disconnect(ConnectionPtr connection, const std::string& error_message) override;
 
 
 private:
@@ -95,42 +97,40 @@ private:
         std::string buffer;
         std::atomic<bool> dead{false};
 
-        //  The server socket's connection_id() when this connection was
-        //  accepted. Passed to every send(), so a write that outlives the
-        //  connection is refused instead of reaching the next client.
-        uint64_t socket_id = 0;
+        //  The server socket's connection for this state. All writes and
+        //  closes go through it: a response that outlives the connection
+        //  is refused by the (inert) connection object instead of
+        //  reaching the next client's socket.
+        AbstractServerSocket2::ConnectionPtr socket;
     };
 
     //  Runs on a thread from the thread pool, one instance per
     //  connection.
     void connection_task(
-        const std::shared_ptr<Connection>& conn,
-        AbstractServerSocket* socket
+        const std::shared_ptr<Connection>& conn
     );
 
     //  Parses one complete request out of "buffer", removing it on
     //  success. Must be called with "conn->lock" held.
     static ParsedRequest try_parse(std::string& buffer);
 
-    //  Marks the connection dead and closes it at the socket level. No-op
-    //  if the socket is no longer connected to this client.
+    //  Marks the connection dead and closes it. No-op if this state is no
+    //  longer the connection the server is serving (in which case the
+    //  close would be stale).
     void end_connection(
-        const std::shared_ptr<Connection>& conn,
-        AbstractServerSocket* socket
+        const std::shared_ptr<Connection>& conn
     );
 
     //  Writes "bytes" to the connection completely; returns false (and
     //  ends the connection) if the peer went away or the write stalled.
     bool write_raw(
         const std::shared_ptr<Connection>& conn,
-        AbstractServerSocket* socket,
         const std::string& bytes
     );
 
     //  Formats and writes the final response.
     bool write_response(
         const std::shared_ptr<Connection>& conn,
-        AbstractServerSocket* socket,
         const Response& response,
         bool keep_alive
     );
@@ -148,7 +148,7 @@ private:
     //  Guards m_socket, m_connection, and m_handler. Never held across a
     //  blocking wait, a task destruction, or a socket destruction.
     mutable Mutex m_lock;
-    std::unique_ptr<AbstractServerSocket> m_socket;
+    std::unique_ptr<AbstractServerSocket2> m_socket;
     std::shared_ptr<Connection> m_connection;
     Handler m_handler;
 
