@@ -85,7 +85,6 @@ size_t ServerSocket2Connection_POSIX::send(
 
     return sent;
 }
-
 void ServerSocket2Connection_POSIX::close(){
     if (m_close_requested.exchange(true)){
         return;
@@ -96,6 +95,83 @@ void ServerSocket2Connection_POSIX::close(){
     //  socket is already gone, ::shutdown just fails harmlessly.)
     ::shutdown(m_client, SHUT_RDWR);
 }
+void ServerSocket2Connection_POSIX::thread_loop(std::shared_ptr<ServerSocket2Connection_POSIX> self){
+    int socket = m_client;
+
+    if (!m_open.load(std::memory_order_relaxed)){
+        //  Closed before this thread started (teardown, or the
+        //  application via active_connection()): hand the slot back and
+        //  drop the socket; there is nothing to report.
+        m_server->release_connection(self);
+        ::close(socket);
+        return;
+    }
+
+    m_server->report_connect(self);
+
+    constexpr size_t BUFFER_SIZE = 4096;
+    char buffer[BUFFER_SIZE];
+    std::string error;
+
+    while (m_open.load(std::memory_order_relaxed)){
+        //  The socket is non-blocking, so this returns immediately. It is
+        //  deliberately called without holding any lock: the liveness
+        //  check above and the result handling below are the only parts
+        //  that need one, and no socket call should stretch it.
+        ssize_t bytes = ::recv(socket, buffer, BUFFER_SIZE, 0);
+
+        if (bytes > 0){
+            //  The application may have closed the connection while we
+            //  were reading: only dispatch the data if it is still open.
+            if (m_open.load(std::memory_order_relaxed)){
+                m_server->report_receive(self, buffer, bytes);
+            }
+            continue;
+        }
+
+        if (bytes == -1){
+            int error_no = errno;
+            if (error_no == EAGAIN){
+                //  No data yet.
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                continue;
+            }
+#if EAGAIN != EWOULDBLOCK
+            if (error_no == EWOULDBLOCK){
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                continue;
+            }
+#endif
+            if (error_no == EINTR){
+                continue;
+            }
+            //  ECONNRESET, EBADF, or any other error: the connection is
+            //  gone. (An application-side close() also lands here, via
+            //  ::shutdown: it makes recv return 0 or fail, and the
+            //  close_requested() check below suppresses the report.)
+            error = "Receive error (errno " + std::to_string(error_no) + "): " + std::string(strerror(error_no));
+        }else{
+            //  The peer closed the connection.
+            error = "Connection closed by client.";
+        }
+        break;
+    }
+
+    //  Hand the slot (and the CONNECTED state) back to the server, then
+    //  make the connection inert. Either way, the object outlives the
+    //  server.
+    m_server->release_connection(self);
+    const bool app_close = m_close_requested.load(std::memory_order_relaxed);
+    m_open.store(false, std::memory_order_release);
+    ::close(socket);
+    if (!app_close){
+        m_server->report_disconnect(self, error);
+    }
+}
+
+
+
+
 
 
 ServerSocket2_POSIX::ServerSocket2_POSIX(ThreadPool& thread_pool)
@@ -363,7 +439,7 @@ void ServerSocket2_POSIX::accept_thread_loop(std::string address, uint16_t port)
             //  server's reference keeps it alive while the thread runs).
             try{
                 AsyncTask task = m_thread_pool.dispatch([conn]{
-                    conn->run(conn);
+                    conn->thread_loop(conn);
                 });
                 std::lock_guard<Mutex> lg(m_task_lock);
                 m_client_thread = std::move(task);
@@ -417,80 +493,8 @@ void ServerSocket2_POSIX::release_connection(ConnectionPtr conn){
     }
 }
 
-void ServerSocket2Connection_POSIX::run(std::shared_ptr<ServerSocket2Connection_POSIX> self){
-    int socket = m_client;
 
-    if (!m_open.load(std::memory_order_relaxed)){
-        //  Closed before this thread started (teardown, or the
-        //  application via active_connection()): hand the slot back and
-        //  drop the socket; there is nothing to report.
-        m_server->release_connection(self);
-        ::close(socket);
-        return;
-    }
 
-    m_server->report_connect(self);
-
-    constexpr size_t BUFFER_SIZE = 4096;
-    char buffer[BUFFER_SIZE];
-    std::string error;
-
-    while (m_open.load(std::memory_order_relaxed)){
-        //  The socket is non-blocking, so this returns immediately. It is
-        //  deliberately called without holding any lock: the liveness
-        //  check above and the result handling below are the only parts
-        //  that need one, and no socket call should stretch it.
-        ssize_t bytes = ::recv(socket, buffer, BUFFER_SIZE, 0);
-
-        if (bytes > 0){
-            //  The application may have closed the connection while we
-            //  were reading: only dispatch the data if it is still open.
-            if (m_open.load(std::memory_order_relaxed)){
-                m_server->report_receive(self, buffer, bytes);
-            }
-            continue;
-        }
-
-        if (bytes == -1){
-            int error_no = errno;
-            if (error_no == EAGAIN){
-                //  No data yet.
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                continue;
-            }
-#if EAGAIN != EWOULDBLOCK
-            if (error_no == EWOULDBLOCK){
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                continue;
-            }
-#endif
-            if (error_no == EINTR){
-                continue;
-            }
-            //  ECONNRESET, EBADF, or any other error: the connection is
-            //  gone. (An application-side close() also lands here, via
-            //  ::shutdown: it makes recv return 0 or fail, and the
-            //  close_requested() check below suppresses the report.)
-            error = "Receive error (errno " + std::to_string(error_no) + "): " + std::string(strerror(error_no));
-        }else{
-            //  The peer closed the connection.
-            error = "Connection closed by client.";
-        }
-        break;
-    }
-
-    //  Hand the slot (and the CONNECTED state) back to the server, then
-    //  make the connection inert. Either way, the object outlives the
-    //  server.
-    m_server->release_connection(self);
-    const bool app_close = m_close_requested.load(std::memory_order_relaxed);
-    m_open.store(false, std::memory_order_release);
-    ::close(socket);
-    if (!app_close){
-        m_server->report_disconnect(self, error);
-    }
-}
 
 }
-
 #endif

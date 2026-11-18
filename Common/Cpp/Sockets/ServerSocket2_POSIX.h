@@ -67,7 +67,7 @@ private:
     //  already track. "self" is the caller's owning reference (the
     //  dispatcher's capture); it is what the server's report methods
     //  keep during the listener callbacks.
-    void run(std::shared_ptr<ServerSocket2Connection_POSIX> self);
+    void thread_loop(std::shared_ptr<ServerSocket2Connection_POSIX> self);
 
     //  Marks the connection closed without touching the socket. The
     //  server calls this when the connection thread could not be
@@ -94,7 +94,6 @@ private:
 
 class ServerSocket2_POSIX final : public AbstractServerSocket2{
 public:
-
     ServerSocket2_POSIX(ThreadPool& thread_pool);
 
     virtual ~ServerSocket2_POSIX(){
@@ -110,7 +109,6 @@ public:
 
 
 private:
-
     //  Stops the server: it stops accepting new connections, closes the
     //  active connection, and returns the server to State::NOT_RUNNING so
     //  the object is fully torn down. It blocks until the worker threads

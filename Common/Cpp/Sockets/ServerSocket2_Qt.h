@@ -43,7 +43,10 @@ class ThreadPool;
 class ServerSocket2_Qt;
 
 
-class ServerSocket2Connection_Qt final : public AbstractServerSocketConnection, public std::enable_shared_from_this<ServerSocket2Connection_Qt>{
+class ServerSocket2Connection_Qt final
+    : public AbstractServerSocketConnection
+    , public std::enable_shared_from_this<ServerSocket2Connection_Qt>
+{
 public:
     //  Carries shared ownership (the signals pass it by value) so that a
     //  call still queued when the caller times out, or when
