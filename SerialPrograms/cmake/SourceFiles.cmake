@@ -1770,6 +1770,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_StatsReader.h
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_TrainerIdReader.cpp
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_TrainerIdReader.h
+    Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_TypeReader.cpp
+    Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_TypeReader.h
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.cpp
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h
     Source/VideoGames/PokemonFRLG/Inference/Sounds/PokemonFRLG_CatchFanfareDetector.cpp

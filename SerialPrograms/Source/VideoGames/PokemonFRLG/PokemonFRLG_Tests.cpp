@@ -28,6 +28,7 @@
 #include "Inference/PokemonFRLG_ShinySymbolDetector.h"
 #include "Inference/PokemonFRLG_StatsReader.h"
 #include "Inference/PokemonFRLG_TrainerIdReader.h"
+#include "Inference/PokemonFRLG_TypeReader.h"
 #include "Inference/PokemonFRLG_WildEncounterReader.h"
 #include "Programs/BoxOrganization/PokemonFRLG_BoxSorter_Tests.h"
 #include "Tests/TestUtils.h"
@@ -65,6 +66,7 @@ void add_tests(UnitTestDatabase& database){
     add_tests_ShinySymbolDetector(database);
     add_tests_SummarySpriteReader(database);
     add_tests_TrainerIdReader(database);
+    add_tests_TypeReader(database);
     add_tests_WildEncounterReader(database);
 }
 
