@@ -15,6 +15,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_RngNavigation.h"
+#include "PokemonFRLG_RngStatsDatabase.h"
 #include "PokemonFRLG_HardReset.h"
 #include "PokemonFRLG_RngCalibration.h"
 #include "PokemonFRLG_RngLoopRoutines.h"
@@ -248,28 +249,23 @@ void RoamingLegendaryRng::program(SingleSwitchProgramEnvironment& env, ProContro
     env.log("Seed delay: " + std::to_string(SEED_DELAY) + "ms, button mode: " + seed_match.button_mode
         + ", column: " + seed_match.column_name);
 
-    BaseStats BASE_STATS;
     std::string SPECIES;
-    int16_t GENDER_THRESHOLD = -1;
     switch (TARGET){
     case PokemonFRLG_RngTarget::raikou:
         SPECIES = "raikou";
-        BASE_STATS = { 90, 85, 75, 115, 100, 115 };
-        GENDER_THRESHOLD = -1;
         break;
     case PokemonFRLG_RngTarget::entei:
         SPECIES = "entei";
-        BASE_STATS = { 115, 115, 85, 90, 75, 100 };
-        GENDER_THRESHOLD = -1;
         break;
     case PokemonFRLG_RngTarget::suicune:
         SPECIES = "suicune";
-        BASE_STATS = { 100, 75, 115, 90, 115, 85 };
-        GENDER_THRESHOLD = -1;
         break;
     default:
         break;
     }
+    const RngStats& STATS = RngStatsDatabase::instance().get_throw(SPECIES);
+    const int16_t GENDER_THRESHOLD = STATS.gender_threshold;
+    const BaseStats& BASE_STATS = STATS.base_stats;
 
     static const int64_t FIXED_SEED_OFFSET = -845; // milliseconds, approximate
 

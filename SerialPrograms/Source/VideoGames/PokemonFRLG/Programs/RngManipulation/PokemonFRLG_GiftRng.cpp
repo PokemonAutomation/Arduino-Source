@@ -15,6 +15,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_RngNavigation.h"
+#include "PokemonFRLG_RngStatsDatabase.h"
 #include "PokemonFRLG_HardReset.h"
 #include "PokemonFRLG_RngCalibration.h"
 #include "PokemonFRLG_RngLoopRoutines.h"
@@ -253,102 +254,73 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     env.log("Seed delay: " + std::to_string(SEED_DELAY) + "ms, button mode: " + seed_match.button_mode
         + ", column: " + seed_match.column_name);
 
-    BaseStats BASE_STATS;
     std::string SPECIES;
-    int16_t GENDER_THRESHOLD = -1;
     uint8_t LEVEL = 0;
     switch (TARGET){
     case PokemonFRLG_RngTarget::magikarp:
         SPECIES = "magikarp";
-        BASE_STATS = { 20, 10, 55, 15, 20, 80 };
-        GENDER_THRESHOLD = 126;
         LEVEL = 5;
         break;
     case PokemonFRLG_RngTarget::hitmonchan:
         SPECIES = "hitmonchan";
-        BASE_STATS = { 50, 105, 79, 35, 110, 76 };
-        GENDER_THRESHOLD = -1;
         LEVEL = 25;
         break;
     case PokemonFRLG_RngTarget::hitmonlee:
         SPECIES = "hitmonlee";
-        BASE_STATS = { 50, 120, 53, 35, 110, 87 };
-        GENDER_THRESHOLD = -1;
         LEVEL = 25;
         break;
     case PokemonFRLG_RngTarget::eevee:
         SPECIES = "eevee";
-        BASE_STATS = { 55, 55, 50, 45, 65, 55 };
-        GENDER_THRESHOLD = 30;
         LEVEL = 25;
         break;
     case PokemonFRLG_RngTarget::lapras:
         SPECIES = "lapras";
-        BASE_STATS = { 130, 85, 80, 85, 95, 60 };
-        GENDER_THRESHOLD = 126;
         LEVEL = 25;
         break;
     case PokemonFRLG_RngTarget::omanyte:
         SPECIES = "omanyte";
-        BASE_STATS = { 35, 40, 100, 90, 55, 35 };
-        GENDER_THRESHOLD = 30;
         LEVEL = 5;
         break;
     case PokemonFRLG_RngTarget::kabuto:
         SPECIES = "kabuto";
-        BASE_STATS = { 30, 80, 90, 55, 45, 55 };
-        GENDER_THRESHOLD = 30;
         LEVEL = 5;
         break;
     case PokemonFRLG_RngTarget::aerodactyl:
         SPECIES = "aerodactyl";
-        BASE_STATS = { 80, 105, 65, 60, 75, 130 };
-        GENDER_THRESHOLD = 30;
         LEVEL = 5;
         break;
     case PokemonFRLG_RngTarget::gamecornerabra:
         SPECIES = "abra";
-        BASE_STATS = { 25, 20, 15, 105, 55, 90 };
-        GENDER_THRESHOLD = 63;
         break;
     case PokemonFRLG_RngTarget::gamecornerclefairy:
         SPECIES = "clefairy";
-        BASE_STATS = { 70, 45, 48, 60, 65, 35 };
-        GENDER_THRESHOLD = 190;
         break;
     case PokemonFRLG_RngTarget::gamecornerdratinifr:
     case PokemonFRLG_RngTarget::gamecornerdratinilg:
         SPECIES = "dratini";
-        BASE_STATS = { 41, 64, 45, 50, 50, 50 };
-        GENDER_THRESHOLD = 126;
         break;
     case PokemonFRLG_RngTarget::gamecornerscyther:
         SPECIES = "scyther";
-        BASE_STATS = { 70, 110, 80, 55, 80, 105 };
-        GENDER_THRESHOLD = 126;
         LEVEL = 25;
         break;
     case PokemonFRLG_RngTarget::gamecornerpinsir:
         SPECIES = "pinsir";
-        BASE_STATS = { 65, 125, 100, 55, 70, 85 };
-        GENDER_THRESHOLD = 126;
         LEVEL = 18;
         break;
     case PokemonFRLG_RngTarget::gamecornerporygon:
         SPECIES = "porygon";
-        BASE_STATS = { 65, 60, 70, 85, 75, 40 };
-        GENDER_THRESHOLD = -1;
         break;
     case PokemonFRLG_RngTarget::togepi:
     case PokemonFRLG_RngTarget::togepifast:
         SPECIES = "togepi";
-        BASE_STATS = { 35, 20, 65, 40, 65, 20 };
-        GENDER_THRESHOLD = 30;
         LEVEL = 5;
         break; 
     default:
         break;
     }
+    const RngStats& STATS = RngStatsDatabase::instance().get_throw(SPECIES);
+    const int16_t GENDER_THRESHOLD = STATS.gender_threshold;
+    const BaseStats& BASE_STATS = STATS.base_stats;
 
     static const int64_t FIXED_SEED_OFFSET = -845; // milliseconds, approximate
 

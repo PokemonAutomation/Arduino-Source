@@ -98,9 +98,8 @@ WildCatchOutcome catch_wild_for_seed_id(
     int sweet_scent_from_last,
     uint64_t& balls_left,
     const std::set<std::string>& species_list,
-    const RngStatsDatabase& stats_data,
     AdvObservedPokemon& pokemon,
-    RngStats& species_stats,
+    const RngStats*& species_stats,
     AdvRngFilters& filters,
     uint64_t& wild_advances_estimate,
     const std::function<void(const AdvRngFilters&)>& publish_filters
@@ -144,15 +143,13 @@ WildCatchOutcome catch_wild_for_seed_id(
 
     go_to_summary(env.console, context);
     pokemon = read_summary(env.console, context, language, species_list);
-    try{
-        species_stats = stats_data.get_throw(pokemon.species);
-    }catch (const InternalProgramError& err){
-        env.log(err.message());
-        env.log("Failed to load base stats.");
+    species_stats = RngStatsDatabase::instance().get_nothrow(pokemon.species);
+    if (species_stats == nullptr){
+        env.log("Failed to load base stats for species: \"" + pokemon.species + "\"");
         return WildCatchOutcome::failed;
     }
 
-    filters = observation_to_filters(pokemon, species_stats.base_stats, AdvRngMethod::Any);
+    filters = observation_to_filters(pokemon, species_stats->base_stats, AdvRngMethod::Any);
     publish_filters(filters);
     return WildCatchOutcome::caught;
 }

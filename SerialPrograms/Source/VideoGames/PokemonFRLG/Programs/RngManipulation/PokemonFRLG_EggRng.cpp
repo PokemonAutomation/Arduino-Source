@@ -356,7 +356,6 @@ bool EggRng::reset_and_check_seed(
     const bool& previously_hit_held_frame,
     Milliseconds& launch_delay,
     const std::set<std::string>& SPECIES_LIST,
-    const RngStatsDatabase& STATS_DATA,
     bool pickup_frame
 ){
     RngCalibrations& calibrations = hist.calibrations;
@@ -443,13 +442,13 @@ bool EggRng::reset_and_check_seed(
 
     // Step 3: Catch a wild encounter and use it to determine the current seed
     AdvObservedPokemon pokemon;
-    RngStats species_stats;
+    const RngStats* species_stats = nullptr;
     AdvRngFilters filters;
     uint64_t wild_advances_estimate;
     WildCatchOutcome catch_outcome = catch_wild_for_seed_id(
         env, context, stats.errors, NOTIFICATION_ERROR_RECOVERABLE, LANGUAGE,
         timestamp, advances, pickup_frame ? 2 : 0,
-        balls_left, SPECIES_LIST, STATS_DATA,
+        balls_left, SPECIES_LIST,
         pokemon, species_stats, filters, wild_advances_estimate,
         [&](const AdvRngFilters& f){ RNG_FILTERS.set(f); }
     );
@@ -464,12 +463,12 @@ bool EggRng::reset_and_check_seed(
     // For the wild step we only need to confirm the correct seed was hit; advance timing is
     // irrelevant and wild_history is largely unused, so result_determined just checks same_seeds.
     std::vector<AdvRngState> search_hits = refine_calibration_with_rare_candy(
-        env, context, LANGUAGE, pokemon, filters, species_stats.base_stats,
+        env, context, LANGUAGE, pokemon, filters, species_stats->base_stats,
         wild_uncertain_history, wild_history, calibrations,
         MAX_HISTORY_LENGTH, candies_left, AdvRngMethod::Any, false,
         stats.errors, NOTIFICATION_ERROR_RECOVERABLE,
         [&](AdvRngFilters& f){
-            return get_wild_search_results(env.console, wild_searcher, f, SEED_VALUES, wild_advances_estimate, WILD_ADVANCES_RADIUS, species_stats.gender_threshold);
+            return get_wild_search_results(env.console, wild_searcher, f, SEED_VALUES, wild_advances_estimate, WILD_ADVANCES_RADIUS, species_stats->gender_threshold);
         },
         [&](const std::vector<AdvRngState>& h){
             if (pickup_frame){ PICKUP_CALIBRATION.set_hits(h); }else{ HELD_CALIBRATION.set_hits(h); }
@@ -727,21 +726,15 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 
     home_black_border_check(env.console, context);
 
-    // prepare database of base stats and gender thresholds
-    const RngStatsDatabase& STATS_DATA = RngStatsDatabase::instance();
-
-    RngStats EGG_STATS;
-    try{
-        EGG_STATS = STATS_DATA.get_throw(EGG_SPECIES.slug());        
-    }catch (const InternalProgramError& err){
-        env.log(err.message());
-        env.log(EGG_SPECIES.slug());
+    const RngStats* egg_stats = RngStatsDatabase::instance().get_nothrow(EGG_SPECIES.slug());
+    if (egg_stats == nullptr){
         OperationFailedExceptionWithScreenshot::fire(
             ErrorReportMode::SEND_ERROR_REPORT,
-            err.message(),
+            "Egg species not found in base stats database: " + EGG_SPECIES.slug(),
             env.console
-        ); 
+        );
     }
+    const RngStats& EGG_STATS = *egg_stats;
 
     // get the relevant encounter slots
     EncountersDatabase encounters_data(GAME_VERSION == GameVersion::firered ? "PokemonFRLG/EncounterSlotsFR.json" : "PokemonFRLG/EncounterSlotsLG.json");
@@ -935,7 +928,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
                 temp_balls_left, temp_candies_left, failed_searches,
                 times_not_held, shiny_found, previously_hit_held_frame,
                 launch_delay,
-                SPECIES_LIST, STATS_DATA,
+                SPECIES_LIST,
                 false
             );
 
@@ -980,7 +973,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
                 temp_balls_left, temp_candies_left, failed_searches,
                 times_not_held, shiny_found, previously_hit_held_frame,
                 launch_delay,
-                SPECIES_LIST, STATS_DATA,
+                SPECIES_LIST,
                 true
             );
 

@@ -4,6 +4,7 @@
  *
  */
 
+#include <optional>
 #include "Common/Cpp/Strings/StringTools.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -14,6 +15,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_RngNavigation.h"
+#include "PokemonFRLG_RngStatsDatabase.h"
 #include "PokemonFRLG_HardReset.h"
 #include "PokemonFRLG_RngCalibration.h"
 #include "PokemonFRLG_RngLoopRoutines.h"
@@ -254,80 +256,62 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     env.log("Seed delay: " + std::to_string(SEED_DELAY) + "ms, button mode: " + seed_match.button_mode
         + ", column: " + seed_match.column_name);
 
-    BaseStats BASE_STATS;
     std::string SPECIES;
-    int16_t GENDER_THRESHOLD = -1;
+    std::optional<BaseStats> FORM_BASE_STATS;
     uint8_t LEVEL = 30;
     switch (TARGET){
     case PokemonFRLG_RngTarget::electrode:
         SPECIES = "electrode";
-        BASE_STATS = { 60, 50, 70, 80, 80, 140 };
-        GENDER_THRESHOLD = -1;
         LEVEL = 34;
         break;
     case PokemonFRLG_RngTarget::snorlax:
         SPECIES = "snorlax";
-        BASE_STATS = { 160, 110, 65, 65, 110, 30 };
-        GENDER_THRESHOLD = 30;
         LEVEL = 30;
         break;
     case PokemonFRLG_RngTarget::articuno:
         SPECIES = "articuno";
-        BASE_STATS = { 90, 85, 100, 95, 125, 85 };
-        GENDER_THRESHOLD = -1;
         LEVEL = 50;
         break;
     case PokemonFRLG_RngTarget::zapdos:
         SPECIES = "zapdos";
-        BASE_STATS = { 90, 90, 85, 125, 90, 100 };
-        GENDER_THRESHOLD = -1;
         LEVEL = 50;
         break;
     case PokemonFRLG_RngTarget::moltres:
         SPECIES = "moltres";
-        BASE_STATS = { 90, 100, 90, 125, 85, 90 };
-        GENDER_THRESHOLD = -1;
         LEVEL = 50;
         break;
     case PokemonFRLG_RngTarget::mewtwo:
         SPECIES = "mewtwo";
-        BASE_STATS = { 106, 110, 90, 154, 90, 130 };
-        GENDER_THRESHOLD = -1;
         LEVEL = 70;
         break;
     case PokemonFRLG_RngTarget::hypno:
         SPECIES = "hypno";
-        BASE_STATS = { 85, 73, 70, 73, 115, 67 };
-        GENDER_THRESHOLD = 126;
         LEVEL = 30;
         break;
     case PokemonFRLG_RngTarget::hooh:
         SPECIES = "ho-oh";
-        BASE_STATS = { 106, 130, 90, 110, 154, 90 };
-        GENDER_THRESHOLD = -1;
         LEVEL = 70;
         break;
     case PokemonFRLG_RngTarget::lugia:
         SPECIES = "lugia";
-        BASE_STATS = { 106, 90, 130, 90, 154, 110 };
-        GENDER_THRESHOLD = -1;
         LEVEL = 70;
         break;
     case PokemonFRLG_RngTarget::deoxys_attack:
         SPECIES = "deoxys";
-        BASE_STATS = { 50, 180, 20, 180, 20, 150 };
-        GENDER_THRESHOLD = -1;
+        FORM_BASE_STATS = BaseStats{ 50, 180, 20, 180, 20, 150 };
         LEVEL = 30;
         break;
     case PokemonFRLG_RngTarget::deoxys_defense:
         SPECIES = "deoxys";
-        BASE_STATS = { 50, 70, 160, 70, 160, 90 };
-        GENDER_THRESHOLD = -1;
+        FORM_BASE_STATS = BaseStats{ 50, 70, 160, 70, 160, 90 };
         LEVEL = 30;
         break;
     default:
         break;
     }
+    const RngStats& STATS = RngStatsDatabase::instance().get_throw(SPECIES);
+    const int16_t GENDER_THRESHOLD = STATS.gender_threshold;
+    const BaseStats BASE_STATS = FORM_BASE_STATS.value_or(STATS.base_stats);
 
     static const int64_t FIXED_SEED_OFFSET = -845; // milliseconds, approximate
     

@@ -285,9 +285,6 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     RNG_FILTERS.reset();
     RNG_CALIBRATION.reset_hits();
 
-    // prepare database of base stats and gender thresholds
-    const RngStatsDatabase& STATS_DATA = RngStatsDatabase::instance();
-
     // get the relevant encounter slots
     EncountersDatabase encounters_data(GAME_VERSION == GameVersion::firered ? "PokemonFRLG/EncounterSlotsFR.json" : "PokemonFRLG/EncounterSlotsLG.json");
 
@@ -562,16 +559,13 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
         go_to_summary(env.console, context, 0, safari_zone ? StartMenuContext::SAFARI_ZONE : StartMenuContext::STANDARD);
         AdvObservedPokemon pokemon = read_summary(env.console, context, LANGUAGE, SPECIES_LIST);
-        RngStats species_stats;
-        try{
-            species_stats = STATS_DATA.get_throw(pokemon.species);        
-        }catch (const InternalProgramError& err){
-            env.log(err.message());
-            env.log("Failed to load base stats.", COLOR_RED);
+        const RngStats* species_stats = RngStatsDatabase::instance().get_nothrow(pokemon.species);
+        if (species_stats == nullptr){
+            env.log("Failed to load base stats for species: \"" + pokemon.species + "\"", COLOR_RED);
             continue;
         }
-        BaseStats base_stats = species_stats.base_stats;
-        int16_t gender_threshold = species_stats.gender_threshold;
+        const BaseStats& base_stats = species_stats->base_stats;
+        const int16_t gender_threshold = species_stats->gender_threshold;
 
         AdvRngFilters filters = observation_to_filters(pokemon, base_stats, AdvRngMethod::Any);
         bool valid_stats = validate_level(filters, pokemon, ENCOUNTER_SLOTS, base_stats);

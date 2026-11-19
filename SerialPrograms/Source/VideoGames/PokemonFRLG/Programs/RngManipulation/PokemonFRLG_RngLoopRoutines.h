@@ -99,9 +99,8 @@ WildCatchOutcome catch_wild_for_seed_id(
     int sweet_scent_from_last,
     uint64_t& balls_left,
     const std::set<std::string>& species_list,
-    const RngStatsDatabase& stats_data,
     AdvObservedPokemon& pokemon,
-    RngStats& species_stats,
+    const RngStats*& species_stats,
     AdvRngFilters& filters,
     uint64_t& wild_advances_estimate,
     const std::function<void(const AdvRngFilters&)>& publish_filters

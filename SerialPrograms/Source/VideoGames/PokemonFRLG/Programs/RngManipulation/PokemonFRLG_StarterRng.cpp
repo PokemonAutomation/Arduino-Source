@@ -20,6 +20,7 @@
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleLevelUpReader.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_RngNavigation.h"
+#include "PokemonFRLG_RngStatsDatabase.h"
 #include "PokemonFRLG_HardReset.h"
 #include "PokemonFRLG_SeedsDatabase.h"
 #include "PokemonFRLG_StarterRng.h"
@@ -581,23 +582,22 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         + ", column: " + seed_match.column_name);
 
     std::string SPECIES;
-    BaseStats BASE_STATS;
     switch (STARTER){
     case Starter::bulbasaur:
         SPECIES = "bulbasaur";
-        BASE_STATS = { 45, 49, 49, 65, 65, 45 };
         break;
     case Starter::squirtle:
         SPECIES = "squirtle";
-        BASE_STATS = { 44, 48, 65, 50, 64, 43 };
         break;
     case Starter::charmander:
         SPECIES = "charmander";
-        BASE_STATS = { 39, 52, 43, 60, 50, 65 };
         break;
     default:
         break;
     }
+    const RngStats& STATS = RngStatsDatabase::instance().get_throw(SPECIES);
+    const int16_t GENDER_THRESHOLD = STATS.gender_threshold;
+    const BaseStats& BASE_STATS = STATS.base_stats;
 
     static const int64_t FIXED_SEED_OFFSET = -845; // milliseconds, approximate
 
@@ -606,8 +606,6 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     static const uint64_t INITIAL_ADVANCES_RADIUS = 1024;
 
     static const uint8_t MAX_HISTORY_LENGTH = 10;
-
-    static const int16_t GENDER_THRESHOLD = 30;
 
     static const std::set<std::string> SPECIES_LIST = { "bulbasaur", "squirtle", "charmander" };
 
