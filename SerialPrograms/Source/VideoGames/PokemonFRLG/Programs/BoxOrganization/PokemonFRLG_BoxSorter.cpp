@@ -47,7 +47,8 @@ std::unique_ptr<StatsTracker> BoxSorter_Descriptor::make_stats() const{
 
 BoxSorter::BoxSorter()
     : LANGUAGE(
-        "<b>Game Language:</b><br>Select the language of your game so the program can read " + STRING_POKEMON + " species names.",
+        "<b>Game Language:</b><br>Select the language of your game so the program can read "
+        + STRING_POKEMON + " species names, natures, and abilities.",
         {
             Language::English,
             Language::Japanese,
@@ -71,6 +72,8 @@ BoxSorter::BoxSorter()
             SortingRuleType::Gender,
             SortingRuleType::Shiny,
             SortingRuleType::Ball_Slug,
+            SortingRuleType::Nature,
+            SortingRuleType::Ability,
         }
     )
     , DRY_RUN(
