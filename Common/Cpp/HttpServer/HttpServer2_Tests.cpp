@@ -15,6 +15,7 @@
 #include <functional>
 #include <mutex>
 #include <random>
+#include <stdexcept>
 #include <string>
 #include <thread>
 #include <vector>
@@ -1320,6 +1321,263 @@ public:
 };
 
 
+//  HTTP/1.0 does not keep the connection alive: the response must carry
+//  "Connection: close", and the server must close the connection after
+//  it.
+class Test_Http2_Http10 : public TestHttpServer{
+public:
+    using TestHttpServer::TestHttpServer;
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        TestServerListener server_listener;
+        HttpServer2 server(m_thread_pool);
+        server.add_listener(server_listener);
+
+        auto handler = [](const HttpServer2::Request&, HttpServer2::Response& response, HttpServer2::HandlerContext&){
+            response.status = 200;
+            response.body = "ok\n";
+        };
+
+        uint16_t port;
+        if (!start_server(server, server_listener, handler, port)){
+            return "Failed to start the server";
+        }
+
+        std::string error;
+        {
+            TestClient client(m_thread_pool);
+            if (!client.connect(port)){
+                error = "The client did not connect";
+            }else if (!client.send_all(
+                "GET / HTTP/1.0\r\n"
+                "Host: 127.0.0.1\r\n"
+                "\r\n"
+            )){
+                error = "The client did not send the request";
+            }else{
+                const std::string expected =
+                    "HTTP/1.1 200 OK\r\n"
+                    "Content-Length: 3\r\n"
+                    "Connection: close\r\n"
+                    "\r\n"
+                    "ok\n";
+                if (!client.wait_for_bytes(expected.size())){
+                    error = "The client did not receive the full response";
+                }else if (client.received_snapshot() != expected){
+                    error = "Bad response:\n" + client.received_snapshot();
+                }
+            }
+
+            if (error.empty() &&
+                !client.waiter.wait_for(
+                    HTTP_TEST_WAIT,
+                    [&client]{ return client.disconnected.load() >= 1; }
+                )
+            ){
+                error = "The server did not close the HTTP/1.0 connection";
+            }
+        }
+
+        server.stop();
+        if (!error.empty()){
+            return error;
+        }
+        return true;
+    }
+};
+
+
+//  A handler that throws gets turned into a 500 with a fixed body, and
+//  the connection is closed.
+class Test_Http2_HandlerThrows : public TestHttpServer{
+public:
+    using TestHttpServer::TestHttpServer;
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        TestServerListener server_listener;
+        HttpServer2 server(m_thread_pool);
+        server.add_listener(server_listener);
+
+        auto handler = [](const HttpServer2::Request&, HttpServer2::Response&, HttpServer2::HandlerContext&){
+            throw std::runtime_error("boom");
+        };
+
+        uint16_t port;
+        if (!start_server(server, server_listener, handler, port)){
+            return "Failed to start the server";
+        }
+
+        std::string error;
+        {
+            TestClient client(m_thread_pool);
+            if (!client.connect(port)){
+                error = "The client did not connect";
+            }else if (!client.send_all(
+                "GET / HTTP/1.1\r\n"
+                "Host: 127.0.0.1\r\n"
+                "\r\n"
+            )){
+                error = "The client did not send the request";
+            }else{
+                const std::string expected =
+                    "HTTP/1.1 500 Internal Server Error\r\n"
+                    "Content-Length: 32\r\n"
+                    "Connection: close\r\n"
+                    "\r\n"
+                    "The handler threw an exception.\n";
+                if (!client.wait_for_bytes(expected.size())){
+                    error = "The client did not receive the full response";
+                }else if (client.received_snapshot() != expected){
+                    error = "Bad response:\n" + client.received_snapshot();
+                }
+            }
+
+            if (error.empty() &&
+                !client.waiter.wait_for(
+                    HTTP_TEST_WAIT,
+                    [&client]{ return client.disconnected.load() >= 1; }
+                )
+            ){
+                error = "The server did not close the connection";
+            }
+        }
+
+        server.stop();
+        if (!error.empty()){
+            return error;
+        }
+        return true;
+    }
+};
+
+
+//  No handler registered: a request gets a 500 and the connection is
+//  closed.
+class Test_Http2_NoHandler : public TestHttpServer{
+public:
+    using TestHttpServer::TestHttpServer;
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        TestServerListener server_listener;
+        HttpServer2 server(m_thread_pool);
+        server.add_listener(server_listener);
+
+        uint16_t port;
+        if (!start_server(server, server_listener, HttpServer2::Handler{}, port)){
+            return "Failed to start the server";
+        }
+
+        std::string error;
+        {
+            TestClient client(m_thread_pool);
+            if (!client.connect(port)){
+                error = "The client did not connect";
+            }else if (!client.send_all(
+                "GET / HTTP/1.1\r\n"
+                "Host: 127.0.0.1\r\n"
+                "\r\n"
+            )){
+                error = "The client did not send the request";
+            }else{
+                const std::string expected =
+                    "HTTP/1.1 500 Internal Server Error\r\n"
+                    "Content-Length: 26\r\n"
+                    "Connection: close\r\n"
+                    "\r\n"
+                    "No handler is registered.\n";
+                if (!client.wait_for_bytes(expected.size())){
+                    error = "The client did not receive the full response";
+                }else if (client.received_snapshot() != expected){
+                    error = "Bad response:\n" + client.received_snapshot();
+                }
+            }
+
+            if (error.empty() &&
+                !client.waiter.wait_for(
+                    HTTP_TEST_WAIT,
+                    [&client]{ return client.disconnected.load() >= 1; }
+                )
+            ){
+                error = "The server did not close the connection";
+            }
+        }
+
+        server.stop();
+        if (!error.empty()){
+            return error;
+        }
+        return true;
+    }
+};
+
+
+//  A handler can opt a keep-alive request out of keep-alive by setting
+//  "response.connection_close": the response carries "Connection: close"
+//  and the server closes the connection after it.
+class Test_Http2_HandlerRequestsClose : public TestHttpServer{
+public:
+    using TestHttpServer::TestHttpServer;
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        TestServerListener server_listener;
+        HttpServer2 server(m_thread_pool);
+        server.add_listener(server_listener);
+
+        auto handler = [](const HttpServer2::Request&, HttpServer2::Response& response, HttpServer2::HandlerContext&){
+            response.status = 200;
+            response.body = "bye\n";
+            response.connection_close = true;
+        };
+
+        uint16_t port;
+        if (!start_server(server, server_listener, handler, port)){
+            return "Failed to start the server";
+        }
+
+        std::string error;
+        {
+            TestClient client(m_thread_pool);
+            if (!client.connect(port)){
+                error = "The client did not connect";
+            }else if (!client.send_all(
+                "GET / HTTP/1.1\r\n"
+                "Host: 127.0.0.1\r\n"
+                "\r\n"
+            )){
+                error = "The client did not send the request";
+            }else{
+                const std::string expected =
+                    "HTTP/1.1 200 OK\r\n"
+                    "Content-Length: 4\r\n"
+                    "Connection: close\r\n"
+                    "\r\n"
+                    "bye\n";
+                if (!client.wait_for_bytes(expected.size())){
+                    error = "The client did not receive the full response";
+                }else if (client.received_snapshot() != expected){
+                    error = "Bad response:\n" + client.received_snapshot();
+                }
+            }
+
+            if (error.empty() &&
+                !client.waiter.wait_for(
+                    HTTP_TEST_WAIT,
+                    [&client]{ return client.disconnected.load() >= 1; }
+                )
+            ){
+                error = "The server did not close the connection";
+            }
+        }
+
+        server.stop();
+        if (!error.empty()){
+            return error;
+        }
+        return true;
+    }
+};
+
+
 
 } // anonymous namespace
 
@@ -1363,6 +1621,18 @@ void add_tests_HttpServer2(UnitTestDatabase& database, ThreadPool& thread_pool){
     );
     database.add<Test_Http2_RejectSecondClient>(
         thread_pool, "HttpServer2 - A second client is rejected"
+    );
+    database.add<Test_Http2_Http10>(
+        thread_pool, "HttpServer2 - HTTP/1.0 requests are not kept alive"
+    );
+    database.add<Test_Http2_HandlerThrows>(
+        thread_pool, "HttpServer2 - A throwing handler gets a 500 and the connection is closed"
+    );
+    database.add<Test_Http2_NoHandler>(
+        thread_pool, "HttpServer2 - A request with no handler registered gets a 500"
+    );
+    database.add<Test_Http2_HandlerRequestsClose>(
+        thread_pool, "HttpServer2 - A handler can request Connection: close"
     );
 }
 
