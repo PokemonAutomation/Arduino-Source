@@ -21,9 +21,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLZA{
 
-class DoorEntryComponentMatcher : public ImageMatch::WaterfillTemplateMatcher{
+class DoorEntryArrowMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
-    DoorEntryComponentMatcher(const char* path)
+    DoorEntryArrowMatcher(const char* path)
         : WaterfillTemplateMatcher(path, Color(0xffc0c0c0), COLOR_WHITE, 100)
     {
         // Compare isolated strokes against black to verify gaps
@@ -44,12 +44,17 @@ public:
     }
 };
 
-class DoorEntryMatcher : public DoorEntryComponentMatcher{
+class DoorEntryMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
     DoorEntryMatcher()
-        : DoorEntryComponentMatcher("PokemonLZA/DoorEntry.png")
+        : WaterfillTemplateMatcher("PokemonLZA/DoorEntry.png", Color(0xffc0c0c0), COLOR_WHITE, 100)
         , m_arrow("PokemonLZA/DoorEntryArrow.png")
     {
+        // Match the bright doorway strokes and ignore the background and soft edges
+        // ExactImageMatcher excludes zero-alpha template pixels from the comparison
+        m_matcher = std::make_unique<ImageMatch::ExactImageMatcher>(filter_rgb32_range(
+            image_template(), 0xffe0e0e0, 0xffffffff, Color(0), false
+        ));
         m_aspect_ratio_lower = 0.85;
         m_aspect_ratio_upper = 1.15;
         m_area_ratio_lower = 0.75;
@@ -67,7 +72,7 @@ public:
         Resolution resolution, const ImageViewRGB32& image,
         const Kernels::Waterfill::WaterfillObject& object
     ) const override{
-        const double outline_rmsd = DoorEntryComponentMatcher::rmsd_original(resolution, image, object);
+        const double outline_rmsd = WaterfillTemplateMatcher::rmsd_original(resolution, image, object);
         if (outline_rmsd >= 90){
             return outline_rmsd;
         }
@@ -101,7 +106,7 @@ public:
     }
 
 private:
-    DoorEntryComponentMatcher m_arrow;
+    DoorEntryArrowMatcher m_arrow;
 };
 
 DoorEntryDetector::DoorEntryDetector(Color color, VideoOverlay* overlay, const ImageFloatBox& box)
@@ -215,6 +220,15 @@ public:
                 const bool erased = detector.detect(scaled);
                 TEST_RESULT_COMPONENT_EQUAL_STR(erased, false, "entry icon removed");
 
+                // The separate arrow alone must not match a doorway.
+                for (size_t y = 0; y < arrow.height(); y++){
+                    for (size_t x = 0; x < arrow.width(); x++){
+                        scaled.pixel(arrow_box.min_x + x, arrow_box.min_y + y) = arrow.pixel(x, y);
+                    }
+                }
+                const bool arrow_only = detector.detect(scaled);
+                TEST_RESULT_COMPONENT_EQUAL_STR(arrow_only, false, "entry arrow without doorway");
+
                 // The same icon must also match elsewhere in the search region.
                 const size_t target_x = scaled.width() * 3 / 5;
                 const size_t target_y = scaled.height() / 2;
@@ -240,6 +254,7 @@ void add_tests_DoorEntryDetector(UnitTestDatabase& database){
     database.add<Test_DoorEntryDetector>("PokemonLZA/DoorEntryDetector/pokemon_center_entry.png", true);
     database.add<Test_DoorEntryDetector>("PokemonLZA/DoorEntryDetector/hotel_elevator_entry.png", true, 1317, 605);
     database.add<Test_DoorEntryDetector>("PokemonLZA/DoorEntryDetector/hotel_room_alternate_card.png", true, 848, 389);
+    database.add<Test_DoorEntryDetector>("PokemonLZA/DoorEntryDetector/hotel_room_bright_outline.png", true, 848, 389);
     database.add<Test_DoorEntryDetector>("PokemonLZA/AutoStory/required_pancham.png", false);
     database.add<Test_DoorEntryDetector>("PokemonLZA/AutoStory/required_cleffa_no_instructions.png", false);
     database.add<Test_DoorEntryDetector>("PokemonLZA/TransparentBattleDialogDetector/mac_jacinthe_False.png", false);
