@@ -46,6 +46,14 @@ private:
     std::map<std::string, RngStats> m_database;
 };
 
+// Returns the name of the ability in the given slot.
+// Returns "Slot N" if the species has no ability data, or "-" if the slot is unknown.
+// "stats" may be null.
+std::string ability_name(const RngStats* stats, AdvAbility ability);
+
+// Returns the gender implied by a PID's gender value, or "-" if "stats" is null.
+std::string gender_name(const RngStats* stats, uint8_t gender_value);
+
 
 
 }

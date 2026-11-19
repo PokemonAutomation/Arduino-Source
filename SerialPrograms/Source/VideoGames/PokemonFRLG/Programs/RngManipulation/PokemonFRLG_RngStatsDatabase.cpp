@@ -84,6 +84,32 @@ const RngStats* RngStatsDatabase::get_nothrow(const std::string& slug) const{
     return &iter->second;
 }
 
+std::string ability_name(const RngStats* stats, AdvAbility ability){
+    size_t slot;
+    switch (ability){
+    case AdvAbility::Zero:
+        slot = 0;
+        break;
+    case AdvAbility::One:
+        slot = 1;
+        break;
+    default:
+        return "-";
+    }
+    if (stats == nullptr || stats->abilities.empty()){
+        return "-";
+    }
+    // Species with only one ability use it regardless of the PID's ability bit.
+    return stats->abilities[slot < stats->abilities.size() ? slot : 0];
+}
+
+std::string gender_name(const RngStats* stats, uint8_t gender_value){
+    if (stats == nullptr){
+        return "-";
+    }
+    return gender_to_string(gender_from_gender_value(gender_value, stats->gender_threshold));
+}
+
 
 
 }

@@ -224,7 +224,7 @@ WildRng::WildRng()
     })
 {
     PA_ADD_OPTION(m_calibration_displays);
-    PA_ADD_OPTION(RNG_TARGET);
+    PA_ADD_STATIC(RNG_TARGET);
     PA_ADD_OPTION(RNG_FILTERS);
     PA_ADD_OPTION(RNG_CALIBRATION);
     PA_ADD_OPTION(m_game_info);
@@ -392,19 +392,8 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
     AdvRngWildSearcher searcher(TARGET_SEED, ADVANCES, ENCOUNTER_SLOTS, RNG_METHOD);
     AdvWildPokemonResult target_result = searcher.generate_pokemon(SUPER_ROD);
-    RNG_TARGET.set_target(target_result, STATS_DATA.get_nothrow(target_result.species)->gender_threshold);
-    env.log("Target Species: " + target_result.species);
-    env.log("Target Level: " + std::to_string(target_result.level));
-    env.log("Target Encounter Slot: " + std::to_string(target_result.slot));
-    env.log("Target PID: " + to_hex_string(target_result.pid));
-    env.log("Target Nature: " + nature_to_string(target_result.nature));
-    env.log("Target IVs:");
-    env.log("   HP: " + std::to_string(target_result.ivs.hp));
-    env.log("   Atk: " + std::to_string(target_result.ivs.attack));
-    env.log("   Def: " + std::to_string(target_result.ivs.defense));
-    env.log("   SpA: " + std::to_string(target_result.ivs.spatk));
-    env.log("   SpD: " + std::to_string(target_result.ivs.spdef));
-    env.log("   Spe: " + std::to_string(target_result.ivs.speed));
+    RNG_TARGET.set_target(target_result);
+    log_target_pokemon(env.console, target_result);
 
     const RngCalibrations initial_calibrations = {
         RNG_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,

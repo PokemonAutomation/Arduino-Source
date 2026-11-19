@@ -270,7 +270,7 @@ EggRng::EggRng()
         })
 {
     PA_ADD_OPTION(m_calibration_displays);
-    PA_ADD_OPTION(RNG_TARGET);
+    PA_ADD_STATIC(RNG_TARGET);
     PA_ADD_OPTION(RNG_FILTERS);
     PA_ADD_OPTION(HELD_CALIBRATION);
     PA_ADD_OPTION(PICKUP_CALIBRATION);
@@ -801,8 +801,8 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     AdvIVs PARENT_B = { rowB.hp, rowB.atk, rowB.def, rowB.spa, rowB.spd, rowB.spe };
 
     AdvPokemonResult target_result = egg_searcher.generate_pokemon(PARENT_A, PARENT_B);
-    RNG_TARGET.set_target(target_result, EGG_STATS.gender_threshold);
-    log_target_pokemon(env.console, target_result, true);
+    RNG_TARGET.set_target(target_result, EGG_SPECIES.slug(), 5);
+    log_target_pokemon(env.console, target_result, EGG_SPECIES.slug(), 5, true);
 
     Milliseconds launch_delay = INITIAL_LAUNCH_DELAY;
 

@@ -194,7 +194,7 @@ StaticRng::StaticRng()
     })
 {
     PA_ADD_OPTION(m_calibration_displays);
-    PA_ADD_OPTION(RNG_TARGET);
+    PA_ADD_STATIC(RNG_TARGET);
     PA_ADD_OPTION(RNG_FILTERS);
     PA_ADD_OPTION(RNG_CALIBRATION);
     PA_ADD_OPTION(m_game_info);
@@ -255,60 +255,72 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         + ", column: " + seed_match.column_name);
 
     BaseStats BASE_STATS;
+    std::string SPECIES;
     int16_t GENDER_THRESHOLD = -1;
     uint8_t LEVEL = 30;
     switch (TARGET){
     case PokemonFRLG_RngTarget::electrode:
+        SPECIES = "electrode";
         BASE_STATS = { 60, 50, 70, 80, 80, 140 };
         GENDER_THRESHOLD = -1;
         LEVEL = 34;
         break;
     case PokemonFRLG_RngTarget::snorlax:
+        SPECIES = "snorlax";
         BASE_STATS = { 160, 110, 65, 65, 110, 30 };
         GENDER_THRESHOLD = 30;
         LEVEL = 30;
         break;
     case PokemonFRLG_RngTarget::articuno:
+        SPECIES = "articuno";
         BASE_STATS = { 90, 85, 100, 95, 125, 85 };
         GENDER_THRESHOLD = -1;
         LEVEL = 50;
         break;
     case PokemonFRLG_RngTarget::zapdos:
+        SPECIES = "zapdos";
         BASE_STATS = { 90, 90, 85, 125, 90, 100 };
         GENDER_THRESHOLD = -1;
         LEVEL = 50;
         break;
     case PokemonFRLG_RngTarget::moltres:
+        SPECIES = "moltres";
         BASE_STATS = { 90, 100, 90, 125, 85, 90 };
         GENDER_THRESHOLD = -1;
         LEVEL = 50;
         break;
     case PokemonFRLG_RngTarget::mewtwo:
+        SPECIES = "mewtwo";
         BASE_STATS = { 106, 110, 90, 154, 90, 130 };
         GENDER_THRESHOLD = -1;
         LEVEL = 70;
         break;
     case PokemonFRLG_RngTarget::hypno:
+        SPECIES = "hypno";
         BASE_STATS = { 85, 73, 70, 73, 115, 67 };
         GENDER_THRESHOLD = 126;
         LEVEL = 30;
         break;
     case PokemonFRLG_RngTarget::hooh:
+        SPECIES = "ho-oh";
         BASE_STATS = { 106, 130, 90, 110, 154, 90 };
         GENDER_THRESHOLD = -1;
         LEVEL = 70;
         break;
     case PokemonFRLG_RngTarget::lugia:
+        SPECIES = "lugia";
         BASE_STATS = { 106, 90, 130, 90, 154, 110 };
         GENDER_THRESHOLD = -1;
         LEVEL = 70;
         break;
     case PokemonFRLG_RngTarget::deoxys_attack:
+        SPECIES = "deoxys";
         BASE_STATS = { 50, 180, 20, 180, 20, 150 };
         GENDER_THRESHOLD = -1;
         LEVEL = 30;
         break;
     case PokemonFRLG_RngTarget::deoxys_defense:
+        SPECIES = "deoxys";
         BASE_STATS = { 50, 70, 160, 70, 160, 90 };
         GENDER_THRESHOLD = -1;
         LEVEL = 30;
@@ -337,8 +349,8 @@ void StaticRng::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     AdvRngSearcher searcher(TARGET_SEED, ADVANCES, AdvRngMethod::Method1);
     AdvPokemonResult target_result = searcher.generate_pokemon();
-    RNG_TARGET.set_target(target_result, GENDER_THRESHOLD);
-    log_target_pokemon(env.console, target_result);
+    RNG_TARGET.set_target(target_result, SPECIES, LEVEL);
+    log_target_pokemon(env.console, target_result, SPECIES, LEVEL);
 
     RngCalibrations calibrations = {
         RNG_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,

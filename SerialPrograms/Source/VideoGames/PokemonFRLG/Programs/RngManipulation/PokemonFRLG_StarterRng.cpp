@@ -181,7 +181,7 @@ StarterRng::StarterRng()
     })
 {
     PA_ADD_OPTION(m_calibration_displays);
-    PA_ADD_OPTION(RNG_TARGET);
+    PA_ADD_STATIC(RNG_TARGET);
     PA_ADD_OPTION(RNG_FILTERS);
     PA_ADD_OPTION(RNG_CALIBRATION);
     PA_ADD_OPTION(m_game_info);
@@ -580,15 +580,19 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     env.log("Seed delay: " + std::to_string(SEED_DELAY) + "ms, button mode: " + seed_match.button_mode
         + ", column: " + seed_match.column_name);
 
+    std::string SPECIES;
     BaseStats BASE_STATS;
     switch (STARTER){
     case Starter::bulbasaur:
+        SPECIES = "bulbasaur";
         BASE_STATS = { 45, 49, 49, 65, 65, 45 };
         break;
     case Starter::squirtle:
+        SPECIES = "squirtle";
         BASE_STATS = { 44, 48, 65, 50, 64, 43 };
         break;
     case Starter::charmander:
+        SPECIES = "charmander";
         BASE_STATS = { 39, 52, 43, 60, 50, 65 };
         break;
     default:
@@ -613,8 +617,8 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     AdvRngSearcher searcher(TARGET_SEED, ADVANCES, AdvRngMethod::Method1);
     AdvPokemonResult target_result = searcher.generate_pokemon();
-    RNG_TARGET.set_target(target_result, GENDER_THRESHOLD);
-    log_target_pokemon(env.console, target_result);
+    RNG_TARGET.set_target(target_result, SPECIES, 5);
+    log_target_pokemon(env.console, target_result, SPECIES, 5);
 
     RngCalibrations calibrations = {
         RNG_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,

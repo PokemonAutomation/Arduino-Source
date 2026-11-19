@@ -188,7 +188,7 @@ RoamingLegendaryRng::RoamingLegendaryRng()
     })
 {
     PA_ADD_OPTION(m_calibration_displays);
-    PA_ADD_OPTION(RNG_TARGET);
+    PA_ADD_STATIC(RNG_TARGET);
     PA_ADD_OPTION(RNG_FILTERS);
     PA_ADD_OPTION(RNG_CALIBRATION);
     PA_ADD_OPTION(m_game_info);
@@ -249,17 +249,21 @@ void RoamingLegendaryRng::program(SingleSwitchProgramEnvironment& env, ProContro
         + ", column: " + seed_match.column_name);
 
     BaseStats BASE_STATS;
+    std::string SPECIES;
     int16_t GENDER_THRESHOLD = -1;
     switch (TARGET){
     case PokemonFRLG_RngTarget::raikou:
+        SPECIES = "raikou";
         BASE_STATS = { 90, 85, 75, 115, 100, 115 };
         GENDER_THRESHOLD = -1;
         break;
     case PokemonFRLG_RngTarget::entei:
+        SPECIES = "entei";
         BASE_STATS = { 115, 115, 85, 90, 75, 100 };
         GENDER_THRESHOLD = -1;
         break;
     case PokemonFRLG_RngTarget::suicune:
+        SPECIES = "suicune";
         BASE_STATS = { 100, 75, 115, 90, 115, 85 };
         GENDER_THRESHOLD = -1;
         break;
@@ -281,8 +285,8 @@ void RoamingLegendaryRng::program(SingleSwitchProgramEnvironment& env, ProContro
 
     AdvRngSearcher searcher(TARGET_SEED, ADVANCES, AdvRngMethod::Method1, true);
     AdvPokemonResult target_result = searcher.generate_pokemon();
-    RNG_TARGET.set_target(target_result, GENDER_THRESHOLD);
-    log_target_pokemon(env.console, target_result);
+    RNG_TARGET.set_target(target_result, SPECIES, 50);
+    log_target_pokemon(env.console, target_result, SPECIES, 50);
 
     RngCalibrations calibrations = {
         RNG_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,
