@@ -320,7 +320,7 @@ void checkpoint_04(
     ssf_press_right_joystick(context, {1, 0}, 0ms, 300ms, 0ms);
     pbf_move_left_joystick(context, {0, 1}, 300ms, 100ms);
     pbf_move_left_joystick(context, {0, 1}, 400ms, 100ms);
-    run_catch(context);
+    run_catch(context, 9000ms);
 
     // Use the news booth as a camera landmark, then pass it on the left toward Weedle
     pbf_move_left_joystick(context, {0, 1}, 500ms, 100ms);
