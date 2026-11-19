@@ -102,6 +102,42 @@ uint64_t ServerSocket_WinSocket::connection_id(){
 }
 
 
+//  Drains the socket's receive queue (bounded). Windows sends an RST
+//  instead of a FIN when a socket is closed with data still in the
+//  receive queue, and a reset makes the peer discard whatever we
+//  already sent to it - for example, the 4xx just written in response
+//  to an oversized request the peer is still streaming. Draining keeps
+//  the close a clean FIN, so the response reaches the peer. Each recv
+//  is non-blocking and the queue is kernel-bounded, so this is fast;
+//  the byte and time bounds are there for a peer that keeps sending.
+static void drain_receive_queue(SOCKET socket){
+    constexpr size_t DRAIN_CAP_BYTES = 1u << 20;
+    const auto deadline =
+        std::chrono::steady_clock::now() + std::chrono::milliseconds(500);
+    char buffer[4096];
+    size_t drained = 0;
+    while (drained < DRAIN_CAP_BYTES
+        && std::chrono::steady_clock::now() < deadline
+    ){
+        const int r = ::recv(socket, buffer, sizeof(buffer), 0);
+        if (r > 0){
+            drained += (size_t)r;
+            continue;
+        }
+        const int err = WSAGetLastError();
+        if (r == SOCKET_ERROR
+            && (err == WSAEWOULDBLOCK || err == WSAEINPROGRESS)
+        ){
+            //  Nothing queued right now; the peer may still be
+            //  sending - give it a moment, then stop.
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            continue;
+        }
+        break;   //  0 (the peer finished) or an error: nothing more.
+    }
+}
+
+
 void ServerSocket_WinSocket::close_connection(){
     SOCKET socket;
     {
@@ -114,6 +150,11 @@ void ServerSocket_WinSocket::close_connection(){
         socket = m_client;
     }
     if (socket != INVALID_SOCKET){
+        //  Empty the receive queue before the shutdown: the shutdown is
+        //  what tells the kernel to close the connection, and with
+        //  unread data in the queue it would reset the connection and
+        //  the peer would discard everything we already sent to it.
+        drain_receive_queue(socket);
         //  Tells the connection thread to stop; it closes the socket
         //  itself. This is safe to call from within a listener callback.
         ::shutdown(socket, SD_BOTH);
@@ -523,6 +564,7 @@ void ServerSocket_WinSocket::connection_thread_loop(){
             }
         }
     }
+    drain_receive_queue(socket);
     ::closesocket(socket);
     if (report_disconnect){
         m_listeners.run_method(&Listener::on_disconnect, error);

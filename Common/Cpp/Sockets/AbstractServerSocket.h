@@ -77,6 +77,11 @@ public:
 
     //  Close the connection and immediately cancel all ongoing sends.
     //  The socket will continue listening for a new incoming connection.
+    //  It is safe to call while the peer is still sending (for example,
+    //  to reject an in-progress oversized request): the close is done
+    //  gracefully, so bytes that "send()" delivered successfully before
+    //  this call are not lost. Data the peer has not finished sending
+    //  is discarded.
     virtual void close_connection() = 0;
 
     virtual size_t send(

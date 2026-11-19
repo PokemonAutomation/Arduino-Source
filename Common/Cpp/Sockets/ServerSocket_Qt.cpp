@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <QTcpServer>
 #include <QTcpSocket>
+#include <QTimer>
 #include <QThread>
 #include "Common/Qt/QtThreadPool.h"
 #include "Common/Qt/GlobalThreadPoolsQt.h"
@@ -405,6 +406,20 @@ void ServerSocket_Qt::connection_lost(QTcpSocket* sock, const std::string& error
     sock->deleteLater();
 }
 
+//  State of a connection socket's graceful close (see
+//  "on_close_connection()"). Only touched on the event thread.
+struct ServerSocket_Qt::DrainState{
+    bool finished = false;
+    qptrdiff drained = 0;
+};
+
+//  The cap on the bytes a graceful close will drain, and the time it
+//  will wait for the peer to stop sending: a peer that keeps sending
+//  beyond that is reset instead (bounded cost, documented trade-off).
+constexpr qptrdiff DRAIN_CAP_BYTES = 1 << 20;
+constexpr int DRAIN_DEADLINE_MS = 500;
+
+
 void ServerSocket_Qt::on_close_connection(QSharedPointer<CloseCompletion> completion){
     QTcpSocket* sock;
     {
@@ -424,13 +439,48 @@ void ServerSocket_Qt::on_close_connection(QSharedPointer<CloseCompletion> comple
         }
     }
     if (sock != nullptr){
-        sock->abort();
-        //  The socket is no longer tracked (m_socket was nulled above):
-        //  schedule its deletion on the event thread. The
-        //  disconnected/errorOccurred signals that abort() may still emit
-        //  go through connection_lost(), which returns early because
-        //  m_socket is already null, so the socket is not scheduled twice.
-        sock->deleteLater();
+        //  The peer may still be streaming data to the socket. Closing
+        //  it while the kernel's receive queue still holds data makes
+        //  Windows reset the connection instead of closing it cleanly,
+        //  and the reset makes the peer discard everything we have
+        //  already written to it. The queue is only visible to this
+        //  class as readyRead deliveries on the event thread, so drain
+        //  it across event-loop iterations: discard delivered data until
+        //  the peer's FIN (no more data is coming), a byte cap, or a
+        //  deadline - then flush and close. The listener has already
+        //  been told the connection is closed (m_socket was nulled
+        //  above), so stop dispatching its data; the drain consumes it
+        //  instead.
+        QObject::disconnect(
+            sock, &QAbstractSocket::readyRead, nullptr, nullptr
+        );
+        QSharedPointer<DrainState> state = QSharedPointer<DrainState>::create();
+        auto* deadline = new QTimer(sock);   //  Dies with the socket
+        deadline->setSingleShot(true);
+        deadline->start(DRAIN_DEADLINE_MS);
+        QObject::connect(
+            sock, &QAbstractSocket::readyRead,
+            sock, [sock, state, deadline, this]{
+                state->drained += sock->readAll().size();
+                if (state->drained >= DRAIN_CAP_BYTES){
+                    finish_close(sock, state, deadline);
+                }
+            }
+        );
+        QObject::connect(
+            //  The peer's FIN: no more data is coming, and everything
+            //  sent before it is delivered, so close now.
+            sock, &QAbstractSocket::disconnected,
+            sock, [sock, state, deadline, this]{
+                finish_close(sock, state, deadline);
+            }
+        );
+        QObject::connect(
+            deadline, &QTimer::timeout,
+            sock, [sock, state, deadline, this]{
+                finish_close(sock, state, deadline);
+            }
+        );
     }
 
     {
@@ -438,6 +488,54 @@ void ServerSocket_Qt::on_close_connection(QSharedPointer<CloseCompletion> comple
         completion->done = true;
     }
     completion->cv.notify_all();
+}
+
+
+void ServerSocket_Qt::finish_close(QTcpSocket* sock, QSharedPointer<DrainState> state, QTimer* deadline){
+    if (state->finished){
+        return;
+    }
+    state->finished = true;
+    deadline->stop();
+    QObject::disconnect(
+        sock, &QAbstractSocket::readyRead, nullptr, nullptr
+    );
+    //  Consume whatever was delivered while finishing.
+    while (sock->bytesAvailable() > 0){
+        sock->readAll();
+    }
+    if (sock->state() != QAbstractSocket::UnconnectedState){
+        //  A graceful close, not abort(): abort() discards the socket's
+        //  pending write buffer - any response written just before this
+        //  close (for example, the 4xx for an oversized request the
+        //  peer is still streaming) would never reach the peer. The
+        //  in-flight "send()" calls were already cancelled by
+        //  close_connection(), so only completed writes are flushed.
+        sock->disconnectFromHost();
+        //  The socket is no longer tracked (m_socket was nulled in
+        //  on_close_connection()): delete it once the disconnection
+        //  completes. deleteLater() must not run before that - its
+        //  deferred event is inserted at the front of the socket's
+        //  event queue, ahead of the socket events that flush the
+        //  pending write buffer, so an immediate deleteLater() would
+        //  destroy the socket and discard the response above. (The
+        //  already-connected connection_lost() returns early for this
+        //  socket, so only these schedule the deletion; deleteLater()
+        //  is idempotent either way.)
+        QObject::connect(
+            sock, &QAbstractSocket::disconnected,
+            sock, [sock]{ sock->deleteLater(); }
+        );
+        QObject::connect(
+            sock, &QAbstractSocket::errorOccurred,
+            sock, [sock]{ sock->deleteLater(); }
+        );
+    }else{
+        //  The peer already closed the connection (the FIN path): the
+        //  queue is fully delivered and there is nothing left to flush,
+        //  so the socket can go away now.
+        sock->deleteLater();
+    }
 }
 
 uint64_t ServerSocket_Qt::connection_id(){

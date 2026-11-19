@@ -18,6 +18,7 @@
 #include "AbstractServerSocket.h"
 
 class QThread;
+class QTimer;
 class QTcpServer;
 class QTcpSocket;
 
@@ -108,6 +109,8 @@ signals:
 
 
 private:
+    struct DrainState;
+
     //  Runs on the QTcpServer's event thread.
     void on_new_connection();
 
@@ -133,6 +136,13 @@ private:
     //  shared ownership keeps each packet alive until its queued call
     //  runs (or is discarded with the server).
     void cancel_inflight_sends();
+
+    //  Finishes the graceful close of a connection socket: consumes the
+    //  last delivered data, flushes the write buffer (a graceful
+    //  close, so a response written just before the close reaches the
+    //  peer), and deletes the socket once the disconnection completes.
+    //  Idempotent. Runs on the QTcpServer's event thread.
+    void finish_close(QTcpSocket* sock, QSharedPointer<DrainState> state, QTimer* deadline);
 
     //  Stops the server: it destroys the QTcpServer (and its connection
     //  socket) on the event thread and returns the state to
