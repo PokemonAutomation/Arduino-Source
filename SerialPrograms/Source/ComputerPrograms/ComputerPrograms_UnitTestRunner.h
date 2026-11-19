@@ -9,6 +9,7 @@
 
 #include <atomic>
 #include "Common/Cpp/TestRunners/ParallelUnitTestRunner.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/StringOption.h"
@@ -69,6 +70,10 @@ private:
 
     StaticTextOption SUBSTRING_TEST_LABEL;
     StringCell SUBSTRING_TEST;
+
+    //  When checked, will run each image test with additional recorded image augmentations
+    //  to increase the test coverage on different capture card distortions.
+    BooleanCheckBoxOption USE_IMAGE_DISTORTION_AUGMENTATIONS;
 
     TextEditOption TESTS_TO_RUN;
     TextEditOption PASSED_TESTS;

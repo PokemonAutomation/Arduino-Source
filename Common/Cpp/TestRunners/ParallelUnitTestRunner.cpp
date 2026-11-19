@@ -6,6 +6,7 @@
 
 #include <thread>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/GlobalAutoPaths.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/MemoryUtilization/MemoryUtilization.h"
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
@@ -17,7 +18,10 @@
 
 namespace PokemonAutomation{
 
-
+const std::string& UNIT_TEST_DEBUG_PATH(){
+    static std::string path = DEBUG_PATH() + "UnitTests/";
+    return path;
+}
 
 
 UnitTestRunner::~UnitTestRunner(){

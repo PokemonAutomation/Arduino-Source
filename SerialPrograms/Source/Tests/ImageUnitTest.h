@@ -6,9 +6,9 @@
  *  and checks the detector's result on it.
  *
  *  It loads the images itself and passes them to `run_on_images()`, which each test implements.
- *  When color distortion augmentation is on ("--augment-color-distortions"), it also runs the test
- *  again on the images re-colored like other capture card / video setups, so one test image covers
- *  more of the color range users see. See Common/Cpp/TestRunners/TestImageDistortionManager.h.
+ *  When color distortion augmentation is enabled, it also runs the test again on the images
+ *  re-colored like other capture card / video setups, so one test image covers more
+ *  of the color range users see. See Common/Cpp/TestRunners/TestImageDistortionManager.h.
  */
 
 #ifndef PokemonAutomation_Tests_ImageUnitTest_H
@@ -56,6 +56,8 @@ public:
     //  per test distortion, on the images re-colored with `TestImageDistortionManager::transform()`.
     //  The test passes only if every run passes. Otherwise the message lists each distortion that
     //  failed with the message of that run, e.g. "[Win-MYPIN] Error: ...".
+    //  For each distortion that fails, it saves the re-colored images to
+    //  DEBUG_PATH()/UnitTest/<test_category_name()>/<distortion label>-<image filename>, to help debug the failure.
     //  There are no distortion runs while generating golden files (`GENERATE_TEST_GOLDEN_FILES`), so the
     //  golden files hold the results on the images as they are.
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override final;
@@ -63,6 +65,15 @@ public:
     //  The test images, relative to `UNIT_TEST_RESOURCE_PATH()`, as given to the constructor.
     const std::vector<std::string>& image_paths() const{
         return m_image_paths;
+    }
+
+    //  The test category: the part of the test name before " - ", with each "::" replaced by "-".
+    //  e.g. "PokemonLA-MMOSpriteMatcher" for the test
+    //  "PokemonLA::MMOSpriteMatcher - PokemonLA/MMOSpriteMatcher/macOS_bright/Highlands/MMO_Region_Highlands_03.png".
+    //  A test name without " - " is used whole.
+    //  `run()` saves the re-colored images of a failed distortion run to a debug sub folder with this name.
+    const std::string& test_category_name() const{
+        return m_test_category_name;
     }
 
 
@@ -80,6 +91,7 @@ protected:
 
 private:
     const std::vector<std::string> m_image_paths;
+    const std::string m_test_category_name;
 };
 
 
