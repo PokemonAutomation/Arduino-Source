@@ -11,7 +11,7 @@ namespace Kernels{
 namespace ScaleInvariantMatrixMatch{
 
 
-struct Context_x86_SSE41{
+struct Context_Default{
     using vtype = float;
 
     static PA_FORCE_INLINE vtype vzero(){
@@ -81,7 +81,7 @@ float compute_scale_Default(
     float const* const* A,
     float const* const* T
 ){
-    return compute_scale<SumATA2<Context_x86_SSE41>>(width, height, A, T);
+    return compute_scale<SumATA2<Context_Default>>(width, height, A, T);
 }
 float compute_scale_Default(
     size_t width, size_t height,
@@ -89,7 +89,7 @@ float compute_scale_Default(
     float const* const* TW,
     float const* const* W
 ){
-    return compute_scale<SumATA2<Context_x86_SSE41>>(width, height, A, TW, W);
+    return compute_scale<SumATA2<Context_Default>>(width, height, A, TW, W);
 }
 float compute_error_Default(
     size_t width, size_t height,
@@ -97,7 +97,7 @@ float compute_error_Default(
     float const* const* A,
     float const* const* T
 ){
-    return compute_error<SumError<Context_x86_SSE41>>(width, height, scale, A, T);
+    return compute_error<SumError<Context_Default>>(width, height, scale, A, T);
 }
 float compute_error_Default(
     size_t width, size_t height,
@@ -106,7 +106,7 @@ float compute_error_Default(
     float const* const* TW,
     float const* const* W
 ){
-    return compute_error<SumError<Context_x86_SSE41>>(width, height, scale, A, TW, W);
+    return compute_error<SumError<Context_Default>>(width, height, scale, A, TW, W);
 }
 
 
