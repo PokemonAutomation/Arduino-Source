@@ -224,6 +224,16 @@ signals:
 private:
     friend class ServerSocket2Connection_Qt;
 
+    //  The backend's internal state machine; not part of the application
+    //  API (the listeners and active_connection() are the observables).
+    enum class State{
+        NOT_RUNNING,
+        LISTENING,
+        CONNECTED,
+        DESTRUCTING,
+    };
+    std::atomic<State> m_state{State::NOT_RUNNING};
+
     //  Queues a connection's send on the event thread (or runs it inline
     //  when called from that thread). Called from the shell's "send()"
     //  with the shell's lock held, which the write loop's

@@ -71,12 +71,9 @@ private:
 
     //  Dispatches the thread. The server calls this exactly once, right
     //  after it has published the connection in m_active (which is what
-    //  keeps the object alive while thread_loop() runs).
-    void start_thread(ThreadPool& thread_pool){
-        m_thread = thread_pool.dispatch([this]{
-            thread_loop();
-        });
-    }
+    //  keeps the object alive while thread_loop() runs). Defined in the
+    //  .cpp: it needs the complete ThreadPool type.
+    void start_thread(ThreadPool& thread_pool);
     //  Joins the thread. The server calls this before it drops its
     //  m_active reference - to replace the slot or to tear down - because
     //  m_active is what keeps the object alive while thread_loop() runs.
@@ -147,10 +144,16 @@ private:
     void report_connect();
     void report_receive(const void* data, size_t bytes);
     void report_disconnect(const std::string& error);
-    //  Hands the CONNECTED state back to the server so it can accept the
-    //  next client. The m_active slot is kept: it anchors the connection's
-    //  lifetime while its thread runs.
-    void release_connection();
+    //  If "self" is still the active connection, hand its CONNECTED
+    //  state back to the server. Called by the connection thread at
+    //  exit, and by close() before the close becomes visible to the
+    //  peer - a client reconnecting after it observes the close must
+    //  not be rejected by a state that is still winding down. No-op
+    //  otherwise (including for a connection that has already been
+    //  replaced). The m_active slot is kept either way: it anchors the
+    //  connection's lifetime while its thread runs, and the server drops
+    //  the slot only after it has joined that thread.
+    void release_connection(ServerSocket2Connection_WinSocket* self);
 
     //  A start attempt failed (or the server was torn down while the task
     //  was still starting up): mark the task dead so that a retrying
@@ -161,6 +164,16 @@ private:
 
 private:
     friend class ServerSocket2Connection_WinSocket;
+
+    //  The backend's internal state machine; not part of the application
+    //  API (the listeners and active_connection() are the observables).
+    enum class State{
+        NOT_RUNNING,
+        LISTENING,
+        CONNECTED,
+        DESTRUCTING,
+    };
+    std::atomic<State> m_state{State::NOT_RUNNING};
 
     ThreadPool& m_thread_pool;
     Mutex m_lock;
