@@ -19,12 +19,15 @@ using namespace Pokemon;
 struct RngStats{
     BaseStats base_stats;
     int16_t gender_threshold;
-    // std::vector<string> abilities;
+    std::vector<std::string> abilities;
 };
 
 class RngStatsDatabase{
 public:
     RngStatsDatabase(const char* json_path);
+
+    static const RngStatsDatabase& instance();
+
     const RngStats& get_throw(const std::string& slug) const;
     const RngStats* get_nothrow(const std::string& slug) const;
 
@@ -42,6 +45,12 @@ public:
 private:
     std::map<std::string, RngStats> m_database;
 };
+
+// Returns the name of the ability in the given slot
+std::string ability_name(const RngStats* stats, AdvAbility ability);
+
+// Returns the gender implied by a PID's gender value
+std::string gender_name(const RngStats* stats, uint8_t gender_value);
 
 
 

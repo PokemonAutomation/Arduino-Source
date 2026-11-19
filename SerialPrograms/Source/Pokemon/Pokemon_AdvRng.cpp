@@ -90,6 +90,25 @@ AdvAbility ability_from_pid(uint32_t pid){
     return AdvAbility (pid % 2);
 }
 
+AdvAbility ability_slot_from_ability(
+    const std::string& observed_ability,
+    const std::vector<std::string>& species_abilities
+){
+    if (observed_ability.empty()
+        || species_abilities.size() < 2
+        || species_abilities[0] == species_abilities[1]
+    ){
+        return AdvAbility::Any;
+    }
+    if (observed_ability == species_abilities[0]){
+        return AdvAbility::Zero;
+    }
+    if (observed_ability == species_abilities[1]){
+        return AdvAbility::One;
+    }
+    return AdvAbility::Any;
+}
+
 uint8_t unown_form_from_pid(uint32_t pid){
     return (((pid & 0x3000000) >> 18) | ((pid & 0x30000) >> 12) | ((pid & 0x300) >> 6) | (pid & 0x3)) % 0x1c;
     // return (
