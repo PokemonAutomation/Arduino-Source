@@ -86,12 +86,26 @@ private:
         m_open.store(false, std::memory_order_release);
     }
 
+    //  Takes ownership of the accepted socket, returning it, or -1 if
+    //  it has already been taken. The socket is handed off exactly
+    //  once - by close() (which then shuts it down, leaving the
+    //  transport to close it) or by the transport/accept-loop paths
+    //  (which close it straight away). This matters because the kernel
+    //  reuses closed fd numbers immediately: once the transport has
+    //  exited and closed its socket, a stale ::shutdown() or ::close()
+    //  on the same number would act on whatever connection now owns
+    //  it, not on this one.
+    int take_fd(){
+        return m_client.exchange(-1, std::memory_order_acq_rel);
+    }
+
     //  The owning server. Dereferenced only from thread_loop(), which the
     //  server's close_and_wait() has joined before the server is
     //  destroyed, so it can never be used after the server's death.
     ServerSocket2_POSIX* m_server;
 
-    int m_client;
+    //  The accepted socket; -1 once take_fd() has handed it off.
+    std::atomic<int> m_client;
     //  The task running thread_loop() (empty if the dispatch failed). It
     //  lives in the connection rather than the server, so the server's
     //  only handle to the connection is m_active.
