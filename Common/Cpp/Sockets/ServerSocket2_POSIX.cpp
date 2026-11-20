@@ -48,8 +48,14 @@ size_t ServerSocket2Connection_POSIX::send(
     while (bytes > 0){
         //  The connection may have closed (by either side) since the last
         //  iteration: this write must stop rather than reach a dead
-        //  socket.
+        //  socket. The socket is only written to while this object still
+        //  owns it - once take_fd() has handed it off, the kernel may
+        //  have reused the number for a different socket.
         if (!m_open.load(std::memory_order_relaxed)){
+            return sent;
+        }
+        const int fd = m_client.load(std::memory_order_acquire);
+        if (fd == -1){
             return sent;
         }
         if (std::chrono::steady_clock::now() >= deadline){
@@ -60,7 +66,7 @@ size_t ServerSocket2Connection_POSIX::send(
 
         constexpr size_t BLOCK_SIZE = 1 << 30;
         size_t current = std::min(BLOCK_SIZE, bytes);
-        ssize_t current_sent = ::send(m_client, ptr, current, MSG_DONTWAIT | MSG_NOSIGNAL);
+        ssize_t current_sent = ::send(fd, ptr, current, MSG_DONTWAIT | MSG_NOSIGNAL);
         if (current_sent != -1){
             sent += (size_t)current_sent;
             ptr += current_sent;
@@ -96,9 +102,15 @@ void ServerSocket2Connection_POSIX::close(){
     //  down. (A no-op unless this connection is still the active one.)
     m_server->release_connection(this);
     //  Tells the connection thread to stop; it closes the socket
-    //  itself. Safe to call from within a listener callback. (If the
-    //  socket is already gone, ::shutdown just fails harmlessly.)
-    ::shutdown(m_client, SHUT_RDWR);
+    //  itself. Safe to call from within a listener callback. The socket
+    //  is only shut down while this object still owns it: if the
+    //  transport has already exited and closed it, the kernel may have
+    //  handed that number to a different socket, and ::shutdown() would
+    //  clobber that one instead of failing.
+    const int fd = take_fd();
+    if (fd != -1){
+        ::shutdown(fd, SHUT_RDWR);
+    }
 }
 void ServerSocket2Connection_POSIX::start_thread(ThreadPool& thread_pool){
     m_thread = thread_pool.dispatch([this]{
@@ -107,14 +119,17 @@ void ServerSocket2Connection_POSIX::start_thread(ThreadPool& thread_pool){
 }
 
 void ServerSocket2Connection_POSIX::thread_loop(){
-    int socket = m_client;
+    int socket = m_client.load(std::memory_order_acquire);
 
     if (!m_open.load(std::memory_order_relaxed)){
         //  Closed before this thread started (teardown, or the
         //  application via active_connection()): hand the state back and
         //  drop the socket; there is nothing to report.
         m_server->release_connection(this);
-        ::close(socket);
+        const int owned = take_fd();
+        if (owned != -1){
+            ::close(owned);
+        }
         return;
     }
 
@@ -169,11 +184,16 @@ void ServerSocket2Connection_POSIX::thread_loop(){
     }
 
     //  Hand the state back to the server, then make the connection
-    //  inert. Either way, the object outlives the server.
+    //  inert. Either way, the object outlives the server. The socket is
+    //  only closed while this object still owns it: close() may have
+    //  already taken it (and shut it down), and no one else may.
     m_server->release_connection(this);
     const bool app_close = m_close_requested.load(std::memory_order_relaxed);
     m_open.store(false, std::memory_order_release);
-    ::close(socket);
+    const int owned = take_fd();
+    if (owned != -1){
+        ::close(owned);
+    }
     if (!app_close){
         m_server->report_disconnect(error);
     }
@@ -447,9 +467,15 @@ void ServerSocket2_POSIX::accept_thread_loop(std::string address, uint16_t port)
         {
             std::lock_guard<Mutex> lg(m_lock);
             if (m_state.load(std::memory_order_relaxed) != State::LISTENING){
-                //  Torn down while polling.
-                ::close(client_socket);
+                //  Torn down while polling. The shell owns the socket
+                //  now, so hand it back through the shell instead of
+                //  closing the local: the transport never started, so
+                //  the shell's take_fd() still returns it.
                 conn->mark_closed();
+                const int owned = conn->take_fd();
+                if (owned != -1){
+                    ::close(owned);
+                }
                 break;
             }
             m_active = conn;
@@ -472,7 +498,10 @@ void ServerSocket2_POSIX::accept_thread_loop(std::string address, uint16_t port)
                 }
             }
             conn->mark_closed();
-            ::close(client_socket);
+            const int owned = conn->take_fd();
+            if (owned != -1){
+                ::close(owned);
+            }
         }
     }
 
