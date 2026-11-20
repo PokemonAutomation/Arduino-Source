@@ -179,11 +179,12 @@ bool StatsReader::read_level(
     );
     
     // The level uses white text with dark shadow on a lilac background.
-    // The digit reader's binarizer captures dark pixels (<=190 on all channels)
-    // but NOT the white text (all channels 255 -> excluded). This leaves the
-    // shadow outline fragmented into many small disconnected blobs.
-    // Preprocess: convert bright-white text pixels to black so the binarizer
-    // merges text + shadow into one solid connected blob per digit.
+    // The digit reader's binarizer captures pixels darker than the background
+    // but NOT the white text. This leaves the shadow outline fragmented into
+    // many small disconnected blobs.
+    // To solve this, we run a preprocess: convert bright-white text pixels to
+    // black so the binarizer merges text + shadow into one solid connected blob
+    // per digit.
     ImageRGB32 preprocessed = level_box.scale_to(level_box.width(), level_box.height());
     for (size_t r = 0; r < level_box.height(); r++){
         for (size_t c = 0; c < level_box.width(); c++){
@@ -202,7 +203,7 @@ bool StatsReader::read_level(
     // give higher RMSD than yellow stat-box crops due to background colour.
     stats.level = read_digits_waterfill_template(
             logger, preprocessed, DigitTemplateType::LevelBox, 230,
-            "levelDigit", 0x7F);
+            "levelDigit");
     // log if it's an obviously bad read
     if (!stats.level.has_value() || stats.level.value_or(-1) < 2 || stats.level.value_or(-1) > 100){
         logger.log("Level OCR result out of range", COLOR_RED);
