@@ -14,8 +14,12 @@
 #include "Inference/Box/PokemonFRLG_BoxSelectionModeDetector.h"
 #include "Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "Inference/Dialogs/PokemonFRLG_DialogDetector.h"
+#include "Inference/Dialogs/PokemonFRLG_DialogTextReader.h"
 #include "Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.h"
+#include "Inference/Map/PokemonFRLG_OverworldPosition.h"
+#include "Inference/Map/PokemonFRLG_OverworldSprites.h"
 #include "Inference/Map/PokemonFRLG_PokemonLeagueDetectors.h"
+#include "Inference/Map/PokemonFRLG_VsSeekerIconDetector.h"
 #include "Inference/Menus/PokemonFRLG_BagDetector.h"
 #include "Inference/Menus/PokemonFRLG_PartyEmptySlotDetector.h"
 #include "Inference/Menus/PokemonFRLG_PartyHeldItemDetector.h"
@@ -52,19 +56,26 @@ void add_tests(UnitTestDatabase& database){
     add_tests_BoxGenderReader(database);
     add_tests_BoxSelectionModeDetector(database);
     add_tests_BoxSorter(database);
+    add_tests_DialogTextReader(database);
     add_tests_EliteFourRoomDetector(database);
     add_tests_HallOfFameSavingDetector(database);
+    add_tests_HouseRoof(database);
+    add_tests_IndoorPosition(database);
+    add_tests_OverworldSprites(database);
     add_tests_PartyEmptySlotDetector(database);
     add_tests_PartyHeldItemDetector(database);
     add_tests_PartyLevelUpReader(database);
     add_tests_PartyMenuDetector(database);
     add_tests_PrizeSelectDetector(database);
+    add_tests_ScreenOdometry(database);
+    add_tests_ScreenScrolledOneTile(database);
     add_tests_PartySlotDetector(database);
     add_tests_StatsReader(database);
     add_tests_SelectionDialogDetector(database);
     add_tests_ShinySymbolDetector(database);
     add_tests_SummarySpriteReader(database);
     add_tests_TrainerIdReader(database);
+    add_tests_VsSeekerIcons(database);
     add_tests_WildEncounterReader(database);
 }
 
