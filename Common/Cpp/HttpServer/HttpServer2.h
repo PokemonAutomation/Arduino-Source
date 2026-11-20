@@ -9,8 +9,7 @@
  *  rules are in "AbstractHttpServer.h"; this file documents the
  *  implementation.
  *
- *  Compared to "HttpServer" (on the old AbstractServerSocket), the
- *  transport's per-connection objects make the connection identity
+ *  The transport's per-connection objects make the connection identity
  *  explicit: the socket's callbacks pass the connection they are about,
  *  and all I/O happens on that connection object. A response that
  *  outlives its connection is sent into an inert shell (send() returns
