@@ -35,6 +35,7 @@
 #include "Common/Cpp/Sockets/ClientSocket_Qt.h"
 #include "Common/Cpp/Sockets/ServerSocket2_Qt.h"
 #ifndef _WIN32
+#include <fcntl.h>
 #include "Common/Cpp/Sockets/ClientSocket_POSIX.h"
 #include "Common/Cpp/Sockets/ServerSocket2_POSIX.h"
 #endif
@@ -1635,6 +1636,116 @@ public:
 };
 
 
+#ifndef _WIN32
+//  Regression test for a socket-handle leak: a server-initiated close()
+//  handed the socket off to itself (take_fd()) and shut it down, but the
+//  connection thread's exit path - the only other place that closes the
+//  socket - no longer owned it, so nothing ever closed the handle. Each
+//  such close then leaked one file descriptor, which grows without bound
+//  in a long-lived server. Counts the process's open fds across many
+//  server-initiated closes and fails if the count keeps growing.
+class Test_ServerSocket2_Posix_NoFdLeak
+    : public TestServerSocket2<ClientSocket_POSIX, ServerSocket2_POSIX>
+{
+public:
+    using TestServerSocket2<ClientSocket_POSIX, ServerSocket2_POSIX>::TestServerSocket2;
+
+    static int count_open_fds(){
+        int count = 0;
+        for (int fd = 0; fd < 4096; fd++){
+            if (::fcntl(fd, F_GETFD) != -1){
+                count++;
+            }
+        }
+        return count;
+    }
+
+    virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
+        if (timing_unreliable()){
+            return UnitTestResult(
+                UnitTestResult::SKIPPED,
+                "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
+            );
+        }
+
+        constexpr int CYCLES = 150;
+        //  The parallel test threads hold their own sockets open through
+        //  their tests, so the process-wide count carries a stable
+        //  background (measured at ~30-35 fds on the full suite);
+        //  the leak under test is one fd per cycle, so the tolerance
+        //  keeps a two-fold margin on both sides. The logged growth
+        //  makes any drift easy to retune.
+        constexpr int TOLERANCE = 75;
+
+        const int before = count_open_fds();
+        std::string error;
+        for (int i = 0; i < CYCLES; i++){
+            error = close_cycle();
+            if (!error.empty()){
+                break;
+            }
+        }
+        const int growth = count_open_fds() - before;
+        logger.log("fd count grew by " + std::to_string(growth) + " over "
+            + std::to_string(CYCLES) + " server-initiated closes (tolerance "
+            + std::to_string(TOLERANCE) + ").");
+        if (!error.empty()){
+            return UnitTestResult(UnitTestResult::FAILED, error);
+        }
+        if (growth > TOLERANCE){
+            return UnitTestResult(
+                UnitTestResult::FAILED,
+                "Server-initiated close() leaked " + std::to_string(growth)
+                    + " file descriptors over " + std::to_string(CYCLES)
+                    + " cycles; each close must leave no open socket behind."
+            );
+        }
+        return UnitTestResult(UnitTestResult::PASSED);
+    }
+
+private:
+    std::string close_cycle() const{
+        Server2Listener server_listener;
+        server_listener.echo = false;
+        ServerSocket2_POSIX server(this->m_thread_pool);
+        server.add_listener(server_listener);
+
+        uint16_t port;
+        if (!this->start_server(server, server_listener, port)){
+            return "The server did not start listening.";
+        }
+
+        ClientSocket_POSIX client(this->m_thread_pool);
+        ClientListener client_listener;
+        client.add_listener(client_listener);
+        if (!this->connect_client(client, client_listener, port, 1)){
+            return "The client did not connect.";
+        }
+
+        if (!server_listener.waiter.wait_for(SOCKET_TEST_WAIT,
+            [&server_listener]{
+                return server_listener.connected.load() >= 1;
+            }
+        )){
+            return "The server did not report the connection.";
+        }
+
+        //  The scenario under test: the server closes its side of the
+        //  connection while the client is still connected.
+        server_listener.connection->close();
+        client_listener.waiter.wait_for(SOCKET_TEST_WAIT,
+            [&client_listener]{
+                return client_listener.disconnected.load() >= 1;
+            }
+        );
+        //  Both destructors close_and_wait() their sockets, so no fd may
+        //  survive this scope.
+        return "";
+    }
+};
+#endif
+
+
 //  The Qt server's event thread is blocked in a listener callback when
 //  this test queues a send and a close: the close's cancel must wake the
 //  sender promptly (without the event thread's help), and the close must
@@ -2254,6 +2365,12 @@ void add_tests_ServerSocket2(UnitTestDatabase& database, ThreadPool& thread_pool
     );
 
     add_server_socket2_tests<ClientSocket_Qt, ServerSocket2_Qt>(database, thread_pool, "Qt");
+#ifndef _WIN32
+    database.add<Test_ServerSocket2_Posix_NoFdLeak>(
+        thread_pool,
+        "ServerSocket2 (POSIX) - server-initiated closes leave no open file descriptor behind"
+    );
+#endif
     database.add<Test_ServerSocket2_Qt_CloseUnderStall>(
         thread_pool,
         "ServerSocket2 (Qt) - close() under a stalled event thread"

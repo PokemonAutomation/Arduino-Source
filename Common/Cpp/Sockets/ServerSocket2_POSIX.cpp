@@ -101,16 +101,16 @@ void ServerSocket2Connection_POSIX::close(){
     //  must be accepted, not rejected by a state that is still winding
     //  down. (A no-op unless this connection is still the active one.)
     m_server->release_connection(this);
-    //  Tells the connection thread to stop; it closes the socket
-    //  itself. Safe to call from within a listener callback. The socket
-    //  is only shut down while this object still owns it: if the
-    //  transport has already exited and closed it, the kernel may have
-    //  handed that number to a different socket, and ::shutdown() would
-    //  clobber that one instead of failing.
-    const int fd = take_fd();
-    if (fd != -1){
-        ::shutdown(fd, SHUT_RDWR);
-    }
+    //  The connection thread closes the socket when it exits: it is the
+    //  only thread that reads it, and it is the only one that may close
+    //  it. close() must not touch the socket at all - it can be called
+    //  from a listener callback that runs on that thread, and by the
+    //  time it runs the transport may already have closed the fd, in
+    //  which case the kernel may have handed that number to a different
+    //  socket (a ::shutdown() here would clobber the other socket,
+    //  and a close() would leak the one this object owns). POSIX closes
+    //  cleanly even with data still queued, so the thread's plain close
+    //  is all this connection needs.
 }
 void ServerSocket2Connection_POSIX::start_thread(ThreadPool& thread_pool){
     m_thread = thread_pool.dispatch([this]{
