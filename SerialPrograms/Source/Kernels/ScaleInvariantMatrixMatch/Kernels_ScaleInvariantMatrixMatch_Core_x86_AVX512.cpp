@@ -41,14 +41,20 @@ struct Context_x86_AVX512{
         return _mm512_reduce_add_ps(a);
     }
 
+    //  COMPILER-BUG-MSVC: use the unaligned masked load instead of the aligned
+    //  one (_mm512_maskz_load_ps) - MSVC miscompiles that form (same bug class as
+    //  the masked store in Kernels_ImageScaleBrightness_x64_AVX512.cpp), which makes
+    //  these tests fail on the Windows CI. The unaligned form is equivalent here:
+    //  both call sites are 64-byte aligned (the back load aligns the pointer first,
+    //  and the front load runs at a vector position in the aligned loop).
     static PA_FORCE_INLINE void load2_partial_back(
         size_t length,
         vtype& A, const void* ptrA,
         vtype& B, const void* ptrB
     ){
         __mmask16 mask = ~(((uint16_t)1 << length) - 1);
-        A = _mm512_maskz_load_ps(mask, ptrA);
-        B = _mm512_maskz_load_ps(mask, ptrB);
+        A = _mm512_maskz_loadu_ps(mask, ptrA);
+        B = _mm512_maskz_loadu_ps(mask, ptrB);
     }
     static PA_FORCE_INLINE void load3_partial_back(
         size_t length,
@@ -57,9 +63,9 @@ struct Context_x86_AVX512{
         vtype& C, const void* ptrC
     ){
         __mmask16 mask = ~(((uint16_t)1 << length) - 1);
-        A = _mm512_maskz_load_ps(mask, ptrA);
-        B = _mm512_maskz_load_ps(mask, ptrB);
-        C = _mm512_maskz_load_ps(mask, ptrC);
+        A = _mm512_maskz_loadu_ps(mask, ptrA);
+        B = _mm512_maskz_loadu_ps(mask, ptrB);
+        C = _mm512_maskz_loadu_ps(mask, ptrC);
     }
     static PA_FORCE_INLINE void load2_partial_front(
         size_t length,
@@ -67,8 +73,8 @@ struct Context_x86_AVX512{
         vtype& B, const void* ptrB
     ){
         __mmask16 mask = ((uint16_t)1 << length) - 1;
-        A = _mm512_maskz_load_ps(mask, ptrA);
-        B = _mm512_maskz_load_ps(mask, ptrB);
+        A = _mm512_maskz_loadu_ps(mask, ptrA);
+        B = _mm512_maskz_loadu_ps(mask, ptrB);
     }
     static PA_FORCE_INLINE void load3_partial_front(
         size_t length,
@@ -77,9 +83,9 @@ struct Context_x86_AVX512{
         vtype& C, const void* ptrC
     ){
         __mmask16 mask = ((uint16_t)1 << length) - 1;
-        A = _mm512_maskz_load_ps(mask, ptrA);
-        B = _mm512_maskz_load_ps(mask, ptrB);
-        C = _mm512_maskz_load_ps(mask, ptrC);
+        A = _mm512_maskz_loadu_ps(mask, ptrA);
+        B = _mm512_maskz_loadu_ps(mask, ptrB);
+        C = _mm512_maskz_loadu_ps(mask, ptrC);
     }
 };
 
