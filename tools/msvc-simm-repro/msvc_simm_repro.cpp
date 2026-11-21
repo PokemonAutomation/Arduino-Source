@@ -1,59 +1,48 @@
-/*  MSVC repro: ScaleInvariantMatrixMatch unweighted compute_scale, SSE
+/*  MSVC probe: ScaleInvariantMatrixMatch unweighted compute_scale, SSE
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  Standalone minimal repro of the intermittent CI failure
+ *  Minimal instrumented probe for the CI-only failure
  *
  *      Kernels::ScaleInvariantMatrixMatch - x86_SSE(w=512, h=513, ...)
  *      Message: compute_scale: default=... isa=... (out of tolerance)
  *
- *  The failing check compares the scalar "Default" kernel and the SSE
- *  kernel on the same deterministic data. Both are instantiations of one
- *  template (SumATA2 in Kernels_ScaleInvariantMatrixMatch_Routines.h),
- *  which this file copies verbatim, together with the two contexts
- *  (Context_Default from Kernels_ScaleInvariantMatrixMatch_Core_Default.cpp
- *  and Context_x86_SSE41 from Kernels_ScaleInvariantMatrixMatch_Core_x86_SSE.cpp)
- *  and the SSE helpers they use (Kernels_PartialWordAccess_x64_SSE41.h and
- *  reduce32_x64_SSE from Kernels_x64_SSE41.h).
+ *  It computes s = sum(A*T) / sum(A*A) over a 512 x 513 float matrix,
+ *  with the same data stream as the failing CI test (same seed and
+ *  std::mt19937 / std::uniform_real_distribution sequence as the weighted
+ *  (512, 513) instance, W draw skipped; on MSVC the A/T values are
+ *  bit-identical to the CI test's), and logs the intermediate steps so a
+ *  failing CI run localizes the divergence:
  *
- *  It computes
+ *    1. the exact compiler build (_MSC_FULL_VER) - the failing pool runs
+ *       and passing ones must be distinguishable;
+ *    2. a data dump (sums + first values, bit patterns included) to check
+ *       the data is what the platform's <random> is supposed to produce,
+ *       and is stable across runs;
+ *    3. every row's ref / default / sse values (row-by-row calls of the
+ *       verbatim kernels) - which row first diverges;
+ *    4. the SSE kernel's four quarter-accumulators (the lanes of the
+ *       sum_at / sum_as vectors) for the first rows and for diverging
+ *       rows - which lane is wrong;
+ *    5. the full-matrix result, exactly like CI, as the verdict.
  *
- *      s = sum(A*T) / sum(A*A)      over a 512 x 513 matrix of floats
+ *  The kernels themselves are verbatim copies of the CI sources
+ *  (Kernels_ScaleInvariantMatrixMatch_Routines.h, Core_Default.cpp,
+ *  Core_x86_SSE.cpp, Kernels_x64_SSE41.h,
+ *  Kernels_PartialWordAccess_x64_SSE41.h). The rows are 64-byte aligned
+ *  at runtime, as in CI, so the partial-row paths are dead; the row
+ *  pointers are rerouted through a volatile so the compiler keeps those
+ *  paths live in the binary, as in the CI build.
  *
- *  three ways:
- *    ref    : double precision scalar - ground truth,
- *    deflt  : the Default kernel (float scalar lanes),
- *    sse    : the SSE kernel (128-bit vector lanes),
- *
- *  and passes (exit 0) when sse and deflt are within the same tolerance
- *  the CI test uses: 4096 ULPs, or 1e-4 times the natural magnitude.
- *
- *  The test data is generated exactly like CI's failing test
- *  (Kernels_ScaleInvariantMatrixMatch_TestInfra.cpp): the same seed
- *  (the weighted (512, 513) instance, the one that fails in CI), the same
- *  std::mt19937 / std::uniform_real_distribution stream, with the W draw
- *  per element skipped. On MSVC this makes the data bit-identical to the
- *  data of the failing CI test, so `deflt` should print the same value CI
- *  prints for `default` (in one observed run: -0.00225342088). On gcc/
- *  clang the data differs (std::uniform_real_distribution is not
- *  standardized), but that only shifts the absolute values, not the
- *  PASS/FAIL logic.
- *
- *  Build with the CI's MSVC flags (RelWithDebInfo, no debug info):
+ *  Build with the CI's MSVC flags:
  *
  *      cl /nologo /std:c++23 /O2 /Ob1 /MD /DNDEBUG /W4 /WX /MP /utf-8 ^
- *         msvc_simm_repro.cpp /Fe:repro.exe
- *      repro.exe
+ *         /external:anglebrackets msvc_simm_repro.cpp /Fe:probe.exe
+ *      probe.exe
  *
- *  A conforming compiler prints PASS and exits 0. The MSVC build that
- *  misbehaves in CI is expected to print FAIL, with sse far from ref.
- *  To bisect the flag set, rebuild without /MP:
- *
- *      cl /nologo /std:c++23 /O2 /Ob1 /MD /DNDEBUG /W4 /WX /utf-8 ^
- *         msvc_simm_repro.cpp /Fe:repro_nom.exe
- *
- *  The same file also builds with clang/gcc (-std=c++23 -O2) for
- *  sanity: it must PASS there.
+ *  and, for flag bisection, the same without /MP. A conforming compiler
+ *  prints PASS and exits 0; the misbehaving build is expected to print
+ *  the diverging rows/lanes and FAIL, exit 1.
  */
 
 #include <bit>
@@ -61,7 +50,6 @@
 #include <cstdint>
 #include <cstdio>
 #include <random>
-#include <cstdlib>
 
 //  Common/Compiler.h's PA_FORCE_INLINE.
 #ifdef _MSC_VER
@@ -73,8 +61,7 @@
 
 
 //
-//  From Kernels_PartialWordAccess_x64_SSE41.h (the load half; the stores are
-//  not used by compute_scale).
+//  From Kernels_PartialWordAccess_x64_SSE41.h (the load half).
 //
 struct PartialWordAccess_x64_SSE41{
 public:
@@ -135,8 +122,7 @@ REPRO_FORCE_INLINE float reduce32_x64_SSE(__m128 x){
 
 //
 //  From Kernels_ScaleInvariantMatrixMatch_Routines.h: the unweighted
-//  SumATA2 template, verbatim (vpms is unused by compute_scale but kept so
-//  the Contexts match the CI code exactly).
+//  SumATA2 template, verbatim.
 //
 template <typename Context>
 struct SumATA2{
@@ -326,8 +312,7 @@ struct Context_x86_SSE41{
 
 
 //  From Kernels_ScaleInvariantMatrixMatch_Routines.h (the CI version also
-//  checks the alignment of A and T and throws on a mismatch; the check is
-//  dead at w = 512, where every row has the same alignment).
+//  checks the row alignment and throws on a mismatch; dead at w = 512).
 template <typename SumATA2>
 REPRO_FORCE_INLINE float compute_scale(
     size_t width, size_t height,
@@ -344,28 +329,27 @@ REPRO_FORCE_INLINE float compute_scale(
 
 
 //
-//  Test data.
+//  Test data: the exact stream of the failing CI test.
 //
 constexpr size_t W = 512;
 constexpr size_t H = 513;
 constexpr size_t HEAD_PAD = 16;
 
 //  64-byte aligned at runtime, exactly like CI's GuardPageBuffer rows at
-//  this size (the 16-float head pad plus 2048-byte rows keep every row on
-//  a 64-byte boundary).
+//  this size.
 alignas(64) static float A_data[HEAD_PAD + W * H];
 alignas(64) static float T_data[HEAD_PAD + W * H];
 
 //  CI's row pointers come out of mmap(), whose alignment the compiler
 //  cannot see; the kernel therefore keeps its partial-row paths live in
-//  the binary. Reroute the pointer through a volatile so this repro emits
-//  the same code.
+//  the binary. Reroute the pointer through a volatile so this probe
+//  emits the same code.
 static const float* drop_alignment(const float* p){
     const volatile uint64_t* v = reinterpret_cast<const volatile uint64_t*>(&p);
     return reinterpret_cast<const float*>(*v);
 }
 
-//  Ground truth, in double.
+//  Double-precision reference, full matrix.
 static double ref_scale(float const* const* A, float const* const* T){
     double sat = 0.0, saa = 0.0;
     for (size_t r = 0; r < H; r++){
@@ -375,6 +359,81 @@ static double ref_scale(float const* const* A, float const* const* T){
         }
     }
     return sat / saa;
+}
+//  Double-precision reference, one row.
+static double ref_row(const float* A, const float* T){
+    double sat = 0.0, saa = 0.0;
+    for (size_t c = 0; c < W; c++){
+        sat += (double)A[c] * (double)T[c];
+        saa += (double)A[c] * (double)A[c];
+    }
+    return sat / saa;
+}
+
+
+
+//
+//  Lane localization: the SSE kernel's row-reduced accumulators for one
+//  row, i.e. the lanes of sum_at / sum_as after the per-row quarter
+//  reduction - lane j holds the contributions of the elements whose index
+//  is j mod 16. A copy of the main loop of
+//  SumATA2<Context_x86_SSE41>::accumulate (the back/front partial-row
+//  paths are dead at w = 512 and are omitted here); the loop body and the
+//  reduction are identical, so a miscompiling compiler is expected to
+//  miscompile both. This copy is instrumentation: its values localize the
+//  bug, while the verdict below uses the verbatim kernel.
+//
+struct RowLanes{
+    float at[4];
+    float as[4];
+};
+static RowLanes sse_row_lanes(const float* A, const float* T){
+    __m128 sum_as0 = _mm_setzero_ps();
+    __m128 sum_as1 = _mm_setzero_ps();
+    __m128 sum_as2 = _mm_setzero_ps();
+    __m128 sum_as3 = _mm_setzero_ps();
+    __m128 sum_at0 = _mm_setzero_ps();
+    __m128 sum_at1 = _mm_setzero_ps();
+    __m128 sum_at2 = _mm_setzero_ps();
+    __m128 sum_at3 = _mm_setzero_ps();
+
+    const __m128* ptrA = (const __m128*)A;
+    const __m128* ptrT = (const __m128*)T;
+
+    size_t lc = W / (4 * 4);
+    do{
+        __m128 a0 = ptrA[0];
+        __m128 a1 = ptrA[1];
+        __m128 a2 = ptrA[2];
+        __m128 a3 = ptrA[3];
+        sum_as0 = _mm_add_ps(_mm_mul_ps(a0, a0), sum_as0);
+        sum_as1 = _mm_add_ps(_mm_mul_ps(a1, a1), sum_as1);
+        sum_as2 = _mm_add_ps(_mm_mul_ps(a2, a2), sum_as2);
+        sum_as3 = _mm_add_ps(_mm_mul_ps(a3, a3), sum_as3);
+        sum_at0 = _mm_add_ps(_mm_mul_ps(a0, ptrT[0]), sum_at0);
+        sum_at1 = _mm_add_ps(_mm_mul_ps(a1, ptrT[1]), sum_at1);
+        sum_at2 = _mm_add_ps(_mm_mul_ps(a2, ptrT[2]), sum_at2);
+        sum_at3 = _mm_add_ps(_mm_mul_ps(a3, ptrT[3]), sum_at3);
+        ptrA += 4;
+        ptrT += 4;
+    }while (--lc);
+
+    //  The per-row reduction, verbatim from SumATA2::accumulate.
+    sum_as0 = _mm_add_ps(sum_as0, sum_as1);
+    sum_at0 = _mm_add_ps(sum_at0, sum_at1);
+    sum_as2 = _mm_add_ps(sum_as2, sum_as3);
+    sum_at2 = _mm_add_ps(sum_at2, sum_at3);
+    sum_as0 = _mm_add_ps(sum_as0, sum_as2);
+    sum_at0 = _mm_add_ps(sum_at0, sum_at2);
+
+    RowLanes l;
+    union { __m128 v; float f[4]; } uat = { sum_at0 };
+    union { __m128 v; float f[4]; } uas = { sum_as0 };
+    for (int i = 0; i < 4; i++){
+        l.at[i] = uat.f[i];
+        l.as[i] = uas.f[i];
+    }
+    return l;
 }
 
 
@@ -406,12 +465,30 @@ static bool within_tolerance(float x, float y, double magnitude){
     return d <= tol;
 }
 
+static void print_floats(const char* label, const float* p, int n){
+    std::printf("%s:", label);
+    for (int i = 0; i < n; i++){
+        uint32_t bits = std::bit_cast<uint32_t>(p[i]);
+        std::printf(" 0x%08X (%.9g)", bits, (double)p[i]);
+    }
+    std::printf("\n");
+}
+
 
 
 int main(){
-    //  Fill the data, exactly like the CI weighted (512, 513) test: the
-    //  same seed and stream, with the W draw per element skipped. HEAD_PAD
-    //  stays zero, as it does in CI.
+    //  0. Which compiler built this? The pool's runners have been
+    //     rotating, and this number is the first thing to compare between
+    //     a failing and a passing run.
+#ifdef _MSC_VER
+    std::printf("compiler: MSVC _MSC_VER=%d _MSC_FULL_VER=%d _MSC_BUILD=%d\n",
+        _MSC_VER, _MSC_FULL_VER, _MSC_BUILD);
+#else
+    std::printf("compiler: non-MSVC (sanity build)\n");
+#endif
+
+    //  1. The data, exactly like the CI weighted (512, 513) test: the
+    //     same seed and stream, with the W draw per element skipped.
     std::mt19937 generator(512u * 1000003u + 513u * 7919u + 2654435761u);
     std::uniform_real_distribution<float> data_distribution(-1.0f, 1.0f);
     std::uniform_real_distribution<float> weight_distribution(0.0f, 1.0f);
@@ -430,48 +507,92 @@ int main(){
         rowsT[r] = baseT + HEAD_PAD + r * W;
     }
 
+    //  2. Data dump: check the stream is what this platform's <random>
+    //     produces, and stable across runs. The row alignment must be 0.
+    double sumA = 0.0, sumT = 0.0;
+    for (size_t c = HEAD_PAD; c < HEAD_PAD + W * H; c++){
+        sumA += A_data[c];
+        sumT += T_data[c];
+    }
+    std::printf("data: sum(A)=%.15g sum(T)=%.15g over %zu elements\n",
+        sumA, sumT, W * H);
+    print_floats("data A[0..3]", A_data + HEAD_PAD, 4);
+    print_floats("data T[0..3]", T_data + HEAD_PAD, 4);
+    std::printf(
+        "rows: A[0] = %p (mod 16 = %llu, mod 64 = %llu), "
+        "T[0] = %p (mod 16 = %llu, mod 64 = %llu)\n",
+        (const void*)rowsA[0],
+        (unsigned long long)((size_t)rowsA[0] % 16),
+        (unsigned long long)((size_t)rowsA[0] % 64),
+        (const void*)rowsT[0],
+        (unsigned long long)((size_t)rowsT[0] % 16),
+        (unsigned long long)((size_t)rowsT[0] % 64)
+    );
+
+    //  3. Row by row: ref / default / sse per row, from the verbatim
+    //     kernels. The first diverging row localizes the bug to a row
+    //     (or to the accumulation across rows, if all rows agree).
+    std::printf("rows (ref = double, def = scalar kernel, sse = SSE kernel):\n");
+    int diverging = 0;
+    size_t first_diverging_row = H;
+    size_t lane_dumped = 0;
+    for (size_t r = 0; r < H; r++){
+        const float* ra = rowsA[r];
+        const float* rt = rowsT[r];
+        const float* one_ra[1] = { ra };
+        const float* one_rt[1] = { rt };
+        double rref = ref_row(ra, rt);
+        float rdef = compute_scale<SumATA2<Context_Default>>(W, 1, one_ra, one_rt);
+        float rsse = compute_scale<SumATA2<Context_x86_SSE41>>(W, 1, one_ra, one_rt);
+        double magD = rdef < 0 ? -(double)rdef : (double)rdef;
+        double magS = rsse < 0 ? -(double)rsse : (double)rsse;
+        double mag = magD > magS ? magD : magS;
+        bool ok = within_tolerance((float)rref, rdef, mag)
+            && within_tolerance((float)rref, rsse, mag);
+        std::printf("row %3zu: ref=%.9g def=%.9g sse=%.9g%s\n",
+            r, (double)rref, (double)rdef, (double)rsse, ok ? "" : "  <-- DIVERGES");
+        if (!ok){
+            diverging++;
+            if (first_diverging_row == H)
+                first_diverging_row = r;
+        }
+        if ((r < 4 || (!ok && lane_dumped < 16) || r == H - 1) && lane_dumped < 32){
+            RowLanes l = sse_row_lanes(ra, rt);
+            std::printf(
+                "      sse lanes: at=[%.9g %.9g %.9g %.9g] as=[%.9g %.9g %.9g %.9g]\n",
+                (double)l.at[0], (double)l.at[1], (double)l.at[2], (double)l.at[3],
+                (double)l.as[0], (double)l.as[1], (double)l.as[2], (double)l.as[3]
+            );
+            lane_dumped++;
+        }
+    }
+
+    //  4. The full-matrix result, exactly like CI: the verdict.
     double ref = ref_scale(rowsA, rowsT);
     float deflt = compute_scale<SumATA2<Context_Default>>(W, H, rowsA, rowsT);
     float sse = compute_scale<SumATA2<Context_x86_SSE41>>(W, H, rowsA, rowsT);
 
     std::printf(
-        "row 0 alignment: A mod 16 = %llu, T mod 16 = %llu "
-        "(0 in CI, where the rows come from a 64-byte-aligned mmap)\n",
-        (unsigned long long)((size_t)rowsA[0] % 16),
-        (unsigned long long)((size_t)rowsT[0] % 16)
+        "total: ref=%.9g def=%.9g sse=%.9g "
+        "(def ulps from ref: %llu, sse ulps from ref: %llu, "
+        "diverging rows: %d, first at row %zu)\n",
+        (double)ref, (double)deflt, (double)sse,
+        (unsigned long long)ulp_distance(deflt, (float)ref),
+        (unsigned long long)ulp_distance(sse, (float)ref),
+        diverging, first_diverging_row
     );
 
-    char rbuf[32], dbuf[32], sbuf[32];
-    std::snprintf(rbuf, sizeof(rbuf), "%.9g", (double)ref);
-    std::snprintf(dbuf, sizeof(dbuf), "%.9g", (double)deflt);
-    std::snprintf(sbuf, sizeof(sbuf), "%.9g", (double)sse);
-
-    std::printf(
-        "w=%zu h=%zu unweighted compute_scale (SIMM SSE repro)\n"
-        "ref (double, ground truth) = %s\n"
-        "default (float scalar)     = %s\n"
-        "sse     (float vector)     = %s\n",
-        W, H, rbuf, dbuf, sbuf
-    );
-
-    //  CI compares against fmax(|default|, |isa|).
-    double magD = (double)deflt; if (magD < 0.0) magD = -magD;
-    double magS = (double)sse; if (magS < 0.0) magS = -magS;
+    double magD = deflt < 0 ? -(double)deflt : (double)deflt;
+    double magS = sse < 0 ? -(double)sse : (double)sse;
     double mag = magD > magS ? magD : magS;
     bool deflt_ok = within_tolerance(deflt, (float)ref, mag);
     bool sse_ok = within_tolerance(sse, (float)ref, mag);
-
     if (deflt_ok && sse_ok){
         std::printf("PASS: default and sse agree with the reference within tolerance\n");
         return 0;
     }
 
-    std::printf(
-        "FAIL: default=%s sse=%s ref=%s "
-        "(default ulps from ref: %llu, sse ulps from ref: %llu)\n",
-        dbuf, sbuf, rbuf,
-        (unsigned long long)ulp_distance(deflt, (float)ref),
-        (unsigned long long)ulp_distance(sse, (float)ref)
-    );
+    std::printf("FAIL: default %s, sse %s the reference\n",
+        deflt_ok ? "matches" : "MISMATCHES", sse_ok ? "matches" : "MISMATCHES");
     return 1;
 }

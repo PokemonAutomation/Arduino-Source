@@ -1,0 +1,55 @@
+#  Copy this file to .github/workflows/msvc-simm-repro.yml, then trigger
+#  it manually (Actions > MSVC SIMM repro probe > Run workflow). It runs
+#  the probe on a windows-2025 runner twice: with the exact CI MSVC
+#  flags, and without /MP. The "Set up MSVC environment" step prints the
+#  runner's cl version, which is the first thing to compare between a
+#  failing and a passing run.
+name: MSVC SIMM repro probe
+on:
+  workflow_dispatch:
+jobs:
+  probe:
+    runs-on: windows-2025
+    steps:
+      - uses: actions/checkout@v7
+      #  Copied from .github/workflows/cpp-ci-serial-programs-base.yml.
+      - name: Set up MSVC environment (Windows)
+        shell: pwsh
+        run: |
+          $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          $vcvars = cmd /c "`"$vs\VC\Auxiliary\Build\vcvars64.bat`" >nul && set"
+          if ($LASTEXITCODE -ne 0) {
+            throw "vcvars64.bat failed with exit code $LASTEXITCODE"
+          }
+          foreach ($line in $vcvars) {
+            # Skip anything that isn't a NAME=value line.
+            if ($line -notmatch '^([^=]+)=(.*)$') {
+              continue
+            }
+            $name = $Matches[1]
+            $value = $Matches[2]
+            if ([Environment]::GetEnvironmentVariable($name) -ne $value) {
+              "$name=$value" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+              [Environment]::SetEnvironmentVariable($name, $value)
+            }
+          }
+          if (-not (Get-Command cl -ErrorAction SilentlyContinue)) {
+            throw "cl.exe isn't on PATH after vcvars64.bat"
+          }
+          Get-Command cl, link, cmake -ErrorAction SilentlyContinue | Format-Table Name, Version, Source -AutoSize
+      - name: Build and run (exact CI flags)
+        shell: cmd
+        run: >
+          cl /nologo /std:c++23 /O2 /Ob1 /MD /DNDEBUG /W4 /WX /MP /utf-8
+          /external:anglebrackets
+          tools\msvc-simm-repro\msvc_simm_repro.cpp
+          /Fe:tools\msvc-simm-repro\probe.exe
+          && tools\msvc-simm-repro\probe.exe
+      - name: Build and run (without /MP)
+        shell: cmd
+        run: >
+          cl /nologo /std:c++23 /O2 /Ob1 /MD /DNDEBUG /W4 /WX /utf-8
+          /external:anglebrackets
+          tools\msvc-simm-repro\msvc_simm_repro.cpp
+          /Fe:tools\msvc-simm-repro\probe.exe
+          && tools\msvc-simm-repro\probe.exe
