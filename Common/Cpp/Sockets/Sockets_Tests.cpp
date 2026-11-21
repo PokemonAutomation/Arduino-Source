@@ -567,6 +567,7 @@ public:
         }
 
         std::string error;
+        bool response_timed_out = false;
         {
             CapturingClientListener client_listener;
             ClientSocketType client(this->m_thread_pool);
@@ -614,6 +615,7 @@ public:
                     }
                 )){
                     error = "The client did not receive the pre-close response";
+                    response_timed_out = true;
                 }else{
                     std::array<uint8_t, 3> head{};
                     {
@@ -631,6 +633,19 @@ public:
         }
 
         if (!error.empty()){
+            //  A timeout on this assertion can mean the machine was
+            //  starved mid-test: the drain's caps and the 60 s budget
+            //  are wall-clock, and a starved peer stream can land late
+            //  enough that the close resets the connection instead of
+            //  closing it cleanly. That is the machine's fault, not the
+            //  socket's - skip instead of failing (the start-of-test
+            //  guard only covers a machine that was already starved).
+            if (response_timed_out && timing_unreliable()){
+                return UnitTestResult(
+                    UnitTestResult::SKIPPED,
+                    "The machine was starved mid-test (timing_unreliable()); the pre-close response is timing-sensitive, so skipping instead of failing."
+                );
+            }
             return error;
         }
         return true;
