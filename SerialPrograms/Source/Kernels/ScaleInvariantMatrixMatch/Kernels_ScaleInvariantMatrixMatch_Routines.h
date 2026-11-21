@@ -41,13 +41,8 @@ struct SumATA2{
 
     PA_FORCE_INLINE void accumulate(size_t length, const float* A, const float* T){
         vtype sum_as0 = Context::vzero();
-        vtype sum_as1 = Context::vzero();
-        vtype sum_as2 = Context::vzero();
-        vtype sum_as3 = Context::vzero();
+        // sum_as1..3 and sum_at1..3 disabled: they were only used by the 4-way block below
         vtype sum_at0 = Context::vzero();
-        vtype sum_at1 = Context::vzero();
-        vtype sum_at2 = Context::vzero();
-        vtype sum_at3 = Context::vzero();
 
         if constexpr (VECTOR_LENGTH > 1){
             size_t align = (size_t)T % (VECTOR_LENGTH * sizeof(float));
@@ -70,33 +65,36 @@ struct SumATA2{
         const vtype* ptrA = (const vtype*)A;
         const vtype* ptrT = (const vtype*)T;
 
-        size_t lc = length / (4 * VECTOR_LENGTH);
-        if (lc){
-            do{
-                vtype a0 = ptrA[0];
-                vtype a1 = ptrA[1];
-                vtype a2 = ptrA[2];
-                vtype a3 = ptrA[3];
-                sum_as0 = Context::vpma(a0, a0, sum_as0);
-                sum_as1 = Context::vpma(a1, a1, sum_as1);
-                sum_as2 = Context::vpma(a2, a2, sum_as2);
-                sum_as3 = Context::vpma(a3, a3, sum_as3);
-                sum_at0 = Context::vpma(a0, ptrT[0], sum_at0);
-                sum_at1 = Context::vpma(a1, ptrT[1], sum_at1);
-                sum_at2 = Context::vpma(a2, ptrT[2], sum_at2);
-                sum_at3 = Context::vpma(a3, ptrT[3], sum_at3);
-                ptrA += 4;
-                ptrT += 4;
-            }while (--lc);
-            sum_as0 = Context::vadd(sum_as0, sum_as1);
-            sum_at0 = Context::vadd(sum_at0, sum_at1);
-            sum_as2 = Context::vadd(sum_as2, sum_as3);
-            sum_at2 = Context::vadd(sum_at2, sum_at3);
-            sum_as0 = Context::vadd(sum_as0, sum_as2);
-            sum_at0 = Context::vadd(sum_at0, sum_at2);
-        }
+        // EXPERIMENT (MSVC 14.52 / VS 2026 miscompiles the 4-way do/while below for the
+        // scalar Default SIMM kernel): disabled, together with the lc declaration; with the
+        // `length %= 4 * VECTOR_LENGTH;` line removed as well, the single-element while
+        // loop below covers the whole length, which is a semantic no-op.
+        // size_t lc = length / (4 * VECTOR_LENGTH);
+        // if (lc){
+        //     do{
+        //         vtype a0 = ptrA[0];
+        //         vtype a1 = ptrA[1];
+        //         vtype a2 = ptrA[2];
+        //         vtype a3 = ptrA[3];
+        //         sum_as0 = Context::vpma(a0, a0, sum_as0);
+        //         sum_as1 = Context::vpma(a1, a1, sum_as1);
+        //         sum_as2 = Context::vpma(a2, a2, sum_as2);
+        //         sum_as3 = Context::vpma(a3, a3, sum_as3);
+        //         sum_at0 = Context::vpma(a0, ptrT[0], sum_at0);
+        //         sum_at1 = Context::vpma(a1, ptrT[1], sum_at1);
+        //         sum_at2 = Context::vpma(a2, ptrT[2], sum_at2);
+        //         sum_at3 = Context::vpma(a3, ptrT[3], sum_at3);
+        //         ptrA += 4;
+        //         ptrT += 4;
+        //     }while (--lc);
+        //     sum_as0 = Context::vadd(sum_as0, sum_as1);
+        //     sum_at0 = Context::vadd(sum_at0, sum_at1);
+        //     sum_as2 = Context::vadd(sum_as2, sum_as3);
+        //     sum_at2 = Context::vadd(sum_at2, sum_at3);
+        //     sum_as0 = Context::vadd(sum_as0, sum_as2);
+        //     sum_at0 = Context::vadd(sum_at0, sum_at2);
+        // }
 
-        length %= 4 * VECTOR_LENGTH;
         while (length >= VECTOR_LENGTH){
             vtype a0 = ptrA[0];
             sum_as0 = Context::vpma(a0, a0, sum_as0);
@@ -119,13 +117,8 @@ struct SumATA2{
     }
     PA_FORCE_INLINE void accumulate(size_t length, const float* A, const float* TW, const float* W){
         vtype sum_as0 = Context::vzero();
-        vtype sum_as1 = Context::vzero();
-        vtype sum_as2 = Context::vzero();
-        vtype sum_as3 = Context::vzero();
+        // sum_as1..3 and sum_at1..3 disabled: they were only used by the 4-way block below
         vtype sum_at0 = Context::vzero();
-        vtype sum_at1 = Context::vzero();
-        vtype sum_at2 = Context::vzero();
-        vtype sum_at3 = Context::vzero();
 
         if constexpr (VECTOR_LENGTH > 1){
             size_t align = (size_t)TW % (VECTOR_LENGTH * sizeof(float));
@@ -152,38 +145,41 @@ struct SumATA2{
         const vtype* ptrT = (const vtype*)TW;
         const vtype* ptrW = (const vtype*)W;
 
-        size_t lc = length / (4 * VECTOR_LENGTH);
-        if (lc){
-            do{
-                vtype a0 = ptrA[0];
-                vtype a1 = ptrA[1];
-                vtype a2 = ptrA[2];
-                vtype a3 = ptrA[3];
-                a0 = Context::vmul(a0, ptrW[0]);
-                a1 = Context::vmul(a1, ptrW[1]);
-                a2 = Context::vmul(a2, ptrW[2]);
-                a3 = Context::vmul(a3, ptrW[3]);
-                sum_as0 = Context::vpma(a0, a0, sum_as0);
-                sum_as1 = Context::vpma(a1, a1, sum_as1);
-                sum_as2 = Context::vpma(a2, a2, sum_as2);
-                sum_as3 = Context::vpma(a3, a3, sum_as3);
-                sum_at0 = Context::vpma(a0, ptrT[0], sum_at0);
-                sum_at1 = Context::vpma(a1, ptrT[1], sum_at1);
-                sum_at2 = Context::vpma(a2, ptrT[2], sum_at2);
-                sum_at3 = Context::vpma(a3, ptrT[3], sum_at3);
-                ptrA += 4;
-                ptrT += 4;
-                ptrW += 4;
-            }while (--lc);
-            sum_as0 = Context::vadd(sum_as0, sum_as1);
-            sum_at0 = Context::vadd(sum_at0, sum_at1);
-            sum_as2 = Context::vadd(sum_as2, sum_as3);
-            sum_at2 = Context::vadd(sum_at2, sum_at3);
-            sum_as0 = Context::vadd(sum_as0, sum_as2);
-            sum_at0 = Context::vadd(sum_at0, sum_at2);
-        }
+        // EXPERIMENT (MSVC 14.52 / VS 2026 miscompiles the 4-way do/while below for the
+        // scalar Default SIMM kernel): disabled, together with the lc declaration; with the
+        // `length %= 4 * VECTOR_LENGTH;` line removed as well, the single-element while
+        // loop below covers the whole length, which is a semantic no-op.
+        // size_t lc = length / (4 * VECTOR_LENGTH);
+        // if (lc){
+        //     do{
+        //         vtype a0 = ptrA[0];
+        //         vtype a1 = ptrA[1];
+        //         vtype a2 = ptrA[2];
+        //         vtype a3 = ptrA[3];
+        //         a0 = Context::vmul(a0, ptrW[0]);
+        //         a1 = Context::vmul(a1, ptrW[1]);
+        //         a2 = Context::vmul(a2, ptrW[2]);
+        //         a3 = Context::vmul(a3, ptrW[3]);
+        //         sum_as0 = Context::vpma(a0, a0, sum_as0);
+        //         sum_as1 = Context::vpma(a1, a1, sum_as1);
+        //         sum_as2 = Context::vpma(a2, a2, sum_as2);
+        //         sum_as3 = Context::vpma(a3, a3, sum_as3);
+        //         sum_at0 = Context::vpma(a0, ptrT[0], sum_at0);
+        //         sum_at1 = Context::vpma(a1, ptrT[1], sum_at1);
+        //         sum_at2 = Context::vpma(a2, ptrT[2], sum_at2);
+        //         sum_at3 = Context::vpma(a3, ptrT[3], sum_at3);
+        //         ptrA += 4;
+        //         ptrT += 4;
+        //         ptrW += 4;
+        //     }while (--lc);
+        //     sum_as0 = Context::vadd(sum_as0, sum_as1);
+        //     sum_at0 = Context::vadd(sum_at0, sum_at1);
+        //     sum_as2 = Context::vadd(sum_as2, sum_as3);
+        //     sum_at2 = Context::vadd(sum_at2, sum_at3);
+        //     sum_as0 = Context::vadd(sum_as0, sum_as2);
+        //     sum_at0 = Context::vadd(sum_at0, sum_at2);
+        // }
 
-        length %= 4 * VECTOR_LENGTH;
         while (length >= VECTOR_LENGTH){
             vtype a0 = ptrA[0];
             a0 = Context::vmul(a0, ptrW[0]);
