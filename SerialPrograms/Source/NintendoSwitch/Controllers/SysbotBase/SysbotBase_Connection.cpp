@@ -21,7 +21,7 @@
 #include <thread>
 #include <vector>
 
-#include "Common/Cpp/Sockets/ServerSocket_Qt.h"
+#include "Common/Cpp/Sockets/ServerSocket2_Qt.h"
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 
@@ -548,7 +548,7 @@ bool timing_unreliable(){
 //  the first received byte (until "stop" is set or the stall elapses).
 //  A peer that stops reading stalls the client's send path the same
 //  way.
-struct StallingServerListener : AbstractServerSocket::Listener{
+struct StallingServerListener : AbstractServerSocket2::Listener{
     std::atomic<bool> listen_ok{false};
     std::atomic<bool> connected{false};
     std::atomic<bool> stalled{false};
@@ -558,11 +558,15 @@ struct StallingServerListener : AbstractServerSocket::Listener{
         listen_ok.store(error_message.empty(), std::memory_order_release);
     }
 
-    virtual void on_connect() override{
+    virtual void on_connect(AbstractServerSocket2::ConnectionPtr) override{
         connected.store(true, std::memory_order_release);
     }
 
-    virtual void on_receive_data(const void*, size_t) override{
+    virtual void on_receive_data(
+        AbstractServerSocket2::ConnectionPtr,
+        const void*,
+        size_t
+    ) override{
         if (!stalled.exchange(true, std::memory_order_acq_rel)){
             const auto end = std::chrono::steady_clock::now() + std::chrono::seconds(30);
             while (std::chrono::steady_clock::now() < end
@@ -611,7 +615,7 @@ public:
         const int64_t BUDGET_MS = 60 * 1000;
 
         StallingServerListener server_listener;
-        ServerSocket_Qt server(GlobalThreadPools::unlimited_normal());
+        ServerSocket2_Qt server(GlobalThreadPools::unlimited_normal());
         server.add_listener(server_listener);
 
         uint16_t port = 0;

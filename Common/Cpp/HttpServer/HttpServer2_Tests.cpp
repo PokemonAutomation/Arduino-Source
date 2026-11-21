@@ -130,10 +130,19 @@ struct TestClient{
 
     bool connect(uint16_t port){
         socket.connect("127.0.0.1", port);
-        return waiter.wait_for(
+        const bool finished = waiter.wait_for(
             HTTP_TEST_WAIT,
             [this]{ return connected.load() >= 1; }
         );
+        //  "on_connect_finished" fires for a failed connect too (with
+        //  the error message): report the failure here instead of
+        //  letting the test fail later with an opaque "did not send
+        //  the request" on the dead socket.
+        if (!finished){
+            return false;
+        }
+        std::lock_guard<Mutex> lg(waiter.lock);
+        return connect_error.empty();
     }
 
     bool send_all(const std::string& bytes){
