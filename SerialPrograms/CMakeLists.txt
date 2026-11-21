@@ -443,9 +443,10 @@ if (WIN32)
         # error. (Visual Studio's ClangCL toolset never passed them on to clang-cl.)
         target_compile_options(SerialProgramsLib PRIVATE /MP /external:anglebrackets)
         # MSVC 14.52 (VS 2026, the default on the windows-2025-vs2026 runner image) miscompiles
-        # the SIMM scalar kernels under the default /fp:precise; /fp:strict disables the FP
-        # contraction that /fp:precise permits. Temporary until the MSVC bug is fixed and a
-        # future toolset can safely go back to /fp:precise.
+        # the SIMM scalar kernels (Kernels::ScaleInvariantMatrixMatch Default path) under the
+        # default /fp:precise; /fp:strict disables the FP contraction that /fp:precise permits.
+        # Temporary until the MSVC bug is fixed (repros: tools/msvc-simm-repro/) and a future
+        # toolset can safely go back to /fp:precise.
         target_compile_options(SerialProgramsLib PRIVATE /fp:strict)
     endif()
     target_compile_options(SerialProgramsLib PRIVATE /wd5054)  # Deprecated enum arithemtic
