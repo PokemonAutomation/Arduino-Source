@@ -49,6 +49,9 @@
 //  Non-Shiny Hunting
 #include "Programs/NonShinyHunting/PokemonLZA_StatsReset.h"
 
+// Story Automation
+#include "Programs/AutoStory/PokemonLZA_AutoStory.h"
+
 //  Developer
 #include "Programs/TestPrograms/PokemonLZA_OverworldWatcher.h"
 #include "Programs/TestPrograms/PokemonLZA_MoveBoxArrow.h"
@@ -113,6 +116,11 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     if (STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back(make_SingleSwitchProgram<ShinyHunt_HyperspaceHunter>());
         ret.emplace_back(make_SingleSwitchProgram<BeldumHunter>());
+    }
+
+    ret.emplace_back("---- Story Automation ----");
+    if (IS_BETA_VERSION){
+        ret.emplace_back(make_SingleSwitchProgram<AutoStory>());
     }
 
 //    ret.emplace_back("---- Non-Shiny Hunting ----");

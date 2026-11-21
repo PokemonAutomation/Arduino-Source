@@ -2184,10 +2184,14 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonLZA/Inference/Map/PokemonLZA_LocationNameReader.h
     Source/VideoGames/PokemonLZA/Inference/Map/PokemonLZA_MapDetector.cpp
     Source/VideoGames/PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h
+    Source/VideoGames/PokemonLZA/Inference/Map/PokemonLZA_TutorialMapDetector.cpp
+    Source/VideoGames/PokemonLZA/Inference/Map/PokemonLZA_TutorialMapDetector.h
     Source/VideoGames/PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.cpp
     Source/VideoGames/PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.h
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.cpp
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.h
+    Source/VideoGames/PokemonLZA/Inference/PokemonLZA_BoothDetector.cpp
+    Source/VideoGames/PokemonLZA/Inference/PokemonLZA_BoothDetector.h
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_ButtonDetector.cpp
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_ButtonDetector.h
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_DayNightChangeDetector.cpp
@@ -2196,16 +2200,22 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_DayNightStateDetector.h
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_DialogDetector.cpp
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
+    Source/VideoGames/PokemonLZA/Inference/PokemonLZA_DoorEntryDetector.cpp
+    Source/VideoGames/PokemonLZA/Inference/PokemonLZA_DoorEntryDetector.h
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_HyperspaceCalorieDetector.cpp
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_HyperspaceCalorieDetector.h
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_HyperspaceRewardNameReader.cpp
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_HyperspaceRewardNameReader.h
+    Source/VideoGames/PokemonLZA/Inference/PokemonLZA_EventMarkerDetector.cpp
+    Source/VideoGames/PokemonLZA/Inference/PokemonLZA_EventMarkerDetector.h
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.cpp
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.cpp
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.cpp
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h
+    Source/VideoGames/PokemonLZA/Inference/PokemonLZA_TutorialWindowDetector.cpp
+    Source/VideoGames/PokemonLZA/Inference/PokemonLZA_TutorialWindowDetector.h
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_WeatherDetector.cpp
     Source/VideoGames/PokemonLZA/Inference/PokemonLZA_WeatherDetector.h
     Source/VideoGames/PokemonLZA/InferenceTraining/PokemonLZA_GenerateLocationNameOCR.cpp
@@ -2226,6 +2236,14 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonLZA/PokemonLZA_Settings.h
     Source/VideoGames/PokemonLZA/PokemonLZA_Tests.cpp
     Source/VideoGames/PokemonLZA/PokemonLZA_Tests.h
+    Source/VideoGames/PokemonLZA/Programs/AutoStory/PokemonLZA_AutoStory.cpp
+    Source/VideoGames/PokemonLZA/Programs/AutoStory/PokemonLZA_AutoStory.h
+    Source/VideoGames/PokemonLZA/Programs/AutoStory/PokemonLZA_AutoStoryTools.cpp
+    Source/VideoGames/PokemonLZA/Programs/AutoStory/PokemonLZA_AutoStoryTools.h
+    Source/VideoGames/PokemonLZA/Programs/AutoStory/PokemonLZA_AutoStory_Segment_01.cpp
+    Source/VideoGames/PokemonLZA/Programs/AutoStory/PokemonLZA_AutoStory_Segment_01.h
+    Source/VideoGames/PokemonLZA/Programs/AutoStory/PokemonLZA_AutoStory_Tests.cpp
+    Source/VideoGames/PokemonLZA/Programs/AutoStory/PokemonLZA_AutoStory_Tests.h
     Source/VideoGames/PokemonLZA/Programs/Farming/PokemonLZA_DonutMaker.cpp
     Source/VideoGames/PokemonLZA/Programs/Farming/PokemonLZA_DonutMaker.h
     Source/VideoGames/PokemonLZA/Programs/Farming/PokemonLZA_FriendshipFarmer.cpp
