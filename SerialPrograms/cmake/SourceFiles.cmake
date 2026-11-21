@@ -97,10 +97,10 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../Common/Cpp/Hardware/Hardware_x86_Linux.tpp
     ../Common/Cpp/Hardware/Hardware_x86_Windows.tpp
     ../Common/Cpp/HttpServer/AbstractHttpServer.h
-    ../Common/Cpp/HttpServer/HttpServer2.cpp
-    ../Common/Cpp/HttpServer/HttpServer2.h
-    ../Common/Cpp/HttpServer/HttpServer2_Tests.cpp
-    ../Common/Cpp/HttpServer/HttpServer2_Tests.h
+    ../Common/Cpp/HttpServer/HttpServer.cpp
+    ../Common/Cpp/HttpServer/HttpServer.h
+    ../Common/Cpp/HttpServer/HttpServer_Tests.cpp
+    ../Common/Cpp/HttpServer/HttpServer_Tests.h
     ../Common/Cpp/ImageResolution.cpp
     ../Common/Cpp/ImageResolution.h
     ../Common/Cpp/Json/JsonArray.cpp
@@ -409,7 +409,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Rectangle.tpp
     ../Common/Cpp/SIMDDebuggers.h
     ../Common/Cpp/Sockets/AbstractClientSocket.h
-    ../Common/Cpp/Sockets/AbstractServerSocket2.h
+    ../Common/Cpp/Sockets/AbstractServerSocket.h
     ../Common/Cpp/Sockets/AbstractServerSocketConnection.h
     ../Common/Cpp/Sockets/ClientSocket.cpp
     ../Common/Cpp/Sockets/ClientSocket.h
@@ -419,15 +419,15 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Sockets/ClientSocket_Qt.h
     ../Common/Cpp/Sockets/ClientSocket_WinSocket.cpp
     ../Common/Cpp/Sockets/ClientSocket_WinSocket.h
-    ../Common/Cpp/Sockets/ServerSocket2.h
-    ../Common/Cpp/Sockets/ServerSocket2_POSIX.cpp
-    ../Common/Cpp/Sockets/ServerSocket2_POSIX.h
-    ../Common/Cpp/Sockets/ServerSocket2_Qt.cpp
-    ../Common/Cpp/Sockets/ServerSocket2_Qt.h
-    ../Common/Cpp/Sockets/ServerSocket2_WinSocket.cpp
-    ../Common/Cpp/Sockets/ServerSocket2_WinSocket.h
-    ../Common/Cpp/Sockets/ServerSocket2_Tests.cpp
-    ../Common/Cpp/Sockets/ServerSocket2_Tests.h
+    ../Common/Cpp/Sockets/ServerSocket.h
+    ../Common/Cpp/Sockets/ServerSocket_POSIX.cpp
+    ../Common/Cpp/Sockets/ServerSocket_POSIX.h
+    ../Common/Cpp/Sockets/ServerSocket_Qt.cpp
+    ../Common/Cpp/Sockets/ServerSocket_Qt.h
+    ../Common/Cpp/Sockets/ServerSocket_WinSocket.cpp
+    ../Common/Cpp/Sockets/ServerSocket_WinSocket.h
+    ../Common/Cpp/Sockets/ServerSocket_Tests.cpp
+    ../Common/Cpp/Sockets/ServerSocket_Tests.h
     ../Common/Cpp/Sockets/Sockets_Tests.cpp
     ../Common/Cpp/Sockets/Sockets_Tests.h
     ../Common/Cpp/StreamConnections/MockDevice.cpp

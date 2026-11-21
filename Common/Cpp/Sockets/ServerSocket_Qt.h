@@ -1,13 +1,13 @@
-/*  Server Socket 2 (Qt)
+/*  Server Socket (Qt)
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  The Qt backend of the per-connection AbstractServerSocket2, for
+ *  The Qt backend of the per-connection AbstractServerSocket, for
  *  callers that need to integrate with a Qt event loop.
  *
  *  The QTcpServer (and its connection sockets) live on the global Qt
  *  event thread. The server hands each accepted client out as a
- *  ServerSocket2Connection_Qt object: a plain C++ shell whose send()/
+ *  ServerSocketConnection_Qt object: a plain C++ shell whose send()/
  *  close() calls run on the event thread (inline when already on it,
  *  queued otherwise). The shell never owns a QObject, so its destructor
  *  is safe from any thread even after the server (and the event-thread
@@ -15,8 +15,8 @@
  *
  */
 
-#ifndef PokemonAutomation_ServerSocket2_Qt_H
-#define PokemonAutomation_ServerSocket2_Qt_H
+#ifndef PokemonAutomation_ServerSocket_Qt_H
+#define PokemonAutomation_ServerSocket_Qt_H
 
 #include <chrono>
 #include <algorithm>
@@ -28,7 +28,7 @@
 #include <QSharedPointer>
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
-#include "AbstractServerSocket2.h"
+#include "AbstractServerSocket.h"
 
 class QTcpServer;
 class QTcpSocket;
@@ -40,12 +40,12 @@ class ThreadPool;
 
 
 
-class ServerSocket2_Qt;
+class ServerSocket_Qt;
 
 
-class ServerSocket2Connection_Qt final
+class ServerSocketConnection_Qt final
     : public AbstractServerSocketConnection
-    , public std::enable_shared_from_this<ServerSocket2Connection_Qt>
+    , public std::enable_shared_from_this<ServerSocketConnection_Qt>
 {
 public:
     //  Carries shared ownership (the signals pass it by value) so that a
@@ -78,7 +78,7 @@ public:
         //  different connection's socket. The shared ownership keeps the
         //  shell alive until the queued call runs (or is discarded with
         //  the server).
-        std::shared_ptr<ServerSocket2Connection_Qt> conn;
+        std::shared_ptr<ServerSocketConnection_Qt> conn;
         Mutex lock;
         ConditionVariable cv;
     };
@@ -97,14 +97,14 @@ public:
 
 
 private:
-    friend class ServerSocket2_Qt;
+    friend class ServerSocket_Qt;
 
     //  Backend internals: the server's event thread and the shell's own
     //  send()/close() only.
 
     //  Constructed on the server's event thread (in
     //  "on_new_connection()"), with the accepted socket.
-    ServerSocket2Connection_Qt(ServerSocket2_Qt& server, QTcpSocket* sock)
+    ServerSocketConnection_Qt(ServerSocket_Qt& server, QTcpSocket* sock)
         : m_server(&server)
         , m_sock(sock)
     {}
@@ -174,7 +174,7 @@ private:
     //  destroys the server, so "send()"/"close()" can never reach a
     //  freed server, and after teardown "m_open"/"m_close_requested"
     //  make them return before they would.
-    ServerSocket2_Qt* m_server;
+    ServerSocket_Qt* m_server;
     //  Owned by Qt (a child of the QTcpServer); destroyed on the event
     //  thread. Never dereferenced after the connection closed.
     QTcpSocket* m_sock;
@@ -196,13 +196,13 @@ private:
 
 
 
-class ServerSocket2_Qt final : public QObject, public AbstractServerSocket2{
+class ServerSocket_Qt final : public QObject, public AbstractServerSocket{
     Q_OBJECT
 
 public:
-    ServerSocket2_Qt(ThreadPool&){}
+    ServerSocket_Qt(ThreadPool&){}
 
-    virtual ~ServerSocket2_Qt(){
+    virtual ~ServerSocket_Qt(){
         close_and_wait();
     }
 
@@ -217,12 +217,12 @@ public:
 
 
 signals:
-    void internal_send(QSharedPointer<ServerSocket2Connection_Qt::SendData> send_data);
+    void internal_send(QSharedPointer<ServerSocketConnection_Qt::SendData> send_data);
     void internal_close_connection();
 
 
 private:
-    friend class ServerSocket2Connection_Qt;
+    friend class ServerSocketConnection_Qt;
 
     //  The backend's internal state machine; not part of the application
     //  API (the listeners and active_connection() are the observables).
@@ -239,7 +239,7 @@ private:
     //  with the shell's lock held, which the write loop's
     //  "finish_send()" re-takes on that inline path - hence the
     //  recursive shell lock.
-    void queue_send(QSharedPointer<ServerSocket2Connection_Qt::SendData> send_data){
+    void queue_send(QSharedPointer<ServerSocketConnection_Qt::SendData> send_data){
         emit internal_send(send_data);
     }
 
@@ -266,7 +266,7 @@ private:
     //  Runs on the QTcpServer's event thread. The context object is the
     //  server, so the call still runs if the connection socket has
     //  already been aborted, and it just reports 0 bytes in that case.
-    void on_send(QSharedPointer<ServerSocket2Connection_Qt::SendData> send_data);
+    void on_send(QSharedPointer<ServerSocketConnection_Qt::SendData> send_data);
 
     //  Stops the server: it destroys the QTcpServer (and its connection
     //  socket) on the event thread, closes the active connection, and

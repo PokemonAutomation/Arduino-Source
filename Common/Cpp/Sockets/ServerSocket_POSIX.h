@@ -1,19 +1,19 @@
-/*  Server Socket 2 (POSIX)
+/*  Server Socket (POSIX)
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  The POSIX backend of the per-connection AbstractServerSocket2.
+ *  The POSIX backend of the per-connection AbstractServerSocket.
  *
  *  One worker thread (from the thread pool) runs the accept loop for the
  *  whole lifetime of the server, and one worker thread per accepted
  *  connection. Each accepted client becomes a
- *  ServerSocket2Connection_POSIX object, which owns the socket's I/O
+ *  ServerSocketConnection_POSIX object, which owns the socket's I/O
  *  (send()/close()) and outlives the server as an inert object.
  *
  */
 
-#ifndef PokemonAutomation_ServerSocket2_POSIX_H
-#define PokemonAutomation_ServerSocket2_POSIX_H
+#ifndef PokemonAutomation_ServerSocket_POSIX_H
+#define PokemonAutomation_ServerSocket_POSIX_H
 
 #include <atomic>
 #include <memory>
@@ -21,16 +21,16 @@
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
-#include "AbstractServerSocket2.h"
+#include "AbstractServerSocket.h"
 
 namespace PokemonAutomation{
 
 
 class ThreadPool;
-class ServerSocket2_POSIX;
+class ServerSocket_POSIX;
 
 
-class ServerSocket2Connection_POSIX final : public AbstractServerSocketConnection{
+class ServerSocketConnection_POSIX final : public AbstractServerSocketConnection{
 public:
     virtual bool is_open() const override{
         return m_open.load(std::memory_order_relaxed);
@@ -46,13 +46,13 @@ public:
 
 
 private:
-    friend class ServerSocket2_POSIX;
+    friend class ServerSocket_POSIX;
 
     //  Backend internals: the server and this connection's own thread
     //  only.
 
     //  Constructed by the server on accept, with the accepted socket.
-    ServerSocket2Connection_POSIX(ServerSocket2_POSIX& server, int client_socket)
+    ServerSocketConnection_POSIX(ServerSocket_POSIX& server, int client_socket)
         : m_server(&server)
         , m_client(client_socket)
     {}
@@ -102,7 +102,7 @@ private:
     //  The owning server. Dereferenced only from thread_loop(), which the
     //  server's close_and_wait() has joined before the server is
     //  destroyed, so it can never be used after the server's death.
-    ServerSocket2_POSIX* m_server;
+    ServerSocket_POSIX* m_server;
 
     //  The accepted socket; -1 once take_fd() has handed it off.
     std::atomic<int> m_client;
@@ -120,11 +120,11 @@ private:
 
 
 
-class ServerSocket2_POSIX final : public AbstractServerSocket2{
+class ServerSocket_POSIX final : public AbstractServerSocket{
 public:
-    ServerSocket2_POSIX(ThreadPool& thread_pool);
+    ServerSocket_POSIX(ThreadPool& thread_pool);
 
-    virtual ~ServerSocket2_POSIX(){
+    virtual ~ServerSocket_POSIX(){
         close_and_wait();
     }
 
@@ -162,7 +162,7 @@ private:
     //  replaced). The m_active slot is kept either way: it anchors the
     //  connection's lifetime while its thread runs, and the server drops
     //  the slot only after it has joined that thread.
-    void release_connection(ServerSocket2Connection_POSIX* self);
+    void release_connection(ServerSocketConnection_POSIX* self);
 
     //  A start attempt failed (or the server was torn down while the task
     //  was still starting up): mark the task dead so that a retrying
@@ -172,7 +172,7 @@ private:
 
 
 private:
-    friend class ServerSocket2Connection_POSIX;
+    friend class ServerSocketConnection_POSIX;
 
     //  The backend's internal state machine; not part of the application
     //  API (the listeners and active_connection() are the observables).

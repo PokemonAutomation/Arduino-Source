@@ -3,9 +3,9 @@
  *  From: https://github.com/PokemonAutomation/
  *
  *  Loopback tests that drive the "ClientSocket" backends against a
- *  "ServerSocket2" peer on 127.0.0.1. These are the client-side
+ *  "ServerSocket" peer on 127.0.0.1. These are the client-side
  *  behaviors of the old ClientSocket/ServerSocket pair that the
- *  "ServerSocket2" test suite (which covers the server side of the same
+ *  "ServerSocket" test suite (which covers the server side of the same
  *  scenarios) does not exercise: the send deadline, a pre-close
  *  response while the client is still sending, close() from the
  *  client's own receive callback, and the Qt client's close()-cancels-
@@ -34,8 +34,8 @@
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "Common/Cpp/Sockets/ClientSocket_Qt.h"
-#include "Common/Cpp/Sockets/ServerSocket2.h"
-#include "Common/Cpp/Sockets/ServerSocket2_Qt.h"
+#include "Common/Cpp/Sockets/ServerSocket.h"
+#include "Common/Cpp/Sockets/ServerSocket_Qt.h"
 #ifndef _WIN32
 #include "Common/Cpp/Sockets/ClientSocket_POSIX.h"
 #endif
@@ -122,10 +122,10 @@ struct ClosingClientListener : AbstractClientSocket::Listener{
 };
 
 
-//  The ServerSocket2 side of these tests: mostly a waiter for the
+//  The ServerSocket side of these tests: mostly a waiter for the
 //  connect/disconnect/listen events, optionally echoing received data
 //  back on the connection.
-struct Server2EchoListener : AbstractServerSocket2::Listener{
+struct Server2EchoListener : AbstractServerSocket::Listener{
     Waiter waiter;
     std::atomic<int> listen_finished{0};
     //  Protected by "waiter.lock" (written by the socket's thread).
@@ -147,7 +147,7 @@ struct Server2EchoListener : AbstractServerSocket2::Listener{
         waiter.notify();
     }
 
-    virtual void on_connect(AbstractServerSocket2::ConnectionPtr) override{
+    virtual void on_connect(AbstractServerSocket::ConnectionPtr) override{
         connected++;
         waiter.notify();
     }
@@ -158,7 +158,7 @@ struct Server2EchoListener : AbstractServerSocket2::Listener{
     }
 
     virtual void on_receive_data(
-        AbstractServerSocket2::ConnectionPtr connection,
+        AbstractServerSocket::ConnectionPtr connection,
         const void* data,
         size_t bytes
     ) override{
@@ -169,7 +169,7 @@ struct Server2EchoListener : AbstractServerSocket2::Listener{
         waiter.notify();
     }
 
-    virtual void on_disconnect(AbstractServerSocket2::ConnectionPtr, const std::string&) override{
+    virtual void on_disconnect(AbstractServerSocket::ConnectionPtr, const std::string&) override{
         disconnected++;
         waiter.notify();
     }
@@ -391,7 +391,7 @@ public:
             }
 
             virtual void on_receive_data(
-                AbstractServerSocket2::ConnectionPtr connection,
+                AbstractServerSocket::ConnectionPtr connection,
                 const void* data,
                 size_t bytes
             ) override{
@@ -409,7 +409,7 @@ public:
 
         StallingServerListener server_listener;
         server_listener.echo = false;
-        ServerSocket2 server(this->m_thread_pool);
+        ServerSocket server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -590,7 +590,7 @@ public:
         std::atomic<int> responded{0};
 
         virtual void on_receive_data(
-            AbstractServerSocket2::ConnectionPtr connection,
+            AbstractServerSocket::ConnectionPtr connection,
             const void*,
             size_t
         ) override{
@@ -639,7 +639,7 @@ public:
         StallWatchdog stall_watchdog;
         RespondingListener server_listener;
         server_listener.echo = false;
-        ServerSocket2 server(this->m_thread_pool);
+        ServerSocket server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -771,7 +771,7 @@ public:
             );
         }
         Server2EchoListener server_listener;
-        ServerSocket2 server(this->m_thread_pool);
+        ServerSocket server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -877,7 +877,7 @@ public:
         };
 
         Server2EchoListener server_listener;
-        ServerSocket2_Qt server(m_thread_pool);
+        ServerSocket_Qt server(m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port = 0;
@@ -1072,7 +1072,7 @@ public:
         constexpr int REJECTIONS = 10;
 
         Server2EchoListener server_listener;
-        ServerSocket2_Qt server(m_thread_pool);
+        ServerSocket_Qt server(m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port = 0;

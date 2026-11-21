@@ -1,9 +1,9 @@
-/*  HTTP Server 2 Tests
+/*  HTTP Server Tests
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  Loopback tests that run a real "HttpServer2" (the platform's default
- *  server socket 2 backend) on 127.0.0.1 and drive it with raw
+ *  Loopback tests that run a real "HttpServer" (the platform's default
+ *  server socket backend) on 127.0.0.1 and drive it with raw
  *  "ClientSocket" clients.
  *
  */
@@ -23,10 +23,10 @@
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
-#include "Common/Cpp/HttpServer/HttpServer2.h"
+#include "Common/Cpp/HttpServer/HttpServer.h"
 #include "Common/Cpp/Sockets/ClientSocket.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "HttpServer2_Tests.h"
+#include "HttpServer_Tests.h"
 
 namespace PokemonAutomation{
 
@@ -174,7 +174,7 @@ struct TestClient{
 };
 
 
-struct TestServerListener : HttpServer2::Listener{
+struct TestServerListener : HttpServer::Listener{
     Waiter waiter;
     std::atomic<int> listen_finished{0};
     //  Protected by "waiter.lock" (written by the socket's thread).
@@ -227,7 +227,7 @@ public:
 protected:
     //  Starts the server with "handler" on a free loopback port, waiting
     //  for the listen to finish. "handler" is copied on each attempt.
-    bool start_server(HttpServer2& server, TestServerListener& listener, HttpServer2::Handler handler, uint16_t& port) const{
+    bool start_server(HttpServer& server, TestServerListener& listener, HttpServer::Handler handler, uint16_t& port) const{
         for (int attempt = 0; attempt < 8; attempt++){
             uint16_t candidate;
             {
@@ -274,10 +274,10 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TestServerListener server_listener;
-        HttpServer2 server(m_thread_pool);
+        HttpServer server(m_thread_pool);
         server.add_listener(server_listener);
 
-        auto handler = [](const HttpServer2::Request& request, HttpServer2::Response& response, HttpServer2::HandlerContext&){
+        auto handler = [](const HttpServer::Request& request, HttpServer::Response& response, HttpServer::HandlerContext&){
             response.status = 200;
             response.headers.push_back({"X-Test", "yes"});
             response.body = request.path + "|" + request.query + "|" + request.header("X-Client") + "|" + request.body;
@@ -351,10 +351,10 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TestServerListener server_listener;
-        HttpServer2 server(m_thread_pool);
+        HttpServer server(m_thread_pool);
         server.add_listener(server_listener);
 
-        auto handler = [](const HttpServer2::Request& request, HttpServer2::Response& response, HttpServer2::HandlerContext&){
+        auto handler = [](const HttpServer::Request& request, HttpServer::Response& response, HttpServer::HandlerContext&){
             response.status = 200;
             response.body = "r" + request.body;
         };
@@ -417,10 +417,10 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TestServerListener server_listener;
-        HttpServer2 server(m_thread_pool);
+        HttpServer server(m_thread_pool);
         server.add_listener(server_listener);
 
-        auto handler = [](const HttpServer2::Request&, HttpServer2::Response& response, HttpServer2::HandlerContext&){
+        auto handler = [](const HttpServer::Request&, HttpServer::Response& response, HttpServer::HandlerContext&){
             response.status = 200;
             response.body = "done";
         };
@@ -505,10 +505,10 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TestServerListener server_listener;
-        HttpServer2 server(m_thread_pool);
+        HttpServer server(m_thread_pool);
         server.add_listener(server_listener);
 
-        auto handler = [](const HttpServer2::Request&, HttpServer2::Response& response, HttpServer2::HandlerContext&){
+        auto handler = [](const HttpServer::Request&, HttpServer::Response& response, HttpServer::HandlerContext&){
             response.status = 200;
             response.body = "ok";
         };
@@ -578,11 +578,11 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TestServerListener server_listener;
-        HttpServer2 server(m_thread_pool);
+        HttpServer server(m_thread_pool);
         server.add_listener(server_listener);
 
         std::atomic<bool> handler_called{false};
-        auto handler = [&handler_called](const HttpServer2::Request&, HttpServer2::Response& response, HttpServer2::HandlerContext&){
+        auto handler = [&handler_called](const HttpServer::Request&, HttpServer::Response& response, HttpServer::HandlerContext&){
             handler_called = true;
             response.status = 200;
             response.body = "ok";
@@ -638,11 +638,11 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TestServerListener server_listener;
-        HttpServer2 server(m_thread_pool);
+        HttpServer server(m_thread_pool);
         server.add_listener(server_listener);
 
         std::atomic<bool> handler_called{false};
-        auto handler = [&handler_called](const HttpServer2::Request&, HttpServer2::Response& response, HttpServer2::HandlerContext&){
+        auto handler = [&handler_called](const HttpServer::Request&, HttpServer::Response& response, HttpServer::HandlerContext&){
             handler_called = true;
             response.status = 200;
             response.body = "ok";
@@ -699,11 +699,11 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TestServerListener server_listener;
-        HttpServer2 server(m_thread_pool);
+        HttpServer server(m_thread_pool);
         server.add_listener(server_listener);
 
         std::atomic<bool> handler_called{false};
-        auto handler = [&handler_called](const HttpServer2::Request&, HttpServer2::Response& response, HttpServer2::HandlerContext&){
+        auto handler = [&handler_called](const HttpServer::Request&, HttpServer::Response& response, HttpServer::HandlerContext&){
             handler_called = true;
             response.status = 200;
             response.body = "ok";
@@ -767,11 +767,11 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TestServerListener server_listener;
-        HttpServer2 server(m_thread_pool);
+        HttpServer server(m_thread_pool);
         server.add_listener(server_listener);
 
         std::atomic<int> handler_calls{0};
-        auto handler = [&handler_calls](const HttpServer2::Request&, HttpServer2::Response& response, HttpServer2::HandlerContext&){
+        auto handler = [&handler_calls](const HttpServer::Request&, HttpServer::Response& response, HttpServer::HandlerContext&){
             handler_calls++;
             response.status = 200;
             response.body = "ok";
@@ -850,10 +850,10 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TestServerListener server_listener;
-        HttpServer2 server(m_thread_pool);
+        HttpServer server(m_thread_pool);
         server.add_listener(server_listener);
 
-        auto handler = [](const HttpServer2::Request& request, HttpServer2::Response& response, HttpServer2::HandlerContext&){
+        auto handler = [](const HttpServer::Request& request, HttpServer::Response& response, HttpServer::HandlerContext&){
             response.status = 200;
             response.body = request.body;
         };
@@ -916,7 +916,7 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TestServerListener server_listener;
-        HttpServer2 server(m_thread_pool);
+        HttpServer server(m_thread_pool);
         server.add_listener(server_listener);
 
         HandlerGate gate;
@@ -925,9 +925,9 @@ public:
         std::atomic<bool> first_call_saw_disconnect{false};
 
         auto handler = [&gate, &call_count, &first_call_alive, &first_call_saw_disconnect](
-            const HttpServer2::Request&,
-            HttpServer2::Response& response,
-            HttpServer2::HandlerContext& context
+            const HttpServer::Request&,
+            HttpServer::Response& response,
+            HttpServer::HandlerContext& context
         ){
             const int call = call_count.fetch_add(1) + 1;
             if (call == 1){
@@ -1043,16 +1043,16 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TestServerListener server_listener;
-        HttpServer2 server(m_thread_pool);
+        HttpServer server(m_thread_pool);
         server.add_listener(server_listener);
 
         HandlerGate gate;
         std::atomic<bool> first_call_alive{false};
 
         auto handler = [&gate, &first_call_alive](
-            const HttpServer2::Request& request,
-            HttpServer2::Response& response,
-            HttpServer2::HandlerContext& context
+            const HttpServer::Request& request,
+            HttpServer::Response& response,
+            HttpServer::HandlerContext& context
         ){
             if (request.path == "/a"){
                 first_call_alive = context.connection_alive();
@@ -1167,7 +1167,7 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TestServerListener server_listener;
-        HttpServer2 server(m_thread_pool);
+        HttpServer server(m_thread_pool);
         server.add_listener(server_listener);
 
         HandlerGate gate;
@@ -1175,9 +1175,9 @@ public:
         std::atomic<bool> saw_disconnect_on_stop{false};
 
         auto handler = [&gate, &handler_started, &saw_disconnect_on_stop](
-            const HttpServer2::Request&,
-            HttpServer2::Response& response,
-            HttpServer2::HandlerContext& context
+            const HttpServer::Request&,
+            HttpServer::Response& response,
+            HttpServer::HandlerContext& context
         ){
             handler_started = true;
             gate.started.notify();
@@ -1240,7 +1240,7 @@ public:
 
         if (error.empty()){
             //  Start again (on a fresh port) and serve a fresh request.
-            auto simple_handler = [](const HttpServer2::Request&, HttpServer2::Response& response, HttpServer2::HandlerContext&){
+            auto simple_handler = [](const HttpServer::Request&, HttpServer::Response& response, HttpServer::HandlerContext&){
                 response.status = 200;
                 response.body = "ok";
             };
@@ -1286,10 +1286,10 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TestServerListener server_listener;
-        HttpServer2 server(m_thread_pool);
+        HttpServer server(m_thread_pool);
         server.add_listener(server_listener);
 
-        auto handler = [](const HttpServer2::Request&, HttpServer2::Response& response, HttpServer2::HandlerContext&){
+        auto handler = [](const HttpServer::Request&, HttpServer::Response& response, HttpServer::HandlerContext&){
             response.status = 200;
             response.body = "ok";
         };
@@ -1339,10 +1339,10 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TestServerListener server_listener;
-        HttpServer2 server(m_thread_pool);
+        HttpServer server(m_thread_pool);
         server.add_listener(server_listener);
 
-        auto handler = [](const HttpServer2::Request&, HttpServer2::Response& response, HttpServer2::HandlerContext&){
+        auto handler = [](const HttpServer::Request&, HttpServer::Response& response, HttpServer::HandlerContext&){
             response.status = 200;
             response.body = "ok\n";
         };
@@ -1404,10 +1404,10 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TestServerListener server_listener;
-        HttpServer2 server(m_thread_pool);
+        HttpServer server(m_thread_pool);
         server.add_listener(server_listener);
 
-        auto handler = [](const HttpServer2::Request&, HttpServer2::Response&, HttpServer2::HandlerContext&){
+        auto handler = [](const HttpServer::Request&, HttpServer::Response&, HttpServer::HandlerContext&){
             throw std::runtime_error("boom");
         };
 
@@ -1468,11 +1468,11 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TestServerListener server_listener;
-        HttpServer2 server(m_thread_pool);
+        HttpServer server(m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
-        if (!start_server(server, server_listener, HttpServer2::Handler{}, port)){
+        if (!start_server(server, server_listener, HttpServer::Handler{}, port)){
             return "Failed to start the server";
         }
 
@@ -1529,10 +1529,10 @@ public:
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         TestServerListener server_listener;
-        HttpServer2 server(m_thread_pool);
+        HttpServer server(m_thread_pool);
         server.add_listener(server_listener);
 
-        auto handler = [](const HttpServer2::Request&, HttpServer2::Response& response, HttpServer2::HandlerContext&){
+        auto handler = [](const HttpServer::Request&, HttpServer::Response& response, HttpServer::HandlerContext&){
             response.status = 200;
             response.body = "bye\n";
             response.connection_close = true;
@@ -1591,57 +1591,57 @@ public:
 } // anonymous namespace
 
 
-void add_tests_HttpServer2(UnitTestDatabase& database, ThreadPool& thread_pool){
+void add_tests_HttpServer(UnitTestDatabase& database, ThreadPool& thread_pool){
     database.add<Test_Http2_PostEcho>(
-        thread_pool, "HttpServer2 - POST request/response with headers, query and body"
+        thread_pool, "HttpServer - POST request/response with headers, query and body"
     );
     database.add<Test_Http2_PipelinedKeepAlive>(
-        thread_pool, "HttpServer2 - Two pipelined requests on one keep-alive connection"
+        thread_pool, "HttpServer - Two pipelined requests on one keep-alive connection"
     );
     database.add<Test_Http2_ConnectionClose>(
-        thread_pool, "HttpServer2 - Connection: close and reconnection"
+        thread_pool, "HttpServer - Connection: close and reconnection"
     );
     database.add<Test_Http2_BadRequest>(
-        thread_pool, "HttpServer2 - Malformed request line"
+        thread_pool, "HttpServer - Malformed request line"
     );
     database.add<Test_Http2_ChunkedRejected>(
-        thread_pool, "HttpServer2 - Chunked request bodies are rejected"
+        thread_pool, "HttpServer - Chunked request bodies are rejected"
     );
     database.add<Test_Http2_BodyTooLarge>(
-        thread_pool, "HttpServer2 - Oversized content-length is rejected"
+        thread_pool, "HttpServer - Oversized content-length is rejected"
     );
     database.add<Test_Http2_HeadersTooLarge>(
-        thread_pool, "HttpServer2 - An oversized header section is rejected"
+        thread_pool, "HttpServer - An oversized header section is rejected"
     );
     database.add<Test_Http2_BufferCap>(
-        thread_pool, "HttpServer2 - A connection over the buffer cap is closed"
+        thread_pool, "HttpServer - A connection over the buffer cap is closed"
     );
     database.add<Test_Http2_ExpectContinue>(
-        thread_pool, "HttpServer2 - Expect: 100-continue"
+        thread_pool, "HttpServer - Expect: 100-continue"
     );
     database.add<Test_Http2_DisconnectDuringHandler>(
-        thread_pool, "HttpServer2 - Disconnect while the handler is running"
+        thread_pool, "HttpServer - Disconnect while the handler is running"
     );
     database.add<Test_Http2_ReconnectWhileHandlerRunning>(
-        thread_pool, "HttpServer2 - Reconnect while the previous handler is still running"
+        thread_pool, "HttpServer - Reconnect while the previous handler is still running"
     );
     database.add<Test_Http2_StopDuringHandler>(
-        thread_pool, "HttpServer2 - stop() while the handler is running"
+        thread_pool, "HttpServer - stop() while the handler is running"
     );
     database.add<Test_Http2_RejectSecondClient>(
-        thread_pool, "HttpServer2 - A second client is rejected"
+        thread_pool, "HttpServer - A second client is rejected"
     );
     database.add<Test_Http2_Http10>(
-        thread_pool, "HttpServer2 - HTTP/1.0 requests are not kept alive"
+        thread_pool, "HttpServer - HTTP/1.0 requests are not kept alive"
     );
     database.add<Test_Http2_HandlerThrows>(
-        thread_pool, "HttpServer2 - A throwing handler gets a 500 and the connection is closed"
+        thread_pool, "HttpServer - A throwing handler gets a 500 and the connection is closed"
     );
     database.add<Test_Http2_NoHandler>(
-        thread_pool, "HttpServer2 - A request with no handler registered gets a 500"
+        thread_pool, "HttpServer - A request with no handler registered gets a 500"
     );
     database.add<Test_Http2_HandlerRequestsClose>(
-        thread_pool, "HttpServer2 - A handler can request Connection: close"
+        thread_pool, "HttpServer - A handler can request Connection: close"
     );
 }
 
