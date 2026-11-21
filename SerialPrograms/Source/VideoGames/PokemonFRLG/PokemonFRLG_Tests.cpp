@@ -20,6 +20,7 @@
 #include "Inference/Menus/PokemonFRLG_PartyEmptySlotDetector.h"
 #include "Inference/Menus/PokemonFRLG_PartyHeldItemDetector.h"
 #include "Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
+#include "Inference/Menus/PokemonFRLG_SummaryDetector.h"
 #include "Inference/PokemonFRLG_BallReader.h"
 #include "Inference/PokemonFRLG_BattleLevelUpReader.h"
 #include "Inference/PokemonFRLG_BattleSelectionArrowDetector.h"
@@ -63,6 +64,7 @@ void add_tests(UnitTestDatabase& database){
     add_tests_StatsReader(database);
     add_tests_SelectionDialogDetector(database);
     add_tests_ShinySymbolDetector(database);
+    add_tests_SummaryDetector(database);
     add_tests_SummarySpriteReader(database);
     add_tests_TrainerIdReader(database);
     add_tests_WildEncounterReader(database);

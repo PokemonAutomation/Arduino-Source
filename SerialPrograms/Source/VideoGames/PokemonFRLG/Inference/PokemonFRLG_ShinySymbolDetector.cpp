@@ -67,7 +67,7 @@ public:
         const std::string& image,
         bool expected
     )
-        : ImageUnitTest("PokemonHome::ShinySymbolDetector - " + image, {image})
+        : ImageUnitTest("PokemonFRLG::ShinySymbolDetector - " + image, {image})
         , m_expected(expected)
     {}
 
@@ -88,6 +88,70 @@ void add_tests_ShinySymbolDetector(UnitTestDatabase& database){
     database.add<Test_ShinySymbolDetector>("PokemonFRLG/ShinySymbolDetector/Char_False.png", false);
     database.add<Test_ShinySymbolDetector>("PokemonFRLG/ShinySymbolDetector/Karp-coloredited_True.png", true);
     database.add<Test_ShinySymbolDetector>("PokemonFRLG/ShinySymbolDetector/Karp-snotyak_True.png", true);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/abra_1_deu.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/bulbasaur_1_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/bulbasaur_1_fra.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/bulbasaur_1_jpn.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/bulbasaur_2_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/bulbasaur_3_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/bulbasaur_4_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/deoxys_1_jpn.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/horsea_1_deu.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/horsea_2_deu.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/horsea_3_deu.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/magikarp_1_spa.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/moltres_1_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/nidoran_m_eng.png", true);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/pidgey_1_ita.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/unown_c_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/unown_ex_eng.png", true);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/unown_h_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/unown_j_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/unown_n_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/unown_p_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/unown_qu_eng.png", true);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/venonat_4k_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/arbok_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/arcanine_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/blastoise_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/butterfree_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/diglett_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/dragonite_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/dragonite_usb3_eng.png", true);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/ekans_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/exeggcute_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/fearow_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/gengar_usb3_eng.png", true);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/geodude_usb3_eng.png", true);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/gloom_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/golbat_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/machoke_usb3_eng.png", true);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/magmar_usb3_eng.png", true);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/magnemite_usb3_eng.png", true);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/magneton_usb3_eng.png", true);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/mantine_usb3_eng.png", true);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/mewtwo_usb3_eng.png", true);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/mr-mime_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/nidoking_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/nidoqueen_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/onix_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/parasect_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/pidgeotto_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/psyduck_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/raichu_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/rhydon_usb3_eng.png", true);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/sneasel_usb3_eng.png", true);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/snorlax_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/swinub_usb3_eng.png", true);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page1/weedle_hd60pro_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page2/abra_1_deu.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page2/deoxys_1_jpn.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page2/mewtwo_1_spa.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page2/nidoranf_1_eng.jpg", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page2/raikou_1_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page2/raikou_2_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page2/scyther_1_eng.png", false);
+    database.add<Test_ShinySymbolDetector>("PokemonFRLG/StatsReader/Page2/venonat_1_eng.jpg", false);
 }
 
 }
