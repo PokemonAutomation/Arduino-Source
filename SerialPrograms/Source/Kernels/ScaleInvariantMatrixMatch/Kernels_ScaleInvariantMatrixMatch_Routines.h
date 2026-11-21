@@ -41,13 +41,9 @@ struct SumATA2{
 
     PA_FORCE_INLINE void accumulate(size_t length, const float* A, const float* T){
         vtype sum_as0 = Context::vzero();
-        vtype sum_as1 = Context::vzero();
-        vtype sum_as2 = Context::vzero();
-        vtype sum_as3 = Context::vzero();
         vtype sum_at0 = Context::vzero();
-        vtype sum_at1 = Context::vzero();
-        vtype sum_at2 = Context::vzero();
-        vtype sum_at3 = Context::vzero();
+        // sum_as1..3 / sum_at1..3 are declared inside the Context::UNROLL block below
+        // (they are only used there).
 
         if constexpr (VECTOR_LENGTH > 1){
             size_t align = (size_t)T % (VECTOR_LENGTH * sizeof(float));
@@ -70,33 +66,41 @@ struct SumATA2{
         const vtype* ptrA = (const vtype*)A;
         const vtype* ptrT = (const vtype*)T;
 
-        size_t lc = length / (4 * VECTOR_LENGTH);
-        if (lc){
-            do{
-                vtype a0 = ptrA[0];
-                vtype a1 = ptrA[1];
-                vtype a2 = ptrA[2];
-                vtype a3 = ptrA[3];
-                sum_as0 = Context::vpma(a0, a0, sum_as0);
-                sum_as1 = Context::vpma(a1, a1, sum_as1);
-                sum_as2 = Context::vpma(a2, a2, sum_as2);
-                sum_as3 = Context::vpma(a3, a3, sum_as3);
-                sum_at0 = Context::vpma(a0, ptrT[0], sum_at0);
-                sum_at1 = Context::vpma(a1, ptrT[1], sum_at1);
-                sum_at2 = Context::vpma(a2, ptrT[2], sum_at2);
-                sum_at3 = Context::vpma(a3, ptrT[3], sum_at3);
-                ptrA += 4;
-                ptrT += 4;
-            }while (--lc);
-            sum_as0 = Context::vadd(sum_as0, sum_as1);
-            sum_at0 = Context::vadd(sum_at0, sum_at1);
-            sum_as2 = Context::vadd(sum_as2, sum_as3);
-            sum_at2 = Context::vadd(sum_at2, sum_at3);
-            sum_as0 = Context::vadd(sum_as0, sum_as2);
-            sum_at0 = Context::vadd(sum_at0, sum_at2);
-        }
+        if constexpr (Context::UNROLL){
+            vtype sum_as1 = Context::vzero();
+            vtype sum_as2 = Context::vzero();
+            vtype sum_as3 = Context::vzero();
+            vtype sum_at1 = Context::vzero();
+            vtype sum_at2 = Context::vzero();
+            vtype sum_at3 = Context::vzero();
 
-        length %= 4 * VECTOR_LENGTH;
+            size_t lc = length / (4 * VECTOR_LENGTH);
+            if (lc){
+                do{
+                    vtype a0 = ptrA[0];
+                    vtype a1 = ptrA[1];
+                    vtype a2 = ptrA[2];
+                    vtype a3 = ptrA[3];
+                    sum_as0 = Context::vpma(a0, a0, sum_as0);
+                    sum_as1 = Context::vpma(a1, a1, sum_as1);
+                    sum_as2 = Context::vpma(a2, a2, sum_as2);
+                    sum_as3 = Context::vpma(a3, a3, sum_as3);
+                    sum_at0 = Context::vpma(a0, ptrT[0], sum_at0);
+                    sum_at1 = Context::vpma(a1, ptrT[1], sum_at1);
+                    sum_at2 = Context::vpma(a2, ptrT[2], sum_at2);
+                    sum_at3 = Context::vpma(a3, ptrT[3], sum_at3);
+                    ptrA += 4;
+                    ptrT += 4;
+                }while (--lc);
+                sum_as0 = Context::vadd(sum_as0, sum_as1);
+                sum_at0 = Context::vadd(sum_at0, sum_at1);
+                sum_as2 = Context::vadd(sum_as2, sum_as3);
+                sum_at2 = Context::vadd(sum_at2, sum_at3);
+                sum_as0 = Context::vadd(sum_as0, sum_as2);
+                sum_at0 = Context::vadd(sum_at0, sum_at2);
+            }
+            length %= 4 * VECTOR_LENGTH;
+        }
         while (length >= VECTOR_LENGTH){
             vtype a0 = ptrA[0];
             sum_as0 = Context::vpma(a0, a0, sum_as0);
@@ -119,13 +123,9 @@ struct SumATA2{
     }
     PA_FORCE_INLINE void accumulate(size_t length, const float* A, const float* TW, const float* W){
         vtype sum_as0 = Context::vzero();
-        vtype sum_as1 = Context::vzero();
-        vtype sum_as2 = Context::vzero();
-        vtype sum_as3 = Context::vzero();
         vtype sum_at0 = Context::vzero();
-        vtype sum_at1 = Context::vzero();
-        vtype sum_at2 = Context::vzero();
-        vtype sum_at3 = Context::vzero();
+        // sum_as1..3 / sum_at1..3 are declared inside the Context::UNROLL block below
+        // (they are only used there).
 
         if constexpr (VECTOR_LENGTH > 1){
             size_t align = (size_t)TW % (VECTOR_LENGTH * sizeof(float));
@@ -152,38 +152,46 @@ struct SumATA2{
         const vtype* ptrT = (const vtype*)TW;
         const vtype* ptrW = (const vtype*)W;
 
-        size_t lc = length / (4 * VECTOR_LENGTH);
-        if (lc){
-            do{
-                vtype a0 = ptrA[0];
-                vtype a1 = ptrA[1];
-                vtype a2 = ptrA[2];
-                vtype a3 = ptrA[3];
-                a0 = Context::vmul(a0, ptrW[0]);
-                a1 = Context::vmul(a1, ptrW[1]);
-                a2 = Context::vmul(a2, ptrW[2]);
-                a3 = Context::vmul(a3, ptrW[3]);
-                sum_as0 = Context::vpma(a0, a0, sum_as0);
-                sum_as1 = Context::vpma(a1, a1, sum_as1);
-                sum_as2 = Context::vpma(a2, a2, sum_as2);
-                sum_as3 = Context::vpma(a3, a3, sum_as3);
-                sum_at0 = Context::vpma(a0, ptrT[0], sum_at0);
-                sum_at1 = Context::vpma(a1, ptrT[1], sum_at1);
-                sum_at2 = Context::vpma(a2, ptrT[2], sum_at2);
-                sum_at3 = Context::vpma(a3, ptrT[3], sum_at3);
-                ptrA += 4;
-                ptrT += 4;
-                ptrW += 4;
-            }while (--lc);
-            sum_as0 = Context::vadd(sum_as0, sum_as1);
-            sum_at0 = Context::vadd(sum_at0, sum_at1);
-            sum_as2 = Context::vadd(sum_as2, sum_as3);
-            sum_at2 = Context::vadd(sum_at2, sum_at3);
-            sum_as0 = Context::vadd(sum_as0, sum_as2);
-            sum_at0 = Context::vadd(sum_at0, sum_at2);
-        }
+        if constexpr (Context::UNROLL){
+            vtype sum_as1 = Context::vzero();
+            vtype sum_as2 = Context::vzero();
+            vtype sum_as3 = Context::vzero();
+            vtype sum_at1 = Context::vzero();
+            vtype sum_at2 = Context::vzero();
+            vtype sum_at3 = Context::vzero();
 
-        length %= 4 * VECTOR_LENGTH;
+            size_t lc = length / (4 * VECTOR_LENGTH);
+            if (lc){
+                do{
+                    vtype a0 = ptrA[0];
+                    vtype a1 = ptrA[1];
+                    vtype a2 = ptrA[2];
+                    vtype a3 = ptrA[3];
+                    a0 = Context::vmul(a0, ptrW[0]);
+                    a1 = Context::vmul(a1, ptrW[1]);
+                    a2 = Context::vmul(a2, ptrW[2]);
+                    a3 = Context::vmul(a3, ptrW[3]);
+                    sum_as0 = Context::vpma(a0, a0, sum_as0);
+                    sum_as1 = Context::vpma(a1, a1, sum_as1);
+                    sum_as2 = Context::vpma(a2, a2, sum_as2);
+                    sum_as3 = Context::vpma(a3, a3, sum_as3);
+                    sum_at0 = Context::vpma(a0, ptrT[0], sum_at0);
+                    sum_at1 = Context::vpma(a1, ptrT[1], sum_at1);
+                    sum_at2 = Context::vpma(a2, ptrT[2], sum_at2);
+                    sum_at3 = Context::vpma(a3, ptrT[3], sum_at3);
+                    ptrA += 4;
+                    ptrT += 4;
+                    ptrW += 4;
+                }while (--lc);
+                sum_as0 = Context::vadd(sum_as0, sum_as1);
+                sum_at0 = Context::vadd(sum_at0, sum_at1);
+                sum_as2 = Context::vadd(sum_as2, sum_as3);
+                sum_at2 = Context::vadd(sum_at2, sum_at3);
+                sum_as0 = Context::vadd(sum_as0, sum_as2);
+                sum_at0 = Context::vadd(sum_at0, sum_at2);
+            }
+            length %= 4 * VECTOR_LENGTH;
+        }
         while (length >= VECTOR_LENGTH){
             vtype a0 = ptrA[0];
             a0 = Context::vmul(a0, ptrW[0]);
@@ -228,9 +236,7 @@ struct SumError{
 
     PA_FORCE_INLINE void accumulate(size_t length, const float* A, const float* T){
         vtype sum0 = Context::vzero();
-        vtype sum1 = Context::vzero();
-        vtype sum2 = Context::vzero();
-        vtype sum3 = Context::vzero();
+        // sum1..3 are declared inside the Context::UNROLL block below (only used there).
 
         if constexpr (VECTOR_LENGTH > 1){
             size_t align = (size_t)T % (VECTOR_LENGTH * sizeof(float));
@@ -253,26 +259,31 @@ struct SumError{
         const vtype* ptrA = (const vtype*)A;
         const vtype* ptrT = (const vtype*)T;
 
-        size_t lc = length / (4 * VECTOR_LENGTH);
-        if (lc){
-            do{
-                vtype a0 = Context::vpms(scale, ptrA[0], ptrT[0]);
-                vtype a1 = Context::vpms(scale, ptrA[1], ptrT[1]);
-                vtype a2 = Context::vpms(scale, ptrA[2], ptrT[2]);
-                vtype a3 = Context::vpms(scale, ptrA[3], ptrT[3]);
-                sum0 = Context::vpma(a0, a0, sum0);
-                sum1 = Context::vpma(a1, a1, sum1);
-                sum2 = Context::vpma(a2, a2, sum2);
-                sum3 = Context::vpma(a3, a3, sum3);
-                ptrA += 4;
-                ptrT += 4;
-            }while (--lc);
-            sum0 = Context::vadd(sum0, sum1);
-            sum2 = Context::vadd(sum2, sum3);
-            sum0 = Context::vadd(sum0, sum2);
-        }
+        if constexpr (Context::UNROLL){
+            vtype sum1 = Context::vzero();
+            vtype sum2 = Context::vzero();
+            vtype sum3 = Context::vzero();
 
-        length %= 4 * VECTOR_LENGTH;
+            size_t lc = length / (4 * VECTOR_LENGTH);
+            if (lc){
+                do{
+                    vtype a0 = Context::vpms(scale, ptrA[0], ptrT[0]);
+                    vtype a1 = Context::vpms(scale, ptrA[1], ptrT[1]);
+                    vtype a2 = Context::vpms(scale, ptrA[2], ptrT[2]);
+                    vtype a3 = Context::vpms(scale, ptrA[3], ptrT[3]);
+                    sum0 = Context::vpma(a0, a0, sum0);
+                    sum1 = Context::vpma(a1, a1, sum1);
+                    sum2 = Context::vpma(a2, a2, sum2);
+                    sum3 = Context::vpma(a3, a3, sum3);
+                    ptrA += 4;
+                    ptrT += 4;
+                }while (--lc);
+                sum0 = Context::vadd(sum0, sum1);
+                sum2 = Context::vadd(sum2, sum3);
+                sum0 = Context::vadd(sum0, sum2);
+            }
+            length %= 4 * VECTOR_LENGTH;
+        }
         while (length >= VECTOR_LENGTH){
             vtype a0 = Context::vpms(scale, ptrA[0], ptrT[0]);
             sum0 = Context::vpma(a0, a0, sum0);
@@ -291,9 +302,7 @@ struct SumError{
     }
     PA_FORCE_INLINE void accumulate(size_t length, const float* A, const float* TW, const float* W){
         vtype sum0 = Context::vzero();
-        vtype sum1 = Context::vzero();
-        vtype sum2 = Context::vzero();
-        vtype sum3 = Context::vzero();
+        // sum1..3 are declared inside the Context::UNROLL block below (only used there).
 
         if constexpr (VECTOR_LENGTH > 1){
             size_t align = (size_t)TW % (VECTOR_LENGTH * sizeof(float));
@@ -320,31 +329,36 @@ struct SumError{
         const vtype* ptrT = (const vtype*)TW;
         const vtype* ptrW = (const vtype*)W;
 
-        size_t lc = length / (4 * VECTOR_LENGTH);
-        if (lc){
-            do{
-                vtype a0 = Context::vmul(scale, ptrA[0]);
-                vtype a1 = Context::vmul(scale, ptrA[1]);
-                vtype a2 = Context::vmul(scale, ptrA[2]);
-                vtype a3 = Context::vmul(scale, ptrA[3]);
-                a0 = Context::vpms(a0, ptrW[0], ptrT[0]);
-                a1 = Context::vpms(a1, ptrW[1], ptrT[1]);
-                a2 = Context::vpms(a2, ptrW[2], ptrT[2]);
-                a3 = Context::vpms(a3, ptrW[3], ptrT[3]);
-                sum0 = Context::vpma(a0, a0, sum0);
-                sum1 = Context::vpma(a1, a1, sum1);
-                sum2 = Context::vpma(a2, a2, sum2);
-                sum3 = Context::vpma(a3, a3, sum3);
-                ptrA += 4;
-                ptrT += 4;
-                ptrW += 4;
-            }while (--lc);
-            sum0 = Context::vadd(sum0, sum1);
-            sum2 = Context::vadd(sum2, sum3);
-            sum0 = Context::vadd(sum0, sum2);
-        }
+        if constexpr (Context::UNROLL){
+            vtype sum1 = Context::vzero();
+            vtype sum2 = Context::vzero();
+            vtype sum3 = Context::vzero();
 
-        length %= 4 * VECTOR_LENGTH;
+            size_t lc = length / (4 * VECTOR_LENGTH);
+            if (lc){
+                do{
+                    vtype a0 = Context::vmul(scale, ptrA[0]);
+                    vtype a1 = Context::vmul(scale, ptrA[1]);
+                    vtype a2 = Context::vmul(scale, ptrA[2]);
+                    vtype a3 = Context::vmul(scale, ptrA[3]);
+                    a0 = Context::vpms(a0, ptrW[0], ptrT[0]);
+                    a1 = Context::vpms(a1, ptrW[1], ptrT[1]);
+                    a2 = Context::vpms(a2, ptrW[2], ptrT[2]);
+                    a3 = Context::vpms(a3, ptrW[3], ptrT[3]);
+                    sum0 = Context::vpma(a0, a0, sum0);
+                    sum1 = Context::vpma(a1, a1, sum1);
+                    sum2 = Context::vpma(a2, a2, sum2);
+                    sum3 = Context::vpma(a3, a3, sum3);
+                    ptrA += 4;
+                    ptrT += 4;
+                    ptrW += 4;
+                }while (--lc);
+                sum0 = Context::vadd(sum0, sum1);
+                sum2 = Context::vadd(sum2, sum3);
+                sum0 = Context::vadd(sum0, sum2);
+            }
+            length %= 4 * VECTOR_LENGTH;
+        }
         while (length >= VECTOR_LENGTH){
             vtype a0 = Context::vmul(scale, ptrA[0]);
             a0 = Context::vpms(a0, ptrW[0], ptrT[0]);
