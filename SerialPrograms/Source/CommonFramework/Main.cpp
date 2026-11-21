@@ -185,14 +185,6 @@ int run_program(int argc, char *argv[]){
 
 
 
-    ScopeExit cleanup([]{
-#ifdef PA_SDL
-        global_gamepad_tracker().stop();
-#endif
-        SerialPortPoller::instance().stop();
-        GlobalMediaServices::instance().stop();
-    });
-
     //  Several novice developers struggled to build and run the program due to missing Resources folder.
     //  Add this check to pop a message box when Resources folder is missing.
     if (!check_resource_folder(logger)){
@@ -207,13 +199,6 @@ int run_program(int argc, char *argv[]){
     }catch (const ParseException& error){
         logger.log(error.message(), COLOR_RED);
     }
-
-    //  Load the Switch framework settings now, not only when their panel is opened.
-    OptionsPanelWrapper<NintendoSwitch::ConsoleSettingsPanel>().make_panel()->load_json_from_global();
-
-    //  Preload a bunch of stuff now so they are ready later.
-    SerialPortPoller::instance().ports();
-    get_all_cameras();
 
     //  Force all the Qt thread pools to be constructed now on the main thread.
     GlobalThreadPools::qt_worker_threadpool();
@@ -246,9 +231,26 @@ int run_program(int argc, char *argv[]){
         return 1;
     }
 
+    //  Tests need no console, serial port or camera. Return before touching
+    //  them, so tests can run while another instance holds the devices.
     if (GlobalSettings::instance().COMMAND_LINE_TEST_MODE){
         return run_command_line_tests(augment_test_color_distortions, test_substring);
     }
+
+    ScopeExit cleanup([]{
+#ifdef PA_SDL
+        global_gamepad_tracker().stop();
+#endif
+        SerialPortPoller::instance().stop();
+        GlobalMediaServices::instance().stop();
+    });
+
+    //  Load the Switch framework settings now, not only when their panel is opened.
+    OptionsPanelWrapper<NintendoSwitch::ConsoleSettingsPanel>().make_panel()->load_json_from_global();
+
+    //  Preload a bunch of stuff now so they are ready later.
+    SerialPortPoller::instance().ports();
+    get_all_cameras();
 
     //  Check whether the hardware is powerful enough to run this program.
     if (!check_hardware()){
