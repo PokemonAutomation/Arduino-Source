@@ -4,10 +4,13 @@
  *
  */
 
+#include <algorithm>
 #include "Common/Cpp/ColoredText.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/PABotBase2/Controllers/PABotBase2_Controller_NS1_OemController.h"
 #include "Controllers/SerialPort/SerialPABotBase.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Gyro.h"
 #include "NintendoSwitch_PABotBase2_OemController.h"
 
 //#include <iostream>
@@ -19,7 +22,12 @@ namespace NintendoSwitch{
 
 using namespace std::chrono_literals;
 
+namespace {
 
+// Protocol 2026061806 from main does not support the physical motion opcode.
+constexpr uint32_t PHYSICAL_MOTION_PROTOCOL_VERSION = 2026061807;
+
+}
 
 void PABotBase2_OemController::add_message_loggers(PABotBase2::MessageLogger& message_logger){
     using namespace PABotBase2;
@@ -111,6 +119,21 @@ void PABotBase2_OemController::add_message_loggers(PABotBase2::MessageLogger& me
             str += "id = " + std::to_string(message->id);
             str += ", ms = " + std::to_string(message->milliseconds);
             return str;
+        }
+    );
+    message_logger.add_message<Message_Command_NS1_OemController_Motion>(
+        "PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_MOTION",
+        PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_MOTION,
+        false,
+        [](const Message_Command_NS1_OemController_Motion* message){
+            return "id = " + std::to_string(message->id)
+                + ", ms = " + std::to_string(message->milliseconds)
+                + ", accel-ug = (" + std::to_string(message->acceleration_ug[0])
+                + ", " + std::to_string(message->acceleration_ug[1])
+                + ", " + std::to_string(message->acceleration_ug[2]) + ")"
+                + ", gyro-mdps = (" + std::to_string(message->angular_velocity_mdps[0])
+                + ", " + std::to_string(message->angular_velocity_mdps[1])
+                + ", " + std::to_string(message->angular_velocity_mdps[2]) + ")";
         }
     );
 }
@@ -422,28 +445,68 @@ Button PABotBase2_OemController::populate_report_buttons(
     }
     return all_buttons;
 }
-bool PABotBase2_OemController::populate_report_gyro(
-    OemController_State0x30_Gyro& gyro,
-    const SwitchControllerState& controller_state
-){
-    gyro.accel_x = controller_state.gyro[0];
-    gyro.accel_y = controller_state.gyro[1];
-    gyro.accel_z = controller_state.gyro[2];
-    gyro.rotation_x = controller_state.gyro[3];
-    gyro.rotation_y = controller_state.gyro[4];
-    gyro.rotation_z = controller_state.gyro[5];
 
-    bool gyro_active = false;
-    gyro_active |= gyro.accel_x != 0;
-    gyro_active |= gyro.accel_y != 0;
-    gyro_active |= gyro.accel_z != 0;
-    gyro_active |= gyro.rotation_x != 0;
-    gyro_active |= gyro.rotation_y != 0;
-    gyro_active |= gyro.rotation_z != 0;
-//    cout << "gyro_active = " << gyro_active << endl;
-    return gyro_active;
+void PABotBase2_OemController::require_gyro_motion_protocol() const{
+    if (m_connection.device().device_protocol_version() < PHYSICAL_MOTION_PROTOCOL_VERSION){
+        throw UserSetupError(
+            m_logger, "Gyro motion requires firmware protocol " +
+                std::to_string(PHYSICAL_MOTION_PROTOCOL_VERSION) + " or newer."
+        );
+    }
 }
 
+void PABotBase2_OemController::issue_motion_report(
+    Cancellable* cancellable,
+    WallDuration duration,
+    const OemController_State0x30_Buttons& buttons,
+    const SwitchControllerState& controller_state,
+    bool has_gyro_motion
+){
+    if (!has_gyro_motion){
+        issue_report(cancellable, duration, buttons);
+        return;
+    }
+
+    require_gyro_motion_protocol();
+
+    const GyroState& state = controller_state.gyro;
+    PABotBase2::Message_Command_NS1_OemController_Motion request{};
+    request.message_bytes = sizeof(request);
+    request.opcode = PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_MOTION;
+    request.buttons = buttons;
+    request.acceleration_ug[0] = Internal::gyro_transport_value(
+        state.acceleration_g.x, Internal::GYRO_ACCEL_TRANSPORT_SCALE, "Gyro acceleration X"
+    );
+    request.acceleration_ug[1] = Internal::gyro_transport_value(
+        state.acceleration_g.y, Internal::GYRO_ACCEL_TRANSPORT_SCALE, "Gyro acceleration Y"
+    );
+    request.acceleration_ug[2] = Internal::gyro_transport_value(
+        state.acceleration_g.z, Internal::GYRO_ACCEL_TRANSPORT_SCALE, "Gyro acceleration Z"
+    );
+    request.angular_velocity_mdps[0] = Internal::gyro_transport_value(
+        state.angular_velocity_dps.x,
+        Internal::GYRO_ANGULAR_VELOCITY_TRANSPORT_SCALE,
+        "Gyro angular velocity X"
+    );
+    request.angular_velocity_mdps[1] = Internal::gyro_transport_value(
+        state.angular_velocity_dps.y,
+        Internal::GYRO_ANGULAR_VELOCITY_TRANSPORT_SCALE,
+        "Gyro angular velocity Y"
+    );
+    request.angular_velocity_mdps[2] = Internal::gyro_transport_value(
+        state.angular_velocity_dps.z,
+        Internal::GYRO_ANGULAR_VELOCITY_TRANSPORT_SCALE,
+        "Gyro angular velocity Z"
+    );
+
+    Milliseconds remaining = std::chrono::duration_cast<Milliseconds>(duration);
+    while (remaining > Milliseconds::zero()){
+        const Milliseconds current = std::min(remaining, 65535ms);
+        request.milliseconds = static_cast<uint16_t>(current.count());
+        m_connection.device().command_queue().send_command(cancellable, request);
+        remaining -= current;
+    }
+}
 
 void PABotBase2_OemController::issue_report(
     Cancellable* cancellable,
@@ -468,72 +531,6 @@ void PABotBase2_OemController::issue_report(
         time_left -= current;
     }
 }
-void PABotBase2_OemController::issue_report(
-    Cancellable* cancellable,
-    WallDuration duration,
-    const OemController_State0x30_Buttons& buttons,
-    const OemController_State0x30_Gyro& gyro
-){
-    //  TODO: For now we duplicate the gyro data to all 3 5ms segments.
-    OemController_State0x30_GyroX3 gyro3{
-        gyro, gyro, gyro
-    };
-
-#if 0
-    //  Purturb results to show the Switch that they are not stuck.
-    if (gyro3.time1.accel_x > 0){
-        gyro3.time0.accel_x--;
-        gyro3.time2.accel_x--;
-    }else if (gyro3.time1.accel_x < 0){
-        gyro3.time0.accel_x++;
-        gyro3.time2.accel_x++;
-    }else{
-        gyro3.time0.accel_x--;
-        gyro3.time2.accel_x++;
-    }
-    if (gyro3.time1.accel_y > 0){
-        gyro3.time0.accel_y--;
-        gyro3.time2.accel_y--;
-    }else if (gyro3.time1.accel_y < 0){
-        gyro3.time0.accel_y++;
-        gyro3.time2.accel_y++;
-    }else{
-        gyro3.time0.accel_y--;
-        gyro3.time2.accel_y++;
-    }
-    if (gyro3.time1.accel_z > 0){
-        gyro3.time0.accel_z--;
-        gyro3.time2.accel_z--;
-    }else if (gyro3.time1.accel_z < 0){
-        gyro3.time0.accel_z++;
-        gyro3.time2.accel_z++;
-    }else{
-        gyro3.time0.accel_z--;
-        gyro3.time2.accel_z++;
-    }
-#endif
-
-    //  We will not do any throttling or timing adjustments here. We'll defer
-    //  to the microcontroller to do that for us.
-
-    //  Divide the controller state into smaller chunks of 65535 milliseconds.
-    Milliseconds time_left = std::chrono::duration_cast<Milliseconds>(duration);
-
-    PABotBase2::Message_Command_NS1_OemController_FullState request;
-    request.message_bytes = sizeof(request);
-    request.opcode = PABB2_MESSAGE_CMD_NS1_OEM_CONTROLLER_FULL_STATE;
-    request.state.buttons = buttons;
-    request.state.gyro = gyro3;
-
-    while (time_left > Milliseconds::zero()){
-        Milliseconds current = std::min(time_left, 65535ms);
-        request.milliseconds = (uint16_t)current.count();
-        m_connection.device().command_queue().send_command(cancellable, request);
-        time_left -= current;
-    }
-}
-
-
 void PABotBase2_OemController::update_status(Cancellable& cancellable){
     using namespace PABotBase2;
 

@@ -7,6 +7,7 @@
  *
  */
 
+#include <stdexcept>
 #include "Common/Cpp/PrettyPrint.h"
 #include "NintendoSwitch_ControllerWithScheduler.h"
 
@@ -152,32 +153,52 @@ void ControllerWithScheduler::issue_right_joystick(
 
 
 
-void ControllerWithScheduler::issue_gyro(
+void ControllerWithScheduler::issue_gyro_motion(
     Cancellable* cancellable,
-    SwitchResource id, const char* name,
-    Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-    int16_t value
+    ControllerClass controller_class,
+    Milliseconds duration,
+    const GyroFunction& function
 ){
+    if (duration <= Milliseconds::zero()){
+        return;
+    }
+    // Reject an unsupported controller before invoking the program's callback.
+    transform_gyro_state(controller_class, {});
+    issue_gyro_motion(cancellable, controller_class, prepare_gyro_motion(cancellable, duration, function));
+}
+
+void ControllerWithScheduler::issue_gyro_motion(
+    Cancellable* cancellable,
+    ControllerClass controller_class,
+    const GyroMotion& motion
+){
+    const std::vector<GyroMotionSample> samples = Internal::transform_gyro_motion(
+        cancellable, controller_class, motion
+    );
+    if (samples.empty()){
+        return;
+    }
+
     SuperscalarScheduler::Schedule schedule;
-    std::lock_guard<Mutex> lg0(m_issue_lock);
+    std::unique_lock<Mutex> issue_lock(m_issue_lock);
     {
         std::lock_guard<Mutex> lg1(m_state_lock);
         if (cancellable){
             cancellable->throw_if_cancelled();
         }
-        m_scheduler.issue_to_resource(
-            schedule,
-            std::make_unique<SwitchCommand_Gyro>(id, value),
-            delay, hold, cooldown
-        );
+        for (const GyroMotionSample& sample : samples){
+            m_scheduler.issue_to_resource(
+                schedule,
+                std::make_unique<SwitchCommand_GyroState>(sample.state),
+                sample.duration, sample.duration, WallDuration::zero()
+            );
+        }
     }
     execute_schedule(cancellable, schedule);
     if (m_logging_throttler){
         m_logger.log(
-            std::string(name) + "(): (" + std::to_string(value) + ")" +
-            ", delay = " + std::to_string(delay.count()) + "ms" +
-            ", hold = " + std::to_string(hold.count()) + "ms" +
-            ", cooldown = " + std::to_string(cooldown.count()) + "ms",
+            "issue_gyro_motion(): duration = " + std::to_string(motion.duration().count()) +
+                "ms, samples = " + std::to_string(samples.size()),
             COLOR_DARKGREEN
         );
     }

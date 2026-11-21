@@ -124,49 +124,6 @@ public:
         ControllerWithScheduler::issue_right_joystick(cancellable, delay, hold, cooldown, position);
     }
 
-    virtual void issue_gyro_accel_x(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) override{
-        ControllerWithScheduler::issue_gyro_accel_x(cancellable, delay, hold, cooldown, value);
-    }
-    virtual void issue_gyro_accel_y(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) override{
-        ControllerWithScheduler::issue_gyro_accel_y(cancellable, delay, hold, cooldown, value);
-    }
-    virtual void issue_gyro_accel_z(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) override{
-        ControllerWithScheduler::issue_gyro_accel_z(cancellable, delay, hold, cooldown, value);
-    }
-    virtual void issue_gyro_rotate_x(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) override{
-        ControllerWithScheduler::issue_gyro_rotate_x(cancellable, delay, hold, cooldown, value);
-    }
-    virtual void issue_gyro_rotate_y(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) override{
-        ControllerWithScheduler::issue_gyro_rotate_y(cancellable, delay, hold, cooldown, value);
-    }
-    virtual void issue_gyro_rotate_z(
-        Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        int16_t value
-    ) override{
-        ControllerWithScheduler::issue_gyro_rotate_z(cancellable, delay, hold, cooldown, value);
-    }
-
     virtual void issue_full_controller_state(
         Cancellable* cancellable,
         bool enable_logging,
@@ -227,8 +184,10 @@ private:
         const SuperscalarScheduler::ScheduleEntry& entry
     ) override{
         SwitchControllerState controller_state;
+        bool has_gyro_motion = false;
         for (auto& item : entry.state){
             static_cast<const SwitchCommand&>(*item).apply(controller_state);
+            has_gyro_motion |= item->id == (size_t)SwitchResource::GYRO;
         }
 
         //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
@@ -264,25 +223,7 @@ private:
             controller_state.right_joystick
         );
 
-        OemController_State0x30_Gyro gyro{
-            0x0000,
-            0x0000,
-            0x0000,
-            0x0000,
-            0x0000,
-            0x0000,
-        };
-        bool gyro_active = populate_report_gyro(gyro, controller_state);
-
-    //    gyro_active = true;
-    //    gyro.rotation_y = 0x00ff;
-    //    gyro.rotation_z = 0x000f;
-
-        if (!gyro_active){
-            issue_report(cancellable, entry.duration, buttons);
-        }else{
-            issue_report(cancellable, entry.duration, buttons, gyro);
-        }
+        issue_motion_report(cancellable, entry.duration, buttons, controller_state, has_gyro_motion);
 
     #if 0
         m_logger.log(
