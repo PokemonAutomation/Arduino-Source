@@ -1563,6 +1563,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonBDSP/Inference/PokemonBDSP_MarkFinder.h
     Source/PokemonBDSP/Inference/PokemonBDSP_MenuDetector.cpp
     Source/PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h
+    Source/PokemonBDSP/Inference/PokemonBDSP_MenuCursorDetector.cpp
+    Source/PokemonBDSP/Inference/PokemonBDSP_MenuCursorDetector.h
     Source/PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.cpp
     Source/PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.h
     Source/PokemonBDSP/Inference/PokemonBDSP_ReceivePokemonDetector.cpp
