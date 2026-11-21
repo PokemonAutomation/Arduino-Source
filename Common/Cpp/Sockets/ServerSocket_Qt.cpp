@@ -1,4 +1,4 @@
-/*  Server Socket 2 (Qt)
+/*  Server Socket (Qt)
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -11,7 +11,7 @@
 #include <QTcpSocket>
 #include "Common/Qt/QtThreadPool.h"
 #include "Common/Qt/GlobalThreadPoolsQt.h"
-#include "ServerSocket2_Qt.h"
+#include "ServerSocket_Qt.h"
 
 namespace PokemonAutomation{
 
@@ -78,7 +78,7 @@ void finish_graceful_close(QTcpSocket* sock, QSharedPointer<DrainState> state, Q
 
 } // anonymous namespace
 
-size_t ServerSocket2Connection_Qt::send(
+size_t ServerSocketConnection_Qt::send(
     const void* data,
     size_t bytes,
     std::chrono::milliseconds timeout
@@ -158,7 +158,7 @@ size_t ServerSocket2Connection_Qt::send(
     return send_data->bytes_sent;
 }
 
-void ServerSocket2Connection_Qt::close(){
+void ServerSocketConnection_Qt::close(){
     //  "m_lock" spans the whole close: "close_for_teardown()" takes it
     //  before the server is destroyed, so if we claim the close the
     //  server is alive for the queued call below - and if we do not
@@ -176,7 +176,7 @@ void ServerSocket2Connection_Qt::close(){
     m_server->close_connection_on();
 }
 
-void ServerSocket2Connection_Qt::close_for_teardown(){
+void ServerSocketConnection_Qt::close_for_teardown(){
     std::lock_guard<RecursiveMutex> lg(m_lock);
     m_close_requested.store(true, std::memory_order_release);
     m_open.store(false, std::memory_order_release);
@@ -184,7 +184,7 @@ void ServerSocket2Connection_Qt::close_for_teardown(){
 }
 
 
-void ServerSocket2_Qt::start(const std::string& address, uint16_t port){
+void ServerSocket_Qt::start(const std::string& address, uint16_t port){
     bool starting;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -261,13 +261,13 @@ void ServerSocket2_Qt::start(const std::string& address, uint16_t port){
     m_listeners.run_method(&Listener::on_listen_finished, m_listen_error);
 }
 
-void ServerSocket2_Qt::close_connection_on(){
+void ServerSocket_Qt::close_connection_on(){
     //  Called from the shell's "close()" with the shell's lock held:
     //  only enqueue the abort; the shell does not wait for it.
     emit internal_close_connection();
 }
 
-void ServerSocket2_Qt::close_and_wait() noexcept{
+void ServerSocket_Qt::close_and_wait() noexcept{
     ConnectionPtr active;
     QTcpServer* server;
     {
@@ -288,7 +288,7 @@ void ServerSocket2_Qt::close_and_wait() noexcept{
         //  Close the connection (inert from now on; its object outlives
         //  the server) and cancel its in-flight sends, so their callers
         //  return promptly with the best-effort byte count.
-        std::static_pointer_cast<ServerSocket2Connection_Qt>(active)->close_for_teardown();
+        std::static_pointer_cast<ServerSocketConnection_Qt>(active)->close_for_teardown();
     }
 
     //  Wait for an in-flight "start()" to finish so we destroy the
@@ -316,7 +316,7 @@ void ServerSocket2_Qt::close_and_wait() noexcept{
     m_state.store(State::NOT_RUNNING, std::memory_order_release);
 }
 
-void ServerSocket2_Qt::on_new_connection(){
+void ServerSocket_Qt::on_new_connection(){
     QTcpServer* server;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -337,8 +337,8 @@ void ServerSocket2_Qt::on_new_connection(){
 
         //  Plain "new" + wrap, not make_shared: the constructor is
         //  private, and this call site is in the friend.
-        auto typed_conn = std::shared_ptr<ServerSocket2Connection_Qt>(
-            new ServerSocket2Connection_Qt(*this, sock)
+        auto typed_conn = std::shared_ptr<ServerSocketConnection_Qt>(
+            new ServerSocketConnection_Qt(*this, sock)
         );
         ConnectionPtr conn;
         bool rejected;
@@ -425,17 +425,17 @@ void ServerSocket2_Qt::on_new_connection(){
     }
 }
 
-void ServerSocket2_Qt::connection_lost(QTcpSocket* sock, const std::string& error_message){
-    std::shared_ptr<ServerSocket2Connection_Qt> conn;
+void ServerSocket_Qt::connection_lost(QTcpSocket* sock, const std::string& error_message){
+    std::shared_ptr<ServerSocketConnection_Qt> conn;
     bool report;
     {
         std::lock_guard<Mutex> lg(m_lock);
         if (m_active &&
-            std::static_pointer_cast<ServerSocket2Connection_Qt>(m_active)->socket() == sock
+            std::static_pointer_cast<ServerSocketConnection_Qt>(m_active)->socket() == sock
         ){
             //  The first callback for the active connection wins;
             //  duplicates for the same socket return without reporting.
-            conn = std::static_pointer_cast<ServerSocket2Connection_Qt>(m_active);
+            conn = std::static_pointer_cast<ServerSocketConnection_Qt>(m_active);
             m_active = ConnectionPtr();
             if (m_state.load(std::memory_order_relaxed) == State::CONNECTED){
                 m_state.store(State::LISTENING, std::memory_order_release);
@@ -464,12 +464,12 @@ void ServerSocket2_Qt::connection_lost(QTcpSocket* sock, const std::string& erro
     sock->deleteLater();
 }
 
-void ServerSocket2_Qt::on_close_connection(){
+void ServerSocket_Qt::on_close_connection(){
     QTcpSocket* sock;
     {
         std::lock_guard<Mutex> lg(m_lock);
         if (m_active != ConnectionPtr()){
-            sock = std::static_pointer_cast<ServerSocket2Connection_Qt>(m_active)->socket();
+            sock = std::static_pointer_cast<ServerSocketConnection_Qt>(m_active)->socket();
             m_active = ConnectionPtr();
             if (m_state.load(std::memory_order_relaxed) != State::DESTRUCTING){
                 //  The server keeps running, so it goes back to
@@ -543,8 +543,8 @@ void ServerSocket2_Qt::on_close_connection(){
     }
 }
 
-void ServerSocket2_Qt::on_send(QSharedPointer<ServerSocket2Connection_Qt::SendData> send_data){
-    ServerSocket2Connection_Qt* conn = send_data->conn.get();
+void ServerSocket_Qt::on_send(QSharedPointer<ServerSocketConnection_Qt::SendData> send_data){
+    ServerSocketConnection_Qt* conn = send_data->conn.get();
     QTcpSocket* sock;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -613,7 +613,7 @@ void ServerSocket2_Qt::on_send(QSharedPointer<ServerSocket2Connection_Qt::SendDa
     conn->finish_send(send_data, bytes_sent);
 }
 
-std::unique_ptr<QTcpServer> ServerSocket2_Qt::make_server(const std::string& address, uint16_t port){
+std::unique_ptr<QTcpServer> ServerSocket_Qt::make_server(const std::string& address, uint16_t port){
     auto server = std::make_unique<QTcpServer>();
     if (!server->listen(QHostAddress(QString::fromStdString(address)), port)){
         std::lock_guard<Mutex> lg(m_lock);
@@ -630,13 +630,13 @@ std::unique_ptr<QTcpServer> ServerSocket2_Qt::make_server(const std::string& add
     //  is alive for the emit, and any drain that runs later still finds
     //  the send in the list and wakes its wait.
     QObject::connect(
-        this, &ServerSocket2_Qt::internal_send,
-        server.get(), [this](QSharedPointer<ServerSocket2Connection_Qt::SendData> send_data){
+        this, &ServerSocket_Qt::internal_send,
+        server.get(), [this](QSharedPointer<ServerSocketConnection_Qt::SendData> send_data){
             on_send(send_data);
         }
     );
     QObject::connect(
-        this, &ServerSocket2_Qt::internal_close_connection,
+        this, &ServerSocket_Qt::internal_close_connection,
         server.get(), [this]{
             on_close_connection();
         }

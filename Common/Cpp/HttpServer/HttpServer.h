@@ -1,9 +1,9 @@
-/*  HTTP Server 2
+/*  HTTP Server
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  The "AbstractServerSocket2" implementation of "AbstractHttpServer": a
- *  minimal HTTP/1.1 server on the platform's default server socket 2
+ *  The "AbstractServerSocket" implementation of "AbstractHttpServer": a
+ *  minimal HTTP/1.1 server on the platform's default server socket
  *  backend, for a single local client that issues one request at a time.
  *  The request/response types, the handler contract, and the threading
  *  rules are in "AbstractHttpServer.h"; this file documents the
@@ -18,8 +18,8 @@
  *
  */
 
-#ifndef PokemonAutomation_HttpServer2_H
-#define PokemonAutomation_HttpServer2_H
+#ifndef PokemonAutomation_HttpServer_H
+#define PokemonAutomation_HttpServer_H
 
 #include <atomic>
 #include <cstddef>
@@ -32,7 +32,7 @@
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/HttpServer/AbstractHttpServer.h"
-#include "Common/Cpp/Sockets/AbstractServerSocket2.h"
+#include "Common/Cpp/Sockets/AbstractServerSocket.h"
 
 namespace PokemonAutomation{
 
@@ -40,7 +40,7 @@ class ThreadPool;
 
 
 
-class HttpServer2 : public AbstractHttpServer, private AbstractServerSocket2::Listener{
+class HttpServer : public AbstractHttpServer, private AbstractServerSocket::Listener{
 public:
     //  The interface's types, re-exported under this class's name.
     using AbstractHttpServer::Request;
@@ -51,8 +51,8 @@ public:
 
 
 public:
-    explicit HttpServer2(ThreadPool& thread_pool);
-    ~HttpServer2();
+    explicit HttpServer(ThreadPool& thread_pool);
+    ~HttpServer();
 
     virtual void start(const std::string& address, uint16_t port, Handler handler) override;
     virtual void stop() override;
@@ -60,17 +60,17 @@ public:
 
 
 private:
-    //  AbstractServerSocket2::Listener.
+    //  AbstractServerSocket::Listener.
     virtual void on_listen_finished(const std::string& error_message) override;
-    virtual void on_connect(AbstractServerSocket2::ConnectionPtr connection) override;
+    virtual void on_connect(AbstractServerSocket::ConnectionPtr connection) override;
     virtual void on_connect_rejected() override;
     virtual void on_receive_data(
-        AbstractServerSocket2::ConnectionPtr connection,
+        AbstractServerSocket::ConnectionPtr connection,
         const void* data,
         size_t bytes
     ) override;
     virtual void on_disconnect(
-        AbstractServerSocket2::ConnectionPtr connection,
+        AbstractServerSocket::ConnectionPtr connection,
         const std::string& error_message
     ) override;
 
@@ -112,7 +112,7 @@ private:
 
         //  The transport. The connection shell stays valid but inert
         //  after it closes, so this reference may be held forever.
-        AbstractServerSocket2::ConnectionPtr socket;
+        AbstractServerSocket::ConnectionPtr socket;
     };
 
     //  Runs on a thread from the thread pool, one instance per
@@ -152,7 +152,7 @@ private:
     //  Guards m_socket, m_connection, and m_handler. Never held across a
     //  blocking wait, a task destruction, or a socket destruction.
     mutable Mutex m_lock;
-    std::unique_ptr<AbstractServerSocket2> m_socket;
+    std::unique_ptr<AbstractServerSocket> m_socket;
     std::shared_ptr<Connection> m_connection;
     Handler m_handler;
 

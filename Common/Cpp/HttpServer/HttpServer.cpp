@@ -1,4 +1,4 @@
-/*  HTTP Server 2
+/*  HTTP Server
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -29,7 +29,7 @@
  *    flight writes block up to WRITE_TIMEOUT otherwise, and the
  *    transport's close() makes them return promptly. "stop()" moves the
  *    socket out under "m_lock" and destroys it after releasing the lock:
- *    "~ServerSocket2" joins the socket's worker threads, and their
+ *    "~ServerSocket" joins the socket's worker threads, and their
  *    callbacks take "m_lock".
  *
  */
@@ -42,8 +42,8 @@
 #include <string>
 #include <utility>
 #include "Common/Cpp/Concurrency/ThreadPool.h"
-#include "Common/Cpp/HttpServer/HttpServer2.h"
-#include "Common/Cpp/Sockets/ServerSocket2.h"
+#include "Common/Cpp/HttpServer/HttpServer.h"
+#include "Common/Cpp/Sockets/ServerSocket.h"
 
 namespace PokemonAutomation{
 
@@ -110,7 +110,7 @@ private:
 
 
 
-const char* HttpServer2::status_reason(int status){
+const char* HttpServer::status_reason(int status){
     switch (status){
     case 100:
         return "Continue";
@@ -158,7 +158,7 @@ const char* HttpServer2::status_reason(int status){
 }
 
 
-std::string HttpServer2::format_response(const Response& response, bool keep_alive){
+std::string HttpServer::format_response(const Response& response, bool keep_alive){
     std::string out;
     out += "HTTP/1.1 ";
     out += std::to_string(response.status);
@@ -193,18 +193,18 @@ std::string HttpServer2::format_response(const Response& response, bool keep_ali
 
 
 
-HttpServer2::HttpServer2(ThreadPool& thread_pool)
+HttpServer::HttpServer(ThreadPool& thread_pool)
     : m_thread_pool(thread_pool)
 {}
 
 
-HttpServer2::~HttpServer2(){
+HttpServer::~HttpServer(){
     stop();
 }
 
 
-void HttpServer2::start(const std::string& address, uint16_t port, Handler handler){
-    AbstractServerSocket2* socket = nullptr;
+void HttpServer::start(const std::string& address, uint16_t port, Handler handler){
+    AbstractServerSocket* socket = nullptr;
     {
         std::lock_guard<Mutex> lg(m_lock);
         if (m_socket != nullptr){
@@ -212,7 +212,7 @@ void HttpServer2::start(const std::string& address, uint16_t port, Handler handl
         }
         m_handler = std::move(handler);
         m_stop_requested.store(false, std::memory_order_release);
-        m_socket = std::make_unique<ServerSocket2>(m_thread_pool);
+        m_socket = std::make_unique<ServerSocket>(m_thread_pool);
         //  Register before start(): the accept thread is dispatched by
         //  start() and may report on_listen_finished() as soon as it runs.
         m_socket->add_listener(*this);
@@ -224,10 +224,10 @@ void HttpServer2::start(const std::string& address, uint16_t port, Handler handl
 }
 
 
-void HttpServer2::stop(){
+void HttpServer::stop(){
     m_stop_requested.store(true, std::memory_order_release);
 
-    AbstractServerSocket2* socket = nullptr;
+    AbstractServerSocket* socket = nullptr;
     {
         std::lock_guard<Mutex> lg(m_lock);
         socket = m_socket.get();
@@ -251,7 +251,7 @@ void HttpServer2::stop(){
     //  would otherwise block up to WRITE_TIMEOUT, and the transport's
     //  close() makes in-flight sends return promptly. (If the connection
     //  task has already closed it, close() is a no-op.)
-    if (AbstractServerSocket2::ConnectionPtr active = socket->active_connection()){
+    if (AbstractServerSocket::ConnectionPtr active = socket->active_connection()){
         active->close();
     }
 
@@ -276,9 +276,9 @@ void HttpServer2::stop(){
     }
 
     //  Take the socket out under m_lock and destroy it after releasing
-    //  the lock: "~ServerSocket2" joins the socket's worker threads, and
+    //  the lock: "~ServerSocket" joins the socket's worker threads, and
     //  their callbacks (on_connect and friends) take m_lock.
-    std::unique_ptr<AbstractServerSocket2> owned;
+    std::unique_ptr<AbstractServerSocket> owned;
     {
         std::lock_guard<Mutex> lg(m_lock);
         owned = std::move(m_socket);
@@ -288,20 +288,20 @@ void HttpServer2::stop(){
 }
 
 
-bool HttpServer2::is_running() const{
+bool HttpServer::is_running() const{
     std::lock_guard<Mutex> lg(m_lock);
     return (m_socket != nullptr);
 }
 
 
 
-void HttpServer2::on_listen_finished(const std::string& error_message){
+void HttpServer::on_listen_finished(const std::string& error_message){
     m_listeners.run_method(&Listener::on_listen_finished, error_message);
 }
 
 
-void HttpServer2::on_connect(AbstractServerSocket2::ConnectionPtr connection){
-    AbstractServerSocket2* socket = nullptr;
+void HttpServer::on_connect(AbstractServerSocket::ConnectionPtr connection){
+    AbstractServerSocket* socket = nullptr;
     std::shared_ptr<Connection> conn;
     {
         std::lock_guard<Mutex> lg(m_lock);
@@ -372,13 +372,13 @@ void HttpServer2::on_connect(AbstractServerSocket2::ConnectionPtr connection){
 }
 
 
-void HttpServer2::on_connect_rejected(){
+void HttpServer::on_connect_rejected(){
     m_listeners.run_method(&Listener::on_connect_rejected);
 }
 
 
-void HttpServer2::on_receive_data(
-    AbstractServerSocket2::ConnectionPtr connection,
+void HttpServer::on_receive_data(
+    AbstractServerSocket::ConnectionPtr connection,
     const void* data,
     size_t bytes
 ){
@@ -418,8 +418,8 @@ void HttpServer2::on_receive_data(
 }
 
 
-void HttpServer2::on_disconnect(
-    AbstractServerSocket2::ConnectionPtr connection,
+void HttpServer::on_disconnect(
+    AbstractServerSocket::ConnectionPtr connection,
     const std::string& error_message
 ){
     {
@@ -439,7 +439,7 @@ void HttpServer2::on_disconnect(
 
 
 
-void HttpServer2::connection_task(const std::shared_ptr<Connection>& conn){
+void HttpServer::connection_task(const std::shared_ptr<Connection>& conn){
     //  The handler may be replaced or cleared by start()/stop() while this
     //  task is waiting; a copy taken under m_lock is stable for the task's
     //  whole lifetime, because stop() waits for the task before clearing it.
@@ -564,7 +564,7 @@ void HttpServer2::connection_task(const std::shared_ptr<Connection>& conn){
 }
 
 
-HttpServer2::ParsedRequest HttpServer2::try_parse(std::string& buffer){
+HttpServer::ParsedRequest HttpServer::try_parse(std::string& buffer){
     ParsedRequest result;
 
     auto error = [&result](int status, const char* reason, std::vector<std::pair<std::string, std::string>> headers = {}){
@@ -763,7 +763,7 @@ HttpServer2::ParsedRequest HttpServer2::try_parse(std::string& buffer){
 }
 
 
-void HttpServer2::end_connection(const std::shared_ptr<Connection>& conn){
+void HttpServer::end_connection(const std::shared_ptr<Connection>& conn){
     conn->dead.store(true, std::memory_order_release);
     conn->cv.notify_all();
     //  Closing the shell only ever affects this client: once the
@@ -773,7 +773,7 @@ void HttpServer2::end_connection(const std::shared_ptr<Connection>& conn){
 }
 
 
-bool HttpServer2::write_raw(const std::shared_ptr<Connection>& conn, const std::string& bytes){
+bool HttpServer::write_raw(const std::shared_ptr<Connection>& conn, const std::string& bytes){
     //  The send happens on the connection object itself: if this
     //  connection has died, the write just fails here (send() returns
     //  0) - it can never be delivered into a later client's socket.
@@ -788,7 +788,7 @@ bool HttpServer2::write_raw(const std::shared_ptr<Connection>& conn, const std::
 }
 
 
-bool HttpServer2::write_response(
+bool HttpServer::write_response(
     const std::shared_ptr<Connection>& conn,
     const Response& response,
     bool keep_alive

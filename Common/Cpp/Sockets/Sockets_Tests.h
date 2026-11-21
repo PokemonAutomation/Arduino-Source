@@ -14,8 +14,8 @@ class UnitTestDatabase;
 
 
 //  Loopback tests that drive the "ClientSocket" backends against a
-//  "ServerSocket2" peer on 127.0.0.1: the client-side behaviors of the
-//  old ClientSocket/ServerSocket pair that the "ServerSocket2" test
+//  "ServerSocket" peer on 127.0.0.1: the client-side behaviors of the
+//  legacy ClientSocket/ServerSocket pair that the "ServerSocket" test
 //  suite does not cover (a send with a deadline against a stalled peer,
 //  a pre-close response while the client is still sending, close() from
 //  the client's own receive callback, and the Qt client's

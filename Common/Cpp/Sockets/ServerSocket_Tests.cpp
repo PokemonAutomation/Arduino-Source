@@ -1,14 +1,14 @@
-/*  Server Socket 2 Tests
+/*  Server Socket Tests
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  Tests for the new AbstractServerSocket2 /
+ *  Tests for the new AbstractServerSocket /
  *  AbstractServerSocketConnection pair.
  *
  *  The first section pins the API contracts against an in-memory stub
  *  backend (pointer lifetime, inert-after-close, on_disconnect() only
  *  for peer closes, one connection at a time). The rest are loopback
- *  tests that combine a ClientSocket and a ServerSocket2 against each
+ *  tests that combine a ClientSocket and a ServerSocket against each
  *  other on 127.0.0.1, written against the abstract classes and
  *  instantiated for every backend that compiles on the current
  *  platform (Qt: always, POSIX: non-Windows, WinSocket: Windows).
@@ -33,19 +33,19 @@
 #include "Common/Cpp/Concurrency/Mutex.h"
 #include "Common/Cpp/Concurrency/ThreadPool.h"
 #include "Common/Cpp/Sockets/ClientSocket_Qt.h"
-#include "Common/Cpp/Sockets/ServerSocket2_Qt.h"
+#include "Common/Cpp/Sockets/ServerSocket_Qt.h"
 #ifndef _WIN32
 #include <fcntl.h>
 #include "Common/Cpp/Sockets/ClientSocket_POSIX.h"
-#include "Common/Cpp/Sockets/ServerSocket2_POSIX.h"
+#include "Common/Cpp/Sockets/ServerSocket_POSIX.h"
 #endif
 #ifdef _WIN32
 #include "Common/Cpp/Sockets/ClientSocket_WinSocket.h"
-#include "Common/Cpp/Sockets/ServerSocket2_WinSocket.h"
+#include "Common/Cpp/Sockets/ServerSocket_WinSocket.h"
 #endif
 #include "Common/Cpp/TestRunners/UnitTest.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
-#include "ServerSocket2_Tests.h"
+#include "ServerSocket_Tests.h"
 
 namespace PokemonAutomation{
 
@@ -120,7 +120,7 @@ struct ClientListener : AbstractClientSocket::Listener{
 //  The server-side listener for the loopback tests. It records the
 //  current connection (so the tests can drive its send()/close()) and
 //  optionally echoes received data back to the client.
-struct Server2Listener : AbstractServerSocket2::Listener{
+struct Server2Listener : AbstractServerSocket::Listener{
     Waiter waiter;
     std::atomic<int> listen_finished{0};
     std::string last_listen_error;
@@ -129,7 +129,7 @@ struct Server2Listener : AbstractServerSocket2::Listener{
     std::atomic<int> disconnected{0};
     std::atomic<uint64_t> bytes_received{0};
     std::atomic<int> closed_in_callback{0};
-    AbstractServerSocket2::ConnectionPtr connection;
+    AbstractServerSocket::ConnectionPtr connection;
 
     //  When set, received data is echoed back to the client.
     bool echo = true;
@@ -143,7 +143,7 @@ struct Server2Listener : AbstractServerSocket2::Listener{
         waiter.notify();
     }
 
-    virtual void on_connect(AbstractServerSocket2::ConnectionPtr conn) override{
+    virtual void on_connect(AbstractServerSocket::ConnectionPtr conn) override{
         connection = conn;
         connected++;
         waiter.notify();
@@ -155,7 +155,7 @@ struct Server2Listener : AbstractServerSocket2::Listener{
     }
 
     virtual void on_receive_data(
-        AbstractServerSocket2::ConnectionPtr conn,
+        AbstractServerSocket::ConnectionPtr conn,
         const void* data,
         size_t bytes
     ) override{
@@ -173,7 +173,7 @@ struct Server2Listener : AbstractServerSocket2::Listener{
     }
 
     virtual void on_disconnect(
-        AbstractServerSocket2::ConnectionPtr,
+        AbstractServerSocket::ConnectionPtr,
         const std::string& error_message
     ) override{
         disconnected++;
@@ -205,10 +205,10 @@ struct StallingClientListener : ClientListener{
 };
 
 
-template <typename ClientSocketType, typename ServerSocket2Type>
-class TestServerSocket2 : public UnitTest{
+template <typename ClientSocketType, typename ServerSocketType>
+class TestServerSocket : public UnitTest{
 public:
-    TestServerSocket2(ThreadPool& thread_pool, std::string name)
+    TestServerSocket(ThreadPool& thread_pool, std::string name)
         : UnitTest(std::move(name))
         , m_thread_pool(thread_pool)
     {
@@ -217,7 +217,7 @@ public:
 
 
 protected:
-    bool start_server(ServerSocket2Type& server, Server2Listener& listener, uint16_t& port) const{
+    bool start_server(ServerSocketType& server, Server2Listener& listener, uint16_t& port) const{
         //  "listen_finished" is never reset between attempts, so each
         //  attempt records where the counter stands and waits for it to
         //  advance. Waiting on "> 0" instead would return immediately on a
@@ -275,10 +275,10 @@ private:
 
 //  Connect, send a packet, verify the echo, disconnect, and check that
 //  the server observed both the connect and the disconnect.
-template <typename ClientSocketType, typename ServerSocket2Type>
-class Test_ServerSocket2_Echo : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_ServerSocket_Echo : public TestServerSocket<ClientSocketType, ServerSocketType>{
 public:
-    using TestServerSocket2<ClientSocketType, ServerSocket2Type>::TestServerSocket2;
+    using TestServerSocket<ClientSocketType, ServerSocketType>::TestServerSocket;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (timing_unreliable()){
@@ -288,7 +288,7 @@ public:
             );
         }
         Server2Listener server_listener;
-        ServerSocket2Type server(this->m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -355,10 +355,10 @@ public:
 
 //  Zero-length sends must be a valid no-op that returns 0 without
 //  touching the connection.
-template <typename ClientSocketType, typename ServerSocket2Type>
-class Test_ServerSocket2_ZeroLengthSend : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_ServerSocket_ZeroLengthSend : public TestServerSocket<ClientSocketType, ServerSocketType>{
 public:
-    using TestServerSocket2<ClientSocketType, ServerSocket2Type>::TestServerSocket2;
+    using TestServerSocket<ClientSocketType, ServerSocketType>::TestServerSocket;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (timing_unreliable()){
@@ -368,7 +368,7 @@ public:
             );
         }
         Server2Listener server_listener;
-        ServerSocket2Type server(this->m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -429,10 +429,10 @@ public:
 
 //  Stream a large payload from the client to the server and verify that
 //  every byte arrives.
-template <typename ClientSocketType, typename ServerSocket2Type>
-class Test_ServerSocket2_LargeTransfer : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_ServerSocket_LargeTransfer : public TestServerSocket<ClientSocketType, ServerSocketType>{
 public:
-    using TestServerSocket2<ClientSocketType, ServerSocket2Type>::TestServerSocket2;
+    using TestServerSocket<ClientSocketType, ServerSocketType>::TestServerSocket;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (timing_unreliable()){
@@ -446,7 +446,7 @@ public:
 
         Server2Listener server_listener;
         server_listener.echo = false;
-        ServerSocket2Type server(this->m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -506,10 +506,10 @@ public:
 //  Rapidly open and close a connection twenty times in a row, with
 //  exact bookkeeping, and verify that the server keeps accepting new
 //  clients and echoing.
-template <typename ClientSocketType, typename ServerSocket2Type>
-class Test_ServerSocket2_RapidReconnect : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_ServerSocket_RapidReconnect : public TestServerSocket<ClientSocketType, ServerSocketType>{
 public:
-    using TestServerSocket2<ClientSocketType, ServerSocket2Type>::TestServerSocket2;
+    using TestServerSocket<ClientSocketType, ServerSocketType>::TestServerSocket;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (timing_unreliable()){
@@ -521,7 +521,7 @@ public:
         constexpr int CYCLES = 20;
 
         Server2Listener server_listener;
-        ServerSocket2Type server(this->m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -591,10 +591,10 @@ public:
 //  best-effort byte count, and the server must keep accepting clients.
 //  (The stalled-peer variant that pins the cancellation itself is
 //  CloseCancelsSend below.)
-template <typename ClientSocketType, typename ServerSocket2Type>
-class Test_ServerSocket2_SendCloseRace : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_ServerSocket_SendCloseRace : public TestServerSocket<ClientSocketType, ServerSocketType>{
 public:
-    using TestServerSocket2<ClientSocketType, ServerSocket2Type>::TestServerSocket2;
+    using TestServerSocket<ClientSocketType, ServerSocketType>::TestServerSocket;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (timing_unreliable()){
@@ -608,7 +608,7 @@ public:
 
         Server2Listener server_listener;
         server_listener.echo = false;
-        ServerSocket2Type server(this->m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -710,11 +710,11 @@ public:
 //  A 256 MiB send against a peer that stops reading stays in flight
 //  when close() lands: the sender must be woken promptly with a
 //  best-effort count, and the server must keep accepting clients.
-template <typename ClientSocketType, typename ServerSocket2Type>
-class Test_ServerSocket2_CloseCancelsSend : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_ServerSocket_CloseCancelsSend : public TestServerSocket<ClientSocketType, ServerSocketType>{
 public:
-    Test_ServerSocket2_CloseCancelsSend(ThreadPool& thread_pool, std::string name)
-        : TestServerSocket2<ClientSocketType, ServerSocket2Type>(thread_pool, std::move(name))
+    Test_ServerSocket_CloseCancelsSend(ThreadPool& thread_pool, std::string name)
+        : TestServerSocket<ClientSocketType, ServerSocketType>(thread_pool, std::move(name))
     {
         //  The 256 MiB payload below, plus a transient 256 MiB copy in
         //  the Qt backend's in-flight send data (overreported on the
@@ -731,7 +731,7 @@ public:
         }
         Server2Listener server_listener;
         server_listener.echo = false;
-        ServerSocket2Type server(this->m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -868,10 +868,10 @@ public:
 //  While a client is connected, every new client must be rejected -
 //  hammered a few times in a row to exercise the rejection path in
 //  churn - and the first client must keep working.
-template <typename ClientSocketType, typename ServerSocket2Type>
-class Test_ServerSocket2_RejectSecondClient : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_ServerSocket_RejectSecondClient : public TestServerSocket<ClientSocketType, ServerSocketType>{
 public:
-    using TestServerSocket2<ClientSocketType, ServerSocket2Type>::TestServerSocket2;
+    using TestServerSocket<ClientSocketType, ServerSocketType>::TestServerSocket;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (timing_unreliable()){
@@ -883,7 +883,7 @@ public:
         constexpr int REJECTIONS = 10;
 
         Server2Listener server_listener;
-        ServerSocket2Type server(this->m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -955,10 +955,10 @@ public:
 
 //  Starting on a port that is already in use must fail cleanly, and the
 //  original server must keep working.
-template <typename ClientSocketType, typename ServerSocket2Type>
-class Test_ServerSocket2_PortInUse : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_ServerSocket_PortInUse : public TestServerSocket<ClientSocketType, ServerSocketType>{
 public:
-    using TestServerSocket2<ClientSocketType, ServerSocket2Type>::TestServerSocket2;
+    using TestServerSocket<ClientSocketType, ServerSocketType>::TestServerSocket;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (timing_unreliable()){
@@ -968,7 +968,7 @@ public:
             );
         }
         Server2Listener server_listener;
-        ServerSocket2Type server(this->m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -983,7 +983,7 @@ public:
         }
 
         Server2Listener second_listener;
-        ServerSocket2Type second_server(this->m_thread_pool);
+        ServerSocketType second_server(this->m_thread_pool);
         second_server.add_listener(second_listener);
         second_server.start("127.0.0.1", port);
         if (!second_listener.waiter.wait_for(
@@ -1046,10 +1046,10 @@ public:
 
 //  A peer-side close must fire on_disconnect() with the connection,
 //  clear the active slot, and leave the server listening.
-template <typename ClientSocketType, typename ServerSocket2Type>
-class Test_ServerSocket2_PeerClose : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_ServerSocket_PeerClose : public TestServerSocket<ClientSocketType, ServerSocketType>{
 public:
-    using TestServerSocket2<ClientSocketType, ServerSocket2Type>::TestServerSocket2;
+    using TestServerSocket<ClientSocketType, ServerSocketType>::TestServerSocket;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (timing_unreliable()){
@@ -1059,7 +1059,7 @@ public:
             );
         }
         Server2Listener server_listener;
-        ServerSocket2Type server(this->m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -1122,10 +1122,10 @@ public:
 //  An application-side close() makes the connection inert (send()
 //  returns 0, close() is a no-op), does not fire on_disconnect(), and
 //  leaves the server accepting new clients.
-template <typename ClientSocketType, typename ServerSocket2Type>
-class Test_ServerSocket2_InertAfterClose : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_ServerSocket_InertAfterClose : public TestServerSocket<ClientSocketType, ServerSocketType>{
 public:
-    using TestServerSocket2<ClientSocketType, ServerSocket2Type>::TestServerSocket2;
+    using TestServerSocket<ClientSocketType, ServerSocketType>::TestServerSocket;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (timing_unreliable()){
@@ -1135,7 +1135,7 @@ public:
             );
         }
         Server2Listener server_listener;
-        ServerSocket2Type server(this->m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -1235,10 +1235,10 @@ public:
 
 //  A send on a connection that has been replaced must be refused, and
 //  the replacement client must not receive the stale bytes.
-template <typename ClientSocketType, typename ServerSocket2Type>
-class Test_ServerSocket2_StaleSend : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_ServerSocket_StaleSend : public TestServerSocket<ClientSocketType, ServerSocketType>{
 public:
-    using TestServerSocket2<ClientSocketType, ServerSocket2Type>::TestServerSocket2;
+    using TestServerSocket<ClientSocketType, ServerSocketType>::TestServerSocket;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (timing_unreliable()){
@@ -1248,7 +1248,7 @@ public:
             );
         }
         Server2Listener server_listener;
-        ServerSocket2Type server(this->m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -1257,7 +1257,7 @@ public:
         }
 
         std::string error;
-        AbstractServerSocket2::ConnectionPtr first;
+        AbstractServerSocket::ConnectionPtr first;
         {
             ClientListener client_listener;
             ClientSocketType client(this->m_thread_pool);
@@ -1328,10 +1328,10 @@ public:
 
 //  Destroying the server closes its active connection, but the
 //  connection object the listener kept stays valid (inert) afterwards.
-template <typename ClientSocketType, typename ServerSocket2Type>
-class Test_ServerSocket2_OutlivesServer : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_ServerSocket_OutlivesServer : public TestServerSocket<ClientSocketType, ServerSocketType>{
 public:
-    using TestServerSocket2<ClientSocketType, ServerSocket2Type>::TestServerSocket2;
+    using TestServerSocket<ClientSocketType, ServerSocketType>::TestServerSocket;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (timing_unreliable()){
@@ -1341,7 +1341,7 @@ public:
             );
         }
         std::string error;
-        AbstractServerSocket2::ConnectionPtr held;
+        AbstractServerSocket::ConnectionPtr held;
         {
             ClientListener client_listener;
             ClientSocketType client(this->m_thread_pool);
@@ -1349,7 +1349,7 @@ public:
 
             {
                 Server2Listener server_listener;
-                ServerSocket2Type server(this->m_thread_pool);
+                ServerSocketType server(this->m_thread_pool);
                 server.add_listener(server_listener);
 
                 uint16_t port;
@@ -1412,10 +1412,10 @@ public:
 //  on_receive_data() callback (the sys-bot-base oversized-line
 //  scenario). close() must return promptly, and the server must keep
 //  accepting clients.
-template <typename ClientSocketType, typename ServerSocket2Type>
-class Test_ServerSocket2_CloseFromReceiveCallback : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_ServerSocket_CloseFromReceiveCallback : public TestServerSocket<ClientSocketType, ServerSocketType>{
 public:
-    using TestServerSocket2<ClientSocketType, ServerSocket2Type>::TestServerSocket2;
+    using TestServerSocket<ClientSocketType, ServerSocketType>::TestServerSocket;
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
         if (timing_unreliable()){
@@ -1426,7 +1426,7 @@ public:
         }
         Server2Listener server_listener;
         server_listener.close_on_receive = true;
-        ServerSocket2Type server(this->m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -1504,11 +1504,11 @@ public:
 
 //  A send with a finite deadline against a stalled peer must stop at
 //  the deadline and return the partial count, instead of hanging.
-template <typename ClientSocketType, typename ServerSocket2Type>
-class Test_ServerSocket2_SendTimeout : public TestServerSocket2<ClientSocketType, ServerSocket2Type>{
+template <typename ClientSocketType, typename ServerSocketType>
+class Test_ServerSocket_SendTimeout : public TestServerSocket<ClientSocketType, ServerSocketType>{
 public:
-    Test_ServerSocket2_SendTimeout(ThreadPool& thread_pool, std::string name)
-        : TestServerSocket2<ClientSocketType, ServerSocket2Type>(thread_pool, std::move(name))
+    Test_ServerSocket_SendTimeout(ThreadPool& thread_pool, std::string name)
+        : TestServerSocket<ClientSocketType, ServerSocketType>(thread_pool, std::move(name))
     {
         //  The 64 MiB payload below, plus a transient 64 MiB copy in
         //  the Qt backend's in-flight send data.
@@ -1522,11 +1522,11 @@ public:
                 "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
             );
         }
-        constexpr bool QT = std::is_same_v<ServerSocket2Type, ServerSocket2_Qt>;
+        constexpr bool QT = std::is_same_v<ServerSocketType, ServerSocket_Qt>;
 
         Server2Listener server_listener;
         server_listener.echo = false;
-        ServerSocket2Type server(this->m_thread_pool);
+        ServerSocketType server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -1644,11 +1644,11 @@ public:
 //  such close then leaked one file descriptor, which grows without bound
 //  in a long-lived server. Counts the process's open fds across many
 //  server-initiated closes and fails if the count keeps growing.
-class Test_ServerSocket2_Posix_NoFdLeak
-    : public TestServerSocket2<ClientSocket_POSIX, ServerSocket2_POSIX>
+class Test_ServerSocket_Posix_NoFdLeak
+    : public TestServerSocket<ClientSocket_POSIX, ServerSocket_POSIX>
 {
 public:
-    using TestServerSocket2<ClientSocket_POSIX, ServerSocket2_POSIX>::TestServerSocket2;
+    using TestServerSocket<ClientSocket_POSIX, ServerSocket_POSIX>::TestServerSocket;
 
     static int count_open_fds(){
         int count = 0;
@@ -1707,7 +1707,7 @@ private:
     std::string close_cycle() const{
         Server2Listener server_listener;
         server_listener.echo = false;
-        ServerSocket2_POSIX server(this->m_thread_pool);
+        ServerSocket_POSIX server(this->m_thread_pool);
         server.add_listener(server_listener);
 
         uint16_t port;
@@ -1750,9 +1750,9 @@ private:
 //  this test queues a send and a close: the close's cancel must wake the
 //  sender promptly (without the event thread's help), and the close must
 //  still land once the stall ends.
-class Test_ServerSocket2_Qt_CloseUnderStall : public UnitTest{
+class Test_ServerSocket_Qt_CloseUnderStall : public UnitTest{
 public:
-    Test_ServerSocket2_Qt_CloseUnderStall(ThreadPool& thread_pool, std::string name)
+    Test_ServerSocket_Qt_CloseUnderStall(ThreadPool& thread_pool, std::string name)
         : UnitTest(std::move(name))
         , m_thread_pool(thread_pool)
     {
@@ -1772,12 +1772,12 @@ public:
         //  stalls: the Qt server delivers the rest of the trigger 4096
         //  bytes at a time, and every other burst stalling the event
         //  thread for 6 s would queue the close behind minutes of stalls.
-        struct StallingServerListener : AbstractServerSocket2::Listener{
+        struct StallingServerListener : AbstractServerSocket::Listener{
             Waiter waiter;
             std::atomic<bool> stall_started{false};
 
             virtual void on_receive_data(
-                AbstractServerSocket2::ConnectionPtr,
+                AbstractServerSocket::ConnectionPtr,
                 const void*,
                 size_t
             ) override{
@@ -1790,7 +1790,7 @@ public:
 
         Server2Listener server_listener;
         StallingServerListener stall_listener;
-        ServerSocket2_Qt server(m_thread_pool);
+        ServerSocket_Qt server(m_thread_pool);
         server.add_listener(server_listener);
         server.add_listener(stall_listener);
 
@@ -1978,50 +1978,50 @@ private:
 };
 
 
-template <typename ClientSocketType, typename ServerSocket2Type>
+template <typename ClientSocketType, typename ServerSocketType>
 void add_server_socket2_tests(UnitTestDatabase& database, ThreadPool& thread_pool, const char* backend_name){
-    const std::string prefix = "ServerSocket2 (" + std::string(backend_name) + ") - ";
+    const std::string prefix = "ServerSocket (" + std::string(backend_name) + ") - ";
 
-    database.add<Test_ServerSocket2_Echo<ClientSocketType, ServerSocket2Type>>(
+    database.add<Test_ServerSocket_Echo<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "Client/server echo round trip"
     );
-    database.add<Test_ServerSocket2_ZeroLengthSend<ClientSocketType, ServerSocket2Type>>(
+    database.add<Test_ServerSocket_ZeroLengthSend<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "Zero-length send"
     );
-    database.add<Test_ServerSocket2_LargeTransfer<ClientSocketType, ServerSocket2Type>>(
+    database.add<Test_ServerSocket_LargeTransfer<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "Large transfer"
     );
-    database.add<Test_ServerSocket2_RapidReconnect<ClientSocketType, ServerSocket2Type>>(
+    database.add<Test_ServerSocket_RapidReconnect<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "Rapid reconnect"
     );
-    database.add<Test_ServerSocket2_SendCloseRace<ClientSocketType, ServerSocket2Type>>(
+    database.add<Test_ServerSocket_SendCloseRace<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "Send/close race"
     );
-    database.add<Test_ServerSocket2_CloseCancelsSend<ClientSocketType, ServerSocket2Type>>(
+    database.add<Test_ServerSocket_CloseCancelsSend<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "close() cancels an in-flight send"
     );
-    database.add<Test_ServerSocket2_RejectSecondClient<ClientSocketType, ServerSocket2Type>>(
+    database.add<Test_ServerSocket_RejectSecondClient<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "Reject a second client"
     );
-    database.add<Test_ServerSocket2_PortInUse<ClientSocketType, ServerSocket2Type>>(
+    database.add<Test_ServerSocket_PortInUse<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "Port in use"
     );
-    database.add<Test_ServerSocket2_PeerClose<ClientSocketType, ServerSocket2Type>>(
+    database.add<Test_ServerSocket_PeerClose<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "A peer close fires on_disconnect()"
     );
-    database.add<Test_ServerSocket2_InertAfterClose<ClientSocketType, ServerSocket2Type>>(
+    database.add<Test_ServerSocket_InertAfterClose<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "An application close leaves an inert connection"
     );
-    database.add<Test_ServerSocket2_StaleSend<ClientSocketType, ServerSocket2Type>>(
+    database.add<Test_ServerSocket_StaleSend<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "A send for a replaced connection is refused"
     );
-    database.add<Test_ServerSocket2_OutlivesServer<ClientSocketType, ServerSocket2Type>>(
+    database.add<Test_ServerSocket_OutlivesServer<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "The connection outlives the server"
     );
-    database.add<Test_ServerSocket2_CloseFromReceiveCallback<ClientSocketType, ServerSocket2Type>>(
+    database.add<Test_ServerSocket_CloseFromReceiveCallback<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "close() from the receive callback"
     );
-    database.add<Test_ServerSocket2_SendTimeout<ClientSocketType, ServerSocket2Type>>(
+    database.add<Test_ServerSocket_SendTimeout<ClientSocketType, ServerSocketType>>(
         thread_pool, prefix + "send() deadline against a stalled peer"
     );
 }
@@ -2063,7 +2063,7 @@ private:
 //  (state, active-connection slot, listener dispatch) and exposes
 //  hooks that simulate the backend's event delivery: a client
 //  connecting, data arriving, the peer closing, and teardown.
-class StubServer2 final : public AbstractServerSocket2{
+class StubServer2 final : public AbstractServerSocket{
 public:
     StubServer2() = default;
 
@@ -2207,23 +2207,23 @@ void StubConnection2::mark_closed_by_peer(){
 
 
 
-class Test_ServerSocket2_StubApi : public UnitTest{
+class Test_ServerSocket_StubApi : public UnitTest{
 public:
-    Test_ServerSocket2_StubApi(ThreadPool&, std::string name)
+    Test_ServerSocket_StubApi(ThreadPool&, std::string name)
         : UnitTest(std::move(name))
     {}
 
     virtual UnitTestResult run(Logger& logger, CancellableScope& scope) const override{
-        struct Probe : AbstractServerSocket2::Listener{
+        struct Probe : AbstractServerSocket::Listener{
             Mutex lock;
-            AbstractServerSocket2::ConnectionPtr connection;
+            AbstractServerSocket::ConnectionPtr connection;
             std::string received;
             int connect_count = 0;
             int rejected_count = 0;
             int disconnect_count = 0;
             std::string last_error;
 
-            virtual void on_connect(AbstractServerSocket2::ConnectionPtr conn) override{
+            virtual void on_connect(AbstractServerSocket::ConnectionPtr conn) override{
                 std::lock_guard<Mutex> lg(lock);
                 connection = std::move(conn);
                 connect_count++;
@@ -2235,7 +2235,7 @@ public:
             }
 
             virtual void on_receive_data(
-                AbstractServerSocket2::ConnectionPtr,
+                AbstractServerSocket::ConnectionPtr,
                 const void* data,
                 size_t bytes
             ) override{
@@ -2244,7 +2244,7 @@ public:
             }
 
             virtual void on_disconnect(
-                AbstractServerSocket2::ConnectionPtr,
+                AbstractServerSocket::ConnectionPtr,
                 const std::string& error_message
             ) override{
                 std::lock_guard<Mutex> lg(lock);
@@ -2255,8 +2255,8 @@ public:
 
         Probe probe;
 
-        AbstractServerSocket2::ConnectionPtr first;
-        AbstractServerSocket2::ConnectionPtr second;
+        AbstractServerSocket::ConnectionPtr first;
+        AbstractServerSocket::ConnectionPtr second;
 
         {
             StubServer2 server;
@@ -2358,28 +2358,28 @@ public:
 }
 
 
-void add_tests_ServerSocket2(UnitTestDatabase& database, ThreadPool& thread_pool){
-    database.add<Test_ServerSocket2_StubApi>(
+void add_tests_ServerSocket(UnitTestDatabase& database, ThreadPool& thread_pool){
+    database.add<Test_ServerSocket_StubApi>(
         thread_pool,
-        "ServerSocket2 (Stub) - API shape and lifetime contracts"
+        "ServerSocket (Stub) - API shape and lifetime contracts"
     );
 
-    add_server_socket2_tests<ClientSocket_Qt, ServerSocket2_Qt>(database, thread_pool, "Qt");
+    add_server_socket2_tests<ClientSocket_Qt, ServerSocket_Qt>(database, thread_pool, "Qt");
 #ifndef _WIN32
-    database.add<Test_ServerSocket2_Posix_NoFdLeak>(
+    database.add<Test_ServerSocket_Posix_NoFdLeak>(
         thread_pool,
-        "ServerSocket2 (POSIX) - server-initiated closes leave no open file descriptor behind"
+        "ServerSocket (POSIX) - server-initiated closes leave no open file descriptor behind"
     );
 #endif
-    database.add<Test_ServerSocket2_Qt_CloseUnderStall>(
+    database.add<Test_ServerSocket_Qt_CloseUnderStall>(
         thread_pool,
-        "ServerSocket2 (Qt) - close() under a stalled event thread"
+        "ServerSocket (Qt) - close() under a stalled event thread"
     );
 #ifndef _WIN32
-    add_server_socket2_tests<ClientSocket_POSIX, ServerSocket2_POSIX>(database, thread_pool, "POSIX");
+    add_server_socket2_tests<ClientSocket_POSIX, ServerSocket_POSIX>(database, thread_pool, "POSIX");
 #endif
 #ifdef _WIN32
-    add_server_socket2_tests<ClientSocket_WinSocket, ServerSocket2_WinSocket>(database, thread_pool, "WinSocket");
+    add_server_socket2_tests<ClientSocket_WinSocket, ServerSocket_WinSocket>(database, thread_pool, "WinSocket");
 #endif
 }
 

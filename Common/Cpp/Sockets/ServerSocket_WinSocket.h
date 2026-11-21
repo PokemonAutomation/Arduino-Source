@@ -1,19 +1,19 @@
-/*  Server Socket 2 (Windows)
+/*  Server Socket (Windows)
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  The WinSocket backend of the per-connection AbstractServerSocket2.
+ *  The WinSocket backend of the per-connection AbstractServerSocket.
  *
  *  One worker thread (from the thread pool) runs the accept loop for the
  *  whole lifetime of the server, and one worker thread per accepted
  *  connection. Each accepted client becomes a
- *  ServerSocket2Connection_WinSocket object, which owns the socket's I/O
+ *  ServerSocketConnection_WinSocket object, which owns the socket's I/O
  *  (send()/close()) and outlives the server as an inert object.
  *
  */
 
-#ifndef PokemonAutomation_ServerSocket2_WinSocket_H
-#define PokemonAutomation_ServerSocket2_WinSocket_H
+#ifndef PokemonAutomation_ServerSocket_WinSocket_H
+#define PokemonAutomation_ServerSocket_WinSocket_H
 
 #include <atomic>
 #include <memory>
@@ -23,16 +23,16 @@
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Concurrency/ConditionVariable.h"
 #include "Common/Cpp/Concurrency/Mutex.h"
-#include "AbstractServerSocket2.h"
+#include "AbstractServerSocket.h"
 
 namespace PokemonAutomation{
 
 
 class ThreadPool;
-class ServerSocket2_WinSocket;
+class ServerSocket_WinSocket;
 
 
-class ServerSocket2Connection_WinSocket final : public AbstractServerSocketConnection{
+class ServerSocketConnection_WinSocket final : public AbstractServerSocketConnection{
 public:
     virtual bool is_open() const override{
         return m_open.load(std::memory_order_relaxed);
@@ -48,13 +48,13 @@ public:
 
 
 private:
-    friend class ServerSocket2_WinSocket;
+    friend class ServerSocket_WinSocket;
 
     //  Backend internals: the server and this connection's own thread
     //  only.
 
     //  Constructed by the server on accept, with the accepted socket.
-    ServerSocket2Connection_WinSocket(ServerSocket2_WinSocket& server, SOCKET client_socket)
+    ServerSocketConnection_WinSocket(ServerSocket_WinSocket& server, SOCKET client_socket)
         : m_server(&server)
         , m_client(client_socket)
     {}
@@ -104,7 +104,7 @@ private:
     //  The owning server. Dereferenced only from thread_loop(), which the
     //  server's close_and_wait() has joined before the server is
     //  destroyed, so it can never be used after the server's death.
-    ServerSocket2_WinSocket* m_server;
+    ServerSocket_WinSocket* m_server;
 
     //  The accepted socket; INVALID_SOCKET once take_fd() has handed it
     //  off.
@@ -123,12 +123,12 @@ private:
 
 
 
-class ServerSocket2_WinSocket final : public AbstractServerSocket2{
+class ServerSocket_WinSocket final : public AbstractServerSocket{
 public:
 
-    ServerSocket2_WinSocket(ThreadPool& thread_pool);
+    ServerSocket_WinSocket(ThreadPool& thread_pool);
 
-    virtual ~ServerSocket2_WinSocket(){
+    virtual ~ServerSocket_WinSocket(){
         close_and_wait();
     }
 
@@ -168,7 +168,7 @@ private:
     //  replaced). The m_active slot is kept either way: it anchors the
     //  connection's lifetime while its thread runs, and the server drops
     //  the slot only after it has joined that thread.
-    void release_connection(ServerSocket2Connection_WinSocket* self);
+    void release_connection(ServerSocketConnection_WinSocket* self);
 
     //  A start attempt failed (or the server was torn down while the task
     //  was still starting up): mark the task dead so that a retrying
@@ -178,7 +178,7 @@ private:
 
 
 private:
-    friend class ServerSocket2Connection_WinSocket;
+    friend class ServerSocketConnection_WinSocket;
 
     //  The backend's internal state machine; not part of the application
     //  API (the listeners and active_connection() are the observables).
