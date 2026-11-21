@@ -51,7 +51,11 @@ cl /nologo /std:c++23 /O2 /Ob1 /MD /DNDEBUG /W4 /WX /MP /utf-8 /external:anglebr
 default_repro.exe
 ```
 
-and, for flag bisection, the same without `/MP`.
+and, for flag bisection, the same without `/MP`, and the default
+repro additionally with an explicit `/arch:SSE2` (to test whether the
+miscompilation is tied to the toolset's default x64 target level:
+PASS with it and FAIL without it would make `/arch:SSE2` on the scalar
+kernels a candidate mitigation as well as a diagnostic).
 
 Sanity check on a non-MSVC toolchain (must PASS):
 
