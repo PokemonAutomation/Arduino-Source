@@ -4,12 +4,12 @@
  *
  */
 
-#include "Common/Cpp/HttpServer/HttpServer2_Tests.h"
+#include "Common/Cpp/HttpServer/HttpServer_Tests.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/MoveOnlyFunction_Tests.h"
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Sockets/ServerSocket2_Tests.h"
+#include "Common/Cpp/Sockets/ServerSocket_Tests.h"
 #include "Common/Cpp/Sockets/Sockets_Tests.h"
 #include "Common/Cpp/TestRunners/TestImageDistortionManager.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
@@ -59,8 +59,8 @@ UnitTestDatabase make_UNIT_TESTS_ALL(){
 
     add_tests_QtEventThreadPool(ret, GlobalThreadPools::computation_normal());
     add_tests_Sockets(ret, GlobalThreadPools::unlimited_normal());
-    add_tests_ServerSocket2(ret, GlobalThreadPools::unlimited_normal());
-    add_tests_HttpServer2(ret, GlobalThreadPools::unlimited_normal());
+    add_tests_ServerSocket(ret, GlobalThreadPools::unlimited_normal());
+    add_tests_HttpServer(ret, GlobalThreadPools::unlimited_normal());
     add_tests_BlackBorderDetector(ret);
     add_tests_ListenerSet(ret);
     add_tests_MoveOnlyFunction(ret);

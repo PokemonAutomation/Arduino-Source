@@ -1,27 +1,23 @@
-/*  Abstract Server Socket 2
+/*  Abstract Server Socket
  *
  *  From: https://github.com/PokemonAutomation/
  *
  *  A minimal TCP server with per-connection objects.
  *
  *  It listens on a port and hands each accepted client to its
- *  listeners as an AbstractServerSocketConnection. Unlike
- *  AbstractServerSocket, the server has no send/receive of its own:
- *  all I/O happens on the connection objects it hands out, so a write
- *  that outlives its connection can never reach a later client's
- *  socket.
+ *  listeners as an AbstractServerSocketConnection. The server has no
+ *  send/receive of its own: all I/O happens on the connection objects
+ *  it hands out, so a write that outlives its connection can never
+ *  reach a later client's socket.
  *
- *  Like AbstractServerSocket, it handles one connection at a time: a
- *  client that connects while one is active is rejected.
+ *  It handles one connection at a time: a client that connects while
+ *  one is active is rejected.
  *
  *  Lifecycle: destroying the server stops it and closes every live
  *  connection. The shared ownership only guarantees the connection
  *  object's validity: after the server is gone, any use of the object
  *  reports the closed connection (is_open() is false, send() returns
  *  0, close() is a no-op).
- *
- *  This class coexists with AbstractServerSocket while the new shape
- *  is proven out; the two are not interchangeable yet.
  *
  *  Thread safety: "start()", "active_connection()",
  *  "add_listener()" and "remove_listener()" are safe to call from any
@@ -34,8 +30,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Sockets_AbstractServerSocket2_H
-#define PokemonAutomation_Sockets_AbstractServerSocket2_H
+#ifndef PokemonAutomation_Sockets_AbstractServerSocket_H
+#define PokemonAutomation_Sockets_AbstractServerSocket_H
 
 #include <cstdint>
 #include <memory>
@@ -47,7 +43,7 @@ namespace PokemonAutomation{
 
 
 
-class AbstractServerSocket2{
+class AbstractServerSocket{
 public:
     using ConnectionPtr = std::shared_ptr<AbstractServerSocketConnection>;
 
@@ -87,8 +83,8 @@ public:
 
 
 public:
-    AbstractServerSocket2() = default;
-    virtual ~AbstractServerSocket2() = default;
+    AbstractServerSocket() = default;
+    virtual ~AbstractServerSocket() = default;
 
     //  Binds to "address" and listens on "port".
     //  Use "0.0.0.0" to accept connections on all interfaces.
