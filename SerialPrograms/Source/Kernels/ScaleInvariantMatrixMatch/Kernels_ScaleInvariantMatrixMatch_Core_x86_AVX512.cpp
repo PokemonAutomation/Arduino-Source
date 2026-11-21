@@ -19,6 +19,8 @@ namespace ScaleInvariantMatrixMatch{
 struct Context_x86_AVX512{
     using vtype = __m512;
 
+    static constexpr bool UNROLL = true;
+
     static PA_FORCE_INLINE vtype vzero(){
         return _mm512_setzero_ps();
     }
