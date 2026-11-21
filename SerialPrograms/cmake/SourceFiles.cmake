@@ -2246,6 +2246,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.h
     Source/VideoGames/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_WeatherFinder.cpp
     Source/VideoGames/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_WeatherFinder.h
+    Source/VideoGames/PokemonLZA/Programs/PokemonLZA_BallThrow.cpp
+    Source/VideoGames/PokemonLZA/Programs/PokemonLZA_BallThrow.h
     Source/VideoGames/PokemonLZA/Programs/PokemonLZA_BasicNavigation.cpp
     Source/VideoGames/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h
     Source/VideoGames/PokemonLZA/Programs/PokemonLZA_BoxSorter.cpp

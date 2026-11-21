@@ -6,9 +6,9 @@
 
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "VideoGames/PokemonLZA/Programs/PokemonLZA_BallThrow.h"
 #include "VideoGames/PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA_PostKillCatcher.h"
 
@@ -70,31 +70,12 @@ void PostKillCatcher::program(SingleSwitchProgramEnvironment& env, ProController
     require_player(env.console, context, BUTTON_L);
 
     while (true){
-        int8_t scrolls = RIGHT_SCROLLS;
-        DpadPosition direction;
-        if (scrolls >= 0){
-            direction = DPAD_RIGHT;
-        }else{
-            direction = DPAD_LEFT;
-            scrolls = -scrolls;
-        }
-
-        Milliseconds hold = SCROLL_HOLD;
-        Milliseconds cool = SCROLL_RELEASE;
-
-        ssf_press_button(
-            context,
-            BUTTON_ZL | BUTTON_ZR,
-            500ms, 500ms + (hold + cool) * scrolls,
-            0ms
-        );
-
-        while (scrolls != 0){
-            pbf_press_dpad(context, direction, hold, cool);
-            scrolls--;
-        }
-
-        pbf_wait(context, POST_THROW_WAIT);
+        throw_ball(context, BallThrowOptions{
+            .right_scrolls = RIGHT_SCROLLS,
+            .scroll_hold = SCROLL_HOLD,
+            .scroll_release = SCROLL_RELEASE,
+            .after_throw = POST_THROW_WAIT,
+        });
 
         go_home(env.console, context);
         reset_game_from_home(env, env.console, context);
