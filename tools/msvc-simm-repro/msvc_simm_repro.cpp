@@ -10,7 +10,8 @@
  *  It computes s = sum(A*T) / sum(A*A) over a 512 x 513 float matrix,
  *  with the same data stream as the failing CI test (same seed and
  *  std::mt19937 / std::uniform_real_distribution sequence as the weighted
- *  (512, 513) instance, W draw skipped; on MSVC the A/T values are
+ *  (512, 513) instance, the W draw per element is discarded but must
+ *  happen to keep the stream aligned; on MSVC the A/T values are
  *  bit-identical to the CI test's), and logs the intermediate steps so a
  *  failing CI run localizes the divergence:
  *
@@ -488,7 +489,8 @@ int main(){
 #endif
 
     //  1. The data, exactly like the CI weighted (512, 513) test: the
-    //     same seed and stream, with the W draw per element skipped.
+    //     same seed and stream; the W draw per element is discarded but
+    //     must happen to keep the mt19937 stream aligned with the test's.
     std::mt19937 generator(512u * 1000003u + 513u * 7919u + 2654435761u);
     std::uniform_real_distribution<float> data_distribution(-1.0f, 1.0f);
     std::uniform_real_distribution<float> weight_distribution(0.0f, 1.0f);

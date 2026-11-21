@@ -1,45 +1,45 @@
-# MSVC SIMM probe
+# MSVC SIMM repros
 
-`msvc_simm_repro.cpp` is a minimal instrumented probe for the CI-only
-failure
+Repros for the CI-only failure
 
 ```
 Kernels::ScaleInvariantMatrixMatch - x86_SSE(w=512, h=513, ...)
-Message: compute_scale: default=... isa=... (out of tolerance)
+Message: compute_scale: default=-0.00225342088 isa=0.000351705559
+(1959531328 ulps, abs 0.002605 vs tolerance 0.000100)
 ```
 
-It computes `s = sum(A*T) / sum(A*A)` over a 512x513 float matrix with
-the same data stream as the failing CI test (same seed and
-`std::mt19937` / `std::uniform_real_distribution` sequence as the
-weighted (512, 513) instance, W draw skipped; on MSVC the A/T values
-are bit-identical to the CI test's), and logs the intermediate steps so
-a failing run localizes the divergence:
+Both files use the exact data stream of the failing test (512 x 513,
+the weighted instance's seed, per element the A, T and W values drawn
+in the test's order - the W draw is discarded by the unweighted
+repros but must happen, to keep the `std::mt19937` stream aligned). On
+MSVC the A/T values are bit-identical to the CI test's.
 
-1. `compiler: MSVC _MSC_VER=... _MSC_FULL_VER=...` - the exact compiler
-   build of the runner. Failing and passing pool runs must be
-   distinguishable here.
-2. a data dump (`sum(A)`, `sum(T)`, first values with bit patterns) -
-   check the stream is what the platform's `<random>` produces, and is
-   stable across runs. Also the row addresses and their 16/64-byte
-   alignment (0 in CI).
-3. every row's `ref` (double) / `def` (scalar kernel) / `sse` (SSE
-   kernel), each from one-row calls of the verbatim kernels - the first
-   diverging row (if any).
-4. the SSE kernel's row-reduced `sum_at` / `sum_as` lanes for the first
-   rows, the diverging rows and the last row - lane `j` holds the
-   contributions of the elements whose index is `j mod 16`, so a wrong
-   lane localizes the corruption to a quarter of the row stride.
-5. the full-matrix result, exactly like CI, as the verdict (exit 0/1).
+**Status:** the instrumented suite probe (see the PR "Kernels:
+instrumented SIMM probe as the only test") localized the failure: on
+the `windows-2025-vs2026` runner image (MSVC 19.52, VS 2026 18.0) the
+**scalar Default kernel** miscompiles - every row diverges - while the
+SSE kernel's results are correct and bit-identical to MSVC 19.43's
+(VS 2022).
 
-The kernels are verbatim copies of the CI sources
-(`Kernels_ScaleInvariantMatrixMatch_Routines.h`, `Core_Default.cpp`,
-`Core_x86_SSE.cpp`, `Kernels_x64_SSE41.h`,
-`Kernels_PartialWordAccess_x64_SSE41.h`). The rows are 64-byte aligned
-at runtime, as in CI, so the partial-row paths are dead; the row
-pointers are rerouted through a `volatile` so the compiler keeps those
-paths live in the binary, as in the CI build. The lane dump uses a
-second copy of the loop with the same body (instrumentation only: its
-values localize the bug, the verdict uses the verbatim kernel).
+## msvc_simm_default_repro.cpp
+
+The smallest repro: verbatim copies of `Context_Default`, the
+unweighted `SumATA2` and the unweighted `compute_scale<>` (from
+`Core_Default.cpp` / `Routines.h`), the CI data, and a
+double-precision reference. Prints the compiler version, the
+diverging rows (if any) and the full-matrix result; exits 1 if the
+Default result diverges beyond the CI tolerance. Expected to PASS on
+gcc/clang and MSVC 19.43, and to FAIL on MSVC 19.52 with
+`total: default=-0.00225342088` - the exact value from the original
+CI failure message. This is the basis for the MSVC bug report.
+
+## msvc_simm_repro.cpp
+
+The fuller probe: Default and SSE kernels (verbatim, with the
+partial-row paths kept live), a double reference, per-row and
+full-matrix values for both, and the SSE row-reduced lane dump. It
+prints which kernel diverges. Under MSVC 19.52 it is expected to FAIL
+naming the **default** kernel.
 
 ## Build and run
 
@@ -47,41 +47,20 @@ MSVC, with the CI's flags:
 
 ```
 cl /nologo /std:c++23 /O2 /Ob1 /MD /DNDEBUG /W4 /WX /MP /utf-8 /external:anglebrackets ^
-   tools\msvc-simm-repro\msvc_simm_repro.cpp /Fe:probe.exe
-probe.exe
+   tools\msvc-simm-repro\msvc_simm_default_repro.cpp /Fe:default_repro.exe
+default_repro.exe
 ```
 
-and, for flag bisection, the same without `/MP`. A conforming compiler
-prints PASS and exits 0; a misbehaving build prints the diverging rows
-and lanes and FAILs (exit 1), which also keeps the CI job red with the
-log captured.
+and, for flag bisection, the same without `/MP`.
 
 Sanity check on a non-MSVC toolchain (must PASS):
 
 ```
-g++ -std=c++23 -O2 tools/msvc-simm-repro/msvc_simm_repro.cpp -o probe
-./probe
+g++ -std=c++23 -O2 tools/msvc-simm-repro/msvc_simm_default_repro.cpp -o default_repro
+./default_repro
 ```
 
-## Running it in CI
-
-Copy `msvc-simm-repro.yml` to `.github/workflows/msvc-simm-repro.yml`
-and trigger it manually (workflow_dispatch). It sets up the MSVC
-environment (printing the runner's `cl` version), then builds and runs
-the probe with the exact CI flags and again without `/MP`.
-
-## Reading the result
-
-- `compiler:` differs between failing and passing CI runs → the pool
-  rotation is confirmed and the version is known; the repro (or a
-  reduced version of it) is the basis for an MSVC bug report.
-- the data dump differs from a passing run → the data generation
-  itself is the problem, not the kernel.
-- some rows diverge → the bug is in the per-row loop; the lane dump
-  says which quarter. All rows agree but the total diverges → the bug
-  is in the accumulation across rows (the `sum_AT = vadd(sum_AT, ...)`
-  update).
-- FAIL with `/MP`, PASS without → `/MP` is involved.
-- PASS on both → the divergence needs more CI context (the other
-  instantiations in the TU, the weighted paths, other TUs); extend the
-  probe accordingly.
+`msvc-simm-repro.yml` (copy to `.github/workflows/` to trigger
+manually) builds and runs both repros in CI with the exact flags, so
+they can be run against a specific runner pool without a local install
+of VS 2026.
