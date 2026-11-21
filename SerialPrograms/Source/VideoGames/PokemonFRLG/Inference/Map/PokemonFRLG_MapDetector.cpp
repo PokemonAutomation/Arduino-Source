@@ -5,12 +5,14 @@
  */
 
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "Tests/ImageUnitTest.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_MapDetector.h"
 
@@ -49,6 +51,59 @@ bool KantoMapDetector::detect(const ImageViewRGB32& screen){
     return false;
 }
 
+
+FlyMapDetector::FlyMapDetector(Color color)
+    : m_color(color)
+    , m_top_box(0.010, 0.010, 0.500, 0.080) // blue (0, 122, 255)
+    , m_left_box(0.069, 0.110, 0.025, 0.880) // white
+    , m_right_box(0.902, 0.110, 0.025, 0.880) // white
+{}
+void FlyMapDetector::make_overlays(VideoOverlaySet& items) const{
+    const BoxOption& GAME_BOX = GameSettings::instance().GAME_BOX;
+    items.add(m_color, GAME_BOX.inner_to_outer(m_top_box));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_left_box));
+    items.add(m_color, GAME_BOX.inner_to_outer(m_right_box));
+}
+bool FlyMapDetector::detect(const ImageViewRGB32& screen){
+    ImageViewRGB32 game_screen = extract_box_reference(screen, GameSettings::instance().GAME_BOX);
+    return is_solid(extract_box_reference(game_screen, m_top_box), { 0.0000, 0.3236, 0.6764 }, 0.25, 20)
+        && is_white(extract_box_reference(game_screen, m_left_box))
+        && is_white(extract_box_reference(game_screen, m_right_box));
+}
+
+
+//  The Fly map of each region is detected; other screens with white borders
+//  or a blue top (the bag, a sign's message, a battle) aren't.
+class Test_FlyMapDetector : public ImageUnitTest{
+public:
+    Test_FlyMapDetector(const std::string& image, bool expected)
+        : ImageUnitTest("PokemonFRLG::FlyMapDetector - " + image, {image})
+        , m_expected(expected)
+    {}
+
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        FlyMapDetector detector(COLOR_RED);
+        if (detector.detect(images[0]) != m_expected){
+            return std::string(m_expected ? "The Fly map wasn't detected." : "Detected a Fly map that isn't there.");
+        }
+        return true;
+    }
+
+private:
+    bool m_expected;
+};
+
+void add_tests_FlyMapDetector(UnitTestDatabase& database){
+    database.add<Test_FlyMapDetector>("PokemonFRLG/FlyMapDetector/Kanto_True.jpg", true);
+    database.add<Test_FlyMapDetector>("PokemonFRLG/FlyMapDetector/Sevii123-CapeBrink_True.jpg", true);
+    database.add<Test_FlyMapDetector>("PokemonFRLG/FlyMapDetector/Sevii67-SixIsland_True.jpg", true);
+    database.add<Test_FlyMapDetector>("PokemonFRLG/FlyMapDetector/Bag_False.jpg", false);
+    database.add<Test_FlyMapDetector>("PokemonFRLG/FlyMapDetector/Sign_False.jpg", false);
+    database.add<Test_FlyMapDetector>("PokemonFRLG/FlyMapDetector/BattleMenu_False.jpg", false);
+}
 
 
 }
