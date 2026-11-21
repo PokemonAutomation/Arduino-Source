@@ -13,21 +13,14 @@
 
 namespace PokemonAutomation{
 
-// create a folder with path ./DebugDumps/`folder_path`.
-// The function will create all parent folders necessary to create the folder.
-void create_debug_folder(const std::string& folder_path){
-    Filesystem::create_directories(Filesystem::Path(DEBUG_PATH() + folder_path));
-}
-
 std::string dump_debug_image(
     Logger& logger,
     const std::string& path,
     const std::string& label,
     const ImageViewRGB32& image
 ){
-    create_debug_folder(path);
     std::string full_path = DEBUG_PATH() + path + "/" + now_to_filestring() + "-" + label + ".png";
-    logger.log("Debug image: " + full_path, COLOR_YELLOW);
+    logger.log("Save debug image: " + full_path, COLOR_YELLOW);
     image.save(full_path);
     return full_path;
 }
