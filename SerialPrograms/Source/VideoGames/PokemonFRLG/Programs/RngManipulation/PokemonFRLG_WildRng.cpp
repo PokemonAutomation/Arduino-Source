@@ -281,6 +281,7 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     WildRng_Descriptor::Stats& stats = env.current_stats<WildRng_Descriptor::Stats>();
 
     home_black_border_check(env.console, context);
+    check_free_party_slots(env.console, context, 1);
 
     RNG_FILTERS.reset();
     RNG_CALIBRATION.reset_hits();

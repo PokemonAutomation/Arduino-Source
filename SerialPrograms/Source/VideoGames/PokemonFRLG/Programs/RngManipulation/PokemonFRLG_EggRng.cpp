@@ -725,6 +725,7 @@ void EggRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext& 
     EggRng_Descriptor::Stats& stats = env.current_stats<EggRng_Descriptor::Stats>();
 
     home_black_border_check(env.console, context);
+    check_free_party_slots(env.console, context, STARTING_POINT == EggProgramState::pickup_calibration ? 2 : 3);
 
     const RngStats* egg_stats = RngStatsDatabase::instance().get_nothrow(EGG_SPECIES.slug());
     if (egg_stats == nullptr){

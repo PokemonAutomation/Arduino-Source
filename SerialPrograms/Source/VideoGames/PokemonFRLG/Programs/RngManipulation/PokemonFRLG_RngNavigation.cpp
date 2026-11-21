@@ -4,24 +4,31 @@
  *
  */
 
+#include <format>
+#include <string>
+#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_ShinySymbolDetector.h"
 #include "VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "VideoGames/PokemonFRLG/Inference/Dialogs/PokemonFRLG_PartyDialogs.h"
 #include "VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h"
 #include "VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_PartyMenuDetector.h"
+#include "VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_PartySlot.h"
 #include "VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_BagDetector.h"
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_StatsReader.h"
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h"
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_PokemonSpriteReader.h"
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_PartyLevelUpReader.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
+#include "VideoGames/PokemonFRLG/PokemonFRLG_Settings.h"
 #include "PokemonFRLG_BlindNavigation.h"
 #include "PokemonFRLG_RngCalibration.h"
 #include "PokemonFRLG_RngStatsDatabase.h"
@@ -836,6 +843,55 @@ bool walk_from_daycare_man_to_pond(ConsoleHandle& console, ProControllerContext&
     pbf_mash_button(context, BUTTON_A, 2000ms);
     context.wait_for_all_requests();
     return false;
+}
+
+namespace{
+
+std::string not_enough_free_slots_message(size_t party_size, size_t free_slots_needed){
+    if (free_slots_needed == 1){
+        return std::format(
+            "Your party is full. Leave a party slot free so the program can check the {} it catches or receives.",
+            Pokemon::STRING_POKEMON
+        );
+    }
+    return std::format(
+        "Your party has {} {}. Leave at least {} party slots free for the {} the program catches or receives.",
+        party_size, Pokemon::STRING_POKEMON, free_slots_needed, Pokemon::STRING_POKEMON
+    );
+}
+
+}  // namespace
+
+void check_free_party_slots(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    size_t free_slots_needed
+){
+    if (free_slots_needed == 0){
+        return;
+    }
+    if (!GameSettings::instance().RUN_RNG_START_CHECKS){
+        console.log("Start checks are off in the FRLG Game Settings. Skipping them.");
+        return;
+    }
+    Logger& logger = console.logger();
+    logger.log(std::format("Checking for {} free party slot(s)...", free_slots_needed));
+    try{
+        open_party_menu_from_overworld(console, context);
+    }catch (OperationFailedException&){
+        logger.log("Unable to open the party menu. Skipping the free party slot check.", COLOR_RED);
+        return;
+    }
+    context.wait_for_all_requests();
+    constexpr size_t MAX_PARTY_SIZE = 6;
+    const size_t party_size = static_cast<size_t>(detect_last_occupied_party_slot(console)) + 1;
+    if (MAX_PARTY_SIZE - party_size < free_slots_needed){
+        throw UserSetupError(logger, not_enough_free_slots_message(party_size, free_slots_needed));
+    }
+    logger.log("Party has enough free slots.");
+    // Exit party menu and start menu back to the overworld.
+    pbf_mash_button(context, BUTTON_B, 2000ms);
+    context.wait_for_all_requests();
 }
 
 }
