@@ -190,7 +190,7 @@ jobs:
       - name: Set up ccache
         uses: hendrikmuhs/ccache-action@v1.2.25
         with:
-          key: ${{inputs.os}}-${{inputs.compiler}}
+          key: ${{inputs.os}}-${{inputs.compiler}}${{inputs.os == 'windows-2025' && inputs.compiler == 'default' && '-v2' || ''}}
           max-size: 5G
           evict-old-files: job
           save: ${{github.ref == 'refs/heads/main'}}
