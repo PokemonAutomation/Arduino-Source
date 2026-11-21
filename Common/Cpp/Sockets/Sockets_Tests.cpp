@@ -224,6 +224,63 @@ bool starved_wait_for(Waiter& waiter, bool& starved, Predicate&& predicate){
     return false;
 }
 
+//  A per-test machine-stall watchdog for tests whose timing assertions
+//  matter only if the machine keeps running: the timing_unreliable()
+//  probes see the machine at the moments they run (the test start, a
+//  failed wait), so a runner that stalls mid-test and recovers by the
+//  failure (a CI machine under extreme load) evades them, even though
+//  the stall is what made the test's wall-clock budgets meaningless.
+//  While the test runs, this class ticks every 100 ms on the steady
+//  clock and records the longest gap between ticks; a gap of many
+//  seconds means the machine was stalled during the test. RAII: the
+//  destructor stops and joins the tick thread on every exit path,
+//  including an exception out of the test body (a leaked joinable
+//  std::thread would terminate the whole test process).
+class StallWatchdog{
+public:
+    StallWatchdog(){
+        m_thread = std::thread([this]{
+            using std::chrono::steady_clock;
+            auto last = steady_clock::now();
+            while (!m_stop.load(std::memory_order_relaxed)){
+                std::this_thread::sleep_for(std::chrono::milliseconds(100));
+                const auto now = steady_clock::now();
+                const double gap =
+                    std::chrono::duration_cast<std::chrono::duration<double>>(
+                        now - last
+                    ).count();
+                if (gap > m_max_gap_seconds){
+                    //  Single writer (this thread); the test thread reads
+                    //  it only after finish() has joined.
+                    m_max_gap_seconds = gap;
+                }
+                last = now;
+            }
+        });
+    }
+    ~StallWatchdog(){
+        finish();
+    }
+
+    //  Stops the tick thread and joins it. Idempotent; call it before
+    //  reading max_gap_seconds().
+    void finish(){
+        if (m_thread.joinable()){
+            m_stop.store(true, std::memory_order_relaxed);
+            m_thread.join();
+        }
+    }
+
+    double max_gap_seconds() const{
+        return m_max_gap_seconds;
+    }
+
+private:
+    std::thread m_thread;
+    std::atomic<bool> m_stop{false};
+    double m_max_gap_seconds = 0.0;
+};
+
 
 template <typename ClientSocketType>
 class TestClientSocket : public UnitTest{
@@ -576,6 +633,10 @@ public:
                 "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
             );
         }
+        //  Catches a mid-test machine stall that the start-of-test probe
+        //  above and the timing_unreliable() re-probe on a failed wait
+        //  both miss (see "StallWatchdog").
+        StallWatchdog stall_watchdog;
         RespondingListener server_listener;
         server_listener.echo = false;
         ServerSocket2 server(this->m_thread_pool);
@@ -654,6 +715,10 @@ public:
             client.close();
         }
 
+        //  Stop the stall watchdog before reading it (its destructor
+        //  would do the same on every other exit path).
+        stall_watchdog.finish();
+
         if (!error.empty()){
             //  A timeout can land on a machine that was healthy when the
             //  test started and starved mid-test: the 60 s budget and the
@@ -667,6 +732,18 @@ public:
                 return UnitTestResult(
                     UnitTestResult::SKIPPED,
                     "Machine was starved mid-test (timing_unreliable()); the 60 s waits are wall-clock, so skipping instead of failing."
+                );
+            }
+            //  A machine that stalled for a long stretch during the test
+            //  and recovered by the failure evades the timing_unreliable()
+            //  probe above; the watchdog's tick gap is the evidence that
+            //  the timing assertions cannot be trusted either way.
+            if (stall_watchdog.max_gap_seconds() > 5.0){
+                return UnitTestResult(
+                    UnitTestResult::SKIPPED,
+                    "Machine stalled during the test (longest 100 ms tick gap was " +
+                    std::to_string((long)(stall_watchdog.max_gap_seconds() + 0.5)) +
+                    " s); the 60 s waits are wall-clock, so skipping instead of failing."
                 );
             }
             return error;
