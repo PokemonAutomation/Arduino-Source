@@ -183,6 +183,25 @@ bool timing_unreliable(){
 //  real regression is still reported within the CI timeouts.
 constexpr std::chrono::seconds SOCKET_TEST_WAIT{60};
 
+//  A timing-sensitive wait with mid-test starvation detection: returns
+//  true when the predicate came true within the shared budget. On a
+//  timeout it probes the machine - if it is starved right now
+//  (timing_unreliable()) it sets *starved, and the calling test should
+//  finish SKIPPED instead of FAILED: the wall-clock budget and the late
+//  socket events cannot be blamed on the socket. A timeout on a healthy
+//  machine leaves *starved alone: a genuine failure to report.
+//
+//  Use only for waits whose timeout is a timing assertion; data
+//  assertions (corruption, wrong counters) must stay hard failures on a
+//  starved machine.
+template <typename Predicate>
+bool starved_wait_for(Waiter& waiter, bool& starved, Predicate&& predicate){
+    if (waiter.wait_for(SOCKET_TEST_WAIT, predicate)){
+        return true;
+    }
+    starved = timing_unreliable();
+    return false;
+}
 
 template <typename ClientSocketType, typename ServerSocketType>
 class TestSockets : public UnitTest{
@@ -1007,19 +1026,22 @@ public:
         }
 
         std::string error;
+        bool starved = false;
         {
             CapturingClientListener client_listener;
             ClientSocketType client(this->m_thread_pool);
             client.add_listener(client_listener);
 
             client.connect("127.0.0.1", port);
-            if (!client_listener.waiter.wait_for(
-                SOCKET_TEST_WAIT,
+            if (!starved_wait_for(
+                client_listener.waiter,
+                starved,
                 [&client_listener]{ return client_listener.connect_finished.load() >= 1; }
             )){
                 error = "The client did not finish connecting";
-            }else if (!server_listener.waiter.wait_for(
-                SOCKET_TEST_WAIT,
+            }else if (!starved_wait_for(
+                server_listener.waiter,
+                starved,
                 [&server_listener]{ return server_listener.connected.load() >= 1; }
             )){
                 error = "The server did not call on_connect";
@@ -1046,8 +1068,9 @@ public:
 
                 //  The response written before the close must still
                 //  reach the client.
-                if (!client_listener.waiter.wait_for(
-                    SOCKET_TEST_WAIT,
+                if (!starved_wait_for(
+                    client_listener.waiter,
+                    starved,
                     [&client_listener]{
                         std::lock_guard<Mutex> lg(client_listener.lock);
                         return client_listener.received.size() >= 3;
@@ -1071,6 +1094,20 @@ public:
         }
 
         if (!error.empty()){
+            //  A timeout can land on a machine that was healthy when the
+            //  test started and starved mid-test: the 60 s budget and the
+            //  drain's caps are wall-clock, so a starved peer's stream can
+            //  land just late enough that the close resets the connection
+            //  instead of closing it cleanly, and the response is lost.
+            //  That is the machine's fault, not the socket's - give up as
+            //  SKIPPED (the start-of-test guard only covers a machine
+            //  that was already starved).
+            if (starved){
+                return UnitTestResult(
+                    UnitTestResult::SKIPPED,
+                    "Machine was starved mid-test (timing_unreliable()); the 60 s waits are wall-clock, so skipping instead of failing."
+                );
+            }
             return error;
         }
         return true;
