@@ -99,6 +99,7 @@ void add_tests_x86_SSE(UnitTestDatabase& database);
 void add_tests_x86_AVX2(UnitTestDatabase& database);
 void add_tests_x86_AVX512(UnitTestDatabase& database);
 void add_tests_arm64_NEON(UnitTestDatabase& database);
+void add_tests_MsvcProbe(UnitTestDatabase& database);
 
 float compute_error(
     size_t width, size_t height,
@@ -165,26 +166,29 @@ float compute_error(
 //  Default path itself gets no tests.
 // 
 void add_tests(UnitTestDatabase& database){
+    //  MsvcProbe debug branch: only the MSVC probe test is registered;
+    //  the ISA test registrations are commented out for this branch.
+    add_tests_MsvcProbe(database);
 #ifdef PA_AutoDispatch_x64_08_Nehalem
-    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
-        add_tests_x86_SSE(database);
-    }
+    //if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+    //    add_tests_x86_SSE(database);
+    //}
 #endif
 #ifdef PA_AutoDispatch_x64_13_Haswell
-    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
-        add_tests_x86_AVX2(database);
-    }
+    //if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
+    //    add_tests_x86_AVX2(database);
+    //}
 #endif
 #ifdef PA_AutoDispatch_x64_17_Skylake
-    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
-        add_tests_x86_AVX512(database);
-    }
+    //if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
+    //    add_tests_x86_AVX512(database);
+    //}
 #endif
 
 #ifdef PA_AutoDispatch_arm64_20_M1
-    if (CPU_CAPABILITY_CURRENT.OK_M1){
-        add_tests_arm64_NEON(database);
-    }
+    //if (CPU_CAPABILITY_CURRENT.OK_M1){
+    //    add_tests_arm64_NEON(database);
+    //}
 #endif
 }
 

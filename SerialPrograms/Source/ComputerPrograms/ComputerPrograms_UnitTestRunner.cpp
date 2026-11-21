@@ -58,39 +58,44 @@ namespace ComputerPrograms{
 UnitTestDatabase make_UNIT_TESTS_ALL(){
     UnitTestDatabase ret;
 
-    add_tests_QtEventThreadPool(ret, GlobalThreadPools::computation_normal());
-    add_tests_Sockets(ret, GlobalThreadPools::unlimited_normal());
-    add_tests_ServerSocket2(ret, GlobalThreadPools::unlimited_normal());
-    add_tests_HttpServer(ret, GlobalThreadPools::unlimited_normal());
-    add_tests_HttpServer2(ret, GlobalThreadPools::unlimited_normal());
-    add_tests_BlackBorderDetector(ret);
-    add_tests_ListenerSet(ret);
-    add_tests_MoveOnlyFunction(ret);
-    SysbotBase::add_tests_SysbotBasePing(ret);
-    SysbotBase::add_tests_SysbotBaseReceiveLine(ret);
-    SysbotBase::add_tests_SysbotBaseShutdown(ret);
-    add_tests_AudioInfo(ret);
-    add_tests_ChannelMixerMatrix(ret);
-    add_tests_FFTStreamer(ret);
-    add_tests_SinkPipeline(ret);
-    add_tests_AudioFileLoader(ret);
-    add_tests_ImageStats(ret);
-    OCR::add_tests(ret);
+    //  MsvcProbe debug branch: only the Kernels test registration is
+    //  active, and within Kernels only the ScaleInvariantMatrixMatch MSVC
+    //  probe test is registered (see Kernels_Tests.cpp and
+    //  Kernels_ScaleInvariantMatrixMatch.cpp). Every other test is
+    //  commented out so the CI suite runs the probe on every platform.
+    //add_tests_QtEventThreadPool(ret, GlobalThreadPools::computation_normal());
+    //add_tests_Sockets(ret, GlobalThreadPools::unlimited_normal());
+    //add_tests_ServerSocket2(ret, GlobalThreadPools::unlimited_normal());
+    //add_tests_HttpServer(ret, GlobalThreadPools::unlimited_normal());
+    //add_tests_HttpServer2(ret, GlobalThreadPools::unlimited_normal());
+    //add_tests_BlackBorderDetector(ret);
+    //add_tests_ListenerSet(ret);
+    //add_tests_MoveOnlyFunction(ret);
+    //SysbotBase::add_tests_SysbotBasePing(ret);
+    //SysbotBase::add_tests_SysbotBaseReceiveLine(ret);
+    //SysbotBase::add_tests_SysbotBaseShutdown(ret);
+    //add_tests_AudioInfo(ret);
+    //add_tests_ChannelMixerMatrix(ret);
+    //add_tests_FFTStreamer(ret);
+    //add_tests_SinkPipeline(ret);
+    //add_tests_AudioFileLoader(ret);
+    //add_tests_ImageStats(ret);
+    //OCR::add_tests(ret);
     Kernels::add_tests(ret);
-    Pokemon::add_tests_AutoStorySelect(ret);
-    NintendoSwitch::add_tests_CheckOnlineDetector(ret);
-    NintendoSwitch::add_tests_FailedToConnectDetector(ret);
-    NintendoSwitch::add_tests_UpdatePopupDetector(ret);
-    NintendoSwitch::Typewriter::add_tests_TypewriterTextMapping(ret);
-    NintendoSwitch::PokemonBDSP::add_tests_DialogDetector(ret);
-    NintendoSwitch::PokemonBDSP::add_tests_MenuDetector(ret);
-    NintendoSwitch::PokemonFRLG::add_tests(ret);
-    NintendoSwitch::PokemonRSE::add_tests(ret);
-    NintendoSwitch::PokemonHome::add_tests(ret);
-    NintendoSwitch::PokemonSwSh::add_tests(ret);
-    NintendoSwitch::PokemonLA::add_tests(ret);
-    NintendoSwitch::PokemonSV::add_tests(ret);
-    NintendoSwitch::PokemonLZA::add_tests(ret);
+    //Pokemon::add_tests_AutoStorySelect(ret);
+    //NintendoSwitch::add_tests_CheckOnlineDetector(ret);
+    //NintendoSwitch::add_tests_FailedToConnectDetector(ret);
+    //NintendoSwitch::add_tests_UpdatePopupDetector(ret);
+    //NintendoSwitch::Typewriter::add_tests_TypewriterTextMapping(ret);
+    //NintendoSwitch::PokemonBDSP::add_tests_DialogDetector(ret);
+    //NintendoSwitch::PokemonBDSP::add_tests_MenuDetector(ret);
+    //NintendoSwitch::PokemonFRLG::add_tests(ret);
+    //NintendoSwitch::PokemonRSE::add_tests(ret);
+    //NintendoSwitch::PokemonHome::add_tests(ret);
+    //NintendoSwitch::PokemonSwSh::add_tests(ret);
+    //NintendoSwitch::PokemonLA::add_tests(ret);
+    //NintendoSwitch::PokemonSV::add_tests(ret);
+    //NintendoSwitch::PokemonLZA::add_tests(ret);
 
     return ret;
 }

@@ -26,20 +26,22 @@ namespace Kernels{
 
 
 void add_tests(UnitTestDatabase& database){
-    AbsFFT::add_tests(database);
-    AudioChannelInterleave::add_tests(database);
-    AudioChannelMixer::add_tests(database);
-    AudioPipeline::add_tests(database);
-    AudioResampler::add_tests(database);
-    AudioStreamConverter::add_tests(database);
-    add_tests_BinaryMatrix(database);
-    add_tests_ImageFilters(database);
-    add_tests_ImageFilter_RGB32_Euclidean(database);
-    add_tests_ImageScaleBrightness(database);
-    add_tests_ImageStats(database);
+    //  MsvcProbe debug branch: only the ScaleInvariantMatrixMatch probe
+    //  test runs; the other kernel test families are commented out.
+    //AbsFFT::add_tests(database);
+    //AudioChannelInterleave::add_tests(database);
+    //AudioChannelMixer::add_tests(database);
+    //AudioPipeline::add_tests(database);
+    //AudioResampler::add_tests(database);
+    //AudioStreamConverter::add_tests(database);
+    //add_tests_BinaryMatrix(database);
+    //add_tests_ImageFilters(database);
+    //add_tests_ImageFilter_RGB32_Euclidean(database);
+    //add_tests_ImageScaleBrightness(database);
+    //add_tests_ImageStats(database);
     ScaleInvariantMatrixMatch::add_tests(database);
-    SpikeConvolution::add_tests(database);
-    add_tests_Waterfill(database);
+    //SpikeConvolution::add_tests(database);
+    //add_tests_Waterfill(database);
 }
 
 
