@@ -23,7 +23,7 @@ class BallReader{
 public:
     BallReader(VideoStream& stream);
 
-    //  Read the ball slug from the first summary page. Return an empty string if no match is found.
+    //  Read the ball slug from the info or skills page of the summary. Return an empty string if no match is found.
     std::string read_ball(const ImageViewRGB32& screen) const;
 
 private:
