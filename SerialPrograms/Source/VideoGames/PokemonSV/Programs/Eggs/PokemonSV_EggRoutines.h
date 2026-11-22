@@ -47,8 +47,10 @@ void picnic_at_zero_gate(
 
 // Starting at the initial position of a picnic, go to picnic table to make a sandwich that gives egg power.
 // Can choose:
-// - Great Peanut Butter Sandwich to gain egg power Lv 2, must have unlocked its recipe and have enough ingredients to make all
-//   the sandwiches for all the unlocked recipes.
+// - Great Peanut Butter Sandwich (No. 17) or Great Marmalade Sandwich (No. 25) to gain egg power Lv 2, or Peanut Butter
+//   Sandwich (No. 16) or Jam Sandwich (No. 12) to gain egg power Lv 1. Must have unlocked the recipe and have enough
+//   ingredients to make all the sandwiches for all the unlocked recipes.
+// - BEST_AVAILABLE_RECIPE tries those recipes from best to worst and makes the first one it can find.
 // - Two-sweet-herbs, bitter-sweet-herbs or salty-sweet-herbs custom sandwich to gain egg power Lv 3, must have enough ingredinets and
 //   provide game language for OCR ingredient lists.
 // Return false if no needed sandwich ingredients or recipe.
@@ -58,6 +60,9 @@ bool eat_egg_sandwich_at_picnic(
     EggSandwichType sandwich_type,
     Language language
 );
+
+// How long to wait between egg basket checks after eating a sandwich of `sandwich_type`.
+size_t egg_basket_wait_seconds(EggSandwichType sandwich_type);
 
 // After eating a sandwich, go around picnic table to wait at basket and collect eggs.
 // `num_eggs_collected` will be updated to add newly collected eggs.

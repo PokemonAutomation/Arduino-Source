@@ -309,6 +309,67 @@ void picnic_at_zero_gate(
     picnic_from_overworld(info, stream, context);
 }
 
+namespace{
+
+struct EggRecipe{
+    EggSandwichType type;
+    size_t recipe_ID;
+    const char* filling;
+    const char* name;
+};
+
+// Egg Power recipe sandwiches, from best to worst. BEST_AVAILABLE_RECIPE tries them in this order.
+// Only the filling is listed: recipe mode adds the condiments.
+const EggRecipe EGG_RECIPES[] = {
+    {EggSandwichType::GREAT_PEANUT_BUTTER,  17, "banana",       "Great Peanut Butter Sandwich (Egg Power Lv 2)"},
+    {EggSandwichType::GREAT_MARMALADE,      25, "cheese",       "Great Marmalade Sandwich (Egg Power Lv 2)"},
+    {EggSandwichType::PEANUT_BUTTER,        16, "banana",       "Peanut Butter Sandwich (Egg Power Lv 1)"},
+    {EggSandwichType::JAM,                  12, "strawberry",   "Jam Sandwich (Egg Power Lv 1)"},
+};
+const size_t EGG_RECIPES_COUNT = sizeof(EGG_RECIPES) / sizeof(EGG_RECIPES[0]);
+
+const EggRecipe& find_egg_recipe(EggSandwichType sandwich_type){
+    for (const EggRecipe& recipe : EGG_RECIPES){
+        if (recipe.type == sandwich_type){
+            return recipe;
+        }
+    }
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "EggSandwichType is not a recipe sandwich.");
+}
+
+// Assuming at the sandwich recipe list, find `recipe` and make it.
+// Return false if the recipe is not unlocked or there are not enough ingredients.
+bool make_egg_recipe_sandwich(
+    ProgramEnvironment& env,
+    VideoStream& stream, ProControllerContext& context,
+    const EggRecipe& recipe,
+    Language language
+){
+    if (select_sandwich_recipe(env.program_info(), stream, context, recipe.recipe_ID) == false){
+        return false;
+    }
+    std::map<std::string, uint8_t> fillings = { {recipe.filling, (uint8_t)1} };
+    std::vector<std::string> fillings_sorted;
+    fillings_sorted.push_back(recipe.filling);
+    int plates = 1;
+    run_sandwich_maker(env, stream, context, language, fillings, fillings_sorted, plates);
+    return true;
+}
+
+}
+
+size_t egg_basket_wait_seconds(EggSandwichType sandwich_type){
+    switch (sandwich_type){
+    case EggSandwichType::TWO_SWEET_HERBS:
+    case EggSandwichType::SALTY_SWEET_HERBS:
+    case EggSandwichType::BITTER_SWEET_HERBS:
+        // Egg Power Lv 3
+        return 120;
+    default:
+        return 180;
+    }
+}
+
 bool eat_egg_sandwich_at_picnic(
     ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context,
@@ -325,18 +386,27 @@ bool eat_egg_sandwich_at_picnic(
     }
     switch (sandwich_type){
     case EggSandwichType::GREAT_PEANUT_BUTTER:
-    {
-        if (select_sandwich_recipe(env.program_info(), stream, context, 17) == false){
-            // cannot find the sandwich recipe, either user has not unlocked it or does not have enough ingredients:
-            return false;
+    case EggSandwichType::GREAT_MARMALADE:
+    case EggSandwichType::PEANUT_BUTTER:
+    case EggSandwichType::JAM:
+        // cannot find the sandwich recipe, either user has not unlocked it or does not have enough ingredients:
+        return make_egg_recipe_sandwich(env, stream, context, find_egg_recipe(sandwich_type), language);
+    case EggSandwichType::BEST_AVAILABLE_RECIPE:
+        for (size_t c = 0; c < EGG_RECIPES_COUNT; c++){
+            if (c > 0){
+                // The recipe search only scrolls down the list, so reopen the list to search from the top again.
+                pbf_press_button(context, BUTTON_B, 160ms, 1000ms);
+                if (enter_sandwich_recipe_list(env.program_info(), stream, context) == false){
+                    return false;
+                }
+            }
+            if (make_egg_recipe_sandwich(env, stream, context, EGG_RECIPES[c], language)){
+                stream.log(std::string("Made the best available egg sandwich: ") + EGG_RECIPES[c].name);
+                return true;
+            }
         }
-        std::map<std::string, uint8_t> fillings = { {"banana", (uint8_t)1} };
-        std::vector<std::string> fillings_sorted;
-        fillings_sorted.push_back("banana");
-        int plates = 1;
-        run_sandwich_maker(env, stream, context, language, fillings, fillings_sorted, plates);
-        break;
-    }
+        stream.log("Cannot make any egg power recipe sandwich.", COLOR_RED);
+        return false;
     case EggSandwichType::TWO_SWEET_HERBS:
     case EggSandwichType::SALTY_SWEET_HERBS:
     case EggSandwichType::BITTER_SWEET_HERBS:

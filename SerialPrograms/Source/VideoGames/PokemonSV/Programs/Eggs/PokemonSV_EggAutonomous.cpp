@@ -373,7 +373,7 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
 
     const size_t max_eggs = HAS_CLONE_RIDE_POKEMON ? 24 : 30;
     size_t num_eggs_collected = 0;
-    const size_t basket_wait_seconds = (EGG_SANDWICH.EGG_SANDWICH_TYPE == EggSandwichType::GREAT_PEANUT_BUTTER ? 180 : 120);
+    const size_t basket_wait_seconds = egg_basket_wait_seconds(EGG_SANDWICH.EGG_SANDWICH_TYPE);
     collect_eggs_after_sandwich(env.program_info(), env.console, context, basket_wait_seconds, max_eggs,
         num_eggs_collected, basket_check_callback);
 
