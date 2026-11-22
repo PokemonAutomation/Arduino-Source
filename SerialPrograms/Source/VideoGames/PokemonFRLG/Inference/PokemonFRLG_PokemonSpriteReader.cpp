@@ -176,7 +176,7 @@ BattleSpriteReader::Result BattleSpriteReader::read(const ImageViewRGB32& frame)
 class Test_SummarySpriteReader : public ImageUnitTest{
 public:
     Test_SummarySpriteReader(const std::string& image, std::string expected)
-        : ImageUnitTest("PokemonFRLG::SummarySpriteReader - " + image, {"PokemonFRLG/StatsReader/" + image})
+        : ImageUnitTest("PokemonFRLG::SummarySpriteReader - " + image, {image})
         , m_expected(std::move(expected))
     {}
 
@@ -213,37 +213,73 @@ private:
 };
 
 void add_tests_SummarySpriteReader(UnitTestDatabase& database){
-    database.add<Test_SummarySpriteReader>("Page1/abra_1_deu.png", "abra");
-    database.add<Test_SummarySpriteReader>("Page1/bulbasaur_1_eng.png", "bulbasaur");
-    database.add<Test_SummarySpriteReader>("Page1/bulbasaur_1_fra.png", "bulbasaur");
-    database.add<Test_SummarySpriteReader>("Page1/bulbasaur_1_jpn.png", "bulbasaur");
-    database.add<Test_SummarySpriteReader>("Page1/bulbasaur_2_eng.png", "bulbasaur");
-    database.add<Test_SummarySpriteReader>("Page1/bulbasaur_3_eng.png", "bulbasaur");
-    database.add<Test_SummarySpriteReader>("Page1/bulbasaur_4_eng.png", "bulbasaur");
-    database.add<Test_SummarySpriteReader>("Page1/deoxys_1_jpn.png", "deoxys");
-    database.add<Test_SummarySpriteReader>("Page1/horsea_1_deu.png", "horsea");
-    database.add<Test_SummarySpriteReader>("Page1/horsea_2_deu.png", "horsea");
-    database.add<Test_SummarySpriteReader>("Page1/horsea_3_deu.png", "horsea");
-    database.add<Test_SummarySpriteReader>("Page1/magikarp_1_spa.png", "magikarp");
-    database.add<Test_SummarySpriteReader>("Page1/moltres_1_eng.png", "moltres");
-    database.add<Test_SummarySpriteReader>("Page1/nidoran_m_eng.png", "nidoran-m");
-    database.add<Test_SummarySpriteReader>("Page1/pidgey_1_ita.png", "pidgey");
-    database.add<Test_SummarySpriteReader>("Page1/unown_c_eng.png", "unown-c");
-    database.add<Test_SummarySpriteReader>("Page1/unown_ex_eng.png", "unown-!");
-    database.add<Test_SummarySpriteReader>("Page1/unown_h_eng.png", "unown-h");
-    database.add<Test_SummarySpriteReader>("Page1/unown_j_eng.png", "unown-j");
-    database.add<Test_SummarySpriteReader>("Page1/unown_n_eng.png", "unown-n");
-    database.add<Test_SummarySpriteReader>("Page1/unown_p_eng.png", "unown-p");
-    database.add<Test_SummarySpriteReader>("Page1/unown_qu_eng.png", "unown-?");
-    database.add<Test_SummarySpriteReader>("Page1/venonat_4k_eng.png", "venonat");
-    database.add<Test_SummarySpriteReader>("Page2/abra_1_deu.png", "abra");
-    database.add<Test_SummarySpriteReader>("Page2/deoxys_1_jpn.png", "deoxys");
-    database.add<Test_SummarySpriteReader>("Page2/mewtwo_1_spa.png", "mewtwo");
-    database.add<Test_SummarySpriteReader>("Page2/nidoranf_1_eng.jpg", "nidoran-f");
-    database.add<Test_SummarySpriteReader>("Page2/raikou_1_eng.png", "raikou");
-    database.add<Test_SummarySpriteReader>("Page2/raikou_2_eng.png", "raikou");
-    database.add<Test_SummarySpriteReader>("Page2/scyther_1_eng.png", "scyther");
-    database.add<Test_SummarySpriteReader>("Page2/venonat_1_eng.jpg", "venonat");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/abra_1_deu.png", "abra");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/bulbasaur_1_eng.png", "bulbasaur");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/bulbasaur_1_fra.png", "bulbasaur");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/bulbasaur_1_jpn.png", "bulbasaur");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/bulbasaur_2_eng.png", "bulbasaur");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/bulbasaur_3_eng.png", "bulbasaur");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/bulbasaur_4_eng.png", "bulbasaur");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/deoxys_1_jpn.png", "deoxys");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/horsea_1_deu.png", "horsea");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/horsea_2_deu.png", "horsea");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/horsea_3_deu.png", "horsea");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/magikarp_1_spa.png", "magikarp");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/moltres_1_eng.png", "moltres");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/nidoran_m_eng.png", "nidoran-m");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/pidgey_1_ita.png", "pidgey");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/unown_c_eng.png", "unown-c");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/unown_ex_eng.png", "unown-!");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/unown_h_eng.png", "unown-h");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/unown_j_eng.png", "unown-j");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/unown_n_eng.png", "unown-n");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/unown_p_eng.png", "unown-p");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/unown_qu_eng.png", "unown-?");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/venonat_4k_eng.png", "venonat");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/arbok_hd60pro_eng.png", "arbok");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/arcanine_hd60pro_eng.png", "arcanine");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/blastoise_hd60pro_eng.png", "blastoise");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/butterfree_hd60pro_eng.png", "butterfree");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/diglett_hd60pro_eng.png", "diglett");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/dragonite_hd60pro_eng.png", "dragonite");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/dragonite_usb3_eng.png", "dragonite");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/ekans_hd60pro_eng.png", "ekans");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/exeggcute_hd60pro_eng.png", "exeggcute");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/fearow_hd60pro_eng.png", "fearow");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/gengar_usb3_eng.png", "gengar");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/geodude_usb3_eng.png", "geodude");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/gloom_hd60pro_eng.png", "gloom");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/golbat_hd60pro_eng.png", "golbat");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/machoke_usb3_eng.png", "machoke");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/magmar_usb3_eng.png", "magmar");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/magnemite_usb3_eng.png", "magnemite");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/magneton_usb3_eng.png", "magneton");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/mantine_usb3_eng.png", "mantine");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/mewtwo_usb3_eng.png", "mewtwo");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/mr-mime_hd60pro_eng.png", "mr-mime");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/nidoking_hd60pro_eng.png", "nidoking");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/nidoqueen_hd60pro_eng.png", "nidoqueen");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/onix_hd60pro_eng.png", "onix");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/parasect_hd60pro_eng.png", "parasect");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/pidgeotto_hd60pro_eng.png", "pidgeotto");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/psyduck_hd60pro_eng.png", "psyduck");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/raichu_hd60pro_eng.png", "raichu");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/rhydon_usb3_eng.png", "rhydon");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/sneasel_usb3_eng.png", "sneasel");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/snorlax_hd60pro_eng.png", "snorlax");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/swinub_usb3_eng.png", "swinub");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page1/weedle_hd60pro_eng.png", "weedle");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page2/abra_1_deu.png", "abra");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page2/deoxys_1_jpn.png", "deoxys");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page2/mewtwo_1_spa.png", "mewtwo");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page2/nidoranf_1_eng.jpg", "nidoran-f");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page2/raikou_1_eng.png", "raikou");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page2/raikou_2_eng.png", "raikou");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page2/scyther_1_eng.png", "scyther");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/StatsReader/Page2/venonat_1_eng.jpg", "venonat");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/ShinySymbolDetector/Char_False.png", "charmander");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/ShinySymbolDetector/Karp-coloredited_True.png", "magikarp");
+    database.add<Test_SummarySpriteReader>("PokemonFRLG/ShinySymbolDetector/Karp-snotyak_True.png", "magikarp");
 }
 
 
