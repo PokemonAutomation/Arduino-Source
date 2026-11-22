@@ -254,6 +254,17 @@ public:
                     //  it only after finish() has joined.
                     m_max_gap_seconds = gap;
                 }
+                //  A healthy machine ticks within a few milliseconds of
+                //  the 100 ms period. A tick that lands 250 ms or more
+                //  late means the watchdog thread was descheduled, i.e.
+                //  the machine was too loaded to run it on time. A runner
+                //  that never deschedules a thread for more than 5 s at a
+                //  time but keeps stuttering evades the single-gap check;
+                //  the accumulated overshoot is the evidence for that
+                //  case too.
+                if (gap > 0.25){
+                    m_total_stall_seconds += gap - 0.25;
+                }
                 last = now;
             }
         });
@@ -275,10 +286,18 @@ public:
         return m_max_gap_seconds;
     }
 
+    //  Total seconds of descheduling over the whole run: the sum of the
+    //  parts of each tick gap that exceed a 250 ms slack. Near zero on a
+    //  healthy machine; seconds or more on a stuttering one.
+    double total_stall_seconds() const{
+        return m_total_stall_seconds;
+    }
+
 private:
     std::thread m_thread;
     std::atomic<bool> m_stop{false};
     double m_max_gap_seconds = 0.0;
+    double m_total_stall_seconds = 0.0;
 };
 
 
@@ -746,6 +765,19 @@ public:
                     " s); the 60 s waits are wall-clock, so skipping instead of failing."
                 );
             }
+            //  The stall can also be a series of deschedules that are each
+            //  under 5 s (a machine that stutters for the whole test
+            //  without ever freezing for 5 s): the accumulated tick
+            //  overshoot is the evidence that the wall-clock budgets were
+            //  eaten by the machine.
+            if (stall_watchdog.total_stall_seconds() > 5.0){
+                return UnitTestResult(
+                    UnitTestResult::SKIPPED,
+                    "Machine stuttered during the test (total tick overshoot was " +
+                    std::to_string((long)(stall_watchdog.total_stall_seconds() + 0.5)) +
+                    " s); the 60 s waits are wall-clock, so skipping instead of failing."
+                );
+            }
             return error;
         }
         return true;
@@ -862,6 +894,11 @@ public:
                 "Machine too starved for a timing-sensitive socket test (timing_unreliable())."
             );
         }
+        //  Catches a mid-test machine stall (or repeated sub-5 s
+        //  deschedules) that the start-of-test probe above and the
+        //  timing_unreliable() re-probes on a failed wait both miss: the
+        //  send/close timings asserted below are wall-clock.
+        StallWatchdog stall_watchdog;
 
         //  Blocks the client's event thread for 6 s on the first data,
         //  and flags it when the block starts.
@@ -1037,7 +1074,27 @@ public:
             client.close();
         }
 
+        //  Stop the stall watchdog before reading it (its destructor
+        //  would do the same on every other exit path).
+        stall_watchdog.finish();
+
         if (!ok && !error.empty()){
+            //  The cancellation is a direct cross-thread notify, so a
+            //  large lag is the woken thread being descheduled by the
+            //  machine (or the close task's own 300 ms head start never
+            //  running on time), not the socket: give up as skipped when
+            //  the watchdog saw the machine stall or stutter.
+            if (stall_watchdog.max_gap_seconds() > 5.0 ||
+                stall_watchdog.total_stall_seconds() > 5.0){
+                return UnitTestResult(
+                    UnitTestResult::SKIPPED,
+                    "Machine stalled or stuttered during the test (longest 100 ms tick gap " +
+                    std::to_string((long)(stall_watchdog.max_gap_seconds() + 0.5)) +
+                    " s, total tick overshoot " +
+                    std::to_string((long)(stall_watchdog.total_stall_seconds() + 0.5)) +
+                    " s); the send/close timings are wall-clock, so skipping instead of failing."
+                );
+            }
             return error;
         }
         return true;
