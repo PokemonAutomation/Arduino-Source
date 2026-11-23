@@ -842,6 +842,38 @@ void open_bag_from_overworld(ConsoleHandle& console, ProControllerContext& conte
     }
 }
 
+bool select_field_move_from_overworld(ConsoleHandle& console, ProControllerContext& context, int from_last, int field_move){
+    open_party_menu_from_overworld(console, context);
+    // navigate to the Pokemon: from slot 1, up goes to CANCEL, then to the last slot
+    for (int i = 0; i < 2 + from_last; i++){
+        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+    }
+
+    PartySelectionWatcher user_selected(COLOR_RED);
+
+    context.wait_for_all_requests();
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context){
+            pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+        },
+        { user_selected }
+    );
+
+    if (ret < 0){
+        console.log("Failed to open the field move user's menu.");
+        pbf_mash_button(context, BUTTON_B, 3000ms);
+        return false;
+    }
+
+    // the menu lists SUMMARY, then the field moves in the order the Pokemon knows them
+    for (int i = 0; i < 1 + field_move; i++){
+        pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
+    }
+    pbf_press_button(context, BUTTON_A, 200ms, 0ms);
+    return true;
+}
+
 void use_sweet_scent_from_overworld(ConsoleHandle& console, ProControllerContext& context, int from_last){
     uint16_t errors = 0;
     
@@ -849,38 +881,18 @@ void use_sweet_scent_from_overworld(ConsoleHandle& console, ProControllerContext
         if (errors > 5){
             OperationFailedExceptionWithScreenshot::fire(
                 ErrorReportMode::SEND_ERROR_REPORT,
-                "use_teleport_from_overworld(): Failed to use Teleport 5 times in a row.",
+                "use_sweet_scent_from_overworld(): Failed to use Sweet Scent 5 times in a row.",
                 console
             );
         }
 
-        open_party_menu_from_overworld(console, context);
-        // navigate to last party slot
-        for (int i=0; i<(2+from_last); i++){
-            pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
-        }
-
-        PartySelectionWatcher sweetscent_selected(COLOR_RED);
-
-        context.wait_for_all_requests();
-        int ret = run_until<ProControllerContext>(
-            console, context,
-            [](ProControllerContext& context){
-                pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
-            },
-            { sweetscent_selected }
-        );
-
-        if (ret < 0){
+        // select Sweet Scent (2nd option, but maybe HMs could change this)
+        if (!select_field_move_from_overworld(console, context, from_last, 0)){
             console.log("Failed to select Sweet Scent user.");
             errors++;
-            pbf_mash_button(context, BUTTON_B, 3000ms);
             continue;
         }
-        
-        // select Sweet Scent (2nd option, but maybe HMs could change this)
-        pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
-        pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+        pbf_wait(context, 1800ms);
         pbf_press_button(context, BUTTON_A, 200ms, 800ms);
 
         context.wait_for_all_requests();
@@ -901,38 +913,19 @@ void use_teleport_from_overworld(ConsoleHandle& console, ProControllerContext& c
             );
         }
 
-        open_party_menu_from_overworld(console, context);
-        // navigate to last party slot
-        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
-        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
-
-        PartySelectionWatcher teleporter_selected(COLOR_RED);
-
-        context.wait_for_all_requests();
-        int ret = run_until<ProControllerContext>(
-            console, context,
-            [](ProControllerContext& context){
-                pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
-            },
-            { teleporter_selected }
-        );
-
-        if (ret < 0){
+        // select Teleport (2nd option, but maybe HMs could change this)
+        if (!select_field_move_from_overworld(console, context, 0, 0)){
             console.log("Failed to select Teleport user.");
             errors++;
-            pbf_mash_button(context, BUTTON_B, 3000ms);
             continue;
         }
-        
-        // select Teleport (2nd option, but maybe HMs could change this)
-        pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
-        pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+        pbf_wait(context, 1800ms);
         pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
 
         BlackScreenWatcher teleport_transition(COLOR_RED);
 
         context.wait_for_all_requests();
-        ret = wait_until(
+        int ret = wait_until(
             console, context, 20000ms,
             {teleport_transition}
         );
@@ -962,36 +955,17 @@ void open_fly_map_from_overworld(ConsoleHandle& console, ProControllerContext& c
             );
         }
 
-        open_party_menu_from_overworld(console, context);
-        // navigate to last party slot
-        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
-        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
-
-        PartySelectionWatcher fly_user_selected(COLOR_RED);
-
-        context.wait_for_all_requests();
-        int ret = run_until<ProControllerContext>(
-            console, context,
-            [](ProControllerContext& context){
-                pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
-            },
-            { fly_user_selected }
-        );
-
-        if (ret < 0){
-            console.log("Failed to select Fly user.");
-            errors++;
-            pbf_mash_button(context, BUTTON_B, 3000ms);
-            continue;
-        }
-        
-        // select Fly (2nd option, but maybe other HMs could change this)
         // The Kanto map is checked for Kanto's land; the Sevii Islands maps only for the map's frame.
         KantoMapWatcher kanto_map_opened(COLOR_RED);
         FlyMapWatcher sevii_map_opened(COLOR_RED);
-        context.wait_for_all_requests();
-        pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
-        pbf_press_button(context, BUTTON_A, 200ms, 0ms);
+
+        // select Fly (2nd option, but maybe other HMs could change this)
+        if (!select_field_move_from_overworld(console, context, 0, 0)){
+            console.log("Failed to select Fly user.");
+            errors++;
+            continue;
+        }
+        int ret;
         if (sevii_islands){
             ret = wait_until(console, context, 20000ms, {sevii_map_opened});
         }else{
@@ -1118,46 +1092,42 @@ void fly_from_kanto_map(ConsoleHandle& console, ProControllerContext& context, K
 
 namespace{
 
-//  A town's cell on its Sevii Islands Fly map page, and the page corner the
-//  cursor goes to first. Each page is a 22 x 15 grid and the cursor stops at
-//  its edges (region_map_layout_sevii_*.h in the decomp), so a corner is an
-//  exact starting point. Each town uses the corner closest to it.
+//  A town's cell on its Sevii Islands Fly map page (region_map_layout_sevii_*.h
+//  in the decomp). Each page is a 22 x 15 grid.
 struct SeviiFlyTarget{
     const char* name;
     int x;
     int y;
-    bool corner_right;
-    bool corner_bottom;
 };
-constexpr int SEVII_MAP_WIDTH = 22;
-constexpr int SEVII_MAP_HEIGHT = 15;
 
 SeviiFlyTarget sevii_fly_target(SeviiFlyLocation destination){
     switch (destination){
     case SeviiFlyLocation::oneisland:
-        return {"One Island",    1,  8, false, true};
+        return {"One Island",    1,  8};
     case SeviiFlyLocation::twoisland:
-        return {"Two Island",    9,  9, false, true};
+        return {"Two Island",    9,  9};
     case SeviiFlyLocation::threeisland:
-        return {"Three Island", 18, 12, true,  true};
+        return {"Three Island", 18, 12};
     case SeviiFlyLocation::fourisland:
-        return {"Four Island",   3,  4, false, false};
+        return {"Four Island",   3,  4};
     case SeviiFlyLocation::fiveisland:
-        return {"Five Island",  16, 11, true,  true};
+        return {"Five Island",  16, 11};
     case SeviiFlyLocation::sixisland:
-        return {"Six Island",   17,  5, true,  false};
+        return {"Six Island",   17,  5};
     case SeviiFlyLocation::sevenisland:
-        return {"Seven Island",  5,  8, false, true};
+        return {"Seven Island",  5,  8};
     }
-    return {"", 0, 0, false, false};
+    return {"", 0, 0};
 }
 
-//  Move the Fly map cursor one cell. (A held direction repeats every 5
-//  frames and can overshoot by a cell; taps don't.)
-void fly_map_cursor_tap(ProControllerContext& context, DpadPosition direction, int count){
-    for (int i = 0; i < count; i++){
-        pbf_press_dpad(context, direction, 50ms, 300ms);
-    }
+//  How long to hold a direction to move the Fly map cursor `cells` cells.
+//  A held direction moves the cursor one cell every 5 frames (4 frames of
+//  movement, then the input is read again: region_map.c in the decomp), so
+//  5 x cells - 2 frames is in the middle of the window that moves it exactly
+//  that far. The Kanto times in fly_from_kanto_map() fit the same pattern,
+//  e.g. 8 cells down to Viridian City in 633ms (38 frames).
+Milliseconds fly_map_hold_time(int cells){
+    return Milliseconds((5 * cells - 2) * 1000 / 60);
 }
 
 }
@@ -1167,33 +1137,24 @@ bool fly_from_sevii_map(ConsoleHandle& console, ProControllerContext& context, S
     SeviiFlyTarget target = sevii_fly_target(destination);
     console.log(std::string("Flying to ") + target.name + ".");
 
-    //  Hold into the corner. From the far side of the page that is 21 cells,
-    //  about 1.8 seconds.
-    pbf_move_left_joystick(
-        context,
-        {target.corner_right ? +1.0 : -1.0, target.corner_bottom ? -1.0 : +1.0},
-        2500ms, 300ms
-    );
+    //  Like fly_from_kanto_map(): from the top left corner, hold down, then
+    //  right.
+    pbf_move_left_joystick(context, {-1, +1}, 4000ms, 500ms);
+    if (target.y > 0){
+        pbf_move_left_joystick(context, {0, -1}, fly_map_hold_time(target.y), 100ms);
+    }
+    if (target.x > 0){
+        pbf_move_left_joystick(context, {+1, 0}, fly_map_hold_time(target.x), 100ms);
+    }
 
-    //  Then tap across to the town.
-    int corner_x = target.corner_right ? SEVII_MAP_WIDTH - 1 : 0;
-    int corner_y = target.corner_bottom ? SEVII_MAP_HEIGHT - 1 : 0;
-    int dx = target.x - corner_x;
-    int dy = target.y - corner_y;
-    fly_map_cursor_tap(context, dx > 0 ? DPAD_RIGHT : DPAD_LEFT, dx > 0 ? dx : -dx);
-    fly_map_cursor_tap(context, dy > 0 ? DPAD_DOWN : DPAD_UP, dy > 0 ? dy : -dy);
-
-    //  A picks the town, A again confirms. The screen fades to black as the
-    //  flight starts.
-    BlackScreenWatcher flying(COLOR_RED);
+    BlackScreenWatcher fly_initiated(COLOR_RED);
     context.wait_for_all_requests();
     int ret = run_until<ProControllerContext>(
         console, context,
         [](ProControllerContext& context){
-            pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
-            pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
+            pbf_mash_button(context, BUTTON_A, 5000ms);
         },
-        { flying }
+        { fly_initiated }
     );
     if (ret < 0){
         //  A does nothing on a place that can't be flown to: a town on another
@@ -1213,167 +1174,8 @@ bool fly_from_sevii_map(ConsoleHandle& console, ProControllerContext& context, S
 }
 
 
-void use_field_move_from_overworld(ConsoleHandle& console, ProControllerContext& context, int from_last, int field_move){
-    uint16_t errors = 0;
-
-    while (true){
-        if (errors > 5){
-            OperationFailedExceptionWithScreenshot::fire(
-                ErrorReportMode::SEND_ERROR_REPORT,
-                "use_field_move_from_overworld(): Failed to open the Pokemon's menu 5 times in a row.",
-                console
-            );
-        }
-
-        open_party_menu_from_overworld(console, context);
-        //  From slot 1, up goes to CANCEL, then to the last slot, then upward.
-        for (int i = 0; i < 2 + from_last; i++){
-            pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
-        }
-
-        PartySelectionWatcher menu_opened(COLOR_RED);
-        context.wait_for_all_requests();
-        int ret = run_until<ProControllerContext>(
-            console, context,
-            [](ProControllerContext& context){
-                pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
-            },
-            { menu_opened }
-        );
-        if (ret < 0){
-            console.log("Failed to open the Pokemon's menu.");
-            errors++;
-            pbf_mash_button(context, BUTTON_B, 3000ms);
-            continue;
-        }
-
-        //  The menu lists SUMMARY, then the field moves in the order the
-        //  Pokemon knows them, then SWITCH, ITEM and CANCEL.
-        for (int i = 0; i < 1 + field_move; i++){
-            pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
-        }
-        pbf_press_button(context, BUTTON_A, 200ms, 800ms);
-        context.wait_for_all_requests();
-        console.log("Used field move " + std::to_string(field_move + 1) + " of the Pokemon " + std::to_string(from_last) + " from the last.");
-        return;
-    }
-}
 
 
-void start_surfing(ConsoleHandle& console, ProControllerContext& context){
-    for (int attempt = 0; attempt < 2; attempt++){
-        WhiteDialogWatcher question(COLOR_RED);
-        context.wait_for_all_requests();
-        pbf_press_button(context, BUTTON_A, 200ms, 0ms);
-        if (wait_until(console, context, 3000ms, { question }) < 0){
-            console.log("No Surf question. Trying again.");
-            continue;
-        }
-        //  "The water is dyed a deep blue... Would you like to SURF?", then
-        //  YES / NO with YES selected.
-        pbf_wait(context, 2000ms);
-        pbf_press_button(context, BUTTON_A, 200ms, 1500ms);
-        //  "X used SURF!", the Pokemon's picture, then the player hops on.
-        pbf_press_button(context, BUTTON_B, 200ms, 3500ms);
-        context.wait_for_all_requests();
-        console.log("Started surfing.");
-        return;
-    }
-    OperationFailedExceptionWithScreenshot::fire(
-        ErrorReportMode::SEND_ERROR_REPORT,
-        "start_surfing(): Couldn't start surfing. Is the player facing water, and does a party Pokemon know Surf?",
-        console
-    );
-}
-
-
-void use_item_from_items_pocket(ConsoleHandle& console, ProControllerContext& context, uint8_t position){
-    open_bag_from_overworld(console, context);
-    pbf_wait(context, 500ms);
-
-    //  The Items pocket is the leftmost and pockets don't wrap. The item list
-    //  doesn't wrap either: holding up reaches the first item.
-    for (int i = 0; i < 3; i++){
-        pbf_press_dpad(context, DPAD_LEFT, 120ms, 400ms);
-    }
-    pbf_press_dpad(context, DPAD_UP, 3000ms, 200ms);
-    for (uint8_t i = 1; i < position; i++){
-        pbf_press_dpad(context, DPAD_DOWN, 120ms, 250ms);
-    }
-
-    //  A opens the item's menu with USE first; A again uses it.
-    pbf_press_button(context, BUTTON_A, 200ms, 800ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1500ms);
-
-    //  Close the message, the bag and the start menu.
-    pbf_mash_button(context, BUTTON_B, 4000ms);
-    pbf_wait(context, 800ms);
-    context.wait_for_all_requests();
-    console.log("Used item " + std::to_string(position) + " of the Items pocket.");
-}
-
-
-void swap_party_slots(ConsoleHandle& console, ProControllerContext& context, uint8_t first, uint8_t second){
-    if (first < 1 || second > 6 || first >= second){
-        throw InternalProgramError(
-            &console.logger(), PA_CURRENT_FUNCTION,
-            "swap_party_slots(): Invalid slots: " + std::to_string(first) + " and " + std::to_string(second)
-        );
-    }
-    open_party_menu_from_overworld(console, context);
-
-    //  Slot 1 is on the left; slots 2 to 6 are a column on the right. The
-    //  cursor starts on slot 1.
-    if (first > 1){
-        pbf_press_dpad(context, DPAD_RIGHT, 150ms, 400ms);
-        for (uint8_t i = 2; i < first; i++){
-            pbf_press_dpad(context, DPAD_DOWN, 150ms, 400ms);
-        }
-    }
-
-    PartySelectionWatcher menu_opened(COLOR_RED);
-    context.wait_for_all_requests();
-    int ret = run_until<ProControllerContext>(
-        console, context,
-        [](ProControllerContext& context){
-            pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
-        },
-        { menu_opened }
-    );
-    if (ret < 0){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReportMode::SEND_ERROR_REPORT,
-            "swap_party_slots(): The Pokemon's menu did not open.",
-            console
-        );
-    }
-
-    //  SWITCH is third from the bottom (SWITCH, ITEM, CANCEL), whatever field
-    //  moves are listed above it, and the menu wraps around: up 3 from SUMMARY.
-    for (int i = 0; i < 3; i++){
-        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
-    }
-    pbf_press_button(context, BUTTON_A, 200ms, 800ms);
-
-    //  Pick the second Pokemon.
-    if (first == 1){
-        pbf_press_dpad(context, DPAD_RIGHT, 150ms, 400ms);
-        for (uint8_t i = 2; i < second; i++){
-            pbf_press_dpad(context, DPAD_DOWN, 150ms, 400ms);
-        }
-    }else{
-        for (uint8_t i = first; i < second; i++){
-            pbf_press_dpad(context, DPAD_DOWN, 150ms, 400ms);
-        }
-    }
-    pbf_press_button(context, BUTTON_A, 200ms, 2500ms);
-
-    //  Close the party menu and the start menu.
-    pbf_mash_button(context, BUTTON_B, 3000ms);
-    pbf_wait(context, 800ms);
-    context.wait_for_all_requests();
-    console.log("Swapped party slots " + std::to_string(first) + " and " + std::to_string(second) + ".");
-}
 
 
 void enter_leave_pokecenter(ConsoleHandle& console, ProControllerContext& context, bool leave){

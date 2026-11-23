@@ -102,6 +102,13 @@ PartySlot detect_last_occupied_party_slot(ConsoleHandle& console);
 // Starting from the start menu, a sub-screen of the start menu, or the overworld, navigate to the bag
 void open_bag_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context = StartMenuContext::STANDARD);
 
+// From the overworld, open the party menu, open the menu of the Pokemon `from_last` slots from the
+// last one (0 = the last Pokemon), move to its field move `field_move` (0 = the first one, right
+// under SUMMARY) and press A. Returns false, after closing the menus, if the Pokemon's menu didn't
+// open. The caller then handles the move's own messages and checks its result: see
+// use_sweet_scent_from_overworld(), use_teleport_from_overworld() and open_fly_map_from_overworld().
+bool select_field_move_from_overworld(ConsoleHandle& console, ProControllerContext& context, int from_last, int field_move = 0);
+
 // Uses Sweet Scent, assuming that the specified party member has it learned
 // The last argument is the distance of the Sweet Scent user from the last party slot
 void use_sweet_scent_from_overworld(ConsoleHandle& console, ProControllerContext& context, int from_last = 0);
@@ -121,25 +128,6 @@ void fly_from_kanto_map(ConsoleHandle& console, ProControllerContext& context, K
 // island group the player is in (see SeviiFlyLocation). Returns false if the flight didn't start
 // (wrong island group, or a town not visited yet), after closing the menus.
 bool fly_from_sevii_map(ConsoleHandle& console, ProControllerContext& context, SeviiFlyLocation destination);
-
-// From the overworld, open the party menu and use a field move (Cut, Flash, Strength, ...).
-// from_last: the user's distance from the last party slot (0 = the last Pokemon).
-// field_move: which of the user's field moves (0 = the first one listed under SUMMARY).
-// Returns once the move is chosen: the party menu closes and the move's animation or message starts.
-void use_field_move_from_overworld(ConsoleHandle& console, ProControllerContext& context, int from_last, int field_move = 0);
-
-// Facing water from land, start surfing: talk to the water and answer YES.
-// Any party Pokemon that knows Surf will use it.
-void start_surfing(ConsoleHandle& console, ProControllerContext& context);
-
-// From the overworld, use the item in the given position of the Items pocket of the bag
-// (1 = the first item), e.g. a Max Repel. The item is not checked: the position must be right.
-// Ends back in the overworld.
-void use_item_from_items_pocket(ConsoleHandle& console, ProControllerContext& context, uint8_t position);
-
-// From the overworld, swap two party Pokemon (slots 1 to 6, first < second) with SWITCH.
-// Ends back in the overworld.
-void swap_party_slots(ConsoleHandle& console, ProControllerContext& context, uint8_t first, uint8_t second);
 
 // Enter a PokeCenter. Assumes the player is standing in front of its door
 void enter_pokecenter(ConsoleHandle& console, ProControllerContext& context);
