@@ -14,8 +14,9 @@ namespace PokemonAutomation{
 class ImageViewRGB32;
 class Logger;
 
-// Dump debug image to ./DebugDumps/`path`/<timestamp>-`label`.png
-// Return image path.
+//  Dump debug image to `DEBUG_PATH()`/`path`/<timestamp>-`label`.png
+//  Return image path.
+//  See SerialPrograms/Source/CommonFramework/GlobalAutoPaths.h for `DEBUG_PATH()`.
 std::string dump_debug_image(
     Logger& logger,
     const std::string& path,

@@ -10,14 +10,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#if _WIN32
 #pragma pack(push, 1)
-#define PABB_PACK
-#elif __GNUC__
-#define PABB_PACK   __attribute__((packed))
-#else
-#define PABB_PACK
-#endif
 
 namespace PokemonAutomation{
 namespace PABotBase2{
@@ -47,14 +40,14 @@ namespace PABotBase2{
 
 using SessionId = uint32_t;
 
-struct PABB_PACK PacketHeader{
+struct PacketHeader{
     uint8_t magic_number;
     uint8_t seqnum;
     uint8_t packet_bytes;
     uint8_t opcode;
 };
 
-struct PABB_PACK PacketHeader_u32 : PacketHeader{
+struct PacketHeader_u32 : PacketHeader{
     uint32_t data;
 };
 
@@ -84,7 +77,7 @@ struct PABB_PACK PacketHeader_u32 : PacketHeader{
 #define PABB2_CONNECTION_OPCODE_ASK_STREAM_DATA         0x12
 #define PABB2_CONNECTION_OPCODE_RET_STREAM_DATA         0x52
 #define PABB2_CONNECTION_OPCODE_ASK_STREAM_REQUEST      0x13    //  Unused for now.
-struct PABB_PACK PacketHeaderData : PacketHeader{
+struct PacketHeaderData : PacketHeader{
     uint16_t stream_offset;
 };
 
@@ -117,8 +110,6 @@ struct PABB_PACK PacketHeaderData : PacketHeader{
 }
 }
 
-#if _WIN32
 #pragma pack(pop)
-#endif
 
 #endif

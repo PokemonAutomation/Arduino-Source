@@ -315,21 +315,12 @@ bool PABotBase2_OemController::run_preconnect_configure(
             controller_type
         );
 
-#if _WIN32
 #pragma pack(push, 1)
-#define PABB_PACK
-#elif __GNUC__
-#define PABB_PACK   __attribute__((packed))
-#else
-#define PABB_PACK
-#endif
     struct Message{
         Message_NS1_OemController_Spi request;
         PABB_NintendoSwitch_ControllerColors colors;
     };
-#if _WIN32
 #pragma pack(pop)
-#endif
     Message message{};
 
     {

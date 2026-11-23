@@ -41,7 +41,10 @@ public:
     MillisecondsOption SELECT_BUTTON_MASH0;
     MillisecondsOption ENTER_GAME_WAIT0;
     MillisecondsOption ENTER_GAME_MASH0;
+
+    SectionDividerOption m_rng_settings;
     BooleanCheckBoxOption HANDLE_ONLINE_LICENSE_CHECK;
+    BooleanCheckBoxOption RUN_RNG_START_CHECKS;
 
     SectionDividerOption m_shiny_audio_settings;
     FloatingPointOption SHINY_SOUND_THRESHOLD;

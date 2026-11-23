@@ -2,10 +2,9 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  The default AbstractServerSocket backend for the current platform,
- *  mirroring "ClientSocket.h". The Qt backend (ServerSocket_Qt) exists
- *  for callers that need to integrate with a Qt event loop; it is not
- *  the default.
+ *  The default AbstractServerSocket backend for the current platform.
+ *  The Qt backend (ServerSocket_Qt) exists for callers that need to
+ *  integrate with a Qt event loop; it is not the default.
  *
  */
 

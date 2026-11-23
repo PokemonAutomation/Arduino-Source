@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonFRLG_RngNavigation_H
 #define PokemonAutomation_PokemonFRLG_RngNavigation_H
 
+#include <cstddef>
 #include "CommonFramework/Language.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "Pokemon/Pokemon_AdvRng.h"
@@ -84,6 +85,15 @@ void walk_from_pond_to_daycare_man(ConsoleHandle& console, ProControllerContext&
 bool smash_daycare_rock(ConsoleHandle& console, ProControllerContext& context);
 void egg_pickup(ConsoleHandle& console, ProControllerContext& context);
 bool walk_from_daycare_man_to_pond(ConsoleHandle& console, ProControllerContext& context);
+
+// Check that the party has at least `free_slots_needed` free slots, when
+// `RUN_RNG_START_CHECKS` is enabled in FRLG Game Settings.
+// Throws UserSetupError if the party does not have enough free slots.
+void check_free_party_slots(
+    ConsoleHandle& console,
+    ProControllerContext& context,
+    size_t free_slots_needed
+);
 
 }
 }

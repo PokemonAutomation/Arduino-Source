@@ -21,6 +21,8 @@ namespace ScaleInvariantMatrixMatch{
 struct Context_x86_SSE41{
     using vtype = __m128;
 
+    static constexpr bool UNROLL = true;
+
     static PA_FORCE_INLINE vtype vzero(){
         return _mm_setzero_ps();
     }

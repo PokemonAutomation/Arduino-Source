@@ -9,29 +9,22 @@
 
 #include <stdint.h>
 
-#if _WIN32
 #pragma pack(push, 1)
-#define PABB_PACK
-#elif __GNUC__
-#define PABB_PACK   __attribute__((packed))
-#else
-#define PABB_PACK
-#endif
 
 namespace PokemonAutomation{
 namespace PABotBase2{
 
 
 
-#define PABB2_MESSAGE_PROTOCOL_VERSION      2026061804
+#define PABB2_MESSAGE_PROTOCOL_VERSION      2026061806
 
 
-struct PABB_PACK MessageHeader{
+struct MessageHeader{
     uint16_t message_bytes;
     uint8_t opcode;
     uint8_t id;
 };
-struct PABB_PACK Message_u32 : MessageHeader{
+struct Message_u32 : MessageHeader{
     uint32_t data;
 };
 
@@ -74,9 +67,7 @@ struct PABB_PACK Message_u32 : MessageHeader{
 }
 
 
-#if _WIN32
 #pragma pack(pop)
-#endif
 
 
 #endif

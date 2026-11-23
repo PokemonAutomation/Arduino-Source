@@ -16,6 +16,7 @@
 
 namespace PokemonAutomation{
     class CancellableScope;
+    class UnitTestDatabase;
     class VideoFeed;
 namespace NintendoSwitch{
 namespace PokemonFRLG{
@@ -84,6 +85,8 @@ public:
         : DetectorToFinder("SummaryPage3Watcher", std::chrono::milliseconds(250), color)
     {}
 };
+
+void add_tests_SummaryDetector(UnitTestDatabase& database);
 
 }
 }

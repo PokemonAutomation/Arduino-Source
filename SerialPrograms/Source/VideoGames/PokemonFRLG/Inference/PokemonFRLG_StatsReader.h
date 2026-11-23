@@ -42,6 +42,7 @@ struct PokemonFRLG_Stats{
     std::optional<unsigned> sp_attack;
     std::optional<unsigned> sp_defense;
     std::optional<unsigned> speed;
+    std::string ability;  // Ability name, or empty if unreadable.
 };
 
 class StatsReader {
@@ -57,7 +58,7 @@ public:
         const std::set<std::string>& subset = {}
     );
 
-    // Reads from page 2 (Stats: HP, Atk, Def, SpA, SpD, Spe)
+    // Reads from page 2 (Stats and Ability)
     void read_page2(
         Logger& logger, Language language,
         const ImageViewRGB32& frame, PokemonFRLG_Stats& stats
@@ -75,6 +76,7 @@ private:
     ImageFloatBox m_box_sp_attack;
     ImageFloatBox m_box_sp_defense;
     ImageFloatBox m_box_speed;
+    ImageFloatBox m_box_ability;
     ImageFloatBox m_box_nature_jpn;
     ImageFloatBox m_box_level_jpn;
     ImageFloatBox m_box_name_jpn;
@@ -85,6 +87,7 @@ private:
     ImageFloatBox m_box_sp_attack_jpn;
     ImageFloatBox m_box_sp_defense_jpn;
     ImageFloatBox m_box_speed_jpn;
+    ImageFloatBox m_box_ability_jpn;
     //  Spanish labels the level "Nv." where the other Latin-script languages
     //  use "Lv". The trailing period pushes the digits ~6px right (at 1080p),
     //  so Spanish needs its own left edge. Right edge matches m_box_level.
@@ -122,6 +125,12 @@ private:
         const std::set<std::string>& subset,
         bool save_debug_images
     );
+
+    bool read_ability(
+        Logger& logger, Language language,
+        const ImageViewRGB32& game_screen,
+        PokemonFRLG_Stats& stats
+    ) const;
 
 };
 

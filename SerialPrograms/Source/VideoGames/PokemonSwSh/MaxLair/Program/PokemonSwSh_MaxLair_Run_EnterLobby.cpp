@@ -8,11 +8,13 @@
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonTools/Images/ImageManip.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Tests/ImageUnitTest.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
 #include "VideoGames/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
@@ -88,7 +90,11 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
 //    dialog_detector.make_overlays(boxes);
 
 //    OverlayBoxScope ore_box(stream.overlay(), {0.900, 0.015, 0.020, 0.040});
-    OverlayBoxScope ore_box(stream.overlay(), {0.930, 0.050, 0.065, 0.010});
+    //  The top of the ore bar sits just below the "xNNN" ore counter. Start the box 2 px below the
+    //  counter: on some capture cards the block-compression ringing of the digits bleeds into the
+    //  first two rows, pushing the stddev sum right up against the is_solid limit so the prompt
+    //  is missed (and then "Boss Slot" silently falls back to Slot 1, see issue #1925).
+    OverlayBoxScope ore_box(stream.overlay(), {0.930, 0.052, 0.065, 0.008});
     OverlayBoxScope ore_quantity(stream.overlay(), {0.945, 0.010, 0.0525, 0.050});
 
     size_t arrow_count = 0;
@@ -222,6 +228,42 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
 
 
 
+
+//  The ore-payment prompt check of enter_lobby(): the bar behind the "pay N ore?" dialog is a
+//  solid warm color. Regression test for #1925: on captures where the "xNNN" ore counter above
+//  the bar causes block-compression ringing, the check used to sit right at the is_solid stddev
+//  limit, so the prompt was missed and "Boss Slot" silently fell back to Slot 1.
+class Test_MaxLairEnterLobbyOrePrompt : public ImageUnitTest{
+public:
+    Test_MaxLairEnterLobbyOrePrompt(const std::string& image)
+        : ImageUnitTest("PokemonSwSh::MaxLairEnterLobbyOrePrompt - " + image, {image})
+        , m_check(0.930, 0.052, 0.065, 0.008, 0.594724, 0.405276, 0.)
+    {}
+
+    virtual UnitTestResult run_on_images(
+        Logger& logger, CancellableScope& scope,
+        const std::vector<ImageRGB32>& images
+    ) const override{
+        const ImageRGB32& image = images[0];
+        bool detected = m_check.check(image);
+        if (detected){
+            return UnitTestResult(true);
+        }
+        return UnitTestResult(UnitTestResult::FAILED, m_check.debug_string(image));
+    }
+
+private:
+    ImageSolidCheck m_check;
+};
+
+
+
+
+void add_tests_MaxLairEnterLobbyOrePrompt(UnitTestDatabase& database){
+    database.add<Test_MaxLairEnterLobbyOrePrompt>(
+        "PokemonSwSh/MaxLair_EnterLobbyOrePrompt/MiraBox_macOS_Japanese_OrePaymentPrompt.png"
+    );
+}
 }
 }
 }

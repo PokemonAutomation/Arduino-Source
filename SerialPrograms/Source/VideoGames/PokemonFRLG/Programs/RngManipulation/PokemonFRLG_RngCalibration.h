@@ -74,8 +74,17 @@ void update_failed_searches(uint16_t& failed_searches, const std::vector<HitType
     }
 }
 
-// log the PID, nature, and IVs of a target pokemon result
-void log_target_pokemon(ConsoleHandle& console, const AdvPokemonResult& result, bool normal_method_note = false);
+// log the species, level, PID, gender, nature, ability, and IVs of a target pokemon result
+// a level of 0 is not logged
+void log_target_pokemon(
+    ConsoleHandle& console,
+    const AdvPokemonResult& result,
+    const std::string& species,
+    uint8_t level,
+    bool normal_method_note = false
+);
+// same as above, plus the encounter slot
+void log_target_pokemon(ConsoleHandle& console, const AdvWildPokemonResult& result);
 
 // log the three calibration offsets (seed/CSF/in-game), in frames
 void log_calibrations(ConsoleHandle& console, const RngCalibrations& calibrations, bool initial = false);
