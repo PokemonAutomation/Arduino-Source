@@ -11,8 +11,22 @@ namespace Kernels{
 namespace ScaleInvariantMatrixMatch{
 
 
-struct Context_x86_SSE41{
+struct Context_Default{
     using vtype = float;
+
+    //  COMPILER-BUG-MSVC: MSVC 14.52 (VS 2026, the default on the windows-2025-vs2026
+    //  runner image) miscompiles the 4-way unrolled do/while loop in
+    //  SumATA2::accumulate() / SumError::accumulate() (in
+    //  Kernels_ScaleInvariantMatrixMatch_Routines.h) when the trip count is a power of
+    //  two: the accumulated sums come out wrong by up to ~10x, failing the SIMM kernel
+    //  tests. /fp:strict has no effect (bit-identical wrong values), so this disables
+    //  the unroll on the scalar path only; the SIMD contexts are unaffected and keep
+    //  it. Re-enable on MSVC once a toolset compiles the loop correctly.
+#ifdef _MSC_VER
+    static constexpr bool UNROLL = false;
+#else
+    static constexpr bool UNROLL = true;
+#endif
 
     static PA_FORCE_INLINE vtype vzero(){
         return 0;
@@ -81,7 +95,7 @@ float compute_scale_Default(
     float const* const* A,
     float const* const* T
 ){
-    return compute_scale<SumATA2<Context_x86_SSE41>>(width, height, A, T);
+    return compute_scale<SumATA2<Context_Default>>(width, height, A, T);
 }
 float compute_scale_Default(
     size_t width, size_t height,
@@ -89,7 +103,7 @@ float compute_scale_Default(
     float const* const* TW,
     float const* const* W
 ){
-    return compute_scale<SumATA2<Context_x86_SSE41>>(width, height, A, TW, W);
+    return compute_scale<SumATA2<Context_Default>>(width, height, A, TW, W);
 }
 float compute_error_Default(
     size_t width, size_t height,
@@ -97,7 +111,7 @@ float compute_error_Default(
     float const* const* A,
     float const* const* T
 ){
-    return compute_error<SumError<Context_x86_SSE41>>(width, height, scale, A, T);
+    return compute_error<SumError<Context_Default>>(width, height, scale, A, T);
 }
 float compute_error_Default(
     size_t width, size_t height,
@@ -106,7 +120,7 @@ float compute_error_Default(
     float const* const* TW,
     float const* const* W
 ){
-    return compute_error<SumError<Context_x86_SSE41>>(width, height, scale, A, TW, W);
+    return compute_error<SumError<Context_Default>>(width, height, scale, A, TW, W);
 }
 
 

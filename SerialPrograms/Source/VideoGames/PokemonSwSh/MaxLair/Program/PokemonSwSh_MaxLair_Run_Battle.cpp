@@ -32,7 +32,7 @@ bool process_header_read(
 ){
     if (mon.size() == 1){
         state.opponent = std::move(mon);
-        return true;
+        return state.opponent_fits_stage();
     }
     if (mon.size() > 1){
         logger.log("Ambiguous Read Result: " + set_to_str(mon), COLOR_PURPLE);
@@ -41,7 +41,7 @@ bool process_header_read(
                 "Using previous known value to disambiguate: " + set_to_str(mon),
                 COLOR_PURPLE
             );
-            return true;
+            return state.opponent_fits_stage();
         }
     }
     if (state.opponent.size() == 1){
@@ -49,7 +49,7 @@ bool process_header_read(
             "Failed to read opponent from battle. Using previously known value: " + set_to_str(state.opponent),
             COLOR_ORANGE
         );
-        return true;
+        return state.opponent_fits_stage();
     }
 
     return false;
@@ -75,14 +75,6 @@ bool read_battle_menu(
     std::set<std::string> mon = reader.read_opponent(stream.logger(), context, stream.video());
 
     bool retry = !process_header_read(stream.logger(), state, std::move(mon));
-    std::string opponent = state.opponent.empty()
-        ? ""
-        : *state.opponent.begin();
-
-    //  If we see a boss before the end. Something is wrong. Retry.
-    if (state.wins != 3 && is_boss(opponent)){
-        retry = true;
-    }
 
     VideoSnapshot snapshot;
     if (retry){
@@ -239,7 +231,7 @@ StateMachineAction run_move_select(
 
     bool all_moves_blocked = false;
 
-    while (true){
+    for (size_t attempts = 0;; attempts++){
         stream.log("Selecting move...");
 
         if (cheer_only){
@@ -254,7 +246,10 @@ StateMachineAction run_move_select(
             inferred,
             player_index
         );
-        stream.log("Choosing move " + std::to_string((int)move.first) + (move.second ? " (dmax)." : "."), COLOR_PURPLE);
+        stream.log(
+            "Choosing move " + std::to_string((int)move.first) + (move.second ? " (dmax)." : "."),
+            COLOR_PURPLE
+        );
 
         if (player.can_dmax && move.second){
             pbf_press_dpad(context, DPAD_LEFT, 80ms, 400ms);
@@ -318,6 +313,14 @@ StateMachineAction run_move_select(
 
         //  Reset position.
         pbf_mash_button(context, BUTTON_B, 2000ms);
+        if (attempts >= 5){
+            stream.log(
+                "Failed to select a move after 5 attempts. Performing full cursor reset...",
+                COLOR_RED
+            );
+            pbf_press_dpad(context, DPAD_RIGHT, 2000ms, 0ms);
+            pbf_press_dpad(context, DPAD_UP, 2000ms, 0ms);
+        }
         pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
         pbf_press_dpad(context, DPAD_RIGHT, 2000ms, 0ms);
         pbf_press_dpad(context, DPAD_UP, 2000ms, 0ms);
@@ -352,14 +355,14 @@ StateMachineAction throw_balls(
     state.players[2].health.value.dead = 0;
     state.players[3].health.value.dead = 0;
 
-
     GlobalState inferred = state_tracker.synchronize(stream.logger(), console_index);
-
 
     std::string ball;
 
     bool boss = inferred.wins == 4;
     if (boss){
+        //  This will crash if `inferred.boss` is still empty after battle-screen
+        //  and the fallback summary read (OCR misses).
         ball = decider.boss_ball(console_index, inferred.boss);
     }else{
         ball = decider.normal_ball(console_index);

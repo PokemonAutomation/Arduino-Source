@@ -99,13 +99,17 @@ private:
 
 
 
-//  Load the global `TestImageDistortionManager` from `test_repo_path` (see its constructor).
-//  Call this before running the tests. Once loaded, later calls do nothing.
-//  Throws like the constructor of `TestImageDistortionManager`, and stays uninitialized if it does.
-void initialize_test_image_distortions(const std::string& test_repo_path);
+//  Call this before running image tests to initialize the image distortion augmentation.
+//  When first run, it initializes the global `TestImageDistortionManager` with distortion data
+//  from `test_repo_path`.
+//  Will throw if the constructor of `TestImageDistortionManager` throws.
+void enable_test_image_distortions(const std::string& test_repo_path);
 
-//  The global `TestImageDistortionManager`, or nullptr if `initialize_test_image_distortions()`
-//  hasn't loaded it.
+//  Turn off distortion augmentation on image tests.
+void disable_test_image_distortions();
+
+//  The global `TestImageDistortionManager`, or nullptr if the distortion manager is not initialized
+//  or disabled.
 const TestImageDistortionManager* test_image_distortion_manager();
 
 

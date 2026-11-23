@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <set>
 #include "PokemonFRLG_BlindNavigation.h"
+#include "PokemonFRLG_RngStatsDatabase.h"
 #include "PokemonFRLG_RngCalibration.h"
 
 namespace PokemonAutomation{
@@ -95,9 +96,22 @@ void apply_seed_bump(RngCalibrations& calibrations, const RngUncertainHistory& u
     calibrations.seed_offset += seed_bump;
 }
 
-void log_target_pokemon(ConsoleHandle& console, const AdvPokemonResult& result, bool normal_method_note){
+void log_target_pokemon(
+    ConsoleHandle& console,
+    const AdvPokemonResult& result,
+    const std::string& species,
+    uint8_t level,
+    bool normal_method_note
+){
+    const RngStats* stats = RngStatsDatabase::instance().get_nothrow(species);
+    console.log("Target Species: " + species);
+    if (level > 0){
+        console.log("Target Level: " + std::to_string(level));
+    }
     console.log("Target PID: " + to_hex_string(result.pid));
+    console.log("Target Gender: " + gender_name(stats, result.gender));
     console.log("Target Nature: " + nature_to_string(result.nature));
+    console.log("Target Ability: " + ability_name(stats, result.ability));
     console.log(normal_method_note ? "Target IVs (assuming Normal method):" : "Target IVs:");
     console.log("   HP: " + std::to_string(result.ivs.hp));
     console.log("   Atk: " + std::to_string(result.ivs.attack));
@@ -105,6 +119,11 @@ void log_target_pokemon(ConsoleHandle& console, const AdvPokemonResult& result, 
     console.log("   SpA: " + std::to_string(result.ivs.spatk));
     console.log("   SpD: " + std::to_string(result.ivs.spdef));
     console.log("   Spe: " + std::to_string(result.ivs.speed));
+}
+void log_target_pokemon(ConsoleHandle& console, const AdvWildPokemonResult& result){
+    console.log("Target Encounter Slot: " + std::to_string(result.slot));
+    AdvPokemonResult pokemon = { result.pid, result.gender, result.nature, result.ability, result.ivs };
+    log_target_pokemon(console, pokemon, result.species, result.level);
 }
 
 void log_calibrations(ConsoleHandle& console, const RngCalibrations& calibrations, bool initial){
@@ -309,7 +328,7 @@ bool validate_level(
 ){
     std::vector<AdvEncounterSlot> valid_slots;
     for (const AdvEncounterSlot& slot : ENCOUNTER_SLOTS){
-        if (base_species_slug(filters.species) == base_species_slug(slot.species)){
+        if (species_matches(filters.species, slot.species)){
             valid_slots.push_back(slot);
         }
     }

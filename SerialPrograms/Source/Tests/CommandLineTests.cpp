@@ -18,7 +18,7 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-int run_command_line_tests(bool augment_color_distortions){
+int run_command_line_tests(bool augment_color_distortions, const std::string& test_substring){
     install_crash_backtrace_handlers();
     //  Keep stdout line-buffered: when piped, stdio defaults to full
     //  buffering, and the last few KB of test output - including the lines
@@ -26,9 +26,13 @@ int run_command_line_tests(bool augment_color_distortions){
     //  explicit buffer size is required: with 0, MSVC's ucrt can end up with
     //  a zero-size buffer, which corrupts the next stdout write.
     setvbuf(stdout, nullptr, _IOLBF, 8192);
-    cout << "Running parallel unit tests..." << endl;
+    if (test_substring.empty()){
+        cout << "Running parallel unit tests..." << endl;
+    }else{
+        cout << "Running parallel unit tests matching substring \"" << test_substring << "\"..." << endl;
+    }
     ComputerPrograms::CommandLineUnitTestRunner runner(global_logger_command_line());
-    if (runner.run(augment_color_distortions)){
+    if (runner.run(augment_color_distortions, test_substring)){
         return 1;
     }
     cout << "Running parallel unit tests... Done!" << endl;

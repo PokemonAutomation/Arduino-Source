@@ -8,6 +8,7 @@
 #include <array>
 #include <map>
 #include <memory>
+#include <optional>
 #include <string>
 #include <opencv2/imgproc.hpp>
 #include "Common/Cpp/Color.h" // needed for COLOR_RED, COLOR_ORANGE
@@ -17,6 +18,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTools/ImageHistogram.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
@@ -154,6 +156,31 @@ static ImagePixelBox tighten_to_glyph(const ImageViewRGB32& region, const ImageP
     );
 }
 
+// Return the brightness that separates the digits from the background in `image`.
+// Return std::nullopt if `image` has no digits.
+//
+// - Background brightness is defined as the median brightness of the 1-pixel wide
+//   `image` border. It is relatively bright.
+// - Digits brightness is defined as the 5th percentile brightness of all pixels.
+//   It is relatively dark.
+// The cutoff is 70% of the way from the digits to the background. 
+// If the digits are less than a fifth darker than the background, the region has no
+// digits.
+static std::optional<uint32_t> digit_cutoff(Logger& logger, const ImageViewRGB32& image){
+    const uint32_t background = image_border_brightest_channel_histogram(image).percentile(0.5);
+    const uint32_t digit = image_brightest_channel_histogram(image).percentile(0.05);
+    const std::string levels =
+        "DigitReader: background brightness " + std::to_string(background) +
+        ", digit brightness " + std::to_string(digit);
+    if (digit + background / 5 > background){
+        // logger.log(levels + ": too little contrast for digits.", COLOR_RED);
+        return std::nullopt;
+    }
+    const uint32_t cutoff = digit + (background - digit) * 7 / 10;
+    // logger.log(levels + ", cutoff " + std::to_string(cutoff));
+    return cutoff;
+}
+
 // ---------------------------------------------------------------------------
 // Main function
 // ---------------------------------------------------------------------------
@@ -163,7 +190,6 @@ int read_digits_waterfill_template(
     DigitTemplateType template_type,
     double rmsd_threshold,
     const std::string& dump_prefix,
-    uint8_t binarize_high,
     bool save_debug_images
 ){
     using namespace Kernels::Waterfill;
@@ -190,16 +216,15 @@ int read_digits_waterfill_template(
 
     // ------------------------------------------------------------------
     // Step 2: Binarise the blurred image.
-    //   Pixels where ALL channels <= binarize_high become 1 (foreground).
-    //   Default 0xBE (190) works for yellow stat boxes.
-    //   Use 0x7F (127) for the lilac level box to prevent the blurred
-    //   lilac background (B~208, drops to ~156 near shadows) from being
-    //   captured and merging digit blobs.
+    //   Pixels where ALL channels <= cutoff become 1 (foreground).
     // ------------------------------------------------------------------
-    uint32_t bh = binarize_high;
-    uint32_t binarize_color = 0xff000000u | (bh << 16) | (bh << 8) | bh;
+    const std::optional<uint32_t> cutoff = digit_cutoff(logger, blurred_img);
+    if (!cutoff){
+        return -1;
+    }
+    const uint32_t cutoff_color = 0xff000000u | (*cutoff << 16) | (*cutoff << 8) | *cutoff;
     PackedBinaryMatrix matrix =
-        compress_rgb32_to_binary_range(blurred_img, 0xff000000u, binarize_color);
+        compress_rgb32_to_binary_range(blurred_img, 0xff000000u, cutoff_color);
 
     // ------------------------------------------------------------------
     // Step 3: Waterfill - find connected dark blobs (individual digits).

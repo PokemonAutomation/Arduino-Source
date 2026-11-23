@@ -1,4 +1,5 @@
 
+#include <cstdlib>
 #include <iostream>
 //#include <QTextStream>
 #include <QApplication>
@@ -220,9 +221,12 @@ int run_program(int argc, char *argv[]){
     GlobalThreadPools::qt_event_threadpool();
 
     bool augment_test_color_distortions = false;
+    std::string test_substring;
+    bool test_substring_missing_value = false;
     for (size_t i = 0; i < argc; i++){
         constexpr const char* force_run_tests = "--command-line-test-mode";
         constexpr const char* distort_test_images = "--augment-color-distortions";
+        constexpr const char* filter_tests_substring = "--test-substring";
 
         if (strcmp(argv[i], force_run_tests) == 0){
             GlobalSettings::instance().COMMAND_LINE_TEST_MODE = true;
@@ -230,10 +234,21 @@ int run_program(int argc, char *argv[]){
         if (strcmp(argv[i], distort_test_images) == 0){
             augment_test_color_distortions = true;
         }
+        if (strcmp(argv[i], filter_tests_substring) == 0){
+            if (i + 1 < argc){
+                test_substring = argv[++i];
+            }else{
+                test_substring_missing_value = true;
+            }
+        }
+    }
+    if (test_substring_missing_value){
+        global_logger_command_line().log("--test-substring requires a value", COLOR_RED);
+        return 1;
     }
 
     if (GlobalSettings::instance().COMMAND_LINE_TEST_MODE){
-        return run_command_line_tests(augment_test_color_distortions);
+        return run_command_line_tests(augment_test_color_distortions, test_substring);
     }
 
     //  Check whether the hardware is powerful enough to run this program.
@@ -335,9 +350,19 @@ int main(int argc, char *argv[]){
 //
 //  Joining threads on Qt 6.9+ Windows will hang!
 //
+//  Command-line test mode gets the same exit treatment: the tests are
+//  done by the time we get here, nothing after this needs the thread
+//  pools, and skipping the joins avoids a hang with no diagnostics when
+//  a thread is still inside a task that never finishes.
+//
 #ifdef PA_ENABLE_QT_ADOPTION_WORKAROUND
     std::cout << "Qt6.9 bug workaround: std::quick_exit() to avoid thread join hangs." << std::endl;
     std::quick_exit(ret);
+#else
+    if (GlobalSettings::instance().COMMAND_LINE_TEST_MODE){
+        std::cout << "Command-line test mode: std::quick_exit() to avoid thread join hangs." << std::endl;
+        std::quick_exit(ret);
+    }
 #endif
 
     //  Force stop the thread pools.

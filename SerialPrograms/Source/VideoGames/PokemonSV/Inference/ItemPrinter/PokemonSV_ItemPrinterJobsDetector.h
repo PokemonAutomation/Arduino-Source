@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSV_ItemPrinterJobsDetector_H
 
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/TestRunners/UnitTest.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/VisualDetector.h"
@@ -43,6 +44,10 @@ private:
     ImageFloatBox m_box_bonus;
 
 };
+
+
+
+void add_tests_ItemPrinterJobsDetector(UnitTestDatabase& database);
 
 
 

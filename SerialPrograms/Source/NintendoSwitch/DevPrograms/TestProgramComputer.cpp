@@ -35,7 +35,6 @@
 #include "Common/Cpp/StreamConnections/MockDevice.h"
 #include "Common/Cpp/TestRunners/ParallelUnitTestRunner.h"
 #include "Common/Qt/TimeQt.h"
-#include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqr.h"

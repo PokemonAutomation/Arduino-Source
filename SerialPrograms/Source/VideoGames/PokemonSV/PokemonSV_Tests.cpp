@@ -26,6 +26,7 @@
 #include "Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
 #include "Inference/Picnics/PokemonSV_SandwichHandDetector.h"
+#include "Inference/ItemPrinter/PokemonSV_ItemPrinterJobsDetector.h"
 #include "Programs/Farming/PokemonSV_BBQTests.h"
 #include "PokemonSV_Tests.h"
 
@@ -53,6 +54,7 @@ void add_tests(UnitTestDatabase& database){
     add_tests_TeraCardDetector(database);
     add_tests_TeraSilhouetteReader(database);
     add_tests_TeraTypeReader(database);
+    add_tests_ItemPrinterJobsDetector(database);
     add_tests_NormalBattleMenus(database);
     add_tests_LetsGoKillDetector(database);
     add_tests_BBQ(database);

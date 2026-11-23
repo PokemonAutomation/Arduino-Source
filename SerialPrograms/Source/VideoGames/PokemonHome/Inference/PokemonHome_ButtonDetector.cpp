@@ -206,6 +206,10 @@ private:
 };
 
 void add_tests_ButtonDetector(UnitTestDatabase& database){
+    database.add<Test_ButtonDetector>("PokemonHome/BoxView/SelectionArrow_Relocate_Grid_Row0_Column2_01.png", ButtonType::ButtonPlus);
+    database.add<Test_ButtonDetector>("PokemonHome/BoxView/SelectionHand_Relocate_Grid_Row2_Column4_01.png", ButtonType::ButtonB);
+    database.add<Test_ButtonDetector>("PokemonHome/PageView/Page10_Box293_Normal_Grid_R3C4_Frame01.png", ButtonType::ButtonPlus);
+    database.add<Test_ButtonDetector>("PokemonHome/PageView/Page10_Box297_Relocate_Grid_R4C2_Frame01.png", ButtonType::ButtonB);
     database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/annihilape_Regular.png", ButtonType::ButtonB);
     database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/bidoof_Regular.png", ButtonType::ButtonB);
     database.add<Test_ButtonDetector>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", ButtonType::ButtonB);

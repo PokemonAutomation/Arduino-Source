@@ -12,6 +12,7 @@
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{ class Logger; }
@@ -43,6 +44,7 @@ private:
         Condensed,
     };
 
+    OCR::LanguageOCROption LANGUAGE;
     SimpleIntegerOption<uint16_t> NUM_BOXES;
     EnumDropdownOption<LivingDexTemplate> LIVING_DEX_TEMPLATE;
     BooleanCheckBoxOption SHINY_DEX;

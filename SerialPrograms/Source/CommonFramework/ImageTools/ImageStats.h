@@ -31,7 +31,9 @@ FloatPixel image_average(const ImageViewRGB32& image);
 FloatPixel image_stddev(const ImageViewRGB32& image);
 ImageStats image_stats(const ImageViewRGB32& image);
 
-// Get stats on the one-pixel-wide border of the image
+// Get stats on the one-pixel-wide border of the image.
+// Unlike `image_stats()`, pixels with alpha < 128 are counted too.
+// Return an empty ImageStats (count 0) if the image has at most one pixel.
 ImageStats image_border_stats(const ImageViewRGB32& image);
 
 

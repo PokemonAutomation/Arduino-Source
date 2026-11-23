@@ -15,12 +15,14 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon/Inference/Pokemon_TypeReader.h"
-#include "VideoGames/PokemonHome/Inference/PokemonHome_BallReader.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_AlphaDetector.h"
+#include "VideoGames/PokemonHome/Inference/PokemonHome_BallReader.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_BoxGenderDetector.h"
+#include "VideoGames/PokemonHome/Inference/PokemonHome_BoxViewDetector.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_GigantamaxDetector.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_OriginMarkReader.h"
 #include "VideoGames/PokemonHome/Inference/PokemonHome_ShinyDetector.h"
@@ -322,46 +324,59 @@ void print_boxes_data(const std::vector<std::optional<CollectedPokemonInfo>>& bo
     env.console.log(ss.str());
 }
 
-void exit_menus(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::chrono::milliseconds video_delay){
-    VideoSnapshot screen = env.console.video().snapshot();
-    VideoOverlaySet video_overlay_set(env.console);
-
-    ImageFloatBox select_check(0.495, 0.0045, 0.01, 0.005); // square color to check which mode is active
-    FloatPixel image_value = image_stats(extract_box_reference(screen, select_check)).average;
-
-    env.console.log("Color detected from the select square: " + image_value.to_string());
-
-    //if the correct color is not detected, getting out of every possible menu to make sure the program work no matter where you start it in your pokemon home
-    video_overlay_set.add(COLOR_BLUE, select_check);
-    if (image_value.r <= image_value.g + image_value.b){
-        for (int var = 0; var < 5; ++var){
-            pbf_press_button(context, BUTTON_B, 80ms, video_delay + 80ms);
-        }
-        context.wait_for_all_requests();
-        context.wait_for(std::chrono::milliseconds(video_delay));
-        screen = env.console.video().snapshot();
-        image_value = image_stats(extract_box_reference(screen, select_check)).average;
-        env.console.log("Color detected from the select square: " + image_value.to_string());
-        if (image_value.r <= image_value.g + image_value.b){
-            for (int i = 0; i < 2; ++i){
-                pbf_press_button(context, BUTTON_ZR, 80ms, video_delay + 240ms); //additional delay because this animation is slower than the rest
+void exit_menus(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    BoxViewWatcher box_watcher(&env.console.overlay());
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [](ProControllerContext& context){
+            for (size_t i = 0; i < 20; i++){
+                pbf_press_button(context, BUTTON_B, 80ms, 250ms);
                 context.wait_for_all_requests();
-                screen = env.console.video().snapshot();
-                image_value = image_stats(extract_box_reference(screen, select_check)).average;
-                env.console.log("Color detected from the select square: " + image_value.to_string());
-                if (image_value.r > image_value.g + image_value.b){
-                    break;
-                }
-                else if (i == 1){
-                    dump_image(env.console, ProgramInfo(), "SelectSquare", screen);
-                    env.console.log("ERROR: Could not find correct color mode please check color logs and timings\n", COLOR_RED);
-                    return;
-                }
             }
-        }
+        },
+        { box_watcher }
+    );
+
+    if (ret != 0){
+        dump_image(env.console, ProgramInfo(), "SelectSquare", env.console.video().snapshot());
+        OperationFailedExceptionWithScreenshot::fire(
+            ErrorReportMode::SEND_ERROR_REPORT, "HomeBoxNavigation_ExitMenus(): could not find box view after 20 attempts", env.console
+        );
     }
 
-    video_overlay_set.clear();
+    // Page view can be detected as Box view. Extra B to ensure we are in box view and not page view.
+    pbf_press_button(context, BUTTON_B, 80ms, 250ms);
+    context.wait_for(250ms);
+    context.wait_for_all_requests();
+}
+
+void switch_selection_mode(SingleSwitchProgramEnvironment& env, ProControllerContext& context, BoxSelectionMode desired_mode){
+    context.wait_for_all_requests();
+    const SelectionArrowDetector detector;
+    auto selection = detector.detect(env.console.video().snapshot());
+    if (!selection){
+        exit_menus(env, context);
+        selection = detector.detect(env.console.video().snapshot());
+        if (!selection){
+            dump_image(env.console, ProgramInfo(), "SelectionArrow", env.console.video().snapshot());
+            OperationFailedExceptionWithScreenshot::fire(
+                ErrorReportMode::SEND_ERROR_REPORT,
+                "HomeBoxNavigation_SwitchSelectionMode(): could not find selection arrow after exiting menus",
+                env.console
+            );
+        }
+    }
+    if (selection->mode == desired_mode){
+        return;
+    }
+
+    // ZL cycles Normal -> Relocate -> Multi -> Normal; ZR goes in reverse.
+    const bool select_left =
+        (selection->mode == BoxSelectionMode::Normal && desired_mode == BoxSelectionMode::Relocate)
+        || (selection->mode == BoxSelectionMode::Relocate && desired_mode == BoxSelectionMode::Multi)
+        || (selection->mode == BoxSelectionMode::Multi && desired_mode == BoxSelectionMode::Normal);
+    pbf_press_button(context, select_left ? BUTTON_ZL : BUTTON_ZR, 80ms, 300ms);
+    context.wait_for_all_requests();
 }
 
 }

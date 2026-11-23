@@ -20,6 +20,7 @@
 #include "VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleLevelUpReader.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_RngNavigation.h"
+#include "PokemonFRLG_RngStatsDatabase.h"
 #include "PokemonFRLG_HardReset.h"
 #include "PokemonFRLG_SeedsDatabase.h"
 #include "PokemonFRLG_StarterRng.h"
@@ -181,7 +182,7 @@ StarterRng::StarterRng()
     })
 {
     PA_ADD_OPTION(m_calibration_displays);
-    PA_ADD_OPTION(RNG_TARGET);
+    PA_ADD_STATIC(RNG_TARGET);
     PA_ADD_OPTION(RNG_FILTERS);
     PA_ADD_OPTION(RNG_CALIBRATION);
     PA_ADD_OPTION(m_game_info);
@@ -580,20 +581,23 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     env.log("Seed delay: " + std::to_string(SEED_DELAY) + "ms, button mode: " + seed_match.button_mode
         + ", column: " + seed_match.column_name);
 
-    BaseStats BASE_STATS;
+    std::string SPECIES;
     switch (STARTER){
     case Starter::bulbasaur:
-        BASE_STATS = { 45, 49, 49, 65, 65, 45 };
+        SPECIES = "bulbasaur";
         break;
     case Starter::squirtle:
-        BASE_STATS = { 44, 48, 65, 50, 64, 43 };
+        SPECIES = "squirtle";
         break;
     case Starter::charmander:
-        BASE_STATS = { 39, 52, 43, 60, 50, 65 };
+        SPECIES = "charmander";
         break;
     default:
         break;
     }
+    const RngStats& STATS = RngStatsDatabase::instance().get_throw(SPECIES);
+    const int16_t GENDER_THRESHOLD = STATS.gender_threshold;
+    const BaseStats& BASE_STATS = STATS.base_stats;
 
     static const int64_t FIXED_SEED_OFFSET = -845; // milliseconds, approximate
 
@@ -603,8 +607,6 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     static const uint8_t MAX_HISTORY_LENGTH = 10;
 
-    static const int16_t GENDER_THRESHOLD = 30;
-
     static const std::set<std::string> SPECIES_LIST = { "bulbasaur", "squirtle", "charmander" };
 
     env.log("RNG Target: " + std::to_string(STARTER.current_value()));
@@ -613,8 +615,8 @@ void StarterRng::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     AdvRngSearcher searcher(TARGET_SEED, ADVANCES, AdvRngMethod::Method1);
     AdvPokemonResult target_result = searcher.generate_pokemon();
-    RNG_TARGET.set_target(target_result, GENDER_THRESHOLD);
-    log_target_pokemon(env.console, target_result);
+    RNG_TARGET.set_target(target_result, SPECIES, 5);
+    log_target_pokemon(env.console, target_result, SPECIES, 5);
 
     RngCalibrations calibrations = {
         RNG_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,
