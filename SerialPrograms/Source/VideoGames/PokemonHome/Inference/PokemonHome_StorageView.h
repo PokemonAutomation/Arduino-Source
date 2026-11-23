@@ -16,7 +16,7 @@ namespace NintendoSwitch{
 namespace PokemonHome{
 
 // These locations are the same for both Box View and Page View.
-inline const ImageFloatBox STORAGE_HEADER_STRIP(0.17, 0.091, 0.16, 0.004);
+inline const ImageFloatBox STORAGE_HEADER_STRIP(0.17, 0.083, 0.16, 0.004);
 inline const ImageFloatBox STORAGE_PLUS_BUTTON(0.100, 0.940, 0.107, 0.057);
 
 enum class StorageViewHeader{

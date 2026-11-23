@@ -97,6 +97,10 @@ file(GLOB CORE_LIBRARY_SOURCES
     ../Common/Cpp/Hardware/Hardware_x86_Linux.tpp
     ../Common/Cpp/Hardware/Hardware_x86_Windows.tpp
     ../Common/Cpp/HttpServer/AbstractHttpServer.h
+    ../Common/Cpp/HttpServer/HttpServer.cpp
+    ../Common/Cpp/HttpServer/HttpServer.h
+    ../Common/Cpp/HttpServer/HttpServer_Tests.cpp
+    ../Common/Cpp/HttpServer/HttpServer_Tests.h
     ../Common/Cpp/ImageResolution.cpp
     ../Common/Cpp/ImageResolution.h
     ../Common/Cpp/Json/JsonArray.cpp
@@ -406,6 +410,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/SIMDDebuggers.h
     ../Common/Cpp/Sockets/AbstractClientSocket.h
     ../Common/Cpp/Sockets/AbstractServerSocket.h
+    ../Common/Cpp/Sockets/AbstractServerSocketConnection.h
     ../Common/Cpp/Sockets/ClientSocket.cpp
     ../Common/Cpp/Sockets/ClientSocket.h
     ../Common/Cpp/Sockets/ClientSocket_POSIX.cpp
@@ -414,13 +419,15 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Sockets/ClientSocket_Qt.h
     ../Common/Cpp/Sockets/ClientSocket_WinSocket.cpp
     ../Common/Cpp/Sockets/ClientSocket_WinSocket.h
-    ../Common/Cpp/Sockets/ServerSocket_POSIX.cpp
-    ../Common/Cpp/Sockets/ServerSocket_WinSocket.cpp
-    ../Common/Cpp/Sockets/ServerSocket_Qt.cpp
-    ../Common/Cpp/Sockets/ServerSocket_POSIX.h
-    ../Common/Cpp/Sockets/ServerSocket_WinSocket.h
-    ../Common/Cpp/Sockets/ServerSocket_Qt.h
     ../Common/Cpp/Sockets/ServerSocket.h
+    ../Common/Cpp/Sockets/ServerSocket_POSIX.cpp
+    ../Common/Cpp/Sockets/ServerSocket_POSIX.h
+    ../Common/Cpp/Sockets/ServerSocket_Qt.cpp
+    ../Common/Cpp/Sockets/ServerSocket_Qt.h
+    ../Common/Cpp/Sockets/ServerSocket_WinSocket.cpp
+    ../Common/Cpp/Sockets/ServerSocket_WinSocket.h
+    ../Common/Cpp/Sockets/ServerSocket_Tests.cpp
+    ../Common/Cpp/Sockets/ServerSocket_Tests.h
     ../Common/Cpp/Sockets/Sockets_Tests.cpp
     ../Common/Cpp/Sockets/Sockets_Tests.h
     ../Common/Cpp/StreamConnections/MockDevice.cpp
@@ -603,8 +610,12 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/ImageTools/ImageBoxes.h
     Source/CommonFramework/ImageTools/ImageDiff.cpp
     Source/CommonFramework/ImageTools/ImageDiff.h
+    Source/CommonFramework/ImageTools/ImageHistogram.cpp
+    Source/CommonFramework/ImageTools/ImageHistogram.h
     Source/CommonFramework/ImageTools/ImageStats.cpp
     Source/CommonFramework/ImageTools/ImageStats.h
+    Source/CommonFramework/ImageTools/ImageStats_Tests.cpp
+    Source/CommonFramework/ImageTools/ImageStats_Tests.h
     Source/CommonFramework/ImageTypes/BinaryImage.cpp
     Source/CommonFramework/ImageTypes/BinaryImage.h
     Source/CommonFramework/ImageTypes/ImageHSV32.cpp
@@ -1731,6 +1742,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_SummaryDetector.h
     Source/VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_TrainerCardDetector.cpp
     Source/VideoGames/PokemonFRLG/Inference/Menus/PokemonFRLG_TrainerCardDetector.h
+    Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BallReader.cpp
+    Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BallReader.h
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleLevelUpReader.cpp
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattleLevelUpReader.h
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_BattlePokemonDetector.cpp
@@ -1757,6 +1770,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_StatsReader.h
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_TrainerIdReader.cpp
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_TrainerIdReader.h
+    Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_TypeReader.cpp
+    Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_TypeReader.h
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.cpp
     Source/VideoGames/PokemonFRLG/Inference/PokemonFRLG_WildEncounterReader.h
     Source/VideoGames/PokemonFRLG/Inference/Sounds/PokemonFRLG_CatchFanfareDetector.cpp
@@ -1879,6 +1894,8 @@ file(GLOB LIBRARY_SOURCES
     Source/VideoGames/PokemonHome/Inference/PokemonHome_GigantamaxDetector.h
     Source/VideoGames/PokemonHome/Inference/PokemonHome_OriginMarkReader.cpp
     Source/VideoGames/PokemonHome/Inference/PokemonHome_OriginMarkReader.h
+    Source/VideoGames/PokemonHome/Inference/PokemonHome_PageViewDetector.cpp
+    Source/VideoGames/PokemonHome/Inference/PokemonHome_PageViewDetector.h
     Source/VideoGames/PokemonHome/Inference/PokemonHome_SelectionArrowDetector.cpp
     Source/VideoGames/PokemonHome/Inference/PokemonHome_SelectionArrowDetector.h
     Source/VideoGames/PokemonHome/Inference/PokemonHome_ShinyDetector.cpp

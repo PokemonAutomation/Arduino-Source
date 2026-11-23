@@ -19,6 +19,8 @@ namespace ScaleInvariantMatrixMatch{
 struct Context_arm64_NEON{
     using vtype = float32x4_t;
 
+    static constexpr bool UNROLL = true;
+
     static PA_FORCE_INLINE vtype vzero(){
         return vdupq_n_f32(0.0f);
     }

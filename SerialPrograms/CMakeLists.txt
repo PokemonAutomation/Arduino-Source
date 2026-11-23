@@ -557,17 +557,45 @@ else() # macOS and Linux
                         STATUS download_status
                     )
                     list(GET download_status 0 error_code)
-                    if(NOT error_code EQUAL 0)
+                    if(error_code EQUAL 0)
+                        # logic for extracting the tarball to our working directory
+                        message(STATUS "Extracting ONNX Runtime...")
+                        execute_process(
+                            COMMAND ${CMAKE_COMMAND} -E tar xzf "${DOWNLOAD_LOCATION}"
+                            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                        )
+                    else()
+                        # The GitHub release is not reachable: the same build is on NuGet
+                        # (Microsoft.ML.OnnxRuntime, a zip), laid out as include/ + runtimes/<rid>/native/.
                         list(GET download_status 1 error_message)
-                        message(FATAL_ERROR "Failed to download ONNX Runtime: ${error_message}")
+                        message(STATUS "GitHub download failed (${error_message}); trying NuGet...")
+                        if(ONNXRUNTIME_ARCH STREQUAL "aarch64")
+                            set(ONNXRUNTIME_NUGET_RID "linux-arm64")
+                        else()
+                            set(ONNXRUNTIME_NUGET_RID "linux-x64")
+                        endif()
+                        set(NUGET_LOCATION "${CMAKE_BINARY_DIR}/onnxruntime-${ONNXRUNTIME_VERSION}.nupkg")
+                        file(DOWNLOAD
+                            "https://www.nuget.org/api/v2/package/Microsoft.ML.OnnxRuntime/${ONNXRUNTIME_VERSION}"
+                            ${NUGET_LOCATION}
+                            STATUS nuget_status
+                        )
+                        list(GET nuget_status 0 nuget_error_code)
+                        if(NOT nuget_error_code EQUAL 0)
+                            list(GET nuget_status 1 nuget_error_message)
+                            message(FATAL_ERROR "Failed to download ONNX Runtime from GitHub (${error_message}) and NuGet (${nuget_error_message})")
+                        endif()
+                        set(NUGET_EXTRACT_DIR "${CMAKE_BINARY_DIR}/onnxruntime-nuget-${ONNXRUNTIME_VERSION}")
+                        file(MAKE_DIRECTORY "${NUGET_EXTRACT_DIR}")
+                        execute_process(
+                            COMMAND ${CMAKE_COMMAND} -E tar xf "${NUGET_LOCATION}"
+                            WORKING_DIRECTORY "${NUGET_EXTRACT_DIR}"
+                        )
+                        file(COPY "${NUGET_EXTRACT_DIR}/build/native/include/" DESTINATION "${EXTRACTED_ONNX_PATH}/include")
+                        file(COPY "${NUGET_EXTRACT_DIR}/runtimes/${ONNXRUNTIME_NUGET_RID}/native/" DESTINATION "${EXTRACTED_ONNX_PATH}/lib")
+                        # The library's SONAME is libonnxruntime.so.1, which the release tarball ships as a link.
+                        file(COPY_FILE "${EXTRACTED_ONNX_PATH}/lib/libonnxruntime.so" "${EXTRACTED_ONNX_PATH}/lib/libonnxruntime.so.1")
                     endif()
-
-                    # logic for extracting the tarball to our working directory
-                    message(STATUS "Extracting ONNX Runtime...")
-                    execute_process(
-                        COMMAND ${CMAKE_COMMAND} -E tar xzf "${DOWNLOAD_LOCATION}"
-                        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-                    )
                 endif()
 
                 # Update the ONNX_ROOT_PATH to point to our downloaded version, force ensures we update it

@@ -172,10 +172,14 @@ struct GlobalState{
     size_t find_player_index(size_t console_id) const;
     void clear_battle_state();
 
-    //  Returns false when the opponent read doesn't fit this battle stage (a
-    //  boss before the fourth battle), so the caller retries the read. On an
-    //  accepted read at the fourth battle, records the boss if none is known
-    //  and the read is a single boss species.
+    //  Whether the opponent read fits this battle stage: before the fourth
+    //  battle, any non-boss; at the fourth battle, exactly the known boss, or a
+    //  single boss species when no boss is known yet.
+    bool opponent_fits_stage() const;
+
+    //  Returns false when the read doesn't fit a battle before the fourth (a
+    //  boss there), so the caller retries the read. At the fourth battle,
+    //  records the boss if none is known and the read fits.
     bool accept_opponent();
 
     //  The same boss, but only if the adventure caught it, else empty: for the
@@ -183,7 +187,6 @@ struct GlobalState{
     //  the boss-caught rules after a loss. Decided from the battles won (the
     //  boss is the fourth battle), not from how many Pokemon were caught, so it
     //  stays right if non-boss catches are ever skipped.
-    //  For now this returns boss whatever the battles won.
     std::string boss_if_caught() const;
 
     std::string dump() const;

@@ -15,6 +15,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonFRLG/PokemonFRLG_Navigation.h"
 #include "PokemonFRLG_RngNavigation.h"
+#include "PokemonFRLG_RngStatsDatabase.h"
 #include "PokemonFRLG_HardReset.h"
 #include "PokemonFRLG_RngCalibration.h"
 #include "PokemonFRLG_RngLoopRoutines.h"
@@ -194,7 +195,7 @@ GiftRng::GiftRng()
     })
 {
     PA_ADD_OPTION(m_calibration_displays);
-    PA_ADD_OPTION(RNG_TARGET);
+    PA_ADD_STATIC(RNG_TARGET);
     PA_ADD_OPTION(RNG_FILTERS);
     PA_ADD_OPTION(RNG_CALIBRATION);
     PA_ADD_OPTION(m_game_info);
@@ -235,6 +236,7 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     GiftRng_Descriptor::Stats& stats = env.current_stats<GiftRng_Descriptor::Stats>();
 
     home_black_border_check(env.console, context);
+    check_free_party_slots(env.console, context, 1);
 
     RNG_FILTERS.reset();
     RNG_CALIBRATION.reset_hits();
@@ -253,86 +255,73 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     env.log("Seed delay: " + std::to_string(SEED_DELAY) + "ms, button mode: " + seed_match.button_mode
         + ", column: " + seed_match.column_name);
 
-    BaseStats BASE_STATS;
-    int16_t GENDER_THRESHOLD = -1;
+    std::string SPECIES;
     uint8_t LEVEL = 0;
     switch (TARGET){
     case PokemonFRLG_RngTarget::magikarp:
-        BASE_STATS = { 20, 10, 55, 15, 20, 80 };
-        GENDER_THRESHOLD = 126;
+        SPECIES = "magikarp";
         LEVEL = 5;
         break;
     case PokemonFRLG_RngTarget::hitmonchan:
-        BASE_STATS = { 50, 105, 79, 35, 110, 76 };
-        GENDER_THRESHOLD = -1;
+        SPECIES = "hitmonchan";
         LEVEL = 25;
         break;
     case PokemonFRLG_RngTarget::hitmonlee:
-        BASE_STATS = { 50, 120, 53, 35, 110, 87 };
-        GENDER_THRESHOLD = -1;
+        SPECIES = "hitmonlee";
         LEVEL = 25;
         break;
     case PokemonFRLG_RngTarget::eevee:
-        BASE_STATS = { 55, 55, 50, 45, 65, 55 };
-        GENDER_THRESHOLD = 30;
+        SPECIES = "eevee";
         LEVEL = 25;
         break;
     case PokemonFRLG_RngTarget::lapras:
-        BASE_STATS = { 130, 85, 80, 85, 95, 60 };
-        GENDER_THRESHOLD = 126;
+        SPECIES = "lapras";
         LEVEL = 25;
         break;
     case PokemonFRLG_RngTarget::omanyte:
-        BASE_STATS = { 35, 40, 100, 90, 55, 35 };
-        GENDER_THRESHOLD = 30;
+        SPECIES = "omanyte";
         LEVEL = 5;
         break;
     case PokemonFRLG_RngTarget::kabuto:
-        BASE_STATS = { 30, 80, 90, 55, 45, 55 };
-        GENDER_THRESHOLD = 30;
+        SPECIES = "kabuto";
         LEVEL = 5;
         break;
     case PokemonFRLG_RngTarget::aerodactyl:
-        BASE_STATS = { 80, 105, 65, 60, 75, 130 };
-        GENDER_THRESHOLD = 30;
+        SPECIES = "aerodactyl";
         LEVEL = 5;
         break;
     case PokemonFRLG_RngTarget::gamecornerabra:
-        BASE_STATS = { 25, 20, 15, 105, 55, 90 };
-        GENDER_THRESHOLD = 63;
+        SPECIES = "abra";
         break;
     case PokemonFRLG_RngTarget::gamecornerclefairy:
-        BASE_STATS = { 70, 45, 48, 60, 65, 35 };
-        GENDER_THRESHOLD = 190;
+        SPECIES = "clefairy";
         break;
     case PokemonFRLG_RngTarget::gamecornerdratinifr:
     case PokemonFRLG_RngTarget::gamecornerdratinilg:
-        BASE_STATS = { 41, 64, 45, 50, 50, 50 };
-        GENDER_THRESHOLD = 126;
+        SPECIES = "dratini";
         break;
     case PokemonFRLG_RngTarget::gamecornerscyther:
-        BASE_STATS = { 70, 110, 80, 55, 80, 105 };
-        GENDER_THRESHOLD = 126;
+        SPECIES = "scyther";
         LEVEL = 25;
         break;
     case PokemonFRLG_RngTarget::gamecornerpinsir:
-        BASE_STATS = { 65, 125, 100, 55, 70, 85 };
-        GENDER_THRESHOLD = 126;
+        SPECIES = "pinsir";
         LEVEL = 18;
         break;
     case PokemonFRLG_RngTarget::gamecornerporygon:
-        BASE_STATS = { 65, 60, 70, 85, 75, 40 };
-        GENDER_THRESHOLD = -1;
+        SPECIES = "porygon";
         break;
     case PokemonFRLG_RngTarget::togepi:
     case PokemonFRLG_RngTarget::togepifast:
-        BASE_STATS = { 35, 20, 65, 40, 65, 20 };
-        GENDER_THRESHOLD = 30;
+        SPECIES = "togepi";
         LEVEL = 5;
         break; 
     default:
         break;
     }
+    const RngStats& STATS = RngStatsDatabase::instance().get_throw(SPECIES);
+    const int16_t GENDER_THRESHOLD = STATS.gender_threshold;
+    const BaseStats& BASE_STATS = STATS.base_stats;
 
     static const int64_t FIXED_SEED_OFFSET = -845; // milliseconds, approximate
 
@@ -355,8 +344,8 @@ void GiftRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
     AdvRngSearcher searcher(TARGET_SEED, ADVANCES, AdvRngMethod::Method1);
     AdvPokemonResult target_result = searcher.generate_pokemon();
-    RNG_TARGET.set_target(target_result, GENDER_THRESHOLD);
-    log_target_pokemon(env.console, target_result);
+    RNG_TARGET.set_target(target_result, SPECIES, LEVEL);
+    log_target_pokemon(env.console, target_result, SPECIES, LEVEL);
 
     RngCalibrations calibrations = {
         RNG_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,

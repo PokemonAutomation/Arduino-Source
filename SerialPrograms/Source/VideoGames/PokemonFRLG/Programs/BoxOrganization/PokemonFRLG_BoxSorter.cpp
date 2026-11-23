@@ -32,7 +32,7 @@ BoxSorter_Descriptor::BoxSorter_Descriptor()
         Pokemon::STRING_POKEMON + " FRLG", "Box Sorter",
         "Programs/PokemonFRLG/BoxSorter.html",
         "Sort boxes of " + STRING_POKEMON + ". Start in Move " + STRING_POKEMON +
-        " with an empty hand in the first box to sort. Uses English species names.",
+        " with an empty hand in the first box to sort.",
         PanelQualityStanding::OFFICIAL_BETA,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
@@ -46,13 +46,35 @@ std::unique_ptr<StatsTracker> BoxSorter_Descriptor::make_stats() const{
 }
 
 BoxSorter::BoxSorter()
-    : NUM_BOXES(
+    : LANGUAGE(
+        "<b>Game Language:</b><br>Select the language of your game so the program can read "
+        + STRING_POKEMON + " species names, natures, and abilities.",
+        {
+            Language::English,
+            Language::Japanese,
+            Language::Spanish,
+            Language::French,
+            Language::German,
+            Language::Italian,
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
+    , NUM_BOXES(
         "<b>Number of Boxes to Sort:</b><br>Starting with the current box and continuing to the right.",
         LockMode::LOCK_WHILE_RUNNING, 1, 1, MAX_BOXES
     )
     , SORT_TABLE(
         "<b>Sort Order Rules:</b><br>Sort order rules will be applied top to bottom.",
-        {SortingRuleType::DexNo, SortingRuleType::Level, SortingRuleType::Gender, SortingRuleType::Shiny}
+        {
+            SortingRuleType::DexNo,
+            SortingRuleType::Level,
+            SortingRuleType::Gender,
+            SortingRuleType::Shiny,
+            SortingRuleType::Ball_Slug,
+            SortingRuleType::Nature,
+            SortingRuleType::Ability,
+        }
     )
     , DRY_RUN(
         "<b>Dry Run:</b><br>Scan boxes and write frlg-box_order.json and "
@@ -61,6 +83,7 @@ BoxSorter::BoxSorter()
     )
     , NOTIFICATIONS({&NOTIFICATION_PROGRAM_FINISH, &NOTIFICATION_ERROR_FATAL})
 {
+    PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(NUM_BOXES);
     PA_ADD_OPTION(SORT_TABLE);
     PA_ADD_OPTION(DRY_RUN);
@@ -76,7 +99,7 @@ void BoxSorter::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     }
 
     auto& stats = env.current_stats<BoxSorter_Descriptor::Stats>();
-    BoxOrganizationScan scan = scan_box_data(env, context, preferences, (uint16_t)NUM_BOXES);
+    BoxOrganizationScan scan = scan_box_data(env, context, LANGUAGE, preferences, (uint16_t)NUM_BOXES);
     const auto& boxes_data = scan.boxes_data;
 
     // Stable ordering avoids unnecessary moves for Pokemon with identical sort keys.

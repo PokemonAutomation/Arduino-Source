@@ -13,6 +13,7 @@
 #include "Inference/PokemonHome_ButtonDetector.h"
 #include "Inference/PokemonHome_GigantamaxDetector.h"
 #include "Inference/PokemonHome_OriginMarkReader.h"
+#include "Inference/PokemonHome_PageViewDetector.h"
 #include "Inference/PokemonHome_SelectionArrowDetector.h"
 #include "Inference/PokemonHome_ShinyDetector.h"
 #include "Inference/PokemonHome_SummaryReader.h"
@@ -36,6 +37,7 @@ void add_tests(UnitTestDatabase& database){
     add_tests_GigantamaxDetector(database);
     add_tests_LivingDexTemplate(database);
     add_tests_OriginMarkReader(database);
+    add_tests_PageViewDetector(database);
     add_tests_SelectionArrowDetector(database);
     add_tests_ShinyDetector(database);
     add_tests_SummaryReader(database);

@@ -558,11 +558,15 @@ struct StallingServerListener : AbstractServerSocket::Listener{
         listen_ok.store(error_message.empty(), std::memory_order_release);
     }
 
-    virtual void on_connect() override{
+    virtual void on_connect(AbstractServerSocket::ConnectionPtr) override{
         connected.store(true, std::memory_order_release);
     }
 
-    virtual void on_receive_data(const void*, size_t) override{
+    virtual void on_receive_data(
+        AbstractServerSocket::ConnectionPtr,
+        const void*,
+        size_t
+    ) override{
         if (!stalled.exchange(true, std::memory_order_acq_rel)){
             const auto end = std::chrono::steady_clock::now() + std::chrono::seconds(30);
             while (std::chrono::steady_clock::now() < end

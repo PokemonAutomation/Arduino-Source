@@ -55,6 +55,8 @@ private:
 
 void add_tests_SummaryScreenDetector(UnitTestDatabase& database){
     database.add<Test_SummaryScreenDetector>("PokemonHome/BoxView/BoxView-1.png", false);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/BoxView/SelectionArrow_Relocate_Grid_Row0_Column2_01.png", false);
+    database.add<Test_SummaryScreenDetector>("PokemonHome/PageView/Page10_Box293_Normal_Grid_R3C4_Frame01.png", false);
     database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/annihilape_Regular.png", true);
     database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/bidoof_Regular.png", true);
     database.add<Test_SummaryScreenDetector>("PokemonHome/SummaryScreen/bulbasaur_Regular.png", true);

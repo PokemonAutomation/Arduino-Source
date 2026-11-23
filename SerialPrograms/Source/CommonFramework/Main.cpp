@@ -1,4 +1,5 @@
 
+#include <cstdlib>
 #include <iostream>
 //#include <QTextStream>
 #include <QApplication>
@@ -349,9 +350,19 @@ int main(int argc, char *argv[]){
 //
 //  Joining threads on Qt 6.9+ Windows will hang!
 //
+//  Command-line test mode gets the same exit treatment: the tests are
+//  done by the time we get here, nothing after this needs the thread
+//  pools, and skipping the joins avoids a hang with no diagnostics when
+//  a thread is still inside a task that never finishes.
+//
 #ifdef PA_ENABLE_QT_ADOPTION_WORKAROUND
     std::cout << "Qt6.9 bug workaround: std::quick_exit() to avoid thread join hangs." << std::endl;
     std::quick_exit(ret);
+#else
+    if (GlobalSettings::instance().COMMAND_LINE_TEST_MODE){
+        std::cout << "Command-line test mode: std::quick_exit() to avoid thread join hangs." << std::endl;
+        std::quick_exit(ret);
+    }
 #endif
 
     //  Force stop the thread pools.
