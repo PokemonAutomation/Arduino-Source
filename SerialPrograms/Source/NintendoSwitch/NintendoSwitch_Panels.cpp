@@ -31,6 +31,7 @@
 #include "DevPrograms/TestProgramSwitch.h"
 #include "DevPrograms/JoyconProgram.h"
 #include "DevPrograms/TestDudunsparceFormDetector.h"
+#include "DevPrograms/CaptureCardCalibration.h"
 #include "Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h"
 #include "Pokemon/Inference/Pokemon_TrainPokemonOCR.h"
 
@@ -86,6 +87,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back(make_MultiSwitchProgram<TestProgram>());
         ret.emplace_back(make_SingleSwitchProgram<JoyconProgram>());
         ret.emplace_back(GameConsole::make_ConsoleProgram<GameConsole::WaterfillTemplateMaker>());
+        ret.emplace_back(GameConsole::make_ConsoleProgram<CaptureCardCalibration>());
         ret.emplace_back(make_ComputerProgram<Pokemon::TrainIVCheckerOCR>());
         ret.emplace_back(make_ComputerProgram<Pokemon::TrainPokemonOCR>());
         ret.emplace_back(make_SingleSwitchProgram<TestDudunsparceFormDetector>());
