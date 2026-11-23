@@ -281,7 +281,7 @@ void add_tests_MenuDetector(UnitTestDatabase& database){
     }
     for (const char* image : {"Options_4.png", "Pokemon_6.png", "Capsules_8.png", "Bag_6.png",
         "TrainerCard_6_First.png", "TrainerCard_6_Middle.png", "TrainerCard_6_Last.png", "SelectionAnimation.png"}){
-        const std::string path = std::string("PokemonBDSP/MenuCursorDetector/") + image;
+        const std::string path = std::string("PokemonBDSP/MenuDetector/") + image;
         database.add<Test_MenuDetector>(MenuCase{.input = {.image = path}, .expectation = {.detected = true}});
     }
     for (const char* image : {
@@ -311,7 +311,7 @@ void add_tests_MenuDetector(UnitTestDatabase& database){
         "TrainerCard_6_04.png",
         "TrainerCard_6_05.png"
     }){
-        const std::string path = std::string("PokemonBDSP/MenuCursorDetector/") + image;
+        const std::string path = std::string("PokemonBDSP/MenuDetector/") + image;
         for (Columns columns : {Columns::FromTop, Columns::BelowNewTags}){
             database.add<Test_MenuDetector>(MenuCase{
                 .input = {.image = path, .columns = columns},
