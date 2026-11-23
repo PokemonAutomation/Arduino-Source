@@ -906,8 +906,10 @@ const Milliseconds CORTONDO_THROUGH_TOWN_DURATION = 3000ms;
 const Milliseconds CORTONDO_JUMP_STRETCH_DURATION = 6000ms;
 const Milliseconds CORTONDO_JUMP_INTERVAL = 1000ms;
 // Map cursor nudge from the Olive Roll field to the Cortondo (West) Pokemon Center, at the default map zoom.
-const JoystickPosition OLIVE_FIELD_TO_CORTONDO_MAP_DIRECTION{-0.4, -1};
-const Milliseconds OLIVE_FIELD_TO_CORTONDO_MAP_DURATION = 320ms;
+// On the map the Pokemon Center is up and to the left of the field: about 185 px left and 140 px up
+// at 1080p. The cursor moves about 0.5 px/ms at full tilt.
+const JoystickPosition OLIVE_FIELD_TO_CORTONDO_MAP_DIRECTION{-0.8, +0.6};
+const Milliseconds OLIVE_FIELD_TO_CORTONDO_MAP_DURATION = 460ms;
 
 void ride_from_cortondo_to_olive_field(VideoStream& stream, ProControllerContext& context){
     stream.log("Ride from Cortondo (West) Pokemon Center to the Olive Roll field.");
