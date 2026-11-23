@@ -101,6 +101,26 @@ void hatch_eggs_at_area_three_lighthouse(
     std::function<void(uint8_t)> egg_hatched_callback = nullptr
 );
 
+// Start at the Cortondo (West) Pokemon Center flying spot. Walk out of town to the grass by the tree and start a picnic.
+// Picnics are not allowed inside Cortondo or in the Olive Roll field, but they are allowed right outside town.
+void picnic_at_cortondo(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
+
+// From inside the Cortondo Olive Roll field, fly back to the Cortondo (West) Pokemon Center.
+void fly_to_cortondo_from_olive_field(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
+
+// Start at the Cortondo (West) Pokemon Center flying spot. Ride through town, jump the wall and the fence into the
+// Olive Roll field north of town, and go in circles there to hatch eggs. Wild Pokemon do not spawn inside the field.
+// `egg_hatched_callback` will be called after each egg hatched, with egg index (0-indexed)
+void hatch_eggs_at_cortondo_olive_field(
+    ProgramEnvironment& env,
+    VideoStream& stream, ProControllerContext& context,
+    EventNotificationOption* attacked_notification,
+    const SinglesAIOption* battle_ai,
+    std::atomic<uint64_t>* attacked,
+    uint8_t num_eggs_in_party,
+    std::function<void(uint8_t)> egg_hatched_callback = nullptr
+);
+
 // From overworld, go in circles to hatch eggs.
 // `egg_hatched_callback` will be called after each egg hatched, with egg index (0-indexed)
 // `already_on_ride`: whether the player character is on ride when starting the function.

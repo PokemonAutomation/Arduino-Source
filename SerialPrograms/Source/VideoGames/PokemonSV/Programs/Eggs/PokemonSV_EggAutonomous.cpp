@@ -104,7 +104,8 @@ EggAutonomous::EggAutonomous()
         "<b>Location:</b><br>The location to hatch eggs.",
         {
             {EggAutoLocation::ZeroGate,         "zero-gate",        "Zero Gate"},
-            {EggAutoLocation::NorthLighthouse,  "north-lighthouse", "North Province (Area Three) Lighthouse"}
+            {EggAutoLocation::NorthLighthouse,  "north-lighthouse", "North Province (Area Three) Lighthouse"},
+            {EggAutoLocation::CortondoOliveField, "cortondo-olive-field", "Cortondo Olive Roll Field (start at Cortondo (West) " + STRING_POKEMON + " Center)"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         EggAutoLocation::ZeroGate
@@ -351,6 +352,8 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
 
     if (LOCATION == EggAutoLocation::ZeroGate){
         picnic_at_zero_gate(env.program_info(), env.console, context);
+    }else if (LOCATION == EggAutoLocation::CortondoOliveField){
+        picnic_at_cortondo(env.program_info(), env.console, context);
     }else{
         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
         picnic_from_overworld(env.program_info(), env.console, context);
@@ -482,6 +485,18 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         };
         if (LOCATION == EggAutoLocation::ZeroGate){
             hatch_eggs_at_zero_gate(
+                env,
+                env.console,
+                context,
+                &NOTIFICATION_ERROR_RECOVERABLE,
+                &BATTLE_AI,
+                &stats.m_attacked,
+                (uint8_t)num_eggs_in_party,
+                hatched_callback
+            );
+            reset_position_to_flying_spot(env, context);
+        }else if (LOCATION == EggAutoLocation::CortondoOliveField){
+            hatch_eggs_at_cortondo_olive_field(
                 env,
                 env.console,
                 context,
@@ -716,6 +731,10 @@ bool EggAutonomous::move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, Pr
 
 void EggAutonomous::reset_position_to_flying_spot(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // Use map to fly back to the flying spot
+    if (LOCATION == EggAutoLocation::CortondoOliveField){
+        fly_to_cortondo_from_olive_field(env.program_info(), env.console, context);
+        return;
+    }
     open_map_from_overworld(env.program_info(), env.console, context);
     if (LOCATION == EggAutoLocation::ZeroGate){
         pbf_move_left_joystick(context, {0, -0.252}, 160ms, 400ms);

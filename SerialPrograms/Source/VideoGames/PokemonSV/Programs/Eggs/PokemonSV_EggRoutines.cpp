@@ -891,6 +891,127 @@ void hatch_eggs_at_area_three_lighthouse(
     } // end hatching each egg
 }
 
+namespace{
+
+// Cortondo route timings. Directions are relative to the camera after pressing L at the
+// Cortondo (West) Pokemon Center, where the camera faces away from the Pokemon Center counter.
+// First draft from video of the route: tune these on hardware.
+const JoystickPosition CORTONDO_TO_PICNIC_DIRECTION{+0.3, +1};
+const Milliseconds CORTONDO_TO_PICNIC_DURATION = 4000ms;
+// Turn so the counter is on your left, then ride north through town.
+const JoystickPosition CORTONDO_TO_TOWN_TURN{+1, 0};
+const Milliseconds CORTONDO_THROUGH_TOWN_DURATION = 3000ms;
+// Last stretch over the yard wall and the field fence. Jump repeatedly so the wall and the fence
+// get cleared whenever we reach them.
+const Milliseconds CORTONDO_JUMP_STRETCH_DURATION = 6000ms;
+const Milliseconds CORTONDO_JUMP_INTERVAL = 1000ms;
+// Map cursor nudge from the Olive Roll field to the Cortondo (West) Pokemon Center, at the default map zoom.
+const JoystickPosition OLIVE_FIELD_TO_CORTONDO_MAP_DIRECTION{-0.4, -1};
+const Milliseconds OLIVE_FIELD_TO_CORTONDO_MAP_DURATION = 320ms;
+
+void ride_from_cortondo_to_olive_field(VideoStream& stream, ProControllerContext& context){
+    stream.log("Ride from Cortondo (West) Pokemon Center to the Olive Roll field.");
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
+    // Get on your ride
+    pbf_press_button(context, BUTTON_PLUS, 400ms, 800ms);
+    pbf_move_left_joystick(context, CORTONDO_TO_TOWN_TURN, 400ms, 400ms);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
+    pbf_move_left_joystick(context, {0, +1}, CORTONDO_THROUGH_TOWN_DURATION, 0ms);
+
+    stream.log("Jump the yard wall and the Olive Roll field fence.");
+    ssf_press_left_joystick(context, {0, +1}, 0ms, CORTONDO_JUMP_STRETCH_DURATION);
+    for (Milliseconds t = 0ms; t < CORTONDO_JUMP_STRETCH_DURATION; t += CORTONDO_JUMP_INTERVAL){
+        ssf_press_button(context, BUTTON_B, CORTONDO_JUMP_INTERVAL, 160ms);
+    }
+    context.wait_for_all_requests();
+}
+
+}
+
+void picnic_at_cortondo(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+    stream.log("Walk out of Cortondo to start a picnic.");
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
+    pbf_move_left_joystick(context, CORTONDO_TO_PICNIC_DIRECTION, CORTONDO_TO_PICNIC_DURATION, 400ms);
+    picnic_from_overworld(info, stream, context);
+}
+
+void fly_to_cortondo_from_olive_field(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+    stream.log("Fly back to Cortondo (West) Pokemon Center.");
+    open_map_from_overworld(info, stream, context);
+    pbf_move_left_joystick(context, OLIVE_FIELD_TO_CORTONDO_MAP_DIRECTION, OLIVE_FIELD_TO_CORTONDO_MAP_DURATION, 400ms);
+    fly_to_overworld_from_map(info, stream, context);
+}
+
+void hatch_eggs_at_cortondo_olive_field(
+    ProgramEnvironment& env,
+    VideoStream& stream, ProControllerContext& context,
+    EventNotificationOption* attacked_notification,
+    const SinglesAIOption* battle_ai,
+    std::atomic<uint64_t>* attacked,
+    uint8_t num_eggs_in_party,
+    std::function<void(uint8_t)> egg_hatched_callback)
+{
+    bool in_field = false;
+    for (uint8_t egg_idx = 0; egg_idx < num_eggs_in_party; egg_idx++){
+        stream.log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party) + ".");
+        stream.overlay().add_log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party), COLOR_BLUE);
+
+        context.wait_for_all_requests();
+
+        if (in_field == false){
+            AdvanceDialogWatcher dialog(COLOR_RED);
+            int ret = run_until<ProControllerContext>(
+                stream, context,
+                [&](ProControllerContext& context){
+                    ride_from_cortondo_to_olive_field(stream, context);
+                },
+                {dialog}
+            );
+            if (ret == 0){
+                // An egg hatched on the way. The route was interrupted, so start it again from the Pokemon Center.
+                handle_egg_hatching(
+                    env.program_info(),
+                    stream,
+                    context,
+                    num_eggs_in_party,
+                    egg_idx,
+                    egg_hatched_callback
+                );
+                fly_to_cortondo_from_olive_field(env.program_info(), stream, context);
+                continue;
+            }
+
+            in_field = true;
+            stream.log("Reached the Olive Roll field.");
+        }
+
+        // Orient camera to look at same direction as player character.
+        pbf_press_button(context, BUTTON_L, 400ms, 320ms);
+
+        // Circular motions:
+        while (do_egg_cycle_motion(
+            env,
+            stream,
+            context,
+            attacked_notification,
+            battle_ai,
+            attacked
+        )){
+            fly_to_cortondo_from_olive_field(env.program_info(), stream, context);
+            ride_from_cortondo_to_olive_field(stream, context);
+        }
+
+        handle_egg_hatching(
+            env.program_info(),
+            stream,
+            context,
+            num_eggs_in_party,
+            egg_idx,
+            egg_hatched_callback
+        );
+    } // end hatching each egg
+}
+
 void hatch_eggs_anywhere(
     ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context,
