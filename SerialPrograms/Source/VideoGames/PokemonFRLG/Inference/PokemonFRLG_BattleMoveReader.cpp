@@ -125,40 +125,81 @@ std::string BattleMoveReader::read_own_name_text(Logger& logger, const ImageView
     return text;
 }
 
+namespace{
+
+bool is_dark(uint32_t pixel){
+    return ((pixel >> 16) & 0xff) <= 130 && ((pixel >> 8) & 0xff) <= 130 && (pixel & 0xff) <= 130;
+}
+
+}
+
 int BattleMoveReader::read_own_level(Logger& logger, const ImageViewRGB32& frame) const{
     //  The HP box shows a level label and then the level, right aligned: the
-    //  last digit always ends at GBA x = 219, and each digit is 5 pixels left
-    //  of the next. The label depends on the language ("Lv" in English, "N."
-    //  in French, ...) and sits right before the first digit, so it isn't
-    //  read: the digits are read with the stat digit templates from the
-    //  areas that 3, 2 and 1 digits would cover, and only a number of that
-    //  many digits is accepted. (In the area of more digits than the level
-    //  has, the label is read as a digit or not at all.)
-    //
-    //  The box is drawn 1 pixel lower on some frames, so the areas are 2 rows
-    //  taller than the digits.
+    //  last digit always ends at GBA x = 219, and each digit is 4 pixels wide
+    //  and 5 pixels left of the next. The label depends on the language ("Lv"
+    //  in English, "N." in French, ...) and sits right before the first digit,
+    //  so it isn't read. A level has k digits if the k-th cell from the right
+    //  looks like a digit: it has a pixel in the text's top row (the "v" of
+    //  "Lv" doesn't), and the gap column left of it is empty (the "N" of "N."
+    //  isn't). Then those k cells are read with the stat digit templates.
     ImageViewRGB32 game_screen = extract_box_reference(frame, GameSettings::instance().GAME_BOX);
-    auto read_digits = [&](int digits){
-        const double left = 216 - 5 * (digits - 1) - 1;
-        const ImageFloatBox box(left / 240, 77.0 / 160, (222 - left) / 240, 12.0 / 160);
-        return read_digits_waterfill_template(
-            logger, extract_box_reference(game_screen, box), DigitTemplateType::StatBox
-        );
+    if (game_screen.width() == 0 || game_screen.height() == 0){
+        return -1;
+    }
+    auto dark = [&](int x, int y){
+        size_t px = (size_t)((x + 0.5) * (double)game_screen.width() / 240);
+        size_t py = (size_t)((y + 0.5) * (double)game_screen.height() / 160);
+        return is_dark(game_screen.pixel(px, py));
     };
 
-    int level = read_digits(3);
-    if (level != 100){
-        level = read_digits(2);
-        if (level < 10 || level > 99){
-            level = read_digits(1);
-            if (level < 1 || level > 9){
-                level = -1;
+    //  The text's top row, from the last digit. The box is drawn 1 pixel lower
+    //  on some frames, so look from row 77 to 88.
+    const int LAST_DIGIT_LEFT = 216;
+    const int TEXT_HEIGHT = 7;
+    int top = -1;
+    for (int y = 77; y < 89 - TEXT_HEIGHT + 1 && top < 0; y++){
+        for (int x = LAST_DIGIT_LEFT; x < LAST_DIGIT_LEFT + 4; x++){
+            if (dark(x, y)){
+                top = y;
+                break;
             }
         }
     }
+    if (top < 0){
+        logger.log("Could not find the battling Pokemon's level.", COLOR_ORANGE);
+        return -1;
+    }
+    auto looks_like_digit_cell = [&](int k){
+        int left = LAST_DIGIT_LEFT - 5 * (k - 1);
+        bool top_row = false;
+        for (int x = left; x < left + 4; x++){
+            top_row |= dark(x, top);
+        }
+        bool gap_empty = true;
+        for (int y = top; y < top + TEXT_HEIGHT; y++){
+            gap_empty &= !dark(left - 1, y);
+        }
+        return top_row && gap_empty;
+    };
 
-    if (level < 0){
-        logger.log("Could not read the battling Pokemon's level.", COLOR_ORANGE);
+    int digits = 1;
+    while (digits < 3 && looks_like_digit_cell(digits + 1)){
+        digits++;
+    }
+    const double left = LAST_DIGIT_LEFT - 5 * (digits - 1) - 1;
+    const ImageFloatBox box(left / 240, (top - 1) / 160.0, (222 - left) / 240, (TEXT_HEIGHT + 2) / 160.0);
+    int level = read_digits_waterfill_template(
+        logger, extract_box_reference(game_screen, box), DigitTemplateType::StatBox
+    );
+
+    const int MIN_LEVEL[4] = {0, 1, 10, 100};
+    const int MAX_LEVEL[4] = {0, 9, 99, 100};
+    if (level < MIN_LEVEL[digits] || level > MAX_LEVEL[digits]){
+        logger.log(
+            "Could not read the battling Pokemon's level (" + std::to_string(digits) +
+            " digits, read " + std::to_string(level) + ").",
+            COLOR_ORANGE
+        );
         if (GlobalSettings::instance().SAVE_DEBUG_IMAGES){
             extract_box_reference(game_screen, m_own_level_box).save("DebugDumps/own_level_box.png");
         }
