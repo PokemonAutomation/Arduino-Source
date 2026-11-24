@@ -62,6 +62,7 @@ struct EggAutonomous_Descriptor::Stats : public StatsTracker{
         , m_kept(m_stats["Kept"])
         , m_attacked(m_stats["Attacked"])
         , m_errors(m_stats["Errors"])
+        , m_hatch_time_ms(m_stats["Hatch Time (ms)"])
     {
         m_display_order.emplace_back("Sandwiches");
         m_display_order.emplace_back("Fetches", ALWAYS_HIDDEN);
@@ -71,9 +72,17 @@ struct EggAutonomous_Descriptor::Stats : public StatsTracker{
         m_display_order.emplace_back("Kept");
         m_display_order.emplace_back("Attacked", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Hatch Time (ms)", ALWAYS_HIDDEN);
 
         m_aliases.emplace(STRING_POKEMON + " Kept", "Kept");
         m_aliases.emplace(STRING_POKEMON + "Fetch Attempts", "Fetches");
+    }
+    virtual std::string to_str(PrintMode mode) const override{
+        std::string str = StatsTracker::to_str(mode);
+        if (mode == DISPLAY_ON_SCREEN){
+            str += avg_time_per_egg_text(m_hatch_time_ms.load(), m_hatched.load());
+        }
+        return str;
     }
 
     std::atomic<uint64_t>& m_sandwiches;
@@ -84,6 +93,7 @@ struct EggAutonomous_Descriptor::Stats : public StatsTracker{
     std::atomic<uint64_t>& m_kept;
     std::atomic<uint64_t>& m_attacked;
     std::atomic<uint64_t>& m_errors;
+    std::atomic<uint64_t>& m_hatch_time_ms;
 };
 std::unique_ptr<StatsTracker> EggAutonomous_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -105,7 +115,7 @@ EggAutonomous::EggAutonomous()
         {
             {EggAutoLocation::ZeroGate,         "zero-gate",        "Zero Gate"},
             {EggAutoLocation::NorthLighthouse,  "north-lighthouse", "North Province (Area Three) Lighthouse"},
-            {EggAutoLocation::CortondoWest,     "cortondo-west",    "Cortondo (West) Pokemon Center - tree picnic"}
+            {EggAutoLocation::CortondoOliveField, "cortondo-olive-field", "Cortondo Olive Roll Field (start at Cortondo (West) " + STRING_POKEMON + " Center)"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         EggAutoLocation::ZeroGate
@@ -220,6 +230,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 
     //  Connect the controller.
     require_player(env.console, context, BUTTON_L);
+    m_last_hatch_time = std::chrono::steady_clock::now();
 
     {
         // reset_position_to_flying_spot(env, context);
@@ -352,8 +363,8 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
 
     if (LOCATION == EggAutoLocation::ZeroGate){
         picnic_at_zero_gate(env.program_info(), env.console, context);
-    }else if (LOCATION == EggAutoLocation::CortondoWest){
-        picnic_at_cortondo_west(env.program_info(), env.console, context);
+    }else if (LOCATION == EggAutoLocation::CortondoOliveField){
+        picnic_at_cortondo(env.program_info(), env.console, context);
     }else{
         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
         picnic_from_overworld(env.program_info(), env.console, context);
@@ -376,14 +387,14 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
 
     const size_t max_eggs = HAS_CLONE_RIDE_POKEMON ? 24 : 30;
     size_t num_eggs_collected = 0;
-    const size_t basket_wait_seconds = (EGG_SANDWICH.EGG_SANDWICH_TYPE == EggSandwichType::GREAT_PEANUT_BUTTER ? 180 : 120);
+    const size_t basket_wait_seconds = egg_basket_wait_seconds(EGG_SANDWICH.EGG_SANDWICH_TYPE);
     collect_eggs_after_sandwich(env.program_info(), env.console, context, basket_wait_seconds, max_eggs,
         num_eggs_collected, basket_check_callback);
 
     leave_picnic(env.program_info(), env.console, context);
 
     // Reset position to flying spot:
-    if (LOCATION == EggAutoLocation::ZeroGate || LOCATION == EggAutoLocation::CortondoWest){
+    if (LOCATION == EggAutoLocation::ZeroGate){
         reset_position_to_flying_spot(env, context);
     }else{
         //Lighthouse: We haven't moved much so just fly.
@@ -480,6 +491,7 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         save_game_if_needed();
 
         auto hatched_callback = [&](uint8_t){
+            add_hatch_time(m_last_hatch_time, stats.m_hatch_time_ms);
             stats.m_hatched++;
             env.update_stats();
         };
@@ -495,8 +507,8 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
                 hatched_callback
             );
             reset_position_to_flying_spot(env, context);
-        }else if (LOCATION == EggAutoLocation::CortondoWest){
-            hatch_eggs_at_cortondo_west(
+        }else if (LOCATION == EggAutoLocation::CortondoOliveField){
+            hatch_eggs_at_cortondo_olive_field(
                 env,
                 env.console,
                 context,
@@ -731,11 +743,13 @@ bool EggAutonomous::move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, Pr
 
 void EggAutonomous::reset_position_to_flying_spot(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // Use map to fly back to the flying spot
+    if (LOCATION == EggAutoLocation::CortondoOliveField){
+        fly_to_cortondo_from_olive_field(env.program_info(), env.console, context);
+        return;
+    }
     open_map_from_overworld(env.program_info(), env.console, context);
     if (LOCATION == EggAutoLocation::ZeroGate){
         pbf_move_left_joystick(context, {0, -0.252}, 160ms, 400ms);
-    }else if (LOCATION == EggAutoLocation::CortondoWest){
-        cortondo_west_map_cursor_to_pokecenter(context);
     }else{ //lighthouse
         pbf_move_left_joystick(context, {+0.016, +1}, 150ms, 50ms);
         pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);

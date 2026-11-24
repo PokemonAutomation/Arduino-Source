@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_EggAutonomous_H
 #define PokemonAutomation_PokemonSV_EggAutonomous_H
 
+#include <chrono>
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
@@ -83,7 +84,7 @@ private:
     enum class EggAutoLocation{
         ZeroGate,
         NorthLighthouse,
-        CortondoWest,
+        CortondoOliveField,
     };
     EnumDropdownOption<EggAutoLocation> LOCATION;
 
@@ -131,6 +132,10 @@ private:
     // When we find a pokemon to keep, we don't want the game to be reset if we haven't placed a save to protect the
     // kept the pokemon. This flag is used to signal when we are in this "don't reset" stage.
     bool m_in_critical_to_save_stage = false;
+
+    // When the last egg hatched (or the program started). Used for average time per egg,
+    // which includes the picnic, sandwich and egg collecting time.
+    std::chrono::steady_clock::time_point m_last_hatch_time;
 };
 
 void change_settings_egg_program(SingleSwitchProgramEnvironment& env, ProControllerContext& context,  Language language);

@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_EggHatcher_H
 #define PokemonAutomation_PokemonSV_EggHatcher_H
 
+#include <chrono>
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
@@ -45,6 +46,9 @@ private:
     // Repeat for all six columns of a box
     void hatch_one_box(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
+    // In box system after hatching a column, check each hatchling in party and release it if it's not shiny.
+    void release_non_shiny_hatchlings(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t num_hatched);
+
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
@@ -62,8 +66,13 @@ private:
 
     BooleanCheckBoxOption HAS_CLONE_RIDE_POKEMON;
 
+    BooleanCheckBoxOption RELEASE_NON_SHINY;
+
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
+
+    // When the last egg hatched (or the program started). Used for average time per egg.
+    std::chrono::steady_clock::time_point m_last_hatch_time;
 };
 
 
