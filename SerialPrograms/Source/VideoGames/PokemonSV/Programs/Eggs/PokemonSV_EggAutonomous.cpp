@@ -105,7 +105,7 @@ EggAutonomous::EggAutonomous()
         {
             {EggAutoLocation::ZeroGate,         "zero-gate",        "Zero Gate"},
             {EggAutoLocation::NorthLighthouse,  "north-lighthouse", "North Province (Area Three) Lighthouse"},
-            {EggAutoLocation::CortondoOliveField, "cortondo-olive-field", "Cortondo Olive Roll Field (start at Cortondo (West) " + STRING_POKEMON + " Center)"},
+            {EggAutoLocation::CortondoWest,     "cortondo-west",    "Cortondo (West) Pokemon Center - tree picnic"}
         },
         LockMode::LOCK_WHILE_RUNNING,
         EggAutoLocation::ZeroGate
@@ -352,8 +352,8 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
 
     if (LOCATION == EggAutoLocation::ZeroGate){
         picnic_at_zero_gate(env.program_info(), env.console, context);
-    }else if (LOCATION == EggAutoLocation::CortondoOliveField){
-        picnic_at_cortondo(env.program_info(), env.console, context);
+    }else if (LOCATION == EggAutoLocation::CortondoWest){
+        picnic_at_cortondo_west(env.program_info(), env.console, context);
     }else{
         pbf_press_button(context, BUTTON_L, 400ms, 320ms);
         picnic_from_overworld(env.program_info(), env.console, context);
@@ -376,14 +376,14 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
 
     const size_t max_eggs = HAS_CLONE_RIDE_POKEMON ? 24 : 30;
     size_t num_eggs_collected = 0;
-    const size_t basket_wait_seconds = egg_basket_wait_seconds(EGG_SANDWICH.EGG_SANDWICH_TYPE);
+    const size_t basket_wait_seconds = (EGG_SANDWICH.EGG_SANDWICH_TYPE == EggSandwichType::GREAT_PEANUT_BUTTER ? 180 : 120);
     collect_eggs_after_sandwich(env.program_info(), env.console, context, basket_wait_seconds, max_eggs,
         num_eggs_collected, basket_check_callback);
 
     leave_picnic(env.program_info(), env.console, context);
 
     // Reset position to flying spot:
-    if (LOCATION == EggAutoLocation::ZeroGate){
+    if (LOCATION == EggAutoLocation::ZeroGate || LOCATION == EggAutoLocation::CortondoWest){
         reset_position_to_flying_spot(env, context);
     }else{
         //Lighthouse: We haven't moved much so just fly.
@@ -495,8 +495,8 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
                 hatched_callback
             );
             reset_position_to_flying_spot(env, context);
-        }else if (LOCATION == EggAutoLocation::CortondoOliveField){
-            hatch_eggs_at_cortondo_olive_field(
+        }else if (LOCATION == EggAutoLocation::CortondoWest){
+            hatch_eggs_at_cortondo_west(
                 env,
                 env.console,
                 context,
@@ -731,13 +731,11 @@ bool EggAutonomous::move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, Pr
 
 void EggAutonomous::reset_position_to_flying_spot(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // Use map to fly back to the flying spot
-    if (LOCATION == EggAutoLocation::CortondoOliveField){
-        fly_to_cortondo_from_olive_field(env.program_info(), env.console, context);
-        return;
-    }
     open_map_from_overworld(env.program_info(), env.console, context);
     if (LOCATION == EggAutoLocation::ZeroGate){
         pbf_move_left_joystick(context, {0, -0.252}, 160ms, 400ms);
+    }else if (LOCATION == EggAutoLocation::CortondoWest){
+        cortondo_west_map_cursor_to_pokecenter(context);
     }else{ //lighthouse
         pbf_move_left_joystick(context, {+0.016, +1}, 150ms, 50ms);
         pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);

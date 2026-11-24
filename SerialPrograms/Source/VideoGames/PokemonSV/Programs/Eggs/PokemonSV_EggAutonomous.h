@@ -83,7 +83,7 @@ private:
     enum class EggAutoLocation{
         ZeroGate,
         NorthLighthouse,
-        CortondoOliveField,
+        CortondoWest,
     };
     EnumDropdownOption<EggAutoLocation> LOCATION;
 
