@@ -593,11 +593,21 @@ public:
 };
 
 
-//  While the client is still sending, the peer sends a short response and
-//  closes the connection: the response written before the close must still
-//  reach the client, and the client's in-flight send must be able to stop
-//  (the pre-close response is lost on Windows if the peer's close resets
-//  the connection instead of flushing).
+//  While the client is still sending, the peer sends a short response
+//  ("bye") and closes the connection.
+//
+//  The contract asserted here is deliberately the weak one: when the peer
+//  closes, our in-flight send must stop promptly (with any byte count,
+//  including 0 or a partial send) and our close must complete promptly -
+//  nothing may hang. The kernel is free to reset the connection while the
+//  client is still sending (Linux resets on a close with unread data,
+//  macOS as soon as more data arrives after the close, Windows on a close
+//  with unread receive data), and a reset loses whatever the peer wrote
+//  before its close. So the delivery of that response is NOT asserted:
+//  the server-side drains that #1940 and #1963 added to keep it alive
+//  cannot be guaranteed on every platform in the first place (macOS).
+//  What IS asserted: promptness of the in-flight send and of the close,
+//  plus the integrity of any data that does arrive.
 template <typename ClientSocketType>
 class Test_Sockets_CloseWhilePeerSending : public TestClientSocket<ClientSocketType>{
 public:
@@ -668,8 +678,17 @@ public:
 
         std::string error;
         bool starved = false;
+        CapturingClientListener client_listener;
+        Waiter send_waiter;
+        std::atomic<bool> send_finished{false};
+        //  Far larger than the kernel buffers: most of it is still in
+        //  flight or waiting unread on the server when the server closes
+        //  the connection.
+        std::vector<uint8_t> payload(1u << 20, 0x5A);
+        AsyncTask send_task;
+        bool send_started = false;
+        auto close_start = std::chrono::steady_clock::now();
         {
-            CapturingClientListener client_listener;
             ClientSocketType client(this->m_thread_pool);
             client.add_listener(client_listener);
 
@@ -687,51 +706,79 @@ public:
             )){
                 error = "The server did not call on_connect";
             }else{
-                //  Far larger than kernel buffering: when the server
-                //  closes the connection, most of it is still sitting
-                //  unread in the server's receive queue - the case where
-                //  Windows resets the connection instead of closing it
-                //  cleanly.
-                constexpr size_t SIZE = 1u << 20;   //  1 MiB
-                std::vector<uint8_t> payload(SIZE, 0x5A);
-
-                //  Best effort: the server closes the connection while
-                //  this is in flight, so a short/partial send is
-                //  expected, not an error.
-                size_t sent = 0;
-                while (sent < SIZE){
-                    const size_t current = client.send(payload.data() + sent, SIZE - sent);
-                    if (current == 0){
-                        break;
+                //  The peer closes the connection while this is in
+                //  flight: the send must stop promptly (with any byte
+                //  count, including 0 or a partial send), so run it on a
+                //  pool task and bound it from the test thread.
+                send_started = true;
+                send_task = this->m_thread_pool.dispatch(
+                    [&client, &payload, &send_finished, &send_waiter]{
+                        const size_t size = payload.size();
+                        size_t sent = 0;
+                        while (sent < size){
+                            const size_t current =
+                                client.send(payload.data() + sent, size - sent);
+                            if (current == 0){
+                                break;
+                            }
+                            sent += current;
+                        }
+                        send_finished.store(true, std::memory_order_release);
+                        send_waiter.notify();
                     }
-                    sent += current;
-                }
-
-                //  The response written before the close must still
-                //  reach the client.
+                );
                 if (!starved_wait_for(
-                    client_listener.waiter,
+                    send_waiter,
                     starved,
-                    [&client_listener]{
-                        std::lock_guard<Mutex> lg(client_listener.lock);
-                        return client_listener.received.size() >= 3;
+                    [&send_finished]{
+                        return send_finished.load(std::memory_order_acquire);
                     }
                 )){
-                    error = "The client did not receive the pre-close response";
-                }else{
-                    std::array<uint8_t, 3> head{};
-                    {
-                        std::lock_guard<Mutex> lg(client_listener.lock);
-                        for (size_t i = 0; i < 3; i++){
-                            head[i] = client_listener.received[i];
-                        }
-                    }
-                    if (std::memcmp(head.data(), "bye", 3) != 0){
-                        error = "The client received the wrong pre-close response";
-                    }
+                    error = "The client's in-flight send did not stop promptly after the peer closed";
                 }
             }
             client.close();
+            close_start = std::chrono::steady_clock::now();
+        }
+
+        //  Destroying the client ran its blocking close_and_wait(): on a
+        //  healthy machine that finishes in milliseconds, even with the
+        //  peer mid-send.
+        if (error.empty()){
+            const long long close_ms =
+                std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::steady_clock::now() - close_start
+                ).count();
+            if (close_ms > 60000){
+                error = "The client's close did not finish promptly (" +
+                    std::to_string(close_ms) + " ms)";
+            }
+        }
+
+        //  The connection is gone, so whatever the peer wrote before its
+        //  close has either arrived or was lost to the kernel's reset -
+        //  both are acceptable. Only what actually arrived is checked,
+        //  for integrity.
+        if (error.empty()){
+            std::vector<uint8_t> received;
+            {
+                std::lock_guard<Mutex> lg(client_listener.lock);
+                received = client_listener.received;
+            }
+            if (!received.empty() &&
+                (received.size() != 3 ||
+                 std::memcmp(received.data(), "bye", 3) != 0)
+            ){
+                error = "The client received corrupt data from the peer (" +
+                    std::to_string(received.size()) + " bytes, expected \"bye\")";
+            }
+        }
+
+        //  Make sure the send task has finished, whatever the outcome:
+        //  destroying the client above cancelled the in-flight send, so
+        //  this cannot hang.
+        if (send_started){
+            send_task.wait_and_ignore_exceptions();
         }
 
         //  Stop the stall watchdog before reading it (its destructor
@@ -740,13 +787,12 @@ public:
 
         if (!error.empty()){
             //  A timeout can land on a machine that was healthy when the
-            //  test started and starved mid-test: the 60 s budget and the
-            //  drain's caps are wall-clock, so a starved peer's stream can
-            //  land just late enough that the close resets the connection
-            //  instead of closing it cleanly, and the response is lost.
-            //  That is the machine's fault, not the socket's - give up as
-            //  SKIPPED (the start-of-test guard only covers a machine
-            //  that was already starved).
+            //  test started and starved mid-test: the 60 s budgets above
+            //  are wall-clock, so on a starved machine a send or close
+            //  that would finish in milliseconds on a healthy one can
+            //  exceed them. That is the machine's fault, not the socket's
+            //  - give up as SKIPPED (the start-of-test guard only covers
+            //  a machine that was already starved).
             if (starved){
                 return UnitTestResult(
                     UnitTestResult::SKIPPED,
@@ -1404,7 +1450,7 @@ void add_client_socket_tests(UnitTestDatabase& database, ThreadPool& thread_pool
     const std::string prefix = "ClientSocket (" + std::string(backend_name) + ") - ";
 
     database.add<Test_Sockets_CloseWhilePeerSending<ClientSocketType>>(
-        thread_pool, prefix + "Closing while the peer is sending does not lose the response"
+        thread_pool, prefix + "Closing while the peer is sending stops the in-flight send promptly"
     );
     database.add<Test_Sockets_ClientSendTimeout<ClientSocketType>>(
         thread_pool, prefix + "Client send() timeout against a stalled peer"
