@@ -46,6 +46,21 @@ bool load_sprite_count(const std::string& filepath, std::map<std::string, int>& 
 // Each line is a slug.
 bool load_slug_list(const std::string& filepath, std::vector<std::string>& sprites);
 
+// Slug with a 2D relative coordinate on image.
+struct SlugWith2DCoordinate{
+    std::string slug;
+    double x = 0.;  // range: [0.0, 1.0)
+    double y = 0.;  // range: [0.0, 1.0)
+};
+
+// Load a list of slugs, each with an optional 2D point, from a text file.
+// Each line is "<slug>" or "<slug> <x> <y>", e.g. "psyduck" or "psyduck 0.6276 0.4426".
+// If a line has no coordinate, the corresponding returned `SlugWithPoint` has `x` and `y` assigned -1.0.
+// x and y are relative to the image size, from 0.0 to 1.0. See `SlugWithPoint`.
+// Return false if the file can't be opened.
+// Throws ParseException if format is broken.
+bool load_slug_list_with_2d_coordinates(const std::string& filepath, std::vector<SlugWith2DCoordinate>& slugs);
+
 
 // Implement the dummy interface of VideoFeed so that we can test
 // the video inference code that relies on a VideoFeed.
