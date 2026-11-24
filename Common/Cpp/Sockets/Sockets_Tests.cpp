@@ -593,11 +593,14 @@ public:
 };
 
 
-//  While the client is still sending, the peer sends a short response and
-//  closes the connection: the response written before the close must still
-//  reach the client, and the client's in-flight send must be able to stop
-//  (the pre-close response is lost on Windows if the peer's close resets
-//  the connection instead of flushing).
+//  The server sends a short response ("bye") and closes the connection
+//  while the client is still sending to it. The client must still get the
+//  "bye", and its send must stop instead of hanging.
+//  This fails if the server's close resets the connection: a Windows
+//  client throws away the data it has received but not read yet, and the
+//  Qt client closes its socket as soon as the reset fails one of its
+//  writes, before it reads the "bye". See `finish_socket_close()` in
+//  ServerSocket_POSIX.cpp.
 template <typename ClientSocketType>
 class Test_Sockets_CloseWhilePeerSending : public TestClientSocket<ClientSocketType>{
 public:
@@ -687,11 +690,10 @@ public:
             )){
                 error = "The server did not call on_connect";
             }else{
-                //  Far larger than kernel buffering: when the server
-                //  closes the connection, most of it is still sitting
-                //  unread in the server's receive queue - the case where
-                //  Windows resets the connection instead of closing it
-                //  cleanly.
+                //  Far more than the OS buffers: when the server closes
+                //  the connection, most of it is still on its way or
+                //  waiting unread on the server. That is when a plain
+                //  close resets the connection.
                 constexpr size_t SIZE = 1u << 20;   //  1 MiB
                 std::vector<uint8_t> payload(SIZE, 0x5A);
 

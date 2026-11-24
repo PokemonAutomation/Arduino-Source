@@ -86,15 +86,14 @@ private:
         m_open.store(false, std::memory_order_release);
     }
 
-    //  Takes ownership of the accepted socket, returning it, or -1 if
-    //  it has already been taken. The socket is handed off exactly
-    //  once - by close() (which then shuts it down, leaving the
-    //  transport to close it) or by the transport/accept-loop paths
-    //  (which close it straight away). This matters because the kernel
-    //  reuses closed fd numbers immediately: once the transport has
-    //  exited and closed its socket, a stale ::shutdown() or ::close()
-    //  on the same number would act on whatever connection now owns
-    //  it, not on this one.
+    //  Take ownership of the accepted socket and return it, or return -1
+    //  if it has already been taken. Whoever takes the socket closes it.
+    //  It is taken exactly once: by the connection thread when it exits,
+    //  or by the accept loop if the thread never started. `close()` never
+    //  takes it.
+    //  Why exactly once: the kernel reuses a closed fd number right away.
+    //  A second ::shutdown() or ::close() on the same number would hit
+    //  whatever connection got that number next.
     int take_fd(){
         return m_client.exchange(-1, std::memory_order_acq_rel);
     }

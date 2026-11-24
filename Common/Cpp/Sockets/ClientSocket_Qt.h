@@ -24,6 +24,22 @@ namespace PokemonAutomation{
 class ThreadPool;
 
 
+//  Known limitation: when the peer resets the connection, this client can
+//  lose data that has already arrived.
+//
+//  A reset is how the OS reports a broken connection. A peer usually
+//  causes one by closing the connection while we are still sending to it.
+//  Example: the peer sends "bye" and closes while we are in the middle of
+//  sending it 1 MiB.
+//  1. Qt hands its whole pending block to the OS in one write() call.
+//  2. The reset makes that call fail (EPIPE or ECONNRESET).
+//  3. Qt closes the socket right away, before it reads the "bye" that is
+//     already waiting. The "bye" is lost.
+//
+//  The POSIX client keeps its socket open for reading after a failed send,
+//  so it still gets the "bye". Our own servers close without a reset (see
+//  `finish_socket_close()` in ServerSocket_POSIX.cpp), so this only
+//  matters for other servers.
 class ClientSocket_Qt final : public QObject, public AbstractClientSocket{
     Q_OBJECT
 

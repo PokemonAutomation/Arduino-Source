@@ -91,6 +91,118 @@ size_t ServerSocketConnection_POSIX::send(
 
     return sent;
 }
+
+//  Step 2 of `finish_socket_close()` below: read and throw away whatever
+//  the peer still sends, so that nothing is left unread when we call
+//  ::close().
+//
+//  It stops at the first of these:
+//  - the peer closes its side, so nothing more will arrive;
+//  - nothing arrives for 50 ms (EMPTY_GRACE);
+//  - 1 MiB has been read, or 500 ms have passed.
+//  These are the same limits the WinSocket server uses. They keep a peer
+//  that never stops sending from holding up the close; that peer gets a
+//  reset in the end.
+//  The socket is non-blocking (the accept loop sets it up that way), so
+//  ::recv() returns right away when nothing has arrived.
+static void drain_receive_queue(int socket){
+    constexpr size_t DRAIN_CAP_BYTES = 1u << 20;
+    constexpr std::chrono::milliseconds DRAIN_DEADLINE{500};
+    //  How long the queue may stay empty before the close proceeds:
+    //  by then the peer's last data has had time to arrive.
+    constexpr std::chrono::milliseconds EMPTY_GRACE{50};
+
+    const auto deadline =
+        std::chrono::steady_clock::now() + DRAIN_DEADLINE;
+    //  "time_point::max()" means the queue has not been observed empty
+    //  yet.
+    auto empty_since = std::chrono::steady_clock::time_point::max();
+
+    char buffer[4096];
+    size_t drained = 0;
+    while (drained < DRAIN_CAP_BYTES
+        && std::chrono::steady_clock::now() < deadline
+    ){
+        const auto now = std::chrono::steady_clock::now();
+        const ssize_t bytes = ::recv(socket, buffer, sizeof(buffer), 0);
+        if (bytes > 0){
+            drained += (size_t)bytes;
+            empty_since = std::chrono::steady_clock::time_point::max();
+            continue;
+        }
+        if (bytes == 0){
+            //  The peer closed its side: nothing more will arrive.
+            break;
+        }
+        const int error_no = errno;
+        if (error_no == EINTR){
+            continue;
+        }
+        bool would_block = (error_no == EAGAIN);
+#if EAGAIN != EWOULDBLOCK
+        would_block = would_block || (error_no == EWOULDBLOCK);
+#endif
+        if (!would_block){
+            //  ECONNRESET or any other error: the connection is gone.
+            break;
+        }
+        //  Nothing queued right now; the peer may still be sending. Give
+        //  it the empty grace for its last data to arrive, then stop.
+        if (empty_since == std::chrono::steady_clock::time_point::max()){
+            empty_since = now;
+        }else if (now >= empty_since + EMPTY_GRACE){
+            break;
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+}
+
+//  Close a connection's socket. The connection thread calls this when it
+//  exits, for a socket it still owns.
+//  `app_close`: true if the close comes from our side (the application, or
+//  the server shutting down), false if the peer closed the connection.
+//
+//  Why not just call ::close():
+//  ::close() only lets go of the socket in our program. The OS keeps the
+//  connection around for a while, and the peer has not heard about the
+//  close yet, so it may keep sending. That data reaches our machine with
+//  nobody left to read it, and the OS answers with a reset, its way of
+//  saying "this connection is broken". Linux sends the reset at the
+//  moment of ::close() if unread data is already waiting. macOS sends it
+//  when the next piece of the peer's data arrives.
+//
+//  The reset can make the peer lose data we sent just before the close.
+//  Example: we send "bye" and close while the peer is sending us 1 MiB.
+//  A Windows peer throws away everything it has received but not read yet,
+//  including the "bye". The Qt client closes its socket as soon as the
+//  reset fails one of its writes, before it reads the "bye" (see
+//  ClientSocket_Qt.h).
+//
+//  So when we close, this closes in three steps (a "lingering close", as
+//  web servers do):
+//  1. ::shutdown(SHUT_WR) closes only our sending side. The peer reads
+//     everything we sent, then sees that no more data is coming. We can
+//     still read.
+//  2. `drain_receive_queue()` reads and throws away what the peer still
+//     sends, within a time and size limit.
+//  3. ::close(). Nothing is left unread, so the OS closes the connection
+//     cleanly.
+//  When the peer closed the connection, it is no longer sending, so a
+//  plain ::close() is enough.
+//
+//  Only the connection thread calls this. It is the only thread that reads
+//  the socket, so no other thread can be using the fd at the same time.
+//  The caller of `close()` never waits for the drain. The accept loop's
+//  housekeeping join and `close_and_wait()` wait at most for the drain's
+//  limits.
+static void finish_socket_close(int socket, bool app_close){
+    if (app_close){
+        ::shutdown(socket, SHUT_WR);
+        drain_receive_queue(socket);
+    }
+    ::close(socket);
+}
+
 void ServerSocketConnection_POSIX::close(){
     if (m_close_requested.exchange(true)){
         return;
@@ -108,9 +220,9 @@ void ServerSocketConnection_POSIX::close(){
     //  time it runs the transport may already have closed the fd, in
     //  which case the kernel may have handed that number to a different
     //  socket (a ::shutdown() here would clobber the other socket,
-    //  and a close() would leak the one this object owns). POSIX closes
-    //  cleanly even with data still queued, so the thread's plain close
-    //  is all this connection needs.
+    //  and a close() would leak the one this object owns). The thread
+    //  closes it with `finish_socket_close()`, which avoids a reset, so
+    //  the peer still gets everything we sent before the close.
 }
 void ServerSocketConnection_POSIX::start_thread(ThreadPool& thread_pool){
     m_thread = thread_pool.dispatch([this]{
@@ -126,9 +238,10 @@ void ServerSocketConnection_POSIX::thread_loop(){
         //  application via active_connection()): hand the state back and
         //  drop the socket; there is nothing to report.
         m_server->release_connection(this);
+        const bool app_close = m_close_requested.load(std::memory_order_relaxed);
         const int owned = take_fd();
         if (owned != -1){
-            ::close(owned);
+            finish_socket_close(owned, app_close);
         }
         return;
     }
@@ -184,15 +297,14 @@ void ServerSocketConnection_POSIX::thread_loop(){
     }
 
     //  Hand the state back to the server, then make the connection
-    //  inert. Either way, the object outlives the server. The socket is
-    //  only closed while this object still owns it: close() may have
-    //  already taken it (and shut it down), and no one else may.
+    //  inert. Either way, the object outlives the server. take_fd()
+    //  hands the socket off exactly once, so it is closed exactly once.
     m_server->release_connection(this);
     const bool app_close = m_close_requested.load(std::memory_order_relaxed);
     m_open.store(false, std::memory_order_release);
     const int owned = take_fd();
     if (owned != -1){
-        ::close(owned);
+        finish_socket_close(owned, app_close);
     }
     if (!app_close){
         m_server->report_disconnect(error);
