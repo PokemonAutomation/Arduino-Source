@@ -88,6 +88,22 @@ jobs:
           ref: 'master'
           path: 'Arduino-Source/Packages'
 
+      # The runner image lists Ubuntu's package mirrors in /etc/apt/apt-mirrors.txt, and apt
+      # downloads from the first one that works. Runners on Azure list azure.archive.ubuntu.com
+      # first, which sends our packages in seconds. Runners on AWS list
+      # us-east-2.ec2.archive.ubuntu.com first, which at times sends only 30-100 kB/s: the
+      # install then takes 25-50 minutes instead of 30 seconds. So put the Azure mirror first on
+      # every runner. The image's own backups, archive.ubuntu.com and then security.ubuntu.com,
+      # stay after it. This runs before Install Qt, because that step also installs packages
+      # with apt.
+      - name: Use the Azure apt mirror (Ubuntu)
+        if: startsWith(inputs.os, 'ubuntu')
+        run: |
+          if [[ -f /etc/apt/apt-mirrors.txt ]]; then
+            sudo sed -i -E 's#^http://[a-z0-9-]+\.ec2\.archive\.ubuntu\.com/#http://azure.archive.ubuntu.com/#' /etc/apt/apt-mirrors.txt
+            cat /etc/apt/apt-mirrors.txt
+          fi
+
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
@@ -97,14 +113,28 @@ jobs:
           modules: 'qtmultimedia qtserialport'
           cache: true
 
+      # Some azure.archive.ubuntu.com servers are slow at times too
+      # (https://github.com/actions/runner-images/issues/14823). apt moves on to the next mirror
+      # only when one stops sending data, not when it sends slowly. So download the packages
+      # first, with a time limit: from a good mirror that takes a few seconds. If the time runs
+      # out, take the Azure mirror off the list and download the rest from archive.ubuntu.com.
+      # apt keeps the files it already downloaded.
       - name: Install dependencies (Ubuntu)
         if: startsWith(inputs.os, 'ubuntu')
+        timeout-minutes: 15
         run: |
           cd Arduino-Source
-          sudo apt update
-          sudo apt install ccache clang-tools libopencv-dev libsystemd-dev libsdl3-dev
-
-          sudo apt install ./3rdPartyBinaries/libdpp-10.1.6-linux-x64.deb
+          PACKAGES=(ccache clang-tools libopencv-dev libsystemd-dev libsdl3-dev ./3rdPartyBinaries/libdpp-10.1.6-linux-x64.deb)
+          sudo apt-get update
+          if ! sudo timeout 3m apt-get install -y --download-only "${PACKAGES[@]}"; then
+            echo "::warning::Downloading the packages from the first apt mirror failed or took over 3 minutes. Trying the next mirror."
+            if [[ -f /etc/apt/apt-mirrors.txt ]]; then
+              sudo sed -i '/azure\.archive\.ubuntu\.com/d' /etc/apt/apt-mirrors.txt
+              cat /etc/apt/apt-mirrors.txt
+            fi
+            sudo apt-get install -y --download-only "${PACKAGES[@]}"
+          fi
+          sudo apt-get install -y "${PACKAGES[@]}"
 
       - name: Install dependencies (Mac)
         if: startsWith(inputs.os, 'mac')
