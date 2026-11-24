@@ -1013,17 +1013,19 @@ namespace {
 //  `targets`: the golden sprites, each with a 2D coordinate.
 //  Return a vector the size of `detected_boxes`: maps: detected box -> the matched index in `targets`,
 //  or SIZE_MAX if it matched none.
-std::vector<size_t> match_MMO_boxes_to_targets(
+std::vector<size_t> match_MMO_boxes_to_test_targets(
     size_t image_width, size_t image_height,
     const std::vector<ImagePixelBox>& detected_boxes,
     const std::vector<SlugWith2DCoordinate>& targets
 ){
     struct Candidate{
-        double distance_squared;
+        double dist_sqr;
         size_t box;
         size_t target;
     };
     std::vector<Candidate> candidates;
+    const double match_dist_threshold = std::min(image_width, image_height) / 10.0;
+    const double match_dist_sqr_threshold = match_dist_threshold * match_dist_threshold;
     for (size_t i = 0; i < detected_boxes.size(); i++){
         const ImagePixelBox& box = detected_boxes[i];
         const double box_x = (double)box.center_x();
@@ -1034,11 +1036,14 @@ std::vector<size_t> match_MMO_boxes_to_targets(
 
             const double dx = target_x - box_x;
             const double dy = target_y - box_y;
-            candidates.push_back({dx * dx + dy * dy, i, j});
+            const double d2 = dx * dx + dy * dy;
+            if (d2 <= match_dist_sqr_threshold){
+                candidates.push_back({d2, i, j});
+            }
         }
     }
     std::stable_sort(candidates.begin(), candidates.end(), [](const Candidate& a, const Candidate& b){
-        return a.distance_squared < b.distance_squared;
+        return a.dist_sqr < b.dist_sqr;
     });
 
     // Greedy matching based on the shortest distance
@@ -1136,6 +1141,23 @@ public:
         }
         const bool match_by_coordinates = num_coordinates > 0;
 
+        //  A slug can end with "?", e.g. "psyduck? 0.5307 0.6389". This means it is an optional target:
+        //  the question mark is partly covered by another map icon, like a satchel or a flag.
+        //  The detector may or may not find it. So the test should handle both cases.
+        std::vector<bool> target_is_optional(target_sprites.size(), false);
+        size_t num_optional_targets = 0;
+        for (size_t i = 0; i < target_sprites.size(); i++){
+            std::string& slug = target_sprites[i].slug;
+            if (slug.size() > 1 && slug.back() == '?'){
+                slug.pop_back();  // remove '?'
+                target_is_optional[i] = true;
+                num_optional_targets++;
+            }
+        }
+        if (num_optional_targets > 0 && !match_by_coordinates){
+            return "Error: an optional slug ending with \"?\" needs a coordinate, \"<slug>? <x> <y>\", in " + mmo_revealed_txt_path;
+        }
+
         auto point_to_str = [](double x, double y) -> std::string{
             std::ostringstream os;
             os << std::fixed << std::setprecision(4) << x << " " << y;
@@ -1173,7 +1195,7 @@ public:
         std::vector<size_t> matched_target_index;
         std::string target_sprite_match_error_msg;
         if (match_by_coordinates){
-            matched_target_index = match_MMO_boxes_to_targets(
+            matched_target_index = match_MMO_boxes_to_test_targets(
                 question_mark_image.width(), question_mark_image.height(),
                 quest_results, target_sprites
             );
@@ -1186,10 +1208,17 @@ public:
                 }
             }
             for (size_t t = 0; t < target_sprites.size(); t++){
-                if (!target_found[t]){
-                    target_sprite_match_error_msg += "Missed question mark of " + target_sprites[t].slug + " at " +
-                        point_to_str(target_sprites[t].x, target_sprites[t].y) + ". ";
+                if (target_found[t]){
+                    continue;
                 }
+                // target is not found:
+                if (target_is_optional[t]){
+                    cout << "Optional question mark of " << target_sprites[t].slug << " at " <<
+                        point_to_str(target_sprites[t].x, target_sprites[t].y) << " is not found." << endl;
+                    continue;
+                }
+                target_sprite_match_error_msg += "Missed question mark of " + target_sprites[t].slug + " at " +
+                    point_to_str(target_sprites[t].x, target_sprites[t].y) + ". ";
             }
             if (!target_sprite_match_error_msg.empty()){
                 cerr << "Error: " << target_sprite_match_error_msg << endl;
@@ -1248,9 +1277,9 @@ public:
             }
         }
 
-        if (success_count != target_sprites.size() || quest_results.size() != target_sprites.size()){
+        if (success_count != quest_results.size() || !target_sprite_match_error_msg.empty()){
             const std::string failure = target_sprite_match_error_msg +
-                "FAILURE: " + std::to_string(target_sprites.size() - success_count) + "/" + std::to_string(target_sprites.size());
+                "FAILURE: " + std::to_string(quest_results.size() - success_count) + "/" + std::to_string(quest_results.size());
             cout << failure << endl;
             return failure;
         }
