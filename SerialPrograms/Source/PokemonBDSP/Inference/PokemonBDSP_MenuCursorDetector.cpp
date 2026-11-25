@@ -168,9 +168,9 @@ void add_tests_MenuCursorDetector(UnitTestDatabase& database){
     database.add<Test_MenuCursorDetector>("PokemonBDSP/MenuDetector/Pokemon_6.png", P::POKEMON, 6);
     database.add<Test_MenuCursorDetector>("PokemonBDSP/MenuDetector/Capsules_8.png", P::CAPSULES, 8);
     database.add<Test_MenuCursorDetector>("PokemonBDSP/MenuDetector/Bag_6.png", P::BAG, 6);
-    database.add<Test_MenuCursorDetector>("PokemonBDSP/MenuDetector/TrainerCard_6_First.png", P::CARD, 6);
-    database.add<Test_MenuCursorDetector>("PokemonBDSP/MenuDetector/TrainerCard_6_Middle.png", P::CARD, 6);
-    database.add<Test_MenuCursorDetector>("PokemonBDSP/MenuDetector/TrainerCard_6_Last.png", P::CARD, 6);
+    database.add<Test_MenuCursorDetector>("PokemonBDSP/MenuDetector/TrainerCard_6_06.png", P::CARD, 6);
+    database.add<Test_MenuCursorDetector>("PokemonBDSP/MenuDetector/TrainerCard_6_08.png", P::CARD, 6);
+    database.add<Test_MenuCursorDetector>("PokemonBDSP/MenuDetector/TrainerCard_6_07.png", P::CARD, 6);
     database.add<Test_MenuCursorDetector>("PokemonBDSP/MenuDetector/Bag_6_01.png", P::BAG, 6);
     database.add<Test_MenuCursorDetector>("PokemonBDSP/MenuDetector/Bag_6_02.png", P::BAG, 6);
     database.add<Test_MenuCursorDetector>("PokemonBDSP/MenuDetector/Bag_6_03.png", P::BAG, 6);
