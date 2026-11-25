@@ -211,6 +211,7 @@ static const StringSelectDatabase& section_database(bool checkpoints, bool tutor
     static const StringSelectDatabase tutorial_segments = [] {
         StringSelectDatabase db;
         db.add_entry(StringSelectEntry("0", ALL_SEGMENTS()[0]->name()));
+        db.add_entry(StringSelectEntry("checkpoint-reselect", "Select again (saved selection unavailable)"));
         return db;
     }();
     static const StringSelectDatabase main_segments = [] {
@@ -218,6 +219,7 @@ static const StringSelectDatabase& section_database(bool checkpoints, bool tutor
         for (size_t i = 1; i < ALL_SEGMENTS().size(); i++){
             db.add_entry(StringSelectEntry(std::to_string(i), ALL_SEGMENTS()[i]->name()));
         }
+        db.add_entry(StringSelectEntry("checkpoint-reselect", "Select again (saved selection unavailable)"));
         return db;
     }();
     static const StringSelectDatabase tutorial_checkpoints = [] {
@@ -226,6 +228,7 @@ static const StringSelectDatabase& section_database(bool checkpoints, bool tutor
             const std::string name = ALL_CHECKPOINTS()[i]->name();
             db.add_entry(StringSelectEntry(name.substr(0, 5), name));
         }
+        db.add_entry(StringSelectEntry("checkpoint-reselect", "Select again (saved selection unavailable)"));
         return db;
     }();
     static const StringSelectDatabase main_checkpoints = [] {
@@ -239,7 +242,7 @@ static const StringSelectDatabase& section_database(bool checkpoints, bool tutor
                 db.add_entry(StringSelectEntry(std::to_string(legacy_index++), name));
             }
         }
-        db.add_entry(StringSelectEntry("checkpoint-reselect", "Select a revised checkpoint (old selection)"));
+        db.add_entry(StringSelectEntry("checkpoint-reselect", "Select again (saved selection unavailable)"));
         return db;
     }();
     return checkpoints ? (tutorial ? tutorial_checkpoints : main_checkpoints)
@@ -311,7 +314,8 @@ BDSPAutoStory::BDSPAutoStory()
         LockMode::LOCK_WHILE_RUNNING,
         false)
     , STORY_SECTION("<b>Story Section:</b>",
-        {{StorySection::TUTORIAL, "tutorial", "Tutorial"}, {StorySection::MAIN_STORY, "main-story", "Main Story"}},
+        {{StorySection::TUTORIAL, "tutorial", "Tutorial"}, {StorySection::MAIN_STORY, "main-story", "Main Story"},
+            {StorySection::RESELECT, "reselect", "Select story section again"}},
         LockMode::LOCK_WHILE_RUNNING,
         StorySection::TUTORIAL)
     , MAINSTORY_NOTE(
@@ -321,7 +325,7 @@ BDSPAutoStory::BDSPAutoStory()
         "Start at the position shown below; later segments require their own starting positions.")
     , ENABLE_ADVANCED_MODE("<b>Advanced mode:</b><br>"
         "Select individual start and end checkpoints instead of whole segments. Both selected checkpoints are included.",
-        LockMode::UNLOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         false)
     , START_CHECKPOINT_TUTORIAL("<b>Start Checkpoint:</b>",
         section_database(true, true),
@@ -329,7 +333,7 @@ BDSPAutoStory::BDSPAutoStory()
         "00.00")
     , END_CHECKPOINT_TUTORIAL("<b>End Checkpoint:</b>",
         section_database(true, true),
-        LockMode::UNLOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         "00.06")
 
     , START_DESCRIPTION_SEGMENT("<b>Start:</b><br>", "")
@@ -345,12 +349,12 @@ BDSPAutoStory::BDSPAutoStory()
 
     , END_CHECKPOINT_MAINSTORY("<b>End Checkpoint:</b>",
         section_database(true, false),
-        LockMode::UNLOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         "09.10")
 
     , START_SEGMENT("<b>Start Segment:</b>", section_database(false, true), LockMode::LOCK_WHILE_RUNNING, "0")
 
-    , END_SEGMENT("<b>End Segment:</b>", section_database(false, true), LockMode::UNLOCK_WHILE_RUNNING, "0")
+    , END_SEGMENT("<b>End Segment:</b>", section_database(false, true), LockMode::LOCK_WHILE_RUNNING, "0")
 
     , START_SEGMENT_MAINSTORY("<b>Start Segment:</b>",
         section_database(false, false),
@@ -417,7 +421,8 @@ BDSPAutoStory::BDSPAutoStory()
     PA_ADD_OPTION(STARTERCHOICE);
     PA_ADD_OPTION(STARTER_SHINY);
     PA_ADD_OPTION(CATCH_LEGENDARY);
-    PA_ADD_OPTION(HELP_MODE);
+    // Keep the dropdown disabled until the unassisted route is implemented.
+    // PA_ADD_OPTION(HELP_MODE);
 
     PA_ADD_OPTION(ENABLE_ADVANCED_MODE);
     PA_ADD_OPTION(DIAGNOSTIC_FAKE_CHECKPOINT_SAVE);
@@ -440,11 +445,21 @@ std::string BDSPAutoStory::check_validity() const {
     if (!error.empty()){
         return error;
     }
-    if (ENABLE_ADVANCED_MODE && STORY_SECTION == StorySection::MAIN_STORY &&
-        (START_CHECKPOINT_MAINSTORY.slug() == "checkpoint-reselect" ||
-            END_CHECKPOINT_MAINSTORY.slug() == "checkpoint-reselect")){
-        return "Checkpoints in Segments 04 through 09 have been consolidated. Select the revised start and end "
-            "checkpoints that match your in-game save before starting.";
+    if (STORY_SECTION == StorySection::RESELECT){
+        return "Select the story section and confirm Basic/Advanced mode before starting.";
+    }
+    const bool tutorial = STORY_SECTION == StorySection::TUTORIAL;
+    const StringSelectOption& start = ENABLE_ADVANCED_MODE
+        ? (tutorial ? START_CHECKPOINT_TUTORIAL : START_CHECKPOINT_MAINSTORY)
+        : (tutorial ? START_SEGMENT : START_SEGMENT_MAINSTORY);
+    const StringSelectOption& end = ENABLE_ADVANCED_MODE
+        ? (tutorial ? END_CHECKPOINT_TUTORIAL : END_CHECKPOINT_MAINSTORY)
+        : (tutorial ? END_SEGMENT : END_SEGMENT_MAINSTORY);
+    if (start.slug() == "checkpoint-reselect" || end.slug() == "checkpoint-reselect"){
+        return "A saved selection is unavailable or ambiguous. Select the start and end matching your in-game save.";
+    }
+    if (start.index() > end.index()){
+        return "Start must be at or before End in the selected story section.";
     }
     return {};
 }
@@ -461,6 +476,35 @@ void BDSPAutoStory::load_json(const JsonValue& json){
     if (!object){
         return;
     }
+    const char* range_keys[] = {
+        "START_SEGMENT", "END_SEGMENT", "START_SEGMENT_MAINSTORY", "END_SEGMENT_MAINSTORY",
+        "START_CHECKPOINT_TUTORIAL", "END_CHECKPOINT_TUTORIAL",
+        "START_CHECKPOINT_MAINSTORY", "END_CHECKPOINT_MAINSTORY",
+    };
+    StringSelectOption* ranges[] = {
+        &START_SEGMENT, &END_SEGMENT, &START_SEGMENT_MAINSTORY, &END_SEGMENT_MAINSTORY,
+        &START_CHECKPOINT_TUTORIAL, &END_CHECKPOINT_TUTORIAL,
+        &START_CHECKPOINT_MAINSTORY, &END_CHECKPOINT_MAINSTORY,
+    };
+    for (size_t i = 0; i < 8; i++){
+        if (!object->get_value(range_keys[i])){
+            continue; // Absent keys retain defaults (or the current selection).
+        }
+        const std::string* value = object->get_string(range_keys[i]);
+        if (!value || !ranges[i]->set_by_slug(*value).empty()){
+            ranges[i]->set_by_slug("checkpoint-reselect");
+        }
+    }
+    if (object->get_value("STORY_SECTION")){
+        const std::string* section = object->get_string("STORY_SECTION");
+        if (!section || (*section != "tutorial" && *section != "main-story")){
+            STORY_SECTION.set(StorySection::RESELECT);
+        }
+    }
+    bool advanced = false;
+    if (object->get_value("ENABLE_ADVANCED_MODE") && !object->read_boolean(advanced, "ENABLE_ADVANCED_MODE")){
+        STORY_SECTION.set(StorySection::RESELECT);
+    }
     const char* keys[] = {"START_CHECKPOINT_MAINSTORY", "END_CHECKPOINT_MAINSTORY"};
     StringSelectOption* selections[] = {&START_CHECKPOINT_MAINSTORY, &END_CHECKPOINT_MAINSTORY};
     for (size_t selection = 0; selection < 2; selection++){
@@ -469,6 +513,7 @@ void BDSPAutoStory::load_json(const JsonValue& json){
             continue;
         }
         if (object->get_integer_default("CHECKPOINT_NUMBERING_VERSION") < 2 && slug->starts_with("09.")){
+            selections[selection]->set_by_slug("checkpoint-reselect");
             // Before the split, 09.03 included both Victory Road and the waterfall.
             if (*slug == "09.03"){
                 selections[selection]->set_by_slug(selection == 0 ? "09.03" : "09.04");
@@ -536,6 +581,15 @@ void BDSPAutoStory::load_json(const JsonValue& json){
         START_CHECKPOINT_TUTORIAL.set_by_slug("00.05");
         END_CHECKPOINT_TUTORIAL.set_by_slug("00.06");
     }
+    int64_t numbering_version = 0;
+    if (object->get_value("CHECKPOINT_NUMBERING_VERSION") &&
+        (!object->read_integer(numbering_version, "CHECKPOINT_NUMBERING_VERSION") ||
+            numbering_version < 0 || numbering_version > 2)){
+        // Future or malformed numbering cannot be interpreted by this build.
+        for (size_t i = 4; i < 8; i++){
+            ranges[i]->set_by_slug("checkpoint-reselect");
+        }
+    }
     on_config_value_changed(nullptr);
 }
 
@@ -570,12 +624,12 @@ void BDSPAutoStory::on_config_value_changed(void*){
         size_t end = tutorial ? END_CHECKPOINT_TUTORIAL.index()
             : END_CHECKPOINT_MAINSTORY.index() + TUTORIAL_CHECKPOINT_COUNT;
 
-        if (start < checkpoints.size()){
+        if (start < (tutorial ? TUTORIAL_CHECKPOINT_COUNT : checkpoints.size())){
             START_DESCRIPTION_CHECKPOINT.set_text("Start: " + checkpoints[start]->start_text());
         }else{
             START_DESCRIPTION_CHECKPOINT.set_text("Select a revised checkpoint matching your in-game save.");
         }
-        if (end < checkpoints.size()){
+        if (end < (tutorial ? TUTORIAL_CHECKPOINT_COUNT : checkpoints.size())){
             END_DESCRIPTION_CHECKPOINT.set_text("End: " + checkpoints[end]->end_text());
         }else{
             END_DESCRIPTION_CHECKPOINT.set_text("Select a revised ending checkpoint.");
@@ -584,14 +638,18 @@ void BDSPAutoStory::on_config_value_changed(void*){
     }else{
         const auto& segments = ALL_SEGMENTS();
 
-        size_t start = std::stoul((tutorial ? START_SEGMENT : START_SEGMENT_MAINSTORY).slug());
-        size_t end = std::stoul((tutorial ? END_SEGMENT : END_SEGMENT_MAINSTORY).slug());
+        size_t start = (tutorial ? START_SEGMENT.index() : START_SEGMENT_MAINSTORY.index() + 1);
+        size_t end = (tutorial ? END_SEGMENT.index() : END_SEGMENT_MAINSTORY.index() + 1);
 
-        if (start < segments.size()){
+        if (start < (tutorial ? size_t(1) : segments.size())){
             START_DESCRIPTION_SEGMENT.set_text("Start: " + segments[start]->start_text());
+        }else{
+            START_DESCRIPTION_SEGMENT.set_text("Select a starting segment matching your in-game save.");
         }
-        if (end < segments.size()){
+        if (end < (tutorial ? size_t(1) : segments.size())){
             END_DESCRIPTION_SEGMENT.set_text("End: " + segments[end]->end_text());
+        }else{
+            END_DESCRIPTION_SEGMENT.set_text("Select an ending segment.");
         }
     }
 
@@ -611,7 +669,7 @@ void BDSPAutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     AutoStoryOptions options{static_cast<Language>(LANGUAGE),
         STARTERCHOICE,
         NOTIFICATION_STATUS_UPDATE,
-        (HelpMode)HELP_MODE,
+        HelpMode::OUTSIDE_HELP,
         OutsideHelpConfig{},
         DIAGNOSTIC_FAKE_CHECKPOINT_SAVE ? CheckpointSaveMode::FAKE : CheckpointSaveMode::REAL};
 
@@ -671,8 +729,8 @@ void BDSPAutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             }
 
         }else{
-            size_t start = std::stoul((tutorial ? START_SEGMENT : START_SEGMENT_MAINSTORY).slug());
-            size_t end = std::stoul((tutorial ? END_SEGMENT : END_SEGMENT_MAINSTORY).slug());
+            size_t start = (tutorial ? START_SEGMENT.index() : START_SEGMENT_MAINSTORY.index() + 1);
+            size_t end = (tutorial ? END_SEGMENT.index() : END_SEGMENT_MAINSTORY.index() + 1);
 
             for (size_t i = start; i <= end && i < segments.size() && !stats.hall_of_fame_save_verified; i++){
                 env.log("Running Segment: " + std::to_string(i));

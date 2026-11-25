@@ -434,6 +434,46 @@ void add_tests_MenuDetector(UnitTestDatabase& database){
     for (const MenuCase& test : CASES){
         database.add<Test_MenuDetector>(test);
     }
+    for (const char* image : {"Options_4.png", "Pokemon_6.png", "Capsules_8.png", "Bag_6.png",
+        "TrainerCard_6_First.png", "TrainerCard_6_Middle.png", "TrainerCard_6_Last.png", "SelectionAnimation.png"}){
+        const std::string path = std::string("PokemonBDSP/MenuDetector/") + image;
+        database.add<Test_MenuDetector>(MenuCase{.input = {.image = path}, .expectation = {.detected = true}});
+    }
+    for (const char* image : {
+        "Bag_6_01.png",
+        "Bag_6_02.png",
+        "Bag_6_03.png",
+        "Bag_6_04.png",
+        "Options_6_01.png",
+        "Options_6_02.png",
+        "Options_6_03.png",
+        "Options_6_04.png",
+        "Pokedex_6_01.png",
+        "Pokedex_6_02.png",
+        "Pokedex_6_03.png",
+        "Pokemon_6_01.png",
+        "Pokemon_6_02.png",
+        "Pokemon_6_03.png",
+        "Pokemon_6_04.png",
+        "TownMap_6_01.png",
+        "TownMap_6_02.png",
+        "TownMap_6_03.png",
+        "TownMap_6_04.png",
+        "TownMap_6_05.png",
+        "TrainerCard_6_01.png",
+        "TrainerCard_6_02.png",
+        "TrainerCard_6_03.png",
+        "TrainerCard_6_04.png",
+        "TrainerCard_6_05.png"
+    }){
+        const std::string path = std::string("PokemonBDSP/MenuDetector/") + image;
+        for (Columns columns : {Columns::FromTop, Columns::BelowNewTags}){
+            database.add<Test_MenuDetector>(MenuCase{
+                .input = {.image = path, .columns = columns},
+                .expectation = {.detected = true}
+            });
+        }
+    }
     database.add<Test_MenuDetector_Legacy>();
 }
 

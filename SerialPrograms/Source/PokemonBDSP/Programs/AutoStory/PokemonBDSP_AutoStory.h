@@ -22,7 +22,8 @@ namespace PokemonBDSP {
 
 enum class StorySection {
     TUTORIAL,
-    MAIN_STORY
+    MAIN_STORY,
+    RESELECT
 };
 
 class BDSPAutoStory_Descriptor : public SingleSwitchProgramDescriptor {

@@ -453,6 +453,143 @@ void handle_battle_with_outside_help(const ProgramInfo& /*info*/,
 //  ⚠️ Estimated player-side status badge region — calibrate against a real capture.
 static const ImageFloatBox PLAYER_STATUS_BOX{0.140, 0.710, 0.080, 0.018};
 
+HPReadConfirmation::HPReadConfirmation(WallClock start)
+    : m_deadline(start + 5s)
+    , m_last_timestamp(start)
+{}
+
+bool HPReadConfirmation::expired(WallClock now) const{
+    return now >= m_deadline;
+}
+
+bool HPReadConfirmation::accept_timestamp(WallClock timestamp){
+    if (timestamp <= m_last_timestamp){
+        return false;
+    }
+    m_last_timestamp = timestamp;
+    return true;
+}
+
+bool HPReadConfirmation::observe(const BattleHPReading& reading){
+    if (reading.current <= 0 || reading.maximum <= 0 || reading.current > reading.maximum){
+        m_reading = {};
+        m_count = 0;
+        return false;
+    }
+    m_count = reading == m_reading ? m_count + 1 : 1;
+    m_reading = reading;
+    return m_count >= 3;
+}
+
+BattleHPReading read_confirmed_hp(VideoStream& stream, ProControllerContext& context,
+    const std::function<BattleHPReading(const ImageViewRGB32&)>& reader,
+    VideoSnapshot* confirmed_frame){
+    context.wait_for_all_requests();
+    const WallClock start = current_time();
+    HPReadConfirmation confirmation(start);
+    size_t fresh = 0, duplicates = 0, invalid = 0;
+    if (confirmed_frame){
+        *confirmed_frame = {};
+    }
+    while (!confirmation.expired(current_time())){
+        context.throw_if_cancelled();
+        const auto frame = stream.video().snapshot();
+        if (!frame){
+            invalid++;
+            confirmation.observe({});
+        }else if (confirmation.accept_timestamp(frame.timestamp)){
+            fresh++;
+            const auto reading = reader(frame);
+            invalid += reading.current <= 0 || reading.maximum <= 0 || reading.current > reading.maximum;
+            const bool confirmed = confirmation.observe(reading);
+            context.throw_if_cancelled();
+            // OCR work also consumes the deadline; never accept a late result.
+            if (confirmation.expired(current_time())){
+                break;
+            }
+            if (confirmed){
+                if (confirmed_frame){
+                    *confirmed_frame = frame;
+                }
+                stream.log("[HP confirmation] " + std::to_string(reading.current) + "/" +
+                    std::to_string(reading.maximum) + "; fresh=" + std::to_string(fresh) +
+                    ", repeated/older=" + std::to_string(duplicates) + ", invalid=" + std::to_string(invalid));
+                return reading;
+            }
+        }else{
+            duplicates++;
+        }
+        pbf_wait(context, 100ms);
+        context.wait_for_all_requests();
+    }
+    stream.log("[HP confirmation] Timed out after 5s; fresh=" + std::to_string(fresh) +
+        ", repeated/older=" + std::to_string(duplicates) + ", invalid=" + std::to_string(invalid) +
+        ", agreeing=" + std::to_string(confirmation.count()));
+    return {};
+}
+
+BattleHPReading read_bag_hp(const ImageViewRGB32& frame, std::string* diagnostic){
+    const int pocket = frame ? bag_pocket_position(frame) : 0;
+    std::string details = "pocket=" + std::to_string(pocket);
+    BattleHPReading result;
+    bool conflicting = false;
+    for (size_t pass = 0; pocket == 1 && pass < 2; pass++){
+        // Preserve the established native-size line reader. Only if none of its
+        // filters yields a valid fraction, retry a tighter enlarged crop. Never
+        // override conflicting valid readings or guess a missing slash.
+        details += pass == 0 ? " native" : " enlarged fallback";
+        const auto crop = extract_box_reference(frame, pass == 0
+            ? ImageFloatBox{0.103, 0.181, 0.104, 0.039}
+            : ImageFloatBox{0.108, 0.181, 0.092, 0.039});
+        if (crop.height() > 0){
+            const auto enlarged = pass == 0 ? crop.copy() : crop.scale_to(crop.width() * 64 / crop.height(), 64);
+            for (const auto& range : OCR::WHITE_TEXT_FILTERS()){
+                const auto filtered = to_blackwhite_rgb32_range(enlarged, true, range.mins, range.maxs);
+                const auto padded = pad_image(filtered, filtered.height() / 4, 0xffffffff);
+                for (const auto mode : {OCR::PageSegMode::SINGLE_LINE, OCR::PageSegMode::SINGLE_WORD}){
+                    if (pass == 0 && mode == OCR::PageSegMode::SINGLE_WORD){
+                        continue;
+                    }
+                    const std::string text = OCR::tesseract_ocr_read(Language::English, padded, mode);
+                    std::string digits;
+                    for (char c : text){
+                        if (c != ' ' && c != '\n' && c != '\r' && c != '\t'){
+                            digits += c;
+                        }
+                    }
+                    details += " [" + digits.substr(0, 40) + "]";
+                    const auto slash = digits.find('/');
+                    if (slash == std::string::npos || slash == 0 || slash > 3 ||
+                        slash + 1 >= digits.size() || digits.size() - slash - 1 > 3 ||
+                        digits.find('/', slash + 1) != std::string::npos ||
+                        digits.find_first_not_of("0123456789/") != std::string::npos){
+                        continue;
+                    }
+                    const int current = std::atoi(digits.substr(0, slash).c_str());
+                    const int maximum = std::atoi(digits.substr(slash + 1).c_str());
+                    if (current <= 0 || maximum <= 0 || current > maximum){
+                        continue;
+                    }
+                    conflicting |= result.current > 0 && (current != result.current || maximum != result.maximum);
+                    result = {current, maximum, 1};
+                }
+            }
+        }
+        if (conflicting || result.current > 0){
+            break;
+        }
+    }
+    if (conflicting){
+        result = {};
+        details += " conflicting HP reads";
+    }
+    if (diagnostic){
+        *diagnostic = std::move(details);
+    }
+    return result;
+}
+
+
 // Digits are read only on a confirmed command menu. Slot is a battlefield
 // position, not the command owner or a persistent Pokemon identity.
 double read_player_hp_ratio(const ImageViewRGB32& frame,
@@ -736,67 +873,20 @@ void use_item_in_battle(VideoStream& stream,
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "Post-battle healing: Medicine pocket not confirmed; cannot read HP.", stream);
             }
-            int hp_current = -1;
-            int hp_maximum = -1;
-            size_t stable = 0;
             std::string last_reading;
-            for (size_t check = 0; check < 20 && stable < 3; check++){
-                context.wait_for_all_requests();
-                const auto frame = stream.video().snapshot();
-                const int pocket = frame ? bag_pocket_position(frame) : 0;
-                int observed_current = -1;
-                int observed_maximum = -1;
-                bool conflicting = false;
-                std::string reading = "pocket=" + std::to_string(pocket);
-                if (pocket == 1){
-                    // Only the HP fraction belongs in this crop; nearby panel edges
-                    // can be read as punctuation. Pad the filtered digits for line OCR.
-                    const auto hp_box = extract_box_reference(frame, ImageFloatBox{0.103, 0.181, 0.104, 0.039});
-                    for (const auto& range : OCR::WHITE_TEXT_FILTERS()){
-                        const auto filtered = to_blackwhite_rgb32_range(hp_box, true, range.mins, range.maxs);
-                        const auto padded = pad_image(filtered, filtered.height() / 4, 0xffffffff);
-                        const std::string text = OCR::tesseract_ocr_read(Language::English, padded,
-                            OCR::PageSegMode::SINGLE_LINE);
-                        std::string digits;
-                        for (char c : text){
-                            if (c != ' ' && c != '\n' && c != '\r' && c != '\t'){
-                                digits += c;
-                            }
-                        }
-                        reading += " [" + digits.substr(0, 40) + "]";
-                        const auto slash = digits.find('/');
-                        if (slash == std::string::npos || slash == 0 || slash > 3 ||
-                            slash + 1 >= digits.size() || digits.size() - slash - 1 > 3 ||
-                            digits.find('/', slash + 1) != std::string::npos ||
-                            digits.find_first_not_of("0123456789/") != std::string::npos){
-                            continue;
-                        }
-                        const int current = std::atoi(digits.substr(0, slash).c_str());
-                        const int maximum = std::atoi(digits.substr(slash + 1).c_str());
-                        if (maximum > 0 && current > 0 && current <= maximum){
-                            conflicting |= observed_current > 0 &&
-                                (current != observed_current || maximum != observed_maximum);
-                            observed_current = current;
-                            observed_maximum = maximum;
-                        }
+            const auto hp = read_confirmed_hp(stream, context,
+                [&](const ImageViewRGB32& frame){
+                    std::string diagnostic;
+                    const auto reading = read_bag_hp(frame, &diagnostic);
+                    if (diagnostic != last_reading){
+                        stream.log("[League healing] HP check: " + diagnostic);
+                        last_reading = std::move(diagnostic);
                     }
-                }
-                if (conflicting){
-                    observed_current = -1;
-                    observed_maximum = -1;
-                    reading += " conflicting HP reads";
-                }
-                if (reading != last_reading){
-                    stream.log("[League healing] HP check: " + reading);
-                    last_reading = reading;
-                }
-                stable = observed_current > 0 && observed_current == hp_current &&
-                    observed_maximum == hp_maximum ? stable + 1 : 0;
-                hp_current = observed_current;
-                hp_maximum = observed_maximum;
-                pbf_wait(context, 150ms);
-            }
-            if (stable < 3 || (pass == 1 && hp_current != hp_maximum)){
+                    return reading;
+                });
+            const int hp_current = hp.current;
+            const int hp_maximum = hp.maximum;
+            if (hp_current <= 0 || (pass == 1 && hp_current != hp_maximum)){
                 context.wait_for_all_requests();
                 const auto frame = stream.video().snapshot();
                 if (frame){
@@ -804,7 +894,7 @@ void use_item_in_battle(VideoStream& stream,
                         "hp-check-failed", frame);
                 }
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-                    stable < 3
+                    hp_current <= 0
                         ? "Post-battle healing: exact HP read was not stable. " + last_reading
                         : "Post-battle healing: Full Restore did not restore full HP (" +
                             std::to_string(hp_current) + "/" + std::to_string(hp_maximum) + ").", stream);
@@ -1173,28 +1263,18 @@ void handle_expert_battle(const ProgramInfo& /*info*/,
         // 1. Check HP / status → use Full Restore if needed
         {
             const BattleHPLayout layout = doubles ? BattleHPLayout::NPC_PARTNER : BattleHPLayout::SINGLES;
-            double hp = -1;
-            BattleHPReading hp_reading;
-            WallClock last_hp_frame = WallClock::min();
-            size_t stable_hp = 0;
             VideoSnapshot frame;
-            for (size_t check = 0; check < 20 && stable_hp < 3; check++){
-                context.wait_for_all_requests();
-                frame = stream.video().snapshot();
-                BattleHPReading observed_reading;
-                hp = frame && frame.timestamp > last_hp_frame
-                    ? read_player_hp_ratio(frame, layout, 1, &observed_reading) : -1;
-                stable_hp = hp > 0 ? (observed_reading == hp_reading ? stable_hp + 1 : 1) : 0;
-                hp_reading = observed_reading;
-                last_hp_frame = frame.timestamp;
-                if (stable_hp < 3){
-                    pbf_wait(context, 100ms);
-                }
-            }
-            if (stable_hp < 3){
+            const auto hp_reading = read_confirmed_hp(stream, context,
+                [&](const ImageViewRGB32& image){
+                    BattleHPReading reading;
+                    read_player_hp_ratio(image, layout, 1, &reading);
+                    return reading;
+                }, &frame);
+            if (hp_reading.current <= 0){
                 OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                     "Expert battle: HP not confirmed; no item or attack selected.", stream);
             }
+            const double hp = static_cast<double>(hp_reading.current) / hp_reading.maximum;
             bool has_status = detect_player_status(frame);
             if (hp < 0.33 || has_status){
                 logger.log("Full Restore needed (HP=" + std::to_string((int)(hp * 100)) +

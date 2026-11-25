@@ -30,7 +30,7 @@
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Dialog.h"
 
-#include "Detect/PokemonBDSP_AutoStory_MenuCursorDetector.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_MenuCursorDetector.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -499,7 +499,7 @@ bool fly_to(VideoStream& stream, ProControllerContext& context, FlyPoint place);
 bool test_fly_locations(VideoStream& stream, ProControllerContext& context);
 
 // Opens the X-menu from the overworld, navigates the cursor to `target`, and presses A.
-// num_icons: 5 (early-game layout) or 8 (late-game layout).
+// num_icons: legacy caller hint; the visible default-order layout is detected.
 void open_menu(VideoStream& stream, ProControllerContext& context, MenuCursorPosition target, int num_icons);
 
 // Optionally read the lead's level while verifying full HP in the Bag.

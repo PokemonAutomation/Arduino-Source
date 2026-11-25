@@ -22,15 +22,19 @@
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MarkFinder.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_ShopDetectors.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_TransitionWatchers.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
+#include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
+#include "PokemonBDSP/Programs/AutoStory/Detect/PokemonBDSP_AutoStory_OverworldDetector.h"
 #include "PokemonBDSP/Programs/AutoStory/PokemonBDSP_AutoStory.h"
 #include "PokemonBDSP/Programs/AutoStory/PokemonBDSP_AutoStoryTools.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Shopping.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Battle.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Dialog.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Segment_00_tools.h"
+#include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_Autostory_Segment_01_tools.h"
 #include "PokemonBDSP/Programs/AutoStory/Utils/PokemonBDSP_OverworldMatchers.h"
 
 #include "PokemonBDSP_AutoStory_Segment_09.h"
@@ -1623,9 +1627,52 @@ void AutoStory_Checkpoint_0904::run_checkpoint(SingleSwitchProgramEnvironment& e
         use_HM(stream, context, "Waterfall");
         pbf_wait(context, 3000ms);
 
-        watch_doorway_transition(stream, context, "Enter the Pokemon League building", [](ProControllerContext& ctx){
-            pbf_move_left_joystick(ctx, {0, +1}, 10000ms, 100ms);
-        });
+        for (size_t encounters = 0; encounters <= 3; encounters++){
+            watch_doorway_transition(stream, context, "League approach transition", [](ProControllerContext& ctx){
+                pbf_move_left_joystick(ctx, {0, +1}, 10000ms, 100ms);
+            });
+
+            // A wild encounter above the waterfall also fades. Classify it before
+            // accepting entry; X can prove navigation without choosing a battle action.
+            BattleMenuWatcher battle(BattleType::STANDARD, COLOR_YELLOW);
+            MenuWatcher game_menu;
+            const int state = run_until<ProControllerContext>(stream, context,
+                [](ProControllerContext& ctx){
+                    pbf_wait(ctx, 2000ms);
+                    for (size_t probe = 0; probe < 10; probe++){
+                        pbf_press_button(ctx, BUTTON_X, 80ms, 2920ms);
+                    }
+                    ctx.wait_for_all_requests();
+                },
+                {battle, game_menu});
+            context.wait_for_all_requests();
+
+            if (state == 1){
+                pbf_press_button(context, BUTTON_B, 80ms, 300ms);
+                context.wait_for_all_requests();
+                MenuDetector menu_visible;
+                OverworldWatcher overworld;
+                if (!wait_for_menu_screen(stream, context,
+                    [&](const ImageViewRGB32& frame){ return !menu_visible.detect(frame) && overworld.detect(frame); },
+                    "League entry menu closed", 5s)){
+                    OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                        "09.04: Could not close the confirmed navigation menu after entry.", stream);
+                }
+                stream.log("09.04: League approach completed; navigation confirmed after the doorway fade.", COLOR_GREEN);
+                return;
+            }
+            if (state != 0){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "09.04: Could not distinguish a wild battle from League entry.", stream);
+            }
+            if (encounters == 3){
+                OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+                    "09.04: More than three wild encounters on the League approach.", stream);
+            }
+            stream.log("09.04: Wild battle detected; escaping before resuming north (" +
+                std::to_string(encounters + 1) + "/3).", COLOR_ORANGE);
+            escape_wild_battle(stream, context, BattleType::STANDARD);
+        }
     }, true);
 }
 

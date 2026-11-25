@@ -15,6 +15,7 @@
 #define PokemonAutomation_PokemonBDSP_AutoStory_Battle_H
 
 #include <array>
+#include "Common/Cpp/Time.h"
 #include <functional>
 #include <string>
 #include <vector>
@@ -54,6 +55,34 @@ struct BattleHPReading{
     size_t command_owner = 0;
     bool operator==(const BattleHPReading&) const = default;
 };
+
+// Confirmation belongs to one decision. Duplicate/older snapshots are ignored;
+// fresh invalid readings reset progress and changing values start at one.
+class HPReadConfirmation{
+public:
+    explicit HPReadConfirmation(WallClock start);
+    bool expired(WallClock now) const;
+    bool accept_timestamp(WallClock timestamp);
+    bool observe(const BattleHPReading& reading);
+    const BattleHPReading& reading() const{ return m_reading; }
+    size_t count() const{ return m_count; }
+private:
+    WallClock m_deadline;
+    WallClock m_last_timestamp;
+    BattleHPReading m_reading;
+    size_t m_count = 0;
+};
+
+// Five-second elapsed-time limit; three agreeing fresh observations. Returns an
+// invalid reading on timeout. Optional frame is the final confirmed observation.
+BattleHPReading read_confirmed_hp(VideoStream& stream, ProControllerContext& context,
+    const std::function<BattleHPReading(const ImageViewRGB32&)>& reader,
+    VideoSnapshot* confirmed_frame = nullptr);
+
+// First party member on the Medicine-pocket list, before/after League healing.
+// Reads the complete fraction and rejects malformed or conflicting OCR results.
+BattleHPReading read_bag_hp(const ImageViewRGB32& frame, std::string* diagnostic = nullptr);
+
 
 // Exact numeric command-screen HP fraction, cross-checked against that slot's
 // HP bar; -1 means unconfirmed. Separate raised/lowered left/right crops are

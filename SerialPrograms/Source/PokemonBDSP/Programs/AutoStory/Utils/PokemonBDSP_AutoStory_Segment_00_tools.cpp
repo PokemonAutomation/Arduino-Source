@@ -1232,28 +1232,17 @@ static void fight_using_move_list(VideoStream& stream,
                     }
                 }
                 if (setup->max_full_restores != 0){
-                    double hp = -1;
-                    BattleHPReading hp_reading;
-                    WallClock last_hp_frame = WallClock::min();
-                    size_t stable_hp = 0;
-                    for (size_t check = 0; check < 20 && stable_hp < 3; check++){
-                        context.wait_for_all_requests();
-                        const auto frame = stream.video().snapshot();
-                        BattleHPReading observed_reading;
-                        const double observed = frame && frame.timestamp > last_hp_frame
-                            ? read_player_hp_ratio(frame, BattleHPLayout::SINGLES, 1, &observed_reading) : -1;
-                        stable_hp = observed > 0 ? (observed_reading == hp_reading ? stable_hp + 1 : 1) : 0;
-                        hp_reading = observed_reading;
-                        last_hp_frame = frame.timestamp;
-                        hp = observed;
-                        if (stable_hp < 3){
-                            pbf_wait(context, 100ms);
-                        }
-                    }
-                    if (stable_hp < 3){
+                    const auto hp_reading = read_confirmed_hp(stream, context,
+                        [&](const ImageViewRGB32& frame){
+                            BattleHPReading reading;
+                            read_player_hp_ratio(frame, BattleHPLayout::SINGLES, 1, &reading);
+                            return reading;
+                        });
+                    if (hp_reading.current <= 0){
                         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
                             label + ": HP not confirmed; no item or attack selected.", stream);
                     }
+                    const double hp = static_cast<double>(hp_reading.current) / hp_reading.maximum;
                     stream.log("[" + label + "] Confirmed HP: " + std::to_string(hp_reading.current) +
                         "/" + std::to_string(hp_reading.maximum) + ".");
                     if (hp_before_restore >= 0){

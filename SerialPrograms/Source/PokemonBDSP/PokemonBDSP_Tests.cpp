@@ -18,11 +18,13 @@
 #include "CommonTools/VisualDetectors/ImageMatchDetector.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Programs/AutoStory/PokemonBDSP_AutoStoryTools.h"
+#include "Programs/AutoStory/PokemonBDSP_AutoStory.h"
 #include "Programs/AutoStory/Utils/PokemonBDSP_AutoStory_Battle.h"
 #include "Programs/AutoStory/Utils/PokemonBDSP_OverworldMatchers.h"
 #include "PokemonBDSP_Tests.h"
 #include "Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "Inference/PokemonBDSP_MenuDetector.h"
+#include "Inference/PokemonBDSP_MenuCursorDetector.h"
 #include "Inference/PokemonBDSP_ButtonDetector.h"
 #include "Inference/PokemonBDSP_OptionsDetector.h"
 #include "Inference/PokemonBDSP_ShopDetectors.h"
@@ -123,6 +125,138 @@ private:
     size_t m_expected;
     std::array<int, 4> m_expected_pp;
 };
+
+class Test_AutoStoryStartup : public UnitTest{
+public:
+    Test_AutoStoryStartup(const std::string& name, const std::string& section, bool advanced,
+        const std::string& key, const std::string& value, bool valid,
+        const std::string& expected = "", int version = 2)
+        : UnitTest("PokemonBDSP::AutoStoryStartup/" + name)
+        , m_section(section), m_advanced(advanced), m_key(key), m_value(value)
+        , m_valid(valid), m_expected(expected), m_version(version)
+    {}
+
+    UnitTestResult run(Logger&, CancellableScope&) const override{
+        BDSPAutoStory program;
+        JsonObject input;
+        input["LANGUAGE"] = "eng";
+        input["STORY_SECTION"] = m_section;
+        input["ENABLE_ADVANCED_MODE"] = m_advanced;
+        input["CHECKPOINT_NUMBERING_VERSION"] = m_version;
+        input["HELP_MODE"] = "no_outside_help";
+        if (!m_key.empty()){
+            if (m_value == "<wrong-type>"){
+                input[m_key] = 42;
+            }else{
+                const size_t split = m_value.find('|');
+                input[m_key] = m_value.substr(0, split);
+                if (split != std::string::npos){
+                    input["END_" + m_key.substr(6)] = m_value.substr(split + 1);
+                }
+            }
+        }
+        program.load_json(JsonValue(std::move(input)));
+        const std::string error = program.check_validity();
+        if (error.empty() != m_valid){
+            return "Unexpected validation: " + error;
+        }
+        JsonValue saved = program.to_json();
+        const JsonObject& object = saved.to_object_throw();
+        if (!m_expected.empty() && object.get_string_default(m_key) != m_expected){
+            return "Unexpected migrated selection: " + object.get_string_default(m_key);
+        }
+        if (object.get_value("HELP_MODE")){
+            return "Unsupported help mode is exposed in saved options.";
+        }
+        BDSPAutoStory restored;
+        restored.load_json(saved);
+        if (restored.check_validity().empty() != m_valid || !(restored.to_json() == saved)){
+            return "Save/load changed the selections or validation result.";
+        }
+        return true;
+    }
+private:
+    std::string m_section;
+    bool m_advanced;
+    std::string m_key;
+    std::string m_value;
+    bool m_valid;
+    std::string m_expected;
+    int m_version;
+};
+
+class Test_HPConfirmation : public UnitTest{
+public:
+    struct Observation{
+        int elapsed_ms;
+        int timestamp_ms;
+        BattleHPReading hp;
+    };
+    Test_HPConfirmation(const std::string& name, std::vector<Observation> sequence, int expected_index)
+        : UnitTest("PokemonBDSP::HPConfirmation/" + name)
+        , m_sequence(std::move(sequence))
+        , m_expected_index(expected_index)
+    {}
+
+    UnitTestResult run(Logger&, CancellableScope&) const override{
+        const WallClock start{};
+        HPReadConfirmation confirmation(start);
+        int confirmed_at = -1;
+        for (size_t i = 0; i < m_sequence.size(); i++){
+            const auto& sample = m_sequence[i];
+            if (confirmation.expired(start + std::chrono::milliseconds(sample.elapsed_ms))){
+                break;
+            }
+            if (confirmation.accept_timestamp(start + std::chrono::milliseconds(sample.timestamp_ms)) &&
+                confirmation.observe(sample.hp)){
+                confirmed_at = static_cast<int>(i);
+                break;
+            }
+        }
+        if (confirmed_at != m_expected_index){
+            return "Unexpected confirmation position: " + std::to_string(confirmed_at);
+        }
+        // A stalled feed must have a finite deadline, including at its boundary.
+        return !confirmation.expired(start + std::chrono::milliseconds(4999)) &&
+            confirmation.expired(start + std::chrono::milliseconds(5000));
+    }
+private:
+    std::vector<Observation> m_sequence;
+    int m_expected_index;
+};
+
+class Test_BagHP : public ImageUnitTest{
+public:
+    Test_BagHP(const std::string& name, int current, int maximum, size_t rejected_width = 0)
+        : ImageUnitTest("PokemonBDSP::BagHP/" + name, {"PokemonBDSP/BagHP/" + name})
+        , m_current(current)
+        , m_maximum(maximum)
+        , m_rejected_width(rejected_width)
+    {
+        m_memory += MAX_TEST_IMAGE_RGB32_BYTES;
+    }
+    UnitTestResult run_on_images(Logger&, CancellableScope&, const std::vector<ImageRGB32>& images) const override{
+        if (images.empty() || !images[0]){
+            return false;
+        }
+        for (size_t width : {size_t(1920), size_t(1280), size_t(960)}){
+            const auto image = images[0].scale_to(width, width * 9 / 16);
+            std::string diagnostic;
+            const auto reading = read_bag_hp(image, &diagnostic);
+            const int expected_current = width == m_rejected_width ? -1 : m_current;
+            const int expected_maximum = width == m_rejected_width ? -1 : m_maximum;
+            if (reading.current != expected_current || reading.maximum != expected_maximum){
+                return "width=" + std::to_string(width) + " " + diagnostic;
+            }
+        }
+        return true;
+    }
+private:
+    int m_current;
+    int m_maximum;
+    size_t m_rejected_width;
+};
+
 
 class Test_PlayerHPRatio : public ImageUnitTest{
 public:
@@ -625,6 +759,8 @@ bool run_bag_screenshot_tests(Logger& logger, const std::string& folder){
             const auto& name = entry.get_string_throw("image");
             const int64_t expected_pocket = entry.get_integer_throw("pocket");
             const bool expected_empty = entry.get_boolean_throw("empty");
+            // AutoStory's pocket verification does not require the legacy screen reference.
+            const bool expected_reference = entry.get_boolean_default("reference_match", expected_pocket != 0);
             if (expected_pocket < 0 || expected_pocket > 8 ||
                 !Filesystem::is_regular_file(prefix + name)){
                 check(false, "Invalid or missing pocket case: " + name);
@@ -633,12 +769,16 @@ bool run_bag_screenshot_tests(Logger& logger, const std::string& folder){
             const auto image = load_image(name);
             for (size_t width : {size_t(1920), size_t(1280), size_t(960)}){
                 const auto scaled = image->scale_to(width, width * 9 / 16);
-                check(expected_pocket == 0 ? !bag.detect(scaled) :
-                    bag.detect(scaled) && bag_pocket_position(scaled) == expected_pocket &&
-                        bag_list_is_empty(scaled) == expected_empty,
+                const int observed_pocket = bag_pocket_position(scaled);
+                const bool reference_match = bag.detect(scaled);
+                check(reference_match == expected_reference &&
+                    (expected_pocket == 0 || (observed_pocket == expected_pocket &&
+                        bag_list_is_empty(scaled) == expected_empty)),
                     name + ": pocket " + std::to_string(expected_pocket) +
                     ", empty=" + (expected_empty ? "true" : "false") +
-                    " at width " + std::to_string(width));
+                    " at width " + std::to_string(width) +
+                    ", observed pocket=" + std::to_string(observed_pocket) +
+                    ", reference match=" + (reference_match ? "true" : "false"));
             }
         }
         check(bag_pocket_position(blank) == 0 && !bag_list_is_empty(blank),
@@ -700,6 +840,115 @@ bool run_bag_screenshot_tests(Logger& logger, const std::string& folder){
 }
 
 void add_tests(UnitTestDatabase& database){
+    database.add<Test_AutoStoryStartup>("tutorial-basic", "tutorial", false, "", "", true, "", 2);
+    database.add<Test_AutoStoryStartup>("tutorial-advanced", "tutorial", true, "", "", true, "", 2);
+    database.add<Test_AutoStoryStartup>("main-story-basic", "main-story", false, "", "", true, "", 2);
+    database.add<Test_AutoStoryStartup>("main-story-advanced", "main-story", true, "", "", true, "", 2);
+    database.add<Test_AutoStoryStartup>("invalid-section", "removed", false, "", "", false, "", 2);
+    database.add<Test_AutoStoryStartup>("START_SEGMENT-removed", "tutorial", false, "START_SEGMENT", "removed", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("START_SEGMENT-<wrong-type>", "tutorial", false, "START_SEGMENT", "<wrong-type>", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("START_SEGMENT-inactive", "tutorial", true, "START_SEGMENT", "removed", true, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("END_SEGMENT-removed", "tutorial", false, "END_SEGMENT", "removed", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("END_SEGMENT-<wrong-type>", "tutorial", false, "END_SEGMENT", "<wrong-type>", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("END_SEGMENT-inactive", "tutorial", true, "END_SEGMENT", "removed", true, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("START_SEGMENT_MAINSTORY-removed", "main-story", false, "START_SEGMENT_MAINSTORY", "removed", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("START_SEGMENT_MAINSTORY-<wrong-type>", "main-story", false, "START_SEGMENT_MAINSTORY", "<wrong-type>", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("START_SEGMENT_MAINSTORY-inactive", "main-story", true, "START_SEGMENT_MAINSTORY", "removed", true, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("END_SEGMENT_MAINSTORY-removed", "main-story", false, "END_SEGMENT_MAINSTORY", "removed", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("END_SEGMENT_MAINSTORY-<wrong-type>", "main-story", false, "END_SEGMENT_MAINSTORY", "<wrong-type>", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("END_SEGMENT_MAINSTORY-inactive", "main-story", true, "END_SEGMENT_MAINSTORY", "removed", true, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("START_CHECKPOINT_TUTORIAL-removed", "tutorial", true, "START_CHECKPOINT_TUTORIAL", "removed", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("START_CHECKPOINT_TUTORIAL-<wrong-type>", "tutorial", true, "START_CHECKPOINT_TUTORIAL", "<wrong-type>", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("START_CHECKPOINT_TUTORIAL-inactive", "tutorial", false, "START_CHECKPOINT_TUTORIAL", "removed", true, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("END_CHECKPOINT_TUTORIAL-removed", "tutorial", true, "END_CHECKPOINT_TUTORIAL", "removed", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("END_CHECKPOINT_TUTORIAL-<wrong-type>", "tutorial", true, "END_CHECKPOINT_TUTORIAL", "<wrong-type>", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("END_CHECKPOINT_TUTORIAL-inactive", "tutorial", false, "END_CHECKPOINT_TUTORIAL", "removed", true, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("START_CHECKPOINT_MAINSTORY-removed", "main-story", true, "START_CHECKPOINT_MAINSTORY", "removed", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("START_CHECKPOINT_MAINSTORY-<wrong-type>", "main-story", true, "START_CHECKPOINT_MAINSTORY", "<wrong-type>", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("START_CHECKPOINT_MAINSTORY-inactive", "main-story", false, "START_CHECKPOINT_MAINSTORY", "removed", true, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("END_CHECKPOINT_MAINSTORY-removed", "main-story", true, "END_CHECKPOINT_MAINSTORY", "removed", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("END_CHECKPOINT_MAINSTORY-<wrong-type>", "main-story", true, "END_CHECKPOINT_MAINSTORY", "<wrong-type>", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("END_CHECKPOINT_MAINSTORY-inactive", "main-story", false, "END_CHECKPOINT_MAINSTORY", "removed", true, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("reversed-main-segments", "main-story", false, "START_SEGMENT_MAINSTORY", "9", true, "9", 2);
+    database.add<Test_AutoStoryStartup>("reversed-main-checkpoints", "main-story", true, "START_CHECKPOINT_MAINSTORY", "09.11", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("main-legacy-20", "main-story", true, "START_CHECKPOINT_MAINSTORY", "20", true, "03.06", 2);
+    database.add<Test_AutoStoryStartup>("main-legacy-21", "main-story", true, "START_CHECKPOINT_MAINSTORY", "21", true, "03.08", 2);
+    database.add<Test_AutoStoryStartup>("main-legacy-22", "main-story", true, "START_CHECKPOINT_MAINSTORY", "22", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("main-legacy-125", "main-story", true, "START_CHECKPOINT_MAINSTORY", "125", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("main-legacy-07.17", "main-story", true, "START_CHECKPOINT_MAINSTORY", "07.17", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("main-legacy-06-reselect", "main-story", true, "START_CHECKPOINT_MAINSTORY", "06-reselect", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("main-legacy-07-reselect", "main-story", true, "START_CHECKPOINT_MAINSTORY", "07-reselect", false, "checkpoint-reselect", 2);
+    database.add<Test_AutoStoryStartup>("tower-end-migration", "main-story", true, "END_CHECKPOINT_MAINSTORY", "20", true, "03.07", 2);
+    database.add<Test_AutoStoryStartup>("old-numbering-09.03", "main-story", true, "START_CHECKPOINT_MAINSTORY", "09.03", true, "09.03", 1);
+    database.add<Test_AutoStoryStartup>("old-numbering-09.03a", "main-story", true, "START_CHECKPOINT_MAINSTORY", "09.03a", true, "09.03", 1);
+    database.add<Test_AutoStoryStartup>("old-numbering-09.03b", "main-story", true, "START_CHECKPOINT_MAINSTORY", "09.03b", true, "09.04", 1);
+    database.add<Test_AutoStoryStartup>("old-numbering-09.04", "main-story", true, "START_CHECKPOINT_MAINSTORY", "09.04", true, "09.05", 1);
+    database.add<Test_AutoStoryStartup>("old-numbering-09.09", "main-story", true, "START_CHECKPOINT_MAINSTORY", "09.09", true, "09.10", 1);
+    database.add<Test_AutoStoryStartup>("old-numbering-09.10", "main-story", true, "START_CHECKPOINT_MAINSTORY", "09.10", false, "checkpoint-reselect", 1);
+    database.add<Test_AutoStoryStartup>("old-numbering-09.99", "main-story", true, "START_CHECKPOINT_MAINSTORY", "09.99", false, "checkpoint-reselect", 1);
+    database.add<Test_AutoStoryStartup>("combined-waterfall-end", "main-story", true, "END_CHECKPOINT_MAINSTORY", "09.03", true, "09.04", 1);
+    database.add<Test_AutoStoryStartup>("tutorial-legacy-0", "tutorial", true, "START_CHECKPOINT_TUTORIAL", "0", true, "00.00", 2);
+    database.add<Test_AutoStoryStartup>("tutorial-legacy-4", "tutorial", true, "START_CHECKPOINT_TUTORIAL", "4", true, "00.04", 2);
+    database.add<Test_AutoStoryStartup>("tutorial-legacy-5", "tutorial", true, "START_CHECKPOINT_TUTORIAL", "5", true, "00.06", 2);
+    database.add<Test_AutoStoryStartup>("tutorial-split-end", "tutorial", true, "END_CHECKPOINT_TUTORIAL", "4", true, "00.05", 2);
+    database.add<Test_AutoStoryStartup>("future-version", "main-story", true, "", "", false, "", 3);
+    database.add<Test_AutoStoryStartup>("future-version-inactive", "main-story", false, "", "", true, "", 3);
+    database.add<Test_BagHP>("Legacy_00_after-aaron-medicine-265-of-265.png", 265, 265);
+    database.add<Test_BagHP>("Legacy_01_frame-15310.0.png", 265, 265);
+    database.add<Test_BagHP>("Legacy_02_after-aaron-tm-no-hp.png", -1, -1);
+    database.add<Test_BagHP>("Legacy_03_frame-15122.0.png", -1, -1);
+    database.add<Test_BagHP>("Legacy_04_frame-14351.0.png", -1, -1);
+    database.add<Test_BagHP>("Legacy_05_frame-4278.0.png", 264, 264);
+    database.add<Test_BagHP>("Legacy_06_brightness-4278.0-0.7.png", 264, 264);
+    database.add<Test_BagHP>("Legacy_07_brightness-4278.0-0.85.png", 264, 264);
+    database.add<Test_BagHP>("Legacy_08_brightness-4278.0-1.15.png", 264, 264);
+    database.add<Test_BagHP>("Legacy_09_frame-4461.0.png", 264, 264);
+    database.add<Test_BagHP>("Legacy_10_brightness-4461.0-0.7.png", 264, 264);
+    database.add<Test_BagHP>("Legacy_11_brightness-4461.0-0.85.png", 264, 264);
+    database.add<Test_BagHP>("Legacy_12_brightness-4461.0-1.15.png", 264, 264);
+    database.add<Test_BagHP>("Legacy_13_frame-4644.0.png", 264, 264);
+    database.add<Test_BagHP>("Legacy_14_brightness-4644.0-0.7.png", 264, 264);
+    database.add<Test_BagHP>("Legacy_15_brightness-4644.0-0.85.png", 264, 264);
+    database.add<Test_BagHP>("Legacy_16_brightness-4644.0-1.15.png", 264, 264);
+    database.add<Test_BagHP>("Legacy_17_frame-265.0.png", 18, 21);
+    database.add<Test_BagHP>("Legacy_18_frame-396.0.png", 17, 21);
+    database.add<Test_BagHP>("Legacy_19_frame-695.0.png", 19, 21);
+    database.add<Test_BagHP>("Legacy_20_frame-802.0.png", 20, 21);
+    // At 540p the established reader disagrees: 19/23 versus 18/23. Reject, do not guess.
+    database.add<Test_BagHP>("Legacy_21_frame-1065.0.png", 19, 23, 960);
+    database.add<Test_BagHP>("Legacy_22_frame-1162.0.png", 22, 25);
+    database.add<Test_BagHP>("Legacy_23_frame-1279.0.png", 24, 25);
+    database.add<Test_AutoStoryStartup>("reversed-segments", "main-story", false, "START_SEGMENT_MAINSTORY", "9|1", false, "9");
+    database.add<Test_AutoStoryStartup>("reversed-tutorial", "tutorial", true, "START_CHECKPOINT_TUTORIAL", "00.06|00.00", false, "00.06");
+    database.add<Test_AutoStoryStartup>("reversed-main", "main-story", true, "START_CHECKPOINT_MAINSTORY", "09.10|6", false, "09.10");
+    database.add<Test_AutoStoryStartup>("single-main", "main-story", true, "START_CHECKPOINT_MAINSTORY", "09.05|09.05", true, "09.05");
+    database.add<Test_AutoStoryStartup>("single-tutorial", "tutorial", true, "START_CHECKPOINT_TUTORIAL", "00.04|00.04", true, "00.04");
+    database.add<Test_AutoStoryStartup>("single-segment", "main-story", false, "START_SEGMENT_MAINSTORY", "5|5", true, "5");
+    database.add<Test_AutoStoryStartup>("partial-main", "main-story", true, "START_CHECKPOINT_MAINSTORY", "03.06|03.08", true, "03.06");
+    using Observation = Test_HPConfirmation::Observation;
+    const BattleHPReading hp{222, 294, 1};
+    const BattleHPReading changed{212, 294, 1};
+    database.add<Test_HPConfirmation>("ordinary", std::vector<Observation>{{100,100,hp},{200,200,hp},{300,300,hp}}, 2);
+    database.add<Test_HPConfirmation>("duplicates", std::vector<Observation>{{100,100,hp},{200,100,{}},{300,300,hp},{400,300,{}},{500,500,hp}}, 4);
+    database.add<Test_HPConfirmation>("changing", std::vector<Observation>{{100,100,hp},{200,200,hp},{300,300,changed},{400,400,changed},{500,500,changed}}, 4);
+    database.add<Test_HPConfirmation>("invalid", std::vector<Observation>{{100,100,hp},{200,200,hp},{300,300,{}},{400,400,hp},{500,500,hp},{600,600,hp}}, 5);
+    database.add<Test_HPConfirmation>("stalled_before_first", std::vector<Observation>{{100,0,hp},{4900,0,hp},{5000,0,hp}}, -1);
+    database.add<Test_HPConfirmation>("stalled_after_one", std::vector<Observation>{{100,100,hp},{4900,100,hp},{5000,100,hp}}, -1);
+    database.add<Test_HPConfirmation>("stalled_after_two", std::vector<Observation>{{100,100,hp},{200,200,hp},{4900,200,hp},{5000,200,hp}}, -1);
+    database.add<Test_HPConfirmation>("slow_feed", std::vector<Observation>{{1000,1000,hp},{2000,1000,hp},{3000,3000,hp},{4000,3000,hp},{4900,4900,hp}}, 4);
+    database.add<Test_HPConfirmation>("deadline", std::vector<Observation>{{100,100,hp},{200,200,hp},{5000,5000,hp}}, -1);
+    database.add<Test_HPConfirmation>("older_timestamp", std::vector<Observation>{{100,100,hp},{200,50,changed},{300,300,hp},{400,400,hp}}, 3);
+    database.add<Test_HPConfirmation>("changed_owner", std::vector<Observation>{{100,100,hp},{200,200,hp},{300,300,{222,294,2}},{400,400,{222,294,2}},{500,500,{222,294,2}}}, 4);
+    database.add<Test_HPConfirmation>("zero_and_impossible", std::vector<Observation>{{100,100,hp},{200,200,{0,294,1}},{300,300,{300,294,1}},{400,400,hp},{500,500,hp}}, -1);
+    database.add<Test_BagHP>("Flint_222.png", 222, 294);
+    database.add<Test_BagHP>("Flint_212.png", 212, 294);
+    database.add<Test_BagHP>("Full_294.png", 294, 294);
+    database.add<Test_BagHP>("Bertha_142.png", 142, 294);
+    database.add<Test_BagHP>("Opening.png", -1, -1);
+    database.add<Test_BagHP>("Overworld.png", -1, -1);
+    database.add<Test_BagHP>("Battle.png", -1, -1);
+
+
     database.add<Test_Route215AceAlignment>("east-approach.png", true, false);
     database.add<Test_Route215AceAlignment>("north-offset.png", true, false);
     database.add<Test_Route215AceAlignment>("vertical-recovery-gap.png", true, false);
@@ -832,6 +1081,7 @@ void add_tests(UnitTestDatabase& database){
     database.add<Test_BagPartyTarget>("Synthetic_6.png", 6);
     database.add<Test_BagPartyTarget>("Synthetic_Ambiguous.png", 0);
     add_tests_MenuDetector(database);
+    add_tests_MenuCursorDetector(database);
     database.add<Test_BattleMoveMenu>("Wake_MoveList_618-7.png", 4, std::array<int, 4>{7, 15, 10, 15});
     database.add<Test_BattleMoveMenu>("Wake_MoveList_619-1.png", 4, std::array<int, 4>{7, 15, 10, 15});
     database.add<Test_BattleMoveMenu>("Wake_MoveList_1064-9.png", 4, std::array<int, 4>{7, 15, 10, 15});

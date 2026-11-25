@@ -68,11 +68,6 @@ public:
 };
 
 
-
-
-//  The screenshot tests in CommandLineTests/PokemonBDSP/MenuDetector/.
-void add_tests_MenuDetector(UnitTestDatabase& database);
-
 } // namespace PokemonBDSP
 } // namespace NintendoSwitch
 } // namespace PokemonAutomation

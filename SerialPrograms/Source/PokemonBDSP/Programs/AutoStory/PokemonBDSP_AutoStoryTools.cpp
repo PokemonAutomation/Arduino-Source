@@ -934,23 +934,28 @@ struct IconGrid {
 };
 
 IconGrid icon_to_grid(MenuCursorPosition pos, int num_icons){
+    if (num_icons < 2 || num_icons > 8){
+        return {-1, -1};
+    }
     switch (pos){
     case MenuCursorPosition::POKEDEX:
-        return {0, 0};
+        return num_icons >= 4 ? IconGrid{0, 0} : IconGrid{-1, -1};
     case MenuCursorPosition::POKEMON:
-        return {0, 1};
+        return num_icons >= 3 ? IconGrid{0, num_icons == 3 ? 0 : 1} : IconGrid{-1, -1};
     case MenuCursorPosition::BAG:
-        return {0, 2};
+        return {0, std::min(num_icons - 2, 2)};
     case MenuCursorPosition::CARD:
-        return {0, 3};
-    case MenuCursorPosition::OPTIONS:
-        return {1, num_icons <= 5 ? 0 : 2};
+        return num_icons >= 5 ? IconGrid{0, 3} : IconGrid{-1, -1};
+    case MenuCursorPosition::OPTIONS:{
+        const int index = std::min(num_icons - 1, 6);
+        return {index / 4, index % 4};
+    }
     case MenuCursorPosition::MAP:
-        return {1, 0};
+        return num_icons >= 6 ? IconGrid{1, 0} : IconGrid{-1, -1};
     case MenuCursorPosition::CAPSULES:
-        return {1, 1};
+        return num_icons >= 7 ? IconGrid{1, 1} : IconGrid{-1, -1};
     case MenuCursorPosition::MYSTERYGIFT:
-        return {1, 3};
+        return num_icons == 8 ? IconGrid{1, 3} : IconGrid{-1, -1};
     default:
         return {-1, -1};
     }
@@ -962,53 +967,9 @@ IconGrid icon_to_grid(MenuCursorPosition pos, int num_icons){
 void open_menu(VideoStream& stream, ProControllerContext& context, MenuCursorPosition target, int num_icons){
     using namespace std::chrono_literals;
 
-    // Previous single opening attempt:
-    // context.wait_for_all_requests();
-    // overworld_to_menu(stream, context);
-    // pbf_wait(context, 1000ms);
-    // context.wait_for_all_requests();
     context.wait_for_all_requests();
-
     MenuCursorDetector detector;
-    {
-        static const char* ICON_NAMES[MENU_CURSOR_NUM_ICONS] = {
-            "POKEDEX",
-            "POKEMON",
-            "BAG",
-            "CARD",
-            "OPTIONS",
-            "MAP",
-            "CAPSULES",
-            "MYSTERYGIFT",
-        };
-        std::string ref_dir = RESOURCE_PATH() + "PokemonBDSP/Autostory";
-        for (int i = 0; i < MENU_CURSOR_NUM_ICONS; i++){
-            std::string path = ref_dir + "/" + ICON_NAMES[i] + ".png";
-            // These templates are optional. The dark-pixel cursor detector
-            // remains available when a template is not packaged.
-            if (!Filesystem::is_regular_file(path)){
-                continue;
-            }
-            ImageRGB32 img(path);
-            if (img){
-                detector.set_icon_reference(static_cast<MenuCursorPosition>(i), std::move(img));
-            }
-        }
-    }
-    // Previous single detection attempt retained for comparison.
-    // MenuCursorPosition cur = MenuCursorPosition::UNKNOWN;
-    // for (int i = 0; i < 10 && cur == MenuCursorPosition::UNKNOWN; i++){
-    //     context.wait_for(50ms);
-    //     VideoSnapshot snap = stream.video().snapshot();
-    //     if (snap) cur = detector.detect(snap);
-    // }
-    // if (cur == MenuCursorPosition::UNKNOWN){
-    //     OperationFailedExceptionWithScreenshot::fire(
-    //         ErrorReportMode::SEND_ERROR_REPORT,
-    //         "Menu cursor not detected after opening menu.",
-    //         stream
-    //     );
-    // }
+    int detected_icon_count = 0;
 
     MenuCursorPosition cur = MenuCursorPosition::UNKNOWN;
     bool menu_confirmed_open = false;
@@ -1034,18 +995,24 @@ void open_menu(VideoStream& stream, ProControllerContext& context, MenuCursorPos
             pbf_wait(context, 1000ms);
             context.wait_for_all_requests();
             MenuCursorPosition candidate = MenuCursorPosition::UNKNOWN;
+            int candidate_icon_count = 0;
             const bool cursor_ready = wait_for_menu_screen(stream, context,
                 [&](const ImageViewRGB32& frame){
-                    const MenuCursorPosition observed = detector.detect(frame);
+                    int observed_icon_count = 0;
+                    const MenuCursorPosition observed = detector.detect(frame, &observed_icon_count);
                     if (observed == MenuCursorPosition::UNKNOWN){
                         candidate = observed;
+                        candidate_icon_count = 0;
                         return false;
                     }
-                    const bool changed = candidate != MenuCursorPosition::UNKNOWN && candidate != observed;
+                    const bool changed = candidate != MenuCursorPosition::UNKNOWN &&
+                        (candidate != observed || candidate_icon_count != observed_icon_count);
                     candidate = observed;
+                    candidate_icon_count = observed_icon_count;
                     return !changed;
                 }, "main-menu-cursor", 5s, &last_cursor_frame);
             cur = cursor_ready ? candidate : MenuCursorPosition::UNKNOWN;
+            detected_icon_count = cursor_ready ? candidate_icon_count : 0;
             if (cur != MenuCursorPosition::UNKNOWN){
                 stream.log("[Open menu] Menu and cursor detected on attempt " + std::to_string(attempt) + ".",
                     COLOR_GREEN);
@@ -1063,17 +1030,19 @@ void open_menu(VideoStream& stream, ProControllerContext& context, MenuCursorPos
             stream, last_cursor_frame.frame);
     }
 
+    // Existing callers retain their layout hint; the visible layout takes precedence.
+    num_icons = detected_icon_count;
     IconGrid cur_g = icon_to_grid(cur, num_icons);
     IconGrid tgt_g = icon_to_grid(target, num_icons);
-    if (tgt_g.row == -1){
+    if (cur_g.row == -1 || tgt_g.row == -1){
         OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
-            "Unknown target menu icon.",
+            "Target menu icon is unavailable in the detected layout.",
             stream);
     }
 
-    if (cur_g.row != tgt_g.row){
-        DpadPosition vert = (cur_g.row < tgt_g.row) ? DPAD_DOWN : DPAD_UP;
-        pbf_press_dpad(context, vert, 80ms, 300ms);
+    // Move across the full top row before descending into a shorter bottom row.
+    if (cur_g.row > tgt_g.row){
+        pbf_press_dpad(context, DPAD_UP, 80ms, 300ms);
         context.wait_for_all_requests();
     }
 
@@ -1084,6 +1053,17 @@ void open_menu(VideoStream& stream, ProControllerContext& context, MenuCursorPos
             pbf_press_dpad(context, horiz, 80ms, 300ms);
             context.wait_for_all_requests();
         }
+    }
+
+    if (cur_g.row < tgt_g.row){
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 300ms);
+        context.wait_for_all_requests();
+    }
+    if (!wait_for_menu_screen(stream, context,
+        [&](const ImageViewRGB32& frame){ return detector.detect(frame) == target; },
+        "main-menu-target", 3s)){
+        OperationFailedExceptionWithScreenshot::fire(ErrorReportMode::SEND_ERROR_REPORT,
+            "Could not confirm the requested menu icon before opening it.", stream);
     }
 
     pbf_press_button(context, BUTTON_A, 80ms, 200ms);
@@ -1427,10 +1407,10 @@ int bag_pocket_position(const ImageViewRGB32& frame){
     }
     int selected = 0;
     for (int pocket = 1; pocket <= 8; pocket++){
-        // The lower left edge of each tab is below the red NEW badge.
-        // This strip includes both the normal outline and enlarged selection.
+        // Stay below the NEW badge and inside this tab's left edge.
+        // Sampling farther left can include the selected neighbor's right edge.
         const auto edge =
-            extract_box_reference(frame, ImageFloatBox(0.570 + (pocket - 1) * 0.0421, 0.098, 0.0045, 0.021));
+            extract_box_reference(frame, ImageFloatBox(0.571 + (pocket - 1) * 0.0421, 0.098, 0.0045, 0.021));
         size_t colored = 0;
         for (size_t y = 0; y < edge.height(); y++){
             for (size_t x = 0; x < edge.width(); x++){
