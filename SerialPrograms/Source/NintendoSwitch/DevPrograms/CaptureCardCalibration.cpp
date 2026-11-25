@@ -17,6 +17,7 @@
 
 #include <algorithm>
 #include <array>
+#include <chrono>
 #include <cmath>
 #include <cstdio>
 #include <string>
@@ -52,6 +53,11 @@ constexpr double SAMPLE_FRACTION = 0.4;
 //  A sampled square whose per-channel standard deviation is above this is not flat, which usually
 //  means the frame isn't on the color picker or the layout doesn't match the image.
 constexpr double FLATNESS_WARNING_STDDEV = 4.0;
+
+//  How long to keep grabbing frames while waiting for the user to scroll the color picker to the
+//  other page. If the second page never shows up in time, the tool falls back to matching on the
+//  first page alone.
+constexpr int SECOND_PAGE_TIMEOUT_S = 120;
 
 using Color3 = std::array<double, 3>;
 
@@ -292,6 +298,44 @@ void sample_patches(const ImageViewRGB32& image, const PatchLayout& layout, bool
 }
 
 
+//  The result of auto-detecting a single frame: which (console, page) combination its sampled
+//  colors best match, the 30 sampled colors, and the clip-aware error of the best profile.
+struct Detection{
+    const Combo* combo = &COMBOS[0];
+    std::vector<Color3> captured;
+    double max_stddev = 0.0;
+    std::string best_label;
+    double best_err = 1e300;
+    bool flat() const { return max_stddev <= FLATNESS_WARNING_STDDEV; }
+};
+
+//  Try every (console, page) combination and return the one whose colors best match a profile.
+//  A wrong layout samples across patch edges and the background, so its colors match no profile.
+Detection detect(const ImageViewRGB32& image, const std::vector<std::pair<std::string, ColorTransform3x4>>& profiles){
+    Detection best;
+    for (const Combo& combo : COMBOS){
+        std::vector<Color3> captured;
+        double max_stddev = 0.0;
+        sample_patches(image, *combo.layout, combo.up, captured, max_stddev);
+
+        const Color3* reference = combo.up ? REFERENCE_COLORS : (REFERENCE_COLORS + 30);
+        std::string combo_best_label;
+        double combo_best_err = 1e300;
+        for (const auto& profile : profiles){
+            const double err = clip_aware_rms(profile.second, reference, captured.data(), captured.size());
+            if (err < combo_best_err){
+                combo_best_err = err;
+                combo_best_label = profile.first;
+            }
+        }
+        if (combo_best_err < best.best_err){
+            best = Detection{&combo, std::move(captured), max_stddev, combo_best_label, combo_best_err};
+        }
+    }
+    return best;
+}
+
+
 //  Solve a 4x4 linear system A x = b with Gaussian elimination and partial pivoting.
 //  On success, `b` is overwritten with the solution and true is returned.
 void solve4(double A[4][4], double b[4]){
@@ -363,28 +407,29 @@ void least_squares_4(const double* D, int n, const double* y, double c[4]){
 //  linear, so it is solved with Gauss-Newton steps, re-solving least squares on the samples whose
 //  current prediction is inside (0, 255).
 ColorTransform3x4 fit_raw_transform(const Color3* reference, const Color3* captured, size_t n){
-    double design[30][4];
+    std::vector<double> design(n * 4);
     for (size_t i = 0; i < n; i++){
-        design[i][0] = reference[i][0];
-        design[i][1] = reference[i][1];
-        design[i][2] = reference[i][2];
-        design[i][3] = 1.0;
+        design[i * 4 + 0] = reference[i][0];
+        design[i * 4 + 1] = reference[i][1];
+        design[i * 4 + 2] = reference[i][2];
+        design[i * 4 + 3] = 1.0;
     }
 
     ColorTransform3x4 m = {};
     for (int ch = 0; ch < 3; ch++){
-        double y[30];
+        std::vector<double> y(n);
         for (size_t i = 0; i < n; i++){
             y[i] = captured[i][ch];
         }
 
-        auto predict = [&](const double coef[4], double pred[30]){
+        auto predict = [&](const double coef[4], std::vector<double>& pred){
+            pred.assign(n, 0.0);
             for (size_t i = 0; i < n; i++){
-                pred[i] = clip01_255(design[i][0] * coef[0] + design[i][1] * coef[1] + design[i][2] * coef[2] + design[i][3] * coef[3]);
+                pred[i] = clip01_255(design[i * 4 + 0] * coef[0] + design[i * 4 + 1] * coef[1] + design[i * 4 + 2] * coef[2] + design[i * 4 + 3] * coef[3]);
             }
         };
         auto loss = [&](const double coef[4]) -> double{
-            double pred[30];
+            std::vector<double> pred;
             predict(coef, pred);
             double s = 0.0;
             for (size_t i = 0; i < n; i++){
@@ -398,53 +443,52 @@ ColorTransform3x4 fit_raw_transform(const Color3* reference, const Color3* captu
             }
             return s;
         };
-        auto solve_subset = [&](const int* idx, int count, double coef[4]){
-            double Dsub[30][4];
-            double ysub[30];
+        auto solve_subset = [&](const std::vector<int>& idx, double coef[4]){
+            const int count = (int)idx.size();
+            std::vector<double> Dsub((size_t)count * 4);
+            std::vector<double> ysub((size_t)count);
             for (int k = 0; k < count; k++){
                 for (int j = 0; j < 4; j++){
-                    Dsub[k][j] = design[idx[k]][j];
+                    Dsub[(size_t)k * 4 + j] = design[(size_t)idx[k] * 4 + j];
                 }
-                ysub[k] = y[idx[k]];
+                ysub[(size_t)k] = y[(size_t)idx[k]];
             }
-            least_squares_4(&Dsub[0][0], count, ysub, coef);
+            least_squares_4(&Dsub[0], count, &ysub[0], coef);
         };
 
         double coef[4];
         {
             //  Start from a plain least-squares fit on the samples whose captured value is not clipped.
-            int idx[30];
-            int ni = 0;
+            std::vector<int> idx;
             for (size_t i = 0; i < n; i++){
                 if (y[i] > CLIP_LOW && y[i] < CLIP_HIGH){
-                    idx[ni++] = (int)i;
+                    idx.push_back((int)i);
                 }
             }
-            if (ni < 4){
-                ni = (int)std::min<size_t>(n, 30);
-                for (int k = 0; k < ni; k++){
-                    idx[k] = k;
+            if (idx.size() < 4){
+                idx.clear();
+                for (size_t i = 0; i < n; i++){
+                    idx.push_back((int)i);
                 }
             }
-            solve_subset(idx, ni, coef);
+            solve_subset(idx, coef);
         }
 
         double current = loss(coef);
         for (int iter = 0; iter < 50; iter++){
-            double pred[30];
+            std::vector<double> pred;
             predict(coef, pred);
-            int idx[30];
-            int nlin = 0;
+            std::vector<int> idx;
             for (size_t i = 0; i < n; i++){
                 if (pred[i] > 0.0 && pred[i] < 255.0){
-                    idx[nlin++] = (int)i;
+                    idx.push_back((int)i);
                 }
             }
-            if (nlin < 4){
+            if (idx.size() < 4){
                 break;
             }
             double candidate[4];
-            solve_subset(idx, nlin, candidate);
+            solve_subset(idx, candidate);
 
             //  Step towards the candidate, halving until the loss decreases.
             double step = 1.0;
@@ -510,7 +554,7 @@ CaptureCardCalibration_Descriptor::CaptureCardCalibration_Descriptor()
         "NintendoSwitch:CaptureCardCalibration",
         "Nintendo Switch", "Capture Card Calibration",
         "",
-        "Identify the capture card from a screenshot of the Switch color picker grid.",
+        "Identify the capture card from screenshots of the Switch color picker grid (both pages).",
         PanelQualityStanding::DEVELOPER,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
@@ -525,18 +569,6 @@ CaptureCardCalibration::CaptureCardCalibration()
 }
 
 void CaptureCardCalibration::program(GameConsole::ConsoleProgramEnvironment& env, CancellableScope& scope){
-    //  Grab a frame from the capture card.
-    VideoSnapshot snapshot = env.console().video().snapshot_latest_blocking();
-    if (!snapshot.frame || snapshot.frame->width() == 0 || snapshot.frame->height() == 0){
-        env.log(
-            "No video frame available. Connect a capture card and put the Switch on the user-icon "
-            "'Edit Background' color picker page, then run again.",
-            COLOR_RED
-        );
-        return;
-    }
-    const ImageViewRGB32& image = *snapshot.frame;
-
     //  Load the measured capture card profiles.
     const std::string filename = UNIT_TEST_RESOURCE_PATH() + "CaptureCardCalibration/color_profile_to_transform.json";
     std::vector<std::pair<std::string, ColorTransform3x4>> profiles;
@@ -565,66 +597,112 @@ void CaptureCardCalibration::program(GameConsole::ConsoleProgramEnvironment& env
         return;
     }
 
-    //  Try every (console, page) combination and keep the one whose colors best match a profile.
-    //  A wrong layout samples across patch edges and the background, so its colors match no profile.
-    struct Result{
-        const Combo* combo;
-        std::vector<Color3> captured;
-        double max_stddev;
-        std::string best_label;
-        double best_err;
-    };
-    Result best;
-    best.combo = &COMBOS[0];
-    best.best_err = 1e300;
-    for (const Combo& combo : COMBOS){
-        std::vector<Color3> captured;
-        double max_stddev = 0.0;
-        sample_patches(image, *combo.layout, combo.up, captured, max_stddev);
+    //  Match the way the profiles were measured: sample both pages of the color picker (60
+    //  patches) and compare all 60 captured colors against every profile.
 
-        const Color3* reference = combo.up ? REFERENCE_COLORS : (REFERENCE_COLORS + 30);
-        std::string combo_best_label;
-        double combo_best_err = 1e300;
-        for (const auto& profile : profiles){
-            const double err = clip_aware_rms(profile.second, reference, captured.data(), captured.size());
-            if (err < combo_best_err){
-                combo_best_err = err;
-                combo_best_label = profile.first;
-            }
-        }
-        if (combo_best_err < best.best_err){
-            best = Result{&combo, std::move(captured), max_stddev, combo_best_label, combo_best_err};
-        }
-    }
-
-    const double threshold = THRESHOLD;
-    const char* page = best.combo->up ? "Up" : "Down";
-    if (best.max_stddev > FLATNESS_WARNING_STDDEV){
+    //  Phase 1: grab the page that is currently shown and detect which console / page it is.
+    VideoSnapshot snapshot = env.console().video().snapshot_latest_blocking();
+    if (!snapshot.frame || snapshot.frame->width() == 0 || snapshot.frame->height() == 0){
         env.log(
-            "Warning: the sampled patches aren't flat (max stddev " + fnum(best.max_stddev, 1) +
+            "No video frame available. Connect a capture card and put the Switch on the user-icon "
+            "'Edit Background' color picker page, then run again.",
+            COLOR_RED
+        );
+        return;
+    }
+    const Detection det1 = detect(*snapshot.frame, profiles);
+    if (!det1.flat()){
+        env.log(
+            "Warning: the sampled patches aren't flat (max stddev " + fnum(det1.max_stddev, 1) +
             "). Make sure the frame is showing the color picker grid.",
             COLOR_RED
         );
     }
+    const char* console = det1.combo->console;
+    const char* page1 = det1.combo->up ? "Up" : "Down";
+    const char* page2 = det1.combo->up ? "Down" : "Up";
 
-    if (best.best_err <= threshold){
+    //  Phase 2: keep grabbing frames until the user scrolls the picker to the other page.
+    env.log("Captured the " + std::string(page1) + " rows on " + console +
+            ". Now scroll the color list to its " + std::string(page2) + " end.");
+    Detection det2;
+    bool have2 = false;
+    const std::chrono::steady_clock::time_point deadline =
+        std::chrono::steady_clock::now() + std::chrono::seconds(SECOND_PAGE_TIMEOUT_S);
+    while (!have2){
+        scope.throw_if_cancelled();
+        if (std::chrono::steady_clock::now() >= deadline){
+            break;
+        }
+        scope.wait_for(std::chrono::milliseconds(200));
+        const VideoSnapshot snap2 = env.console().video().snapshot_latest_blocking();
+        if (!snap2.frame || snap2.frame->width() == 0 || snap2.frame->height() == 0){
+            continue;
+        }
+        const Detection det = detect(*snap2.frame, profiles);
+        if (det.flat() && det.combo->layout == det1.combo->layout && det.combo->up != det1.combo->up){
+            det2 = det;
+            have2 = true;
+        }
+    }
+
+    //  Build the (reference, captured) alignment used for matching.
+    std::vector<Color3> reference;
+    std::vector<Color3> captured;
+    if (have2){
+        //  All 60, in REFERENCE_COLORS order: the Up page first (0..29), the Down page after (30..59).
+        reference.assign(REFERENCE_COLORS, REFERENCE_COLORS + 60);
+        const Detection& up = det1.combo->up ? det1 : det2;
+        const Detection& down = det1.combo->up ? det2 : det1;
+        captured.reserve(60);
+        for (const Color3& c : up.captured){
+            captured.push_back(c);
+        }
+        for (const Color3& c : down.captured){
+            captured.push_back(c);
+        }
+        env.log("Captured the " + std::string(page2) + " rows as well; matching on all 60 colors.", COLOR_BLUE);
+    }else{
         env.log(
-            "Capture card: " + best.best_label +
-            "  (clip-aware color error " + fnum(best.best_err, 2) + " levels, " + best.combo->console + " " + page + " rows)",
+            "The " + std::string(page2) + " page was not shown in time; matching on the "
+            + std::string(page1) + " rows only (30 colors).",
+            COLOR_YELLOW
+        );
+        const Color3* ref = det1.combo->up ? REFERENCE_COLORS : (REFERENCE_COLORS + 30);
+        reference.assign(ref, ref + 30);
+        captured = det1.captured;
+    }
+
+    //  Match against every profile.
+    std::string best_label;
+    double best_err = 1e300;
+    for (const auto& profile : profiles){
+        const double err = clip_aware_rms(profile.second, reference.data(), captured.data(), captured.size());
+        if (err < best_err){
+            best_err = err;
+            best_label = profile.first;
+        }
+    }
+
+    const double threshold = THRESHOLD;
+    if (best_err <= threshold){
+        env.log(
+            "Capture card: " + best_label +
+            "  (clip-aware color error " + fnum(best_err, 2) + " levels, " + std::to_string(captured.size()) +
+            " colors on " + console + ")",
             COLOR_GREEN
         );
     }else{
-        const Color3* reference = best.combo->up ? REFERENCE_COLORS : (REFERENCE_COLORS + 30);
-        const ColorTransform3x4 raw = fit_raw_transform(reference, best.captured.data(), best.captured.size());
+        const ColorTransform3x4 raw = fit_raw_transform(reference.data(), captured.data(), captured.size());
         env.log(
-            "No profile matched (closest: " + best.best_label + ", clip-aware color error " +
-            fnum(best.best_err, 2) + " levels > threshold " + fnum(threshold, 1) + ").",
+            "No profile matched (closest: " + best_label + ", clip-aware color error " +
+            fnum(best_err, 2) + " levels > threshold " + fnum(threshold, 1) + ").",
             COLOR_YELLOW
         );
         std::string raw_msg =
             "Fitted raw transform captured = clip(M @ reference + b, 0, 255), as a new "
             "color_profile_to_transform.json entry:\n    \"";
-        raw_msg += best.combo->console;
+        raw_msg += console;
         raw_msg += "-Unknown\":";
         raw_msg += format_transform(raw);
         env.log(raw_msg, COLOR_YELLOW);
