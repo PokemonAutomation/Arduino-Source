@@ -88,78 +88,17 @@ size_t ServerSocketConnection_WinSocket::send(
 
     return sent;
 }
-//  Drains the socket's receive queue (bounded). Windows sends an RST
-//  instead of a FIN when a socket is closed with data still in the
-//  receive queue, and a reset makes the peer discard whatever we
-//  already sent to it - for example, the response just written before
-//  the close. Draining keeps the close a clean FIN, so the response
-//  reaches the peer.
-//
-//  Called from the connection thread's exit, on the app-close paths:
-//  the caller of close() never waits for it (the thread runs it when
-//  it notices the close), but the accept loop's housekeeping join and
-//  close_and_wait() span it, so it stays bounded in both directions:
-//  a peer that keeps sending is drained up to 1 MiB or 500 ms,
-//  whichever comes first - after that the close proceeds and the
-//  excess is reset (bounded cost, documented trade-off, same as the
-//  legacy close); a peer that stops sending costs only the empty grace
-//  below, so a quiet peer does not hold the exit for the whole
-//  deadline. Each recv is non-blocking and the queue is kernel-bounded,
-//  so this is fast.
-static void drain_receive_queue(SOCKET socket){
-    constexpr size_t DRAIN_CAP_BYTES = 1u << 20;
-    constexpr std::chrono::milliseconds DRAIN_DEADLINE{500};
-    //  How long the queue may stay empty before the close proceeds:
-    //  by then the peer's last data has had time to arrive.
-    constexpr std::chrono::milliseconds EMPTY_GRACE{50};
-
-    const auto deadline =
-        std::chrono::steady_clock::now() + DRAIN_DEADLINE;
-    //  "time_point::max()" means the queue has not been observed empty
-    //  yet.
-    auto empty_since = std::chrono::steady_clock::time_point::max();
-
-    char buffer[4096];
-    size_t drained = 0;
-    while (drained < DRAIN_CAP_BYTES
-        && std::chrono::steady_clock::now() < deadline
-    ){
-        const auto now = std::chrono::steady_clock::now();
-        const int r = ::recv(socket, buffer, sizeof(buffer), 0);
-        if (r > 0){
-            drained += (size_t)r;
-            empty_since = std::chrono::steady_clock::time_point::max();
-            continue;
-        }
-        const int err = WSAGetLastError();
-        if (r == SOCKET_ERROR
-            && (err == WSAEWOULDBLOCK || err == WSAEINPROGRESS)
-        ){
-            //  Nothing queued right now; the peer may still be sending.
-            //  Give it the empty grace for the last data to arrive,
-            //  then stop.
-            if (empty_since == std::chrono::steady_clock::time_point::max()){
-                empty_since = now;
-            }else if (now >= empty_since + EMPTY_GRACE){
-                break;
-            }
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            continue;
-        }
-        break;   //  0 (the peer finished) or an error: nothing more.
-    }
-}
-
 //  The connection thread's exit sequence for a socket the shell still
 //  owns: if the close was initiated by the application (or the server's
-//  teardown) rather than by the peer, drain the receive queue first and
-//  send a clean FIN, so the peer keeps the data we already wrote to it;
-//  then close. Only the connection thread calls this: it is the thread
-//  that reads the socket, so no other thread can be using the handle
-//  while it is drained, shut down, and closed.
+//  teardown) rather than by the peer, send the FIN first, then close.
+//  Only the connection thread calls this: it is the thread that reads
+//  the socket, so no other thread can be using the handle while it is
+//  shut down and closed. The receive queue is not drained: the kernel
+//  is free to reset the connection while the peer is still sending,
+//  and the close contract is that in-flight operations stop promptly,
+//  not that the peer's pre-close data is delivered.
 static void finish_socket_close(SOCKET socket, bool app_close){
     if (app_close){
-        drain_receive_queue(socket);
         ::shutdown(socket, SD_BOTH);
     }
     ::closesocket(socket);
@@ -176,18 +115,14 @@ void ServerSocketConnection_WinSocket::close(){
     //  down. (A no-op unless this connection is still the active one.)
     m_server->release_connection(this);
     //  The connection thread performs the actual close: when it exits
-    //  it drains the receive queue (bounded, on its own thread, so this
-    //  call never blocks) and shuts the socket down before closing it.
-    //  close() itself makes no socket call: it may run on that thread
-    //  (a listener callback), and by the time it runs the transport may
-    //  have already closed the fd, in which case the system may have
-    //  handed that handle to a different socket - any socket call here
-    //  could reach the other socket instead. Handing the fd off to this
-    //  object would be worse: no one else would then close it, and the
-    //  handle would leak. A close of a connection whose peer keeps
-    //  streaming can delay the accept loop's housekeeping join and
-    //  close_and_wait() by at most the drain's bounds; the caller of
-    //  close() is never delayed.
+    //  it shuts the socket down and closes it. close() itself makes no
+    //  socket call: it may run on that thread (a listener callback),
+    //  and by the time it runs the transport may have already closed
+    //  the fd, in which case the system may have handed that handle to
+    //  a different socket - any socket call here could reach the other
+    //  socket instead. Handing the fd off to this object would be
+    //  worse: no one else would then close it, and the handle would
+    //  leak.
 }
 void ServerSocketConnection_WinSocket::start_thread(ThreadPool& thread_pool){
     m_thread = thread_pool.dispatch([this]{
