@@ -137,7 +137,6 @@ YOLOv5Session::YOLOv5Session(const std::string& model_path, bool use_gpu)
     , m_memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
     , m_input_names{m_session.GetInputNames()}
     , m_output_names{m_session.GetOutputNames()}
-    , m_model_input(3*YOLO5_INPUT_IMAGE_SIZE*YOLO5_INPUT_IMAGE_SIZE)
 {
     // Extract YOLO labels from model metadata
     try{
@@ -170,7 +169,7 @@ YOLOv5Session::YOLOv5Session(const std::string& model_path, bool use_gpu)
     }
 
     std::vector<int64_t> output_dims = m_session.GetOutputTypeInfo(0).GetTensorTypeAndShapeInfo().GetShape();
-    if (output_dims.size() != 3 || output_dims[2] <= 5){
+    if (output_dims.size() != 3 || output_dims[1] <= 0 || output_dims[2] <= 5){
         throw std::runtime_error("YOLOv5 model does not have the correct output dimension, found shape " + to_string(output_dims));
     }
     m_output_shape[2] = output_dims[2];
@@ -180,7 +179,19 @@ YOLOv5Session::YOLOv5Session(const std::string& model_path, bool use_gpu)
             " output labels but YOLOv5Session was initialized with " + std::to_string(m_label_names.size()) + " labels"
         );
     }
-    m_model_output.resize(YOLO5_NUM_CANDIDATES * m_output_shape[2]);
+
+    // Models must be exported with a fixed input size, e.g. [1, 3, 640, 640] or [1, 3, 1280, 1280].
+    std::vector<int64_t> input_dims = m_session.GetInputTypeInfo(0).GetTensorTypeAndShapeInfo().GetShape();
+    if (input_dims.size() != 4 || input_dims[1] != 3 || input_dims[2] <= 0 || input_dims[3] <= 0){
+        throw std::runtime_error("YOLOv5 model does not have a fixed [1, 3, H, W] input shape, found shape " + to_string(input_dims));
+    }
+    m_input_shape[2] = input_dims[2];
+    m_input_shape[3] = input_dims[3];
+    m_output_shape[1] = output_dims[1];
+    global_logger_tagged().log("YOLOv5: Input shape " + to_string(input_dims) + ", output shape " + to_string(output_dims), COLOR_PURPLE);
+
+    m_model_input.resize(3 * m_input_shape[2] * m_input_shape[3]);
+    m_model_output.resize(m_output_shape[1] * m_output_shape[2]);
 }
 
 // input: rgb color order
@@ -193,7 +204,7 @@ void YOLOv5Session::run(const cv::Mat& input_image, std::vector<YOLOv5Session::D
     int x_shift = 0, y_shift = 0;
     double x_scale = 1.0, y_scale = 1.0;
     std::tie(x_shift, y_shift, x_scale, y_scale) = resize_image_with_border(input_image, image_resized,
-        YOLO5_INPUT_IMAGE_SIZE, YOLO5_INPUT_IMAGE_SIZE, cv::Scalar(114, 114, 114));
+        (int)m_input_shape[3], (int)m_input_shape[2], cv::Scalar(114, 114, 114));
 
     // Declare a destination Mat for float32
     cv::Mat image_float;
@@ -232,7 +243,7 @@ void YOLOv5Session::run(const cv::Mat& input_image, std::vector<YOLOv5Session::D
     std::vector<float> scores;
     std::vector<size_t> labels;
 
-    for (int i = 0; i < YOLO5_NUM_CANDIDATES; i++){
+    for (int i = 0; i < (int)m_output_shape[1]; i++){
         float cx = m_model_output[cand_size*i];
         float cy = m_model_output[cand_size*i+1];
         float w = m_model_output[cand_size*i+2];
@@ -261,7 +272,7 @@ void YOLOv5Session::run(const cv::Mat& input_image, std::vector<YOLOv5Session::D
 
     for (int index : indices)
     {
-        // Note the model predicts on (640x640) images, we need to convert the detected pixel_boxes back to
+        // Note the model predicts on images of its input size (e.g. 640x640), we need to convert the detected pixel_boxes back to
         // the full frame dimension.
         double x = (pixel_boxes[index].x - x_shift) * x_scale;
         double y = (pixel_boxes[index].y - y_shift) * y_scale;

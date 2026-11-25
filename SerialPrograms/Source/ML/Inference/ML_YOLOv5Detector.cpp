@@ -50,7 +50,6 @@ YOLOv5Detector::YOLOv5Detector(const std::string& model_path)
             "Error: YOLOv5 model path must end with .onnx. But got " + model_path + ".");
     }
 
-    std::string label_file_path = model_path.substr(0, model_path.size() - 5) + "_label.txt";
     m_yolo_session = std::make_unique<YOLOv5Session>(m_model_path, m_use_gpu);
 }
 
