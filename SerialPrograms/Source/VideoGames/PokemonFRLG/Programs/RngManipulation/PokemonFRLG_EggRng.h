@@ -101,7 +101,6 @@ private:
         const bool& previously_hit_held_frame,
         Milliseconds& launch_delay,
         const std::set<std::string>& SPECIES_LIST,
-        const RngStatsDatabase& STATS_DATA,
         bool pickup_frame
     );
     

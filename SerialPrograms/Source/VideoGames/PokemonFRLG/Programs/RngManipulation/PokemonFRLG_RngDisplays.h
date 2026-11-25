@@ -49,12 +49,11 @@ public:
         )
     {}
 
-    void set_target(const AdvPokemonResult& pokemon, const int16_t& gender_threshold);
-    void set_target(const AdvWildPokemonResult& pokemon, const int16_t& gender_threshold);
+    void set_target(const AdvPokemonResult& pokemon, const std::string& species, uint8_t level);
+    void set_target(const AdvWildPokemonResult& pokemon);
 
 private:
-    std::string result_to_string(const AdvPokemonResult& pokemon, const int16_t& gender_threshold);
-    std::string result_to_string(const AdvWildPokemonResult& pokemon, const int16_t& gender_threshold);
+    std::string result_to_string(const AdvPokemonResult& pokemon, const std::string& species, uint8_t level);
 };
 
 class RngFilterDisplay : public GroupOption{
@@ -71,6 +70,7 @@ public:
     StringOption species;
     StringOption gender;
     StringOption nature;
+    StringOption ability;
     StringOption level;
     StringOption hp;
     StringOption atk;

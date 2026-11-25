@@ -209,23 +209,31 @@ const std::string* TestImageDistortionManager::image_label(const std::string& im
 
 namespace{
 
-//  The global manager, published by `initialize_test_image_distortions()` and read by the tests,
-//  which can run on any thread.
+//  Manages image distortion augmentations to be used by each image tests.
+//  This singleton is initialized by `enable_test_image_distortions()`.
+//  One created, the singleton can on any thread.
+//  If distortion augmentation is enabled and then disabled, this atomic
+//  pointer will be set to nullptr while the singleton remains existent.
 std::atomic<const TestImageDistortionManager*> global_manager(nullptr);
 
 }
 
 
-void initialize_test_image_distortions(const std::string& test_repo_path){
+void enable_test_image_distortions(const std::string& test_repo_path){
     static Mutex lock;
+    //  Loaded once and kept until the program exits, so turning the runs off and on again
+    //  doesn't reload the files.
     static std::unique_ptr<const TestImageDistortionManager> manager;
 
     std::lock_guard<Mutex> lg(lock);
-    if (manager){
-        return;
+    if (!manager){
+        manager = std::make_unique<const TestImageDistortionManager>(test_repo_path);
     }
-    manager = std::make_unique<const TestImageDistortionManager>(test_repo_path);
     global_manager.store(manager.get(), std::memory_order_release);
+}
+
+void disable_test_image_distortions(){
+    global_manager.store(nullptr, std::memory_order_release);
 }
 
 const TestImageDistortionManager* test_image_distortion_manager(){

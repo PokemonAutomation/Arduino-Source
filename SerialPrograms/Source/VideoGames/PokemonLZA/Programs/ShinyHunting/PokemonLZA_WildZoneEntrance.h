@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonLZA_WildZoneEntrance_H
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-//#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "VideoGames/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
@@ -49,6 +49,7 @@ private:
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
     MillisecondsOption WALK_TIME_IN_ZONE;
     BooleanCheckBoxOption RUNNING;
+    SimpleIntegerOption<uint64_t> NUM_VISITS;
 
     ShinySoundDetectedActionOption SHINY_DETECTED;
 

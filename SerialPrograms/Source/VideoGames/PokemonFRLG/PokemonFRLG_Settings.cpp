@@ -65,6 +65,7 @@ GameSettings::GameSettings()
         LockMode::LOCK_WHILE_RUNNING,
         "3000 ms"
     )
+    , m_rng_settings("<font size=4><b>RNG Settings:</b></font>")
     , HANDLE_ONLINE_LICENSE_CHECK(
         "<b>Handle Online License Check:</b><br>"
         "Turn this on if your console checks the game's license online when it starts the game: "
@@ -72,6 +73,12 @@ GameSettings::GameSettings()
         "The RNG programs' hard reset then waits for the game to start instead of using a fixed delay.",
         LockMode::LOCK_WHILE_RUNNING,
         false // default
+    )
+    , RUN_RNG_START_CHECKS(
+        "<b>Run Start Checks:</b><br>"
+        "Run pre-program validation checks, e.g. that your party has enough free slots.",
+        LockMode::LOCK_WHILE_RUNNING,
+        true // default
     )
     , m_shiny_audio_settings("<font size=4><b>Shiny Audio Settings:</b></font>")
     , SHINY_SOUND_THRESHOLD(
@@ -98,7 +105,9 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(SELECT_BUTTON_MASH0);
     PA_ADD_OPTION(ENTER_GAME_WAIT0);
     PA_ADD_OPTION(ENTER_GAME_MASH0);
+    PA_ADD_STATIC(m_rng_settings);
     PA_ADD_OPTION(HANDLE_ONLINE_LICENSE_CHECK);
+    PA_ADD_OPTION(RUN_RNG_START_CHECKS);
     PA_ADD_STATIC(m_shiny_audio_settings);
     PA_ADD_OPTION(SHINY_SOUND_THRESHOLD);
     PA_ADD_OPTION(SHINY_SOUND_LOW_FREQUENCY);

@@ -145,9 +145,10 @@ void StatsReader::read_gender(
     );
     const size_t num_red_pixels = image_stats(red_region).count;
 
+    //  Blue from 150, not higher: darker capture cards show the male symbol's blue at ~155.
     const ImageRGB32 blue_region = filter_rgb32_range(
         gender_box,
-        combine_rgb(0, 0, 180), combine_rgb(130, 130, 255), Color(0), replace_color_within_range
+        combine_rgb(0, 0, 150), combine_rgb(130, 130, 255), Color(0), replace_color_within_range
     );
     const size_t num_blue_pixels = image_stats(blue_region).count;
 
@@ -179,11 +180,12 @@ bool StatsReader::read_level(
     );
     
     // The level uses white text with dark shadow on a lilac background.
-    // The digit reader's binarizer captures dark pixels (<=190 on all channels)
-    // but NOT the white text (all channels 255 -> excluded). This leaves the
-    // shadow outline fragmented into many small disconnected blobs.
-    // Preprocess: convert bright-white text pixels to black so the binarizer
-    // merges text + shadow into one solid connected blob per digit.
+    // The digit reader's binarizer captures pixels darker than the background
+    // but NOT the white text. This leaves the shadow outline fragmented into
+    // many small disconnected blobs.
+    // To solve this, we run a preprocess: convert bright-white text pixels to
+    // black so the binarizer merges text + shadow into one solid connected blob
+    // per digit.
     ImageRGB32 preprocessed = level_box.scale_to(level_box.width(), level_box.height());
     for (size_t r = 0; r < level_box.height(); r++){
         for (size_t c = 0; c < level_box.width(); c++){
@@ -202,7 +204,7 @@ bool StatsReader::read_level(
     // give higher RMSD than yellow stat-box crops due to background colour.
     stats.level = read_digits_waterfill_template(
             logger, preprocessed, DigitTemplateType::LevelBox, 230,
-            "levelDigit", 0x7F);
+            "levelDigit");
     // log if it's an obviously bad read
     if (!stats.level.has_value() || stats.level.value_or(-1) < 2 || stats.level.value_or(-1) > 100){
         logger.log("Level OCR result out of range", COLOR_RED);
@@ -571,6 +573,39 @@ void add_tests_StatsReader(UnitTestDatabase& database){
     database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/unown_p_eng.png");
     database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/unown_qu_eng.png");
     database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/venonat_4k_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/arbok_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/arcanine_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/blastoise_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/butterfree_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/diglett_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/dragonite_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/dragonite_usb3_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/ekans_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/exeggcute_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/fearow_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/gengar_usb3_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/geodude_usb3_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/gloom_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/golbat_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/machoke_usb3_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/magmar_usb3_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/magnemite_usb3_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/magneton_usb3_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/mantine_usb3_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/mewtwo_usb3_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/mr-mime_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/nidoking_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/nidoqueen_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/onix_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/parasect_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/pidgeotto_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/psyduck_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/raichu_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/rhydon_usb3_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/sneasel_usb3_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/snorlax_hd60pro_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/swinub_usb3_eng.png");
+    database.add<Test_StatsReaderPage1>("PokemonFRLG/StatsReader/Page1/weedle_hd60pro_eng.png");
     database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/abra_1_deu.png");
     database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/deoxys_1_jpn.png");
     database.add<Test_StatsReaderPage2>("PokemonFRLG/StatsReader/Page2/mewtwo_1_spa.png");

@@ -9,6 +9,7 @@
 
 #include <sstream>
 #include <fstream>
+#include "Common/Cpp/Exceptions.h"
 #include "TestUtils.h"
 
 using std::cout;
@@ -101,6 +102,60 @@ bool load_slug_list(const std::string& filepath, std::vector<std::string>& sprit
         }
 
         sprites.emplace_back(std::move(word));
+    }
+
+    return true;
+}
+
+bool load_slug_list_with_2d_coordinates(const std::string& filepath, std::vector<SlugWith2DCoordinate>& slugs){
+    std::ifstream fin(filepath.c_str());
+    if (!fin){
+        return false;
+    }
+
+    std::string line;
+    size_t line_number = 0;
+    while (std::getline(fin, line)){
+        line_number++;
+        std::istringstream is(line);
+        std::vector<std::string> words;
+        std::string word;
+        while (is >> word){
+            words.emplace_back(std::move(word));
+        }
+        if (words.empty()){
+            continue; // empty line, skip
+        }
+
+        const std::string where = filepath + ", line " + std::to_string(line_number) + ": \"" + line + "\"";
+        SlugWith2DCoordinate entry;
+        entry.slug = words[0];
+        switch (words.size()){
+        case 1:
+            entry.x = entry.y = -1.0;
+            break;
+        case 3:{
+            //  `std::stod()` would accept "12abc", so check that the whole word is used.
+            size_t x_length = 0;
+            size_t y_length = 0;
+            try{
+                entry.x = std::stod(words[1], &x_length);
+                entry.y = std::stod(words[2], &y_length);
+            }catch (std::exception&){}
+            if (x_length != words[1].size() || y_length != words[2].size()){
+                throw ParseException("The point must be two numbers \"<x> <y>\" in " + where);
+            }
+            //  This also catches a point in pixels, e.g. "1205 478".
+            //  `!(... >= ...)` is also true for NaN.
+            if (!(entry.x >= 0 && entry.x <= 1 && entry.y >= 0 && entry.y <= 1)){
+                throw ParseException("The point must be relative to the image size, from 0.0 to 1.0, in " + where);
+            }
+            break;
+        }
+        default:
+            throw ParseException("Each line must be \"<slug>\" or \"<slug> <x> <y>\" in " + where);
+        }
+        slugs.emplace_back(std::move(entry));
     }
 
     return true;

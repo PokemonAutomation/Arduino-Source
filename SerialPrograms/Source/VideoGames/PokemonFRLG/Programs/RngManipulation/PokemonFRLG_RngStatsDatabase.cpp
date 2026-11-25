@@ -36,13 +36,29 @@ RngStatsDatabase::RngStatsDatabase(const char* json_path){
 
         int16_t gender_threshold = int16_t(obj.get_integer_throw("genderThreshold", path));
 
-        RngStats rng_stats = { base_stats, gender_threshold };
+        std::vector<std::string> abilities;
+        const JsonArray* abilities_arr = obj.get_array("abilities");
+        if (abilities_arr != nullptr){
+            for (const auto& ability : *abilities_arr){
+                abilities.emplace_back(ability.to_string_throw(path));
+            }
+            if (abilities.size() > 2){
+                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Too many abilities for " + slug + ".", path);
+            }
+        }
+
+        RngStats rng_stats = { base_stats, gender_threshold, std::move(abilities) };
 
         m_database.emplace(
             slug,
             rng_stats
         );
     }
+}
+
+const RngStatsDatabase& RngStatsDatabase::instance(){
+    static const RngStatsDatabase database("PokemonFRLG/BaseStats.json");
+    return database;
 }
 
 const RngStats& RngStatsDatabase::get_throw(const std::string& slug) const{
@@ -66,6 +82,32 @@ const RngStats* RngStatsDatabase::get_nothrow(const std::string& slug) const{
         return nullptr;
     }
     return &iter->second;
+}
+
+std::string ability_name(const RngStats* stats, AdvAbility ability){
+    size_t slot;
+    switch (ability){
+    case AdvAbility::Zero:
+        slot = 0;
+        break;
+    case AdvAbility::One:
+        slot = 1;
+        break;
+    default:
+        return "-";
+    }
+    if (stats == nullptr || stats->abilities.empty()){
+        return "-";
+    }
+    // Species with only one ability use it regardless of the PID's ability bit.
+    return stats->abilities[slot < stats->abilities.size() ? slot : 0];
+}
+
+std::string gender_name(const RngStats* stats, uint8_t gender_value){
+    if (stats == nullptr){
+        return "-";
+    }
+    return gender_to_string(gender_from_gender_value(gender_value, stats->gender_threshold));
 }
 
 

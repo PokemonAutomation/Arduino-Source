@@ -82,8 +82,11 @@ protected:
     size_t m_threads = 1;
 };
 
-
-
+//  Folder path (end with "/") to hold debugging images and other
+//  debugging files for unit tests.
+//  This path is inside `DEBUG_PATH()`, which is defined in
+//  CommonFramework/GlobalAutoPaths.h.
+const std::string& UNIT_TEST_DEBUG_PATH();
 
 
 //  Forward Declaration

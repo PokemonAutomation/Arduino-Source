@@ -224,7 +224,7 @@ WildRng::WildRng()
     })
 {
     PA_ADD_OPTION(m_calibration_displays);
-    PA_ADD_OPTION(RNG_TARGET);
+    PA_ADD_STATIC(RNG_TARGET);
     PA_ADD_OPTION(RNG_FILTERS);
     PA_ADD_OPTION(RNG_CALIBRATION);
     PA_ADD_OPTION(m_game_info);
@@ -281,12 +281,10 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
     WildRng_Descriptor::Stats& stats = env.current_stats<WildRng_Descriptor::Stats>();
 
     home_black_border_check(env.console, context);
+    check_free_party_slots(env.console, context, 1);
 
     RNG_FILTERS.reset();
     RNG_CALIBRATION.reset_hits();
-
-    // prepare database of base stats and gender thresholds
-    RngStatsDatabase STATS_DATA("PokemonFRLG/BaseStats.json");
 
     // get the relevant encounter slots
     EncountersDatabase encounters_data(GAME_VERSION == GameVersion::firered ? "PokemonFRLG/EncounterSlotsFR.json" : "PokemonFRLG/EncounterSlotsLG.json");
@@ -392,19 +390,8 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
     AdvRngWildSearcher searcher(TARGET_SEED, ADVANCES, ENCOUNTER_SLOTS, RNG_METHOD);
     AdvWildPokemonResult target_result = searcher.generate_pokemon(SUPER_ROD);
-    RNG_TARGET.set_target(target_result, STATS_DATA.get_nothrow(target_result.species)->gender_threshold);
-    env.log("Target Species: " + target_result.species);
-    env.log("Target Level: " + std::to_string(target_result.level));
-    env.log("Target Encounter Slot: " + std::to_string(target_result.slot));
-    env.log("Target PID: " + to_hex_string(target_result.pid));
-    env.log("Target Nature: " + nature_to_string(target_result.nature));
-    env.log("Target IVs:");
-    env.log("   HP: " + std::to_string(target_result.ivs.hp));
-    env.log("   Atk: " + std::to_string(target_result.ivs.attack));
-    env.log("   Def: " + std::to_string(target_result.ivs.defense));
-    env.log("   SpA: " + std::to_string(target_result.ivs.spatk));
-    env.log("   SpD: " + std::to_string(target_result.ivs.spdef));
-    env.log("   Spe: " + std::to_string(target_result.ivs.speed));
+    RNG_TARGET.set_target(target_result);
+    log_target_pokemon(env.console, target_result);
 
     const RngCalibrations initial_calibrations = {
         RNG_CALIBRATION.seed_calibration / FRLG_FRAME_DURATION,
@@ -573,16 +560,13 @@ void WildRng::program(SingleSwitchProgramEnvironment& env, ProControllerContext&
 
         go_to_summary(env.console, context, 0, safari_zone ? StartMenuContext::SAFARI_ZONE : StartMenuContext::STANDARD);
         AdvObservedPokemon pokemon = read_summary(env.console, context, LANGUAGE, SPECIES_LIST);
-        RngStats species_stats;
-        try{
-            species_stats = STATS_DATA.get_throw(pokemon.species);        
-        }catch (const InternalProgramError& err){
-            env.log(err.message());
-            env.log("Failed to load base stats.", COLOR_RED);
+        const RngStats* species_stats = RngStatsDatabase::instance().get_nothrow(pokemon.species);
+        if (species_stats == nullptr){
+            env.log("Failed to load base stats for species: \"" + pokemon.species + "\"", COLOR_RED);
             continue;
         }
-        BaseStats base_stats = species_stats.base_stats;
-        int16_t gender_threshold = species_stats.gender_threshold;
+        const BaseStats& base_stats = species_stats->base_stats;
+        const int16_t gender_threshold = species_stats->gender_threshold;
 
         AdvRngFilters filters = observation_to_filters(pokemon, base_stats, AdvRngMethod::Any);
         bool valid_stats = validate_level(filters, pokemon, ENCOUNTER_SLOTS, base_stats);

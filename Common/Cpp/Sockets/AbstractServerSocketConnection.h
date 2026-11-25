@@ -2,7 +2,7 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  A single client connection on an AbstractServerSocket2.
+ *  A single client connection on an AbstractServerSocket.
  *
  *  The server hands these out through its listeners, one per accepted
  *  client. All I/O happens on the connection object, not on the server:

@@ -3,10 +3,18 @@
  *  From: https://github.com/PokemonAutomation/
  *
  *  The "AbstractServerSocket" implementation of "AbstractHttpServer": a
- *  minimal HTTP/1.1 server on the platform's default server socket, for a
- *  single local client that issues one request at a time. The request/
- *  response types, the handler contract, and the threading rules are in
- *  "AbstractHttpServer.h"; this file documents the implementation.
+ *  minimal HTTP/1.1 server on the platform's default server socket
+ *  backend, for a single local client that issues one request at a time.
+ *  The request/response types, the handler contract, and the threading
+ *  rules are in "AbstractHttpServer.h"; this file documents the
+ *  implementation.
+ *
+ *  The transport's per-connection objects make the connection identity
+ *  explicit: the socket's callbacks pass the connection they are about,
+ *  and all I/O happens on that connection object. A response that
+ *  outlives its connection is sent into an inert shell (send() returns
+ *  0) instead of being refused by a connection id, and closing a
+ *  connection can never touch a later client's socket.
  *
  */
 
@@ -54,10 +62,17 @@ public:
 private:
     //  AbstractServerSocket::Listener.
     virtual void on_listen_finished(const std::string& error_message) override;
-    virtual void on_connect() override;
+    virtual void on_connect(AbstractServerSocket::ConnectionPtr connection) override;
     virtual void on_connect_rejected() override;
-    virtual void on_receive_data(const void* data, size_t bytes) override;
-    virtual void on_disconnect(const std::string& error_message) override;
+    virtual void on_receive_data(
+        AbstractServerSocket::ConnectionPtr connection,
+        const void* data,
+        size_t bytes
+    ) override;
+    virtual void on_disconnect(
+        AbstractServerSocket::ConnectionPtr connection,
+        const std::string& error_message
+    ) override;
 
 
 private:
@@ -95,42 +110,31 @@ private:
         std::string buffer;
         std::atomic<bool> dead{false};
 
-        //  The server socket's connection_id() when this connection was
-        //  accepted. Passed to every send(), so a write that outlives the
-        //  connection is refused instead of reaching the next client.
-        uint64_t socket_id = 0;
+        //  The transport. The connection shell stays valid but inert
+        //  after it closes, so this reference may be held forever.
+        AbstractServerSocket::ConnectionPtr socket;
     };
 
     //  Runs on a thread from the thread pool, one instance per
     //  connection.
-    void connection_task(
-        const std::shared_ptr<Connection>& conn,
-        AbstractServerSocket* socket
-    );
+    void connection_task(const std::shared_ptr<Connection>& conn);
 
     //  Parses one complete request out of "buffer", removing it on
     //  success. Must be called with "conn->lock" held.
     static ParsedRequest try_parse(std::string& buffer);
 
-    //  Marks the connection dead and closes it at the socket level. No-op
-    //  if the socket is no longer connected to this client.
-    void end_connection(
-        const std::shared_ptr<Connection>& conn,
-        AbstractServerSocket* socket
-    );
+    //  Marks the connection dead and closes its transport. No-op if the
+    //  transport is already closed; it can only ever affect this
+    //  connection, never a later client's.
+    void end_connection(const std::shared_ptr<Connection>& conn);
 
     //  Writes "bytes" to the connection completely; returns false (and
     //  ends the connection) if the peer went away or the write stalled.
-    bool write_raw(
-        const std::shared_ptr<Connection>& conn,
-        AbstractServerSocket* socket,
-        const std::string& bytes
-    );
+    bool write_raw(const std::shared_ptr<Connection>& conn, const std::string& bytes);
 
     //  Formats and writes the final response.
     bool write_response(
         const std::shared_ptr<Connection>& conn,
-        AbstractServerSocket* socket,
         const Response& response,
         bool keep_alive
     );

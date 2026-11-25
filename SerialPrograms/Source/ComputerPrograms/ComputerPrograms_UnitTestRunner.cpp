@@ -4,12 +4,13 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/HttpServer/HttpServer_Tests.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/MoveOnlyFunction_Tests.h"
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Sockets/ServerSocket2_Tests.h"
+#include "Common/Cpp/Sockets/ServerSocket_Tests.h"
 #include "Common/Cpp/Sockets/Sockets_Tests.h"
 #include "Common/Cpp/TestRunners/TestImageDistortionManager.h"
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
@@ -59,7 +60,7 @@ UnitTestDatabase make_UNIT_TESTS_ALL(){
 
     add_tests_QtEventThreadPool(ret, GlobalThreadPools::computation_normal());
     add_tests_Sockets(ret, GlobalThreadPools::unlimited_normal());
-    add_tests_ServerSocket2(ret, GlobalThreadPools::unlimited_normal());
+    add_tests_ServerSocket(ret, GlobalThreadPools::unlimited_normal());
     add_tests_HttpServer(ret, GlobalThreadPools::unlimited_normal());
     add_tests_BlackBorderDetector(ret);
     add_tests_ListenerSet(ret);
@@ -129,6 +130,20 @@ size_t add_tests_matching(const std::string& filter, AddTest&& add_test){
     }
     return count;
 }
+
+
+void enable_and_log_test_image_distortions(Logger& logger){
+    enable_test_image_distortions(UNIT_TEST_RESOURCE_PATH());
+    const TestImageDistortionManager& manager = *test_image_distortion_manager();
+    std::string labels;
+    for (size_t c = 0; c < manager.num_test_distortions(); c++){
+        labels += c == 0 ? "" : ", ";
+        labels += manager.test_distortion_label(c);
+    }
+    logger.log("Color distortion augmentation enabled. Image tests with labeled images also run with: " + labels);
+}
+
+size_t MAX_NUM_TESTS_TO_SHOWN = 1000;
 
 }
 
@@ -204,6 +219,14 @@ UnitTestRunner::UnitTestRunner()
     )
     , SUBSTRING_TEST_LABEL("<b>Run All Tests Containing This Substring:</b>")
     , SUBSTRING_TEST(false, LockMode::LOCK_WHILE_RUNNING, "", "PokemonSwSh")
+    , USE_IMAGE_DISTORTION_AUGMENTATIONS(
+        "<b>Also Run With Image Distortion Augmentations:</b><br>"
+        "Each image test will also be run with additional image distortion augmentations to simulate "
+        "different capture card distortions.<br>"
+        "Only images with a recorded distortion label are used to augment the tests.",
+        LockMode::LOCK_WHILE_RUNNING,
+        false
+    )
     , TESTS_TO_RUN(
         "<b>Tests to Run:</b>",
         LockMode::READ_ONLY,
@@ -227,6 +250,7 @@ UnitTestRunner::UnitTestRunner()
     PA_ADD_OPTION(SINGLE_TEST);
     PA_ADD_STATIC(SUBSTRING_TEST_LABEL);
     PA_ADD_OPTION(SUBSTRING_TEST);
+    PA_ADD_OPTION(USE_IMAGE_DISTORTION_AUGMENTATIONS);
     PA_ADD_STATIC(TESTS_TO_RUN);
     PA_ADD_OPTION(PASSED_TESTS);
     PA_ADD_OPTION(FAILED_TESTS);
@@ -264,12 +288,12 @@ void UnitTestRunner::on_config_value_changed(void* object){
         TESTS_TO_RUN.set("");
         size_t num_shown = 0;
         size_t count = add_tests_matching(name, [&](std::shared_ptr<const UnitTest> test){
-            if (++num_shown <= 1000){
+            if (++num_shown <= MAX_NUM_TESTS_TO_SHOWN){
                 TESTS_TO_RUN.append(test->name() + "\n");
             }
         });
-        if (count > 1000){
-            TESTS_TO_RUN.append("<" + tostr_u_commas(count - 1000) + " more...>\n");
+        if (count > MAX_NUM_TESTS_TO_SHOWN){
+            TESTS_TO_RUN.append("<" + tostr_u_commas(count - MAX_NUM_TESTS_TO_SHOWN) + " more...>\n");
         }
         TESTS_TO_RUN.set_label("<b>Tests to Run: " + tostr_u_commas(count) + "</b>");
     }
@@ -285,6 +309,16 @@ void UnitTestRunner::program(ProgramEnvironment& env, CancellableScope& scope){
     ScopeExit run_on_exit([this]{
         m_env = nullptr;
     });
+
+    if (USE_IMAGE_DISTORTION_AUGMENTATIONS){
+        try{
+            enable_and_log_test_image_distortions(env.logger());
+        }catch (Exception& e){
+            throw UserSetupError(env.logger(), "Unable to load image distortion data: " + e.to_str());
+        }
+    }else{
+        disable_test_image_distortions();
+    }
 
     //  Uncapped pool: the runner caps the # of concurrently running tests itself, and
     //  dispatch_now_blocking() would stall the dispatcher once a capped pool saturates.
@@ -326,6 +360,10 @@ void UnitTestRunner::program(ProgramEnvironment& env, CancellableScope& scope){
     }
 
     runner.run();
+
+    if (m_total_failed.load(std::memory_order_acquire) > 0 && USE_IMAGE_DISTORTION_AUGMENTATIONS){
+        FAILED_TESTS.append("See " + UNIT_TEST_DEBUG_PATH() + " for any augmented images that failed the tests.");
+    }
 }
 
 
@@ -345,9 +383,9 @@ void UnitTestRunner::on_test_finished(
         break;
     case UnitTestResult::PASSED:{
         uint64_t passed = stats.passed.fetch_add(1) + 1;
-        if (passed <= 1000){
+        if (passed <= MAX_NUM_TESTS_TO_SHOWN){
             PASSED_TESTS.append(test->name() + "\n");
-        }else if (passed == 1001){
+        }else if (passed == MAX_NUM_TESTS_TO_SHOWN + 1){
             PASSED_TESTS.append("<more not shown...>\n");
         }
         break;
@@ -355,9 +393,9 @@ void UnitTestRunner::on_test_finished(
     case UnitTestResult::FAILED:{
         uint64_t failed = m_total_failed.fetch_add(1) + 1;
         stats.failed++;
-        if (failed <= 1000){
-            FAILED_TESTS.append("FAILED: " + test->name() + "\n");
-        }else if (failed == 1001){
+        if (failed <= MAX_NUM_TESTS_TO_SHOWN){
+            FAILED_TESTS.append("FAILED: " +  test->name() + ": " + result.message + "\n");
+        }else if (failed == MAX_NUM_TESTS_TO_SHOWN + 1){
             FAILED_TESTS.append("<more not shown...>\n");
         }
         break;
@@ -368,9 +406,9 @@ void UnitTestRunner::on_test_finished(
     case UnitTestResult::OOM:{
         uint64_t failed = m_total_failed.fetch_add(1) + 1;
         stats.oom++;
-        if (failed <= 1000){
+        if (failed <= MAX_NUM_TESTS_TO_SHOWN){
             FAILED_TESTS.append("OOM: " + test->name() + "\n");
-        }else if (failed == 1001){
+        }else if (failed == MAX_NUM_TESTS_TO_SHOWN + 1){
             FAILED_TESTS.append("<more not shown...>\n");
         }
         break;
@@ -386,21 +424,14 @@ void UnitTestRunner::on_test_finished(
 
 bool CommandLineUnitTestRunner::run(bool augment_color_distortions, const std::string& test_substring){
     if (augment_color_distortions){
-        //  Load the distortion data before any test runs. Each `ImageUnitTest` checks the global
-        //  manager when it runs, and only runs with distortions if it is loaded.
+        //  Turn on the distortion runs before any test runs. Each `ImageUnitTest` checks the
+        //  global manager when it runs, and only runs with distortions if it is on.
         try{
-            initialize_test_image_distortions(UNIT_TEST_RESOURCE_PATH());
+            enable_and_log_test_image_distortions(m_logger);
         }catch (Exception& e){
             m_logger.log("Unable to load the test image distortions: " + e.to_str(), COLOR_RED);
             return true;
         }
-        const TestImageDistortionManager& manager = *test_image_distortion_manager();
-        std::string labels;
-        for (size_t c = 0; c < manager.num_test_distortions(); c++){
-            labels += c == 0 ? "" : ", ";
-            labels += manager.test_distortion_label(c);
-        }
-        m_logger.log("Color distortion augmentation enabled. Image tests with labeled images also run with: " + labels);
     }
 
     //  Uncapped pool: the runner caps the # of concurrently running tests itself, and
@@ -444,7 +475,7 @@ void CommandLineUnitTestRunner::on_test_finished(
         m_passed_tests++;
         break;
     case UnitTestResult::FAILED:
-        m_logger.log("FAILED: " + test->name(), COLOR_RED);
+        m_logger.log("FAILED: " + test->name() + ": " + result.message, COLOR_RED);
         m_failed_tests++;
         break;
     case UnitTestResult::SKIPPED:

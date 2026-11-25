@@ -129,6 +129,11 @@ ShinyHunt_WildZoneEntrance::ShinyHunt_WildZoneEntrance()
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
+    , NUM_VISITS(
+        "<b>Max Number of Visits:</b><br>Stop after this many visits. 0 means no limit.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0
+    )
     , SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY)
     , NOTIFICATION_STATUS("Status Update", true, false, Seconds(3600))
     , NOTIFICATIONS({
@@ -144,6 +149,7 @@ ShinyHunt_WildZoneEntrance::ShinyHunt_WildZoneEntrance()
     PA_ADD_OPTION(MOVEMENT);
     PA_ADD_OPTION(WALK_TIME_IN_ZONE);
     PA_ADD_OPTION(RUNNING);
+    PA_ADD_OPTION(NUM_VISITS);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 
@@ -548,6 +554,12 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
 
                     // No failure. Reset consecutive failure counter.
                     consecutive_failures = 0;
+
+                    // Stop once the user-set visit limit is reached. 0 means no limit.
+                    if (NUM_VISITS > 0 && stats.visits >= NUM_VISITS){
+                        env.log("Reached max number of visits: " + std::to_string(NUM_VISITS));
+                        break;
+                    }
                 }catch (OperationFailedException&){
                     consecutive_failures++;
                     env.log("Consecutive failures: " + std::to_string(consecutive_failures), COLOR_RED);

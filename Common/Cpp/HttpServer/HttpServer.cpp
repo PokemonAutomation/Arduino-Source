@@ -8,11 +8,11 @@
  *    connection (from the thread pool) does all parsing and writing, so
  *    the handler may run for a long time without stalling the socket's
  *    receive loop.
- *  - Every write goes through "AbstractServerSocket::send()" with the
- *    connection's socket id (captured at accept time), so a response
- *    that outlives its connection - the peer disconnected and the next
- *    client was accepted in the meantime - is refused by the socket
- *    instead of reaching the new client's stream.
+ *  - All I/O happens on the connection object the socket hands out: a
+ *    response that outlives its connection - the peer disconnected and
+ *    the next client was accepted in the meantime - is sent into the
+ *    inert shell of the old connection (send() returns 0) and can never
+ *    reach the new client's socket.
  *  - "Expect: 100-continue" is answered as soon as the headers are
  *    validated, while the body is still pending (a waiting client is
  *    blocked on that interim response).
@@ -24,12 +24,13 @@
  *    previous connection's task still finishing (for example, still in a
  *    long handler call); its handle is kept and reaped later.
  *  - "stop()" marks the active connection dead before it waits for the
- *    in-flight task: the socket suppresses its disconnect callback for a
- *    close_connection() close, so without the mark a handler polling
- *    "connection_alive()" would never see the shutdown. "stop()" then
- *    moves the socket out under "m_lock" and destroys it after releasing
- *    the lock: "~ServerSocket" joins the socket's worker threads, and
- *    their callbacks take "m_lock".
+ *    in-flight task, so a handler polling "connection_alive()" sees the
+ *    shutdown. It then closes the active connection's transport: in
+ *    flight writes block up to WRITE_TIMEOUT otherwise, and the
+ *    transport's close() makes them return promptly. "stop()" moves the
+ *    socket out under "m_lock" and destroys it after releasing the lock:
+ *    "~ServerSocket" joins the socket's worker threads, and their
+ *    callbacks take "m_lock".
  *
  */
 
@@ -235,10 +236,9 @@ void HttpServer::stop(){
         return;
     }
 
-    //  Mark the active connection dead: the socket suppresses its
-    //  disconnect callback for a close_connection() close, so without
-    //  this a handler polling connection_alive() would never see the
-    //  shutdown, and the wait for it below would never end.
+    //  Mark the active connection dead: without this a handler polling
+    //  connection_alive() would never see the shutdown, and the wait for
+    //  it below would never end.
     {
         std::lock_guard<Mutex> lg(m_lock);
         if (m_connection != nullptr){
@@ -247,12 +247,13 @@ void HttpServer::stop(){
         }
     }
 
-    //  Kill the active connection, if any: it cancels in-flight writes and
-    //  makes the socket's connection thread exit. The socket keeps
-    //  listening until it is destroyed below, so it may accept a few more
-    //  clients in the meantime; on_connect() sees m_stop_requested and
-    //  closes them without dispatching a connection task.
-    socket->close_connection();
+    //  Close the active connection's transport: a write_raw() in flight
+    //  would otherwise block up to WRITE_TIMEOUT, and the transport's
+    //  close() makes in-flight sends return promptly. (If the connection
+    //  task has already closed it, close() is a no-op.)
+    if (AbstractServerSocket::ConnectionPtr active = socket->active_connection()){
+        active->close();
+    }
 
     //  Wait for the in-flight connection tasks. The handles are moved out
     //  under m_task_lock (never destroyed while holding m_lock: a task's
@@ -299,7 +300,7 @@ void HttpServer::on_listen_finished(const std::string& error_message){
 }
 
 
-void HttpServer::on_connect(){
+void HttpServer::on_connect(AbstractServerSocket::ConnectionPtr connection){
     AbstractServerSocket* socket = nullptr;
     std::shared_ptr<Connection> conn;
     {
@@ -309,31 +310,25 @@ void HttpServer::on_connect(){
             !m_stop_requested.load(std::memory_order_acquire)
         ){
             conn = std::make_shared<Connection>();
-            //  The previous socket connection is over (the socket only
-            //  accepts a new client once the previous one is gone), but
-            //  its task may still be finishing (for example, still inside
-            //  a long handler call), and the socket's on_disconnect
-            //  callback for it may not have run yet: it runs after the
-            //  socket has already moved back to listening. Mark it dead
-            //  now, before the new connection takes over the socket's
-            //  active fd, so the old task discards its response instead
-            //  of delivering it to the new client.
+            conn->socket = std::move(connection);
+            //  The previous connection's transport is fully closed (the
+            //  socket only accepts a new client once it is), but the
+            //  previous connection's task may still be finishing (for
+            //  example, still inside a long handler call). Mark it dead
+            //  now, before the new connection takes over, so the old task
+            //  discards its response.
             if (m_connection != nullptr){
                 m_connection->dead.store(true, std::memory_order_release);
                 m_connection->cv.notify_all();
             }
             m_connection = conn;
-            //  The token of the connection this one will serve; send()
-            //  refuses to write through a socket that has moved on.
-            conn->socket_id = socket->connection_id();
         }
     }
     if (conn == nullptr){
         //  Stopping (or the socket is gone): close the connection without
-        //  a connection task.
-        if (socket != nullptr){
-            socket->close_connection();
-        }
+        //  a connection task. The shell is valid in both cases; closing
+        //  it only ever affects this client.
+        connection->close();
     }else{
         //  Dispatch outside m_lock: the task's final cleanup takes
         //  m_lock, and so does stop(). The task handles live in m_tasks
@@ -343,8 +338,8 @@ void HttpServer::on_connect(){
         //  while holding m_lock.
         try{
             AsyncTask task = m_thread_pool.dispatch(
-                [this, conn, socket]{
-                    connection_task(conn, socket);
+                [this, conn]{
+                    connection_task(conn);
                 }
             );
             std::lock_guard<Mutex> lg(m_task_lock);
@@ -370,7 +365,7 @@ void HttpServer::on_connect(){
                     m_connection = nullptr;
                 }
             }
-            socket->close_connection();
+            connection->close();
         }
     }
     m_listeners.run_method(&Listener::on_connect);
@@ -382,13 +377,24 @@ void HttpServer::on_connect_rejected(){
 }
 
 
-void HttpServer::on_receive_data(const void* data, size_t bytes){
+void HttpServer::on_receive_data(
+    AbstractServerSocket::ConnectionPtr connection,
+    const void* data,
+    size_t bytes
+){
     std::shared_ptr<Connection> conn;
-    AbstractServerSocket* socket = nullptr;
     {
         std::lock_guard<Mutex> lg(m_lock);
-        conn = m_connection;
-        socket = m_socket.get();
+        //  The socket reports data on the connection it belongs to: it is
+        //  for the current connection only while that connection is still
+        //  the active one. (The socket joins a connection's transport
+        //  thread before it accepts the next client, so a late report for
+        //  a previous connection is the only case this check filters out.)
+        if (m_connection != nullptr &&
+            m_connection->socket == connection
+        ){
+            conn = m_connection;
+        }
     }
     if (conn == nullptr){
         return;
@@ -403,47 +409,37 @@ void HttpServer::on_receive_data(const void* data, size_t bytes){
         }
     }
     conn->cv.notify_all();
-    if (exceeded && socket != nullptr){
+    if (exceeded){
         //  The stream is longer than we are willing to buffer. It is
         //  likely in the middle of a request, so there is no reliable
-        //  response left to send: just end the connection. ("socket" can
-        //  be null only while stop() is tearing the socket down, in which
-        //  case there is no connection task left to wake up.)
-        end_connection(conn, socket);
+        //  response left to send: just end the connection.
+        end_connection(conn);
     }
 }
 
 
-void HttpServer::on_disconnect(const std::string& error_message){
-    std::shared_ptr<Connection> conn;
+void HttpServer::on_disconnect(
+    AbstractServerSocket::ConnectionPtr connection,
+    const std::string& error_message
+){
     {
         std::lock_guard<Mutex> lg(m_lock);
-        //  The socket may already be serving the next client by the time
-        //  this callback runs: the socket's connection thread sets the
-        //  state back to LISTENING before it reports the disconnect, so a
-        //  fast reconnect can be accepted in between. In that case this
-        //  disconnect is about the previous connection, which on_connect()
-        //  has already marked dead; the current one belongs to the new
-        //  client and must not be killed.
-        if (m_socket == nullptr ||
-            m_socket->state() != AbstractServerSocket::State::CONNECTED
+        //  The callback carries the connection this disconnect is about,
+        //  so no state is needed to find it; it only matters while that
+        //  connection is still the active one.
+        if (m_connection != nullptr &&
+            m_connection->socket == connection
         ){
-            conn = m_connection;
+            m_connection->dead.store(true, std::memory_order_release);
+            m_connection->cv.notify_all();
         }
-    }
-    if (conn != nullptr){
-        conn->dead.store(true, std::memory_order_release);
-        conn->cv.notify_all();
     }
     m_listeners.run_method(&Listener::on_disconnect, error_message);
 }
 
 
 
-void HttpServer::connection_task(
-    const std::shared_ptr<Connection>& conn,
-    AbstractServerSocket* socket
-){
+void HttpServer::connection_task(const std::shared_ptr<Connection>& conn){
     //  The handler may be replaced or cleared by start()/stop() while this
     //  task is waiting; a copy taken under m_lock is stable for the task's
     //  whole lifetime, because stop() waits for the task before clearing it.
@@ -481,7 +477,7 @@ void HttpServer::connection_task(
             //  the final response alone moves the client on; RFC 9110).
             if (parsed.expect_continue && !sent_continue){
                 static const char CONTINUE_RESPONSE[] = "HTTP/1.1 100 Continue\r\n\r\n";
-                if (!write_raw(conn, socket, CONTINUE_RESPONSE)){
+                if (!write_raw(conn, CONTINUE_RESPONSE)){
                     break;
                 }
                 sent_continue = true;
@@ -510,8 +506,8 @@ void HttpServer::connection_task(
             response.status = parsed.error_status;
             response.headers = std::move(parsed.error_headers);
             response.body = parsed.error_reason + "\n";
-            write_response(conn, socket, response, false);
-            end_connection(conn, socket);
+            write_response(conn, response, false);
+            end_connection(conn);
             break;
         }
 
@@ -547,11 +543,11 @@ void HttpServer::connection_task(
         const bool keep_alive = parsed.http_1_1
             && !parsed.connection_close_requested
             && !response.connection_close;
-        if (!write_response(conn, socket, response, keep_alive)){
+        if (!write_response(conn, response, keep_alive)){
             break;
         }
         if (!keep_alive){
-            end_connection(conn, socket);
+            end_connection(conn);
             break;
         }
         //  Keep-alive: the next request (possibly already buffered) is
@@ -767,40 +763,25 @@ HttpServer::ParsedRequest HttpServer::try_parse(std::string& buffer){
 }
 
 
-void HttpServer::end_connection(
-    const std::shared_ptr<Connection>& conn,
-    AbstractServerSocket* socket
-){
+void HttpServer::end_connection(const std::shared_ptr<Connection>& conn){
     conn->dead.store(true, std::memory_order_release);
     conn->cv.notify_all();
-    //  Close the socket's connection only while it still belongs to this
-    //  connection: by the time a task notices its own connection died,
-    //  the socket may already be serving the next client, and closing
-    //  unconditionally would kill that client's connection instead.
-    {
-        std::lock_guard<Mutex> lg(m_lock);
-        if (m_connection.get() != conn.get()){
-            return;
-        }
-    }
-    socket->close_connection();
+    //  Closing the shell only ever affects this client: once the
+    //  connection is closed (by either side, or because the server went
+    //  away), the shell is inert and close() is a no-op.
+    conn->socket->close();
 }
 
 
-bool HttpServer::write_raw(
-    const std::shared_ptr<Connection>& conn,
-    AbstractServerSocket* socket,
-    const std::string& bytes
-){
-    //  "conn->socket_id" is the socket's connection token when this
-    //  connection was accepted: if the socket has moved on to the next
-    //  client since then, the send is refused instead of being delivered
-    //  into the new client's socket.
-    const size_t sent = socket->send(bytes.data(), bytes.size(), WRITE_TIMEOUT, conn->socket_id);
+bool HttpServer::write_raw(const std::shared_ptr<Connection>& conn, const std::string& bytes){
+    //  The send happens on the connection object itself: if this
+    //  connection has died, the write just fails here (send() returns
+    //  0) - it can never be delivered into a later client's socket.
+    const size_t sent = conn->socket->send(bytes.data(), bytes.size(), WRITE_TIMEOUT);
     if (sent != bytes.size()){
         //  The peer went away, or the write stalled: the connection is
         //  unusable either way.
-        end_connection(conn, socket);
+        end_connection(conn);
         return false;
     }
     return true;
@@ -809,11 +790,10 @@ bool HttpServer::write_raw(
 
 bool HttpServer::write_response(
     const std::shared_ptr<Connection>& conn,
-    AbstractServerSocket* socket,
     const Response& response,
     bool keep_alive
 ){
-    return write_raw(conn, socket, format_response(response, keep_alive));
+    return write_raw(conn, format_response(response, keep_alive));
 }
 
 

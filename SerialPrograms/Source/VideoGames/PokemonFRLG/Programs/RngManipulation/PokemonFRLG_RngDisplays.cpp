@@ -9,6 +9,7 @@
 #include <iostream>
 #include <sstream>
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
+#include "PokemonFRLG_RngStatsDatabase.h"
 #include "PokemonFRLG_RngDisplays.h"
 
 namespace PokemonAutomation{
@@ -29,7 +30,16 @@ std::string species_display_name(const std::string& slug){
     return get_pokemon_name(slug).display_name();
 }
 
+std::string ivs_to_string(const AdvIVs& ivs){
+    return  std::to_string(ivs.hp) + "/" +
+            std::to_string(ivs.attack) + "/" +
+            std::to_string(ivs.defense) + "/" +
+            std::to_string(ivs.spatk) + "/" +
+            std::to_string(ivs.spdef) + "/" +
+            std::to_string(ivs.speed);
 }
+
+} // namespace
 
 SidHelperDisplay::SidHelperDisplay()
     : GroupOption("TID/SID Results", LockMode::READ_ONLY)
@@ -52,40 +62,26 @@ void SidHelperDisplay::set(uint16_t trainerId, const std::vector<std::pair<std::
     sids.set(get_sids_string(sid_messages));
 }
 
-std::string RngTargetDisplay::result_to_string(const AdvPokemonResult& pokemon, const int16_t& gender_threshold){
+std::string RngTargetDisplay::result_to_string(const AdvPokemonResult& pokemon, const std::string& species, uint8_t level){
+    const RngStats* stats = RngStatsDatabase::instance().get_nothrow(species);
     std::string out;
-    out += gender_to_string(gender_from_gender_value(pokemon.gender, gender_threshold)) + " ";
+    out += species_display_name(species) + " ";
+    if (level > 0){
+        out += "Lv" + std::to_string(level) + " ";
+    }
+    out += gender_name(stats, pokemon.gender) + " ";
     out += nature_to_string(pokemon.nature) + " ";
-    out +=  std::to_string(pokemon.ivs.hp) + "/" +
-            std::to_string(pokemon.ivs.attack) + "/" +
-            std::to_string(pokemon.ivs.defense) + "/" +
-            std::to_string(pokemon.ivs.spatk) + "/" +
-            std::to_string(pokemon.ivs.spdef) + "/" +
-            std::to_string(pokemon.ivs.speed) + " ";
+    out += ability_name(stats, pokemon.ability) + " ";
+    out += ivs_to_string(pokemon.ivs);
     return out;
-}   
-
-std::string RngTargetDisplay::result_to_string(const AdvWildPokemonResult& pokemon, const int16_t& gender_threshold){
-    std::string name = species_display_name(pokemon.species);
-    std::string out;
-    out += name + " ";
-    out += "Lv" + std::to_string(pokemon.level) + " ";
-    out += gender_to_string(gender_from_gender_value(pokemon.gender, gender_threshold)) + " ";
-    out += nature_to_string(pokemon.nature) + " ";
-    out +=  std::to_string(pokemon.ivs.hp) + "/" +
-            std::to_string(pokemon.ivs.attack) + "/" +
-            std::to_string(pokemon.ivs.defense) + "/" +
-            std::to_string(pokemon.ivs.spatk) + "/" +
-            std::to_string(pokemon.ivs.spdef) + "/" +
-            std::to_string(pokemon.ivs.speed) + " ";
-    return out;
-}   
-
-void RngTargetDisplay::set_target(const AdvPokemonResult& pokemon, const int16_t& gender_threshold){
-    set(result_to_string(pokemon, gender_threshold));
 }
-void RngTargetDisplay::set_target(const AdvWildPokemonResult& pokemon, const int16_t& gender_threshold){
-    set(result_to_string(pokemon, gender_threshold));
+
+void RngTargetDisplay::set_target(const AdvPokemonResult& pokemon, const std::string& species, uint8_t level){
+    set(result_to_string(pokemon, species, level));
+}
+void RngTargetDisplay::set_target(const AdvWildPokemonResult& pokemon){
+    AdvPokemonResult result = { pokemon.pid, pokemon.gender, pokemon.nature, pokemon.ability, pokemon.ivs };
+    set_target(result, pokemon.species, pokemon.level);
 }
 
 
@@ -94,6 +90,7 @@ RngFilterDisplay::RngFilterDisplay()
     , species(false, "<b>Species:</b>", LockMode::READ_ONLY, "-", "")
     , gender(false, "<b>Gender:</b>", LockMode::READ_ONLY, "-", "")
     , nature(false, "<b>Nature:</b>", LockMode::READ_ONLY, "-", "")
+    , ability(false, "<b>Ability:</b>", LockMode::READ_ONLY, "-", "")
     , level(false, "<b>Level:</b>", LockMode::READ_ONLY, "-", "")
     , hp(false, "<b>HP IV:</b>", LockMode::READ_ONLY, "-", "")
     , atk(false, "<b>Attack IV:</b>", LockMode::READ_ONLY, "-", "")
@@ -105,6 +102,7 @@ RngFilterDisplay::RngFilterDisplay()
     PA_ADD_STATIC(species);
     PA_ADD_STATIC(gender);
     PA_ADD_STATIC(nature);
+    PA_ADD_STATIC(ability);
     PA_ADD_STATIC(level);
     PA_ADD_STATIC(hp);
     PA_ADD_STATIC(atk);
@@ -127,6 +125,7 @@ void RngFilterDisplay::set(const AdvRngFilters& filter){
     species.set(species_display_name(filter.species));
     gender.set(gender_to_string(filter.gender));
     nature.set(nature_to_string(filter.nature));
+    ability.set(ability_name(RngStatsDatabase::instance().get_nothrow(filter.species), filter.ability));
     level.set(std::to_string(filter.level));
     hp.set(get_range_string(filter.ivs.hp));
     atk.set(get_range_string(filter.ivs.attack));
@@ -140,6 +139,7 @@ void RngFilterDisplay::reset(){
     species.set("-");
     gender.set("-");
     nature.set("-");
+    ability.set("-");
     level.set("-");
     hp.set("-");
     atk.set("-");
