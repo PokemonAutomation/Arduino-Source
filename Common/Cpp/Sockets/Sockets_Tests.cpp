@@ -604,8 +604,10 @@ public:
 //  macOS as soon as more data arrives after the close, Windows on a close
 //  with unread receive data), and a reset loses whatever the peer wrote
 //  before its close. So the delivery of that response is NOT asserted:
-//  the server-side drains that #1940 and #1963 added to keep it alive
-//  cannot be guaranteed on every platform in the first place (macOS).
+//  it cannot be guaranteed on every platform in the first place (macOS
+//  resets as soon as data arrives after the close, no matter what the
+//  server does), and the server-side drains that #1940 and #1963 added
+//  to keep it alive were removed rather than chase the guarantee.
 //  What IS asserted: promptness of the in-flight send and of the close,
 //  plus the integrity of any data that does arrive.
 template <typename ClientSocketType>
