@@ -114,6 +114,9 @@ namespace{
     case BoxSelectionLocation::Newest30:
         location = "Newest30";
         break;
+    case BoxSelectionLocation::Back:
+        location = "Back";
+        break;
     }
     return "BoxSelection{BoxSelectionMode::" + mode + ", BoxSelectionLocation::" + location
         + ", " + std::to_string(arrow->row) + ", " + std::to_string(arrow->column) + "}";

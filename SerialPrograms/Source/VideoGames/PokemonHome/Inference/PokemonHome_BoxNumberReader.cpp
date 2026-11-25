@@ -85,7 +85,6 @@ void add_tests_BoxNumberReader(UnitTestDatabase& database){
     database.add<Test_BoxNumberReader>("PokemonHome/BoxView/SelectionArrow_Multi_Grid_Row3_Column2_01.png", 37);
     database.add<Test_BoxNumberReader>("PokemonHome/BoxView/SelectionArrow_Multi_Grid_Row3_Column3_01.png", 41);
     database.add<Test_BoxNumberReader>("PokemonHome/BoxView/SelectionArrow_Multi_Grid_Row3_Column4_01.png", 41);
-    // Frame 01 still has the fading Newest 30 preview over the box number.
     database.add<Test_BoxNumberReader>("PokemonHome/BoxView/SelectionArrow_Multi_Grid_Row4_Column4_02.png", 31);
     database.add<Test_BoxNumberReader>("PokemonHome/BoxView/SelectionArrow_Multi_Newest30_01.png", std::nullopt);
     database.add<Test_BoxNumberReader>("PokemonHome/BoxView/SelectionArrow_Normal_BoxName_01.png", 8);
