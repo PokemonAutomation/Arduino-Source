@@ -39,9 +39,6 @@ public:
     size_t label_index(const std::string& label_name) const;
     
 private:
-    const int YOLO5_INPUT_IMAGE_SIZE = 640;
-    const int YOLO5_NUM_CANDIDATES = 25200;
-
     std::vector<std::string> m_label_names;
 
     Ort::Session m_session;
@@ -49,8 +46,9 @@ private:
     Ort::RunOptions m_run_options;
     std::vector<std::string> m_input_names, m_output_names;
 
-    const std::array<int64_t, 4> m_input_shape{1, 3, YOLO5_INPUT_IMAGE_SIZE, YOLO5_INPUT_IMAGE_SIZE};
-    std::array<int64_t, 3> m_output_shape{1, YOLO5_NUM_CANDIDATES, 0};
+    // [1, 3, H, W] and [1, num_candidates, 5 + num_labels], read from the model in the constructor.
+    std::array<int64_t, 4> m_input_shape{1, 3, 0, 0};
+    std::array<int64_t, 3> m_output_shape{1, 0, 0};
 
     std::vector<float> m_model_input;
     std::vector<float> m_model_output;
