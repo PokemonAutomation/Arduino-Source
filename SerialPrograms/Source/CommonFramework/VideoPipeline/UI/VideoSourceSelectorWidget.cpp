@@ -99,7 +99,7 @@ VideoSourceSelectorWidget::VideoSourceSelectorWidget(Logger& logger, VideoSessio
         m_format_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [this](int index){
             int resolution_index = m_resolution_box->currentIndex();
-            if (resolution_index < 0 || resolution_index > (int)m_formats.size()){
+            if (resolution_index < 0 || resolution_index >= (int)m_formats.size()){
                 return;
             }
             const std::vector<std::pair<VideoFormat, size_t>>& format_list = m_formats[resolution_index].second;
