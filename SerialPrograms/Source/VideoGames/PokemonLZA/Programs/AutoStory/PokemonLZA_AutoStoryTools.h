@@ -115,10 +115,10 @@ void press_button_until_dialog(
     Milliseconds timeout = std::chrono::minutes(2)
 );
 
-// Mash the requested button until the requested on-screen icon appears, throws on timeout.
-void mash_button_until_button(
+// Mash the requested button until the right-stick up/down icon appears, throws on timeout.
+void mash_button_until_right_stick(
     ConsoleHandle& console, ProControllerContext& context,
-    Button mash_button, ButtonType button_type, const ImageFloatBox& button_box,
+    Button mash_button, const ImageFloatBox& joystick_box,
     Milliseconds timeout = std::chrono::minutes(2)
 );
 

@@ -46,9 +46,11 @@ void checkpoint_00(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
     // Wait out the train as it can false positive on the button detector
     pbf_wait(context, 13000ms);
-    mash_button_until_button(
-        env.console, context, BUTTON_B, ButtonType::RightStickUpDown,
-        {0.35, 0.70, 0.30, 0.30}, 60s
+    // Keep the similar left-stick icon in the movement row out of the search.
+    const ImageFloatBox camera_hint_box{0.35, 0.902, 0.30, 0.028};
+    mash_button_until_right_stick(
+        env.console, context, BUTTON_B,
+        camera_hint_box, 60s
     );
 
     // Change text speed to fast (consider turn off rumble too if it causes issues in bluetooth traffic)
@@ -59,9 +61,9 @@ void checkpoint_00(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     pbf_press_button(context, BUTTON_A, 100ms, 1100ms);
     pbf_press_dpad(context, DPAD_DOWN, 100ms, 300ms);
     pbf_press_dpad(context, DPAD_RIGHT, 100ms, 300ms);
-    mash_button_until_button(
-        env.console, context, BUTTON_B, ButtonType::RightStickUpDown,
-        {0.35, 0.70, 0.30, 0.30}, 60s
+    mash_button_until_right_stick(
+        env.console, context, BUTTON_B,
+        camera_hint_box, 60s
     );
 
     // Exit station and mash through the NPC introduction cutscene

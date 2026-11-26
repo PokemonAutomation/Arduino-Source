@@ -189,32 +189,32 @@ void press_button_until_dialog(
     console.log("press_button_until_dialog(): Detected dialog.");
 }
 
-void mash_button_until_button(
+void mash_button_until_right_stick(
     ConsoleHandle& console, ProControllerContext& context,
-    Button mash_button, ButtonType button_type, const ImageFloatBox& button_box,
+    Button mash_button, const ImageFloatBox& joystick_box,
     Milliseconds timeout
 ){
     context.wait_for_all_requests();
 
-    ButtonWatcher button(COLOR_RED, button_type, button_box, &console.overlay(), 200ms);
+    RightStickUpDownWatcher joystick(COLOR_RED, joystick_box, &console.overlay(), 200ms);
     int ret = run_until<ProControllerContext>(
         console, context,
         [=](ProControllerContext& context){
             pbf_mash_button(context, mash_button, timeout);
         },
-        {button}
+        {joystick}
     );
     if (ret < 0){
         OperationFailedExceptionWithScreenshot::fire(
             ErrorReportMode::SEND_ERROR_REPORT,
-            "mash_button_until_button(): Requested button not detected within " +
+            "mash_button_until_right_stick(): Right-stick icon not detected within " +
                 std::to_string(timeout.count()) + " milliseconds.",
             console
         );
     }
 
     context.wait_for_all_requests();
-    console.log("mash_button_until_button(): Detected requested button.");
+    console.log("mash_button_until_right_stick(): Detected right-stick icon.");
 }
 
 void mash_button_until_door_entry(

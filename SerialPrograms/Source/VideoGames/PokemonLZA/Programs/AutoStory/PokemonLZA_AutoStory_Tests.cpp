@@ -661,7 +661,7 @@ public:
                 // One prompt alone must not be treated as a map
                 for (const ImageFloatBox& box : {
                     ImageFloatBox{0.005, 0.15, 0.025, 0.11},
-                    ImageFloatBox{0.9, 0.94, 0.04, 0.04},
+                    ImageFloatBox{0.85, 0.94, 0.10, 0.04},
                 }){
                     ImageRGB32 missing_prompt = scaled.copy();
                     const ImagePixelBox pixels = floatbox_to_pixelbox(missing_prompt, box);

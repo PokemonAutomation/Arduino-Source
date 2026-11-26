@@ -49,8 +49,9 @@ bool BoothDetector::detect(const ImageViewRGB32& screen){
     for (const auto& object : objects){
         const double width = static_cast<double>(object.width());
         const double height = static_cast<double>(object.height());
+        // Try to find the long cyan strip on the top the booth
         if (width < 70 * scale || width > 600 * scale || height < 2 * scale ||
-            width / height < 10 || width / height > 120 || object.area < width * height * 0.3){
+            width / height < 15 || width / height > 120 || object.area < width * height * 0.3){
             continue;
         }
         const ImagePixelBox roof(
