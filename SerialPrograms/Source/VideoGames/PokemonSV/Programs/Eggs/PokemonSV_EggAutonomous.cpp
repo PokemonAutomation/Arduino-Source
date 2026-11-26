@@ -18,7 +18,11 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
+#include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
+#include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 //#include "VideoGames/PokemonSV/PokemonSV_Settings.h"
 #include "VideoGames/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
@@ -176,6 +180,16 @@ EggAutonomous::EggAutonomous()
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
+    , CLEANUP_BEFORE_START(
+        "<b>Clean Up Before Starting:</b><br>"
+        "Use this after a crash or a stopped run. First the game is <b>restarted without saving</b>, so no sandwich "
+        "ingredients are used up. Then, if eggs were left in the egg box (or in your party), they are hatched and checked "
+        "like normal: shinies are kept and the rest are released. Leftover non-shiny hatchlings in the egg box are released too. "
+        "If a shiny is sitting in the egg box, the program stops so you can move it. "
+        "Only the egg box (the box you are on) is touched. When it's clean, the normal egg loop starts.",
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
     , SAVE_DEBUG_VIDEO(
         "<b>Save debug videos to Switch:</b><br>"
         "Set this on to save a Switch video everytime an error occurs. You can send the video to developers to help them debug later.",
@@ -218,6 +232,7 @@ EggAutonomous::EggAutonomous()
     PA_ADD_OPTION(m_battle_ai_description);
     PA_ADD_OPTION(BATTLE_AI);
     PA_ADD_OPTION(HAS_CLONE_RIDE_POKEMON);
+    PA_ADD_OPTION(CLEANUP_BEFORE_START);
 
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -248,13 +263,20 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     }
 
     try{
+        m_num_sandwich_spent = 0;
+        m_num_kept = 0;
+        m_stop_after_this_box = false;
+
+        if (CLEANUP_BEFORE_START){
+            cleanup_before_start(env, context);
+        }
+
+        // After cleanup, this save makes the clean egg box the point every reset goes back to.
         if (AUTO_SAVING != AutoSave::NoAutoSave){
             save_game(env, context, true);
         }
 
         const size_t max_num_sandwiches = EGG_SANDWICH.MAX_NUM_SANDWICHES;
-        m_num_sandwich_spent = 0;
-        m_num_kept = 0;
         size_t consecutive_failures = 0;
         while (true){
             m_saved_after_fetched_eggs = false;
@@ -316,6 +338,11 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                 } // end try catch
             } // end recoverable loop to hatch eggs
 
+            if (m_stop_after_this_box){
+                env.log("Max keepers reached and the box is finished. Stopping program.", COLOR_BLUE);
+                throw ProgramFinishedException();
+            }
+
             // If the program can't save-reload, then we cannot reload spent sandwich ingredients
             if (AUTO_SAVING == AutoSave::NoAutoSave){
                 m_num_sandwich_spent++;
@@ -373,7 +400,12 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
     bool can_make_sandwich = eat_egg_sandwich_at_picnic(env, env.console, context,
         EGG_SANDWICH.EGG_SANDWICH_TYPE, LANGUAGE);
     if (can_make_sandwich == false){
-        throw UserSetupError(env.console, "No sandwich recipe or ingredients. Cannot open and select the sandwich recipe.");
+        throw UserSetupError(
+            env.console,
+            "Out of Egg Power sandwich supplies (or the recipe isn't unlocked). No ingredients were used. "
+            "Buy ingredients, then start again. Great Peanut Butter Sandwich = Banana + Peanut Butter + Butter "
+            "(Sure Cans + Artisan Bakery, e.g. in Levincia)."
+        );
     }
     env.current_stats<EggAutonomous_Descriptor::Stats>().m_sandwiches++;
     env.update_stats();
@@ -394,7 +426,8 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
     leave_picnic(env.program_info(), env.console, context);
 
     // Reset position to flying spot:
-    if (LOCATION == EggAutoLocation::ZeroGate){
+    if (LOCATION == EggAutoLocation::ZeroGate || LOCATION == EggAutoLocation::CortondoOliveField){
+        // Cortondo: finds the Pokemon Center icon on the map instead of flying wherever the cursor is.
         reset_position_to_flying_spot(env, context);
     }else{
         //Lighthouse: We haven't moved much so just fly.
@@ -615,6 +648,13 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
     } // end egg batch loop
 
     save_game_if_needed();
+
+    if (m_stop_after_this_box && AUTO_SAVING != AutoSave::NoAutoSave){
+        // Box is finished: all eggs hatched, non-keepers released, picnic party back, at the Pokemon Center.
+        env.log("Box finished after reaching Max Keepers. Saving the game.", COLOR_BLUE);
+        env.console.overlay().add_log("Final save", COLOR_WHITE);
+        save_game(env, context, true);
+    }
 }
 
 // While in box system and the current box is egg box, process one baby pokemon in party
@@ -660,12 +700,25 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, ProCon
         }
     };
 
+    // Before stopping because of a keeper, save the game so the kept Pokemon isn't lost
+    // (the original code stopped without saving, leaving the keeper only in unsaved game memory).
+    auto save_then_stop = [&](){
+        if (AUTO_SAVING != AutoSave::NoAutoSave){
+            env.log("Saving the game before stopping so the kept " + STRING_POKEMON + " is safe.", COLOR_BLUE);
+            env.console.overlay().add_log("Saving before stop", COLOR_WHITE);
+            leave_box_system_to_overworld(env.program_info(), env.console, context);
+            save_game(env, context, true);
+        }
+        throw ProgramFinishedException();
+    };
+
     switch (action){
     case StatsHuntAction::StopProgram:
             env.log("Program stop requested...");
             env.console.overlay().add_log("Request program stop", COLOR_WHITE);
             send_keep_notification();
-            throw ProgramFinishedException();
+            save_then_stop();
+            break; // not reached: save_then_stop() always throws
     case StatsHuntAction::Keep:
             m_in_critical_to_save_stage = true;
             env.log("Moving Pokemon to keep box...", COLOR_BLUE);
@@ -678,13 +731,15 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, ProCon
             if (move_pokemon_to_keep(env, context, party_row) == false){
                 env.log("No empty slot available to place new pokemon.");
                 env.console.overlay().add_log("No box space", COLOR_RED);
-                throw ProgramFinishedException();
+                save_then_stop();
             }
 
-            if (m_num_kept >= MAX_KEEPERS){
-                env.log("Max keepers reached. Stopping program...");
-                env.console.overlay().add_log("Max Keepers reached", COLOR_WHITE);
-                throw ProgramFinishedException();
+            if (m_num_kept >= MAX_KEEPERS && !m_stop_after_this_box){
+                // Don't stop right away: finish this box first so no eggs or unreleased babies are left,
+                // then save at the Pokemon Center and stop. (Any more shinies in this box are still kept.)
+                env.log("Max keepers reached. Finishing this box, then saving and stopping.", COLOR_BLUE);
+                env.console.overlay().add_log("Max Keepers: finish box", COLOR_WHITE);
+                m_stop_after_this_box = true;
             }
             break;
 
@@ -793,6 +848,119 @@ int EggAutonomous::picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& e
     return num_eggs_in_party;
 }
 
+
+void EggAutonomous::cleanup_before_start(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    env.log("Cleanup: restarting the game without saving.", COLOR_PURPLE);
+    env.console.overlay().add_log("Cleanup: restart game", COLOR_WHITE);
+    reset_game(env.program_info(), env.console, context);
+
+    const uint8_t first_row = HAS_CLONE_RIDE_POKEMON ? 1 : 0;
+
+    enter_box_system_from_overworld(env.program_info(), env.console, context);
+    context.wait_for(std::chrono::milliseconds(400));
+    move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 0, 0);
+    // Egg and shiny detection need the stats or judge view.
+    change_view_to_stats_or_judge(env.console, context);
+    context.wait_for(std::chrono::seconds(1));
+
+    const std::pair<uint8_t, uint8_t> party = check_egg_party_column(env.program_info(), env.console, context);
+    env.log("Cleanup: party has " + std::to_string(party.first) + " eggs and " +
+        std::to_string(party.second) + " other " + STRING_POKEMON + " after the lead.");
+
+    if (party.first > 0){
+        // The last save was made in the middle of hatching (after keeping a shiny):
+        // the party is the Flame Body lead plus eggs. Finish this box like a normal run would.
+        leave_box_system_to_overworld(env.program_info(), env.console, context);
+        env.log("Cleanup: eggs in party. Finishing the hatch from the last save.", COLOR_PURPLE);
+        env.console.overlay().add_log("Cleanup: finish hatching", COLOR_WHITE);
+        // Pretend we already saved this box, so the routine releases the box and swaps back
+        // to the picnic party at the end, instead of resetting the game.
+        m_saved_after_fetched_eggs = true;
+        m_in_critical_to_save_stage = false;
+        hatch_eggs_full_routine(env, context, -1);
+        m_saved_after_fetched_eggs = false;
+        env.log("Cleanup: done.", COLOR_PURPLE);
+        return;
+    }
+
+    // Party has no eggs. Look through the egg box slot by slot.
+    env.console.overlay().add_log("Cleanup: check egg box", COLOR_WHITE);
+    SomethingInBoxSlotDetector sth_in_box_detector(COLOR_RED);
+    BoxCurrentEggDetector egg_detector;
+    size_t eggs_in_box = 0;
+    size_t released = 0;
+    size_t shinies_in_box = 0;
+    for (uint8_t row = first_row; row < 5; row++){
+        for (uint8_t col = 0; col < 6; col++){
+            move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::SLOTS, row, col);
+            context.wait_for_all_requests();
+            context.wait_for(std::chrono::milliseconds(300));
+            auto snapshot = env.console.video().snapshot();
+            if (!sth_in_box_detector.detect(snapshot)){
+                continue;
+            }
+            if (egg_detector.detect(snapshot)){
+                eggs_in_box++;
+                continue;
+            }
+
+            VideoOverlaySet overlay_set(env.console.overlay());
+            BoxShinyWatcher shiny_detector;
+            shiny_detector.make_overlays(overlay_set);
+            const bool shiny = wait_until(
+                env.console, context,
+                std::chrono::milliseconds(500),
+                {shiny_detector}
+            ) == 0;
+            if (shiny){
+                env.log("Cleanup: shiny in egg box at row " + std::to_string(row) + ", col " + std::to_string(col) + ".", COLOR_BLUE);
+                shinies_in_box++;
+                continue;
+            }
+
+            env.log("Cleanup: releasing leftover hatchling at row " + std::to_string(row) + ", col " + std::to_string(col) + ".");
+            size_t local_errors = 0;
+            release_one_pokemon(env.program_info(), env.console, context, local_errors);
+            released++;
+        }
+    }
+    env.log("Cleanup: egg box had " + std::to_string(eggs_in_box) + " eggs, released " +
+        std::to_string(released) + ", shinies " + std::to_string(shinies_in_box) + ".", COLOR_PURPLE);
+    env.console.overlay().add_log("Cleanup: released " + std::to_string(released), COLOR_WHITE);
+
+    if (shinies_in_box > 0){
+        leave_box_system_to_overworld(env.program_info(), env.console, context);
+        throw UserSetupError(
+            env.console,
+            "Cleanup found a shiny in the egg box. Nothing was saved and nothing else was changed. "
+            "Move the shiny to another box, save, then start the program again."
+        );
+    }
+
+    if (eggs_in_box > 0){
+        // Eggs left in the box but the picnic party is out: swap to the hatching party and hatch them.
+        // The routine loads egg columns from the left, so eggs should be in whole columns like the program leaves them.
+        if (released > 0){
+            // Releasing may have left the box half empty. Saving now locks in the releases before hatching.
+            leave_box_system_to_overworld(env.program_info(), env.console, context);
+            save_game(env, context, true);
+        }else{
+            leave_box_system_to_overworld(env.program_info(), env.console, context);
+        }
+        env.log("Cleanup: hatching leftover eggs in the egg box.", COLOR_PURPLE);
+        env.console.overlay().add_log("Cleanup: hatch leftovers", COLOR_WHITE);
+        const int num_party_eggs = picnic_party_to_hatch_party(env, context);
+        m_saved_after_fetched_eggs = true;
+        m_in_critical_to_save_stage = false;
+        hatch_eggs_full_routine(env, context, num_party_eggs);
+        m_saved_after_fetched_eggs = false;
+        env.log("Cleanup: done.", COLOR_PURPLE);
+        return;
+    }
+
+    leave_box_system_to_overworld(env.program_info(), env.console, context);
+    env.log("Cleanup: egg box is clean.", COLOR_PURPLE);
+}
 
 void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool from_overworld){
     try{

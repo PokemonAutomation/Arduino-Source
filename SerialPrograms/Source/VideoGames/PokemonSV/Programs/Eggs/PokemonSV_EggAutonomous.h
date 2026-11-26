@@ -62,6 +62,10 @@ private:
 
     void save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool from_overworld);
 
+    // Before the first save: reset without saving, then finish leftover eggs and release leftover
+    // non-shiny hatchlings in the egg box, so the run starts from a clean egg box and picnic party.
+    void cleanup_before_start(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
     //  Return true if you should rethrow.
     bool handle_recoverable_error(
         SingleSwitchProgramEnvironment& env, ProControllerContext& context,
@@ -109,6 +113,8 @@ private:
 
     BooleanCheckBoxOption HAS_CLONE_RIDE_POKEMON;
 
+    BooleanCheckBoxOption CLEANUP_BEFORE_START;
+
     BooleanCheckBoxOption SAVE_DEBUG_VIDEO;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
@@ -132,6 +138,10 @@ private:
     // When we find a pokemon to keep, we don't want the game to be reset if we haven't placed a save to protect the
     // kept the pokemon. This flag is used to signal when we are in this "don't reset" stage.
     bool m_in_critical_to_save_stage = false;
+
+    // Set when Max Keepers is reached: finish hatching the rest of this box, release the
+    // non-keepers, go back to the Pokemon Center, save, and then stop.
+    bool m_stop_after_this_box = false;
 
     // When the last egg hatched (or the program started). Used for average time per egg,
     // which includes the picnic, sandwich and egg collecting time.
