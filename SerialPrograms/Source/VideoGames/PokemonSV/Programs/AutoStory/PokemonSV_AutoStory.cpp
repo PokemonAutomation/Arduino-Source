@@ -22,7 +22,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
-#include "ML/Inference/ML_YOLOv5Detector.h"
+#include "ML/Inference/ML_YOLODetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
@@ -1112,7 +1112,7 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
 
     if (TEST_YOLO_BOX){
         VideoOverlaySet overlays(env.console.overlay());
-        YOLOv5Detector yolo_detector(RESOURCE_PATH() + std::string(YOLO_PATH));
+        YOLODetector yolo_detector(RESOURCE_PATH() + std::string(YOLO_PATH));
         
         // ImageFloatBox target_box =
         get_highest_confident_yolo_box(env, context, overlays, yolo_detector, TARGET_LABEL);
@@ -1180,7 +1180,7 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
         
 
 
-        // YOLOv5Detector yolo_detector(DOWNLOADED_RESOURCE_PATH() + "PokemonSV/AreaZero/A0-station-2.onnx");
+        // YOLODetector yolo_detector(DOWNLOADED_RESOURCE_PATH() + "PokemonSV/AreaZero/A0-station-2.onnx");
         // move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-tera", 0.294444);
         // move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-tera", 0.604688);
         direction.change_direction(env.program_info(), env.console, context, 3.855289);

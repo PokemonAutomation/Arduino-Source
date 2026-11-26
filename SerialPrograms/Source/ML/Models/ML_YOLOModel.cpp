@@ -1,8 +1,8 @@
-/*  ML YOLOv5 Model
+/*  ML YOLO Model
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  Run YOLOv5 model for object detection
+ *  Run a YOLO model for object detection (versions listed in YOLOVersion)
  */
 
 
@@ -16,7 +16,7 @@
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"
-#include "ML_YOLOv5Model.h"
+#include "ML_YOLOModel.h"
 
 namespace PokemonAutomation{
 namespace ML{
@@ -132,7 +132,7 @@ std::tuple<int, int, double, double> resize_image_with_border(
 }
 
 
-YOLOv5Session::YOLOv5Session(const std::string& model_path, bool use_gpu)
+YOLOSession::YOLOSession(const std::string& model_path, bool use_gpu)
     : m_session{create_session(model_path, ML_MODEL_CACHE_PATH() + "YOLOv5", use_gpu)}
     , m_memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
     , m_input_names{m_session.GetInputNames()}
@@ -148,19 +148,19 @@ YOLOv5Session::YOLOv5Session(const std::string& model_path, bool use_gpu)
 
         if (names_value){
             std::string names_str(names_value.get());
-            global_logger_tagged().log("YOLOv5: Found label metadata: " + names_str, COLOR_PURPLE);
+            global_logger_tagged().log("YOLO: Found label metadata: " + names_str, COLOR_PURPLE);
 
             m_label_names = parse_yolo_metadata_names(names_str);
 
             if (!m_label_names.empty()){
-                global_logger_tagged().log("YOLOv5: Extracted " + std::to_string(m_label_names.size()) +
+                global_logger_tagged().log("YOLO: Extracted " + std::to_string(m_label_names.size()) +
                                             " labels from model metadata", COLOR_GREEN);
             }
         }else{
-            throw std::runtime_error("YOLOv5 model does not have 'names' metadata to extract labels from");
+            throw std::runtime_error("YOLO model does not have 'names' metadata to extract labels from");
         }
     }catch (const std::exception& e){
-        throw std::runtime_error("YOLOv5: Failed to extract labels from metadata: " + std::string(e.what()));
+        throw std::runtime_error("YOLO: Failed to extract labels from metadata: " + std::string(e.what()));
     }
 
     // Which output layout the model has. Models exported before this key existed are all YOLOv5.
@@ -193,7 +193,7 @@ YOLOv5Session::YOLOv5Session(const std::string& model_path, bool use_gpu)
         if (output_dims[2] - 5 != static_cast<int>(m_label_names.size())){
             throw std::runtime_error(
                 "YOLOv5 model has " + std::to_string(output_dims[2]-5) +
-                " output labels but YOLOv5Session was initialized with " + std::to_string(m_label_names.size()) + " labels"
+                " output labels but YOLOSession was initialized with " + std::to_string(m_label_names.size()) + " labels"
             );
         }
         break;
@@ -208,19 +208,19 @@ YOLOv5Session::YOLOv5Session(const std::string& model_path, bool use_gpu)
     // Models must be exported with a fixed input size, e.g. [1, 3, 640, 640] or [1, 3, 1280, 1280].
     std::vector<int64_t> input_dims = m_session.GetInputTypeInfo(0).GetTensorTypeAndShapeInfo().GetShape();
     if (input_dims.size() != 4 || input_dims[1] != 3 || input_dims[2] <= 0 || input_dims[3] <= 0){
-        throw std::runtime_error("YOLOv5 model does not have a fixed [1, 3, H, W] input shape, found shape " + to_string(input_dims));
+        throw std::runtime_error("YOLO model does not have a fixed [1, 3, H, W] input shape, found shape " + to_string(input_dims));
     }
     m_input_shape[2] = input_dims[2];
     m_input_shape[3] = input_dims[3];
     m_output_shape[1] = output_dims[1];
-    global_logger_tagged().log("YOLOv5: Input shape " + to_string(input_dims) + ", output shape " + to_string(output_dims), COLOR_PURPLE);
+    global_logger_tagged().log("YOLO: Input shape " + to_string(input_dims) + ", output shape " + to_string(output_dims), COLOR_PURPLE);
 
     m_model_input.resize(3 * m_input_shape[2] * m_input_shape[3]);
     m_model_output.resize(m_output_shape[1] * m_output_shape[2]);
 }
 
 // input: rgb color order
-void YOLOv5Session::run(const cv::Mat& input_image, std::vector<YOLOv5Session::DetectionBox>& output_boxes){
+void YOLOSession::run(const cv::Mat& input_image, std::vector<YOLOSession::DetectionBox>& output_boxes){
     CV_Assert(input_image.depth() == CV_8U);
     CV_Assert(input_image.channels() == 3);
 
@@ -325,7 +325,7 @@ void YOLOv5Session::run(const cv::Mat& input_image, std::vector<YOLOv5Session::D
         double h = pixel_boxes[index].height * y_scale;
         // std::cout << scores[index] << " " <<  x << " " << y << " " << w << " " << h << std::endl;
 
-        YOLOv5Session::DetectionBox b;
+        YOLOSession::DetectionBox b;
         b.box = ImageFloatBox(x, y, w, h);
         b.score = scores[index];
         b.label_idx = labels[index];
@@ -334,7 +334,7 @@ void YOLOv5Session::run(const cv::Mat& input_image, std::vector<YOLOv5Session::D
 }
 
 
-size_t YOLOv5Session::label_index(const std::string& label_name) const{
+size_t YOLOSession::label_index(const std::string& label_name) const{
     for (size_t i = 0; i < m_label_names.size(); i++){
         if (label_name == m_label_names[i]){
             return i;
@@ -343,7 +343,7 @@ size_t YOLOv5Session::label_index(const std::string& label_name) const{
     return SIZE_MAX;
 }
 
-const YOLOv5Session::DetectionBox* find_detection(const std::vector<YOLOv5Session::DetectionBox>& detection, size_t label_idx){
+const YOLOSession::DetectionBox* find_detection(const std::vector<YOLOSession::DetectionBox>& detection, size_t label_idx){
     for (const auto& box : detection){
         if (box.label_idx == label_idx){
             return &box;

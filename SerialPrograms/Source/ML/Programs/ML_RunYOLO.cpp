@@ -12,7 +12,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 //#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 //#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "ML/Inference/ML_YOLOv5Detector.h"
+#include "ML/Inference/ML_YOLODetector.h"
 #include "ML_RunYOLO.h"
 
 namespace PokemonAutomation{
@@ -48,7 +48,7 @@ RunYOLO::RunYOLO()
 
 void RunYOLO::program(NintendoSwitch::SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     std::string model_path = MODEL_PATH;
-    YOLOv5Watcher watcher(env.console.overlay(), model_path);
+    YOLOWatcher watcher(env.console.overlay(), model_path);
 
     wait_until(env.console, scope, WallClock::max(), {watcher});
 }

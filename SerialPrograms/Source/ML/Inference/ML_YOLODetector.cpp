@@ -1,4 +1,4 @@
-/*  YOLOv5 Detector
+/*  YOLO Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -16,7 +16,7 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "ML_YOLOv5Detector.h"
+#include "ML_YOLODetector.h"
 
 //#include <iostream>
 //using std::cout;
@@ -39,21 +39,21 @@ namespace {
     }
 }
 
-YOLOv5Detector::~YOLOv5Detector() = default;
+YOLODetector::~YOLODetector() = default;
 
-YOLOv5Detector::YOLOv5Detector(const std::string& model_path)
+YOLODetector::YOLODetector(const std::string& model_path)
     : m_model_path(to_resource_filepath(model_path))
     , m_use_gpu(PerformanceOptions::instance().ONNX_OPTIONS.USE_GPU)
 {
     if (!model_path.ends_with(".onnx")){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, 
-            "Error: YOLOv5 model path must end with .onnx. But got " + model_path + ".");
+            "Error: YOLO model path must end with .onnx. But got " + model_path + ".");
     }
 
-    m_yolo_session = std::make_unique<YOLOv5Session>(m_model_path, m_use_gpu);
+    m_yolo_session = std::make_unique<YOLOSession>(m_model_path, m_use_gpu);
 }
 
-bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
+bool YOLODetector::detect(const ImageViewRGB32& screen){
     if (!m_yolo_session){
         return false;
     }
@@ -76,7 +76,7 @@ bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
                 std::cerr << "Warning: YOLO session failed using the GPU. Will reattempt with the CPU.\n" << e.what() << std::endl;
                 m_use_gpu = false;
                 std::vector<std::string> labels = m_yolo_session->get_label_names();
-                m_yolo_session = std::make_unique<YOLOv5Session>(m_model_path, m_use_gpu);
+                m_yolo_session = std::make_unique<YOLOSession>(m_model_path, m_use_gpu);
             }else{
                 throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Error: YOLO session failed even when using the CPU." + std::string(e.what()));
             }
@@ -94,22 +94,22 @@ bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
     return m_output_boxes.size() > 0;
 }
 
-const std::string& YOLOv5Detector::label_name(size_t label_idx) const{
+const std::string& YOLODetector::label_name(size_t label_idx) const{
     return m_yolo_session->label_name(label_idx);
 }
 
-size_t YOLOv5Detector::label_index(const std::string& label_name) const{
+size_t YOLODetector::label_index(const std::string& label_name) const{
     return m_yolo_session->label_index(label_name);
 }
 
-YOLOv5Watcher::YOLOv5Watcher(VideoOverlay& overlay, const std::string& model_path)
-    : VisualInferenceCallback("YOLOv5")
+YOLOWatcher::YOLOWatcher(VideoOverlay& overlay, const std::string& model_path)
+    : VisualInferenceCallback("YOLO")
     , m_overlay_set(overlay)
     , m_detector(model_path)
 {
 }
 
-bool YOLOv5Watcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+bool YOLOWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     if (!m_detector.model_loaded()){
         return false;
     }
@@ -123,15 +123,15 @@ bool YOLOv5Watcher::process_frame(const ImageViewRGB32& frame, WallClock timesta
     }
 
     {
-        WriteSpinLock lg(m_output_lock, "YOLOv5Watcher::process_frame()");
+        WriteSpinLock lg(m_output_lock, "YOLOWatcher::process_frame()");
         m_output_boxes = std::move(m_detector.detected_boxes());
     }
     return false;
 }
 
 
-std::vector<YOLOv5Watcher::DetectionBox> YOLOv5Watcher::detected_boxes(){
-    ReadSpinLock lg(m_output_lock, "YOLOv5Watcher::detected_boxes()");
+std::vector<YOLOWatcher::DetectionBox> YOLOWatcher::detected_boxes(){
+    ReadSpinLock lg(m_output_lock, "YOLOWatcher::detected_boxes()");
     return m_output_boxes;
 }
 

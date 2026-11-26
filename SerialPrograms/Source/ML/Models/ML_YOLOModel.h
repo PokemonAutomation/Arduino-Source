@@ -1,12 +1,12 @@
-/*  ML YOLOv5 Model
+/*  ML YOLO Model
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  Run YOLOv5 model for object detection
+ *  Run a YOLO model for object detection (versions listed in YOLOVersion)
  */
 
-#ifndef PokemonAutomation_ML_YOLOv5Model_H
-#define PokemonAutomation_ML_YOLOv5Model_H
+#ifndef PokemonAutomation_ML_YOLOModel_H
+#define PokemonAutomation_ML_YOLOModel_H
 
 
 #include <opencv2/core/mat.hpp>
@@ -28,7 +28,7 @@ enum class YOLOVersion{
     YOLO26_NMS_FREE,
 };
 
-class YOLOv5Session{
+class YOLOSession{
 public:
     struct DetectionBox{
         // Confidence value the model predicts on the detection. Range: [0.0, 1.0].
@@ -40,7 +40,7 @@ public:
         size_t label_idx;
     };
 
-    YOLOv5Session(const std::string& model_path, bool use_gpu);
+    YOLOSession(const std::string& model_path, bool use_gpu);
 
     void run(const cv::Mat& input_image, std::vector<DetectionBox>& detections);
 
@@ -67,8 +67,8 @@ private:
     std::vector<float> m_model_output;
 };
 
-// Find the first detection matching the given label ID from a YOLOv5Session detection output.
-const YOLOv5Session::DetectionBox* find_detection(const std::vector<YOLOv5Session::DetectionBox>& detection, size_t label_idx);
+// Find the first detection matching the given label ID from a YOLOSession detection output.
+const YOLOSession::DetectionBox* find_detection(const std::vector<YOLOSession::DetectionBox>& detection, size_t label_idx);
 
 
 }

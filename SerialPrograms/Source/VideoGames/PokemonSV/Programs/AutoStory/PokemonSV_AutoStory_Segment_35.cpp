@@ -8,7 +8,7 @@
 //#include "CommonFramework/Exceptions/OperationFailedException.h"
 //#include "CommonFramework/VideoPipeline/VideoFeed.h"
 //#include "CommonTools/Async/InferenceRoutines.h"
-#include "ML/Inference/ML_YOLOv5Detector.h"
+#include "ML/Inference/ML_YOLODetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_SaveGame.h"
@@ -234,7 +234,7 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     [&](size_t attempt_number){
 
 
-        YOLOv5Detector yolo_detector(DOWNLOADED_RESOURCE_PATH() + "PokemonSV/AreaZero/A0-station-1.onnx");
+        YOLODetector yolo_detector(DOWNLOADED_RESOURCE_PATH() + "PokemonSV/AreaZero/A0-station-1.onnx");
 
 
         move_player_forward(env, context, 6,
@@ -606,7 +606,7 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
 
-        YOLOv5Detector yolo_detector2(DOWNLOADED_RESOURCE_PATH() + "PokemonSV/AreaZero/station-door-1.onnx");
+        YOLODetector yolo_detector2(DOWNLOADED_RESOURCE_PATH() + "PokemonSV/AreaZero/station-door-1.onnx");
         move_player_forward(env, context, 4,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
