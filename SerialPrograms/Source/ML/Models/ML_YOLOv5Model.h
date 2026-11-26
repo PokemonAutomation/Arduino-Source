@@ -17,6 +17,17 @@ namespace PokemonAutomation{
 namespace ML{
 
 
+// How to read a YOLO model's output. Set by the model's "yolo_version" metadata;
+// a model without that key is read as YOLOv5.
+enum class YOLOVersion{
+    // "yolov5" or no key: [1, num_candidates, 5 + num_labels],
+    // each row cx, cy, w, h, objectness, then one score per label.
+    YOLOv5,
+    // "yolo26-nms-free": Ultralytics YOLO26 exported with its NMS-free head (nms=False).
+    // [1, max_det, 6], each row x1, y1, x2, y2, score, label index.
+    YOLO26_NMS_FREE,
+};
+
 class YOLOv5Session{
 public:
     struct DetectionBox{
@@ -37,16 +48,18 @@ public:
     const std::vector<std::string>& get_label_names() const { return m_label_names; }
     // Return SIZE_MAX if no such label name exists.
     size_t label_index(const std::string& label_name) const;
-    
+    YOLOVersion version() const { return m_version; }
+
 private:
     std::vector<std::string> m_label_names;
+    YOLOVersion m_version = YOLOVersion::YOLOv5;
 
     Ort::Session m_session;
     Ort::MemoryInfo m_memory_info;
     Ort::RunOptions m_run_options;
     std::vector<std::string> m_input_names, m_output_names;
 
-    // [1, 3, H, W] and [1, num_candidates, 5 + num_labels], read from the model in the constructor.
+    // [1, 3, H, W] and the output shape (see YOLOVersion), read from the model in the constructor.
     std::array<int64_t, 4> m_input_shape{1, 3, 0, 0};
     std::array<int64_t, 3> m_output_shape{1, 0, 0};
 

@@ -163,22 +163,47 @@ YOLOv5Session::YOLOv5Session(const std::string& model_path, bool use_gpu)
         throw std::runtime_error("YOLOv5: Failed to extract labels from metadata: " + std::string(e.what()));
     }
 
+    // Which output layout the model has. Models exported before this key existed are all YOLOv5.
+    {
+        Ort::ModelMetadata metadata = m_session.GetModelMetadata();
+        Ort::AllocatorWithDefaultOptions allocator;
+        Ort::AllocatedStringPtr version_value = metadata.LookupCustomMetadataMapAllocated("yolo_version", allocator);
+        const std::string version = version_value ? std::string(version_value.get()) : "yolov5";
+        if (version == "yolov5"){
+            m_version = YOLOVersion::YOLOv5;
+        }else if (version == "yolo26-nms-free"){
+            m_version = YOLOVersion::YOLO26_NMS_FREE;
+        }else{
+            throw std::runtime_error("YOLO model has unknown 'yolo_version' metadata: " + version);
+        }
+        global_logger_tagged().log("YOLO: model version " + version, COLOR_PURPLE);
+    }
+
     if (m_session.GetOutputCount() != 1){
-        throw std::runtime_error("YOLOv5 model does not have the correct output count, found count " + 
+        throw std::runtime_error("YOLO model does not have the correct output count, found count " +
             std::to_string(m_session.GetOutputCount()));
     }
 
     std::vector<int64_t> output_dims = m_session.GetOutputTypeInfo(0).GetTensorTypeAndShapeInfo().GetShape();
-    if (output_dims.size() != 3 || output_dims[1] <= 0 || output_dims[2] <= 5){
-        throw std::runtime_error("YOLOv5 model does not have the correct output dimension, found shape " + to_string(output_dims));
+    switch (m_version){
+    case YOLOVersion::YOLOv5:
+        if (output_dims.size() != 3 || output_dims[1] <= 0 || output_dims[2] <= 5){
+            throw std::runtime_error("YOLOv5 model does not have the correct output dimension, found shape " + to_string(output_dims));
+        }
+        if (output_dims[2] - 5 != static_cast<int>(m_label_names.size())){
+            throw std::runtime_error(
+                "YOLOv5 model has " + std::to_string(output_dims[2]-5) +
+                " output labels but YOLOv5Session was initialized with " + std::to_string(m_label_names.size()) + " labels"
+            );
+        }
+        break;
+    case YOLOVersion::YOLO26_NMS_FREE:
+        if (output_dims.size() != 3 || output_dims[1] <= 0 || output_dims[2] != 6){
+            throw std::runtime_error("YOLO26 NMS-free model output is not [1, max_det, 6], found shape " + to_string(output_dims));
+        }
+        break;
     }
     m_output_shape[2] = output_dims[2];
-    if (output_dims[2] - 5 != static_cast<int>(m_label_names.size())){
-        throw std::runtime_error(
-            "YOLOv5 model has " + std::to_string(output_dims[2]-5) +
-            " output labels but YOLOv5Session was initialized with " + std::to_string(m_label_names.size()) + " labels"
-        );
-    }
 
     // Models must be exported with a fixed input size, e.g. [1, 3, 640, 640] or [1, 3, 1280, 1280].
     std::vector<int64_t> input_dims = m_session.GetInputTypeInfo(0).GetTensorTypeAndShapeInfo().GetShape();
@@ -236,7 +261,7 @@ void YOLOv5Session::run(const cv::Mat& input_image, std::vector<YOLOv5Session::D
     // auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
     // std::cout << "Yolov5 inference time: " << milliseconds << " ms" << std::endl;
 
-    const size_t cand_size = m_label_names.size() + 5;
+    const size_t cand_size = (size_t)m_output_shape[2];
 
     std::vector<cv::Rect> pixel_boxes;
     std::vector<int> indices;
@@ -244,25 +269,45 @@ void YOLOv5Session::run(const cv::Mat& input_image, std::vector<YOLOv5Session::D
     std::vector<size_t> labels;
 
     for (int i = 0; i < (int)m_output_shape[1]; i++){
-        float cx = m_model_output[cand_size*i];
-        float cy = m_model_output[cand_size*i+1];
-        float w = m_model_output[cand_size*i+2];
-        float h = m_model_output[cand_size*i+3];
-        float sc = m_model_output[cand_size*i+4];
+        const float* cand = m_model_output.data() + cand_size * i;
+        switch (m_version){
+        case YOLOVersion::YOLOv5:{
+            float cx = cand[0];
+            float cy = cand[1];
+            float w = cand[2];
+            float h = cand[3];
+            float sc = cand[4];
 
-        float max_score = 0.0;
-        size_t pred_label = 0;  // predicted label
-        for (size_t j_label = 0; j_label < m_label_names.size(); j_label++){
-            float score = m_model_output[cand_size*i+5+j_label];
-            if (score > max_score){
-                max_score = score;
-                pred_label = j_label;
+            float max_score = 0.0;
+            size_t pred_label = 0;  // predicted label
+            for (size_t j_label = 0; j_label < m_label_names.size(); j_label++){
+                float score = cand[5 + j_label];
+                if (score > max_score){
+                    max_score = score;
+                    pred_label = j_label;
+                }
             }
+            scores.push_back(max_score * sc); // sc is like a global confidence scale?
+            pixel_boxes.emplace_back((int)(cx - w / 2 + 0.5), (int)(cy - h / 2 + 0.5), int(w + 0.5), int(h + 0.5));
+            labels.push_back(pred_label);
+            break;
         }
-        scores.push_back(max_score * sc); // sc is like a global confidence scale?
-        pixel_boxes.emplace_back((int)(cx - w / 2 + 0.5), (int)(cy - h / 2 + 0.5), int(w + 0.5), int(h + 0.5));
-        indices.push_back(i);
-        labels.push_back(pred_label);
+        case YOLOVersion::YOLO26_NMS_FREE:{
+            // x1, y1, x2, y2, score, label index. The model keeps its top max_det rows, already
+            // one per object; the NMS below still drops overlapping boxes with different labels.
+            float label = cand[5];
+            if (!(label >= 0 && label < (float)m_label_names.size())){
+                continue;
+            }
+            scores.push_back(cand[4]);
+            pixel_boxes.emplace_back(
+                (int)(cand[0] + 0.5), (int)(cand[1] + 0.5),
+                int(cand[2] - cand[0] + 0.5), int(cand[3] - cand[1] + 0.5)
+            );
+            labels.push_back((size_t)(label + 0.5));
+            break;
+        }
+        }
     }
 
     cv::dnn::NMSBoxes(pixel_boxes, scores, 0.2f, 0.45f, indices);
