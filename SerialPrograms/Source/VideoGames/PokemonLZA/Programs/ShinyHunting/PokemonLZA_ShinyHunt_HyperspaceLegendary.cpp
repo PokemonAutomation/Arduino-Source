@@ -18,7 +18,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
-#include "ML/Inference/ML_YOLOv5Detector.h"
+#include "ML/Inference/ML_YOLODetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
@@ -38,8 +38,8 @@ namespace NintendoSwitch {
 namespace PokemonLZA {
 
 using namespace Pokemon;
-using ML::YOLOv5Watcher;
-using DetectionBox = ML::YOLOv5Session::DetectionBox;
+using ML::YOLOWatcher;
+using DetectionBox = ML::YOLOSession::DetectionBox;
 
 
 ShinyHunt_HyperspaceLegendary_Descriptor::ShinyHunt_HyperspaceLegendary_Descriptor()
@@ -523,7 +523,7 @@ void hunt_virizion_balcony(
 {
 
     std::string model_path = "PokemonLZA/YOLO/Virizion.onnx";
-    YOLOv5Watcher yolo_watcher(env.console.overlay(), model_path);
+    YOLOWatcher yolo_watcher(env.console.overlay(), model_path);
 
     const uint16_t min_calorie = MIN_CALORIE_TO_CATCH;
 

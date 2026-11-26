@@ -1587,7 +1587,7 @@ void move_player_forward(
 void move_forward_until_yolo_object_above_min_size(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
-    YOLOv5Detector& yolo_detector, 
+    YOLODetector& yolo_detector, 
     const std::string& target_label,
     double min_width, double min_height,
     std::function<void()>&& recovery_action, 
@@ -1667,7 +1667,7 @@ void move_forward_until_yolo_object_above_min_size(
 void move_player_until_yolo_object_detected(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
-    YOLOv5Detector& yolo_detector, 
+    YOLODetector& yolo_detector, 
     const std::string& target_label,   
     std::function<void()>&& recovery_action, 
     uint16_t max_rounds, 
@@ -1723,7 +1723,7 @@ void move_player_until_yolo_object_detected(
 void move_forward_until_yolo_object_not_detected(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
-    YOLOv5Detector& yolo_detector, 
+    YOLODetector& yolo_detector, 
     const std::string& target_label,   
     size_t times_not_seen_threshold,
     std::function<void()>&& recovery_action, 
@@ -1778,7 +1778,7 @@ void move_forward_until_yolo_object_not_detected(
 bool move_player_to_realign_via_yolo(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
-    YOLOv5Detector& yolo_detector, 
+    YOLODetector& yolo_detector, 
     const std::string& target_label,
     double x_target
 ){
@@ -1874,7 +1874,7 @@ bool move_player_to_realign_via_yolo(
 void move_player_to_realign_via_yolo_with_recovery(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
-    YOLOv5Detector& yolo_detector, 
+    YOLODetector& yolo_detector, 
     const std::string& target_label,
     double x_target,
     std::function<void()>&& recovery_action
@@ -1890,7 +1890,7 @@ void move_player_to_realign_via_yolo_with_recovery(
 void move_camera_until_yolo_object_detected(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
-    YOLOv5Detector& yolo_detector, 
+    YOLODetector& yolo_detector, 
     const std::string& target_label,
     double initial_x_move, 
     Milliseconds initial_hold,

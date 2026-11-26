@@ -18,7 +18,7 @@
 
 namespace PokemonAutomation{
     namespace ML{
-        class YOLOv5Detector;
+        class YOLODetector;
     }
 namespace NintendoSwitch{
 
@@ -35,7 +35,7 @@ ImageFloatBox get_highest_confident_yolo_box(
     NintendoSwitch::SingleSwitchProgramEnvironment& env,
     NintendoSwitch::ProControllerContext& context,
     VideoOverlaySet& overlays,
-    ML::YOLOv5Detector& yolo_detector,
+    ML::YOLODetector& yolo_detector,
     const std::string& target_label
 );
 
@@ -47,7 +47,7 @@ void move_camera_yolo(
     NintendoSwitch::SingleSwitchProgramEnvironment& env,
     NintendoSwitch::ProControllerContext& context,
     CameraAxis axis,
-    ML::YOLOv5Detector& yolo_detector,
+    ML::YOLODetector& yolo_detector,
     const std::string& target_label,
     double target_line,
     std::function<void()>&& recovery_action

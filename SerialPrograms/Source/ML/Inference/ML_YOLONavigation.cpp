@@ -12,8 +12,8 @@
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "ML/Inference/ML_YOLOv5Detector.h"
-#include "ML/Models/ML_YOLOv5Model.h"
+#include "ML/Inference/ML_YOLODetector.h"
+#include "ML/Models/ML_YOLOModel.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "VideoGames/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h"
@@ -28,18 +28,18 @@ ImageFloatBox get_highest_confident_yolo_box(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     VideoOverlaySet& overlays,
-    ML::YOLOv5Detector& yolo_detector,
+    ML::YOLODetector& yolo_detector,
     const std::string& target_label
 ){
     context.wait_for_all_requests();
     overlays.clear();
-    const std::vector<ML::YOLOv5Session::DetectionBox>& detected_boxes = yolo_detector.detected_boxes();
+    const std::vector<ML::YOLOSession::DetectionBox>& detected_boxes = yolo_detector.detected_boxes();
     auto snapshot = env.console.video().snapshot();
     yolo_detector.detect(snapshot);
 
     ImageFloatBox target_box{-1, -1, -1, -1};
     double best_score = 0;
-    for (const ML::YOLOv5Session::DetectionBox& detected_box : detected_boxes){
+    for (const ML::YOLOSession::DetectionBox& detected_box : detected_boxes){
         ImageFloatBox box = detected_box.box;
         const std::string& label = yolo_detector.session()->label_name(detected_box.label_idx);
         double score = detected_box.score;
@@ -69,7 +69,7 @@ void move_camera_yolo(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     CameraAxis axis,
-    ML::YOLOv5Detector& yolo_detector,
+    ML::YOLODetector& yolo_detector,
     const std::string& target_label,
     double target_line,
     std::function<void()>&& recovery_action
