@@ -196,7 +196,7 @@ void mash_button_until_right_stick(
 ){
     context.wait_for_all_requests();
 
-    RightStickUpDownWatcher joystick(COLOR_RED, joystick_box, &console.overlay(), 200ms);
+    RightStickWatcher joystick(COLOR_RED, joystick_box, &console.overlay(), 200ms);
     int ret = run_until<ProControllerContext>(
         console, context,
         [=](ProControllerContext& context){

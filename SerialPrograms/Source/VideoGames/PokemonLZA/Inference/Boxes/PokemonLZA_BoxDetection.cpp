@@ -471,11 +471,11 @@ void BoxDetector::move_cursor(
 
 
 SomethingInBoxCellDetector::SomethingInBoxCellDetector(Color color, VideoOverlay* overlay)
-: m_right_stick_up_down_detector(color, {0.933, 0.381, 0.027, 0.051}, overlay)
+: m_right_stick_detector(color, {0.933, 0.381, 0.027, 0.051}, overlay)
 , m_left_white_space_box{0.453, 0.100, 0.009, 0.059}, m_right_white_space_box{0.947, 0.107, 0.010, 0.052} {}
 
 void SomethingInBoxCellDetector::make_overlays(VideoOverlaySet& items) const{
-    m_right_stick_up_down_detector.make_overlays(items);
+    m_right_stick_detector.make_overlays(items);
     items.add(COLOR_BLACK, m_left_white_space_box);
     items.add(COLOR_BLACK, m_right_white_space_box);
 }
@@ -491,7 +491,7 @@ bool SomethingInBoxCellDetector::detect(const ImageViewRGB32& screen){
     if (!detected){
         return false;
     }
-    return m_right_stick_up_down_detector.detect(screen);
+    return m_right_stick_detector.detect(screen);
 }
 
 

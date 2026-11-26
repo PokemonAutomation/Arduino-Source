@@ -267,9 +267,9 @@ bool ButtonDetector::detect(const ImageViewRGB32& screen){
     return found;
 }
 
-class RightStickUpDownMatcher : public ImageMatch::WaterfillTemplateMatcher{
+class RightStickMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
-    RightStickUpDownMatcher()
+    RightStickMatcher()
         : WaterfillTemplateMatcher(
             "PokemonLZA/Buttons/RightStickUpDown.png", Color(0xff808080), COLOR_WHITE, 100
         )
@@ -281,7 +281,7 @@ public:
     }
 };
 
-RightStickUpDownDetector::RightStickUpDownDetector(
+RightStickDetector::RightStickDetector(
     Color color, const ImageFloatBox& box, VideoOverlay* overlay
 )
     : m_color(color)
@@ -289,19 +289,19 @@ RightStickUpDownDetector::RightStickUpDownDetector(
     , m_overlay(overlay)
 {}
 
-void RightStickUpDownDetector::make_overlays(VideoOverlaySet& items) const{
+void RightStickDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 
-void RightStickUpDownDetector::reset_state(){
+void RightStickDetector::reset_state(){
     m_last_detected = {};
     m_last_detected_box.reset();
 }
 
-bool RightStickUpDownDetector::detect(const ImageViewRGB32& screen){
+bool RightStickDetector::detect(const ImageViewRGB32& screen){
     m_last_detected = {};
     m_last_detected_box.reset();
-    static const RightStickUpDownMatcher matcher;
+    static const RightStickMatcher matcher;
     const double scale = screen.height() / 2160.0;
     // The camera hint's oval contains about 188 white pixels at 1080p.
     const size_t min_area = std::max<size_t>(1, size_t(400 * scale * scale));

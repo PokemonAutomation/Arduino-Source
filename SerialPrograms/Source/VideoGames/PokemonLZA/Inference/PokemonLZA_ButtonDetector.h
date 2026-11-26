@@ -92,10 +92,10 @@ public:
 };
 
 
-// Detect the small oval R icon used for right-stick up/down hints.
-class RightStickUpDownDetector : public StaticScreenDetector{
+// Detect the small oval R icon used in right-stick hints.
+class RightStickDetector : public StaticScreenDetector{
 public:
-    RightStickUpDownDetector(
+    RightStickDetector(
         Color color, const ImageFloatBox& box, VideoOverlay* overlay = nullptr
     );
 
@@ -113,13 +113,13 @@ private:
     std::optional<OverlayBoxScope> m_last_detected_box;
 };
 
-class RightStickUpDownWatcher : public DetectorToFinder<RightStickUpDownDetector>{
+class RightStickWatcher : public DetectorToFinder<RightStickDetector>{
 public:
-    RightStickUpDownWatcher(
+    RightStickWatcher(
         Color color, const ImageFloatBox& box, VideoOverlay* overlay = nullptr,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
     )
-        : DetectorToFinder("RightStickUpDownWatcher", hold_duration, color, box, overlay)
+        : DetectorToFinder("RightStickWatcher", hold_duration, color, box, overlay)
     {}
 };
 
