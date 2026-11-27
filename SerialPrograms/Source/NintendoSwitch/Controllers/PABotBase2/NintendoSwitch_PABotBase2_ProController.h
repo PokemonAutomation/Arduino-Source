@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_PABotBase2_ProController_H
 #define PokemonAutomation_NintendoSwitch_PABotBase2_ProController_H
 
+#include "Controllers/JoystickTools.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_PABotBase2_OemController.h"
 
@@ -20,8 +21,8 @@ class PABotBase2_ProController final :
     public ProController,
     public PABotBase2_OemController
 {
-    static constexpr uint16_t JOYSTICK_MIN_THRESHOLD = 1874;
-    static constexpr uint16_t JOYSTICK_MAX_THRESHOLD = 320;
+    static constexpr double JOYSTICK_MIN_THRESHOLD = 1874.;  //  1874
+    static constexpr double JOYSTICK_MAX_THRESHOLD = 320.;   //  320
 
 
 public:
@@ -254,16 +255,28 @@ private:
         }
 
         //  Left Stick
-        encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
-            buttons.left_joystick,
+        JoystickPosition left_stick = JoystickTools::map_to_range(
+            JOYSTICK_MIN_THRESHOLD,
+            JOYSTICK_MAX_THRESHOLD,
             controller_state.left_joystick
         );
+        uint16_t wx = JoystickTools::linear_float_to_u12(left_stick.x);
+        uint16_t wy = JoystickTools::linear_float_to_u12(left_stick.y);
+        buttons.left_joystick[0] = (uint8_t)wx;
+        buttons.left_joystick[1] = (uint8_t)(wx >> 8 | wy << 4);
+        buttons.left_joystick[2] = (uint8_t)(wy >> 4);
 
         //  Right Stick
-        encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
-            buttons.right_joystick,
+        JoystickPosition right_stick = JoystickTools::map_to_range(
+            JOYSTICK_MIN_THRESHOLD,
+            JOYSTICK_MAX_THRESHOLD,
             controller_state.right_joystick
         );
+        wx = JoystickTools::linear_float_to_u12(right_stick.x);
+        wy = JoystickTools::linear_float_to_u12(right_stick.y);
+        buttons.right_joystick[0] = (uint8_t)wx;
+        buttons.right_joystick[1] = (uint8_t)(wx >> 8 | wy << 4);
+        buttons.right_joystick[2] = (uint8_t)(wy >> 4);
 
         OemController_State0x30_Gyro gyro{
             0x0000,

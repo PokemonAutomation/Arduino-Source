@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <cmath>
 #include <algorithm>
+#include "Joystick.h"
 
 namespace PokemonAutomation{
 namespace JoystickTools{
@@ -51,6 +52,56 @@ inline double project_to_range(double x, double lo, double hi){
         return 1;
     }
     return x * (hi - lo) + lo;
+}
+
+//  Maps a joystick position into a Switch console's report range.
+//
+//  The thresholds are in 12-bit units (2048 = neutral):
+//
+//      min_threshold: 2048 - min_threshold is the point where the
+//          console's joystick calibrator registers the stick as
+//          off-center (Nintendo's way of alleviating the joycon
+//          drift problem): a moved stick reports at this value in
+//          the direction of movement rather than near neutral.
+//
+//      max_threshold: 2048 - max_threshold is where the stick
+//          reaches its maximum value; a genuine controller does not
+//          use the full 12-bit range.
+//
+//  A non-neutral position's magnitude is mapped linearly between
+//  the two, an exactly neutral position stays neutral, and a
+//  position beyond full travel is clamped to the edge of the unit
+//  square.
+inline JoystickPosition map_to_range(
+    double min_threshold, double max_threshold,
+    const JoystickPosition& position
+){
+    double fx = position.x;
+    double fy = position.y;
+    double mag_squared = fx*fx + fy*fy;
+
+    if (mag_squared == 0){
+        return position;
+    }
+
+    fx = std::min(fx, +1.0);
+    fx = std::max(fx, -1.0);
+    fy = std::min(fy, +1.0);
+    fy = std::max(fy, -1.0);
+
+    if (mag_squared >= 1){
+        max_out_magnitude(fx, fy);
+        return JoystickPosition(fx, fy);
+    }
+
+    double lo = 1 - min_threshold / 2048.;
+    double hi = 1 - max_threshold / 2048.;
+
+    double true_mag = std::sqrt(mag_squared);
+    double report_mag = project_to_range(true_mag, lo, hi);
+    double scale = report_mag / true_mag;
+
+    return JoystickPosition(fx * scale, fy * scale);
 }
 
 
