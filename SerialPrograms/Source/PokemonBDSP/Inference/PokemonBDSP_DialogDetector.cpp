@@ -42,7 +42,10 @@ void ShortDialogDetector::make_overlays(VideoOverlaySet& items) const{
 bool ShortDialogDetector::detect(const ImageViewRGB32& screen){
     ImageStats left_white = image_stats(extract_box_reference(screen, m_left_white));
 //    cout << left_white.average << left_white.stddev << endl;
-    if (!is_white(left_white)){
+    // Gardenia's reward text can overlap the primary left-hand sample.
+    if (!is_white(left_white) && !is_white(image_stats(extract_box_reference(
+        screen, ImageFloatBox(0.208, 0.860, 0.002, 0.025)
+    )))){
         return false;
     }
     ImageStats right_white = image_stats(extract_box_reference(screen, m_right_white));
@@ -196,7 +199,8 @@ private:
 } // namespace
 
 void add_tests_DialogDetector(UnitTestDatabase& database){
-    static constexpr std::array<DialogCase, 6> CASES{{
+    static constexpr std::array<DialogCase, 7> CASES{{
+        {.input = {.image = "PokemonBDSP/DialogDetector/GardeniaRewardDialogue_True.png"}, .expectation = {.detected = true}},
         {.input = {.image = "PokemonBDSP/DialogDetector/IntroRowanNameTab_True.png"}, .expectation = {.detected = true}},
         {.input = {.image = "PokemonBDSP/DialogDetector/IntroRowanNoArrow_True.png"}, .expectation = {.detected = true}},
         {.input = {.image = "PokemonBDSP/DialogDetector/IntroRowanShortLine_True.png"}, .expectation = {.detected = true}},
