@@ -22,8 +22,8 @@ class PABotBase2_JoyCon :
     public JoyconType,
     public PABotBase2_OemController
 {
-    static constexpr double JOYSTICK_MIN_THRESHOLD = 1874.;  //  1874
-    static constexpr double JOYSTICK_MAX_THRESHOLD = 260.;   //  260
+    static constexpr double JOYSTICK_MIN_THRESHOLD = 1874. / 2048.;  //  1874
+    static constexpr double JOYSTICK_MAX_THRESHOLD = 260. / 2048.;   //  260
 
 public:
     PABotBase2_JoyCon(

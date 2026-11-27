@@ -21,8 +21,8 @@ class PABotBase2_ProController final :
     public ProController,
     public PABotBase2_OemController
 {
-    static constexpr double JOYSTICK_MIN_THRESHOLD = 1874.;  //  1874
-    static constexpr double JOYSTICK_MAX_THRESHOLD = 320.;   //  320
+    static constexpr double JOYSTICK_MIN_THRESHOLD = 1874. / 2048.;  //  1874
+    static constexpr double JOYSTICK_MAX_THRESHOLD = 320. / 2048.;   //  320
 
 
 public:

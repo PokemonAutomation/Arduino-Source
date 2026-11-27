@@ -56,17 +56,18 @@ inline double project_to_range(double x, double lo, double hi){
 
 //  Maps a joystick position into a Switch console's report range.
 //
-//  The thresholds are in 12-bit units (2048 = neutral):
+//  The thresholds are fractions of full scale (0..1, where 1 is
+//  the full travel from neutral):
 //
-//      min_threshold: 2048 - min_threshold is the point where the
-//          console's joystick calibrator registers the stick as
-//          off-center (Nintendo's way of alleviating the joycon
-//          drift problem): a moved stick reports at this value in
-//          the direction of movement rather than near neutral.
+//      min_threshold: the point at which the console's joystick
+//          calibrator registers the stick as off-center (Nintendo's
+//          way of alleviating the joycon drift problem): a moved
+//          stick reports at 1 - min_threshold in the direction of
+//          movement rather than near neutral.
 //
-//      max_threshold: 2048 - max_threshold is where the stick
-//          reaches its maximum value; a genuine controller does not
-//          use the full 12-bit range.
+//      max_threshold: where the stick reaches its maximum value:
+//          a genuine controller does not use the full range, and
+//          saturates at 1 - max_threshold.
 //
 //  A non-neutral position's magnitude is mapped linearly between
 //  the two, an exactly neutral position stays neutral, and a
@@ -94,8 +95,8 @@ inline JoystickPosition map_to_range(
         return JoystickPosition(fx, fy);
     }
 
-    double lo = 1 - min_threshold / 2048.;
-    double hi = 1 - max_threshold / 2048.;
+    double lo = 1 - min_threshold;
+    double hi = 1 - max_threshold;
 
     double true_mag = std::sqrt(mag_squared);
     double report_mag = project_to_range(true_mag, lo, hi);

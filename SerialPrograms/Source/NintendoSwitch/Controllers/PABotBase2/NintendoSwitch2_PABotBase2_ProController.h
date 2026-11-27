@@ -26,8 +26,8 @@ class PABotBase2_ProController final :
     using PABotBase2_Controller = NintendoSwitch::PABotBase2_Controller;
 
     //  TODO: Exact values TBD
-    static constexpr double JOYSTICK_MIN_THRESHOLD = 1874.;  //  1874
-    static constexpr double JOYSTICK_MAX_THRESHOLD = 320.;   //  320
+    static constexpr double JOYSTICK_MIN_THRESHOLD = 1874. / 2048.;  //  1874
+    static constexpr double JOYSTICK_MAX_THRESHOLD = 320. / 2048.;   //  320
 
 
 public:
