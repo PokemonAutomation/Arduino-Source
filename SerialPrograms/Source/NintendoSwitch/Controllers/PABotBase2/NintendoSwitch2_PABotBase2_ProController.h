@@ -189,9 +189,11 @@ private:
         Cancellable* cancellable,
         const SuperscalarScheduler::ScheduleEntry& entry
     ) override{
-        NintendoSwitch::SwitchControllerState controller_state;
+        using namespace NintendoSwitch;
+
+        SwitchControllerState controller_state;
         for (auto& item : entry.state){
-            static_cast<const NintendoSwitch::SwitchCommand&>(*item).apply(controller_state);
+            static_cast<const SwitchCommand&>(*item).apply(controller_state);
         }
 
         //  The Pro Controller 2's native report (0x09): the 3 button
@@ -203,8 +205,8 @@ private:
         populate_report_buttons(buttons, controller_state);
 
         {
-            NintendoSwitch::SplitDpad dpad =
-                NintendoSwitch::convert_unified_to_split_dpad(controller_state.dpad);
+            SplitDpad dpad =
+                convert_unified_to_split_dpad(controller_state.dpad);
             buttons.buttons[1] |= (dpad.down  ? 1 : 0) << 0;
             buttons.buttons[1] |= (dpad.right ? 1 : 0) << 1;
             buttons.buttons[1] |= (dpad.left  ? 1 : 0) << 2;
