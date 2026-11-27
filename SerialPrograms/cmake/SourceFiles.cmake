@@ -342,6 +342,9 @@ file(GLOB CORE_LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_ProController.h
     Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_WiredController.cpp
     Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_WiredController.h
+    Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch2_PABotBase2_OemController.cpp
+    Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch2_PABotBase2_OemController.h
+    Source/NintendoSwitch/Controllers/PABotBase2/NintendoSwitch2_PABotBase2_ProController.h
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.cpp
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController_from_Keyboard.cpp
@@ -1306,16 +1309,16 @@ file(GLOB LIBRARY_SOURCES
     Source/ML/Inference/ML_PaddleOCRPipeline.h
     Source/ML/Inference/ML_YOLONavigation.cpp
     Source/ML/Inference/ML_YOLONavigation.h
-    Source/ML/Inference/ML_YOLOv5Detector.cpp
-    Source/ML/Inference/ML_YOLOv5Detector.h
+    Source/ML/Inference/ML_YOLODetector.cpp
+    Source/ML/Inference/ML_YOLODetector.h
     Source/ML/ML_Panels.cpp
     Source/ML/ML_Panels.h
     Source/ML/Models/ML_ONNXRuntimeHelpers.cpp
     Source/ML/Models/ML_ONNXRuntimeHelpers.h
     Source/ML/Models/ML_OrtEnv.cpp
     Source/ML/Models/ML_OrtEnv.h
-    Source/ML/Models/ML_YOLOv5Model.cpp
-    Source/ML/Models/ML_YOLOv5Model.h
+    Source/ML/Models/ML_YOLOModel.cpp
+    Source/ML/Models/ML_YOLOModel.h
     Source/ML/Programs/ML_LabelImages.cpp
     Source/ML/Programs/ML_LabelImages.h
     Source/ML/Programs/ML_LabelImagesOverlayManager.cpp

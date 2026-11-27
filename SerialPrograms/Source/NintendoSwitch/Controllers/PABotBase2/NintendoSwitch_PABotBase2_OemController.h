@@ -19,7 +19,6 @@ namespace NintendoSwitch{
 
 
 
-
 class PABotBase2_OemController :
     public PABotBase2_Controller,
     private ControllerStatusThreadCallback

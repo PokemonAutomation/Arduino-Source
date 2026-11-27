@@ -12,9 +12,10 @@
 #endif
 
 #include "Controllers/StandardHid/StandardHid_Keyboard_PABotBase2.h"
+#include "NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_WiredController.h"
 #include "NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_ProController.h"
 #include "NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_Joycon.h"
-#include "NintendoSwitch/Controllers/PABotBase2/NintendoSwitch_PABotBase2_WiredController.h"
+#include "NintendoSwitch/Controllers/PABotBase2/NintendoSwitch2_PABotBase2_ProController.h"
 
 #include "SerialPABotBase2_Connection.h"
 #include "SerialPABotBase2_Descriptor.h"
@@ -119,6 +120,16 @@ std::unique_ptr<AbstractController> SerialPABotBase2_Descriptor::make_controller
     case ControllerType::NintendoSwitch_WirelessRightJoycon:
         return std::unique_ptr<AbstractController>(
             new PokemonAutomation::NintendoSwitch::PABotBase2_RightJoycon(
+                logger,
+                static_cast<PABotBase2::Connection&>(connection),
+                controller_type
+            )
+        );
+
+    case ControllerType::NintendoSwitch2_WiredProController:
+    case ControllerType::NintendoSwitch2_WirelessProController:
+        return std::unique_ptr<AbstractController>(
+            new PokemonAutomation::NintendoSwitch2::PABotBase2_ProController(
                 logger,
                 static_cast<PABotBase2::Connection&>(connection),
                 controller_type

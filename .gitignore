@@ -58,6 +58,7 @@ SerialPrograms/*.lib
 .vs
 Resources/*
 Packages/
+UnitTestResources/
 SerialPrograms/CMakeLists.txt.user
 opencv_world4120.dll
 opencv_world4120d.dll
