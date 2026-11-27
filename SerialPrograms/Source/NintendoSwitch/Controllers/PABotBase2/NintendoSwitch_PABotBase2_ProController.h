@@ -23,6 +23,7 @@ class PABotBase2_ProController final :
     static constexpr uint16_t JOYSTICK_MIN_THRESHOLD = 1874;
     static constexpr uint16_t JOYSTICK_MAX_THRESHOLD = 320;
 
+
 public:
     PABotBase2_ProController(
         Logger& logger,
