@@ -121,32 +121,44 @@ public:
         Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
-    ) = 0;
+    ){
+        issue_nop(cancellable, delay);
+    }
     virtual void issue_gyro_accel_y(
         Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
-    ) = 0;
+    ){
+        issue_nop(cancellable, delay);
+    }
     virtual void issue_gyro_accel_z(
         Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
-    ) = 0;
+    ){
+        issue_nop(cancellable, delay);
+    }
     virtual void issue_gyro_rotate_x(
         Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
-    ) = 0;
+    ){
+        issue_nop(cancellable, delay);
+    }
     virtual void issue_gyro_rotate_y(
         Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
-    ) = 0;
+    ){
+        issue_nop(cancellable, delay);
+    }
     virtual void issue_gyro_rotate_z(
         Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
-    ) = 0;
+    ){
+        issue_nop(cancellable, delay);
+    }
 
     //
     //  Press all the following buttons/joysticks simultaneously for the
