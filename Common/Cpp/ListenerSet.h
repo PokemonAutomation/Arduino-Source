@@ -360,6 +360,7 @@ void ListenerSet<ListenerType>::run_method(Function function, Args&&... args){
 
     Node* node = m_head;
     while (node != nullptr){
+        bool last = node->next == nullptr;
         {
             ReadSpinLock lg(node->lock, m_suppress_lock_prints ? nullptr : "ListenerSet::run_method()");
 
@@ -368,11 +369,23 @@ void ListenerSet<ListenerType>::run_method(Function function, Args&&... args){
 #endif
             m_lock.unlock_read();
             try{
-                (node->listener.*function)(std::forward<Args>(args)...);
+                //  Only do full forwarding on the last listener due to
+                //  moves being unsafe.
+                if (last){
+                    (node->listener.*function)(std::forward<Args>(args)...);
+                }else{
+                    (node->listener.*function)(args...);
+                }
             }catch (...){
                 if (!err){
                     err = std::current_exception();
                 }
+            }
+            if (last){
+                if (err){
+                    std::rethrow_exception(err);
+                }
+                return;
             }
             m_lock.acquire_read();
         }

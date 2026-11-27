@@ -484,12 +484,16 @@ bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context){
     const auto duration = end_time - start_time;
     const auto second_count = std::chrono::duration_cast<std::chrono::seconds>(duration).count();
     // Due to day/night change may eating the mashing button A sequence, we may still be inside the zone!
-    // We need to check if we can fast travel 
-    if (duration < 16s){
+    // We need to check if we can fast travel
+    //
+    // We tell the two cases apart by how long it takes to get the overworld back:
+    // - A normal leave (gate animation only) takes 1-2 sec.
+    // - A day/night change during the leave takes about 13-14 sec.
+    // The 6 sec threshold sits between the two with margin on both sides.
+    if (duration < 6s){
         console.log("Leaving zone function took " + std::to_string(second_count) + " sec. No day/night change");
         console.overlay().add_log("Left Gate");
 
-        // The animation of leaving the gate does not take more than 15 sec.
         // In this case, there is no day/night change. We are sure we are outside the wild zone
         // (unless some angry Garchomp or Drilbur used Dig and escaped wild zone containment... We don't
         // consider this case for now)
