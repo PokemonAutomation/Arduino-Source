@@ -239,10 +239,12 @@ private:
         OemController_State0x09_Buttons& buttons,
         const NintendoSwitch::SwitchControllerState& controller_state
     ){
-        NintendoSwitch::Button all_buttons = NintendoSwitch::BUTTON_NONE;
-        for (size_t c = 0; c < NintendoSwitch::TOTAL_BUTTONS; c++){
-            NintendoSwitch::Button button =
-                (NintendoSwitch::Button)((NintendoSwitch::ButtonFlagType)1 << c);
+        using namespace NintendoSwitch;
+
+        Button all_buttons = BUTTON_NONE;
+        for (size_t c = 0; c < TOTAL_BUTTONS; c++){
+            Button button =
+                (Button)((ButtonFlagType)1 << c);
             if (!(controller_state.buttons & button)){
                 continue;
             }
@@ -250,31 +252,31 @@ private:
             all_buttons |= button;
             switch (button){
             //  Right: byte0
-            case NintendoSwitch::BUTTON_B:          buttons.buttons[0] |= 1 << 0; break;
-            case NintendoSwitch::BUTTON_A:          buttons.buttons[0] |= 1 << 1; break;
-            case NintendoSwitch::BUTTON_Y:          buttons.buttons[0] |= 1 << 2; break;
-            case NintendoSwitch::BUTTON_X:          buttons.buttons[0] |= 1 << 3; break;
-            case NintendoSwitch::BUTTON_R:          buttons.buttons[0] |= 1 << 4; break;
-            case NintendoSwitch::BUTTON_ZR:         buttons.buttons[0] |= 1 << 5; break;
-            case NintendoSwitch::BUTTON_PLUS:       buttons.buttons[0] |= 1 << 6; break;
-            case NintendoSwitch::BUTTON_RCLICK:     buttons.buttons[0] |= 1 << 7; break;
+            case BUTTON_B:          buttons.buttons[0] |= 1 << 0; break;
+            case BUTTON_A:          buttons.buttons[0] |= 1 << 1; break;
+            case BUTTON_Y:          buttons.buttons[0] |= 1 << 2; break;
+            case BUTTON_X:          buttons.buttons[0] |= 1 << 3; break;
+            case BUTTON_R:          buttons.buttons[0] |= 1 << 4; break;
+            case BUTTON_ZR:         buttons.buttons[0] |= 1 << 5; break;
+            case BUTTON_PLUS:       buttons.buttons[0] |= 1 << 6; break;
+            case BUTTON_RCLICK:     buttons.buttons[0] |= 1 << 7; break;
 
             //  Left + dpad: byte1
-            case NintendoSwitch::BUTTON_DOWN:       buttons.buttons[1] |= 1 << 0; break;
-            case NintendoSwitch::BUTTON_RIGHT:      buttons.buttons[1] |= 1 << 1; break;
-            case NintendoSwitch::BUTTON_LEFT:       buttons.buttons[1] |= 1 << 2; break;
-            case NintendoSwitch::BUTTON_UP:         buttons.buttons[1] |= 1 << 3; break;
-            case NintendoSwitch::BUTTON_L:          buttons.buttons[1] |= 1 << 4; break;
-            case NintendoSwitch::BUTTON_ZL:         buttons.buttons[1] |= 1 << 5; break;
-            case NintendoSwitch::BUTTON_MINUS:      buttons.buttons[1] |= 1 << 6; break;
-            case NintendoSwitch::BUTTON_LCLICK:     buttons.buttons[1] |= 1 << 7; break;
+            case BUTTON_DOWN:       buttons.buttons[1] |= 1 << 0; break;
+            case BUTTON_RIGHT:      buttons.buttons[1] |= 1 << 1; break;
+            case BUTTON_LEFT:       buttons.buttons[1] |= 1 << 2; break;
+            case BUTTON_UP:         buttons.buttons[1] |= 1 << 3; break;
+            case BUTTON_L:          buttons.buttons[1] |= 1 << 4; break;
+            case BUTTON_ZL:         buttons.buttons[1] |= 1 << 5; break;
+            case BUTTON_MINUS:      buttons.buttons[1] |= 1 << 6; break;
+            case BUTTON_LCLICK:     buttons.buttons[1] |= 1 << 7; break;
 
             //  Shared: byte2
-            case NintendoSwitch::BUTTON_HOME:       buttons.buttons[2] |= 1 << 0; break;
-            case NintendoSwitch::BUTTON_CAPTURE:    buttons.buttons[2] |= 1 << 1; break;
-            case NintendoSwitch::BUTTON_GR:         buttons.buttons[2] |= 1 << 2; break;
-            case NintendoSwitch::BUTTON_GL:         buttons.buttons[2] |= 1 << 3; break;
-            case NintendoSwitch::BUTTON_C:          buttons.buttons[2] |= 1 << 4; break;
+            case BUTTON_HOME:       buttons.buttons[2] |= 1 << 0; break;
+            case BUTTON_CAPTURE:    buttons.buttons[2] |= 1 << 1; break;
+            case BUTTON_GR:         buttons.buttons[2] |= 1 << 2; break;
+            case BUTTON_GL:         buttons.buttons[2] |= 1 << 3; break;
+            case BUTTON_C:          buttons.buttons[2] |= 1 << 4; break;
 
             default:;
             }
