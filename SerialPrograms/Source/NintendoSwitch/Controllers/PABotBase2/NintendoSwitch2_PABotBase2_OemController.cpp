@@ -18,7 +18,142 @@ using namespace std::chrono_literals;
 void PABotBase2_OemController::add_message_loggers(PABotBase2::MessageLogger& message_logger){
     using namespace PABotBase2;
 
-    //  TODO: Add messages.
+    message_logger.add_message<Message_NS2_OemController_Flash>(
+        "PABB2_MESSAGE_REQ_NS2_OEM_CONTROLLER_READ_FLASH",
+        PABB2_MESSAGE_REQ_NS2_OEM_CONTROLLER_READ_FLASH,
+        true,
+        [](const Message_NS2_OemController_Flash* message){
+            std::string str;
+            str += "id = " + std::to_string(message->id);
+            str += ", controller_type = 0x" + tostr_hex(message->controller_type);
+            str += ", address = 0x" + tostr_hex(message->address);
+            str += ", bytes = " + std::to_string(message->bytes);
+            return str;
+        }
+    );
+    message_logger.add_message_min_length<Message_NS2_OemController_Flash>(
+        "PABB2_MESSAGE_REQ_NS2_OEM_CONTROLLER_WRITE_FLASH",
+        PABB2_MESSAGE_REQ_NS2_OEM_CONTROLLER_WRITE_FLASH,
+        true,
+        [](const Message_NS2_OemController_Flash* message){
+            std::string str;
+            str += "id = " + std::to_string(message->id);
+            str += ", controller_type = 0x" + tostr_hex(message->controller_type);
+            str += ", address = 0x" + tostr_hex(message->address);
+            str += ", bytes = " + std::to_string(message->bytes);
+            return str;
+        }
+    );
+    message_logger.add_message<Message_Command_NS2_OemController_Buttons0x05>(
+        "PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_BUTTONS_0X05",
+        PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_BUTTONS_0X05,
+        false,
+        [](const Message_Command_NS2_OemController_Buttons0x05* message){
+            std::string str;
+            str += "id = " + std::to_string(message->id);
+            str += ", ms = " + std::to_string(message->milliseconds);
+            return str;
+        }
+    );
+    message_logger.add_message<Message_Command_NS2_OemController_FullState0x05>(
+        "PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_FULL_STATE_0X05",
+        PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_FULL_STATE_0X05,
+        false,
+        [](const Message_Command_NS2_OemController_FullState0x05* message){
+            std::string str;
+            str += "id = " + std::to_string(message->id);
+            str += ", ms = " + std::to_string(message->milliseconds);
+            return str;
+        }
+    );
+    message_logger.add_message<Message_Command_NS2_OemController_Buttons0x07>(
+        "PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_BUTTONS_0X07",
+        PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_BUTTONS_0X07,
+        false,
+        [](const Message_Command_NS2_OemController_Buttons0x07* message){
+            std::string str;
+            str += "id = " + std::to_string(message->id);
+            str += ", ms = " + std::to_string(message->milliseconds);
+            return str;
+        }
+    );
+    message_logger.add_message<Message_Command_NS2_OemController_FullState0x07>(
+        "PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_FULL_STATE_0X07",
+        PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_FULL_STATE_0X07,
+        false,
+        [](const Message_Command_NS2_OemController_FullState0x07* message){
+            std::string str;
+            str += "id = " + std::to_string(message->id);
+            str += ", ms = " + std::to_string(message->milliseconds);
+            return str;
+        }
+    );
+    message_logger.add_message<Message_Command_NS2_OemController_Buttons0x08>(
+        "PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_BUTTONS_0X08",
+        PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_BUTTONS_0X08,
+        false,
+        [](const Message_Command_NS2_OemController_Buttons0x08* message){
+            std::string str;
+            str += "id = " + std::to_string(message->id);
+            str += ", ms = " + std::to_string(message->milliseconds);
+            return str;
+        }
+    );
+    message_logger.add_message<Message_Command_NS2_OemController_FullState0x08>(
+        "PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_FULL_STATE_0X08",
+        PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_FULL_STATE_0X08,
+        false,
+        [](const Message_Command_NS2_OemController_FullState0x08* message){
+            std::string str;
+            str += "id = " + std::to_string(message->id);
+            str += ", ms = " + std::to_string(message->milliseconds);
+            return str;
+        }
+    );
+    message_logger.add_message<Message_Command_NS2_OemController_Buttons0x09>(
+        "PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_BUTTONS_0X09",
+        PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_BUTTONS_0X09,
+        false,
+        [](const Message_Command_NS2_OemController_Buttons0x09* message){
+            std::string str;
+            str += "id = " + std::to_string(message->id);
+            str += ", ms = " + std::to_string(message->milliseconds);
+            return str;
+        }
+    );
+    message_logger.add_message<Message_Command_NS2_OemController_FullState0x09>(
+        "PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_FULL_STATE_0X09",
+        PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_FULL_STATE_0X09,
+        false,
+        [](const Message_Command_NS2_OemController_FullState0x09* message){
+            std::string str;
+            str += "id = " + std::to_string(message->id);
+            str += ", ms = " + std::to_string(message->milliseconds);
+            return str;
+        }
+    );
+    message_logger.add_message<Message_Command_NS2_OemController_Buttons0x0A>(
+        "PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_BUTTONS_0X0A",
+        PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_BUTTONS_0X0A,
+        false,
+        [](const Message_Command_NS2_OemController_Buttons0x0A* message){
+            std::string str;
+            str += "id = " + std::to_string(message->id);
+            str += ", ms = " + std::to_string(message->milliseconds);
+            return str;
+        }
+    );
+    message_logger.add_message<Message_Command_NS2_OemController_FullState0x0A>(
+        "PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_FULL_STATE_0X0A",
+        PABB2_MESSAGE_CMD_NS2_OEM_CONTROLLER_FULL_STATE_0X0A,
+        false,
+        [](const Message_Command_NS2_OemController_FullState0x0A* message){
+            std::string str;
+            str += "id = " + std::to_string(message->id);
+            str += ", ms = " + std::to_string(message->milliseconds);
+            return str;
+        }
+    );
 }
 
 
@@ -66,10 +201,6 @@ PABotBase2_OemController::PABotBase2_OemController(
     //  Add controller-specific messages.
 
     add_message_loggers(connection.message_logger());
-
-
-
-    //  TODO: Add messages.
 
 
 
@@ -174,12 +305,12 @@ void PABotBase2_OemController::update_status(Cancellable& cancellable){
     const PABotBase2::Message_u32* header = (const PABotBase2::Message_u32*)response.data();
 
     switch (header->data){
-    case PABB_CID_NintendoSwitch_WiredProController:
-    case PABB_CID_NintendoSwitch_WiredLeftJoycon:
-    case PABB_CID_NintendoSwitch_WiredRightJoycon:
-    case PABB_CID_NintendoSwitch_WirelessProController:
-    case PABB_CID_NintendoSwitch_WirelessLeftJoycon:
-    case PABB_CID_NintendoSwitch_WirelessRightJoycon:
+    case PABB_CID_NintendoSwitch2_WiredProController:
+    case PABB_CID_NintendoSwitch2_WiredLeftJoycon:
+    case PABB_CID_NintendoSwitch2_WiredRightJoycon:
+    case PABB_CID_NintendoSwitch2_WirelessProController:
+    case PABB_CID_NintendoSwitch2_WirelessLeftJoycon:
+    case PABB_CID_NintendoSwitch2_WirelessRightJoycon:
         break;
     default:
         WriteSpinLock lg(m_error_lock);
