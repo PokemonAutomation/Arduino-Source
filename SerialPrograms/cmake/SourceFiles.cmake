@@ -288,6 +288,8 @@ file(GLOB CORE_LIBRARY_SOURCES
     Source/Controllers/Joystick.cpp
     Source/Controllers/Joystick.h
     Source/Controllers/JoystickTools.h
+    Source/Controllers/JoystickTools_Tests.cpp
+    Source/Controllers/JoystickTools_Tests.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
     Source/Controllers/PABotBase2/PABotBase2_CommandQueueManager.cpp
