@@ -188,7 +188,7 @@ jobs:
       # On Windows, install the action's own ccache: the runner's Strawberry Perl puts an older
       # ccache (4.9.1) on PATH, which the default install: detect would use instead.
       - name: Set up ccache
-        uses: hendrikmuhs/ccache-action@v1.2.25
+        uses: hendrikmuhs/ccache-action@v1.2.26
         with:
           key: ${{inputs.os}}-${{inputs.compiler}}
           max-size: 5G
