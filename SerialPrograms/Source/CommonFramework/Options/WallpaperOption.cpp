@@ -26,8 +26,8 @@ WallpaperOption::WallpaperOption()
         "<b>Wallpaper Path:</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
         "",
-        "Images (*.png *.jpg *.jpeg *.bmp *.webp);;All Files (*)",
-        "Select a PNG, JPEG, BMP, or WebP image"
+        "Images (*.png *.jpg *.jpeg *.bmp *.webp *.svg *.svgz);;All Files (*)",
+        "Select a PNG, JPEG, BMP, WebP, or SVG image"
     )
     , IMAGE_FIT(
         "<b>Wallpaper Image Fit:</b>",
