@@ -4,6 +4,7 @@
  *
  */
 
+#include <algorithm>
 #include <sstream>
 #include <iostream>
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
@@ -189,14 +190,26 @@ std::vector<ImagePixelBox> MMOQuestionMarkDetector::detect_MMOs_on_region_map(co
     match_template_by_waterfill(
         frame.size(),
         map_image, MMOQuestionMarkBackgroundMatcher::instance(),
-        {{combine_rgb(0, 5, 30), combine_rgb(100, 130, 130)}},
+        {
+            {combine_rgb(0, 0, 15), combine_rgb(100, 130, 130)},
+            {combine_rgb(0, 0, 0), combine_rgb(100, 130, 130)},
+        },
         {scale(min_bg_size), scale(max_bg_size)}, 110,
         [&](WaterfillObject& object){
             size_t min_x = object.min_x + map_min_x;
             size_t min_y = object.min_y + map_min_y;
             size_t max_x = object.max_x + map_min_x;
             size_t max_y = object.max_y + map_min_y;
-            results.emplace_back(min_x, min_y, max_x, max_y);
+            const ImagePixelBox box(min_x, min_y, max_x, max_y);
+            //  Both filters can find the same question mark. Skip the newer one if the old found boxes
+            //  overlap at least 50%.
+            for (const ImagePixelBox& found : results){
+                const size_t overlap = found.overlapping_area(box);
+                if (2 * overlap >= std::min(found.area(), box.area())){
+                    return false;
+                }
+            }
+            results.emplace_back(box);
             return false;
         }
     );

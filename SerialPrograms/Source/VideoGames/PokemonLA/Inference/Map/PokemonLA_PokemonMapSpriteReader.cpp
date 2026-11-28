@@ -806,7 +806,7 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
 
     // configs for the algorithm:
     const size_t num_feature_candidates = 10;
-    const double color_difference_threshold = 10.0;
+    const double color_difference_threshold = 15.0;
     const double gradient_confidence_threshold = 2.0;
     const double color_to_gradient_confidence_scale = 2.0;
 
@@ -1126,36 +1126,24 @@ public:
             return "Error: cannot load MMO revealed sprites image file " + image_paths()[1];
         }
 
-        // Find target sprite slugs and their locations on image from the golden file
+        //  Find target sprite slugs and their locations on image from the golden file.
+        //  Each line is "<slug> <x> <y>", e.g. "psyduck 0.6276 0.4426": the center of the question mark,
+        //  relative to the image size.
         std::vector<SlugWith2DCoordinate> target_sprites;
         if (!load_slug_list_with_2d_coordinates(mmo_revealed_txt_path, target_sprites)){
             return "Error: cannot load the golden sprite list " + mmo_revealed_txt_path;
         }
-        size_t num_coordinates = 0;
-        for (const SlugWith2DCoordinate& target : target_sprites){
-            num_coordinates += target.x >= 0.0 && target.y >= 0.0 ? 1 : 0;
-        }
-        if (num_coordinates != 0 && num_coordinates != target_sprites.size()){
-            return "Error: " + std::to_string(num_coordinates) + " of the " + std::to_string(target_sprites.size()) +
-                " lines in " + mmo_revealed_txt_path + " have a coordinate. Either every line has a coordinate or none does.";
-        }
-        const bool match_by_coordinates = num_coordinates > 0;
 
         //  A slug can end with "?", e.g. "psyduck? 0.5307 0.6389". This means it is an optional target:
         //  the question mark is partly covered by another map icon, like a satchel or a flag.
         //  The detector may or may not find it. So the test should handle both cases.
         std::vector<bool> target_is_optional(target_sprites.size(), false);
-        size_t num_optional_targets = 0;
         for (size_t i = 0; i < target_sprites.size(); i++){
             std::string& slug = target_sprites[i].slug;
             if (slug.size() > 1 && slug.back() == '?'){
                 slug.pop_back();  // remove '?'
                 target_is_optional[i] = true;
-                num_optional_targets++;
             }
-        }
-        if (num_optional_targets > 0 && !match_by_coordinates){
-            return "Error: an optional slug ending with \"?\" needs a coordinate, \"<slug>? <x> <y>\", in " + mmo_revealed_txt_path;
         }
 
         auto point_to_str = [](double x, double y) -> std::string{
@@ -1192,71 +1180,62 @@ public:
 
         //  matched_target_index[i]: quest result i -> the index in `target_sprites` that matches this found question mark.
         //  SIZE_MAX if it matches none.
-        std::vector<size_t> matched_target_index;
+        const std::vector<size_t> matched_target_index = match_MMO_boxes_to_test_targets(
+            question_mark_image.width(), question_mark_image.height(),
+            quest_results, target_sprites
+        );
         std::string target_sprite_match_error_msg;
-        if (match_by_coordinates){
-            matched_target_index = match_MMO_boxes_to_test_targets(
-                question_mark_image.width(), question_mark_image.height(),
-                quest_results, target_sprites
-            );
-            std::vector<bool> target_found(target_sprites.size(), false);
-            for (size_t i = 0; i < quest_results.size(); i++){
-                if (matched_target_index[i] == SIZE_MAX){
-                    target_sprite_match_error_msg += "Extra question mark at " + box_center_to_str(quest_results[i]) + ". ";
-                }else{
-                    target_found[matched_target_index[i]] = true;
-                }
-            }
-            for (size_t t = 0; t < target_sprites.size(); t++){
-                if (target_found[t]){
-                    continue;
-                }
-                // target is not found:
-                if (target_is_optional[t]){
-                    cout << "Optional question mark of " << target_sprites[t].slug << " at " <<
-                        point_to_str(target_sprites[t].x, target_sprites[t].y) << " is not found." << endl;
-                    continue;
-                }
-                target_sprite_match_error_msg += "Missed question mark of " + target_sprites[t].slug + " at " +
-                    point_to_str(target_sprites[t].x, target_sprites[t].y) + ". ";
-            }
-            if (!target_sprite_match_error_msg.empty()){
-                cerr << "Error: " << target_sprite_match_error_msg << endl;
-            }
-        }else{
-            if (quest_results.size() != target_sprites.size()){
-                cerr << "Error: the number of MMO question marks detected is not correct: " << quest_results.size() << " should be " <<
-                    target_sprites.size() << endl;
-                return "Error: the number of MMO question marks detected is not correct: " + std::to_string(quest_results.size()) +
-                " should be " + std::to_string(target_sprites.size());
-            }
-            for (size_t i = 0; i < quest_results.size(); i++){
-                matched_target_index.push_back(i);
+        std::vector<bool> target_found(target_sprites.size(), false);
+        for (size_t i = 0; i < quest_results.size(); i++){
+            if (matched_target_index[i] == SIZE_MAX){
+                target_sprite_match_error_msg += "Extra question mark at " + box_center_to_str(quest_results[i]) + ". ";
+            }else{
+                target_found[matched_target_index[i]] = true;
             }
         }
+        for (size_t t = 0; t < target_sprites.size(); t++){
+            if (target_found[t]){
+                continue;
+            }
+            // target is not found:
+            if (target_is_optional[t]){
+                cout << "Optional question mark of " << target_sprites[t].slug << " at " <<
+                    point_to_str(target_sprites[t].x, target_sprites[t].y) << " is not found." << endl;
+                continue;
+            }
+            target_sprite_match_error_msg += "Missed question mark of " + target_sprites[t].slug + " at " +
+                point_to_str(target_sprites[t].x, target_sprites[t].y) + ". ";
+        }
+        if (!target_sprite_match_error_msg.empty()){
+            cerr << "Error: " << target_sprite_match_error_msg << endl;
+        }
 
-        // static int count = 0;
+//  Define to save the found question mark boxes drawn on both test images, to debug a failure.
+// #define _SAVE_MMO_DEBUG_IMAGES
+#ifdef _SAVE_MMO_DEBUG_IMAGES
+        static int count = 0;
         ImageRGB32 output_sprite = sprite_image.copy();
         ImageRGB32 output_quest = question_mark_image.copy();
+#endif
         std::vector<ImagePixelBox> new_boxes;
         for (size_t i = 0; i < quest_results.size(); i++){
             auto box = quest_results[i];
+#ifdef _SAVE_MMO_DEBUG_IMAGES
             draw_box(output_quest, box, combine_rgb(255, 0, 0));
             draw_box(output_sprite, box, combine_rgb(255, 0, 0));
+#endif
 
             pxint_t radius = (pxint_t)((box.width() + box.height()) / 4 + 0.5);
             pxint_t center_x = (pxint_t)box.center_x();
             pxint_t center_y = (pxint_t)box.center_y();
             auto new_box = ImagePixelBox(center_x - radius, center_y - radius, center_x + radius, center_y + radius);
             new_boxes.push_back(new_box);
-
-            // std::ostringstream os;
-            // os << "test_sprite_" << count << "_" << std::setfill('0') << std::setw(2) << i << ".png";
-            // std::string sprite_filename = os.str();
-            // extract_box_reference(sprite_image, new_box).save(sprite_filename);
         }
-        // output_quest.save("test_MMO_question_mark_detection_" + std::to_string(count) + ".png");
-        // output_sprite.save("test_sprite_detection_" + std::to_string(count) + ".png");
+#ifdef _SAVE_MMO_DEBUG_IMAGES
+        output_quest.save("test_MMO_question_mark_detection_" + std::to_string(count) + ".png");
+        output_sprite.save("test_sprite_detection_" + std::to_string(count) + ".png");
+        count++;
+#endif
 
         size_t success_count = 0;
         for (size_t i = 0; i < quest_results.size(); i++){
