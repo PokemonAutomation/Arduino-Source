@@ -4,6 +4,7 @@
  *
  */
 
+#include <algorithm>
 #include <iostream>
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/StaticGlobals.h"
@@ -65,10 +66,6 @@ public:
         static ButtonMatcher matcher(ButtonType::ButtonRight, 50, 50, 70);
         return matcher;
     }
-    static const ButtonMatcher& RightStickUpDown(){
-        static ButtonMatcher matcher(ButtonType::RightStickUpDown, 20, 20, 120);
-        return matcher;
-    }
     static const ButtonMatcher& DpadUp(){
         static ButtonMatcher matcher(ButtonType::ButtonDpadUp, 30, 30, 80);
         return matcher;
@@ -126,8 +123,6 @@ const char* template_path(ButtonType type){
         return "PokemonLZA/Buttons/ButtonMinus.png";
     case ButtonType::ButtonRight:
         return "PokemonLZA/Buttons/ButtonRight.png";
-    case ButtonType::RightStickUpDown:
-        return "PokemonLZA/Buttons/RightStickUpDown.png";
     case ButtonType::ButtonDpadUp:
     case ButtonType::ButtonDpadUpInterior:
         return "PokemonLZA/Buttons/ButtonDpadUp.png";
@@ -159,8 +154,6 @@ const ButtonMatcher& get_button_matcher(ButtonType type){
         return ButtonMatcher::Minus();
     case ButtonType::ButtonRight:
         return ButtonMatcher::Right();
-    case ButtonType::RightStickUpDown:
-        return ButtonMatcher::RightStickUpDown();
     case ButtonType::ButtonDpadUp:
         return ButtonMatcher::DpadUp();
     case ButtonType::ButtonDpadDown:
@@ -274,13 +267,67 @@ bool ButtonDetector::detect(const ImageViewRGB32& screen){
     return found;
 }
 
+class RightStickMatcher : public ImageMatch::WaterfillTemplateMatcher{
+public:
+    RightStickMatcher()
+        : WaterfillTemplateMatcher(
+            "PokemonLZA/Buttons/RightStickUpDown.png", Color(0xff808080), COLOR_WHITE, 100
+        )
+    {}
 
+    virtual bool check_image(Resolution resolution, const ImageViewRGB32& image) const override{
+        return image.width() >= 20 * resolution.width / 3840
+            && image.height() >= 20 * resolution.height / 2160;
+    }
+};
 
+RightStickDetector::RightStickDetector(
+    Color color, const ImageFloatBox& box, VideoOverlay* overlay
+)
+    : m_color(color)
+    , m_box(box)
+    , m_overlay(overlay)
+{}
 
+void RightStickDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_box);
+}
 
+void RightStickDetector::reset_state(){
+    m_last_detected = {};
+    m_last_detected_box.reset();
+}
 
-
-
+bool RightStickDetector::detect(const ImageViewRGB32& screen){
+    m_last_detected = {};
+    m_last_detected_box.reset();
+    static const RightStickMatcher matcher;
+    const double scale = screen.height() / 2160.0;
+    // The camera hint's oval contains about 188 white pixels at 1080p.
+    const size_t min_area = std::max<size_t>(1, size_t(400 * scale * scale));
+    const bool found = match_template_by_waterfill(
+        screen.size(), extract_box_reference(screen, m_box), matcher,
+        {
+            {0xff808080, 0xffffffff},
+            {0xff909090, 0xffffffff},
+            {0xffa0a0a0, 0xffffffff},
+            {0xffb0b0b0, 0xffffffff},
+            {0xffc0c0c0, 0xffffffff},
+            {0xffd0d0d0, 0xffffffff},
+            {0xffe0e0e0, 0xffffffff},
+            {0xfff0f0f0, 0xffffffff},
+        },
+        {min_area, SIZE_MAX}, 120,
+        [&](Kernels::Waterfill::WaterfillObject& object){
+            m_last_detected = translate_to_parent(screen, m_box, object);
+            return true;
+        }
+    );
+    if (found && m_overlay){
+        m_last_detected_box.emplace(*m_overlay, m_last_detected, COLOR_GREEN);
+    }
+    return found;
+}
 
 
 class Test_ButtonDetector : public ImageUnitTest{

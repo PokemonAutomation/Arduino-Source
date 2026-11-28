@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonLZA_ButtonDetector_H
 #define PokemonAutomation_PokemonLZA_ButtonDetector_H
 
+#include <chrono>
 #include <optional>
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -29,7 +30,6 @@ enum class ButtonType{
     ButtonPlus,
     ButtonMinus,
     ButtonRight,
-    RightStickUpDown,
     ButtonDpadUp,
     ButtonDpadDown,
     ButtonDpadUpInterior,   // Used to create button detector that detects the black triangle inside the DPAD_UP button
@@ -88,6 +88,38 @@ public:
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
     )
          : DetectorToFinder("ButtonGoneWatcher", FinderType::GONE, hold_duration, color, button_type, box, overlay)
+    {}
+};
+
+
+// Detect the small oval R icon used in right-stick hints.
+class RightStickDetector : public StaticScreenDetector{
+public:
+    RightStickDetector(
+        Color color, const ImageFloatBox& box, VideoOverlay* overlay = nullptr
+    );
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+    virtual void reset_state() override;
+
+    const ImageFloatBox& last_detected() const{ return m_last_detected; }
+
+private:
+    Color m_color;
+    ImageFloatBox m_box;
+    VideoOverlay* m_overlay;
+    ImageFloatBox m_last_detected;
+    std::optional<OverlayBoxScope> m_last_detected_box;
+};
+
+class RightStickWatcher : public DetectorToFinder<RightStickDetector>{
+public:
+    RightStickWatcher(
+        Color color, const ImageFloatBox& box, VideoOverlay* overlay = nullptr,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+    )
+        : DetectorToFinder("RightStickWatcher", hold_duration, color, box, overlay)
     {}
 };
 

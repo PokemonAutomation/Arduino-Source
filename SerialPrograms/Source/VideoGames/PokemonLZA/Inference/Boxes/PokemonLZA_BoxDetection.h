@@ -103,7 +103,7 @@ public:
     virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
-    ButtonDetector m_right_stick_up_down_detector;
+    RightStickDetector m_right_stick_detector;
     ImageFloatBox m_left_white_space_box, m_right_white_space_box;
 };
 class SomethingInBoxCellWatcher : public DetectorToFinder<SomethingInBoxCellDetector>{

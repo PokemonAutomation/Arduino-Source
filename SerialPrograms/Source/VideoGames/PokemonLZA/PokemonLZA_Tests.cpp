@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/TestRunners/UnitTestDatabase.h"
+#include "Programs/AutoStory/PokemonLZA_AutoStory_Tests.h"
 #include "Inference/Donuts/PokemonLZA_DonutBerriesDetector.h"
 #include "Inference/Donuts/PokemonLZA_FlavorPowerScreenDetector.h"
 #include "Inference/PokemonLZA_AlertEyeDetector.h"
@@ -12,6 +13,7 @@
 #include "Inference/PokemonLZA_ButtonDetector.h"
 #include "Inference/Map/PokemonLZA_DirectionArrowDetector.h"
 #include "Inference/PokemonLZA_DialogDetector.h"
+#include "Inference/PokemonLZA_DoorEntryDetector.h"
 #include "Inference/PokemonLZA_WeatherDetector.h"
 #include "Inference/PokemonLZA_HyperspaceCalorieDetector.h"
 #include "Inference/PokemonLZA_MainMenuDetector.h"
@@ -28,10 +30,12 @@ namespace PokemonLZA{
 
 void add_tests(UnitTestDatabase& database){
     add_tests_AlertEyeDetector(database);
+    add_tests_AutoStory(database);
     add_tests_BoxCellInfoDetector(database);
     add_tests_ButtonDetector(database);
     add_tests_DirectionArrowDetector(database);
     add_tests_DialogDetector(database);
+    add_tests_DoorEntryDetector(database);
     add_tests_WeatherDetector(database);
     add_tests_DonutBerriesReader(database);
     add_tests_FlavorPowerScreenDetector(database);
