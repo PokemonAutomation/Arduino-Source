@@ -1342,6 +1342,8 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.cpp
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h
+    Source/NintendoSwitch/DevPrograms/CaptureCardCalibration.cpp
+    Source/NintendoSwitch/DevPrograms/CaptureCardCalibration.h
     Source/NintendoSwitch/DevPrograms/JoyconProgram.cpp
     Source/NintendoSwitch/DevPrograms/JoyconProgram.h
     Source/NintendoSwitch/DevPrograms/TestDudunsparceFormDetector.cpp
