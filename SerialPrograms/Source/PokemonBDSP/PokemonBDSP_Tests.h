@@ -15,6 +15,9 @@ namespace PokemonBDSP{
 
 
 
+// No controller context is accepted; this function only reads images and logs.
+bool run_bag_screenshot_tests(Logger& logger, const std::string& folder);
+
 void add_tests(UnitTestDatabase& database);
 
 
