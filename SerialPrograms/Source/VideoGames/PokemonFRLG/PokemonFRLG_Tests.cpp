@@ -15,6 +15,7 @@
 #include "Inference/Dialogs/PokemonFRLG_BattleDialogs.h"
 #include "Inference/Dialogs/PokemonFRLG_DialogDetector.h"
 #include "Inference/Dialogs/PokemonFRLG_PrizeSelectDetector.h"
+#include "Inference/Map/PokemonFRLG_MapDetector.h"
 #include "Inference/Map/PokemonFRLG_PokemonLeagueDetectors.h"
 #include "Inference/Menus/PokemonFRLG_BagDetector.h"
 #include "Inference/Menus/PokemonFRLG_PartyEmptySlotDetector.h"
@@ -55,6 +56,7 @@ void add_tests(UnitTestDatabase& database){
     add_tests_BoxSelectionModeDetector(database);
     add_tests_BoxSorter(database);
     add_tests_EliteFourRoomDetector(database);
+    add_tests_FlyMapDetector(database);
     add_tests_HallOfFameSavingDetector(database);
     add_tests_PartyEmptySlotDetector(database);
     add_tests_PartyHeldItemDetector(database);

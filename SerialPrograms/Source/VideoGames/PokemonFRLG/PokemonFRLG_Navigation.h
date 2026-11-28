@@ -47,6 +47,20 @@ enum class KantoFlyLocation{
     indigoplateau,
 };
 
+//  Towns on the Sevii Islands Fly map. The Fly map only shows the island group
+//  the player is in (it has no SWITCH button), so each can only be reached from
+//  its own group: One, Two and Three Island; Four and Five Island; Six and
+//  Seven Island.
+enum class SeviiFlyLocation{
+    oneisland,
+    twoisland,
+    threeisland,
+    fourisland,
+    fiveisland,
+    sixisland,
+    sevenisland,
+};
+
 
 // Press A+B+Select+Start at the same time to soft reset, then re-enters the game.
 // There are two random waits, one before pressing start and another after loading in the game.
@@ -88,6 +102,13 @@ PartySlot detect_last_occupied_party_slot(ConsoleHandle& console);
 // Starting from the start menu, a sub-screen of the start menu, or the overworld, navigate to the bag
 void open_bag_from_overworld(ConsoleHandle& console, ProControllerContext& context, StartMenuContext menu_context = StartMenuContext::STANDARD);
 
+// From the overworld, open the party menu, open the menu of the Pokemon `from_last` slots from the
+// last one (0 = the last Pokemon), move to its field move `field_move` (0 = the first one, right
+// under SUMMARY) and press A. Returns false, after closing the menus, if the Pokemon's menu didn't
+// open. The caller then handles the move's own messages and checks its result: see
+// use_sweet_scent_from_overworld(), use_teleport_from_overworld() and open_fly_map_from_overworld().
+bool select_field_move_from_overworld(ConsoleHandle& console, ProControllerContext& context, int from_last, int field_move = 0);
+
 // Uses Sweet Scent, assuming that the specified party member has it learned
 // The last argument is the distance of the Sweet Scent user from the last party slot
 void use_sweet_scent_from_overworld(ConsoleHandle& console, ProControllerContext& context, int from_last = 0);
@@ -97,10 +118,16 @@ void use_sweet_scent_from_overworld(ConsoleHandle& console, ProControllerContext
 void use_teleport_from_overworld(ConsoleHandle& console, ProControllerContext& context);
 
 // Navigates to the fly map. Assumes that Fly is usable and the last member of your party has it learned
-void open_fly_map_from_overworld(ConsoleHandle& console, ProControllerContext& context);
+// Set sevii_islands to true when the player is on the Sevii Islands, whose Fly map is not the Kanto map.
+void open_fly_map_from_overworld(ConsoleHandle& console, ProControllerContext& context, bool sevii_islands = false);
 
 // Starting from the Kanto Fly map, fly to a specified location.
 void fly_from_kanto_map(ConsoleHandle& console, ProControllerContext& context, KantoFlyLocation destination);
+
+// Starting from the Sevii Islands Fly map, fly to a specified town. The town must be on the
+// island group the player is in (see SeviiFlyLocation). Returns false if the flight didn't start
+// (wrong island group, or a town not visited yet), after closing the menus.
+bool fly_from_sevii_map(ConsoleHandle& console, ProControllerContext& context, SeviiFlyLocation destination);
 
 // Enter a PokeCenter. Assumes the player is standing in front of its door
 void enter_pokecenter(ConsoleHandle& console, ProControllerContext& context);

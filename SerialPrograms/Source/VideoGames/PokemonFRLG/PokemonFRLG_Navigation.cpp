@@ -7,6 +7,7 @@
  */
 
 #include <array>
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Random.h"
@@ -841,6 +842,38 @@ void open_bag_from_overworld(ConsoleHandle& console, ProControllerContext& conte
     }
 }
 
+bool select_field_move_from_overworld(ConsoleHandle& console, ProControllerContext& context, int from_last, int field_move){
+    open_party_menu_from_overworld(console, context);
+    // navigate to the Pokemon: from slot 1, up goes to CANCEL, then to the last slot
+    for (int i = 0; i < 2 + from_last; i++){
+        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+    }
+
+    PartySelectionWatcher user_selected(COLOR_RED);
+
+    context.wait_for_all_requests();
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context){
+            pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+        },
+        { user_selected }
+    );
+
+    if (ret < 0){
+        console.log("Failed to open the field move user's menu.");
+        pbf_mash_button(context, BUTTON_B, 3000ms);
+        return false;
+    }
+
+    // the menu lists SUMMARY, then the field moves in the order the Pokemon knows them
+    for (int i = 0; i < 1 + field_move; i++){
+        pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
+    }
+    pbf_press_button(context, BUTTON_A, 200ms, 0ms);
+    return true;
+}
+
 void use_sweet_scent_from_overworld(ConsoleHandle& console, ProControllerContext& context, int from_last){
     uint16_t errors = 0;
     
@@ -848,38 +881,18 @@ void use_sweet_scent_from_overworld(ConsoleHandle& console, ProControllerContext
         if (errors > 5){
             OperationFailedExceptionWithScreenshot::fire(
                 ErrorReportMode::SEND_ERROR_REPORT,
-                "use_teleport_from_overworld(): Failed to use Teleport 5 times in a row.",
+                "use_sweet_scent_from_overworld(): Failed to use Sweet Scent 5 times in a row.",
                 console
             );
         }
 
-        open_party_menu_from_overworld(console, context);
-        // navigate to last party slot
-        for (int i=0; i<(2+from_last); i++){
-            pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
-        }
-
-        PartySelectionWatcher sweetscent_selected(COLOR_RED);
-
-        context.wait_for_all_requests();
-        int ret = run_until<ProControllerContext>(
-            console, context,
-            [](ProControllerContext& context){
-                pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
-            },
-            { sweetscent_selected }
-        );
-
-        if (ret < 0){
+        // select Sweet Scent (2nd option, but maybe HMs could change this)
+        if (!select_field_move_from_overworld(console, context, from_last, 0)){
             console.log("Failed to select Sweet Scent user.");
             errors++;
-            pbf_mash_button(context, BUTTON_B, 3000ms);
             continue;
         }
-        
-        // select Sweet Scent (2nd option, but maybe HMs could change this)
-        pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
-        pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+        pbf_wait(context, 1800ms);
         pbf_press_button(context, BUTTON_A, 200ms, 800ms);
 
         context.wait_for_all_requests();
@@ -900,38 +913,19 @@ void use_teleport_from_overworld(ConsoleHandle& console, ProControllerContext& c
             );
         }
 
-        open_party_menu_from_overworld(console, context);
-        // navigate to last party slot
-        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
-        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
-
-        PartySelectionWatcher teleporter_selected(COLOR_RED);
-
-        context.wait_for_all_requests();
-        int ret = run_until<ProControllerContext>(
-            console, context,
-            [](ProControllerContext& context){
-                pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
-            },
-            { teleporter_selected }
-        );
-
-        if (ret < 0){
+        // select Teleport (2nd option, but maybe HMs could change this)
+        if (!select_field_move_from_overworld(console, context, 0, 0)){
             console.log("Failed to select Teleport user.");
             errors++;
-            pbf_mash_button(context, BUTTON_B, 3000ms);
             continue;
         }
-        
-        // select Teleport (2nd option, but maybe HMs could change this)
-        pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
-        pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
+        pbf_wait(context, 1800ms);
         pbf_press_button(context, BUTTON_A, 200ms, 2800ms);
 
         BlackScreenWatcher teleport_transition(COLOR_RED);
 
         context.wait_for_all_requests();
-        ret = wait_until(
+        int ret = wait_until(
             console, context, 20000ms,
             {teleport_transition}
         );
@@ -950,7 +944,7 @@ void use_teleport_from_overworld(ConsoleHandle& console, ProControllerContext& c
     }
 }
 
-void open_fly_map_from_overworld(ConsoleHandle& console, ProControllerContext& context){
+void open_fly_map_from_overworld(ConsoleHandle& console, ProControllerContext& context, bool sevii_islands){
     uint16_t errors = 0;
     while (true){
         if (errors > 5){
@@ -961,41 +955,25 @@ void open_fly_map_from_overworld(ConsoleHandle& console, ProControllerContext& c
             );
         }
 
-        open_party_menu_from_overworld(console, context);
-        // navigate to last party slot
-        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
-        pbf_move_left_joystick(context, {0, +1}, 200ms, 300ms);
+        // The Kanto map is checked for Kanto's land; the Sevii Islands maps only for the map's frame.
+        KantoMapWatcher kanto_map_opened(COLOR_RED);
+        FlyMapWatcher sevii_map_opened(COLOR_RED);
 
-        PartySelectionWatcher fly_user_selected(COLOR_RED);
-
-        context.wait_for_all_requests();
-        int ret = run_until<ProControllerContext>(
-            console, context,
-            [](ProControllerContext& context){
-                pbf_press_button(context, BUTTON_A, 200ms, 1800ms);
-            },
-            { fly_user_selected }
-        );
-
-        if (ret < 0){
+        // select Fly (2nd option, but maybe other HMs could change this)
+        if (!select_field_move_from_overworld(console, context, 0, 0)){
             console.log("Failed to select Fly user.");
             errors++;
-            pbf_mash_button(context, BUTTON_B, 3000ms);
             continue;
         }
-        
-        // select Fly (2nd option, but maybe other HMs could change this)
-        KantoMapWatcher map_opened(COLOR_RED);
-        context.wait_for_all_requests();
-        pbf_move_left_joystick(context, {0, -1}, 200ms, 300ms);
-        pbf_press_button(context, BUTTON_A, 200ms, 0ms);
-        ret = wait_until(
-            console, context, 20000ms,
-            {map_opened}
-        );
+        int ret;
+        if (sevii_islands){
+            ret = wait_until(console, context, 20000ms, {sevii_map_opened});
+        }else{
+            ret = wait_until(console, context, 20000ms, {kanto_map_opened});
+        }
 
         if (ret < 0){
-            console.log("Failed to detect Kanto map");
+            console.log(sevii_islands ? "Failed to detect Sevii Islands map" : "Failed to detect Kanto map");
             errors++;
             pbf_mash_button(context, BUTTON_B, 4000ms);
             continue;
@@ -1003,7 +981,7 @@ void open_fly_map_from_overworld(ConsoleHandle& console, ProControllerContext& c
 
         pbf_wait(context, 1000ms);
         context.wait_for_all_requests();
-        console.log("Kanto map detected.");
+        console.log(sevii_islands ? "Sevii Islands map detected." : "Kanto map detected.");
         return;
     }
 }
@@ -1111,6 +1089,94 @@ void fly_from_kanto_map(ConsoleHandle& console, ProControllerContext& context, K
     }
     
 }
+
+namespace{
+
+//  A town's cell on its Sevii Islands Fly map page (region_map_layout_sevii_*.h
+//  in the decomp). Each page is a 22 x 15 grid.
+struct SeviiFlyTarget{
+    const char* name;
+    int x;
+    int y;
+};
+
+SeviiFlyTarget sevii_fly_target(SeviiFlyLocation destination){
+    switch (destination){
+    case SeviiFlyLocation::oneisland:
+        return {"One Island",    1,  8};
+    case SeviiFlyLocation::twoisland:
+        return {"Two Island",    9,  9};
+    case SeviiFlyLocation::threeisland:
+        return {"Three Island", 18, 12};
+    case SeviiFlyLocation::fourisland:
+        return {"Four Island",   3,  4};
+    case SeviiFlyLocation::fiveisland:
+        return {"Five Island",  16, 11};
+    case SeviiFlyLocation::sixisland:
+        return {"Six Island",   17,  5};
+    case SeviiFlyLocation::sevenisland:
+        return {"Seven Island",  5,  8};
+    }
+    return {"", 0, 0};
+}
+
+//  How long to hold a direction to move the Fly map cursor `cells` cells.
+//  A held direction moves the cursor one cell every 5 frames (4 frames of
+//  movement, then the input is read again: region_map.c in the decomp), so
+//  5 x cells - 2 frames is in the middle of the window that moves it exactly
+//  that far. The Kanto times in fly_from_kanto_map() fit the same pattern,
+//  e.g. 8 cells down to Viridian City in 633ms (38 frames).
+Milliseconds fly_map_hold_time(int cells){
+    return Milliseconds((5 * cells - 2) * 1000 / 60);
+}
+
+}
+
+
+bool fly_from_sevii_map(ConsoleHandle& console, ProControllerContext& context, SeviiFlyLocation destination){
+    SeviiFlyTarget target = sevii_fly_target(destination);
+    console.log(std::string("Flying to ") + target.name + ".");
+
+    //  Like fly_from_kanto_map(): from the top left corner, hold down, then
+    //  right.
+    pbf_move_left_joystick(context, {-1, +1}, 4000ms, 500ms);
+    if (target.y > 0){
+        pbf_move_left_joystick(context, {0, -1}, fly_map_hold_time(target.y), 100ms);
+    }
+    if (target.x > 0){
+        pbf_move_left_joystick(context, {+1, 0}, fly_map_hold_time(target.x), 100ms);
+    }
+
+    BlackScreenWatcher fly_initiated(COLOR_RED);
+    context.wait_for_all_requests();
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_A, 5000ms);
+        },
+        { fly_initiated }
+    );
+    if (ret < 0){
+        //  A does nothing on a place that can't be flown to: a town on another
+        //  island group's page, or one not visited yet. Close the Fly map, the
+        //  party menu and the start menu.
+        console.log("Could not start flying. Is the town on this island group, and has it been visited?", COLOR_RED);
+        pbf_mash_button(context, BUTTON_B, 4000ms);
+        pbf_wait(context, 800ms);
+        context.wait_for_all_requests();
+        return false;
+    }
+
+    pbf_wait(context, 8000ms);
+    context.wait_for_all_requests();
+    console.log(std::string("Landed on ") + target.name + ".");
+    return true;
+}
+
+
+
+
+
 
 void enter_leave_pokecenter(ConsoleHandle& console, ProControllerContext& context, bool leave){
     uint16_t errors = 0;
