@@ -10,6 +10,7 @@
 #include <string>
 #include "Common/Cpp/Color.h"
 #include "LogLevel.h"
+#include "FormattedLogMethods.h"
 
 namespace PokemonAutomation{
 
@@ -20,8 +21,12 @@ struct LogLine{
 };
 
 
-// Abstract base class as a logger interface
-class Logger{
+// Abstract base class as a logger interface.
+// Besides the `log()` methods below, it has one method per log level that builds the
+// line with `std::format()`, from `FormattedLogMethods`, e.g.
+//   logger.info("Read {} at {:.2f}", name, x);
+//   logger.warning("Retry {} of {}", attempt, max_attempts);   // orange
+class Logger : public FormattedLogMethods<Logger>{
 public:
     // Log a line at `LogLevel::Info`.
     virtual void log(const std::string& msg, Color color = Color()) = 0;

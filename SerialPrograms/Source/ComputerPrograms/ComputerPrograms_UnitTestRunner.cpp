@@ -7,6 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/HttpServer/HttpServer_Tests.h"
 #include "Common/Cpp/ListenerSet.h"
+#include "Common/Cpp/Logging/FormattedLogMethods_Tests.h"
 #include "Common/Cpp/MoveOnlyFunction_Tests.h"
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/PrettyPrint.h"
@@ -65,6 +66,7 @@ UnitTestDatabase make_UNIT_TESTS_ALL(){
     add_tests_BlackBorderDetector(ret);
     add_tests_ListenerSet(ret);
     add_tests_MoveOnlyFunction(ret);
+    add_tests_FormattedLogMethods(ret);
     SysbotBase::add_tests_SysbotBasePing(ret);
     SysbotBase::add_tests_SysbotBaseReceiveLine(ret);
     SysbotBase::add_tests_SysbotBaseShutdown(ret);
