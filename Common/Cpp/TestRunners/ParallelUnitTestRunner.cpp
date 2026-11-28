@@ -86,16 +86,34 @@ void UnitTestRunner::add_test(std::shared_ptr<const UnitTest> test){
             }
             throw;
         }
+        m_total_tests.fetch_add(1, std::memory_order_relaxed);
     }
 
     m_cv.notify_all();
 }
 
+
+//  Return how often a passed test is logged: once every this many finished tests.
+//  It is `ceil(total_tests / MAX_PASSED_TESTS_TO_LOG)`, so no more than
+//  `MAX_PASSED_TESTS_TO_LOG` passed tests are logged, and it is at least 1.
+static size_t passed_test_log_interval(size_t total_tests){
+    size_t interval = (total_tests + UnitTestRunner::MAX_PASSED_TESTS_TO_LOG - 1) / UnitTestRunner::MAX_PASSED_TESTS_TO_LOG;
+    return interval == 0 ? 1 : interval;
+}
+
 void UnitTestRunner::run(){
+    const size_t total_tests = m_total_tests.load(std::memory_order_relaxed);
+    const size_t interval = passed_test_log_interval(total_tests);
     m_logger.log(
         "Starting UnitTestRunner with:"
+        "\n    Tests: " + tostr_u_commas(total_tests) +
         "\n    Max Memory: " + tostr_bytes(m_max_memory) +
-        "\n    Max Threads: " + tostr_u_commas(m_max_threads)
+        "\n    Max Threads: " + tostr_u_commas(m_max_threads) +
+        "\n    Passed Tests Logged: " + (interval == 1
+            ? std::string("all")
+            : "1 in every " + tostr_u_commas(interval) + " finished tests"
+        ) +
+        "\n    Failed/Skipped Tests Logged: all"
     );
 //    cout << "thread_loop() - start" << endl;
     std::unique_lock<Mutex> lg(m_lock);
@@ -171,6 +189,24 @@ bool UnitTestRunner::cancel(std::exception_ptr reason) noexcept{
 
 
 
+//  Run one test and return its result. An exception thrown by the test becomes its result:
+//  FAILED with the exception's message, or OOM for std::bad_alloc.
+//  Called by the task `dispatch_test()` starts for each test.
+static UnitTestResult run_and_catch(const UnitTest& test, Logger& logger, CancellableScope& scope){
+    try{
+        return test.run(logger, scope);
+    }catch (Exception& e){
+        return UnitTestResult(UnitTestResult::FAILED, e.to_str());
+    }catch (std::bad_alloc&){
+        return UnitTestResult::OOM;
+    }catch (std::exception& e){
+        return UnitTestResult(UnitTestResult::FAILED, e.what());
+    }catch (...){
+        return UnitTestResult(UnitTestResult::FAILED, "Unknown exception.");
+    }
+}
+
+
 void UnitTestRunner::dispatch_test(const std::string& name){
     //  Must be called under the lock.
 
@@ -189,35 +225,9 @@ void UnitTestRunner::dispatch_test(const std::string& name){
         ReverseLockGuard<Mutex> lg(m_lock);
         node.task = m_thread_pool.dispatch_now_blocking([this, iter_current]{
             const UnitTest& test = *iter_current->second.test;
-            UnitTestResult result;
-            try{
-                m_logger.log("Starting: " + test.name());
-                result = test.run(m_logger, *this);
-            }catch (Exception& e){
-                result = UnitTestResult(UnitTestResult::FAILED, e.to_str());
-            }catch (std::bad_alloc&){
-                result = UnitTestResult::OOM;
-            }catch (std::exception& e){
-                result = UnitTestResult(UnitTestResult::FAILED, e.what());
-            }catch (...){
-                result = UnitTestResult(UnitTestResult::FAILED, "Unknown exception.");
-            }
+            UnitTestResult result = run_and_catch(test, m_logger, *this);
 
-            switch (result.result){
-            case UnitTestResult::NOT_RUN:
-            case UnitTestResult::PASSED:
-                m_logger.log("Passed: " + test.name(), COLOR_BLUE);
-                break;
-            case UnitTestResult::FAILED:
-                m_logger.log("Failed: " + test.name() + ", Message: " + result.message, COLOR_RED);
-                break;
-            case UnitTestResult::SKIPPED:
-                m_logger.log("Skipped: " + test.name(), COLOR_ORANGE);
-                break;
-            case UnitTestResult::OOM:
-                m_logger.log("Out-of-Memory: " + test.name(), COLOR_ORANGE);
-                break;
-            }
+            log_test_result(test, result);
 
             m_listeners.run_method(
                 &Listener::on_test_finished,
@@ -240,6 +250,30 @@ void UnitTestRunner::dispatch_test(const std::string& name){
     m_test_by_per_thread_memory.erase(entry.iter_density);
     m_test_by_name.erase(iter);
 //    cout << "dispatch_test() - end" << endl;
+}
+
+
+void UnitTestRunner::log_test_result(const UnitTest& test, const UnitTestResult& result){
+    const size_t finished = m_finished_tests.fetch_add(1, std::memory_order_relaxed) + 1;
+    const size_t total = m_total_tests.load(std::memory_order_relaxed);
+    const std::string prefix = "[" + std::to_string(finished) + "/" + std::to_string(total) + "] ";
+
+    switch (result.result){
+    case UnitTestResult::PASSED:
+        if (finished % passed_test_log_interval(total) == 0 || finished == total){
+            m_logger.log(prefix + "PASSED: " + test.name(), COLOR_BLUE);
+        }
+        break;
+    case UnitTestResult::FAILED:
+        m_logger.log(prefix + "FAILED: " + test.name() + ", Message: " + result.message, COLOR_RED);
+        break;
+    case UnitTestResult::SKIPPED:
+        m_logger.log(prefix + "SKIPPED: " + test.name(), COLOR_ORANGE);
+        break;
+    case UnitTestResult::OOM:
+        m_logger.log(prefix + "OOM: " + test.name(), COLOR_ORANGE);
+        break;
+    }
 }
 
 

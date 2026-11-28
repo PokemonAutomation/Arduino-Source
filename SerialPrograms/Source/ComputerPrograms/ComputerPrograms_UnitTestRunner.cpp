@@ -378,9 +378,6 @@ void UnitTestRunner::on_test_finished(
     UnitTestRunner_Descriptor::Stats& stats = m_env->current_stats<UnitTestRunner_Descriptor::Stats>();
     stats.tests++;
     switch (result.result){
-    case UnitTestResult::NOT_RUN:
-        stats.skipped++;
-        break;
     case UnitTestResult::PASSED:{
         uint64_t passed = stats.passed.fetch_add(1) + 1;
         if (passed <= MAX_NUM_TESTS_TO_SHOWN){
@@ -462,28 +459,19 @@ bool CommandLineUnitTestRunner::run(bool augment_color_distortions, const std::s
     return m_failed_tests.load(std::memory_order_acquire) > 0;
 }
 void CommandLineUnitTestRunner::on_test_finished(
-    std::shared_ptr<const UnitTest> test,
+    std::shared_ptr<const UnitTest>,
     UnitTestResult result
 ){
+    //  Only count the results here: `PokemonAutomation::UnitTestRunner` already logs each one.
     switch (result.result){
-    case UnitTestResult::NOT_RUN:
-        m_logger.log("NOT RUN: " + test->name(), COLOR_ORANGE);
+    case UnitTestResult::SKIPPED:
         m_skipped_tests++;
         break;
     case UnitTestResult::PASSED:
-        m_logger.log("PASSED: " + test->name(), COLOR_BLUE);
         m_passed_tests++;
         break;
     case UnitTestResult::FAILED:
-        m_logger.log("FAILED: " + test->name() + ": " + result.message, COLOR_RED);
-        m_failed_tests++;
-        break;
-    case UnitTestResult::SKIPPED:
-        m_logger.log("SKIPPED: " + test->name(), COLOR_ORANGE);
-        m_skipped_tests++;
-        break;
     case UnitTestResult::OOM:
-        m_logger.log("OOM: " + test->name(), COLOR_RED);
         m_failed_tests++;
         break;
     }

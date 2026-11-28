@@ -8,6 +8,7 @@
 #define PokemonAutomation_ParallelUnitTestRunner_H
 
 #include <map>
+#include <atomic>
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/CancellableScope.h"
@@ -21,8 +22,11 @@ namespace PokemonAutomation{
 
 
 
+//  Run unit tests in parallel, within a memory and a thread limit.
 class UnitTestRunner final : public CancellableScope{
 public:
+    static constexpr size_t MAX_PASSED_TESTS_TO_LOG = 100;
+
     struct Listener{
         virtual void on_test_finished(
             std::shared_ptr<const UnitTest> test,
@@ -80,10 +84,19 @@ public:
 private:
     void dispatch_test(const std::string& name);
 
+    //  Log the result of a test that just finished.
+    //  Called by the test's task in `dispatch_test()`, from the thread pool.
+    void log_test_result(const UnitTest& test, const UnitTestResult& result);
+
 
 private:
     Logger& m_logger;
     ThreadPool& m_thread_pool;
+
+    //  # of tests added by `add_test()`
+    std::atomic<size_t> m_total_tests = 0;
+    //  # of tests finished so far.
+    std::atomic<size_t> m_finished_tests = 0;
 
     uint64_t m_max_memory = 0;
     size_t m_max_threads = 1;
