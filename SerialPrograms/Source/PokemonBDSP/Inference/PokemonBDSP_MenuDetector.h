@@ -26,6 +26,8 @@ public:
     virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
+    bool detect_menu_chrome(const ImageViewRGB32& screen) const;
+
     Color m_color;
     ImageFloatBox m_line0;
     ImageFloatBox m_line1;
@@ -33,6 +35,17 @@ private:
     ImageFloatBox m_line3;
     ImageFloatBox m_line4;
     ImageFloatBox m_cross;
+    ImageFloatBox m_panel_top;
+    ImageFloatBox m_panel_left;
+    ImageFloatBox m_panel_right;
+    ImageFloatBox m_footer;
+    ImageFloatBox m_confirm_button;
+    ImageFloatBox m_confirm_button_with_swap;
+    ImageFloatBox m_save_button;
+    ImageFloatBox m_close_button;
+    ImageFloatBox m_save_heading;
+    ImageFloatBox m_save_background;
+    ImageFloatBox m_save_shortcut;
 };
 
 
