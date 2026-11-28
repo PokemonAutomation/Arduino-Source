@@ -53,12 +53,13 @@ struct SlugWith2DCoordinate{
     double y = 0.;  // range: [0.0, 1.0)
 };
 
-// Load a list of slugs, each with an optional 2D point, from a text file.
-// Each line is "<slug>" or "<slug> <x> <y>", e.g. "psyduck" or "psyduck 0.6276 0.4426".
-// If a line has no coordinate, the corresponding returned `SlugWithPoint` has `x` and `y` assigned -1.0.
-// x and y are relative to the image size, from 0.0 to 1.0. See `SlugWithPoint`.
+// Load a list of slugs, each with a 2D point, from a text file.
+// Each line is "<slug> <x> <y>", e.g. "psyduck 0.6276 0.4426". Empty lines are skipped.
+// x and y are relative to the image size, from 0.0 to 1.0: x from the left edge to the right edge,
+// y from the top edge to the bottom edge. So the file still works on a resized copy of the image.
 // Return false if the file can't be opened.
-// Throws ParseException if format is broken.
+// Throws ParseException if a line has no point, a word that isn't a number, a number outside 0.0 to 1.0
+// (e.g. a point in pixels), or extra words.
 bool load_slug_list_with_2d_coordinates(const std::string& filepath, std::vector<SlugWith2DCoordinate>& slugs);
 
 
