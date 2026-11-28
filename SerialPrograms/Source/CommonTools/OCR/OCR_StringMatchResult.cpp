@@ -72,7 +72,7 @@ void StringMatchResult::log(Logger& logger, double max_log10p, const std::string
         str += " ===> ";
         str += extra;
     }
-    logger.log(str, color);
+    logger.log(str, color, LogLevel::Verbose);
 }
 
 void StringMatchResult::add(double log10p, StringMatchData data){

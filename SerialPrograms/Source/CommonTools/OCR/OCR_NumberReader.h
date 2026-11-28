@@ -18,6 +18,11 @@ namespace PokemonAutomation{
 namespace OCR{
 
 
+//  The functions below log each text they read at `LogLevel::Verbose`, e.g.
+//    OCR Text: "0263" -> "0263" -> 263
+//  since programs read numbers many times in a run.
+
+
 //  Returns -1 if no number is found.
 //  No processing is done on the image. It is OCR'ed directly.
 //  The best way to use read_number() is to not give Language as a parameter.
