@@ -119,7 +119,7 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 env.update_stats();
             };
 
-            const size_t basket_wait_seconds = (EGG_SANDWICH.EGG_SANDWICH_TYPE == EggSandwichType::GREAT_PEANUT_BUTTER ? 180 : 120);
+            const size_t basket_wait_seconds = egg_basket_wait_seconds(EGG_SANDWICH.EGG_SANDWICH_TYPE);
             collect_eggs_after_sandwich(
                 env.program_info(),
                 env.console, context,

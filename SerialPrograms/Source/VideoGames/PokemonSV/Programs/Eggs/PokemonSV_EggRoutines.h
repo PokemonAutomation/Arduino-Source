@@ -9,7 +9,9 @@
 #ifndef PokemonAutomation_PokemonSV_EggRoutines_H
 #define PokemonAutomation_PokemonSV_EggRoutines_H
 
+#include <chrono>
 #include <functional>
+#include <string>
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
@@ -47,8 +49,10 @@ void picnic_at_zero_gate(
 
 // Starting at the initial position of a picnic, go to picnic table to make a sandwich that gives egg power.
 // Can choose:
-// - Great Peanut Butter Sandwich to gain egg power Lv 2, must have unlocked its recipe and have enough ingredients to make all
-//   the sandwiches for all the unlocked recipes.
+// - Great Peanut Butter Sandwich (No. 17) or Great Marmalade Sandwich (No. 25) to gain egg power Lv 2, or Peanut Butter
+//   Sandwich (No. 16) or Jam Sandwich (No. 12) to gain egg power Lv 1. Must have unlocked the recipe and have enough
+//   ingredients to make all the sandwiches for all the unlocked recipes.
+// - BEST_AVAILABLE_RECIPE tries those recipes from best to worst and makes the first one it can find.
 // - Two-sweet-herbs, bitter-sweet-herbs or salty-sweet-herbs custom sandwich to gain egg power Lv 3, must have enough ingredinets and
 //   provide game language for OCR ingredient lists.
 // Return false if no needed sandwich ingredients or recipe.
@@ -58,6 +62,15 @@ bool eat_egg_sandwich_at_picnic(
     EggSandwichType sandwich_type,
     Language language
 );
+
+// Text for the stats bar: " - Avg Time/Egg: 1m 05s", or "" when nothing has hatched yet.
+std::string avg_time_per_egg_text(uint64_t total_ms, uint64_t eggs);
+
+// Add the time since `last_mark` to `total_ms` and move `last_mark` to now. Call once per hatched egg.
+void add_hatch_time(std::chrono::steady_clock::time_point& last_mark, std::atomic<uint64_t>& total_ms);
+
+// How long to wait between egg basket checks after eating a sandwich of `sandwich_type`.
+size_t egg_basket_wait_seconds(EggSandwichType sandwich_type);
 
 // After eating a sandwich, go around picnic table to wait at basket and collect eggs.
 // `num_eggs_collected` will be updated to add newly collected eggs.
@@ -87,6 +100,26 @@ void hatch_eggs_at_zero_gate(
 // This is a minor modification to hatch_eggs_at_zero_gate
 // `egg_hatched_callback` will be called after each egg hatched, with egg index (0-indexed)
 void hatch_eggs_at_area_three_lighthouse(
+    ProgramEnvironment& env,
+    VideoStream& stream, ProControllerContext& context,
+    EventNotificationOption* attacked_notification,
+    const SinglesAIOption* battle_ai,
+    std::atomic<uint64_t>* attacked,
+    uint8_t num_eggs_in_party,
+    std::function<void(uint8_t)> egg_hatched_callback = nullptr
+);
+
+// Start at the Cortondo (West) Pokemon Center flying spot. Walk out of town to the grass by the tree and start a picnic.
+// Picnics are not allowed inside Cortondo or in the Olive Roll field, but they are allowed right outside town.
+void picnic_at_cortondo(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
+
+// From inside the Cortondo Olive Roll field, fly back to the Cortondo (West) Pokemon Center.
+void fly_to_cortondo_from_olive_field(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
+
+// Start at the Cortondo (West) Pokemon Center flying spot. Ride through town, jump the wall and the fence into the
+// Olive Roll field north of town, and go in circles there to hatch eggs. Wild Pokemon do not spawn inside the field.
+// `egg_hatched_callback` will be called after each egg hatched, with egg index (0-indexed)
+void hatch_eggs_at_cortondo_olive_field(
     ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context,
     EventNotificationOption* attacked_notification,

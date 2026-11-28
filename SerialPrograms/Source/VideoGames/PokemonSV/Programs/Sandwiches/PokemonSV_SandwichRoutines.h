@@ -60,7 +60,12 @@ enum class EggSandwichType{
     GREAT_PEANUT_BUTTER,
     TWO_SWEET_HERBS,
     BITTER_SWEET_HERBS,
-    SALTY_SWEET_HERBS
+    SALTY_SWEET_HERBS,
+    GREAT_MARMALADE,
+    PEANUT_BUTTER,
+    JAM,
+    // Try the recipe sandwiches above from best to worst and make the first one available.
+    BEST_AVAILABLE_RECIPE,
 };
 
 // Assuming starting at the custom sandwich mode,

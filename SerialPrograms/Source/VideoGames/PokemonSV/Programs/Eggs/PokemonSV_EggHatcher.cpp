@@ -7,11 +7,15 @@
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
+#include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h"
+#include "VideoGames/PokemonSV/Programs/Boxes/PokemonSV_BoxRelease.h"
 #include "VideoGames/PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "VideoGames/PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
 #include "VideoGames/PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
@@ -39,16 +43,32 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
 struct EggHatcher_Descriptor::Stats : public StatsTracker{
     Stats()
         : m_hatched(m_stats["Hatched"])
+        , m_shinies(m_stats["Shinies"])
+        , m_released(m_stats["Released"])
         , m_attacked(m_stats["Attacked"])
         , m_errors(m_stats["Errors"])
+        , m_hatch_time_ms(m_stats["Hatch Time (ms)"])
     {
         m_display_order.emplace_back("Hatched");
+        m_display_order.emplace_back("Shinies");
+        m_display_order.emplace_back("Released", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Attacked", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Hatch Time (ms)", ALWAYS_HIDDEN);
+    }
+    virtual std::string to_str(PrintMode mode) const override{
+        std::string str = StatsTracker::to_str(mode);
+        if (mode == DISPLAY_ON_SCREEN){
+            str += avg_time_per_egg_text(m_hatch_time_ms.load(), m_hatched.load());
+        }
+        return str;
     }
     std::atomic<uint64_t>& m_hatched;
+    std::atomic<uint64_t>& m_shinies;
+    std::atomic<uint64_t>& m_released;
     std::atomic<uint64_t>& m_attacked;
     std::atomic<uint64_t>& m_errors;
+    std::atomic<uint64_t>& m_hatch_time_ms;
 };
 std::unique_ptr<StatsTracker> EggHatcher_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -92,6 +112,14 @@ EggHatcher::EggHatcher()
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
+    , RELEASE_NON_SHINY(
+        "<b>Release Non-Shiny Hatchlings:</b><br>"
+        "After each column hatches, check every new hatchling and <b>release</b> it if it is not shiny. "
+        "Shiny hatchlings are put back in the box. Releasing cannot be undone, so only turn this on if you "
+        "only want shinies. Your Flame Body " + STRING_POKEMON + " (and cloned ride legendary) are never released.",
+        LockMode::LOCK_WHILE_RUNNING,
+        false
+    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -106,6 +134,7 @@ EggHatcher::EggHatcher()
     PA_ADD_OPTION(m_battle_ai_description);
     PA_ADD_OPTION(BATTLE_AI);
     PA_ADD_OPTION(HAS_CLONE_RIDE_POKEMON);
+    PA_ADD_OPTION(RELEASE_NON_SHINY);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -148,10 +177,15 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, ProControlle
         }
         
         env.log("Loaded " + std::to_string(num_eggs) + " eggs to party.");
+        // Only auto-release when the column was all eggs. If the column also had already-hatched
+        // Pokemon mixed in, we can't tell which party slots are the new hatchlings, so leave it alone.
+        const uint8_t num_hatched = num_eggs;
+        const bool column_was_all_eggs = num_non_egg_pokemon == (HAS_CLONE_RIDE_POKEMON ? 1 : 0);
         env.console.overlay().add_log("Load " + std::to_string(num_eggs) + " eggs");
         leave_box_system_to_overworld(env.program_info(), env.console, context);
 
         auto hatched_callback = [&](uint8_t){  
+            add_hatch_time(m_last_hatch_time, stats.m_hatch_time_ms);
             stats.m_hatched++;
             env.update_stats();
         };
@@ -192,10 +226,59 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, ProControlle
             );
         }
 
+        if (RELEASE_NON_SHINY){
+            if (column_was_all_eggs){
+                release_non_shiny_hatchlings(env, context, num_hatched);
+            }else{
+                env.log("Column had non-egg Pokemon mixed with eggs. Skipping release for this column to be safe.", COLOR_RED);
+                env.console.overlay().add_log("Mixed column: no release", COLOR_YELLOW);
+            }
+        }
+
         unload_one_column_from_party(env, env.console, context, NOTIFICATION_ERROR_RECOVERABLE, column_index, HAS_CLONE_RIDE_POKEMON);
     }
 
     context.wait_for_all_requests();
+}
+
+void EggHatcher::release_non_shiny_hatchlings(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t num_hatched){
+    EggHatcher_Descriptor::Stats& stats = env.current_stats<EggHatcher_Descriptor::Stats>();
+
+    // Party: Flame Body lead, (cloned ride legendary), then the hatchlings.
+    // Go from the bottom of the party up, so releasing one never shifts the ones we still need to check.
+    const uint8_t first_hatchling_row = HAS_CLONE_RIDE_POKEMON ? 2 : 1;
+    for (uint8_t i = 0; i < num_hatched; i++){
+        const uint8_t party_row = (uint8_t)(first_hatchling_row + num_hatched - 1 - i);
+        move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, party_row, 0);
+        context.wait_for_all_requests();
+
+        // Shiny star shows on the stats/judge view of the box.
+        change_view_to_stats_or_judge(env.console, context);
+        VideoOverlaySet overlay_set(env.console.overlay());
+        BoxShinyWatcher shiny_detector;
+        shiny_detector.make_overlays(overlay_set);
+        const bool shiny = wait_until(
+            env.console, context,
+            std::chrono::milliseconds(500),
+            {shiny_detector}
+        ) == 0;
+
+        if (shiny){
+            env.log("Party slot " + std::to_string(party_row) + ": shiny! Keeping it.", COLOR_BLUE);
+            env.console.overlay().add_log("Shiny! Keep", COLOR_GREEN);
+            stats.m_shinies++;
+            env.update_stats();
+            continue;
+        }
+
+        env.log("Party slot " + std::to_string(party_row) + ": not shiny. Releasing.");
+        env.console.overlay().add_log("Not shiny: release", COLOR_WHITE);
+        size_t local_errors = 0;
+        release_one_pokemon(env.program_info(), env.console, context, local_errors);
+        stats.m_released++;
+        stats.m_errors += local_errors;
+        env.update_stats();
+    }
 }
 
 void EggHatcher::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -205,6 +288,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     //  Connect the controller.
     require_player(env.console, context, BUTTON_L);
+    m_last_hatch_time = std::chrono::steady_clock::now();
 
     if (START_LOCATION == StartLocation::AnywhereOffRide){
         // Get on ride:

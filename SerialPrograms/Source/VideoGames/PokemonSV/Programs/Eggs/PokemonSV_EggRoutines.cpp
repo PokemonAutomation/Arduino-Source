@@ -4,6 +4,9 @@
  *
  */
 
+#include <algorithm>
+#include <cfloat>
+#include <cmath>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -16,7 +19,11 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Options/Pokemon_StatsHuntFilter.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "VideoGames/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
+#include "VideoGames/PokemonSV/Inference/Picnics/PokemonSV_SandwichRecipeDetector.h"
+#include "VideoGames/PokemonSV/Inference/Map/PokemonSV_MapDetector.h"
+#include "VideoGames/PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxGenderDetector.h"
 #include "VideoGames/PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h"
@@ -309,6 +316,163 @@ void picnic_at_zero_gate(
     picnic_from_overworld(info, stream, context);
 }
 
+namespace{
+
+struct EggRecipe{
+    EggSandwichType type;
+    size_t recipe_ID;
+    const char* filling;
+    const char* name;
+};
+
+// Egg Power recipe sandwiches, from best to worst. BEST_AVAILABLE_RECIPE tries them in this order.
+// Only the filling is listed: recipe mode adds the condiments.
+const EggRecipe EGG_RECIPES[] = {
+    {EggSandwichType::GREAT_PEANUT_BUTTER,  17, "banana",       "Great Peanut Butter Sandwich (Egg Power Lv 2)"},
+    {EggSandwichType::GREAT_MARMALADE,      25, "cheese",       "Great Marmalade Sandwich (Egg Power Lv 2)"},
+    {EggSandwichType::PEANUT_BUTTER,        16, "banana",       "Peanut Butter Sandwich (Egg Power Lv 1)"},
+    {EggSandwichType::JAM,                  12, "strawberry",   "Jam Sandwich (Egg Power Lv 1)"},
+};
+const size_t EGG_RECIPES_COUNT = sizeof(EGG_RECIPES) / sizeof(EGG_RECIPES[0]);
+
+const EggRecipe& find_egg_recipe(EggSandwichType sandwich_type){
+    for (const EggRecipe& recipe : EGG_RECIPES){
+        if (recipe.type == sandwich_type){
+            return recipe;
+        }
+    }
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "EggSandwichType is not a recipe sandwich.");
+}
+
+// At the top of the sandwich recipe list: scroll down reading recipe numbers to see which Egg Power
+// recipes can be made. The game hides recipes you don't have the ingredients for.
+// Returns the index in EGG_RECIPES of the best one you can make, or -1 if none.
+int scan_for_best_egg_recipe(VideoStream& stream, ProControllerContext& context){
+    SandwichRecipeNumberDetector recipe_detector(stream.logger());
+    VideoOverlaySet overlay_set(stream.overlay());
+    recipe_detector.make_overlays(overlay_set);
+
+    bool available[EGG_RECIPES_COUNT] = {};
+    size_t highest_wanted_ID = 0;
+    for (const EggRecipe& recipe : EGG_RECIPES){
+        highest_wanted_ID = std::max(highest_wanted_ID, recipe.recipe_ID);
+    }
+
+    size_t last_max_ID = 0;
+    int presses_without_change = 0;
+    for (int attempt = 0; attempt < 100; attempt++){
+        context.wait_for(Milliseconds(200));
+        context.wait_for_all_requests();
+        auto snapshot = stream.video().snapshot();
+        size_t recipe_IDs[6] = {0, 0, 0, 0, 0, 0};
+        recipe_detector.detect_recipes(snapshot, recipe_IDs);
+
+        size_t max_ID = 0;
+        for (size_t id : recipe_IDs){
+            max_ID = std::max(max_ID, id);
+            for (size_t c = 0; c < EGG_RECIPES_COUNT; c++){
+                if (id != 0 && id == EGG_RECIPES[c].recipe_ID){
+                    available[c] = true;
+                }
+            }
+        }
+        if (max_ID >= highest_wanted_ID){
+            break;
+        }
+        // The cursor moves inside a page before the page scrolls, so allow a few presses without change.
+        if (max_ID == last_max_ID){
+            if (++presses_without_change >= 4){
+                break; // end of the list
+            }
+        }else{
+            presses_without_change = 0;
+        }
+        last_max_ID = max_ID;
+        pbf_press_dpad(context, DPAD_DOWN, 80ms, 400ms);
+    }
+
+    std::string found = "Egg Power recipes you can make:";
+    for (size_t c = 0; c < EGG_RECIPES_COUNT; c++){
+        if (available[c]){
+            found += " " + std::to_string(EGG_RECIPES[c].recipe_ID);
+        }
+    }
+    stream.log(found);
+
+    for (size_t c = 0; c < EGG_RECIPES_COUNT; c++){
+        if (available[c]){
+            return (int)c;
+        }
+    }
+    return -1;
+}
+
+// In the sandwich recipe list: move up until `target_ID` is on screen and the cursor is on the
+// top-left cell, so select_sandwich_recipe() (which only moves down and right) can reach it.
+bool move_recipe_cursor_above(VideoStream& stream, ProControllerContext& context, size_t target_ID){
+    SandwichRecipeNumberDetector recipe_detector(stream.logger());
+    for (int attempt = 0; attempt < 100; attempt++){
+        context.wait_for(Milliseconds(200));
+        context.wait_for_all_requests();
+        auto snapshot = stream.video().snapshot();
+        size_t recipe_IDs[6] = {0, 0, 0, 0, 0, 0};
+        recipe_detector.detect_recipes(snapshot, recipe_IDs);
+        const bool target_visible = std::find(recipe_IDs, recipe_IDs + 6, target_ID) != recipe_IDs + 6;
+
+        SandwichRecipeSelectionWatcher selection_watcher;
+        if (wait_until(stream, context, std::chrono::seconds(3), {selection_watcher}) < 0){
+            return false;
+        }
+        const int selected_cell = selection_watcher.selected_recipe_cell();
+        if (selected_cell < 0){
+            return false;
+        }
+
+        if (target_visible && selected_cell < 2){
+            if (selected_cell == 1){
+                pbf_press_dpad(context, DPAD_LEFT, 80ms, 400ms);
+                context.wait_for_all_requests();
+            }
+            return true;
+        }
+        pbf_press_dpad(context, DPAD_UP, 80ms, 400ms);
+    }
+    return false;
+}
+
+// Assuming at the sandwich recipe list, find `recipe` and make it.
+// Return false if the recipe is not unlocked or there are not enough ingredients.
+bool make_egg_recipe_sandwich(
+    ProgramEnvironment& env,
+    VideoStream& stream, ProControllerContext& context,
+    const EggRecipe& recipe,
+    Language language
+){
+    if (select_sandwich_recipe(env.program_info(), stream, context, recipe.recipe_ID) == false){
+        return false;
+    }
+    std::map<std::string, uint8_t> fillings = { {recipe.filling, (uint8_t)1} };
+    std::vector<std::string> fillings_sorted;
+    fillings_sorted.push_back(recipe.filling);
+    int plates = 1;
+    run_sandwich_maker(env, stream, context, language, fillings, fillings_sorted, plates);
+    return true;
+}
+
+}
+
+size_t egg_basket_wait_seconds(EggSandwichType sandwich_type){
+    switch (sandwich_type){
+    case EggSandwichType::TWO_SWEET_HERBS:
+    case EggSandwichType::SALTY_SWEET_HERBS:
+    case EggSandwichType::BITTER_SWEET_HERBS:
+        // Egg Power Lv 3
+        return 120;
+    default:
+        return 180;
+    }
+}
+
 bool eat_egg_sandwich_at_picnic(
     ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context,
@@ -325,17 +489,31 @@ bool eat_egg_sandwich_at_picnic(
     }
     switch (sandwich_type){
     case EggSandwichType::GREAT_PEANUT_BUTTER:
-    {
-        if (select_sandwich_recipe(env.program_info(), stream, context, 17) == false){
-            // cannot find the sandwich recipe, either user has not unlocked it or does not have enough ingredients:
+    case EggSandwichType::GREAT_MARMALADE:
+    case EggSandwichType::PEANUT_BUTTER:
+    case EggSandwichType::JAM:
+        // cannot find the sandwich recipe, either user has not unlocked it or does not have enough ingredients:
+        return make_egg_recipe_sandwich(env, stream, context, find_egg_recipe(sandwich_type), language);
+    case EggSandwichType::BEST_AVAILABLE_RECIPE:{
+        // Read the list once to see what you can make, then go back up to the best one.
+        // (Closing and reopening the list to search again doesn't work reliably.)
+        const int best = scan_for_best_egg_recipe(stream, context);
+        if (best < 0){
+            stream.log("Cannot make any egg power recipe sandwich.", COLOR_RED);
+            stream.overlay().add_log("Out of sandwich supplies!", COLOR_RED);
             return false;
         }
-        std::map<std::string, uint8_t> fillings = { {"banana", (uint8_t)1} };
-        std::vector<std::string> fillings_sorted;
-        fillings_sorted.push_back("banana");
-        int plates = 1;
-        run_sandwich_maker(env, stream, context, language, fillings, fillings_sorted, plates);
-        break;
+        const EggRecipe& recipe = EGG_RECIPES[best];
+        if (!move_recipe_cursor_above(stream, context, recipe.recipe_ID)){
+            stream.log("Could not move back up to recipe " + std::to_string(recipe.recipe_ID) + ".", COLOR_RED);
+            return false;
+        }
+        if (make_egg_recipe_sandwich(env, stream, context, recipe, language)){
+            stream.log(std::string("Made the best available egg sandwich: ") + recipe.name);
+            return true;
+        }
+        stream.log("Cannot make any egg power recipe sandwich.", COLOR_RED);
+        return false;
     }
     case EggSandwichType::TWO_SWEET_HERBS:
     case EggSandwichType::SALTY_SWEET_HERBS:
@@ -821,6 +999,288 @@ void hatch_eggs_at_area_three_lighthouse(
     } // end hatching each egg
 }
 
+namespace{
+
+// Cortondo route timings. Directions are relative to the camera after pressing L at the
+// Cortondo (West) Pokemon Center, where the camera faces away from the Pokemon Center counter.
+// After L the camera looks out over the open field. The big tree is to the LEFT of that view
+// (checked on hardware: {+0.3, +1} ran straight out into the field, nowhere near the tree).
+// If she misses the tree: add a little forward (+0.2) or back (-0.2) to the second number.
+// {-1, 0} ran straight into the trunk. {-1, -0.18} turns about 10 degrees further left (east) so she runs past it.
+const JoystickPosition CORTONDO_TO_PICNIC_DIRECTION{-1, -0.18};
+const Milliseconds CORTONDO_TO_PICNIC_DURATION = 2600ms;  // 400ms turn tap + 2200ms straight run
+// Short tap that only turns the player to face CORTONDO_TO_PICNIC_DIRECTION before walking straight.
+const Milliseconds CORTONDO_TO_PICNIC_TURN_DURATION = 400ms;
+// Ride to the Olive Roll field, timed from the user's video (Nov 24):
+//   1. Turn so the counter is on your left and ride up the town road (~2.4 s).
+//   2. Bear a little left into the lane between the blue house and the yellow arch house.
+//   3. Straight through the lane, across the grass, jump the low wall (~4 s in),
+//      jump the white field fence (~7 s in), stop inside the field.
+const JoystickPosition CORTONDO_TO_TOWN_TURN{+1, 0};
+const Milliseconds CORTONDO_THROUGH_TOWN_DURATION = 2400ms;
+// The bear-left into the lane. About 20 degrees. More left = bigger first number (-0.5), less = (-0.2).
+const JoystickPosition CORTONDO_TO_LANE_TURN{-0.36, +1};
+const Milliseconds CORTONDO_LANE_TURN_DURATION = 300ms;
+// Lane + grass + wall + fence + a little way into the field. Jump the whole time so the wall and
+// the fence get cleared whenever we reach them.
+const Milliseconds CORTONDO_JUMP_STRETCH_DURATION = 11000ms;
+const Milliseconds CORTONDO_JUMP_INTERVAL = 1000ms;
+// Tested Nov 24: she reached the field fence but passed it on the LEFT side. So partway through the
+// jump stretch (out on the open grass), bear right a little. More right = bigger first number.
+const Milliseconds CORTONDO_RIGHT_CORRECTION_AFTER = 3000ms;
+const JoystickPosition CORTONDO_RIGHT_CORRECTION_TURN{+0.36, +1};
+const Milliseconds CORTONDO_RIGHT_CORRECTION_DURATION = 300ms;
+
+void ride_from_cortondo_to_olive_field(VideoStream& stream, ProControllerContext& context){
+    stream.log("Ride from Cortondo (West) Pokemon Center to the Olive Roll field.");
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
+    // Get on your ride
+    pbf_press_button(context, BUTTON_PLUS, 400ms, 800ms);
+    pbf_move_left_joystick(context, CORTONDO_TO_TOWN_TURN, 400ms, 400ms);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
+    pbf_move_left_joystick(context, {0, +1}, CORTONDO_THROUGH_TOWN_DURATION, 0ms);
+
+    stream.log("Bear left into the lane between the houses.");
+    pbf_move_left_joystick(context, CORTONDO_TO_LANE_TURN, CORTONDO_LANE_TURN_DURATION, 0ms);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
+
+    stream.log("Jump the yard wall and the Olive Roll field fence.");
+    auto ride_and_jump = [&](Milliseconds duration){
+        ssf_press_left_joystick(context, {0, +1}, 0ms, duration);
+        for (Milliseconds t = 0ms; t < duration; t += CORTONDO_JUMP_INTERVAL){
+            ssf_press_button(context, BUTTON_B, CORTONDO_JUMP_INTERVAL, 160ms);
+        }
+        context.wait_for_all_requests();
+    };
+    ride_and_jump(CORTONDO_RIGHT_CORRECTION_AFTER);
+
+    stream.log("Bear right toward the Olive Roll field gate side.");
+    pbf_move_left_joystick(context, CORTONDO_RIGHT_CORRECTION_TURN, CORTONDO_RIGHT_CORRECTION_DURATION, 0ms);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
+
+    ride_and_jump(CORTONDO_JUMP_STRETCH_DURATION - CORTONDO_RIGHT_CORRECTION_AFTER);
+}
+
+}
+
+void picnic_at_cortondo(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+    stream.log("Walk out of Cortondo to start a picnic.");
+    // Holding a diagonal for the whole walk makes the camera slowly swing to follow the player,
+    // so the path curves a different amount each run (the drift). Instead: tap the direction to
+    // turn the player, press L so the camera is straight behind, then walk straight forward.
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
+    pbf_move_left_joystick(context, CORTONDO_TO_PICNIC_DIRECTION, CORTONDO_TO_PICNIC_TURN_DURATION, 400ms);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
+    pbf_move_left_joystick(context, {0, +1}, CORTONDO_TO_PICNIC_DURATION - CORTONDO_TO_PICNIC_TURN_DURATION, 400ms);
+    pbf_press_button(context, BUTTON_L, 400ms, 320ms);
+    picnic_from_overworld(info, stream, context);
+}
+
+// With the map open: find the Pokemon Center icons on screen and return the WEST-most one's
+// position (pixels). Cortondo has two Pokemon Centers (West and East) close together, and every
+// route here starts from the West one, so "closest" isn't good enough.
+bool find_westmost_pokecenter(VideoStream& stream, ProControllerContext& context, double& x_out, double& y_out){
+    context.wait_for_all_requests();
+    const auto frame = stream.video().snapshot().frame;
+    const double screen_width = (double)frame->width();
+    const double screen_height = (double)frame->height();
+
+    MapPokeCenterIconWatcher watcher(COLOR_RED, stream.overlay(), MAP_READABLE_AREA);
+    if (wait_until(stream, context, std::chrono::seconds(2), {watcher}) != 0 || watcher.found_locations().empty()){
+        stream.log("No Pokemon Center icon visible on the map.");
+        return false;
+    }
+    // Only look at the Pokemon Centers near the player (Cortondo's two), never another city's:
+    // keep icons no further than 2.5x the distance of the nearest one, then take the west-most.
+    struct Icon{ double x, y, dist; };
+    std::vector<Icon> icons;
+    double nearest = DBL_MAX;
+    for (const ImageFloatBox& box : watcher.found_locations()){
+        const double x = (box.x + box.width / 2) * screen_width;
+        const double y = (box.y + box.height / 2) * screen_height;
+        const double dx = (x - 0.5 * screen_width) * 1920 / screen_width;
+        const double dy = (y - 0.5 * screen_height) * 1080 / screen_height;
+        const double dist = std::sqrt(dx * dx + dy * dy);
+        stream.log("Pokemon Center icon at (" + std::to_string(x) + ", " + std::to_string(y) + "), distance " + std::to_string(dist) + ".");
+        icons.push_back({x, y, dist});
+        nearest = std::min(nearest, dist);
+    }
+    x_out = DBL_MAX;
+    for (const Icon& icon : icons){
+        if (icon.dist > 2.5 * std::max(nearest, 40.0)){
+            stream.log("Ignoring far-away Pokemon Center at (" + std::to_string(icon.x) + ", " + std::to_string(icon.y) + ").");
+            continue;
+        }
+        if (icon.x < x_out){
+            x_out = icon.x;
+            y_out = icon.y;
+        }
+    }
+    return true;
+}
+
+// Push the map cursor from the screen center (the player) to (x, y). Same math as the built-in
+// "fly to closest Pokemon Center".
+void push_map_cursor_to(VideoStream& stream, ProControllerContext& context, double x, double y, double push_scale){
+    const auto frame = stream.video().snapshot().frame;
+    const double screen_width = (double)frame->width();
+    const double screen_height = (double)frame->height();
+    const double dif_x = (x - 0.5 * screen_width) * 1920 / screen_width;
+    const double dif_y = (y - 0.5 * screen_height) * 1080 / screen_height;
+    const double magnitude = std::max(std::sqrt(dif_x * dif_x + dif_y * dif_y), 1.0);
+    const double move_x = std::max(std::min(dif_x * 0.5 / magnitude, +1.0), -1.0);
+    const double move_y = -std::max(std::min(dif_y * 0.5 / magnitude, +1.0), -1.0);
+    const uint16_t push_ticks = std::max(uint16_t(magnitude * push_scale + 0.5), uint16_t(3));
+    pbf_move_left_joystick(context, {move_x, move_y}, push_ticks * 8ms, 240ms);
+    context.wait_for_all_requests();
+}
+
+// One attempt: open the map, find the West Pokemon Center and fly there. Returns true on success.
+bool try_fly_to_cortondo_west(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, double push_scale){
+    open_map_from_overworld(info, stream, context);
+
+    // Zoom in one level. Right next to the Pokemon Center (like at the picnic tree), the player icon
+    // can sit on top of the Pokemon Center icon and hide it; zooming in spreads the icons apart.
+    pbf_press_button(context, BUTTON_ZR, 320ms, 800ms);
+    double x = 0, y = 0;
+    bool found = find_westmost_pokecenter(stream, context, x, y);
+
+    if (!found){
+        // Nothing at this zoom: zoom out past the normal level and look again.
+        pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
+        pbf_press_button(context, BUTTON_ZL, 320ms, 800ms);
+        found = find_westmost_pokecenter(stream, context, x, y);
+    }
+
+    const double screen_width = (double)stream.video().snapshot().frame->width();
+    const bool only_east_icons = found && x > 0.53 * screen_width;
+    if (!found || only_east_icons){
+        // Every icon we can see is EAST of the player, or there are none. The West Pokemon Center is
+        // probably hidden under the player icon, so try flying right where we are first.
+        stream.log("West Pokemon Center may be under the player icon. Trying to fly from here.");
+        if (fly_to_overworld_from_map(info, stream, context, true)){
+            return true;
+        }
+        pbf_press_button(context, BUTTON_B, 480ms, 800ms); // close the destination menu
+        if (!found){
+            press_Bs_to_back_to_overworld(info, stream, context);
+            return false;
+        }
+    }
+
+    stream.overlay().add_log("Fly to Cortondo (West) PC", COLOR_WHITE);
+    push_map_cursor_to(stream, context, x, y, push_scale);
+    if (fly_to_overworld_from_map(info, stream, context, true)){
+        return true;
+    }
+    stream.log("Cursor missed the Pokemon Center.", COLOR_RED);
+    press_Bs_to_back_to_overworld(info, stream, context);
+    return false;
+}
+
+void fly_to_cortondo_from_olive_field(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+    stream.log("Fly back to Cortondo (West) Pokemon Center.");
+    // Try a few cursor push strengths (the Switch can lag). Each try opens the map fresh.
+    const double push_scales[] = {0.29, 0.29 * 1.4, 0.29 * 0.8, 0.29 * 1.2};
+    for (double push_scale : push_scales){
+        if (try_fly_to_cortondo_west(info, stream, context, push_scale)){
+            return;
+        }
+    }
+    // Last resort: the built-in search (may pick the East Pokemon Center).
+    stream.log("Falling back to the closest Pokemon Center.", COLOR_RED);
+    open_map_from_overworld(info, stream, context);
+    fly_to_closest_pokecenter_on_map(info, stream, context);
+}
+
+void hatch_eggs_at_cortondo_olive_field(
+    ProgramEnvironment& env,
+    VideoStream& stream, ProControllerContext& context,
+    EventNotificationOption* attacked_notification,
+    const SinglesAIOption* battle_ai,
+    std::atomic<uint64_t>* attacked,
+    uint8_t num_eggs_in_party,
+    std::function<void(uint8_t)> egg_hatched_callback)
+{
+    // Eggs in one party hatch close together: once the first one hatches, the rest are only a few
+    // steps away. So after a hatch we stay and keep circling right where we are, and only fly back
+    // to the Pokemon Center if we've been circling a long time (to stop drift from carrying us off).
+    const std::chrono::minutes MAX_CIRCLING_BEFORE_REANCHOR(3);
+    bool in_field = false;
+    WallClock last_anchor = current_time();
+    for (uint8_t egg_idx = 0; egg_idx < num_eggs_in_party; egg_idx++){
+        stream.log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party) + ".");
+        stream.overlay().add_log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party), COLOR_BLUE);
+
+        context.wait_for_all_requests();
+
+        if (in_field == false){
+            AdvanceDialogWatcher dialog(COLOR_RED);
+            int ret = run_until<ProControllerContext>(
+                stream, context,
+                [&](ProControllerContext& context){
+                    ride_from_cortondo_to_olive_field(stream, context);
+                },
+                {dialog}
+            );
+            if (ret == 0){
+                // An egg hatched on the way. The other eggs are close to hatching too, so don't go back:
+                // just keep circling from here.
+                handle_egg_hatching(
+                    env.program_info(),
+                    stream,
+                    context,
+                    num_eggs_in_party,
+                    egg_idx,
+                    egg_hatched_callback
+                );
+                stream.log("Egg hatched on the way. Staying here to hatch the rest.");
+                in_field = true;
+                last_anchor = current_time();
+                continue;
+            }
+
+            in_field = true;
+            last_anchor = current_time();
+            stream.log("Reached the Olive Roll field.");
+        }
+
+        // Orient camera to look at same direction as player character.
+        pbf_press_button(context, BUTTON_L, 400ms, 320ms);
+
+        // Circular motions:
+        while (do_egg_cycle_motion(
+            env,
+            stream,
+            context,
+            attacked_notification,
+            battle_ai,
+            attacked
+        )){
+            fly_to_cortondo_from_olive_field(env.program_info(), stream, context);
+            ride_from_cortondo_to_olive_field(stream, context);
+        }
+
+        handle_egg_hatching(
+            env.program_info(),
+            stream,
+            context,
+            num_eggs_in_party,
+            egg_idx,
+            egg_hatched_callback
+        );
+
+        // Riding in circles slowly drifts. If we've been circling a long time, go back to the Pokemon
+        // Center and ride out again so we never wander far enough that its map icon is out of view.
+        // (After the last egg the caller flies back.)
+        if (egg_idx + 1 < num_eggs_in_party && current_time() - last_anchor > MAX_CIRCLING_BEFORE_REANCHOR){
+            stream.log("Circled a long time. Going back to the Pokemon Center to re-center.");
+            fly_to_cortondo_from_olive_field(env.program_info(), stream, context);
+            in_field = false;
+        }
+    } // end hatching each egg
+}
+
 void hatch_eggs_anywhere(
     ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context,
@@ -866,6 +1326,27 @@ void reset_position_at_zero_gate(
     fly_to_overworld_from_map(info, stream, context);
 }
 
+
+std::string avg_time_per_egg_text(uint64_t total_ms, uint64_t eggs){
+    if (eggs == 0 || total_ms == 0){
+        return "";
+    }
+    const uint64_t avg_seconds = (total_ms / eggs + 500) / 1000;
+    std::string seconds = std::to_string(avg_seconds % 60);
+    if (seconds.size() < 2){
+        seconds = "0" + seconds;
+    }
+    if (avg_seconds < 60){
+        return " - Avg Time/Egg: " + std::to_string(avg_seconds) + "s";
+    }
+    return " - Avg Time/Egg: " + std::to_string(avg_seconds / 60) + "m " + seconds + "s";
+}
+
+void add_hatch_time(std::chrono::steady_clock::time_point& last_mark, std::atomic<uint64_t>& total_ms){
+    const auto now = std::chrono::steady_clock::now();
+    total_ms += (uint64_t)std::chrono::duration_cast<std::chrono::milliseconds>(now - last_mark).count();
+    last_mark = now;
+}
 
 bool check_baby_info(
     const ProgramInfo& info,
