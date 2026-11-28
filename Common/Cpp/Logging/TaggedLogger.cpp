@@ -22,13 +22,20 @@ TaggedLogger::TaggedLogger(TaggedLogger& logger, std::string tag)
     m_tags.emplace_back(std::move(tag));
 }
 
-void TaggedLogger::log(const std::string& msg, Color color){
+std::string TaggedLogger::add_timestamp_and_tags(const std::string& msg) const{
     std::string str = current_time_to_str() + " - ";
     for (const std::string& tag : m_tags){
         str += "[" + tag + "]";
     }
     str += ": " + msg;
-    m_logger.log(std::move(str), color);
+    return str;
+}
+
+void TaggedLogger::log(const std::string& msg, Color color){
+    m_logger.log(add_timestamp_and_tags(msg), color);
+}
+void TaggedLogger::log(const std::string& msg, Color color, LogLevel level){
+    m_logger.log(add_timestamp_and_tags(msg), color, level);
 }
 
 

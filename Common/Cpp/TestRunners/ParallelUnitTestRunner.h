@@ -84,7 +84,8 @@ public:
 private:
     void dispatch_test(const std::string& name);
 
-    //  Log the result of a test that just finished.
+    //  Log the result of a test that just finished: a passed test at Info, a skipped
+    //  test at Warning, and a failed or out-of-memory test at Error.
     //  Called by the test's task in `dispatch_test()`, from the thread pool.
     void log_test_result(const UnitTest& test, const UnitTestResult& result);
 
