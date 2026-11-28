@@ -33,6 +33,11 @@ struct StringMatchResult{
         exact_match = false;
         results.clear();
     }
+    // Write to log the current matching results stored in `results`, e.g.
+    //   String Match Result: "Lonely" -> "10ne1y" -> (10ne1y): (Lonely) (log10p = -4.19382)
+    // Use `max_log10p` to choose the color: blue if it is a match, red if not.
+    // `extra` is added to the end of the line.
+    // It logs at `LogLevel::Verbose`, since programs read text many times in a run.
     void log(Logger& logger, double max_log10p, const std::string& extra = std::string()) const;
 
     void add(double log10p, StringMatchData data);

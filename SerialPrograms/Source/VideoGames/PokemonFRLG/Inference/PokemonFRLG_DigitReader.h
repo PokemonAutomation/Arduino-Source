@@ -42,6 +42,7 @@ enum class DigitTemplateType{
 // save_debug_images  Save each digit crop to DebugDumps/.
 //
 // Returns the number, or -1 if `stat_region` is empty or no digit can be found.
+// It logs each digit it reads and the number at `LogLevel::Verbose`.
 int read_digits_waterfill_template(
     Logger& logger,
     const ImageViewRGB32& stat_region,

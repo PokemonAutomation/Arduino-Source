@@ -811,7 +811,7 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
     const double color_to_gradient_confidence_scale = 2.0;
 
     MapSpriteMatchResult result;
-    logger.log("Start map MMO sprite matching:");
+    logger.log("Start map MMO sprite matching:", LogLevel::Verbose);
 
     // This map has the match score for all sprites.
     // This map must be not empty for subsequent computation.
@@ -833,7 +833,7 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
             }
             os << result.candidates[i];
         }
-        logger.log(os.str());
+        logger.log(os.str(), LogLevel::Verbose);
     }
 
     // Should not happen if we correctly loads the sprite data.
@@ -841,7 +841,7 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
         return result;
     }
 
-    logger.log("Color matching...");
+    logger.log("Color matching...", LogLevel::Verbose);
     {
         const ImagePixelBox expanded_box = box.expand_as(2);
         const ImageHSV32 sprite_hsv = compute_MMO_sprite_color_hsv(extract_box_reference(screen, expanded_box));
@@ -874,13 +874,13 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
             const auto& stats = sprite_map.find(slug)->second.rgb_stats;
             std::ostringstream os;
             os << p.first << " - " << slug << " " << stats.stddev.sum();
-            logger.log(os.str());
+            logger.log(os.str(), LogLevel::Verbose);
         }
         if (result_count == 5){
             size_t num_rest_results = result.color_match_results.size() - 5;
             std::ostringstream os;
             os << "Skip " << num_rest_results << " more result" << (num_rest_results > 1 ? "s" : "");
-            logger.log(os.str());
+            logger.log(os.str(), LogLevel::Verbose);
         }
         
         result_count++;
@@ -897,7 +897,7 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
     if (color_second == result.color_match_results.end()){
         // we only have one color match result.
         result.color_lead = DBL_MAX;
-        logger.log("Single color match result: " + color_top_slug);
+        logger.log("Single color match result: " + color_top_slug, LogLevel::Verbose);
         save_debug_image_if_required(result);
         return result;
     }
@@ -908,17 +908,17 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
     {
         std::ostringstream os;
         os << "Top color score: " << result.color_score << " diff to second: " << result.color_lead;
-        logger.log(os.str());
+        logger.log(os.str(), LogLevel::Verbose);
     }
 
     if (result.color_lead >= color_difference_threshold){
-        logger.log("Color difference large enough. Good match: " + result.slug);
+        logger.log("Color difference large enough. Good match: " + result.slug, LogLevel::Verbose);
         result.second_slug = color_second->second;
         save_debug_image_if_required(result);
         return result;
     }
 
-    logger.log("Gradient matching...");
+    logger.log("Gradient matching...", LogLevel::Verbose);
     ImageRGB32 gradient_image = compute_MMO_sprite_gradient(extract_box_reference(screen, box));
     
     // std::ostringstream os;
@@ -939,12 +939,12 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
             size_t num_rest_results = result.gradient_match_results.size() - 5;
             std::ostringstream os;
             os << "Skip " << num_rest_results << " more result" << (num_rest_results > 1 ? "s" : "");
-            logger.log(os.str());
+            logger.log(os.str(), LogLevel::Verbose);
             break;
         }
         std::ostringstream os;
         os << p.first << " - " << p.second;
-        logger.log(os.str());
+        logger.log(os.str(), LogLevel::Verbose);
         result_count++;
     }
 
@@ -963,11 +963,11 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
     {
         std::ostringstream os;
         os << "Top gradient score: " << result.gradient_score << " diff to second: " << result.gradient_lead;
-        logger.log(os.str());
+        logger.log(os.str(), LogLevel::Verbose);
     }
 
     if (result.gradient_lead >= gradient_confidence_threshold){
-        logger.log("Gradient difference large enough. Good match: " + result.slug);
+        logger.log("Gradient difference large enough. Good match: " + result.slug, LogLevel::Verbose);
         save_debug_image_if_required(result);
         return result;
     }
@@ -983,7 +983,7 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
         os << "Gradient difference not large enough. Check color difference: " << 
             result.graident_top_color_score << " vs " << result.gradient_second_color_score << ", diff: " <<
             color_diff;
-        logger.log(os.str());
+        logger.log(os.str(), LogLevel::Verbose);
     }
     
     // If color score is more confident in telling those two sprites apart
@@ -991,10 +991,10 @@ MapSpriteMatchResult match_sprite_on_map(Logger& logger, const ImageViewRGB32& s
         if (color_diff < 0){ // second gradient sprite is better in color matching than the first graident sprite:
             result.pick_gradient_second = true;
             std::swap(result.slug, result.second_slug);
-            logger.log("Switch to more confident color result: " + result.slug);
+            logger.log("Switch to more confident color result: " + result.slug, LogLevel::Verbose);
         }
     }else{
-        logger.log("Low confidence match: " + result.slug);
+        logger.log("Low confidence match: " + result.slug, LogLevel::Verbose);
     }
 
     save_debug_image_if_required(result);
@@ -1171,12 +1171,12 @@ public:
             return a.center_x() < b.center_x();
         });
 
-        //  e.g. "- 1205, 478 (0.6276 0.4426) 24 x 30": the box center in pixels, then relative to the image
-        //  size as in the golden file, then the box size in pixels.
-        cout << "Detect MMO question marks at:" << endl;
+        //  e.g. "- 0.6276 0.4426": the box center relative to the image size, as in the golden file.
+        std::string detected_str = "Detect MMO question marks at:";
         for (const auto& box : quest_results){
-            cout << "- " << box_center_to_str(box) << endl;
+            detected_str += "\n- " + box_center_to_str(box);
         }
+        logger.log(detected_str, LogLevel::Verbose);
 
         //  matched_target_index[i]: quest result i -> the index in `target_sprites` that matches this found question mark.
         //  SIZE_MAX if it matches none.
@@ -1199,8 +1199,11 @@ public:
             }
             // target is not found:
             if (target_is_optional[t]){
-                cout << "Optional question mark of " << target_sprites[t].slug << " at " <<
-                    point_to_str(target_sprites[t].x, target_sprites[t].y) << " is not found." << endl;
+                logger.log(
+                    "Optional question mark of " + target_sprites[t].slug + " at " +
+                    point_to_str(target_sprites[t].x, target_sprites[t].y) + " is not found.",
+                    LogLevel::Verbose
+                );
                 continue;
             }
             target_sprite_match_error_msg += "Missed question mark of " + target_sprites[t].slug + " at " +
@@ -1238,32 +1241,40 @@ public:
 #endif
 
         size_t success_count = 0;
+        //  Each wrong sprite match, e.g. "Read haunter instead of gastly at 0.6276 0.4426. "
+        //  It goes into the failure message, since the per-match log lines are at `LogLevel::Verbose`.
+        std::string wrong_match_msg;
         for (size_t i = 0; i < quest_results.size(); i++){
             if (matched_target_index[i] == SIZE_MAX){
                 continue;   //  An extra question mark, already in `target_sprite_match_error_msg`.
             }
             const std::string& target_slug = target_sprites[matched_target_index[i]].slug;
-            cout << "--------------------------------------------------------------------" << endl;
-            cout << i << ": Target slug: " << target_slug << endl;
+            logger.log(
+                "--------------------------------------------------------------------\n" +
+                std::to_string(i) + ": Target slug: " + target_slug,
+                LogLevel::Verbose
+            );
 
             bool debug_mode = false;
             auto result = match_sprite_on_map(logger, sprite_image, new_boxes[i], region, debug_mode);
             if (result.slug == target_slug){
                 success_count++;
-                cout << "Match SUCCESS" << endl;
+                logger.log("Match SUCCESS", LogLevel::Verbose);
             }else{
-                cout << "Match FAILURE" << endl;
+                logger.log("Match FAILURE", LogLevel::Verbose);
+                wrong_match_msg += "Read " + result.slug + " instead of " + target_slug +
+                    " at " + box_center_to_str(quest_results[i]) + ". ";
             }
         }
 
         if (success_count != quest_results.size() || !target_sprite_match_error_msg.empty()){
-            const std::string failure = target_sprite_match_error_msg +
+            const std::string failure = target_sprite_match_error_msg + wrong_match_msg +
                 "FAILURE: " + std::to_string(quest_results.size() - success_count) + "/" + std::to_string(quest_results.size());
             cout << failure << endl;
             return failure;
         }
 
-        cout << "ALL SUCCESS" << endl;
+        logger.log("ALL SUCCESS", LogLevel::Verbose);
         return true;
     };
 };

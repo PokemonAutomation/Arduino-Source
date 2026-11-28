@@ -265,13 +265,13 @@ void UnitTestRunner::log_test_result(const UnitTest& test, const UnitTestResult&
         }
         break;
     case UnitTestResult::FAILED:
-        m_logger.log(prefix + "FAILED: " + test.name() + ", Message: " + result.message, COLOR_RED);
+        m_logger.log(prefix + "FAILED: " + test.name() + ", Message: " + result.message, COLOR_RED, LogLevel::Error);
         break;
     case UnitTestResult::SKIPPED:
-        m_logger.log(prefix + "SKIPPED: " + test.name(), COLOR_ORANGE);
+        m_logger.log(prefix + "SKIPPED: " + test.name(), COLOR_ORANGE, LogLevel::Warning);
         break;
     case UnitTestResult::OOM:
-        m_logger.log(prefix + "OOM: " + test.name(), COLOR_ORANGE);
+        m_logger.log(prefix + "OOM: " + test.name(), COLOR_ORANGE, LogLevel::Error);
         break;
     }
 }

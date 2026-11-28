@@ -15,6 +15,7 @@
 #include "Common/Cpp/Logging/GlobalLogger.h"
 #include "CommonFramework/GlobalAutoPaths.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/StaticGlobals.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/ImageTypes/ImageRGB32_OpenCV.h"
@@ -533,7 +534,7 @@ void add_vertical_padding(cv::Mat& image, const cv::Mat& binary_tight_crop, int 
     int w = binary_tight_crop.cols;
 
     if (is_horizontal_line(binary_tight_crop, debug_image_index)){
-        cout << "Input image is likely just a horizontal line." << endl;
+        global_logger_tagged().log("Input image is likely just a horizontal line.", LogLevel::Verbose);
         cv::Scalar bg = estimate_background_color(image);
 
         int target_h = static_cast<int>(std::ceil(w / 2));

@@ -223,10 +223,13 @@ int run_program(int argc, char *argv[]){
     bool augment_test_color_distortions = false;
     std::string test_substring;
     bool test_substring_missing_value = false;
+    std::string log_level_name;
+    bool log_level_missing_value = false;
     for (size_t i = 0; i < argc; i++){
         constexpr const char* force_run_tests = "--command-line-test-mode";
         constexpr const char* distort_test_images = "--augment-color-distortions";
         constexpr const char* filter_tests_substring = "--test-substring";
+        constexpr const char* console_log_level = "--log-level";
 
         if (strcmp(argv[i], force_run_tests) == 0){
             GlobalSettings::instance().COMMAND_LINE_TEST_MODE = true;
@@ -241,10 +244,33 @@ int run_program(int argc, char *argv[]){
                 test_substring_missing_value = true;
             }
         }
+        if (strcmp(argv[i], console_log_level) == 0){
+            if (i + 1 < argc){
+                log_level_name = argv[++i];
+            }else{
+                log_level_missing_value = true;
+            }
+        }
     }
     if (test_substring_missing_value){
         global_logger_command_line().log("--test-substring requires a value", COLOR_RED);
         return 1;
+    }
+    if (log_level_missing_value){
+        global_logger_command_line().log("--log-level requires a value, one of: " + all_log_level_names(), LogLevel::Error);
+        return 1;
+    }
+    if (!log_level_name.empty()){
+        //  Which log lines the command-line tests print, e.g. "verbose" to also print every OCR read.
+        const std::optional<LogLevel> log_level = parse_log_level(log_level_name);
+        if (!log_level){
+            global_logger_command_line().log(
+                "Unknown --log-level \"" + log_level_name + "\". Use one of: " + all_log_level_names(),
+                LogLevel::Error
+            );
+            return 1;
+        }
+        set_command_line_log_level(*log_level);
     }
 
     if (GlobalSettings::instance().COMMAND_LINE_TEST_MODE){

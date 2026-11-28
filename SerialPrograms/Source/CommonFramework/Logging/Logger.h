@@ -20,9 +20,17 @@ namespace PokemonAutomation{
 Logger& global_logger_tagged();
 
 // This logger wraps around `global_logger_raw()` to also print the log
-// into command line using std::cout.
+// into command line (stdout).
 // Useful for running command line tests.
+// It prints only lines at or above a minimum level, `LogLevel::Info` by default,
+// so the test log is not flooded with details like every OCR read result.
+// Lines below the level still go to `global_logger_raw()`, i.e. the log file.
 Logger& global_logger_command_line();
+
+// Set the minimum level of the lines `global_logger_command_line()` prints, e.g.
+// `LogLevel::Verbose` to print every line. Set by the command-line option
+// `--log-level` of the command-line test mode.
+void set_command_line_log_level(LogLevel level);
 
 
 class BooleanCheckBoxOption;
