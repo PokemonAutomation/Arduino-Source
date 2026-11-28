@@ -450,13 +450,16 @@ bool CommandLineUnitTestRunner::run(bool augment_color_distortions, const std::s
     }
     runner.run();
 
+    const bool any_failed = m_failed_tests.load(std::memory_order_acquire) > 0;
+    //  At Error when a test failed, so `--log-level error` still prints this summary.
     m_logger.log(
         "Tests Finished:"
         "\n    Passed:  " + tostr_u_commas(m_passed_tests.load(std::memory_order_acquire)) +
         "\n    Failed:  " + tostr_u_commas(m_failed_tests.load(std::memory_order_acquire)) +
-        "\n    Skipped: " + tostr_u_commas(m_skipped_tests.load(std::memory_order_acquire))
+        "\n    Skipped: " + tostr_u_commas(m_skipped_tests.load(std::memory_order_acquire)),
+        any_failed ? LogLevel::Error : LogLevel::Info
     );
-    return m_failed_tests.load(std::memory_order_acquire) > 0;
+    return any_failed;
 }
 void CommandLineUnitTestRunner::on_test_finished(
     std::shared_ptr<const UnitTest>,
