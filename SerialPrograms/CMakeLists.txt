@@ -147,6 +147,7 @@ if(WIN32 AND QT_DEPLOY_FILES)
             Qml
             Quick
             QuickWidgets
+            Svg
         )
     else()
         # Find all subdirectories in the Qt base directory
@@ -159,6 +160,7 @@ if(WIN32 AND QT_DEPLOY_FILES)
             Qml
             Quick
             QuickWidgets
+            Svg
         )
         file(GLOB QT_SUBDIRS LIST_DIRECTORIES true "${QT_BASE_DIR}/${QT_MAJOR}*")
 
@@ -196,6 +198,7 @@ else()
         Qml
         Quick
         QuickWidgets
+        Svg
     )
 endif()
 
@@ -310,6 +313,7 @@ function(apply_common_target_properties target_name)
         Qt${QT_MAJOR}::Qml
         Qt${QT_MAJOR}::Quick
         Qt${QT_MAJOR}::QuickWidgets
+        Qt${QT_MAJOR}::Svg
     )    
 
     # more include directories
