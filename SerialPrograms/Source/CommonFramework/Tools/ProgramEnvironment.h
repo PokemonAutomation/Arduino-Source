@@ -20,7 +20,9 @@ struct ProgramInfo;
 
 struct ProgramEnvironmentData;
 
-class ProgramEnvironment{
+//  It also has the log methods of `FormattedLogMethods`, which pass the line to the
+//  program's logger, e.g. `env.info("Found {} eggs", eggs);`.
+class ProgramEnvironment : public FormattedLogMethods<ProgramEnvironment>{
 public:
     virtual ~ProgramEnvironment() = default;
     ProgramEnvironment(
@@ -38,6 +40,8 @@ public:
     Logger& logger(){ return m_logger; }
     void log(const char* msg, Color color = Color()){ m_logger.log(msg, color); }
     void log(const std::string& msg, Color color = Color()){ m_logger.log(msg, color); }
+    void log(const std::string& msg, LogLevel level){ m_logger.log(msg, level); }
+    void log(const std::string& msg, Color color, LogLevel level){ m_logger.log(msg, color, level); }
 
     virtual void log_to_ui(const std::string& msg, Color color = Color()){}
 

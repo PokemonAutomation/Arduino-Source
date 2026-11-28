@@ -27,16 +27,22 @@ public:
     }
 
 public:
-    virtual void log(const std::string& msg, Color color = Color()){
+    virtual void log(const std::string& msg, Color color = Color()) override{
         m_listeners.run_method(
             (void (Logger::*)(const std::string&, Color))&Logger::log,
             msg, color
         );
     }
-    virtual void log(const char* msg, Color color = Color()){
+    virtual void log(const char* msg, Color color = Color()) override{
         m_listeners.run_method(
             (void (Logger::*)(const char* msg, Color))&Logger::log,
             msg, color
+        );
+    }
+    virtual void log(const std::string& msg, Color color, LogLevel level) override{
+        m_listeners.run_method(
+            (void (Logger::*)(const std::string&, Color, LogLevel))&Logger::log,
+            msg, color, level
         );
     }
 

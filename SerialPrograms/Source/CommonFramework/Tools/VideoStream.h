@@ -33,7 +33,9 @@ class VisualInferencePivot;
 class AudioInferencePivot;
 
 
-class VideoStream{
+//  It also has the log methods of `FormattedLogMethods`, which pass the line to the
+//  logger, e.g. `stream.info("Read {} at {:.2f}", name, x);`.
+class VideoStream : public FormattedLogMethods<VideoStream>{
 public:
     VideoStream(VideoStream&& x);
     void operator=(VideoStream&& x) = delete;
@@ -50,7 +52,10 @@ public:
         VideoOverlay& overlay
     );
 
-    //  log(string-like msg, Color color = Color())
+    //  Pass the arguments to one of the `Logger::log()` methods:
+    //    log(string-like msg, Color color = Color())
+    //    log(const std::string& msg, LogLevel level)
+    //    log(const std::string& msg, Color color, LogLevel level)
     //  string-like can be const char* or std::string
     template <class... Args>
     void log(Args&&... args){

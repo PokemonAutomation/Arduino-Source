@@ -48,6 +48,13 @@ struct MapSpriteMatchResult{
     std::string second_slug;
 };
 
+// Read which pokemon sprite is at `box` on the region map `screen` of `region`:
+// 1. Pick the 10 sprites whose features are closest.
+// 2. Match their colors. Stop if the best color match leads the second by enough.
+// 3. Otherwise match their gradients, and fall back on color when gradients are close.
+// It logs each step and the result at `LogLevel::Verbose`, since a map has many sprites.
+// `debug_mode`: also save the sprite image with `dump_debug_image()`, in a folder named
+//               after the matched slug.
 MapSpriteMatchResult match_sprite_on_map(
     Logger& logger,
     const ImageViewRGB32& screen,

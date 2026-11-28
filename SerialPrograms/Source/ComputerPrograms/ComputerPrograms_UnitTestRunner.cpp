@@ -7,6 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/HttpServer/HttpServer_Tests.h"
 #include "Common/Cpp/ListenerSet.h"
+#include "Common/Cpp/Logging/FormattedLogMethods_Tests.h"
 #include "Common/Cpp/MoveOnlyFunction_Tests.h"
 #include "Common/Cpp/ScopeExit.h"
 #include "Common/Cpp/PrettyPrint.h"
@@ -66,6 +67,7 @@ UnitTestDatabase make_UNIT_TESTS_ALL(){
     add_tests_BlackBorderDetector(ret);
     add_tests_ListenerSet(ret);
     add_tests_MoveOnlyFunction(ret);
+    add_tests_FormattedLogMethods(ret);
     SysbotBase::add_tests_SysbotBasePing(ret);
     SysbotBase::add_tests_SysbotBaseReceiveLine(ret);
     SysbotBase::add_tests_SysbotBaseShutdown(ret);
@@ -452,13 +454,16 @@ bool CommandLineUnitTestRunner::run(bool augment_color_distortions, const std::s
     }
     runner.run();
 
+    const bool any_failed = m_failed_tests.load(std::memory_order_acquire) > 0;
+    //  At Error when a test failed, so `--log-level error` still prints this summary.
     m_logger.log(
         "Tests Finished:"
         "\n    Passed:  " + tostr_u_commas(m_passed_tests.load(std::memory_order_acquire)) +
         "\n    Failed:  " + tostr_u_commas(m_failed_tests.load(std::memory_order_acquire)) +
-        "\n    Skipped: " + tostr_u_commas(m_skipped_tests.load(std::memory_order_acquire))
+        "\n    Skipped: " + tostr_u_commas(m_skipped_tests.load(std::memory_order_acquire)),
+        any_failed ? LogLevel::Error : LogLevel::Info
     );
-    return m_failed_tests.load(std::memory_order_acquire) > 0;
+    return any_failed;
 }
 void CommandLineUnitTestRunner::on_test_finished(
     std::shared_ptr<const UnitTest>,

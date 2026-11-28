@@ -15,7 +15,7 @@ void ImageMatchResult::log(Logger& logger, double max_alpha) const{
 
     if (results.empty()){
         str += "no matches";
-        logger.log(str, COLOR_RED);
+        logger.log(str, COLOR_RED, LogLevel::Verbose);
         return;
     }
 
@@ -30,7 +30,7 @@ void ImageMatchResult::log(Logger& logger, double max_alpha) const{
         str += " (alpha = ";
         str += std::to_string(iter->first);
         str += ")";
-        logger.log(str, color);
+        logger.log(str, color, LogLevel::Verbose);
         return;
     }
 
@@ -49,7 +49,7 @@ void ImageMatchResult::log(Logger& logger, double max_alpha) const{
         printed++;
     }
 
-    logger.log(str, color);
+    logger.log(str, color, LogLevel::Verbose);
 }
 
 void ImageMatchResult::add(double alpha, std::string slug){

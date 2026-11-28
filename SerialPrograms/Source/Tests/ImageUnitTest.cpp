@@ -134,7 +134,9 @@ UnitTestResult ImageUnitTest::run(Logger& logger, CancellableScope& scope) const
         }();
 
         if (distorted_result.result == UnitTestResult::PASSED){
-            logger.log(run_name + ": passed", COLOR_BLUE);
+            //  Verbose: one line per test and distortion would flood the log. The test's
+            //  own result line says it passed.
+            logger.log(run_name + ": passed", COLOR_BLUE, LogLevel::Verbose);
             continue;
         }
         // The test failed with distortion augmentation:

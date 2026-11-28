@@ -36,8 +36,18 @@ public:
     //  Get the underlying base logger.
     Logger& base_logger(){ return m_logger; }
 
+    //  Keep the other `Logger::log()` overloads callable on a `TaggedLogger`,
+    //  e.g. `log(msg, LogLevel::Debug)`. Declaring `log()` below would hide them.
+    using Logger::log;
+
     //  Logger interface: prepends timestamp and tag, then forwards to base logger.
     virtual void log(const std::string& msg, Color color = Color()) override;
+    //  Same as above, and passes the level on to the base logger.
+    virtual void log(const std::string& msg, Color color, LogLevel level) override;
+
+private:
+    //  Return `msg` with the timestamp and tags in front.
+    std::string add_timestamp_and_tags(const std::string& msg) const;
 
 private:
     Logger& m_logger;

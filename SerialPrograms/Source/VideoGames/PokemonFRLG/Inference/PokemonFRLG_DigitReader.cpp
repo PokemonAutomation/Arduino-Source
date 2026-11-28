@@ -323,7 +323,7 @@ int read_digits_waterfill_template(
                     "DigitReader: blob at x=" + std::to_string(min_x) +
                     " skipped (best RMSD=" + std::to_string(best_rmsd) +
                     ", threshold=" + std::to_string(rmsd_threshold) + ").",
-                    COLOR_ORANGE
+                    COLOR_ORANGE, LogLevel::Verbose
                 );
                 continue;
             }
@@ -331,7 +331,8 @@ int read_digits_waterfill_template(
             logger.log(
                 "DigitReader: blob at x=" + std::to_string(min_x) +
                 " -> digit " + std::to_string(best_digit) +
-                " (RMSD=" + std::to_string(best_rmsd) + ")"
+                " (RMSD=" + std::to_string(best_rmsd) + ")",
+                LogLevel::Verbose
             );
             // Save crop with prefix so level and stat crops are distinguishable.
             if (save_debug_images){
@@ -351,7 +352,8 @@ int read_digits_waterfill_template(
     int number = std::atoi(result_str.c_str());
     logger.log(
         "DigitReader: \"" + result_str + "\" -> " +
-        std::to_string(number)
+        std::to_string(number),
+        LogLevel::Verbose
     );
     return number;
 }

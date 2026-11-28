@@ -21,6 +21,7 @@ struct ImageMatchResult{
 
     // Write to log the current matching results stored in `results`.
     // Use `max_alpha` to determine whether matches are found.
+    // It logs at `LogLevel::Verbose`, since programs match images many times in a run.
     void log(Logger& logger, double max_alpha) const;
 
     // Add to `results`.
