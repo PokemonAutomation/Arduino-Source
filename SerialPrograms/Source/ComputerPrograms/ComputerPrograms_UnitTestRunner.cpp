@@ -28,6 +28,7 @@
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/VisualDetectors/BlackBorderDetector.h"
 #include "CommonTools/OCR/OCR_Tests.h"
+#include "Controllers/JoystickTools_Tests.h"
 
 #include "NintendoSwitch/Inference/NintendoSwitch_CheckOnlineDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_FailedToConnectDetector.h"
@@ -74,6 +75,7 @@ UnitTestDatabase make_UNIT_TESTS_ALL(){
     add_tests_SinkPipeline(ret);
     add_tests_AudioFileLoader(ret);
     add_tests_ImageStats(ret);
+    add_tests_JoystickTools(ret);
     OCR::add_tests(ret);
     Kernels::add_tests(ret);
     Pokemon::add_tests_AutoStorySelect(ret);

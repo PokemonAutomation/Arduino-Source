@@ -4,6 +4,7 @@
  *
  */
 
+#include <cmath>
 #include "Common/Cpp/ColoredText.h"
 #include "Common/PABotBase2/Controllers/PABotBase2_Controller_NS1_OemController.h"
 #include "Controllers/SerialPort/SerialPABotBase.h"

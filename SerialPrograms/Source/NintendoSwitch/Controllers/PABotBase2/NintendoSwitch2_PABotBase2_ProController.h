@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include "Common/PABotBase2/Controllers/PABotBase2_Controller_NS2_OemController.h"
+#include "Controllers/JoystickTools.h"
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch2_PABotBase2_OemController.h"
 
@@ -25,8 +26,8 @@ class PABotBase2_ProController final :
     using PABotBase2_Controller = NintendoSwitch::PABotBase2_Controller;
 
     //  TODO: Exact values TBD
-    static constexpr uint16_t JOYSTICK_MIN_THRESHOLD = 1874;
-    static constexpr uint16_t JOYSTICK_MAX_THRESHOLD = 320;
+    static constexpr double JOYSTICK_MIN_THRESHOLD = 1874. / 2048.;  //  1874
+    static constexpr double JOYSTICK_MAX_THRESHOLD = 320. / 2048.;   //  320
 
 
 public:
@@ -214,16 +215,28 @@ private:
         }
 
         //  Left Stick
-        encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
-            buttons.left_stick,
+        JoystickPosition left_stick = JoystickTools::map_to_range(
+            JOYSTICK_MIN_THRESHOLD,
+            JOYSTICK_MAX_THRESHOLD,
             controller_state.left_joystick
         );
+        uint16_t wx = JoystickTools::linear_float_to_u12(left_stick.x);
+        uint16_t wy = JoystickTools::linear_float_to_u12(left_stick.y);
+        buttons.left_stick[0] = (uint8_t)wx;
+        buttons.left_stick[1] = (uint8_t)(wx >> 8 | wy << 4);
+        buttons.left_stick[2] = (uint8_t)(wy >> 4);
 
         //  Right Stick
-        encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
-            buttons.right_stick,
+        JoystickPosition right_stick = JoystickTools::map_to_range(
+            JOYSTICK_MIN_THRESHOLD,
+            JOYSTICK_MAX_THRESHOLD,
             controller_state.right_joystick
         );
+        wx = JoystickTools::linear_float_to_u12(right_stick.x);
+        wy = JoystickTools::linear_float_to_u12(right_stick.y);
+        buttons.right_stick[0] = (uint8_t)wx;
+        buttons.right_stick[1] = (uint8_t)(wx >> 8 | wy << 4);
+        buttons.right_stick[2] = (uint8_t)(wy >> 4);
 
         issue_report(cancellable, entry.duration, buttons);
     }
