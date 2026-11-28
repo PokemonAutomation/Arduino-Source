@@ -125,12 +125,13 @@ UnitTestResult ImageUnitTest::run(Logger& logger, CancellableScope& scope) const
         }
 
         //  Turn an exception into a failure of this distortion, so the message says which one threw.
-        UnitTestResult distorted_result;
-        try{
-            distorted_result = run_on_images(logger, scope, distorted_images);
-        }catch (Exception& e){
-            distorted_result = UnitTestResult(UnitTestResult::FAILED, e.to_str());
-        }
+        UnitTestResult distorted_result = [&]{
+            try{
+                return run_on_images(logger, scope, distorted_images);
+            }catch (Exception& e){
+                return UnitTestResult(UnitTestResult::FAILED, e.to_str());
+            }
+        }();
 
         if (distorted_result.result == UnitTestResult::PASSED){
             logger.log(run_name + ": passed", COLOR_BLUE);

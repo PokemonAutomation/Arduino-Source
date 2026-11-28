@@ -189,6 +189,24 @@ bool UnitTestRunner::cancel(std::exception_ptr reason) noexcept{
 
 
 
+//  Run one test and return its result. An exception thrown by the test becomes its result:
+//  FAILED with the exception's message, or OOM for std::bad_alloc.
+//  Called by the task `dispatch_test()` starts for each test.
+static UnitTestResult run_and_catch(const UnitTest& test, Logger& logger, CancellableScope& scope){
+    try{
+        return test.run(logger, scope);
+    }catch (Exception& e){
+        return UnitTestResult(UnitTestResult::FAILED, e.to_str());
+    }catch (std::bad_alloc&){
+        return UnitTestResult::OOM;
+    }catch (std::exception& e){
+        return UnitTestResult(UnitTestResult::FAILED, e.what());
+    }catch (...){
+        return UnitTestResult(UnitTestResult::FAILED, "Unknown exception.");
+    }
+}
+
+
 void UnitTestRunner::dispatch_test(const std::string& name){
     //  Must be called under the lock.
 
@@ -207,18 +225,7 @@ void UnitTestRunner::dispatch_test(const std::string& name){
         ReverseLockGuard<Mutex> lg(m_lock);
         node.task = m_thread_pool.dispatch_now_blocking([this, iter_current]{
             const UnitTest& test = *iter_current->second.test;
-            UnitTestResult result;
-            try{
-                result = test.run(m_logger, *this);
-            }catch (Exception& e){
-                result = UnitTestResult(UnitTestResult::FAILED, e.to_str());
-            }catch (std::bad_alloc&){
-                result = UnitTestResult::OOM;
-            }catch (std::exception& e){
-                result = UnitTestResult(UnitTestResult::FAILED, e.what());
-            }catch (...){
-                result = UnitTestResult(UnitTestResult::FAILED, "Unknown exception.");
-            }
+            UnitTestResult result = run_and_catch(test, m_logger, *this);
 
             log_test_result(test, result);
 
@@ -252,10 +259,6 @@ void UnitTestRunner::log_test_result(const UnitTest& test, const UnitTestResult&
     const std::string prefix = "[" + std::to_string(finished) + "/" + std::to_string(total) + "] ";
 
     switch (result.result){
-    case UnitTestResult::NOT_RUN:
-        //  The test didn't really run, so always show it, like a skipped test.
-        m_logger.log(prefix + "Not Run: " + test.name(), COLOR_ORANGE);
-        break;
     case UnitTestResult::PASSED:
         if (finished % passed_test_log_interval(total) == 0 || finished == total){
             m_logger.log(prefix + "PASSED: " + test.name(), COLOR_BLUE);

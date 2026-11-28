@@ -378,9 +378,6 @@ void UnitTestRunner::on_test_finished(
     UnitTestRunner_Descriptor::Stats& stats = m_env->current_stats<UnitTestRunner_Descriptor::Stats>();
     stats.tests++;
     switch (result.result){
-    case UnitTestResult::NOT_RUN:
-        stats.skipped++;
-        break;
     case UnitTestResult::PASSED:{
         uint64_t passed = stats.passed.fetch_add(1) + 1;
         if (passed <= MAX_NUM_TESTS_TO_SHOWN){
@@ -467,7 +464,6 @@ void CommandLineUnitTestRunner::on_test_finished(
 ){
     //  Only count the results here: `PokemonAutomation::UnitTestRunner` already logs each one.
     switch (result.result){
-    case UnitTestResult::NOT_RUN:
     case UnitTestResult::SKIPPED:
         m_skipped_tests++;
         break;

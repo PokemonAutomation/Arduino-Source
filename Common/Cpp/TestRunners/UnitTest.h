@@ -17,20 +17,17 @@ class CancellableScope;
 
 
 
+//  The result a `UnitTest::run()` returns.
 struct UnitTestResult{
     enum Result{
-        NOT_RUN,
         PASSED,
         FAILED,
         SKIPPED,
-        OOM,
+        OOM,  //  The test ran out of memory.
     };
     Result result;
     std::string message;
 
-    UnitTestResult()
-        : result(NOT_RUN)
-    {}
     UnitTestResult(bool pass)
         : result(pass ? PASSED : FAILED)
     {}
