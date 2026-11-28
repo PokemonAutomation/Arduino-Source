@@ -9,6 +9,7 @@
 
 #include <QVideoFrame>
 #include "Common/Cpp/Time.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFormats.h"
 
 namespace PokemonAutomation{
@@ -45,6 +46,11 @@ public:
     }
 };
 
+
+//  Unlike QVideoFrame::toImage(), honors the frame's declared color space and
+//  range. "force_full_range" is for devices that mislabel full range as limited.
+//  Returns an empty image for unsupported formats.
+ImageRGB32 frame_to_ImageRGB32(const QVideoFrame& frame, bool force_full_range);
 
 }
 #endif
